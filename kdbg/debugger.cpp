@@ -886,6 +886,7 @@ void KDebugger::restoreProgramSettings()
 
     // watch expressions
     m_programConfig->setGroup(WatchGroup);
+    m_watchVariables.clear();
     for (int i = 0;; ++i) {
 	varName.sprintf(ExprFmt, i);
 	if (!m_programConfig->hasKey(varName)) {
