@@ -360,7 +360,7 @@ bool KDebugger::setBreakpoint(QString file, int lineNo,
 	{
 	    bp->address = address;
 	}
-	setBreakpoint(bp);
+	setBreakpoint(bp, false);
     }
     else
     {
@@ -377,7 +377,7 @@ bool KDebugger::setBreakpoint(QString file, int lineNo,
     return true;
 }
 
-void KDebugger::setBreakpoint(Breakpoint* bp)
+void KDebugger::setBreakpoint(Breakpoint* bp, bool queueOnly)
 {
     CmdQueueItem* cmd;
     if (!bp->text.isEmpty())
@@ -400,13 +400,23 @@ void KDebugger::setBreakpoint(Breakpoint* bp)
 	if (offset >= 0) {
 	    file.remove(0, offset+1);
 	}
-	cmd = m_d->executeCmd(bp->temporary ? DCtbreakline : DCbreakline,
-			      file, bp->lineNo);
+	if (queueOnly) {
+	    cmd = m_d->queueCmd(bp->temporary ? DCtbreakline : DCbreakline,
+				file, bp->lineNo, DebuggerDriver::QMoverride);
+	} else {
+	    cmd = m_d->executeCmd(bp->temporary ? DCtbreakline : DCbreakline,
+				  file, bp->lineNo);
+	}
     }
     else
     {
-	cmd = m_d->executeCmd(bp->temporary ? DCtbreakaddr : DCbreakaddr,
-			      bp->address.asString());
+	if (queueOnly) {
+	    cmd = m_d->queueCmd(bp->temporary ? DCtbreakaddr : DCbreakaddr,
+				bp->address.asString(), DebuggerDriver::QMoverride);
+	} else {
+	    cmd = m_d->executeCmd(bp->temporary ? DCtbreakaddr : DCbreakaddr,
+				  bp->address.asString());
+	}
     }
     cmd->m_brkpt = bp;	// used in newBreakpoint()
 }
@@ -422,12 +432,20 @@ bool KDebugger::enableDisableBreakpoint(Breakpoint* bp)
 {
     /*
      * Toggle enabled/disabled state.
+     * 
+     * The driver is not bothered if we are modifying an orphaned
+     * breakpoint.
      */
-    if (canChangeBreakpoints()) {
+    if (!bp->isOrphaned()) {
+	if (!canChangeBreakpoints()) {
+	    return false;
+	}
 	m_d->executeCmd(bp->enabled ? DCdisable : DCenable, bp->id);
-	return true;
+    } else {
+	bp->enabled = !bp->enabled;
+	emit breakpointsChanged();
     }
-    return false;
+    return true;
 }
 
 bool KDebugger::conditionalBreakpoint(Breakpoint* bp,
@@ -436,10 +454,16 @@ bool KDebugger::conditionalBreakpoint(Breakpoint* bp,
 {
     /*
      * Change the condition and ignore count.
+     *
+     * The driver is not bothered if we are removing an orphaned
+     * breakpoint.
      */
 
-    if (canChangeBreakpoints())
-    {
+    if (!bp->isOrphaned()) {
+	if (!canChangeBreakpoints()) {
+	    return false;
+	}
+
 	bool changed = false;
 
 	if (bp->condition != condition) {
@@ -456,19 +480,33 @@ bool KDebugger::conditionalBreakpoint(Breakpoint* bp,
 	    // get the changes
 	    m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
 	}
-	return true;
+    } else {
+	bp->condition = condition;
+	bp->ignoreCount = ignoreCount;
+	emit breakpointsChanged();
     }
-    return false;
+    return true;
 }
 
 bool KDebugger::deleteBreakpoint(Breakpoint* bp)
 {
     /*
      * Remove the breakpoint.
+     *
+     * The driver is not bothered if we are removing an orphaned
+     * breakpoint.
      */
-    if (canChangeBreakpoints()) {
+    if (!bp->isOrphaned()) {
+	if (!canChangeBreakpoints()) {
+	    return false;
+	}
 	m_d->executeCmd(DCdelete, bp->id);
-	return true;
+    } else {
+	// move the last entry to bp's slot and shorten the list
+	int i = m_brkpts.findRef(bp);
+	m_brkpts.insert(i, m_brkpts.take(m_brkpts.size()-1));
+	m_brkpts.resize(m_brkpts.size()-1);
+	emit breakpointsChanged();
     }
     return false;
 }
@@ -860,7 +898,7 @@ void KDebugger::restoreBreakpoints(KSimpleConfig* config)
 	/*
 	 * Add the breakpoint.
 	 */
-	setBreakpoint(bp);
+	setBreakpoint(bp, false);
 	// the new breakpoint is disabled or conditionalized later
 	// in newBreakpoint()
     }
@@ -1050,6 +1088,19 @@ void KDebugger::handleRunCommands(const char* output)
     if (flags & DebuggerDriver::SFrefreshSource) {
 	TRACE("re-reading files");
 	emit executableUpdated();
+    }
+
+    /* 
+     * Try to set any orphaned breakpoints now.
+     */
+    for (int i = m_brkpts.size()-1; i >= 0; i--) {
+	if (m_brkpts[i]->isOrphaned()) {
+	    TRACE("re-trying brkpt loc: "+m_brkpts[i]->location+
+		  " file: "+m_brkpts[i]->fileName+
+		  QString().sprintf(" line: %d", m_brkpts[i]->lineNo));
+	    setBreakpoint(m_brkpts[i], true);
+	    flags |= DebuggerDriver::SFrefreshBreak;
+	}
     }
 
     /*
@@ -1804,6 +1855,11 @@ void KDebugger::handleRegisters(const char* output)
 /*
  * The output of the DCbreak* commands has more accurate information about
  * the file and the line number.
+ *
+ * All newly set breakpoints are inserted in the m_brkpts, even those that
+ * were not set sucessfully. The unsuccessful breakpoints ("orphaned
+ * breakpoints") are assigned negative ids, and they are tried to set later
+ * when the program stops again at a breakpoint.
  */
 void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 {
@@ -1812,23 +1868,46 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
     if (bp == 0)
 	return;
 
+    // if this is a new breakpoint, put it in the list
+    bool isNew = !m_brkpts.contains(bp);
+    if (isNew) {
+	assert(bp->id == 0);
+	int n = m_brkpts.size();
+	m_brkpts.resize(n+1);
+	m_brkpts.insert(n, bp);
+    }
+
+    // parse the output to determine success or failure
     int id;
     QString file;
     int lineNo;
     QString address;
     if (!m_d->parseBreakpoint(output, id, file, lineNo, address))
     {
-	delete cmd->m_brkpt;
+	/*
+	 * Failure, the breakpoint could not be set. If this is a new
+	 * breakpoint, assign it a negative id. We look for the minimal id
+	 * of all breakpoints (that are already in the list) to get the new
+	 * id.
+	 */
+	if (isNew)
+	{
+	    assert(bp->id == 0);
+	    for (int i = m_brkpts.size()-2; i >= 0; i--) {
+		if (m_brkpts[i]->id < bp->id) {
+		    bp->id = m_brkpts[i]->id;
+		    break;
+		}
+	    }
+	    --bp->id;
+	}
 	return;
     }
 
     // The breakpoint was successfully set.
+    if (bp->id <= 0)
     {
-	// add it
-	int n = m_brkpts.size();
-	m_brkpts.resize(n+1);
-	m_brkpts.insert(n, cmd->m_brkpt);
-
+	// this is a new or orphaned breakpoint:
 	// set the remaining properties
 	if (!cmd->m_brkpt->enabled) {
 	    m_d->executeCmd(DCdisable, id);
@@ -1856,6 +1935,10 @@ void KDebugger::updateBreakList(const char* output)
 
     for (int i = m_brkpts.size()-1; i >= 0; i--)	// decrement!
     {
+	// skip orphaned breakpoints
+	if (m_brkpts[i]->id < 0)
+	    continue;
+
 	for (Breakpoint* bp = brks.first(); bp != 0; bp = brks.next())
 	{
 	    if (bp->id == m_brkpts[i]->id) {

@@ -178,8 +178,9 @@ public:
      * Set a breakpoint.
      * 
      * @param bp Describes the breakpoint.
+     * @param queueOnly If false, the breakpoint is set using a high-priority command.
      */
-    void setBreakpoint(Breakpoint* bp);
+    void setBreakpoint(Breakpoint* bp, bool queueOnly);
 
     /**
      * Enable or disable a breakpoint at the specified location.
@@ -202,7 +203,9 @@ public:
     bool enableDisableBreakpoint(Breakpoint* bp);
 
     /**
-     * Removes the specified breakpoint.
+     * Removes the specified breakpoint. Note that if bp is an orphaned
+     * breakpoint, then bp is an invalid pointer if (and only if) this
+     * function returns true.
      *
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.

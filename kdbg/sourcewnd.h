@@ -78,8 +78,8 @@ protected:
     QString m_fileName;
     enum LineItem { liPC = 1, liPCup = 2,
 	liBP = 4, liBPdisabled = 8, liBPtemporary = 16,
-	liBPconditional = 32,
-	liBPany = liBP|liBPdisabled|liBPtemporary|liBPconditional
+	liBPconditional = 32, liBPorphan = 64,
+	liBPany = liBP|liBPdisabled|liBPtemporary|liBPconditional|liBPorphan
     };
 
     struct SourceLine {
@@ -100,6 +100,7 @@ protected:
     QPixmap m_brkdis;			/* disabled breakpoint */
     QPixmap m_brktmp;			/* temporary breakpoint marker */
     QPixmap m_brkcond;			/* conditional breakpoint marker */
+    QPixmap m_brkorph;			/* orphaned breakpoint marker */
 };
 
 #endif // SOURCEWND_H

@@ -8,6 +8,10 @@ Version 1.9.0
 
 	Improved register formating by Daniel Kristjansson.
 
+	"Orphaned breakpoints", i.e. breakpoints that gdb cannot set
+	immediately, can be set. This helps debug shared libraries and
+	dynamically loaded modules.
+
 Version 1.2.7
 
 	Fixed parsing of stack frames for recent gdbs.

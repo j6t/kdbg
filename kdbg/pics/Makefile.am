@@ -19,6 +19,7 @@ PICTOGRAMS = \
 	brkdis.xpm \
 	brktmp.xpm \
 	brkcond.xpm \
+	brkorph.xpm \
 	pcinner.xpm \
 	pcup.xpm \
 	regs.xpm \

@@ -170,7 +170,7 @@ void BreakpointTable::addBP()
 	Breakpoint* bp = new Breakpoint;
 	bp->text = bpText;
 
-	m_debugger->setBreakpoint(bp);
+	m_debugger->setBreakpoint(bp, false);
     }
 }
 
@@ -184,7 +184,7 @@ void BreakpointTable::addWP()
 	bp->type = Breakpoint::watchpoint;
 	bp->text = wpExpr;
 
-	m_debugger->setBreakpoint(bp);
+	m_debugger->setBreakpoint(bp, false);
     }
 }
 
@@ -197,6 +197,8 @@ void BreakpointTable::removeBP()
     Breakpoint* brk = m_debugger->breakpointById(bp->id);
     if (brk != 0) {
 	m_debugger->deleteBreakpoint(brk);
+	// note that both brk and bp may be deleted by now
+	// (if bp was an orphaned breakpoint)
     }
 }
 
@@ -345,16 +347,18 @@ void BreakpointTable::initListAndIcons()
     QPixmap watchdis = BarIcon("watchdis.xpm");
     QPixmap brktmp = BarIcon("brktmp.xpm");
     QPixmap brkcond = BarIcon("brkcond.xpm");
+    QPixmap brkorph = BarIcon("brkorph.xpm");
 
     /*
-     * There are 16 different pixmaps: The basic enabled or disabled
+     * There are 32 different pixmaps: The basic enabled or disabled
      * breakpoint, plus an optional overlaid brktmp icon plus an optional
-     * overlaid brkcond icon. Then the same sequence for watchpoints.
+     * overlaid brkcond icon, plus an optional overlaid brkorph icon. Then
+     * the same sequence for watchpoints.
      */
-    m_icons.setSize(16);
+    m_icons.setSize(32);
     QPixmap canvas(16,16);
 
-    for (int i = 0; i < 16; i++) {
+    for (int i = 0; i < 32; i++) {
 	{
 	    QPainter p(&canvas);
 	    // clear canvas
@@ -372,6 +376,10 @@ void BreakpointTable::initListAndIcons()
 	    // conditional overlay
 	    if (i & 4) {
 		p.drawPixmap(1,1, brkcond);
+	    }
+	    // orphan overlay
+	    if (i & 16) {
+		p.drawPixmap(1,1, brkorph);
 	    }
 	}
 	canvas.setMask(canvas.createHeuristicMask());
@@ -391,6 +399,8 @@ void BreakpointItem::display()
 	code += 4;
     if (type == watchpoint)
 	code += 8;
+    if (isOrphaned())
+	code += 16;
     setPixmap(0, lb->m_icons[code]);
 
     // more breakpoint info

@@ -129,6 +129,7 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	    m_filesWindow, SLOT(activate(const QString&,int,const DbgAddr&)));
     connect(m_debugger, SIGNAL(updateUI()), m_bpTable, SLOT(updateUI()));
     connect(m_debugger, SIGNAL(breakpointsChanged()), m_bpTable, SLOT(updateBreakList()));
+    connect(m_debugger, SIGNAL(breakpointsChanged()), m_bpTable, SLOT(updateUI()));
 
     connect(m_debugger, SIGNAL(registersChanged(QList<RegisterInfo>&)),
 	    m_registers, SLOT(updateRegisters(QList<RegisterInfo>&)));

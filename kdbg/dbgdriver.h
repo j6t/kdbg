@@ -184,6 +184,7 @@ struct Breakpoint
     QString fileName;
     int lineNo;				/* zero-based line number */
     Breakpoint();
+    bool isOrphaned() const { return id < 0; }
 };
 
 /**

@@ -32,6 +32,7 @@ SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* na
     m_brkdis = BarIcon("brkdis");
     m_brktmp = BarIcon("brktmp");
     m_brkcond = BarIcon("brkcond");
+    m_brkorph = BarIcon("brkorph");
     setFont(KGlobalSettings::fixedFont());
 }
 
@@ -229,6 +230,12 @@ void SourceWindow::paintCell(QPainter* p, int row, int col)
 	    if (y < 0) y = 0;
 	    p->drawPixmap(0,y,m_brkcond);
 	}
+	if (item & liBPorphan) {
+	    // orphaned breakpoint marker
+	    int y = (h - m_brkcond.height())/2;
+	    if (y < 0) y = 0;
+	    p->drawPixmap(0,y,m_brkorph);
+	}
 	if (item & liPC) {
 	    // program counter in innermost frame
 	    int y = (h - m_pcinner.height())/2;
@@ -298,6 +305,8 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
 		flags |= liBPtemporary;
 	    if (!bp->condition.isEmpty() || bp->ignoreCount != 0)
 		flags |= liBPconditional;
+	    if (bp->isOrphaned())
+		flags |= liBPorphan;
 	    // update if changed
 	    int row = lineToRow(i, bp->address);
 	    if ((m_lineItems[row] & liBPany) != flags) {
