@@ -6,7 +6,7 @@ EXTRA_DIST = xsldoc.xsl xsldoc.xml
 # set the include path for X, qt and KDE
 INCLUDES= $(all_includes)
 # always compile with debugging info switched on
-CXXFLAGS = -g
+AM_CXXFLAGS = -g
 
 if BUILDTESTPROGS
 PROGS = testfile locals maths repeats std
