@@ -1,20 +1,22 @@
 # KDE Config File 
 [KDE Desktop Entry]
 Name=Debugger
-Name[de]=Debugger
+Name[es]=Depurador
+Name[fr]=Débogueur
 Name[no]=Avluser
 Name[pt]=Depurador
 Name[pt_BR]=Depurador
-Name[fr]=Débogueur
 Exec=kdbg -caption "%c" %i %m
 Icon=kdbg.xpm
 Type=Application
 DocPath=kdbg/index.html
 Comment=Debug programs
+Comment[cs]=Ladídí program
 Comment[de]=Programme debuggen
+Comment[es]=Depurador de programas
+Comment[fr]=Déboguer un programme
 Comment[no]=Avluse programmer
 Comment[pt]=Depurador de programas
 Comment[pt_BR]=Depurador de programas
-Comment[fr]=Déboguer un programme
 Terminal=0
 MiniIcon=mini-kdbg.xpm
