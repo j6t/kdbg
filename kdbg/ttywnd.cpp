@@ -7,7 +7,7 @@
 #include <qpopupmenu.h>
 #include "ttywnd.h"
 #if QT_VERSION >= 200
-#include <kglobal.h>
+#include <kglobalsettings.h>
 #include <klocale.h>
 #else
 #include <kapp.h>
@@ -144,7 +144,7 @@ TTYWindow::TTYWindow(QWidget* parent, const char* name) :
 #if QT_VERSION < 200
     setFont(kapp->fixedFont);
 #else
-    setFont(KGlobal::fixedFont());
+    setFont(KGlobalSettings::fixedFont());
 #endif
     clear();
     setFocusPolicy(StrongFocus);

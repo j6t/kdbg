@@ -5,7 +5,7 @@
 
 #include <qheader.h>
 #if QT_VERSION >= 200
-#include <kglobal.h>
+#include <kglobalsettings.h>
 #include <klocale.h>			/* i18n */
 #include <kiconloader.h>
 #include <qfontdialog.h>
@@ -338,7 +338,7 @@ void RegisterView::slotSetFont()
     QFont f = QFontDialog::getFont(&ok, font());
     if (ok) {
 	setFont(f);
-	header()->setFont(*KGlobal::_generalFont);
+	header()->setFont(KGlobalSettings::generalFont());
     }
 #endif
 }

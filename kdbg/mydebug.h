@@ -13,19 +13,12 @@
 # ifdef NDEBUG
 #  define ASSERT(x) ((void)0)
 # else
-#  define ASSERT(x) ((x) ? (void)0 : kDebugInfo("%s", (QString("assertion failed: ") + #x).ascii()))
+#  define ASSERT(x) ((x) ? (void)0 : kdDebug() << \
+					(QString("assertion failed: ") + #x).ascii() << '\n')
 # endif
 #endif
 #ifdef WANT_TRACE_OUTPUT
-# ifndef KDEBUG
-#  ifdef kDebugArea // "modern" KDE2
-#   define TRACE(x) kDebugInfo("%s", (const char*)(x))
-#  else // KRASH release
-#   define TRACE(x) kdebug(KDEBUG_INFO,0,"%s", (const char*)(x))
-#  endif
-# else  
-#  define TRACE(x) KDEBUG(KDEBUG_INFO,0,(x))
-# endif
+# define TRACE(x) (kdDebug() << (const char*)(x) << '\n')
 #else
 #define TRACE(x) ((void)0)
 #endif

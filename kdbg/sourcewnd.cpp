@@ -13,7 +13,7 @@
 #include <kapp.h>
 #include <kiconloader.h>
 #if QT_VERSION >= 200
-#include <kglobal.h>
+#include <kglobalsettings.h>
 #else
 #include <ctype.h>
 #endif
@@ -46,7 +46,7 @@ SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* na
     m_brkdis = BarIcon("brkdis");
     m_brktmp = BarIcon("brktmp");
     m_brkcond = BarIcon("brkcond");
-    setFont(KGlobal::fixedFont());
+    setFont(KGlobalSettings::fixedFont());
 #endif
 }
 
@@ -516,7 +516,7 @@ void SourceWindow::paletteChange(const QPalette& oldPal)
 #if QT_VERSION < 200
     setFont(kapp->fixedFont);
 #else
-    setFont(KGlobal::fixedFont());
+    setFont(KGlobalSettings::fixedFont());
 #endif
     KTextView::paletteChange(oldPal);
 }
