@@ -1886,7 +1886,6 @@ bool parseFrame(const char*& s, int& frameNo, QString& func, QString& file, int&
     }
     const char* start = p;
     // search opening parenthesis
-goForParen:
     while (*p != '\0' && *p != '(')
 	p++;
     if (*p == '\0') {
@@ -1896,15 +1895,18 @@ goForParen:
 	s = p;
 	return true;
     }
-    // we might have hit the () of xyz::operator()
-    if (p-start >= 10 && strncmp(p-8, "operator()", 10) == 0) {
-	// skip over it and continue search
-	p += 2;
-	goto goForParen;
-    }
-    skipNestedWithString(p, '(', ')');
-    while (isspace(*p))
-	p++;
+    /*
+     * Skip parameters. But notice that for complicated conversion
+     * functions (eg. "operator int(**)()()", ie. convert to pointer to
+     * pointer to function) as well as operator()(...) we have to skip
+     * additional pairs of parentheses.
+     */
+    do {
+	skipNestedWithString(p, '(', ')');
+	while (isspace(*p))
+	    p++;
+    } while (*p == '(');
+
     // check for file position
     if (strncmp(p, "at ", 3) == 0) {
 	p += 3;
@@ -1923,6 +1925,16 @@ goForParen:
 	if (*p != '\0')
 	    p++;
     } else {
+	// check for "from shared lib"
+	if (strncmp(p, "from ", 5) == 0) {
+	    p += 5;
+	    // go for the end of the line
+	    while (*p != '\0' && *p != '\n')
+		p++;
+	    // skip new-line
+	    if (*p != '\0')
+		p++;
+	}
 	file = "";
 	lineNo = 0;
     }
