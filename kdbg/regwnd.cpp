@@ -238,10 +238,6 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
     m_modemenu->insertItem(i18n("He&xadecimal"),3);
     connect(m_modemenu,SIGNAL(activated(int)),SLOT(slotModeChange(int)));
 
-    m_menu = new QPopupMenu();
-    m_menu->insertItem(i18n("&Font..."), this, SLOT(slotSetFont()));
-    m_menu->insertItem(i18n("&View mode"), m_modemenu);
-
     resize(200,300);
 }
 
@@ -324,19 +320,7 @@ void RegisterView::rightButtonClicked(QListViewItem* item, const QPoint& p, int 
     m_modemenu->setItemChecked(1, m_mode ==  8);
     m_modemenu->setItemChecked(2, m_mode == 10);
     m_modemenu->setItemChecked(3, m_mode == 16);
-    m_menu->popup(p);
-}
-
-void RegisterView::slotSetFont()
-{
-#if QT_VERSION >= 200
-    bool ok;
-    QFont f = QFontDialog::getFont(&ok, font());
-    if (ok) {
-	setFont(f);
-	header()->setFont(KGlobalSettings::generalFont());
-    }
-#endif
+    m_modemenu->popup(p);
 }
 
 void RegisterView::slotModeChange(int code)
