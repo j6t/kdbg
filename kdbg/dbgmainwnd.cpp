@@ -310,6 +310,7 @@ void DebuggerMainWnd::initToolbar()
 			   i18n("Search"));
 
     connect(toolbar, SIGNAL(clicked(int)), SLOT(menuCallback(int)));
+    toolbar->setBarPos(KToolBar::Top);
     
     initAnimation();
 
