@@ -28,7 +28,9 @@ protected:
 protected:
     virtual void keyPressEvent(QKeyEvent* ev);
     virtual void mousePressEvent(QMouseEvent* ev);
-    
+
+    void paletteChange(const QPalette& oldPal);
+
     int m_width;
     int m_height;
     

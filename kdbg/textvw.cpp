@@ -20,7 +20,7 @@ KTextView::KTextView(QWidget* parent, const char* name, WFlags f) :
 	m_curRow(-1)
 {
     setNumCols(1);
-    setBackgroundColor(white);
+    setBackgroundColor(colorGroup().base());
     setTableFlags(Tbl_autoScrollBars);
 }
 
@@ -98,7 +98,7 @@ void KTextView::paintCell(QPainter* p, int row, int /*col*/)
     }
     if (row == m_curRow) {
 	// paint background
-	p->fillRect(0,0, m_width,m_height, QBrush(gray));
+	p->fillRect(0,0, m_width,m_height, QBrush(colorGroup().background()));
     }
     p->drawText(2,1, m_width-2, m_height-2,
 		AlignLeft | SingleLine | DontClip | ExpandTabs,
@@ -198,4 +198,11 @@ void KTextView::activateLine(int row)
     if (row >= 0) {
 	updateCell(row, col);
     }
+}
+
+/* This is needed to make the kcontrol's color setup working */
+void KTextView::paletteChange(const QPalette& oldPal)
+{
+    setBackgroundColor(colorGroup().base());
+    QTableView::paletteChange(oldPal);
 }
