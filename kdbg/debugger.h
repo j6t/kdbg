@@ -22,7 +22,8 @@ class VarTree;
 class ProgramTypeTable;
 class KTreeViewItem;
 class KConfig;
-class KSimpleConfig;
+class KConfigBase;
+class ProgramConfig;
 class QListBox;
 class RegisterInfo;
 class ThreadInfo;
@@ -375,8 +376,8 @@ protected:
     void newBreakpoint(CmdQueueItem* cmd, const char* output);
     void updateBreakList(const char* output);
     bool stopMayChangeBreakList() const;
-    void saveBreakpoints(KSimpleConfig* config);
-    void restoreBreakpoints(KSimpleConfig* config);
+    void saveBreakpoints(ProgramConfig* config);
+    void restoreBreakpoints(ProgramConfig* config);
 
     bool m_haveExecutable;		/* has an executable been specified */
     bool m_programActive;		/* is the program active (possibly halting in a brkpt)? */
@@ -392,7 +393,7 @@ protected:
     QStringList m_boolOptions;		/* boolean options */
     QStrList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
-    KSimpleConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
+    ProgramConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
     void saveProgramSettings();
     void restoreProgramSettings();
     QString readDebuggerCmd();
@@ -523,12 +524,12 @@ signals:
     /**
      * Gives other objects a chance to save program specific settings.
      */
-    void saveProgramSpecific(KSimpleConfig* config);
+    void saveProgramSpecific(KConfigBase* config);
 
     /**
      * Gives other objects a chance to restore program specific settings.
      */
-    void restoreProgramSpecific(KSimpleConfig* config);
+    void restoreProgramSpecific(KConfigBase* config);
 
 protected:
     ExprWnd& m_localVariables;

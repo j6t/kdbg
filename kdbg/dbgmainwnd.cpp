@@ -137,10 +137,10 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 
     connect(m_debugger, SIGNAL(memoryDumpChanged(const QString&, QList<MemoryDump>&)),
 	    m_memoryWindow, SLOT(slotNewMemoryDump(const QString&, QList<MemoryDump>&)));
-    connect(m_debugger, SIGNAL(saveProgramSpecific(KSimpleConfig*)),
-	    m_memoryWindow, SLOT(saveProgramSpecific(KSimpleConfig*)));
-    connect(m_debugger, SIGNAL(restoreProgramSpecific(KSimpleConfig*)),
-	    m_memoryWindow, SLOT(restoreProgramSpecific(KSimpleConfig*)));
+    connect(m_debugger, SIGNAL(saveProgramSpecific(KConfigBase*)),
+	    m_memoryWindow, SLOT(saveProgramSpecific(KConfigBase*)));
+    connect(m_debugger, SIGNAL(restoreProgramSpecific(KConfigBase*)),
+	    m_memoryWindow, SLOT(restoreProgramSpecific(KConfigBase*)));
 
     // thread window
     connect(m_debugger, SIGNAL(threadsChanged(QList<ThreadInfo>&)),

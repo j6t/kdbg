@@ -18,6 +18,7 @@ kdbg_SOURCES = \
 	ktreeview.cpp \
 	textvw.cpp \
 	debugger.cpp \
+	programconfig.cpp \
 	dbgdriver.cpp \
 	gdbdriver.cpp \
 	xsldbgdriver.cpp \

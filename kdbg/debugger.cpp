@@ -9,13 +9,13 @@
 #include "typetable.h"
 #include "exprwnd.h"
 #include "pgmsettings.h"
+#include "programconfig.h"
 #include "valarray.h"
 #include <qregexp.h>
 #include <qfileinfo.h>
 #include <qlistbox.h>
 #include <qstringlist.h>
 #include <kapp.h>
-#include <ksimpleconfig.h>
 #include <kconfig.h>
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
@@ -663,20 +663,8 @@ void KDebugger::openProgramConfig(const QString& name)
     ASSERT(m_programConfig == 0);
 
     QString pgmConfigFile = getConfigForExe(name);
-    // check whether we can write to the file
-    QFile file(pgmConfigFile);
-    bool readonly = true;
-    bool openit = true;
-    if (file.open(IO_ReadWrite)) {	/* don't truncate! */
-	readonly = false;
-	// the file exists now
-    } else if (!file.open(IO_ReadOnly)) {
-	/* file does not exist and cannot be created: don't use it */
-	openit = false;
-    }
-    if (openit) {
-	m_programConfig = new KSimpleConfig(pgmConfigFile, readonly);
-    }
+
+    m_programConfig = new ProgramConfig(pgmConfigFile);
 }
 
 const char EnvironmentGroup[] = "Environment";
@@ -808,17 +796,10 @@ void KDebugger::restoreProgramSettings()
 QString KDebugger::readDebuggerCmd()
 {
     QString debuggerCmd = m_programConfig->readEntry(DebuggerCmdStr);
-    if (m_programConfig->isReadOnly() ||
-	// always let the user confirm the debugger cmd if we are root
-	::geteuid() == 0)
+
+    // always let the user confirm the debugger cmd if we are root
+    if (::geteuid() == 0)
     {
-	/*
-	 * The permissions don't allow write access. We do not trust the
-	 * entry DebuggerCmdStr for the following reason: Should the
-	 * debuggee be located in a world-writable directory somebody else
-	 * may have created the program config file where this entry
-	 * contains a malicious command.
-	 */
 	if (!debuggerCmd.isEmpty()) {
 	    QString msg = i18n(
 		"The settings for this program specify "
@@ -847,7 +828,7 @@ const char Temporary[] = "Temporary";
 const char Enabled[] = "Enabled";
 const char Condition[] = "Condition";
 
-void KDebugger::saveBreakpoints(KSimpleConfig* config)
+void KDebugger::saveBreakpoints(ProgramConfig* config)
 {
     QString groupName;
     int i = 0;
@@ -898,7 +879,7 @@ void KDebugger::saveBreakpoints(KSimpleConfig* config)
     }
 }
 
-void KDebugger::restoreBreakpoints(KSimpleConfig* config)
+void KDebugger::restoreBreakpoints(ProgramConfig* config)
 {
     QString groupName;
     /*

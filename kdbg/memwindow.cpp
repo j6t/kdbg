@@ -6,7 +6,7 @@
 #include "memwindow.h"
 #include <qheader.h>
 #include <klocale.h>
-#include <ksimpleconfig.h>
+#include <kconfigbase.h>
 #include "debugger.h"
 #include "dbgdriver.h"			/* memory dump formats */
 
@@ -249,7 +249,7 @@ static const char ExpressionFmt[] = "Expression%d";
 static const char FormatFmt[] = "Format%d";
 static const char ColumnWidths[] = "ColumnWidths";
 
-void MemoryWindow::saveProgramSpecific(KSimpleConfig* config)
+void MemoryWindow::saveProgramSpecific(KConfigBase* config)
 {
     KConfigGroupSaver s(config, MemoryGroup);
 
@@ -279,7 +279,7 @@ void MemoryWindow::saveProgramSpecific(KSimpleConfig* config)
     config->writeEntry(ColumnWidths, widths);
 }
 
-void MemoryWindow::restoreProgramSpecific(KSimpleConfig* config)
+void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
 {
     KConfigGroupSaver s(config, MemoryGroup);
 

@@ -15,7 +15,7 @@
 #include <qmap.h>
 
 class KDebugger;
-class KSimpleConfig;
+class KConfigBase;
 struct MemoryDump;
 
 class MemoryWindow : public QWidget
@@ -49,8 +49,8 @@ public slots:
     void slotNewExpression(const QString&);
     void slotTypeChange(int id);
     void slotNewMemoryDump(const QString&, QList<MemoryDump>&);
-    void saveProgramSpecific(KSimpleConfig* config);
-    void restoreProgramSpecific(KSimpleConfig* config);
+    void saveProgramSpecific(KConfigBase* config);
+    void restoreProgramSpecific(KConfigBase* config);
 };
 
 #endif // MEMWINDOW_H
