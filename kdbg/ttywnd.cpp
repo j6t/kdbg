@@ -145,6 +145,10 @@ TTYWindow::TTYWindow(QWidget* parent, const char* name) :
     setFont(KGlobal::fixedFont());
 #endif
     clear();
+    setFocusPolicy(StrongFocus);
+
+    // create a context menu
+    m_popmenu.insertItem(i18n("&Clear"), this, SLOT(clear()));
 }
 
 TTYWindow::~TTYWindow()
@@ -217,7 +221,23 @@ void TTYWindow::slotAppend(char* buffer, int count)
 void TTYWindow::clear()
 {
     m_texts.setSize(0);
+    m_width = 300; m_height = 14;	/* Same as in KTextView::KTextView */
     insertLine(QString());
+}
+
+void TTYWindow::mousePressEvent(QMouseEvent* mouseEvent)
+{
+    // Check if right button was clicked.
+    if (mouseEvent->button() == RightButton)
+    {
+	if (m_popmenu.isVisible()) {
+	    m_popmenu.hide();
+	} else {
+	    m_popmenu.popup(mapToGlobal(mouseEvent->pos()));
+	}
+    } else {
+	QWidget::mousePressEvent(mouseEvent);
+    }
 }
 
 #include "ttywnd.moc"

@@ -7,6 +7,7 @@
 #define TTYWND_H
 
 #include <textvw.h>
+#include <qpopupmenu.h>
 
 class QSocketNotifier;
 
@@ -56,6 +57,8 @@ public:
 
 protected:
     STTY* m_tty;
+    QPopupMenu m_popmenu;
+    virtual void mousePressEvent(QMouseEvent* mouseEvent);
 
 protected slots:
     void slotAppend(char* buffer, int count);
