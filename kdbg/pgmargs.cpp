@@ -5,6 +5,7 @@
 
 #include "pgmargs.h"
 #include <kapp.h>
+#include <kfiledialog.h>
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
 #endif
@@ -17,6 +18,7 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
 	m_programArgs(this, "args"),
 	m_wdLabel(this, "wd_label"),
 	m_wd(this, "wd"),
+	m_wdBrowse(this, "wd_browse"),
 	m_envLabel(this, "env_label"),
 	m_envVar(this, "env_var"),
 	m_envList(this, "env_list"),
@@ -26,7 +28,8 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
 	m_buttonDelete(this, "delete"),
 	m_layout(this, 8),
 	m_edits(8),
-	m_buttons(8)
+	m_buttons(8),
+	m_wdEdit(0)
 {
     m_envVars.setAutoDelete(false);
 
@@ -56,6 +59,11 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     s = m_wdLabel.sizeHint();
     m_wdLabel.setMinimumSize(s);
     int btnSpace = s.height();
+
+    m_wdBrowse.setText("...");
+    s = m_wdBrowse.sizeHint();
+    m_wdBrowse.setMinimumSize(s);
+    connect(&m_wdBrowse, SIGNAL(clicked()), SLOT(browseWd()));
 
     s = m_wd.sizeHint();
     m_wd.setMinimumSize(s);
@@ -103,7 +111,7 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     m_edits.addWidget(&m_label);
     m_edits.addWidget(&m_programArgs);
     m_edits.addWidget(&m_wdLabel);
-    m_edits.addWidget(&m_wd);
+    m_edits.addLayout(&m_wdEdit);
     m_edits.addWidget(&m_envLabel);
     m_edits.addWidget(&m_envVar);
     m_edits.addWidget(&m_envList, 10);
@@ -113,6 +121,8 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     m_buttons.addWidget(&m_buttonModify);
     m_buttons.addWidget(&m_buttonDelete);
     m_buttons.addStretch(10);
+    m_wdEdit.addWidget(&m_wd, 10);
+    m_wdEdit.addWidget(&m_wdBrowse);
 
     m_layout.activate();
 
@@ -233,6 +243,15 @@ void PgmArgs::accept()
 {
     modifyVar();
     QDialog::accept();
+}
+
+void PgmArgs::browseWd()
+{
+    // browse for the working directory
+    QString newDir = KDirDialog::getDirectory(wd(), this);
+    if (!newDir.isEmpty()) {
+	setWd(newDir);
+    }
 }
 
 #include "pgmargs.moc"

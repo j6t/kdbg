@@ -38,6 +38,7 @@ protected:
     QLineEdit m_programArgs;
     QLabel m_wdLabel;
     QLineEdit m_wd;
+    QPushButton m_wdBrowse;
     QLabel m_envLabel;
     QLineEdit m_envVar;
     QListView m_envList;
@@ -48,12 +49,14 @@ protected:
     QHBoxLayout m_layout;
     QVBoxLayout m_edits;
     QVBoxLayout m_buttons;
+    QHBoxLayout m_wdEdit;
 
 protected slots:
     void modifyVar();
     void deleteVar();
     void envListCurrentChanged(QListViewItem*);
     void accept();
+    void browseWd();
 };
 
 #endif // PgmArgs_included
