@@ -97,7 +97,7 @@ int main(int argc, char** argv)
     // session management
     bool restored = false;
     if (app.isRestored()) {
-	if (KTMainWindow::canBeRestored(1)) {
+	if (KMainWindow::canBeRestored(1)) {
 	    debugger.restore(1);
 	    restored = true;
 	}

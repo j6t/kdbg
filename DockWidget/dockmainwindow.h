@@ -8,7 +8,7 @@
 #ifndef DOCKMAINWINDOW_H
 #define DOCKMAINWINDOW_H
 
-#include <ktmainwindow.h>
+#include <kmainwindow.h>
 #include <qpixmap.h>
 
 #include "dockmanager.h"
@@ -27,7 +27,7 @@ struct dockPosData
 };
 #endif
 
-class DockMainWindow : public KTMainWindow
+class DockMainWindow : public KMainWindow
 {Q_OBJECT
 public:
   DockMainWindow( const char *name = 0L );

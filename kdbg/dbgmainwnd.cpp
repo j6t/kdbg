@@ -414,10 +414,16 @@ void DebuggerMainWnd::menuCallback(int item)
 	kapp->quit();
 	break;
     case ID_VIEW_TOOLBAR:
-	enableToolBar();
+	if (toolBar()->isVisible())
+	    toolBar()->hide();
+	else
+	    toolBar()->show();
 	break;
     case ID_VIEW_STATUSBAR:
-	enableStatusBar();
+	if (statusBar()->isVisible())
+	    statusBar()->hide();
+	else
+	    statusBar()->show();
 	break;
     case ID_PROGRAM_UNTIL:
 	if (m_debugger != 0)

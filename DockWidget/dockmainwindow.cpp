@@ -18,7 +18,7 @@
 #include "dock_close_top.xpm"
 
 DockMainWindow::DockMainWindow( const char *name )
-:KTMainWindow( name ),
+:KMainWindow( 0, name ),
   dockManager(0)
 {
 #ifdef DOCK_ORIGINAL
@@ -94,10 +94,10 @@ void DockMainWindow::setView( QWidget *view )
 {
   if ( view->isA("DockWidget") ){
     if ( view->parent() != this ) ((DockWidget*)view)->applyToWidget( this );
-    KTMainWindow::setView(view);
+      KMainWindow::setCentralWidget(view);
     viewDock = (DockWidget*)view;
   } else {
-    KTMainWindow::setView(view);
+      KMainWindow::setCentralWidget(view);
   }
 }
 
@@ -344,5 +344,4 @@ void DockMainWindow::readDockConfig( KConfig* c, QString group )
 void DockMainWindow::setDockView( QWidget* widget )
 {
   setView( widget );
-  updateRects();
 }
