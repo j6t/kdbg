@@ -2185,28 +2185,33 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 	    value = FROM_LATIN1(start, output-start).simplifyWhiteSpace();
 
 	    /*
-	     * We split the raw from the cooked values. For this purpose,
-	     * we split off the first token (separated by whitespace). It
-	     * is the raw value. The remainder of the line is the cooked
-	     * value.
+	     * We split the raw from the cooked values.
+	     * Some modern gdbs explicitly say: "0.1234 (raw 0x3e4567...)".
+	     * Here, the cooked value comes first, and the raw value is in
+	     * the second part.
 	     */
-	    int pos = value.find(' ');
-	    if (pos < 0) {
-		reg->rawValue = value;
-		reg->cookedValue = QString();
-	    } else {
-		reg->rawValue = value.left(pos);
-		reg->cookedValue = value.mid(pos+1);
+	    int pos = value.find(" (raw ");
+	    if (pos >= 0)
+	    {
+		reg->cookedValue = value.left(pos);
+		reg->rawValue = value.mid(pos+6);
+		if (reg->rawValue.right(1) == ")")	// remove closing bracket
+		    reg->rawValue.truncate(reg->rawValue.length()-1);
+	    }
+	    else
+	    {
 		/*
-		 * Some modern gdbs explicitly say: "0.1234 (raw 0x3e4567...)".
-		 * Here the raw value is actually in the second part.
-		 */
-		if (reg->cookedValue.left(5) == "(raw ") {
-		    QString raw = reg->cookedValue.right(reg->cookedValue.length()-5);
-		    if (raw[raw.length()-1] == ')')	/* remove closing bracket */
-			raw = raw.left(raw.length()-1);
-		    reg->cookedValue = reg->rawValue;
-		    reg->rawValue = raw;
+		* In other cases we split off the first token (separated by
+		* whitespace). It is the raw value. The remainder of the line
+		* is the cooked value.
+		*/
+		int pos = value.find(' ');
+		if (pos < 0) {
+		    reg->rawValue = value;
+		    reg->cookedValue = QString();
+		} else {
+		    reg->rawValue = value.left(pos);
+		    reg->cookedValue = value.mid(pos+1);
 		}
 	    }
 	}

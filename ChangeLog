@@ -1,3 +1,7 @@
+Version 1.9.6
+
+	"<invalid float value>" in register dumps was not parsed correctly.
+
 Version 1.9.5
 
 	Fixed some issues when the items in the environment variable list
