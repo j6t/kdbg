@@ -28,6 +28,9 @@ public:
     void setSize(int newSize);
     int size() const { return m_size; }
     void append(const T& newElem, int count = 1) { expand(newElem, m_size+count); }
+    void insertAt(int start, const T& newElem, int count = 1);
+    void insertAt(int start, const ValArray<T>& newElems);
+    void removeAt(int start, int count = 1);
 
 protected:
     T* m_pData;
@@ -96,6 +99,67 @@ void ValArray<T>::expand(const T& newElem, int newSize)
     while (m_size < newSize) {
 	new(&m_pData[m_size]) T(newElem);
 	m_size++;
+    }
+}
+
+template<class T>
+void ValArray<T>::removeAt(int start, int count)
+{
+    if (count <= 0)
+	return;
+    // move elements down
+    int nMove = m_size-start-count;
+    for (int src = start+count; nMove > 0; src++, start++, nMove--) {
+	// first destruct destination
+	m_pData[start].~T();
+	// copy-construct source to destination
+	new(&m_pData[start]) T(m_pData[src]);
+    }
+    setSize(start);
+}
+
+template<class T>
+void ValArray<T>::insertAt(int start, const T& newElem, int count)
+{
+    if (count <= 0)
+	return;
+
+    int nMove = m_size - start;
+    int src = m_size-1;
+    setSize(m_size+count);
+    for (int dest = m_size-1; nMove > 0; src--, dest--, nMove--) {
+	// first destruct destination
+	m_pData[dest].~T();
+	// copy-construct source to destination
+	new(&m_pData[dest]) T(m_pData[src]);
+    }
+    // copy new elements (after destruction destination)
+    for (; count > 0; start++, count--) {
+	m_pData[start].~T();
+	new(&m_pData[start]) T(newElem);
+    }
+}
+
+template<class T>
+void ValArray<T>::insertAt(int start, const ValArray<T>& newElems)
+{
+    int count = newElems.size();
+    if (count <= 0)
+	return;
+
+    int nMove = m_size - start;
+    int src = m_size-1;
+    setSize(m_size+count);
+    for (int dest = m_size-1; nMove > 0; src--, dest--, nMove--) {
+	// first destruct destination
+	m_pData[dest].~T();
+	// copy-construct source to destination
+	new(&m_pData[dest]) T(m_pData[src]);
+    }
+    // copy new elements (after destruction destination)
+    for (int i = 0; count > 0; i++, start++, count--) {
+	m_pData[start].~T();
+	new(&m_pData[start]) T(newElems[i]);
     }
 }
 
