@@ -1,0 +1,244 @@
+# KDbg - Debugger GUI for gdb
+# Copyright (C) 1998 Johannes Sixt
+# Johannes Sixt <Johannes.Sixt@telecom.at>, 1998
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kdbg 0.2.2\n"
+"POT-Creation-Date: 1998-08-30 18:03+0200\n"
+"PO-Revision-Date: 1998-08-11 20:21+0200\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+
+#: brkpt.cpp:38
+msgid "&Add"
+msgstr "&Legg til"
+
+#: brkpt.cpp:46
+msgid "&View Code"
+msgstr "&Vis kode"
+
+#: brkpt.cpp:495
+msgid "E"
+msgstr "E"
+
+#: brkpt.cpp:497
+msgid "Location"
+msgstr "Sted"
+
+#: pgmargs.cpp:20
+msgid ": Program arguments"
+msgstr ": Programargumenter"
+
+#: pgmargs.cpp:25
+#, c-format
+msgid "Run %s with these arguments:"
+msgstr "Kjør %s med disse argumentene:"
+
+#: debugger.cpp:91
+msgid " Add "
+msgstr " Legg til "
+
+#: debugger.cpp:92
+msgid " Del "
+msgstr " Slett "
+
+#: debugger.cpp:97
+msgid "busy"
+msgstr "opptatt"
+
+#: debugger.cpp:98
+msgid "active"
+msgstr "aktiv"
+
+#: debugger.cpp:117
+msgid "Locals"
+msgstr "Lokaler"
+
+#: debugger.cpp:154
+msgid "Breakpoints"
+msgstr "Brytningspunkter"
+
+#: debugger.cpp:265
+msgid "Select the executable to debug"
+msgstr "Velg programmet du vil avluse"
+
+#: debugger.cpp:500
+msgid "&Open Source..."
+msgstr "&Åpne kildekode..."
+
+#: debugger.cpp:501
+msgid "&Reload Source"
+msgstr ""
+
+#: debugger.cpp:503
+msgid "&Executable..."
+msgstr "&Programfil..."
+
+#: debugger.cpp:509
+msgid "&Find..."
+msgstr ""
+
+#: debugger.cpp:510
+msgid "Toggle &Toolbar"
+msgstr "Vis/skjul &verktøylinje"
+
+#: debugger.cpp:511
+msgid "Toggle &Statusbar"
+msgstr "Vis/skjul &statuslinje"
+
+#: debugger.cpp:514
+msgid "&Run"
+msgstr "&Kjør"
+
+#: debugger.cpp:515
+msgid "Step &into"
+msgstr "Hopp &inn i"
+
+#: debugger.cpp:516
+msgid "Step &over"
+msgstr "Hopp &over"
+
+#: debugger.cpp:517
+msgid "Step o&ut"
+msgstr "Hopp &ut"
+
+#: debugger.cpp:518
+msgid "Run to &cursor"
+msgstr "Kjør til &markør"
+
+#: debugger.cpp:520
+msgid "&Break"
+msgstr "&Bryt"
+
+#: debugger.cpp:521
+msgid "Re&start"
+msgstr ""
+
+#: debugger.cpp:523
+msgid "&Arguments..."
+msgstr "&Argumenter..."
+
+#: debugger.cpp:531
+msgid "Set/Clear &breakpoint"
+msgstr "Sett/nullstill &brytningspunkter"
+
+#: debugger.cpp:532
+msgid "Set &temporary breakpoint"
+msgstr "Se&tt midlertidig brytningspunkt"
+
+#: debugger.cpp:533
+msgid "&Enable/Disable breakpoint"
+msgstr "&Skru av/på brytningspunkter"
+
+#: debugger.cpp:534
+msgid "&List..."
+msgstr "&List..."
+
+#: debugger.cpp:539
+msgid "&More..."
+msgstr "&Mer..."
+
+#: debugger.cpp:553
+msgid "E&xecution"
+msgstr "&Programfil"
+
+#: debugger.cpp:554
+msgid "&Breakpoint"
+msgstr "&Brytningpunkter"
+
+#: debugger.cpp:555
+msgid "&Window"
+msgstr "&Vindu"
+
+#: debugger.cpp:569
+msgid "Open a source file"
+msgstr "Åpne en kildekodefil"
+
+#: debugger.cpp:571
+msgid "Reload source file"
+msgstr ""
+
+#: debugger.cpp:574
+msgid "Run/Continue"
+msgstr "Kjør/fortsett"
+
+#: debugger.cpp:576
+msgid "Step into"
+msgstr "Hopp inn i"
+
+#: debugger.cpp:578
+msgid "Step over"
+msgstr "Hopp over"
+
+#: debugger.cpp:580
+msgid "Step out"
+msgstr "Hopp ut"
+
+#: debugger.cpp:583
+msgid "Breakpoint"
+msgstr "Brytningspunkt"
+
+#: debugger.cpp:586
+msgid "Search"
+msgstr ""
+
+#: debugger.cpp:587
+msgid "Restart"
+msgstr ""
+
+#: debugger.cpp:593
+msgid "Line 00000"
+msgstr ""
+
+#: debugger.cpp:731
+msgid ": Program output"
+msgstr ": Programutmating"
+
+#: debugger.cpp:783
+#, c-format
+msgid "`%s' is not a file or does not exist"
+msgstr "%s' er ikke en fil eller eksisterer ikke"
+
+#: debugger.cpp:2096
+#, c-format
+msgid "Line %d"
+msgstr ""
+
+#: winstack.cpp:627
+msgid ": Open Windows"
+msgstr ""
+
+#: winstack.cpp:635
+msgid "Show"
+msgstr ""
+
+#: winstack.cpp:703
+msgid ": Search"
+msgstr ""
+
+#: winstack.cpp:709
+msgid "&Case sensitive"
+msgstr ""
+
+#: winstack.cpp:711
+msgid "&Forward"
+msgstr ""
+
+#: winstack.cpp:713
+msgid "&Backward"
+msgstr ""
+
+#: main.cpp:65
+msgid ""
+"Cannot start debugger.\n"
+"Exiting..."
+msgstr ""
+"Kan ikke starte avluser.\n"
+"Avslutter..."
+
+#~ msgid "&Remove"
+#~ msgstr "&Fjern"

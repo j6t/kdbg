@@ -1,0 +1,20 @@
+
+#ifndef HAVE_BOOL
+#define HAVE_BOOL
+typedef int bool;
+const bool false = 0;
+const bool true = 1;
+#endif
+
+/*
+ * I am planning to drop support for the "this"-pane. I leave the
+ * code in if you really want to use it, but I am not actively
+ * maintaining the code.
+ *
+ * Define this if you want the "this"-pane in the debugger window.
+ * If you do so, drop me a message that you use the "this"-pane,
+ * and I will think about keeping it.
+ * If I don't get feedback about it, I WILL kick it out sooner
+ * or later.
+ */
+#undef WANT_THIS_PANE

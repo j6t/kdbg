@@ -1,0 +1,241 @@
+# KDbg - Debugger GUI for gdb
+# Copyright (C) 1998 Johannes Sixt
+# Johannes Sixt <Johannes.Sixt@telecom.at>, 1998
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kdbg 0.2.2\n"
+"POT-Creation-Date: 1998-08-30 18:03+0200\n"
+"PO-Revision-Date: 1998-01-24 16:10+MET\n"
+"Last-Translator: Eric Plante <plante@iro.umontreal.ca>\n"
+"Language-Team: none\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO8859-1\n"
+"Content-Transfer-Encoding: 8-bit\n"
+
+#: brkpt.cpp:38
+msgid "&Add"
+msgstr "&Ajouter"
+
+#: brkpt.cpp:46
+msgid "&View Code"
+msgstr "&Voir le code"
+
+#: brkpt.cpp:495
+msgid "E"
+msgstr "A"
+
+#: brkpt.cpp:497
+msgid "Location"
+msgstr "Endroit"
+
+#: pgmargs.cpp:20
+msgid ": Program arguments"
+msgstr ": Paramètres du programme"
+
+#: pgmargs.cpp:25
+#, c-format
+msgid "Run %s with these arguments:"
+msgstr "Exécuter %s avec ces paramètres"
+
+#: debugger.cpp:91
+msgid " Add "
+msgstr " Ajouter "
+
+#: debugger.cpp:92
+msgid " Del "
+msgstr " Supp "
+
+#: debugger.cpp:97
+msgid "busy"
+msgstr "occupé"
+
+#: debugger.cpp:98
+msgid "active"
+msgstr "actif"
+
+#: debugger.cpp:117
+msgid "Locals"
+msgstr "Locales"
+
+#: debugger.cpp:154
+msgid "Breakpoints"
+msgstr "Points d'arrêt"
+
+#: debugger.cpp:265
+msgid "Select the executable to debug"
+msgstr "Choisissez l'exécutable à déboguer"
+
+#: debugger.cpp:500
+msgid "&Open Source..."
+msgstr "&Ouvrir un fichier source..."
+
+#: debugger.cpp:501
+msgid "&Reload Source"
+msgstr "&Recharger ce fichier source"
+
+#: debugger.cpp:503
+msgid "&Executable..."
+msgstr "&Exécutable..."
+
+#: debugger.cpp:509
+msgid "&Find..."
+msgstr "Re&chercher..."
+
+#: debugger.cpp:510
+msgid "Toggle &Toolbar"
+msgstr "Barre d'ou&tils"
+
+#: debugger.cpp:511
+msgid "Toggle &Statusbar"
+msgstr "Barre d'ét&at"
+
+#: debugger.cpp:514
+msgid "&Run"
+msgstr "E&xécuter"
+
+#: debugger.cpp:515
+msgid "Step &into"
+msgstr "Pas en &dedans"
+
+#: debugger.cpp:516
+msgid "Step &over"
+msgstr "Pas en &avant"
+
+#: debugger.cpp:517
+msgid "Step o&ut"
+msgstr "Pas en &haut"
+
+#: debugger.cpp:518
+msgid "Run to &cursor"
+msgstr "Exécuter &jusqu'au curseur"
+
+#: debugger.cpp:520
+msgid "&Break"
+msgstr "&Stopper"
+
+#: debugger.cpp:521
+msgid "Re&start"
+msgstr "&Continuer"
+
+#: debugger.cpp:523
+msgid "&Arguments..."
+msgstr "&Paramètres..."
+
+#: debugger.cpp:531
+msgid "Set/Clear &breakpoint"
+msgstr "Placer/supp. &point d'arrêt"
+
+#: debugger.cpp:532
+msgid "Set &temporary breakpoint"
+msgstr "Point d'arrêt &temporaire"
+
+#: debugger.cpp:533
+msgid "&Enable/Disable breakpoint"
+msgstr "&Activer/Désactiver pt. d'arrêt"
+
+#: debugger.cpp:534
+msgid "&List..."
+msgstr "&Liste..."
+
+#: debugger.cpp:539
+msgid "&More..."
+msgstr "&Autres..."
+
+#: debugger.cpp:553
+msgid "E&xecution"
+msgstr "E&xécution"
+
+#: debugger.cpp:554
+msgid "&Breakpoint"
+msgstr "&Points d'arrêt"
+
+#: debugger.cpp:555
+msgid "&Window"
+msgstr "&Fenêtre"
+
+#: debugger.cpp:569
+msgid "Open a source file"
+msgstr "Ouvrir un fichier source"
+
+#: debugger.cpp:571
+msgid "Reload source file"
+msgstr "Recharger ce fichier source"
+
+#: debugger.cpp:574
+msgid "Run/Continue"
+msgstr "Exécuter/Continuer"
+
+#: debugger.cpp:576
+msgid "Step into"
+msgstr ""
+
+#: debugger.cpp:578
+msgid "Step over"
+msgstr ""
+
+#: debugger.cpp:580
+msgid "Step out"
+msgstr ""
+
+#: debugger.cpp:583
+msgid "Breakpoint"
+msgstr "Point d'arrêt"
+
+#: debugger.cpp:586
+msgid "Search"
+msgstr "Rechercher"
+
+#: debugger.cpp:587
+msgid "Restart"
+msgstr "Continuer"
+
+#: debugger.cpp:593
+msgid "Line 00000"
+msgstr "Ligne 00000"
+
+#: debugger.cpp:731
+msgid ": Program output"
+msgstr ": Sortie du programme"
+
+#: debugger.cpp:783
+#, c-format
+msgid "`%s' is not a file or does not exist"
+msgstr "`%s' n'est pas un fichier ou n'existe pas"
+
+#: debugger.cpp:2096
+#, c-format
+msgid "Line %d"
+msgstr "Ligne %d"
+
+#: winstack.cpp:627
+msgid ": Open Windows"
+msgstr ": Fichiers ouverts"
+
+#: winstack.cpp:635
+msgid "Show"
+msgstr "Montrer"
+
+#: winstack.cpp:703
+msgid ": Search"
+msgstr ": Rechercher"
+
+#: winstack.cpp:709
+msgid "&Case sensitive"
+msgstr "&Différencier min/maj"
+
+#: winstack.cpp:711
+msgid "&Forward"
+msgstr "&Suivant"
+
+#: winstack.cpp:713
+msgid "&Backward"
+msgstr "&Précédent"
+
+#: main.cpp:65
+msgid ""
+"Cannot start debugger.\n"
+"Exiting..."
+msgstr ""
+"Incapable de démarrer le débogueur.\n"
+"Sortie..."

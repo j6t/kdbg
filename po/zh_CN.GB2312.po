@@ -1,0 +1,244 @@
+# KDbg - Debugger GUI for gdb
+# Copyright (C) 1998 Johannes Sixt
+# Johannes Sixt <Johannes.Sixt@telecom.at>, 1998
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kdbg 0.2.2\n"
+"POT-Creation-Date: 1998-08-30 18:03+0200\n"
+"PO-Revision-Date: 1998-08-11 20:15+0200\n"
+"Last-Translator: Wang Jian <lark@linux.ustc.edu.cn>\n"
+"Language-Team: zh_CN ( gb2312 )\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+
+#: brkpt.cpp:38
+msgid "&Add"
+msgstr "添加[&A]"
+
+#: brkpt.cpp:46
+msgid "&View Code"
+msgstr "看代码[&V]"
+
+#: brkpt.cpp:495
+msgid "E"
+msgstr "E"
+
+#: brkpt.cpp:497
+msgid "Location"
+msgstr "位置"
+
+#: pgmargs.cpp:20
+msgid ": Program arguments"
+msgstr ": 参数"
+
+#: pgmargs.cpp:25
+#, c-format
+msgid "Run %s with these arguments:"
+msgstr "运行 %s ,使用这些参数:"
+
+#: debugger.cpp:91
+msgid " Add "
+msgstr " 添加 "
+
+#: debugger.cpp:92
+msgid " Del "
+msgstr " 删除 "
+
+#: debugger.cpp:97
+msgid "busy"
+msgstr "忙"
+
+#: debugger.cpp:98
+msgid "active"
+msgstr "活动"
+
+#: debugger.cpp:117
+msgid "Locals"
+msgstr "本地的"
+
+#: debugger.cpp:154
+msgid "Breakpoints"
+msgstr "断点"
+
+#: debugger.cpp:265
+msgid "Select the executable to debug"
+msgstr "选中要调试的执行文件"
+
+#: debugger.cpp:500
+msgid "&Open Source..."
+msgstr "打开源文件[&O]..."
+
+#: debugger.cpp:501
+msgid "&Reload Source"
+msgstr ""
+
+#: debugger.cpp:503
+msgid "&Executable..."
+msgstr "可执行文件[&E]..."
+
+#: debugger.cpp:509
+msgid "&Find..."
+msgstr ""
+
+#: debugger.cpp:510
+msgid "Toggle &Toolbar"
+msgstr "(不)显示工具条[&T]"
+
+#: debugger.cpp:511
+msgid "Toggle &Statusbar"
+msgstr "(不)显示状态条[&S]"
+
+#: debugger.cpp:514
+msgid "&Run"
+msgstr "运行[&R]"
+
+#: debugger.cpp:515
+msgid "Step &into"
+msgstr "单步进入函数[&I]"
+
+#: debugger.cpp:516
+msgid "Step &over"
+msgstr "单步跳过函数[&O]"
+
+#: debugger.cpp:517
+msgid "Step o&ut"
+msgstr "单步跳出函数[&U]"
+
+#: debugger.cpp:518
+msgid "Run to &cursor"
+msgstr "运行到光标处[&C]"
+
+#: debugger.cpp:520
+msgid "&Break"
+msgstr "中断[&B]"
+
+#: debugger.cpp:521
+msgid "Re&start"
+msgstr ""
+
+#: debugger.cpp:523
+msgid "&Arguments..."
+msgstr "参数[&A]..."
+
+#: debugger.cpp:531
+msgid "Set/Clear &breakpoint"
+msgstr "设定/清除断点"
+
+#: debugger.cpp:532
+msgid "Set &temporary breakpoint"
+msgstr "设置临时断点[&T]"
+
+#: debugger.cpp:533
+msgid "&Enable/Disable breakpoint"
+msgstr "允许/不允许断点[&E]"
+
+#: debugger.cpp:534
+msgid "&List..."
+msgstr "列表[&L]..."
+
+#: debugger.cpp:539
+msgid "&More..."
+msgstr "更多[&M]..."
+
+#: debugger.cpp:553
+msgid "E&xecution"
+msgstr "执行[&X]"
+
+#: debugger.cpp:554
+msgid "&Breakpoint"
+msgstr "断点[&B]"
+
+#: debugger.cpp:555
+msgid "&Window"
+msgstr "窗口[&W]"
+
+#: debugger.cpp:569
+msgid "Open a source file"
+msgstr "打开源文件"
+
+#: debugger.cpp:571
+msgid "Reload source file"
+msgstr ""
+
+#: debugger.cpp:574
+msgid "Run/Continue"
+msgstr "运行/继续"
+
+#: debugger.cpp:576
+msgid "Step into"
+msgstr "单步进入函数"
+
+#: debugger.cpp:578
+msgid "Step over"
+msgstr "单步不进入函数"
+
+#: debugger.cpp:580
+msgid "Step out"
+msgstr "单步跳出函数"
+
+#: debugger.cpp:583
+msgid "Breakpoint"
+msgstr "断点"
+
+#: debugger.cpp:586
+msgid "Search"
+msgstr ""
+
+#: debugger.cpp:587
+msgid "Restart"
+msgstr ""
+
+#: debugger.cpp:593
+msgid "Line 00000"
+msgstr ""
+
+#: debugger.cpp:731
+msgid ": Program output"
+msgstr ": 程序输出"
+
+#: debugger.cpp:783
+#, c-format
+msgid "`%s' is not a file or does not exist"
+msgstr "`%s' 不是一个文件或者不存在"
+
+#: debugger.cpp:2096
+#, c-format
+msgid "Line %d"
+msgstr ""
+
+#: winstack.cpp:627
+msgid ": Open Windows"
+msgstr ""
+
+#: winstack.cpp:635
+msgid "Show"
+msgstr ""
+
+#: winstack.cpp:703
+msgid ": Search"
+msgstr ""
+
+#: winstack.cpp:709
+msgid "&Case sensitive"
+msgstr ""
+
+#: winstack.cpp:711
+msgid "&Forward"
+msgstr ""
+
+#: winstack.cpp:713
+msgid "&Backward"
+msgstr ""
+
+#: main.cpp:65
+msgid ""
+"Cannot start debugger.\n"
+"Exiting..."
+msgstr ""
+"不能启动调试器.\n"
+"退出..."
+
+#~ msgid "&Remove"
+#~ msgstr "删除[&R]"

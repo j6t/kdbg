@@ -1,0 +1,240 @@
+# KDbg - Debugger GUI for gdb
+# Copyright (C) 1998 Johannes Sixt
+# Johannes Sixt <Johannes.Sixt@telecom.at>, 1998
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kdbg 0.2.2\n"
+"POT-Creation-Date: 1998-08-30 18:03+0200\n"
+"PO-Revision-Date: 1998-05-26 12:00+0000\n"
+"Last-Translator: Pedro Morais <morais@kde.org>\n"
+
+#: brkpt.cpp:38
+msgid "&Add"
+msgstr "&Adicionar"
+
+#: brkpt.cpp:46
+msgid "&View Code"
+msgstr "&Ver Código"
+
+#: brkpt.cpp:495
+msgid "E"
+msgstr "E"
+
+#: brkpt.cpp:497
+msgid "Location"
+msgstr "Localização"
+
+#: pgmargs.cpp:20
+msgid ": Program arguments"
+msgstr ": Argumentos do programa"
+
+#: pgmargs.cpp:25
+#, c-format
+msgid "Run %s with these arguments:"
+msgstr "Correr %s com estes argumentos:"
+
+#: debugger.cpp:91
+msgid " Add "
+msgstr " Adicionar "
+
+#: debugger.cpp:92
+msgid " Del "
+msgstr " Apagar "
+
+#: debugger.cpp:97
+msgid "busy"
+msgstr "ocupado"
+
+#: debugger.cpp:98
+msgid "active"
+msgstr "activo"
+
+#: debugger.cpp:117
+msgid "Locals"
+msgstr "Locals"
+
+#: debugger.cpp:154
+msgid "Breakpoints"
+msgstr "Breakpoints"
+
+#: debugger.cpp:265
+msgid "Select the executable to debug"
+msgstr "Seleccione o executavel a depurar"
+
+#: debugger.cpp:500
+msgid "&Open Source..."
+msgstr "&Abrir Código..."
+
+#: debugger.cpp:501
+msgid "&Reload Source"
+msgstr ""
+
+#: debugger.cpp:503
+msgid "&Executable..."
+msgstr "&Executavel..."
+
+#: debugger.cpp:509
+msgid "&Find..."
+msgstr ""
+
+#: debugger.cpp:510
+msgid "Toggle &Toolbar"
+msgstr "Mostrar Barra de &Ferramentas"
+
+#: debugger.cpp:511
+msgid "Toggle &Statusbar"
+msgstr "Mostrar Barra de &Status"
+
+#: debugger.cpp:514
+msgid "&Run"
+msgstr "&Correr"
+
+#: debugger.cpp:515
+msgid "Step &into"
+msgstr "&Entrar"
+
+#: debugger.cpp:516
+msgid "Step &over"
+msgstr "&Saltar"
+
+#: debugger.cpp:517
+msgid "Step o&ut"
+msgstr "S&air"
+
+#: debugger.cpp:518
+msgid "Run to &cursor"
+msgstr "Correr até ao &cursor"
+
+#: debugger.cpp:520
+msgid "&Break"
+msgstr "&Paragens"
+
+#: debugger.cpp:521
+msgid "Re&start"
+msgstr ""
+
+#: debugger.cpp:523
+msgid "&Arguments..."
+msgstr "&Argumentos..."
+
+#: debugger.cpp:531
+msgid "Set/Clear &breakpoint"
+msgstr "Colocar/tirar &breakpoint"
+
+#: debugger.cpp:532
+msgid "Set &temporary breakpoint"
+msgstr "Colocar breakpoint &temporario"
+
+#: debugger.cpp:533
+msgid "&Enable/Disable breakpoint"
+msgstr "&Activar/desactivar breakpoint"
+
+#: debugger.cpp:534
+msgid "&List..."
+msgstr "&Listar..."
+
+#: debugger.cpp:539
+msgid "&More..."
+msgstr "&Mais..."
+
+#: debugger.cpp:553
+msgid "E&xecution"
+msgstr "E&xecução"
+
+#: debugger.cpp:554
+msgid "&Breakpoint"
+msgstr "&Breakpoint"
+
+#: debugger.cpp:555
+msgid "&Window"
+msgstr "&Janela"
+
+#: debugger.cpp:569
+msgid "Open a source file"
+msgstr "Abrir o ficheiro com o código"
+
+#: debugger.cpp:571
+msgid "Reload source file"
+msgstr ""
+
+#: debugger.cpp:574
+msgid "Run/Continue"
+msgstr "Correr/Continuar"
+
+#: debugger.cpp:576
+msgid "Step into"
+msgstr "Entrar"
+
+#: debugger.cpp:578
+msgid "Step over"
+msgstr "Saltar"
+
+#: debugger.cpp:580
+msgid "Step out"
+msgstr "Sair"
+
+#: debugger.cpp:583
+msgid "Breakpoint"
+msgstr "Breakpoint"
+
+#: debugger.cpp:586
+msgid "Search"
+msgstr ""
+
+#: debugger.cpp:587
+msgid "Restart"
+msgstr ""
+
+#: debugger.cpp:593
+msgid "Line 00000"
+msgstr ""
+
+#: debugger.cpp:731
+msgid ": Program output"
+msgstr ": Saída do programa"
+
+#: debugger.cpp:783
+#, c-format
+msgid "`%s' is not a file or does not exist"
+msgstr "`%s' não é um ficheiro ou não existe"
+
+#: debugger.cpp:2096
+#, c-format
+msgid "Line %d"
+msgstr ""
+
+#: winstack.cpp:627
+msgid ": Open Windows"
+msgstr ""
+
+#: winstack.cpp:635
+msgid "Show"
+msgstr ""
+
+#: winstack.cpp:703
+msgid ": Search"
+msgstr ""
+
+#: winstack.cpp:709
+msgid "&Case sensitive"
+msgstr ""
+
+#: winstack.cpp:711
+msgid "&Forward"
+msgstr ""
+
+#: winstack.cpp:713
+msgid "&Backward"
+msgstr ""
+
+#: main.cpp:65
+msgid ""
+"Cannot start debugger.\n"
+"Exiting..."
+msgstr ""
+"Não consigo iniciar o depurador.\n"
+"A sair..."
+
+#~ msgid "&Remove"
+#~ msgstr "&Remover"

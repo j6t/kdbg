@@ -1,0 +1,244 @@
+# KDbg - Debugger GUI for gdb
+# Copyright (C) 1998 Johannes Sixt
+# Johannes Sixt <Johannes.Sixt@telecom.at>, 1998
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kdbg 0.2.2\n"
+"POT-Creation-Date: 1998-08-30 18:03+0200\n"
+"PO-Revision-Date: 1998-07-10 14:24+0200\n"
+"Last-Translator: Vatafu Valerica <wally@socrates.tlnet.de>\n"
+"Language-Team: Romanian <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO 8859-2\n"
+"Content-Transfer-Encoding: ENCODING\n"
+
+#: brkpt.cpp:38
+msgid "&Add"
+msgstr "&Adaugã"
+
+#: brkpt.cpp:46
+msgid "&View Code"
+msgstr "&Analizeazã Codul"
+
+#: brkpt.cpp:495
+msgid "E"
+msgstr "E"
+
+#: brkpt.cpp:497
+msgid "Location"
+msgstr "Locaþia"
+
+#: pgmargs.cpp:20
+msgid ": Program arguments"
+msgstr ": Argumentele programului"
+
+#: pgmargs.cpp:25
+#, c-format
+msgid "Run %s with these arguments:"
+msgstr "Ruleazã %s cu aceste argumente:"
+
+#: debugger.cpp:91
+msgid " Add "
+msgstr "Adaugã"
+
+#: debugger.cpp:92
+msgid " Del "
+msgstr " ªterge "
+
+#: debugger.cpp:97
+msgid "busy"
+msgstr "ocupat"
+
+#: debugger.cpp:98
+msgid "active"
+msgstr "activ"
+
+#: debugger.cpp:117
+msgid "Locals"
+msgstr "Locale"
+
+#: debugger.cpp:154
+msgid "Breakpoints"
+msgstr "Breakpoints"
+
+#: debugger.cpp:265
+msgid "Select the executable to debug"
+msgstr "Selecteazã programul pentru debug"
+
+#: debugger.cpp:500
+msgid "&Open Source..."
+msgstr "&Deschide sursa..."
+
+#: debugger.cpp:501
+msgid "&Reload Source"
+msgstr ""
+
+#: debugger.cpp:503
+msgid "&Executable..."
+msgstr "&Executabil..."
+
+#: debugger.cpp:509
+msgid "&Find..."
+msgstr ""
+
+#: debugger.cpp:510
+msgid "Toggle &Toolbar"
+msgstr "Toggle &Toolbar"
+
+#: debugger.cpp:511
+msgid "Toggle &Statusbar"
+msgstr "Toggle &Statusbar"
+
+#: debugger.cpp:514
+msgid "&Run"
+msgstr "&Ruleazã"
+
+#: debugger.cpp:515
+msgid "Step &into"
+msgstr "Pas &înauntru"
+
+#: debugger.cpp:516
+msgid "Step &over"
+msgstr "Pas &deasupra"
+
+#: debugger.cpp:517
+msgid "Step o&ut"
+msgstr "Pas în a&farã"
+
+#: debugger.cpp:518
+msgid "Run to &cursor"
+msgstr "Ruleazã la &cursor"
+
+#: debugger.cpp:520
+msgid "&Break"
+msgstr "&Break"
+
+#: debugger.cpp:521
+msgid "Re&start"
+msgstr ""
+
+#: debugger.cpp:523
+msgid "&Arguments..."
+msgstr "&Argumente..."
+
+#: debugger.cpp:531
+msgid "Set/Clear &breakpoint"
+msgstr "Seteazã/ªterge &Breakpoint"
+
+#: debugger.cpp:532
+msgid "Set &temporary breakpoint"
+msgstr "Seteazã breakpoint-ul &temporar"
+
+#: debugger.cpp:533
+msgid "&Enable/Disable breakpoint"
+msgstr "&Activeazã/Dezactiveazã breakpoint"
+
+#: debugger.cpp:534
+msgid "&List..."
+msgstr "&Lista..."
+
+#: debugger.cpp:539
+msgid "&More..."
+msgstr "&Mai mult..."
+
+#: debugger.cpp:553
+msgid "E&xecution"
+msgstr "E&xecutarea"
+
+#: debugger.cpp:554
+msgid "&Breakpoint"
+msgstr "&Breakpoint"
+
+#: debugger.cpp:555
+msgid "&Window"
+msgstr "&Fereastra"
+
+#: debugger.cpp:569
+msgid "Open a source file"
+msgstr "Deschide un fiºier sursã"
+
+#: debugger.cpp:571
+msgid "Reload source file"
+msgstr ""
+
+#: debugger.cpp:574
+msgid "Run/Continue"
+msgstr "Ruleazã/Continuã"
+
+#: debugger.cpp:576
+msgid "Step into"
+msgstr "Pas înauntru"
+
+#: debugger.cpp:578
+msgid "Step over"
+msgstr "Pas înafarã"
+
+#: debugger.cpp:580
+msgid "Step out"
+msgstr "Pas în afarã"
+
+#: debugger.cpp:583
+msgid "Breakpoint"
+msgstr "Breakpoint"
+
+#: debugger.cpp:586
+msgid "Search"
+msgstr ""
+
+#: debugger.cpp:587
+msgid "Restart"
+msgstr ""
+
+#: debugger.cpp:593
+msgid "Line 00000"
+msgstr ""
+
+#: debugger.cpp:731
+msgid ": Program output"
+msgstr ": Program output"
+
+#: debugger.cpp:783
+#, c-format
+msgid "`%s' is not a file or does not exist"
+msgstr "'%s' nu existã ca fiºier"
+
+#: debugger.cpp:2096
+#, c-format
+msgid "Line %d"
+msgstr ""
+
+#: winstack.cpp:627
+msgid ": Open Windows"
+msgstr ""
+
+#: winstack.cpp:635
+msgid "Show"
+msgstr ""
+
+#: winstack.cpp:703
+msgid ": Search"
+msgstr ""
+
+#: winstack.cpp:709
+msgid "&Case sensitive"
+msgstr ""
+
+#: winstack.cpp:711
+msgid "&Forward"
+msgstr ""
+
+#: winstack.cpp:713
+msgid "&Backward"
+msgstr ""
+
+#: main.cpp:65
+msgid ""
+"Cannot start debugger.\n"
+"Exiting..."
+msgstr ""
+"Nu pot porni debugger-ul.\n"
+"Exiting..."
+
+#~ msgid "&Remove"
+#~ msgstr "&Mutã"

@@ -1,0 +1,107 @@
+<html>
+<head>
+<title>KDbg's type table</title>
+</head>
+
+<body>
+<h1>KDbg's type table</h1>
+
+<p>
+KDbg's type tables are located under
+<code>$KDEDIR/share/apps/kdbg/types</code>. By convention, there is one
+table for each library like Qt, kdecore, X11, etc.
+The files are named after the library file and end with
+<code>.kdbgtt</code>. Example: The type table for <code>libqt.a</code> is
+named <code>qt.kdbgtt</code>.
+</p>
+
+<p>
+A type table file obeys the regular KDE configuration file syntax. The file
+has the following groups:
+<il>
+<li> A group <code>[Type Table]</code> which lists the types and information
+how the debugger can identify whether the program is linked against the
+library.
+<li> A group for each type which has information about how the value of such
+a type is displayed by KDbg.
+</il></p>
+
+<h2>The <code>[Type Table]</code> group</h2>
+
+<p>
+This group contains the following entries:
+<il>
+<li> <code>Types1</code>, <code>Types2</code>, etc. These entries name the
+types. Each of them is a comma-separated list of type names. Each of the
+entries can name any number of types. (The types names can be distributed to
+several lines just so that the lines don't get excessivly long.) No blank
+space is allowed in these lines. The entries must be numbered consecutively
+(KDbg stops reading at the first gap), although an entry may be empty (i.e.
+name no type at all). Sometimes the order in which the names are listed is
+important (see <code>Alias</code> types below).
+<li> One of the following:<br>
+<code>IdentifyingType</code> or<br>
+<code>IdentifyingVariable</code> or<br>
+<code>IdentifyingPrint</code> and <code>IndentifyingPrintResult</code><br>
+These entries tell KDbg how it can determine whether the program is linked
+against library (to which this type table applies).
+<code>IdentifyingType</code> names a sufficiently unique type.
+<code>IdentifyingVariable</code> names a (global) variable of the library.
+<code>IdentifyingPrint</code> is a print statement (e.g. a variable that
+contains a version number) and <code>IdentifyingPrintResult</code> is a
+regular expression that must match the print statement's result.<br>
+<emph>Currently this information is not used. KDbg just assumes that the
+program is linked against this library - in effect, all type tables
+available are applied for every program. This usually doesn't hurt.</emph>
+</il>
+</il></p>
+
+<h2>The type's group</h2>
+
+<p>
+There is one group for each type that is named exactly as the type. <emph>At
+the moment C++ template classes are not supported.</emph> Each group
+contains the following entries:
+<il>
+<li><code>Display</code> determines how the value of the type is displayed
+by KDbg. The string must contain 1 to 5 percent characters '<code>%</code>'.
+These are replaced by the results of the expressions printed by the
+<code>Expr</code><emph>x</emph> entries.
+<li>One or more of <code>Expr1</code>, <code>Expr2</code>, etc. These
+entries specify partial expressions that will be submitted to gdb, and the
+result substituted back for the corresponding percent character in the
+<code>Display</code> string. The partial expression must contain
+<strong>exactly one</strong> <code>%s</code> sequence. It will be replaced
+by the variable name before the expression is submitted to gdb.
+<li><code>Alias</code> names an alias type. If this entry is present, the
+type is treated like the named type. That alias type must appear before this
+type in the <code>Types</code><emph>x</emph> entries in the <code>Type
+Table</code>.
+</il>
+<p>
+<emph>Currently the number of expressions per type is limited to&nbsp;5.
+This can easily be changed if it's too restrictive, but I recommend not to
+go to that limit at all - it will slow down the debugging process.</emph>
+</p>
+
+<h2>An example</h2>
+The example shows how <code>QString</code> and <code>QWidget</code> are
+defined in <code>qt.kdbgtt</code>. Additionally, <code>QTableView</code> is
+defined as an alias of <code>QWidget</code>.
+<pre>[Type Table]
+Types1=QString
+Types2=QWidget,QTableView
+[QString]
+Display={ % }
+Expr1=(%s).shd->data
+[QWidget]
+Display={ name=% #chld=% #conn=% }
+Expr1=(%s).objname
+Expr2=(%s).childObjects->numNodes
+Expr3=(%s).connections->numItems
+[QTableView]
+Alias=QWidget
+</pre>
+Note that it is safer to wrap the <code>%s</code> in parentheses.
+
+</body>
