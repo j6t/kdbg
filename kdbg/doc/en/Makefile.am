@@ -1,6 +1,4 @@
-
-# add here all files
-data_DATA = \
+html_DATA = \
 	argspwdenv.html \
 	breakptlist.html \
 	globaloptions.html \
@@ -18,8 +16,6 @@ data_DATA = \
 	watches.html \
 	index.html
 
-# this is the directory, where all datas are installed
-# you have given the datas in data_DATA
-datadir = $(kde_htmldir)/en/kdbg
+htmldir = $(kde_htmldir)/en/kdbg
 
-EXTRA_DIST = $(data_DATA)
+EXTRA_DIST = $(html_DATA)

@@ -1,6 +1,4 @@
-
-# add here all files
-data_DATA = \
+html_DATA = \
 	argspwdenv.html \
 	breakptlist.html \
 	globaloptions.html \
@@ -17,15 +15,13 @@ data_DATA = \
 	watches.html \
 	index.html
 
-# this is the directory, where all datas are installed
-# you have given the datas in data_DATA
-datadir = $(kde_htmldir)/de/kdbg
+htmldir = $(kde_htmldir)/de/kdbg
 
-EXTRA_DIST = $(data_DATA)
+EXTRA_DIST = $(html_DATA)
 
 install-data-local:
-	$(mkinstalldirs) $(DESTDIR)$(datadir)
-	cd $(DESTDIR)$(datadir) && ln -s -f ../../en/kdbg/types.html .
+	$(mkinstalldirs) $(DESTDIR)$(htmldir)
+	cd $(DESTDIR)$(htmldir) && ln -s -f ../../en/kdbg/types.html .
 
 uninstall-local:
-	-rm -f $(DESTDIR)$(datadir)/types.html
+	-rm -f $(DESTDIR)$(htmldir)/types.html
