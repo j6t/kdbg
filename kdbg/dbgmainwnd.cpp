@@ -216,6 +216,9 @@ void DebuggerMainWnd::initToolbar()
  */
 void DebuggerMainWnd::closeEvent(QCloseEvent* e)
 {
+#if QT_VERSION >= 200
+    clearWFlags(WDestructiveClose);
+#endif
     e->accept();
     kapp->quit();
 }
