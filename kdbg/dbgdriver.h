@@ -44,6 +44,8 @@ enum DbgCommand {
 	DCbreaktext,
 	DCbreakline,			/* line number is zero-based! */
 	DCtbreakline,			/* line number is zero-based! */
+	DCbreakaddr,
+	DCtbreakaddr,
 	DCdelete,
 	DCenable,
 	DCdisable,

@@ -99,6 +99,8 @@ static GdbCmdInfo cmds[] = {
     { DCbreaktext, "break %s\n", GdbCmdInfo::argString },
     { DCbreakline, "break %s:%d\n", GdbCmdInfo::argStringNum },
     { DCtbreakline, "tbreak %s:%d\n", GdbCmdInfo::argStringNum },
+    { DCbreakaddr, "break *%s\n", GdbCmdInfo::argString },
+    { DCtbreakaddr, "tbreak *%s\n", GdbCmdInfo::argString },
     { DCdelete, "delete %d\n", GdbCmdInfo::argNum },
     { DCenable, "enable %d\n", GdbCmdInfo::argNum },
     { DCdisable, "disable %d\n", GdbCmdInfo::argNum },
@@ -1432,7 +1434,7 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	    while (*p != '\0' && !isspace(*p))
 		p++;
 	    address = FROM_LATIN1(start, p-start);
-	    while (isspace(*p))
+	    while (isspace(*p) && *p != '\n')
 		p++;
 	    if (*p == '\0')
 		break;
