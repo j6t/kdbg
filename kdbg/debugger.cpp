@@ -839,8 +839,21 @@ bool KDebugger::debugProgram(const QString& name)
     }
     pgmConfigFile += ".kdbgrc." + fi.fileName();
     TRACE("program config file = " + pgmConfigFile);
-    m_programConfig = new KSimpleConfig(pgmConfigFile);
-    // it is read in later in the handler of DCexecutable
+    // check whether we can write to the file
+    QFile file(pgmConfigFile);
+    bool readonly = true;
+    bool openit = true;
+    if (file.open(IO_ReadWrite)) {	/* don't truncate! */
+	readonly = false;
+	// the file exists now
+    } else if (!file.open(IO_ReadOnly)) {
+	/* file does not exist and cannot be created: don't use it */
+	openit = false;
+    }
+    if (openit) {
+	m_programConfig = new KSimpleConfig(pgmConfigFile, readonly);
+	// it is read in later in the handler of DCexecutable
+    }
 
     emit updateUI();
     slotFileChanged();
@@ -854,6 +867,7 @@ const char ProgramArgs[] = "ProgramArgs";
 
 void KDebugger::saveProgramSettings()
 {
+    ASSERT(m_programConfig != 0);
     m_programConfig->setGroup(GeneralGroup);
     m_programConfig->writeEntry(FileVersion, 1);
     m_programConfig->writeEntry(ProgramArgs, m_programArgs);
@@ -863,6 +877,7 @@ void KDebugger::saveProgramSettings()
 
 void KDebugger::restoreProgramSettings()
 {
+    ASSERT(m_programConfig != 0);
     m_programConfig->setGroup(GeneralGroup);
     /*
      * We ignore file version for now we will use it in the future to
@@ -1191,7 +1206,9 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	    strcmp(m_gdbOutput, "(no debugging symbols found)...") == 0)
 	{
 	    // success; restore breakpoints etc.
-	    restoreProgramSettings();
+	    if (m_programConfig != 0) {
+		restoreProgramSettings();
+	    }
 	    // load file containing main() or core file
 	    if (m_corefile.isEmpty()) {
 		queueCmd(DCinfolinemain, "info line main", QMnormal);
