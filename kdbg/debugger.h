@@ -59,6 +59,7 @@ public:
 	DCtty,
 	DCexecutable,
 	DCcorefile,
+	DCattach,
 	DCinfolinemain,
 	DCinfolocals,
 	DCbt,
@@ -187,6 +188,7 @@ protected:
     bool m_programRunning;		/* is the program executing (not stopped)? */
     QString m_executable;
     QString m_corefile;
+    QString m_attachedPid;		/* user input of attaching to pid */
     QString m_programArgs;
     KSimpleConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
     void saveProgramSettings();

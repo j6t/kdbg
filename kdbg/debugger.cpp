@@ -9,6 +9,7 @@
 #include "updateui.h"
 #include "parsevar.h"
 #include "pgmargs.h"
+#include "procattach.h"
 #include "typetable.h"
 #include <qregexp.h>
 #include <qfileinf.h>
@@ -352,6 +353,19 @@ void KDebugger::menuCallback(int item)
 	    m_programRunning = true;
 	}
 	break;
+    case ID_PROGRAM_ATTACH:
+	if (isReady()) {
+	    ProcAttach dlg(this);
+	    dlg.setText(m_attachedPid);
+	    if (dlg.exec()) {
+		m_attachedPid = dlg.text();
+		TRACE("Attaching to " + m_attachedPid);
+		executeCmd(DCattach, "attach " + m_attachedPid);
+		m_programActive = true;
+		m_programRunning = true;
+	    }
+	}
+	break;
     case ID_PROGRAM_RUN_AGAIN:
 	if (isReady() && m_programActive && !m_programRunning) {
 	    executeCmd(DCrun, "run " + m_programArgs, true);
@@ -502,6 +516,7 @@ void KDebugger::updateUIItem(UpdateUI* item)
     case ID_PROGRAM_RUN_AGAIN:
 	item->enable(isReady() && m_programActive && !m_programRunning);
 	break;
+    case ID_PROGRAM_ATTACH:
     case ID_PROGRAM_RUN:
 	item->enable(isReady());
 	break;
@@ -555,6 +570,7 @@ void KDebugger::initMenu()
     m_menuProgram.insertSeparator();
     m_menuProgram.insertItem(i18n("&Break"), ID_PROGRAM_BREAK);
     m_menuProgram.insertItem(i18n("Re&start"), ID_PROGRAM_RUN_AGAIN);
+    m_menuProgram.insertItem(i18n("A&ttach..."), ID_PROGRAM_ATTACH);
     m_menuProgram.insertSeparator();
     m_menuProgram.insertItem(i18n("&Arguments..."), ID_PROGRAM_ARGS);
     m_menuProgram.setAccel(Key_F5, ID_PROGRAM_RUN);
@@ -603,6 +619,8 @@ void KDebugger::initToolbar()
 {
     KIconLoader* loader = kapp->getIconLoader();
 
+    m_toolbar.insertButton(loader->loadIcon("execopen.xpm"),ID_FILE_EXECUTABLE, true,
+			   i18n("Executable"));
     m_toolbar.insertButton(loader->loadIcon("fileopen.xpm"),ID_FILE_OPEN, true,
 			   i18n("Open a source file"));
     m_toolbar.insertButton(loader->loadIcon("reload.xpm"),ID_FILE_RELOAD, true,
@@ -633,7 +651,6 @@ void KDebugger::initToolbar()
 
     // reserve some translations
     i18n("Restart");
-    i18n("Executable");
     i18n("Core dump");
 }
 
@@ -1317,6 +1334,7 @@ void KDebugger::parse(CmdQueueItem* cmd)
     case DCprint:
 	handlePrint(cmd);
 	break;
+    case DCattach:
     case DCrun:
     case DCcont:
     case DCstep:
@@ -1392,9 +1410,11 @@ void KDebugger::handleRunCommands()
     do {
 	start++;			/* skip '\n' */
 
-	if (strncmp(start, "Program ", 7) == 0) {
+	if (strncmp(start, "Program ", 8) == 0 ||
+	    strncmp(start, "ptrace: ", 8) == 0) {
 	    if (strncmp(start, "Program exited", 14) == 0 ||
-		strncmp(start, "Program terminated", 18) == 0)
+		strncmp(start, "Program terminated", 18) == 0 ||
+		strncmp(start, "ptrace: ", 8) == 0)
 	    {
 		m_programActive = false;
 	    }
