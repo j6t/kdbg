@@ -593,7 +593,7 @@ int KTreeViewItem::width(int indent, const QFontMetrics& fm) const
 KTreeView::KTreeView(QWidget *parent,
 		     const char *name,
 		     WFlags f) :
-	QTableView(parent, name, f),
+	TableView(parent, name, f),
 	clearing(false),
 	current(-1),
 	drawExpandButton(true),
@@ -607,28 +607,10 @@ KTreeView::KTreeView(QWidget *parent,
 	visibleItems(0),
 	rubberband_mode(false)
 {
-    initMetaObject();
-    setCellHeight(0);
-    setCellWidth(0);
     setNumRows(0);
     setNumCols(1);
-    setTableFlags(Tbl_autoScrollBars | Tbl_clipCellPainting | Tbl_snapToVGrid);
-    clearTableFlags(Tbl_scrollLastVCell | Tbl_scrollLastHCell | Tbl_snapToVGrid);
-    switch(style()) {
-    case WindowsStyle:
-    case MotifStyle:
-	setFrameStyle(QFrame::WinPanel | QFrame::Sunken);
-	setBackgroundColor(colorGroup().base());
-	break;
-    default:
-	setFrameStyle(QFrame::Panel | QFrame::Plain);
-	setLineWidth(1);
-    }
-#if QT_VERSION < 200
-    setFocusPolicy(StrongFocus);
-#else
-    setFocusPolicy(WheelFocus);
-#endif
+    setBackgroundColor(colorGroup().base());
+
     treeRoot = new KTreeViewItem;
     treeRoot->setExpanded(true);
     treeRoot->owner = this;
@@ -690,30 +672,6 @@ void KTreeView::appendChildItem(KTreeViewItem* newItem, const KPath& thePath)
     appendChildItem(parentItem, newItem);
 }
                                  
-// indicates whether horizontal scrollbar appears only when needed
-bool KTreeView::autoBottomScrollBar() const
-{
-  return testTableFlags(Tbl_autoHScrollBar);
-}
-
-// indicates whether vertical scrollbar appears only when needed
-bool KTreeView::autoScrollBar() const
-{
-  return testTableFlags(Tbl_autoVScrollBar);
-}
-
-// indicates whether display updates automatically on changes
-bool KTreeView::autoUpdate() const
-{
-  return QTableView::autoUpdate();
-}
-
-// indicates whether horizontal scrollbar is present
-bool KTreeView::bottomScrollBar() const
-{
-  return testTableFlags(Tbl_hScrollBar);
-}
-
 // translate mouse coord to cell coord
 QPoint KTreeView::cellCoords(int row, const QPoint& widgetCoord)
 {
@@ -957,7 +915,7 @@ bool KTreeView::insertItem(KTreeViewItem* newItem,
  * returns pointer to KTreeViewItem at the specifed row or 0 if row is out
  * of limits.
  */
-KTreeViewItem* KTreeView::itemAt(int row)
+KTreeViewItem* KTreeView::itemAt(int row) const
 {
     if (row < 0 || row >= numRows()) {
 	return 0;
@@ -1086,12 +1044,6 @@ void KTreeView::removeItem(const KPath& thePath)
     }
 }
 
-// indicates whether vertical scrollbar is present
-bool KTreeView::scrollBar() const
-{
-  return testTableFlags(Tbl_vScrollBar);
-}
-
 void KTreeView::scrollVisible(KTreeViewItem* item, bool children)
 {
     if (item == 0)
@@ -1132,19 +1084,6 @@ void KTreeView::scrollVisible(KTreeViewItem* item, bool children)
 	// just move the item to the top
 	setTopCell(row);
     }
-}
-
-// enables/disables auto update of display
-void KTreeView::setAutoUpdate(bool enable)
-{
-  QTableView::setAutoUpdate(enable);
-}
-
-// enables/disables horizontal scrollbar
-void KTreeView::setBottomScrollBar(bool enable)
-{
-  enable ? setTableFlags(Tbl_hScrollBar) :
-    clearTableFlags(Tbl_hScrollBar);
 }
 
 // sets the current item and hightlights it, emitting signals
@@ -1215,13 +1154,6 @@ void KTreeView::setMoveCurrentToSibling(bool m)
     moveCurrentToSibling = m;
 }
 
-// enables/disables vertical scrollbar
-void KTreeView::setScrollBar(bool enable)
-{
-  enable ? setTableFlags(Tbl_vScrollBar) :
-    clearTableFlags(Tbl_vScrollBar);
-}
-
 // enables/disables display of item text (keys)
 void KTreeView::setShowItemText(bool enable)
 {
@@ -1234,13 +1166,6 @@ void KTreeView::setShowItemText(bool enable)
 
     if (autoUpdate() && isVisible())
 	repaint();
-}
-
-// indicates whether vertical scrolling is by pixel or row
-void KTreeView::setSmoothScrolling(bool enable)
-{
-  enable ? setTableFlags(Tbl_smoothVScrolling) :
-    clearTableFlags(Tbl_smoothVScrolling);
 }
 
 // enables/disables tree branch drawing
@@ -1261,12 +1186,6 @@ void KTreeView::setTreeDrawing(bool enable)
 bool KTreeView::showItemText() const
 {
   return showText;
-}
-
-// indicates whether scrolling is by pixel or row
-bool KTreeView::smoothScrolling() const
-{
-  return testTableFlags(Tbl_smoothVScrolling);
 }
 
 // indents the item at the given index, splitting the tree into
@@ -1345,14 +1264,14 @@ void KTreeView::appendChildItem(KTreeViewItem* theParent,
 }
 
 // returns the height of the cell(row) at the specified row (index)
-int KTreeView::cellHeight(int row)
+int KTreeView::cellHeight(int row) const
 {
   return itemAt(row)->height(fontMetrics());
 }
 
 // returns the width of the cells. Note: this is mostly for derived classes
 // which have more than 1 column
-int KTreeView::cellWidth(int /*col*/)
+int KTreeView::cellWidth(int /*col*/) const
 {
   return maxItemWidth;
 }
@@ -2096,7 +2015,7 @@ void KTreeView::takeItem(KTreeViewItem* item)
 }
 
 // visits each item, calculates the maximum width  
-// and updates QTableView
+// and updates TableView
 void KTreeView::updateCellWidth()
 {
     // make cells at least 1 pixel wide to avoid singularities (division by zero)

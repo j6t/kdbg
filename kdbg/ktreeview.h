@@ -28,7 +28,7 @@
 #include <qpixmap.h>			/* used in items */
 #include <qstack.h>			/* used to specify tree paths */
 #include <qstring.h>			/* used in items */
-#include <qtableview.h>			/* base class for widget */
+#include "tableview.h"			/* base class for widget */
 
 // use stack of strings to represent path information
 typedef QStack<QString> KPath;
@@ -403,13 +403,13 @@ protected:
  * @short A collapsible treelist widget
  * @author Johannes Sixt <Johannes.Sixt@telecom.at>, Keith Brown
  */
-class KTreeView : public QTableView
+class KTreeView : public TableView
 {
     friend class KTreeViewItem;
     Q_OBJECT
 public:
     /**
-     * Widget contructor. All parameters are passed on to base QTableView,
+     * Widget contructor. All parameters are passed on to base TableView,
      * and are not used directly.
      */
     KTreeView(QWidget* parent = 0, const char* name = 0, WFlags f = 0);
@@ -465,32 +465,6 @@ public:
      * @see #appendChildItem
      */
     void appendChildItem(KTreeViewItem* newItem, const KPath& path);
-
-    /**
-	Returns a bool value indicating whether the list will display a
-	horizontal scrollbar if one of the displayed items is wider than can
-	be displayed at the current width of the view.
-	*/
-  bool autoBottomScrollBar() const;
-
-  /**
-	Returns a bool value indicating whether the list will display a
-	vertical scrollbar if the number of displayed items is more than can
-	be displayed at the current height of the view.
-	*/
-  bool autoScrollBar() const;
-
-  /**
-	Returns a bool value indicating whether the list will update
-	immediately on changing the state of the widget in some way.
-	*/
-  bool autoUpdate() const;
-
-  /**
-	Returns a bool value indicating whether the list has currently has a
-	horizontal scroll bar.
-	*/
-  bool bottomScrollBar() const;
 
     /**
      * Computes coordinates relative to the specified row from the given
@@ -699,7 +673,7 @@ public:
      * @see #itemRow
      * @see #itemPath
      */
-    KTreeViewItem* itemAt(int row);
+    KTreeViewItem* itemAt(int row) const;
 
     /**
      * Returns a pointer to the item at the end of the path, or 0 if there
@@ -779,12 +753,6 @@ public:
      */
     void removeItem(const KPath& thePath);
 
-  /**
-	Returns bool value indicating whether the list currently displays a
-	vertical scroll bar.
-	*/
-  bool scrollBar() const;
-
     /**
      * The specified item is scrolled into view.  If the specified item is
      * already visible, nothing happens, unless children is true, in which
@@ -795,16 +763,6 @@ public:
      * @param children specifies whether children should be made visible
      */
     void scrollVisible(KTreeViewItem* item, bool children);
-
-    /**
-	If enable is TRUE (default), enables auto update, else disables it.
-	*/
-  void setAutoUpdate(bool enable);
-
-  /**
-	If enable is TRUE, displays a horizontal scroll bar, else hides it.
-	*/
-  void setBottomScrollBar(bool enable);
 
     /**
      * Makes the item at specifies row the current item and highlights it.
@@ -835,21 +793,10 @@ public:
     void setMoveCurrentToSibling(bool m = true);
 
   /**
-	If enable is TRUE, displays a vertical scroll bar, else hides it.                                        
-	*/
-  void setScrollBar(bool enable);
-
-  /**
 	If enable is TRUE (default), item text will be displayed, otherwise 
 	it will not, and no highlight will be shown in the default widget.
 	*/
   void setShowItemText(bool enable);
-
-  /**
-	If enable is TRUE, enables smooth scrolling, else disables 
-	it (default).
-	*/
-  void setSmoothScrolling(bool enable);
 
   /**
 	If enable is TRUE (default), lines depicting the structure of the
@@ -861,11 +808,6 @@ public:
 	Indicates whether item text is displayed.
 	*/
   bool showItemText() const;
-
-  /**
-	Returns a bool value indicating whether smooth scrolling is enabled.
-	*/
-  bool smoothScrolling() const;
 
     /**
      * Indents the item at the specified index, creating a new branch.
@@ -976,8 +918,8 @@ protected:
      */
     void appendChildItem(KTreeViewItem* parent,
 			 KTreeViewItem* child);
-    virtual int cellHeight(int row);
-    virtual int cellWidth(int col);
+    virtual int cellHeight(int row) const;
+    virtual int cellWidth(int col) const;
     void changeItem(KTreeViewItem* toChange,
 		    int itemRow, const char* newText,
 		    const QPixmap* newPixmap);

@@ -62,6 +62,9 @@ bool SourceWindow::loadFile()
 	return false;
     }
 
+    bool upd = autoUpdate();
+    setAutoUpdate(false);
+
     QTextStream t(&f);
     QString s;
     while (!t.eof()) {
@@ -69,6 +72,11 @@ bool SourceWindow::loadFile()
 	insertLine(s);
     }
     f.close();
+
+    setAutoUpdate(upd);
+    if (upd) {
+	updateTableSize();
+    }
 
     // then we copy it into our own m_sourceCode
     m_sourceCode.setSize(m_texts.size());
@@ -183,7 +191,7 @@ int SourceWindow::textCol() const
     return 2;
 }
 
-int SourceWindow::cellWidth(int col)
+int SourceWindow::cellWidth(int col) const
 {
     if (col == 0) {
 	return 15;

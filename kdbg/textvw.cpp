@@ -16,7 +16,7 @@
 #define DEFAULT_LINEHEIGHT 1
 
 KTextView::KTextView(QWidget* parent, const char* name, WFlags f) :
-	QTableView(parent, name, f),
+	TableView(parent, name, f),
 	m_width(DEFAULT_WIDTH),
 	m_height(DEFAULT_LINEHEIGHT),
 	m_tabWidth(0),
@@ -24,7 +24,6 @@ KTextView::KTextView(QWidget* parent, const char* name, WFlags f) :
 {
     setNumCols(1);
     setBackgroundColor(colorGroup().base());
-    setTableFlags(Tbl_autoScrollBars);
 }
 
 KTextView::~KTextView()
@@ -63,9 +62,9 @@ void KTextView::insertLine(const QString& text)
     m_texts.append(text);
     setNumRows(m_texts.size());
 
-    bool update = updateCellSize(text);
+    updateCellSize(text);
 
-    if (update && autoUpdate()) {
+    if (autoUpdate()) {
 	updateTableSize();
 	repaint();
     }
@@ -84,11 +83,11 @@ void KTextView::replaceLine(int line, const QString& text)
 
     bool update = updateCellSize(text);
 
-    if (update) {
-	updateTableSize();
-	if (autoUpdate()) {
-	    repaint();
+    if (autoUpdate()) {
+	if (update) {
+	    updateTableSize();
 	}
+	repaint();
     }
 }
 
@@ -103,12 +102,12 @@ void KTextView::cursorPosition(int* row, int* col)
     *col = 0;
 }
 
-int KTextView::cellWidth(int /*col*/)
+int KTextView::cellWidth(int /*col*/) const 
 {
     return m_width;
 }
 
-int KTextView::cellHeight(int /*row*/)
+int KTextView::cellHeight(int /*row*/) const
 {
     return m_height;
 }
@@ -250,7 +249,7 @@ void KTextView::activateLine(int row)
 void KTextView::paletteChange(const QPalette& oldPal)
 {
     setBackgroundColor(colorGroup().base());
-    QTableView::paletteChange(oldPal);
+    TableView::paletteChange(oldPal);
 
     // recompute window size
     m_width = DEFAULT_WIDTH;

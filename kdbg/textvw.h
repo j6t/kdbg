@@ -6,10 +6,10 @@
 #ifndef TEXTVW_H
 #define TEXTVW_H
 
-#include <qtableview.h>
+#include "tableview.h"
 #include "valarray.h"
 
-class KTextView : public QTableView
+class KTextView : public TableView
 {
     Q_OBJECT
 public:
@@ -20,8 +20,8 @@ public:
     virtual void setCursorPosition(int row, int col);
     virtual void cursorPosition(int* row, int* col);
 protected:
-    virtual int cellWidth(int col);
-    virtual int cellHeight(int row);
+    virtual int cellWidth(int col) const;
+    virtual int cellHeight(int row) const;
     virtual void paintCell(QPainter* p, int row, int col);
     virtual void activateLine(int row);
     virtual int textCol() const;

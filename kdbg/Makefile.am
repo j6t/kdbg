@@ -14,6 +14,7 @@ bin_PROGRAMS = 	kdbg
 kdbg_SOURCES = \
 	pgmargs.cpp \
 	procattach.cpp \
+	tableview.cpp \
 	ktreeview.cpp \
 	textvw.cpp \
 	debugger.cpp \
@@ -50,6 +51,7 @@ kdbg_LDADD   = \
 noinst_HEADERS = \
 	pgmargs.h \
 	procattach.h \
+	tableview.h \
 	textvw.h \
 	valarray.h \
 	debugger.h \
@@ -75,7 +77,7 @@ noinst_HEADERS = \
 	commandids.h \
 	mydebug.h
 
-METASOURCES = AUTO
+kdbg_METASOURCES = AUTO
 
 # if you "make clean", this files get removed. If you want to remove
 # them while "make distclean", use DISTCLEANFILES

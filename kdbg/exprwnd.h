@@ -85,7 +85,7 @@ protected:
     bool updateExprRec(VarTree* display, VarTree* newValues);
     void replaceChildren(VarTree* display, VarTree* newValues);
     virtual void paintCell(QPainter* painter, int row, int col);
-    virtual int cellWidth(int col);
+    virtual int cellWidth(int col) const;
     void updateValuesWidth();
     static bool getMaxValueWidth(KTreeViewItem* item, void* user);
     void collectUnknownTypes(VarTree* item);

@@ -230,7 +230,6 @@ ExprWnd::ExprWnd(QWidget* parent, const char* name) :
 	maxValueWidth(0)
 {
     setNumCols(2);
-    clearTableFlags(Tbl_clipCellPainting);
     
     connect(this, SIGNAL(expanded(int)), SLOT(slotExpandOrCollapse(int)));
     connect(this, SIGNAL(collapsed(int)), SLOT(slotExpandOrCollapse(int)));
@@ -633,7 +632,7 @@ void ExprWnd::paintCell(QPainter* painter, int row, int col)
     }
 }
 
-int ExprWnd::cellWidth(int col)
+int ExprWnd::cellWidth(int col) const
 {
     if (col == 0) {
 	return KTreeView::cellWidth(col);

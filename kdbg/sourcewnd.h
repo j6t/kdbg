@@ -51,7 +51,7 @@ public:
 
 protected:
     virtual int textCol() const;
-    virtual int cellWidth(int col);
+    virtual int cellWidth(int col) const;
     virtual void paintCell(QPainter* p, int row, int col);
     virtual void mousePressEvent(QMouseEvent* ev);
     virtual void keyPressEvent(QKeyEvent* ev);
