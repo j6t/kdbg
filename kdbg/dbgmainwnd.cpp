@@ -207,19 +207,6 @@ void DebuggerMainWnd::initMenu()
     menu->insertItem(i18n("E&xecution"), m_menuProgram);
     menu->insertItem(i18n("&Breakpoint"), m_menuBrkpt);
     menu->insertItem(i18n("&Window"), m_menuWindow);
-    menu->insertSeparator();
-    
-    QString about = "KDbg " VERSION " - ";
-    about += i18n("A Debugger\n"
-		  "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
-		  "with the help of many others");
-    menu->insertItem(i18n("&Help"),
-#if QT_VERSION < 200
-		     kapp->getHelpMenu(false, about)
-#else
-		     helpMenu(about)
-#endif
-	);
 }
 
 #if QT_VERSION < 200
@@ -529,7 +516,11 @@ void DebuggerMainWnd::slotAddWatch()
 void DebuggerMainWnd::slotFileChanged()
 {
     // set caption
+#if QT_VERSION < 200
     QString caption = kapp->getCaption();
+#else
+    QString caption;
+#endif
     if (m_debugger->haveExecutable()) {
 	// basename part of executable
 	QString executable = m_debugger->executable();
@@ -537,7 +528,9 @@ void DebuggerMainWnd::slotFileChanged()
 	int lastSlash = executable.findRev('/');
 	if (lastSlash >= 0)
 	    execBase += lastSlash + 1;
+#if QT_VERSION < 200
 	caption += ": ";
+#endif
 	caption += execBase;
     }
     QString file;

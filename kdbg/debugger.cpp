@@ -25,10 +25,6 @@
 #endif
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
-
-#ifndef VERSION				/* #ifndef HAVE_CONFIG_H */
-#define VERSION ""
-#endif
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>			/* sleep(3) */
 #endif
