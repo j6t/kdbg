@@ -23,8 +23,8 @@
 class RegisterViewItem : public QListViewItem
 {
 public:
-    RegisterViewItem(RegisterView* parent, QString reg,
-		     QString raw, QString cooked);
+    RegisterViewItem(RegisterView* parent, QListViewItem* insertAfter,
+		     QString reg, QString raw, QString cooked);
     ~RegisterViewItem();
 
     void setValue(QString raw, QString cooked);
@@ -39,24 +39,19 @@ protected:
 };
 
 
-RegisterViewItem::RegisterViewItem(RegisterView* parent, QString reg,
-				   QString raw, QString cooked) :
-	QListViewItem(parent, parent->m_lastInsert),
+RegisterViewItem::RegisterViewItem(RegisterView* parent, QListViewItem* insertAfter,
+				   QString reg, QString raw, QString cooked) :
+	QListViewItem(parent, insertAfter),
 	m_changes(false),
 	m_found(true)
 {
     m_reg.regName = reg;
-    parent->m_lastInsert = this;
     setValue(raw, cooked);
     setText(0, reg);
 }
 
 RegisterViewItem::~RegisterViewItem()
 {
-    RegisterView* r = static_cast<RegisterView*>(listView());
-    if (r->m_lastInsert == this) {
-	r->m_lastInsert = itemAbove();
-    }
 }
 
 /*
@@ -205,7 +200,7 @@ void RegisterViewItem::paintCell(QPainter* p, const QColorGroup& cg,
 
 RegisterView::RegisterView(QWidget* parent, const char* name) :
 	QListView(parent, name),
-	m_lastInsert(0),
+	m_lastItem(0),
 	m_mode(16)
 {
     setSorting(-1);
@@ -292,23 +287,25 @@ void RegisterView::updateRegisters(QList<RegisterInfo>& regs)
 	    }
 	}
 	if (!found)
-	    m_lastInsert = new RegisterViewItem(this, reg->regName,
-						reg->rawValue, reg->cookedValue);
+	    m_lastItem = new RegisterViewItem(this, m_lastItem, reg->regName,
+					      reg->rawValue, reg->cookedValue);
     }
 
     // remove all 'not found' items;
     QList<QListViewItem> deletedItem;
     deletedItem.setAutoDelete(true);
+    m_lastItem = 0;
     for (QListViewItem* i = firstChild(); i; i = i->nextSibling() ){
 	RegisterViewItem* it = static_cast<RegisterViewItem*>(i);
 	if (!it->m_found) {
 	    deletedItem.append(it);
+	} else {
+	    m_lastItem = it;
 	}
     }
     deletedItem.clear();
 
     setUpdatesEnabled(true);
-//    repaint();
     triggerUpdate();
 }
 

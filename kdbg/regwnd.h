@@ -27,7 +27,7 @@ protected slots:
     void updateRegisters(QList<RegisterInfo>&);
 
 private:
-    QListViewItem* m_lastInsert;
+    QListViewItem* m_lastItem;
     QPopupMenu* m_menu;
     QPopupMenu* m_modemenu;
     int m_mode;
