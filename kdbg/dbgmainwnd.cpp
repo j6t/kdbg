@@ -27,6 +27,7 @@
 #include "memwindow.h"
 #include "ttywnd.h"
 #include "procattach.h"
+#include "dbgdriver.h"
 #include "mydebug.h"
 
 
@@ -744,10 +745,31 @@ void DebuggerMainWnd::slotLocalsToWatch()
  */
 void DebuggerMainWnd::slotEditValue()
 {
-    int idx = m_localVariables->currentItem();
-    if (idx >= 0 && m_debugger != 0 && m_debugger->canSingleStep()) {
+    // does one of the value trees have the focus
+    QWidget* f = kapp->focusWidget();
+    ExprWnd* wnd;
+    if (f == m_localVariables) {
+	wnd = m_localVariables;
+    } else if (f == m_watches->watchVariables()) {
+	wnd = m_watches->watchVariables();
+    } else {
+	return;
+    }
+
+    if (m_localVariables->isEditing() ||
+	m_watches->watchVariables()->isEditing())
+    {
+	return;				/* don't edit twice */
+    }
+    
+    int idx = wnd->currentItem();
+    if (idx >= 0 && m_debugger != 0 && m_debugger->canSingleStep())
+    {
 	TRACE("edit value");
-	m_debugger->editLocalValue(idx);
+	// determine the text to edit
+	VarTree* expr = static_cast<VarTree*>(wnd->itemAt(idx));
+	QString text = m_debugger->driver()->editableValue(expr);
+	wnd->editValue(idx, text);
     }
 }
 
