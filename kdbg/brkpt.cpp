@@ -9,6 +9,7 @@
 #endif
 #include <kiconloader.h>
 #include <ksimpleconfig.h>
+#include <qdialog.h>
 #include <qkeycode.h>
 #include <qpainter.h>
 #include <qlabel.h>
@@ -33,8 +34,8 @@ public:
 };
 
 
-BreakpointTable::BreakpointTable() :
-	QDialog(0, "breakpoints"),
+BreakpointTable::BreakpointTable(QWidget* parent, const char* name) :
+	QWidget(parent, name),
 	m_debugger(0),
 	m_bpEdit(this, "bpedit"),
 	m_list(this, "bptable"),
@@ -42,7 +43,6 @@ BreakpointTable::BreakpointTable() :
 	m_btRemove(this, "remove"),
 	m_btViewCode(this, "view"),
 	m_btConditional(this, "conditional"),
-	m_btClose(this, "close"),
 	m_layout(this, 8),
 	m_listandedit(8),
 	m_buttons(8)
@@ -70,10 +70,6 @@ BreakpointTable::BreakpointTable() :
     m_btConditional.setMinimumSize(m_btConditional.sizeHint());
     connect(&m_btConditional, SIGNAL(clicked()), this, SLOT(conditionalBP()));
 
-    m_btClose.setText(i18n("Close"));
-    m_btClose.setMinimumSize(m_btClose.sizeHint());
-    connect(&m_btClose, SIGNAL(clicked()), this, SLOT(hide()));
-
     m_layout.addLayout(&m_listandedit, 10);
     m_layout.addLayout(&m_buttons);
     m_listandedit.addWidget(&m_bpEdit);
@@ -82,7 +78,6 @@ BreakpointTable::BreakpointTable() :
     m_buttons.addWidget(&m_btRemove);
     m_buttons.addWidget(&m_btViewCode);
     m_buttons.addWidget(&m_btConditional);
-    m_buttons.addWidget(&m_btClose);
     m_buttons.addStretch(10);
 
     m_layout.activate();
@@ -137,18 +132,6 @@ void BreakpointItem::updateFrom(const Breakpoint& bp)
 {
     Breakpoint::operator=(bp);		/* assign new values */
     display();
-}
-
-void BreakpointTable::closeEvent(QCloseEvent* ev)
-{
-    QDialog::closeEvent(ev);
-    emit closed();
-}
-
-void BreakpointTable::hide()
-{
-    QDialog::hide();
-    emit closed();
 }
 
 void BreakpointTable::addBP()

@@ -8,7 +8,6 @@
 #ifndef BRKPT_H
 #define BRKPT_H
 
-#include <qdialog.h>
 #include <qlistview.h>
 #include <qlayout.h>
 #include <qpushbutton.h>
@@ -19,11 +18,11 @@ class KDebugger;
 class BreakpointItem;
 
 
-class BreakpointTable : public QDialog
+class BreakpointTable : public QWidget
 {
     Q_OBJECT
 public:
-    BreakpointTable();
+    BreakpointTable(QWidget* parent, const char* name);
     ~BreakpointTable();
     void setDebugger(KDebugger* deb) { m_debugger = deb; }
 
@@ -35,7 +34,6 @@ protected:
     QPushButton m_btRemove;
     QPushButton m_btViewCode;
     QPushButton m_btConditional;
-    QPushButton m_btClose;
     QHBoxLayout m_layout;
     QVBoxLayout m_listandedit;
     QVBoxLayout m_buttons;
@@ -50,8 +48,6 @@ protected:
     void updateBreakpointCondition(int id, const QString& condition,
 				   int ignoreCount);
 
-    void closeEvent(QCloseEvent*);
-
     friend class BreakpointItem;
     
 signals:
@@ -65,9 +61,7 @@ signals:
      * @param lineNo specifies the line number (0-based!).
      */
     void activateFileLine(const QString& file, int lineNo);
-    void closed();
 public slots:
-    virtual void hide();
     virtual void addBP();
     virtual void removeBP();
     virtual void viewBP();

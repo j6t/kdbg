@@ -12,96 +12,106 @@
 #include <kiconloader.h>
 #include <kstdaccel.h>
 #include <qtabdialog.h>
+#include <qlistbox.h>
 #include <kwm.h>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "prefdebugger.h"
 #include "updateui.h"
 #include "commandids.h"
+#include "winstack.h"
+#include "brkpt.h"
 #include "mydebug.h"
 
 
 DebuggerMainWnd::DebuggerMainWnd(const char* name) :
-	KTMainWindow(name),
-	DebuggerMainWndBase(),
-#if QT_VERSION < 200
-	m_mainPanner(this, "main_pane", KNewPanner::Vertical, KNewPanner::Percent, 60),
-	m_leftPanner(&m_mainPanner, "left_pane", KNewPanner::Horizontal, KNewPanner::Percent, 70),
-	m_rightPanner(&m_mainPanner, "right_pane", KNewPanner::Horizontal, KNewPanner::Percent, 50),
-#else
-	m_mainPanner(QSplitter::Horizontal, this, "main_pane"),
-	m_leftPanner(QSplitter::Vertical, &m_mainPanner, "left_pane"),
-	m_rightPanner(QSplitter::Vertical, &m_mainPanner, "right_pane"),
-#endif
-	m_filesWindow(&m_leftPanner, "files"),
-	m_btWindow(&m_leftPanner, "backtrace"),
-	m_localVariables(&m_rightPanner, "locals"),
-	m_watches(&m_rightPanner, "watches"),
-	m_registers(0)
+	DockMainWindow(name),
+	DebuggerMainWndBase()
 {
+    setDockManager(new DockManager( this, QString(name)+"_DockManager"));
+
+    QPixmap p;
+
+    DockWidget* dw0 = createDockWidget("Source", p);
+    dw0->setCaption(i18n("Source"));
+    m_filesWindow = new WinStack(dw0, "files");
+    setView(dw0);
+
+    DockWidget* dw1 = createDockWidget("Stack", p);
+    dw1->setCaption(i18n("Stack"));
+    m_btWindow = new QListBox(dw1, "backtrace");
+    DockWidget* dw2 = createDockWidget("Locals", p);
+    dw2->setCaption(i18n("Locals"));
+    m_localVariables = new ExprWnd(dw2, "locals");
+    DockWidget* dw3 = createDockWidget("Watches", p);
+    dw3->setCaption(i18n("Watches"));
+    m_watches = new WatchWindow(dw3, "watches");
+    DockWidget* dw4 = createDockWidget("Registers", p);
+    dw4->setCaption(i18n("Registers"));
+    m_registers = new RegisterView(dw4, "registers");
+    DockWidget* dw5 = createDockWidget("Breakpoints", p);
+    dw5->setCaption(i18n("Breakpoints"));
+    m_bpTable = new BreakpointTable(dw5, "breakpoints");
+
     initMenu();
     initToolbar();
 
-    setupDebugger(&m_localVariables, m_watches.watchVariables(), &m_btWindow);
-    m_bpTable.setDebugger(m_debugger);
+    setupDebugger(m_localVariables, m_watches->watchVariables(), m_btWindow);
+    m_bpTable->setDebugger(m_debugger);
 
-#if QT_VERSION < 200
-    m_mainPanner.activate(&m_leftPanner, &m_rightPanner);
-    m_leftPanner.activate(&m_filesWindow, &m_btWindow);
-    m_rightPanner.activate(&m_localVariables, &m_watches);
-#endif
-    setView(&m_mainPanner, true);	/* show frame */
+    connect(m_watches, SIGNAL(addWatch()), SLOT(slotAddWatch()));
+    connect(m_watches, SIGNAL(deleteWatch()), m_debugger, SLOT(slotDeleteWatch()));
 
-    connect(&m_watches, SIGNAL(addWatch()), SLOT(slotAddWatch()));
-    connect(&m_watches, SIGNAL(deleteWatch()), m_debugger, SLOT(slotDeleteWatch()));
-
-    m_filesWindow.setWindowMenu(&m_menuWindow);
-    connect(&m_filesWindow.m_findDlg, SIGNAL(closed()), SLOT(updateUI()));
-    connect(&m_filesWindow, SIGNAL(newFileLoaded()),
+    m_filesWindow->setWindowMenu(m_menuWindow);
+    connect(&m_filesWindow->m_findDlg, SIGNAL(closed()), SLOT(updateUI()));
+    connect(m_filesWindow, SIGNAL(newFileLoaded()),
 	    SLOT(slotNewFileLoaded()));
-    connect(&m_filesWindow, SIGNAL(toggleBreak(const QString&, int)),
+    connect(m_filesWindow, SIGNAL(toggleBreak(const QString&, int)),
 	    this, SLOT(slotToggleBreak(const QString&,int)));
-    connect(&m_filesWindow, SIGNAL(enadisBreak(const QString&, int)),
+    connect(m_filesWindow, SIGNAL(enadisBreak(const QString&, int)),
 	    this, SLOT(slotEnaDisBreak(const QString&,int)));
     connect(m_debugger, SIGNAL(activateFileLine(const QString&,int)),
-	    &m_filesWindow, SLOT(activate(const QString&,int)));
+	    m_filesWindow, SLOT(activate(const QString&,int)));
     connect(m_debugger, SIGNAL(executableUpdated()),
-	    &m_filesWindow, SLOT(reloadAllFiles()));
+	    m_filesWindow, SLOT(reloadAllFiles()));
     connect(m_debugger, SIGNAL(updatePC(const QString&,int,int)),
-	    &m_filesWindow, SLOT(updatePC(const QString&,int,int)));
+	    m_filesWindow, SLOT(updatePC(const QString&,int,int)));
     // value popup communication
-    connect(&m_filesWindow, SIGNAL(initiateValuePopup(const QString&)),
+    connect(m_filesWindow, SIGNAL(initiateValuePopup(const QString&)),
 	    m_debugger, SLOT(slotValuePopup(const QString&)));
     connect(m_debugger, SIGNAL(valuePopup(const QString&)),
-	    &m_filesWindow, SLOT(slotShowValueTip(const QString&)));
+	    m_filesWindow, SLOT(slotShowValueTip(const QString&)));
 
     // Establish communication when right clicked on file window.
-    connect(&m_filesWindow.m_menuFloat, SIGNAL(activated(int)),
+    connect(&m_filesWindow->m_menuFloat, SIGNAL(activated(int)),
 	    SLOT(menuCallback(int)));
 
     // Connection when right clicked on file window before any file is
     // loaded.
-    connect(&m_filesWindow.m_menuFileFloat, SIGNAL(activated(int)),
+    connect(&m_filesWindow->m_menuFileFloat, SIGNAL(activated(int)),
 	    SLOT(menuCallback(int)));
 
     // route unhandled menu items to winstack
-    connect(this, SIGNAL(forwardMenuCallback(int)), &m_filesWindow, SLOT(menuCallback(int)));
+    connect(this, SIGNAL(forwardMenuCallback(int)), m_filesWindow, SLOT(menuCallback(int)));
     // file/line updates
-    connect(&m_filesWindow, SIGNAL(fileChanged()), SLOT(slotFileChanged()));
-    connect(&m_filesWindow, SIGNAL(lineChanged()), SLOT(slotLineChanged()));
+    connect(m_filesWindow, SIGNAL(fileChanged()), SLOT(slotFileChanged()));
+    connect(m_filesWindow, SIGNAL(lineChanged()), SLOT(slotLineChanged()));
 
-    m_bpTable.setCaption(i18n("Breakpoints"));
-    connect(&m_bpTable, SIGNAL(closed()), SLOT(updateUI()));
-    connect(&m_bpTable, SIGNAL(activateFileLine(const QString&,int)),
-	    &m_filesWindow, SLOT(activate(const QString&,int)));
-    connect(m_debugger, SIGNAL(updateUI()), &m_bpTable, SLOT(updateUI()));
-    connect(m_debugger, SIGNAL(breakpointsChanged()), &m_bpTable, SLOT(updateBreakList()));
+    // connect breakpoint table
+    connect(m_bpTable, SIGNAL(activateFileLine(const QString&,int)),
+	    m_filesWindow, SLOT(activate(const QString&,int)));
+    connect(m_debugger, SIGNAL(updateUI()), m_bpTable, SLOT(updateUI()));
+    connect(m_debugger, SIGNAL(breakpointsChanged()), m_bpTable, SLOT(updateBreakList()));
 
     connect(m_debugger, SIGNAL(registersChanged(QList<RegisterInfo>&)),
-	    &m_registers, SLOT(updateRegisters(QList<RegisterInfo>&)));
-    m_registers.show();
-    
+	    m_registers, SLOT(updateRegisters(QList<RegisterInfo>&)));
+
+    // view menu changes when docking state changes
+    connect(dockManager, SIGNAL(change()), SLOT(updateUI()));
+
     restoreSettings(kapp->getConfig());
+
+//    dockManager->activate();
 
     updateUI();
     slotFileChanged();
@@ -113,68 +123,89 @@ DebuggerMainWnd::~DebuggerMainWnd()
     // must delete m_debugger early since it references our windows
     delete m_debugger;
     m_debugger = 0;
+    // must disconnect from dockManager since it keeps emitting signals
+    dockManager->disconnect(this);
+
+    delete m_menuWindow;
+    delete m_menuBrkpt;
+    delete m_menuProgram;
+    delete m_menuView;
+    delete m_menuFile;
 }
 
 void DebuggerMainWnd::initMenu()
 {
-    m_menuFile.insertItem(i18n("&Open Source..."), ID_FILE_OPEN);
-    m_menuFile.insertItem(i18n("&Reload Source"), ID_FILE_RELOAD);
-    m_menuFile.insertSeparator();
-    m_menuFile.insertItem(i18n("&Executable..."), ID_FILE_EXECUTABLE);
-    m_menuFile.insertItem(i18n("&Core dump..."), ID_FILE_COREFILE);
-    m_menuFile.insertSeparator();
-    m_menuFile.insertItem(i18n("&Global Options..."), ID_FILE_GLOBAL_OPTIONS);
-    m_menuFile.insertSeparator();
-    m_menuFile.insertItem(i18n("&Quit"), ID_FILE_QUIT);
-    m_menuFile.setAccel(keys->open(), ID_FILE_OPEN);
-    m_menuFile.setAccel(keys->quit(), ID_FILE_QUIT);
+    m_menuFile = new QPopupMenu;
+    m_menuFile->insertItem(i18n("&Open Source..."), ID_FILE_OPEN);
+    m_menuFile->insertItem(i18n("&Reload Source"), ID_FILE_RELOAD);
+    m_menuFile->insertSeparator();
+    m_menuFile->insertItem(i18n("&Executable..."), ID_FILE_EXECUTABLE);
+    m_menuFile->insertItem(i18n("&Core dump..."), ID_FILE_COREFILE);
+    m_menuFile->insertSeparator();
+    m_menuFile->insertItem(i18n("&Global Options..."), ID_FILE_GLOBAL_OPTIONS);
+    m_menuFile->insertSeparator();
+    m_menuFile->insertItem(i18n("&Quit"), ID_FILE_QUIT);
+    m_menuFile->setAccel(keys->open(), ID_FILE_OPEN);
+    m_menuFile->setAccel(keys->quit(), ID_FILE_QUIT);
 
-    m_menuView.insertItem(i18n("&Find..."), ID_VIEW_FINDDLG);
-    m_menuView.insertItem(i18n("Toggle &Toolbar"), ID_VIEW_TOOLBAR);
-    m_menuView.insertItem(i18n("Toggle &Statusbar"), ID_VIEW_STATUSBAR);
-    m_menuView.setAccel(keys->find(), ID_VIEW_FINDDLG);
+    m_menuView = new QPopupMenu;
+    m_menuView->setCheckable(true);
+    m_menuView->insertItem(i18n("&Find..."), ID_VIEW_FINDDLG);
+    m_menuView->insertSeparator();
+    m_menuView->insertItem(i18n("Source &code"), ID_VIEW_SOURCE);
+    m_menuView->insertItem(i18n("Stac&k"), ID_VIEW_STACK);
+    m_menuView->insertItem(i18n("&Locals"), ID_VIEW_LOCALS);
+    m_menuView->insertItem(i18n("&Watched expressions"), ID_VIEW_WATCHES);
+    m_menuView->insertItem(i18n("&Registers"), ID_VIEW_REGISTERS);
+    m_menuView->insertItem(i18n("&Breakpoints"), ID_BRKPT_LIST);
+    m_menuView->insertItem(i18n("T&hreads"), ID_VIEW_THREADS);
+    m_menuView->insertSeparator();
+    m_menuView->insertItem(i18n("Toggle &Toolbar"), ID_VIEW_TOOLBAR);
+    m_menuView->insertItem(i18n("Toggle &Statusbar"), ID_VIEW_STATUSBAR);
+    m_menuView->setAccel(keys->find(), ID_VIEW_FINDDLG);
 
-    m_menuProgram.insertItem(i18n("&Run"), ID_PROGRAM_RUN);
-    m_menuProgram.insertItem(i18n("Step &into"), ID_PROGRAM_STEP);
-    m_menuProgram.insertItem(i18n("Step &over"), ID_PROGRAM_NEXT);
-    m_menuProgram.insertItem(i18n("Step o&ut"), ID_PROGRAM_FINISH);
-    m_menuProgram.insertItem(i18n("Run to &cursor"), ID_PROGRAM_UNTIL);
-    m_menuProgram.insertSeparator();
-    m_menuProgram.insertItem(i18n("&Break"), ID_PROGRAM_BREAK);
-    m_menuProgram.insertItem(i18n("&Kill"), ID_PROGRAM_KILL);
-    m_menuProgram.insertItem(i18n("Re&start"), ID_PROGRAM_RUN_AGAIN);
-    m_menuProgram.insertItem(i18n("A&ttach..."), ID_PROGRAM_ATTACH);
-    m_menuProgram.insertSeparator();
-    m_menuProgram.insertItem(i18n("&Arguments..."), ID_PROGRAM_ARGS);
-    m_menuProgram.setAccel(Key_F5, ID_PROGRAM_RUN);
-    m_menuProgram.setAccel(Key_F8, ID_PROGRAM_STEP);
-    m_menuProgram.setAccel(Key_F10, ID_PROGRAM_NEXT);
-    m_menuProgram.setAccel(Key_F6, ID_PROGRAM_FINISH);
-    m_menuProgram.setAccel(Key_F7, ID_PROGRAM_UNTIL);
+    m_menuProgram = new QPopupMenu;
+    m_menuProgram->insertItem(i18n("&Run"), ID_PROGRAM_RUN);
+    m_menuProgram->insertItem(i18n("Step &into"), ID_PROGRAM_STEP);
+    m_menuProgram->insertItem(i18n("Step &over"), ID_PROGRAM_NEXT);
+    m_menuProgram->insertItem(i18n("Step o&ut"), ID_PROGRAM_FINISH);
+    m_menuProgram->insertItem(i18n("Run to &cursor"), ID_PROGRAM_UNTIL);
+    m_menuProgram->insertSeparator();
+    m_menuProgram->insertItem(i18n("&Break"), ID_PROGRAM_BREAK);
+    m_menuProgram->insertItem(i18n("&Kill"), ID_PROGRAM_KILL);
+    m_menuProgram->insertItem(i18n("Re&start"), ID_PROGRAM_RUN_AGAIN);
+    m_menuProgram->insertItem(i18n("A&ttach..."), ID_PROGRAM_ATTACH);
+    m_menuProgram->insertSeparator();
+    m_menuProgram->insertItem(i18n("&Arguments..."), ID_PROGRAM_ARGS);
+    m_menuProgram->setAccel(Key_F5, ID_PROGRAM_RUN);
+    m_menuProgram->setAccel(Key_F8, ID_PROGRAM_STEP);
+    m_menuProgram->setAccel(Key_F10, ID_PROGRAM_NEXT);
+    m_menuProgram->setAccel(Key_F6, ID_PROGRAM_FINISH);
+    m_menuProgram->setAccel(Key_F7, ID_PROGRAM_UNTIL);
 
-    m_menuBrkpt.setCheckable(true);
-    m_menuBrkpt.insertItem(i18n("Set/Clear &breakpoint"), ID_BRKPT_SET);
-    m_menuBrkpt.insertItem(i18n("Set &temporary breakpoint"), ID_BRKPT_TEMP);
-    m_menuBrkpt.insertItem(i18n("&Enable/Disable breakpoint"), ID_BRKPT_ENABLE);
-    m_menuBrkpt.insertItem(i18n("&List..."), ID_BRKPT_LIST);
-    m_menuBrkpt.setAccel(Key_F9, ID_BRKPT_SET);
-    m_menuBrkpt.setAccel(SHIFT+Key_F9, ID_BRKPT_TEMP);
-    m_menuBrkpt.setAccel(CTRL+Key_F9, ID_BRKPT_ENABLE);
+    m_menuBrkpt = new QPopupMenu;
+    m_menuBrkpt->insertItem(i18n("Set/Clear &breakpoint"), ID_BRKPT_SET);
+    m_menuBrkpt->insertItem(i18n("Set &temporary breakpoint"), ID_BRKPT_TEMP);
+    m_menuBrkpt->insertItem(i18n("&Enable/Disable breakpoint"), ID_BRKPT_ENABLE);
+    m_menuBrkpt->setAccel(Key_F9, ID_BRKPT_SET);
+    m_menuBrkpt->setAccel(SHIFT+Key_F9, ID_BRKPT_TEMP);
+    m_menuBrkpt->setAccel(CTRL+Key_F9, ID_BRKPT_ENABLE);
 
-    m_menuWindow.insertItem(i18n("&More..."), ID_WINDOW_MORE);
+    m_menuWindow = new QPopupMenu;
+    m_menuWindow->insertItem(i18n("&More..."), ID_WINDOW_MORE);
   
-    connect(&m_menuFile, SIGNAL(activated(int)), SLOT(menuCallback(int)));
-    connect(&m_menuView, SIGNAL(activated(int)), SLOT(menuCallback(int)));
-    connect(&m_menuProgram, SIGNAL(activated(int)), SLOT(menuCallback(int)));
-    connect(&m_menuBrkpt, SIGNAL(activated(int)), SLOT(menuCallback(int)));
-    connect(&m_menuWindow, SIGNAL(activated(int)), SLOT(menuCallback(int)));
+    connect(m_menuFile, SIGNAL(activated(int)), SLOT(menuCallback(int)));
+    connect(m_menuView, SIGNAL(activated(int)), SLOT(menuCallback(int)));
+    connect(m_menuProgram, SIGNAL(activated(int)), SLOT(menuCallback(int)));
+    connect(m_menuBrkpt, SIGNAL(activated(int)), SLOT(menuCallback(int)));
+    connect(m_menuWindow, SIGNAL(activated(int)), SLOT(menuCallback(int)));
 
     KMenuBar* menu = menuBar();
-    menu->insertItem(i18n("&File"), &m_menuFile);
-    menu->insertItem(i18n("&View"), &m_menuView);
-    menu->insertItem(i18n("E&xecution"), &m_menuProgram);
-    menu->insertItem(i18n("&Breakpoint"), &m_menuBrkpt);
-    menu->insertItem(i18n("&Window"), &m_menuWindow);
+    menu->insertItem(i18n("&File"), m_menuFile);
+    menu->insertItem(i18n("&View"), m_menuView);
+    menu->insertItem(i18n("E&xecution"), m_menuProgram);
+    menu->insertItem(i18n("&Breakpoint"), m_menuBrkpt);
+    menu->insertItem(i18n("&Window"), m_menuWindow);
     menu->insertSeparator();
     
     QString about = "KDbg " VERSION " - ";
@@ -273,66 +304,13 @@ void DebuggerMainWnd::readProperties(KConfig* config)
     }
 }
 
-#if QT_VERSION >= 200
-static int getPercentSize(QSplitter* w)
-{
-    const QValueList<int> sizes = w->sizes();
-    int total = *sizes.begin() + *sizes.at(1);
-    int p = *sizes.begin()*100/total;
-    return p;
-}
-
-static void restorePercentSize(QSplitter* w, int percent)
-{
-    QValueList<int> sizes = w->sizes();
-    if (sizes.count() < 2) {
-	w->setSizes(sizes);
-	// only now we have 2 sizes!
-	sizes = w->sizes();
-    }
-    int total = *sizes.begin() + *sizes.at(1);
-    int p1 = total*percent/100;
-    *sizes.begin() = p1;
-    *sizes.at(1) = total-p1;
-    w->setSizes(sizes);
-}
-#endif
-
 const char WindowGroup[] = "Windows";
-const char MainPane[] = "MainPane";
-const char LeftPane[] = "LeftPane";
-const char RightPane[] = "RightPane";
-const char MainPosition[] = "MainPosition";
-const char BreaklistVisible[] = "BreaklistVisible";
-const char Breaklist[] = "Breaklist";
-
 
 void DebuggerMainWnd::saveSettings(KConfig* config)
 {
     KConfigGroupSaver g(config, WindowGroup);
-    // panner positions
-#if QT_VERSION < 200
-    int vsep = m_mainPanner.separatorPos();
-    int lsep = m_leftPanner.separatorPos();
-    int rsep = m_rightPanner.separatorPos();
-#else
-    int vsep = getPercentSize(&m_mainPanner);
-    int lsep = getPercentSize(&m_leftPanner);
-    int rsep = getPercentSize(&m_rightPanner);
-#endif
-    config->writeEntry(MainPane, vsep);
-    config->writeEntry(LeftPane, lsep);
-    config->writeEntry(RightPane, rsep);
-    // window position
-    QRect r = KWM::geometry(winId());
-    config->writeEntry(MainPosition, r);
 
-    // breakpoint window
-    bool visible = m_bpTable.isVisible();
-    // ask window manager for position
-    r = KWM::geometry(m_bpTable.winId());
-    config->writeEntry(BreaklistVisible, visible);
-    config->writeEntry(Breaklist, r);
+    writeDockConfig(config);
 
     DebuggerMainWndBase::saveSettings(config);
 }
@@ -340,31 +318,8 @@ void DebuggerMainWnd::saveSettings(KConfig* config)
 void DebuggerMainWnd::restoreSettings(KConfig* config)
 {
     KConfigGroupSaver g(config, WindowGroup);
-    // window position
-    QRect pos(0,0,600,600);
-    pos = config->readRectEntry(MainPosition, &pos);
-    resize(pos.width(), pos.height());	/* only restore size */
-    // panner positions
-    int vsep = config->readNumEntry(MainPane, 60);
-    int lsep = config->readNumEntry(LeftPane, 70);
-    int rsep = config->readNumEntry(RightPane, 50);
-#if QT_VERSION < 200
-    m_mainPanner.setSeparatorPos(vsep);
-    m_leftPanner.setSeparatorPos(lsep);
-    m_rightPanner.setSeparatorPos(rsep);
-#else
-    restorePercentSize(&m_mainPanner, vsep);
-    restorePercentSize(&m_leftPanner, lsep);
-    restorePercentSize(&m_rightPanner, rsep);
-#endif
 
-    // breakpoint window
-    bool visible = config->readBoolEntry(BreaklistVisible, false);
-    if (config->hasKey(Breaklist)) {
-	QRect r = config->readRectEntry(Breaklist);
-	m_bpTable.setGeometry(r);
-    }
-    visible ? m_bpTable.show() : m_bpTable.hide();
+    readDockConfig(config);
 
     DebuggerMainWndBase::restoreSettings(config);
 }
@@ -386,7 +341,7 @@ void DebuggerMainWnd::menuCallback(int item)
 	{
 	    QString file;
 	    int lineNo;
-	    if (m_filesWindow.activeLine(file, lineNo))
+	    if (m_filesWindow->activeLine(file, lineNo))
 		m_debugger->runUntil(file, lineNo);
 	}
 	break;
@@ -396,7 +351,7 @@ void DebuggerMainWnd::menuCallback(int item)
 	{
 	    QString file;
 	    int lineNo;
-	    if (m_filesWindow.activeLine(file, lineNo))
+	    if (m_filesWindow->activeLine(file, lineNo))
 		m_debugger->setBreakpoint(file, lineNo, item == ID_BRKPT_TEMP);
 	}
 	break;
@@ -405,17 +360,30 @@ void DebuggerMainWnd::menuCallback(int item)
 	{
 	    QString file;
 	    int lineNo;
-	    if (m_filesWindow.activeLine(file, lineNo))
+	    if (m_filesWindow->activeLine(file, lineNo))
 		m_debugger->enableDisableBreakpoint(file, lineNo);
 	}
 	break;
     case ID_BRKPT_LIST:
-	// toggle visibility
-	if (m_bpTable.isVisible()) {
-	    m_bpTable.hide();
-	} else {
-	    m_bpTable.show();
-	}
+	showhideWindow(m_bpTable);
+	break;
+    case ID_VIEW_SOURCE:
+	showhideWindow(m_filesWindow);
+	break;
+    case ID_VIEW_STACK:
+	showhideWindow(m_btWindow);
+	break;
+    case ID_VIEW_LOCALS:
+	showhideWindow(m_localVariables);
+	break;
+    case ID_VIEW_WATCHES:
+	showhideWindow(m_watches);
+	break;
+    case ID_VIEW_REGISTERS:
+	showhideWindow(m_registers);
+	break;
+    case ID_VIEW_THREADS:
+//	showhideWindow(m_btWindow);
 	break;
     default:
 	// forward all others
@@ -429,32 +397,32 @@ void DebuggerMainWnd::updateUI()
 {
     // enumerate all menus
     {
-	UpdateMenuUI updateMenu(&m_menuFile, this, SLOT(updateUIItem(UpdateUI*)));
+	UpdateMenuUI updateMenu(m_menuFile, this, SLOT(updateUIItem(UpdateUI*)));
 	updateMenu.iterateMenu();
     }
     {
-	UpdateMenuUI updateMenu(&m_menuView, this, SLOT(updateUIItem(UpdateUI*)));
+	UpdateMenuUI updateMenu(m_menuView, this, SLOT(updateUIItem(UpdateUI*)));
 	updateMenu.iterateMenu();
     }
     {
-	UpdateMenuUI updateMenu(&m_menuProgram, this, SLOT(updateUIItem(UpdateUI*)));
+	UpdateMenuUI updateMenu(m_menuProgram, this, SLOT(updateUIItem(UpdateUI*)));
 	updateMenu.iterateMenu();
     }
     {
-	UpdateMenuUI updateMenu(&m_menuBrkpt, this, SLOT(updateUIItem(UpdateUI*)));
+	UpdateMenuUI updateMenu(m_menuBrkpt, this, SLOT(updateUIItem(UpdateUI*)));
 	updateMenu.iterateMenu();
     }
 
     // Update winstack float popup items
     {
-	UpdateMenuUI updateMenu(&m_filesWindow.m_menuFloat, this,
+	UpdateMenuUI updateMenu(&m_filesWindow->m_menuFloat, this,
 				SLOT(updateUIItem(UpdateUI*)));
 	updateMenu.iterateMenu();
     }
 
     // Update winstack float file popup items
     {
-	UpdateMenuUI updateMenu(&m_filesWindow.m_menuFileFloat, this,
+	UpdateMenuUI updateMenu(&m_filesWindow->m_menuFileFloat, this,
 				SLOT(updateUIItem(UpdateUI*)));
 	updateMenu.iterateMenu();
     }
@@ -469,11 +437,22 @@ void DebuggerMainWnd::updateUI()
     updateToolbar.iterateToolbar();
 }
 
+void DebuggerMainWnd::dockUpdateHelper(UpdateUI* item, QWidget* w)
+{
+    if (canChangeDockVisibility(w)) {
+	item->enable(true);
+	item->setCheck(isDockVisible(w));
+    } else {
+	item->enable(false);
+	item->setCheck(false);
+    }
+}
+
 void DebuggerMainWnd::updateUIItem(UpdateUI* item)
 {
     switch (item->id) {
     case ID_VIEW_FINDDLG:
-	item->setCheck(m_filesWindow.m_findDlg.isVisible());
+	item->setCheck(m_filesWindow->m_findDlg.isVisible());
 	break;
     case ID_BRKPT_SET:
     case ID_BRKPT_TEMP:
@@ -483,7 +462,25 @@ void DebuggerMainWnd::updateUIItem(UpdateUI* item)
 	item->enable(m_debugger->canChangeBreakpoints());
 	break;
     case ID_BRKPT_LIST:
-	item->setCheck(m_bpTable.isVisible());
+	dockUpdateHelper(item, m_bpTable);
+	break;
+    case ID_VIEW_SOURCE:
+	dockUpdateHelper(item, m_filesWindow);
+	break;
+    case ID_VIEW_STACK:
+	dockUpdateHelper(item, m_btWindow);
+	break;
+    case ID_VIEW_LOCALS:
+	dockUpdateHelper(item, m_localVariables);
+	break;
+    case ID_VIEW_WATCHES:
+	dockUpdateHelper(item, m_watches);
+	break;
+    case ID_VIEW_REGISTERS:
+	dockUpdateHelper(item, m_registers);
+	break;
+    case ID_VIEW_THREADS:
+//	dockUpdateHelper(item, m_filesWindow);
 	break;
     default:
 	DebuggerMainWndBase::updateUIItem(item);
@@ -499,13 +496,13 @@ void DebuggerMainWnd::updateUIItem(UpdateUI* item)
 
 void DebuggerMainWnd::updateLineItems()
 {
-    m_filesWindow.updateLineItems(m_debugger);
+    m_filesWindow->updateLineItems(m_debugger);
 }
 
 void DebuggerMainWnd::slotAddWatch()
 {
     if (m_debugger != 0) {
-	QString t = m_watches.watchText();
+	QString t = m_watches->watchText();
 	m_debugger->addWatch(t);
     }
 }
@@ -526,7 +523,7 @@ void DebuggerMainWnd::slotFileChanged()
     }
     QString file;
     int line;
-    bool anyWindows = m_filesWindow.activeLine(file, line);
+    bool anyWindows = m_filesWindow->activeLine(file, line);
     updateLineStatus(anyWindows ? line : -1);
     if (anyWindows) {
 	caption += " (";
@@ -540,14 +537,14 @@ void DebuggerMainWnd::slotLineChanged()
 {
     QString file;
     int line;
-    bool anyWindows = m_filesWindow.activeLine(file, line);
+    bool anyWindows = m_filesWindow->activeLine(file, line);
     updateLineStatus(anyWindows ? line : -1);
 }
 
 void DebuggerMainWnd::slotNewFileLoaded()
 {
     // updates program counter in the new file
-    m_filesWindow.updateLineItems(m_debugger);
+    m_filesWindow->updateLineItems(m_debugger);
 }
 
 void DebuggerMainWnd::updateLineStatus(int lineNo)
@@ -559,6 +556,38 @@ void DebuggerMainWnd::updateLineStatus(int lineNo)
 	strLine.sprintf(i18n("Line %d"), lineNo + 1);
 	statusBar()->changeItem(strLine, ID_STATUS_LINENO);
     }
+}
+
+DockWidget* DebuggerMainWnd::dockParent(QWidget* w)
+{
+    while ((w = w->parentWidget()) != 0) {
+	if (w->isA("DockWidget"))
+	    return static_cast<DockWidget*>(w);
+    }
+    return 0;
+}
+
+bool DebuggerMainWnd::isDockVisible(QWidget* w)
+{
+    DockWidget* d = dockParent(w);
+    return d != 0 && d->mayBeHide();
+}
+
+bool DebuggerMainWnd::canChangeDockVisibility(QWidget* w)
+{
+    DockWidget* d = dockParent(w);
+    return d != 0 && (d->mayBeHide() || d->mayBeShow());
+}
+
+void DebuggerMainWnd::showhideWindow(QWidget* w)
+{
+    DockWidget* d = dockParent(w);
+    if (d == 0) {
+	TRACE(QString("no dockParent found: ") + d->name());
+	return;
+    }
+    d->changeHideShowState();
+//    updateUI();
 }
 
 KToolBar* DebuggerMainWnd::dbgToolBar()

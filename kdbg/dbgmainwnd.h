@@ -6,20 +6,18 @@
 #ifndef DBGMAINWND_H
 #define DBGMAINWND_H
 
-#include <qlistbox.h>
-#if QT_VERSION < 200
-#include <knewpanner.h>
-#else
-#include <qsplitter.h>
-#endif
-#include <ktmainwindow.h>
+#include "dockmainwindow.h"
 #include "mainwndbase.h"
-#include "winstack.h"
-#include "brkpt.h"
 #include "regwnd.h"
 
+class WinStack;
+class QPopupMenu;
+class QListBox;
+class ExprWnd;
+class DockWidget;
+class BreakpointTable;
 
-class DebuggerMainWnd : public KTMainWindow, public DebuggerMainWndBase
+class DebuggerMainWnd : public DockMainWindow, public DebuggerMainWndBase
 {
     Q_OBJECT
 public:
@@ -41,34 +39,31 @@ protected:
     void initToolbar();
 
     // view windows
-#if QT_VERSION < 200
-    KNewPanner m_mainPanner;
-    KNewPanner m_leftPanner;
-    KNewPanner m_rightPanner;
-#else
-    QSplitter m_mainPanner;
-    QSplitter m_leftPanner;
-    QSplitter m_rightPanner;
-#endif
-    WinStack m_filesWindow;
-    QListBox m_btWindow;
-    ExprWnd m_localVariables;
-    WatchWindow m_watches;
-    BreakpointTable m_bpTable;
-    RegisterView m_registers;
+    WinStack* m_filesWindow;
+    QListBox* m_btWindow;
+    ExprWnd* m_localVariables;
+    WatchWindow* m_watches;
+    RegisterView* m_registers;
+    BreakpointTable* m_bpTable;
 
     // menus
-    QPopupMenu m_menuFile;
-    QPopupMenu m_menuView;
-    QPopupMenu m_menuProgram;
-    QPopupMenu m_menuBrkpt;
-    QPopupMenu m_menuWindow;
+    QPopupMenu* m_menuFile;
+    QPopupMenu* m_menuView;
+    QPopupMenu* m_menuProgram;
+    QPopupMenu* m_menuBrkpt;
+    QPopupMenu* m_menuWindow;
 
 protected:
     virtual void closeEvent(QCloseEvent* e);
     virtual KToolBar* dbgToolBar();
     virtual KStatusBar* dbgStatusBar();
     virtual QWidget* dbgMainWnd();
+
+    DockWidget* dockParent(QWidget* w);
+    bool isDockVisible(QWidget* w);
+    bool canChangeDockVisibility(QWidget* w);
+    void showhideWindow(QWidget* w);
+    void dockUpdateHelper(UpdateUI* item, QWidget* w);
 
 signals:
     void forwardMenuCallback(int item);

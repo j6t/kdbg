@@ -13,7 +13,7 @@
 # kde_wallpaperdir  Where general wallpapers should go to.
 
 # set the include path for X, qt and KDE
-INCLUDES= $(all_includes)
+INCLUDES= $(all_includes) -I$(top_srcdir)/STabCtl -I$(top_srcdir)/DockWidget
 
 # claim, which subdirectories you want to install
 SUBDIRS = doc pics typetables testprogs
@@ -43,10 +43,14 @@ kdbg_SOURCES = \
 	main.cpp
 
 # the library search path
-kdbg_LDFLAGS = $(all_libraries) $(KDE_RPATH)
+kdbg_LDFLAGS = \
+	$(all_libraries) $(KDE_RPATH)
 
 # the libraries to link against.
-kdbg_LDADD   = $(LIB_KFILE)
+kdbg_LDADD   = \
+	$(top_builddir)/DockWidget/libdock_library.a \
+	$(top_builddir)/STabCtl/libtab_library.a \
+	$(LIB_KFILE)
 
 # this option you can leave out. Just, if you use "make dist", you need it
 noinst_HEADERS = \

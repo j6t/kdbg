@@ -506,7 +506,7 @@ void WinStack::setWindowMenu(QPopupMenu* menu)
 
 void WinStack::menuCallback(int item)
 {
-    TRACE(QString().sprintf("menu item=0x%x", item));
+    TRACE("menu item=" + QString().setNum(item));
     // check for window
     if ((item & ~ID_WINDOW_INDEX_MASK) == ID_WINDOW_MORE) {
 	selectWindow(item & ID_WINDOW_INDEX_MASK);
