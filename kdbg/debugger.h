@@ -143,7 +143,7 @@ public:
     /**
      * Tells whether the debuggee can be changed.
      */
-    bool KDebugger::canChangeExecutable() { return isReady() && !m_programActive; }
+    bool canChangeExecutable() { return isReady() && !m_programActive; }
 
     /**
      * Add a watch expression.

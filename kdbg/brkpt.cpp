@@ -333,6 +333,14 @@ void BreakpointTable::viewBP()
     emit activateFileLine(bp->fileName, bp->lineNo);
 }
 
+void BreakpointTable::updateUI()
+{
+    bool enableChkpt = m_debugger.canChangeBreakpoints();
+    m_btAdd.setEnabled(enableChkpt);
+    m_btRemove.setEnabled(enableChkpt);
+    m_btConditional.setEnabled(enableChkpt);
+}
+
 class ConditionalDlg : public QDialog
 {
 public:

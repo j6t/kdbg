@@ -96,6 +96,7 @@ KDebugger::KDebugger(QWidget* parent,
     connect(&m_bpTable, SIGNAL(closed()), SIGNAL(updateUI()));
     connect(&m_bpTable, SIGNAL(activateFileLine(const QString&,int)),
 	    this, SIGNAL(activateFileLine(const QString&,int)));
+    connect(this, SIGNAL(updateUI()), &m_bpTable, SLOT(updateUI()));
 
     // debugger process
     connect(&m_gdb, SIGNAL(receivedStdout(KProcess*,char*,int)),
@@ -107,6 +108,8 @@ KDebugger::KDebugger(QWidget* parent,
     connect(&m_animationTimer, SIGNAL(timeout()), SIGNAL(animationTimeout()));
     // special update of animation
     connect(this, SIGNAL(updateUI()), SLOT(slotUpdateAnimation()));
+
+    emit updateUI();
 }
 
 KDebugger::~KDebugger()
@@ -440,7 +443,7 @@ bool KDebugger::canSingleStep()
 
 bool KDebugger::canChangeBreakpoints()
 {
-    return isReady();
+    return isReady() && !m_programRunning;
 }
 
 

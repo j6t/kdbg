@@ -128,6 +128,7 @@ public slots:
     virtual void removeBP();
     virtual void viewBP();
     virtual void conditionalBP();
+    void updateUI();
 };
 
 #endif // BRKPT_H

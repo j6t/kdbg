@@ -464,10 +464,10 @@ void DebuggerMainWnd::updateUIItem(UpdateUI* item)
 	item->enable(m_debugger->haveExecutable());
     case ID_BRKPT_SET:
     case ID_BRKPT_TEMP:
-	item->enable(m_debugger->isReady());
+	item->enable(m_debugger->canChangeBreakpoints());
 	break;
     case ID_BRKPT_ENABLE:
-	item->enable(m_debugger->isReady());
+	item->enable(m_debugger->canChangeBreakpoints());
 	break;
     case ID_BRKPT_LIST:
 	item->setCheck(m_debugger->isBreakListVisible());
