@@ -23,6 +23,10 @@
 #include "mydebug.h"
 
 
+// helper that checks for matching file names
+static bool fileNamesMatch(const QString& f1, const QString& f2);
+
+
 FileWindow::FileWindow(const char* fileName, QWidget* parent, const char* name) :
 	KTextView(parent, name),
 	m_fileName(fileName)
@@ -198,14 +202,6 @@ void FileWindow::paintCell(QPainter* p, int row, int col)
 
 void FileWindow::updateLineItems(const BreakpointTable& bpt)
 {
-    // get the simple name for this file
-    QString name = fileName();
-    name.detach();
-    int slash = name.findRev('/');
-    if (slash >= 0) {
-	name.remove(0, slash+1);
-    }
-
     // clear outdated breakpoints
     for (int i = m_lineItems.size()-1; i >= 0; i--) {
 	if (m_lineItems[i] & liBPany) {
@@ -214,7 +210,7 @@ void FileWindow::updateLineItems(const BreakpointTable& bpt)
 	    int j;
 	    for (j = bpt.numBreakpoints()-1; j >= 0; j--) {
 		const Breakpoint& bp = bpt.breakpoint(j);
-		if (bp.lineNo == i && bp.fileName == name) {
+		if (bp.lineNo == i && fileNamesMatch(bp.fileName, fileName())) {
 		    // yes it exists; mode is changed below
 		    break;
 		}
@@ -230,7 +226,7 @@ void FileWindow::updateLineItems(const BreakpointTable& bpt)
     // add new breakpoints
     for (int j = bpt.numBreakpoints()-1; j >= 0; j--) {
 	const Breakpoint& bp = bpt.breakpoint(j);
-	if (bp.fileName == name) {
+	if (fileNamesMatch(bp.fileName, fileName())) {
 	    TRACE(QString().sprintf("updating %s:%d", bp.fileName.data(), bp.lineNo));
 	    int i = bp.lineNo;
 	    if (i < 0 || uint(i) >= m_lineItems.size())
