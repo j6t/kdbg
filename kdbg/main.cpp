@@ -38,9 +38,20 @@ int main(int argc, char** argv)
 
     KDebugger debugger("debugger");
 
+    // session management
+    bool restored = false;
+    if (app.isRestored()) {
+	if (KTopLevelWidget::canBeRestored(1)) {
+	    debugger.restore(1);
+	    restored = true;
+	}
+    }
+
     app.setMainWidget(&debugger);
 
-    if (argc > 1) {
+    debugger.show();
+
+    if (!restored && argc > 1) {
 	if (!debugger.debugProgram(argv[1])) {
 	    // failed
 	    TRACE("cannot start debugger");
@@ -51,15 +62,7 @@ int main(int argc, char** argv)
 //	    delete keys;
 	    return 1;
 	}
-    } else {
-	/*
-	 * Ask for executable; this is a workaround since the menu
-	 * doesn't work (kdbg simply exits; this appears to be a bug in Qt).
-	 */
-	debugger.menuCallbackExecutable();
     }
-
-    debugger.show();
 
     int rc = app.exec();
 //    delete keys;
