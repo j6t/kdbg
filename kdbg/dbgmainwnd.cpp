@@ -6,6 +6,7 @@
 #include <kapp.h>
 #include <kiconloader.h>
 #include <kstdaccel.h>
+#include <qpainter.h>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "updateui.h"
@@ -495,10 +496,14 @@ void DebuggerMainWnd::updateLineItems()
 
 void DebuggerMainWnd::initAnimation()
 {
-    QPixmap pixmap;
+#if QT_VERSION < 200
     QString path = kapp->kde_datadir() + "/kfm/pics/";
-
+    QPixmap pixmap;
     pixmap.load(path + "/kde1.xpm");
+#else
+    KIconLoader* loader = kapp->getIconLoader();
+    QPixmap pixmap = loader->loadIcon("kde1.xpm");
+#endif
 
     KToolBar* toolbar = toolBar();
     toolbar->insertButton(pixmap, ID_STATUS_BUSY);
@@ -508,13 +513,25 @@ void DebuggerMainWnd::initAnimation()
     m_animation.setAutoDelete(true);
     QString n;
     for (int i = 1; i <= 9; i++) {
+#if QT_VERSION < 200
 	n.sprintf("/kde%d.xpm", i);
 	QPixmap* p = new QPixmap();
 	p->load(path + n);
+#else
+	n.sprintf("kde%d.xpm", i);
+	QPixmap* p = new QPixmap(loader->loadIcon(n));
+#endif
 	if (!p->isNull()) {
 	    m_animation.append(p);
 	}
     }
+    // safeguard: if we did not find a single icon, add a dummy
+    if (m_animation.count() == 0) {
+	QPixmap* pix = new QPixmap(2,2);
+	QPainter p(pix);
+	p.fillRect(0,0,2,2,QBrush(white));
+    }
+    
     connect(m_debugger, SIGNAL(animationTimeout()), SLOT(slotAnimationTimeout()));
 }
 
