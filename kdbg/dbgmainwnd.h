@@ -7,7 +7,7 @@
 #define DBGMAINWND_H
 
 #include <qtimer.h>
-#include "dockmainwindow.h"
+#include <kdockwidget.h>
 #include "mainwndbase.h"
 #include "regwnd.h"
 
@@ -16,13 +16,12 @@ class WinStack;
 class QListBox;
 class QCString;
 class ExprWnd;
-class DockWidget;
 class BreakpointTable;
 class ThreadList;
 class MemoryWindow;
 struct DbgAddr;
 
-class DebuggerMainWnd : public DockMainWindow, public DebuggerMainWndBase
+class DebuggerMainWnd : public KDockMainWindow, public DebuggerMainWndBase
 {
     Q_OBJECT
 public:
@@ -66,10 +65,11 @@ protected:
     virtual TTYWindow* ttyWindow();
     virtual QString createOutputWindow();
 
-    DockWidget* dockParent(QWidget* w);
+    KDockWidget* dockParent(QWidget* w);
     bool isDockVisible(QWidget* w);
     bool canChangeDockVisibility(QWidget* w);
     void dockUpdateHelper(QString action, QWidget* w);
+    void fixDockConfig(KConfig* c, bool upgrade);
 
     QString makeSourceFilter();
 

@@ -1,7 +1,7 @@
 ## $Id$
 
 # set the include path for X, qt and KDE
-INCLUDES= $(all_includes) -I$(top_srcdir)/STabCtl -I$(top_srcdir)/DockWidget
+INCLUDES= $(all_includes)
 
 # claim, which subdirectories you want to install
 SUBDIRS = doc pics typetables testprogs
@@ -48,10 +48,7 @@ else
 MYKDELIBS=$(LIB_KFILE)
 endif
 
-kdbg_LDADD   = \
-	$(top_builddir)/DockWidget/libdock_library.a \
-	$(top_builddir)/STabCtl/libtab_library.a \
-	$(MYKDELIBS)
+kdbg_LDADD = $(MYKDELIBS)
 
 # this option you can leave out. Just, if you use "make dist", you need it
 noinst_HEADERS = \

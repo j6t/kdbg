@@ -31,42 +31,43 @@
 
 
 DebuggerMainWnd::DebuggerMainWnd(const char* name) :
-	DockMainWindow(name),
+	KDockMainWindow(0, name),
 	DebuggerMainWndBase()
 {
-    setDockManager(new DockManager( this, QString(name)+"_DockManager"));
-
     QPixmap p;
 
-    DockWidget* dw0 = createDockWidget("Source", p);
-    dw0->setCaption(i18n("Source"));
+    KDockWidget* dw0 = createDockWidget("Source", p, 0, i18n("Source"));
     m_filesWindow = new WinStack(dw0, "files");
+    dw0->setWidget(m_filesWindow);
+    dw0->setDockSite(KDockWidget::DockCorner);
+    dw0->setEnableDocking(KDockWidget::DockNone);
     setView(dw0);
+    setMainDockWidget(dw0);
 
-    DockWidget* dw1 = createDockWidget("Stack", p);
-    dw1->setCaption(i18n("Stack"));
+    KDockWidget* dw1 = createDockWidget("Stack", p, 0, i18n("Stack"));
     m_btWindow = new QListBox(dw1, "backtrace");
-    DockWidget* dw2 = createDockWidget("Locals", p);
-    dw2->setCaption(i18n("Locals"));
+    dw1->setWidget(m_btWindow);
+    KDockWidget* dw2 = createDockWidget("Locals", p, 0, i18n("Locals"));
     m_localVariables = new ExprWnd(dw2, "locals");
-    DockWidget* dw3 = createDockWidget("Watches", p);
-    dw3->setCaption(i18n("Watches"));
+    dw2->setWidget(m_localVariables);
+    KDockWidget* dw3 = createDockWidget("Watches", p, 0, i18n("Watches"));
     m_watches = new WatchWindow(dw3, "watches");
-    DockWidget* dw4 = createDockWidget("Registers", p);
-    dw4->setCaption(i18n("Registers"));
+    dw3->setWidget(m_watches);
+    KDockWidget* dw4 = createDockWidget("Registers", p, 0, i18n("Registers"));
     m_registers = new RegisterView(dw4, "registers");
-    DockWidget* dw5 = createDockWidget("Breakpoints", p);
-    dw5->setCaption(i18n("Breakpoints"));
+    dw4->setWidget(m_registers);
+    KDockWidget* dw5 = createDockWidget("Breakpoints", p, 0, i18n("Breakpoints"));
     m_bpTable = new BreakpointTable(dw5, "breakpoints");
-    DockWidget* dw6 = createDockWidget("Output", p);
-    dw6->setCaption(i18n("Output"));
+    dw5->setWidget(m_bpTable);
+    KDockWidget* dw6 = createDockWidget("Output", p, 0, i18n("Output"));
     m_ttyWindow = new TTYWindow(dw6, "output");
-    DockWidget* dw7 = createDockWidget("Threads", p);
-    dw7->setCaption(i18n("Threads"));
+    dw6->setWidget(m_ttyWindow);
+    KDockWidget* dw7 = createDockWidget("Threads", p, 0, i18n("Threads"));
     m_threads = new ThreadList(dw7, "threads");
-    DockWidget* dw8 = createDockWidget("Memory", p);
-    dw8->setCaption(i18n("Memory"));
+    dw7->setWidget(m_threads);
+    KDockWidget* dw8 = createDockWidget("Memory", p, 0, i18n("Memory"));
     m_memoryWindow = new MemoryWindow(dw8, "memory");
+    dw8->setWidget(m_memoryWindow);
 
     setupDebugger(this, m_localVariables, m_watches->watchVariables(), m_btWindow);
     m_bpTable->setDebugger(m_debugger);
@@ -223,7 +224,7 @@ void DebuggerMainWnd::initKAction()
 	{ i18n("&Memory"), m_memoryWindow, "view_memory"}
     };
     for (unsigned i = 0; i < sizeof(dw)/sizeof(dw[0]); i++) {
-	DockWidget* d = dockParent(dw[i].w);
+	KDockWidget* d = dockParent(dw[i].w);
 	(void)new KToggleAction(dw[i].text, 0, d, SLOT(changeHideShowState()),
 			  actionCollection(), dw[i].id);
     }
@@ -368,6 +369,7 @@ void DebuggerMainWnd::saveSettings(KConfig* config)
     KConfigGroupSaver g(config, WindowGroup);
 
     writeDockConfig(config);
+    fixDockConfig(config, false);	// downgrade
 
     m_recentExecAction->saveEntries(config, RecentExecutables);
 
@@ -378,6 +380,7 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
 {
     KConfigGroupSaver g(config, WindowGroup);
 
+    fixDockConfig(config, true);	// upgrade
     readDockConfig(config);
 
     m_recentExecAction->loadEntries(config, RecentExecutables);
@@ -507,25 +510,58 @@ void DebuggerMainWnd::updateLineStatus(int lineNo)
     }
 }
 
-DockWidget* DebuggerMainWnd::dockParent(QWidget* w)
+KDockWidget* DebuggerMainWnd::dockParent(QWidget* w)
 {
     while ((w = w->parentWidget()) != 0) {
-	if (w->isA("DockWidget"))
-	    return static_cast<DockWidget*>(w);
+	if (w->isA("KDockWidget"))
+	    return static_cast<KDockWidget*>(w);
     }
     return 0;
 }
 
 bool DebuggerMainWnd::isDockVisible(QWidget* w)
 {
-    DockWidget* d = dockParent(w);
+    KDockWidget* d = dockParent(w);
     return d != 0 && d->mayBeHide();
 }
 
 bool DebuggerMainWnd::canChangeDockVisibility(QWidget* w)
 {
-    DockWidget* d = dockParent(w);
+    KDockWidget* d = dockParent(w);
     return d != 0 && (d->mayBeHide() || d->mayBeShow());
+}
+
+// upgrades the entries from version 0.0.4 to 0.0.5 and back
+void DebuggerMainWnd::fixDockConfig(KConfig* c, bool upgrade)
+{
+    static const char dockGroup[] = "dock_setting_default";
+    if (!c->hasGroup(dockGroup))
+	return;
+
+    static const char oldVersion[] = "0.0.4";
+    static const char newVersion[] = "0.0.5";
+    const char* from = upgrade ? oldVersion : newVersion;
+    const char* to   = upgrade ? newVersion : oldVersion;
+    QMap<QString,QString> e = c->entryMap(dockGroup);
+    if (e["Version"] != from)
+	return;
+
+    KConfigGroupSaver g(c, dockGroup);
+    c->writeEntry("Version", to);
+    TRACE(upgrade ? "upgrading dockconfig" : "downgrading dockconfig");
+
+    // turn all orientation entries from 0 to 1 and from 1 to 0
+    QMap<QString,QString>::Iterator i;
+    for (i = e.begin(); i != e.end(); ++i)
+    {
+	if (i.key().right(12) == ":orientation") {
+	    TRACE("upgrading " + i.key() + " old value: " + *i);
+	    int orientation = c->readNumEntry(i.key(), -1);
+	    if (orientation >= 0) {	// paranoia
+		c->writeEntry(i.key(), 1 - orientation);
+	    }
+	}
+    }
 }
 
 TTYWindow* DebuggerMainWnd::ttyWindow()
