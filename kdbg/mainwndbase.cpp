@@ -21,7 +21,7 @@
 
 KStdAccel* keys = 0;
 
-WatchWindow::WatchWindow(QWidget* parent, const char* name, WFlags f = 0) :
+WatchWindow::WatchWindow(QWidget* parent, const char* name, WFlags f) :
 	QWidget(parent, name, f),
 	m_watchEdit(this, "watch_edit"),
 	m_watchAdd(i18n(" Add "), this, "watch_add"),
@@ -229,8 +229,7 @@ void DebuggerMainWndBase::initAnimation()
     QPixmap pixmap;
     pixmap.load(path + "/kde1.xpm");
 #else
-    KIconLoader* loader = kapp->getIconLoader();
-    QPixmap pixmap = loader->loadIcon("kde1.xpm");
+    QPixmap pixmap = BarIcon("kde1");
 #endif
 
     KToolBar* toolbar = toolBar();
@@ -246,11 +245,13 @@ void DebuggerMainWndBase::initAnimation()
 	QPixmap* p = new QPixmap();
 	p->load(path + n);
 #else
-	n.sprintf("kde%d.xpm", i);
-	QPixmap* p = new QPixmap(loader->loadIcon(n));
+	n.sprintf("kde%d", i);
+	QPixmap* p = new QPixmap(BarIcon(n));
 #endif
 	if (!p->isNull()) {
 	    m_animation.append(p);
+	} else {
+	    delete p;
 	}
     }
     // safeguard: if we did not find a single icon, add a dummy

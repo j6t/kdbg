@@ -8,9 +8,24 @@ dnl without this order in this file, automake will be confused!
 dnl the argument 
 AM_CONFIG_HEADER(config.h)
 
+dnl ask for Qt and KDE version
+AC_ARG_WITH(kde-version,
+  [  --with-kde-version=N    KDE version to configure for: 1 (default) or 2],
+  :, with_kde_version=1)
+if test "x$with_kde_version" = "x1"; then
+  AC_MSG_RESULT("configuring for KDE 1.1.x and Qt 1.4x")
+elif test "x$with_kde_version" = "x2"; then
+  AC_MSG_RESULT("configuring for KDE 2 and Qt 2.0")
+else
+  AC_ERROR([The argument to --with-kde-version must be
+   1    for KDE 1.1.x or
+   2    for KDE 2
+and nothing else!])
+fi
+
 dnl insert here your program name and version number
-KDE_USE_QT(1,>= 1.42, QT_VERSION >= 142)
-KDE_DO_IT_ALL(kdbg, 1.0beta2)
+KDE_USE_QT($with_kde_version)
+KDE_DO_IT_ALL(kdbg, 1.0beta3)
 
 dnl in this space add everything you want to check for
 dnl examples are specific headers, libraries, etc.

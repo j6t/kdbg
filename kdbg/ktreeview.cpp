@@ -3,7 +3,7 @@
  *
  * KTreeView implementation
  * 
- * Copyright (C) 1997 Johannes Sixt
+ * Copyright (C) 1997-1999 Johannes Sixt
  * 
  * based on KTreeList, which is
  * Copyright (C) 1996 Keith Brown and KtSoft
@@ -770,9 +770,9 @@ void KTreeView::clear()
 	clearing = FALSE;
   if(goingDown || QApplication::closingDown())
     return;
+  setAutoUpdate(autoU);
   if(autoU && isVisible())
     repaint();
-  setAutoUpdate(autoU);
 }
 
 // return a count of all the items in the tree, whether visible or not
@@ -1328,9 +1328,9 @@ void KTreeView::appendChildItem(KTreeViewItem* theParent,
 	bool autoU = autoUpdate();
 	setAutoUpdate(false);
 	updateVisibleItems();
-	if(autoU && isVisible())
-	    repaint();
 	setAutoUpdate(autoU);
+	if (autoU && isVisible())
+	    repaint();
     }
 }
 
@@ -1387,9 +1387,9 @@ void KTreeView::collapseSubTree(KTreeViewItem* subRoot, bool emitSignal)
 	if (emitSignal) {
 	    emit collapsed(itemRow(subRoot));
 	}
+	setAutoUpdate(autoU);
 	if (autoU && isVisible())
 	    repaint();
-	setAutoUpdate(autoU);
     }
 }
 
@@ -1433,9 +1433,9 @@ void KTreeView::expandSubTree(KTreeViewItem* subRoot, bool emitSignal)
 	if (emitSignal) {
 	    emit expanded(itemRow(subRoot));
 	}
+	setAutoUpdate(autoU);
 	if (autoU && isVisible())
 	    repaint();
-	setAutoUpdate(autoU);
     }
 }
 
@@ -1537,9 +1537,9 @@ bool KTreeView::insertItem(KTreeViewItem* referenceItem,
 	bool autoU = autoUpdate();
 	setAutoUpdate(FALSE);
 	updateVisibleItems();
-	if(autoU && isVisible())
-	    repaint();
 	setAutoUpdate(autoU);
+	if (autoU && isVisible())
+	    repaint();
     }
     return true;
 }
@@ -1569,9 +1569,9 @@ void KTreeView::join(KTreeViewItem *item)
     setAutoUpdate(FALSE);
     takeItem(item);
     insertItem(itemParent, item, FALSE);
+    setAutoUpdate(autoU);
     if(autoU && isVisible())
       repaint();
-    setAutoUpdate(autoU);
   }
 }
 
@@ -1701,9 +1701,9 @@ void KTreeView::lowerItem(KTreeViewItem *item)
     setAutoUpdate(FALSE);
     takeItem(item);
     insertItem(itemParent->childAt(itemChildIndex), item, FALSE);
+    setAutoUpdate(autoU);
     if(autoU && isVisible())
       repaint();
-    setAutoUpdate(autoU);
   }
 }
 
@@ -1931,9 +1931,9 @@ void KTreeView::raiseItem(KTreeViewItem *item)
     setAutoUpdate(FALSE);
     takeItem(item);
     insertItem(itemParent->childAt(--itemChildIndex), item, TRUE);
+    setAutoUpdate(autoU);
     if(autoU && isVisible())
       repaint();
-    setAutoUpdate(autoU);
   }
 }
 
@@ -2019,9 +2019,9 @@ void KTreeView::split(KTreeViewItem *item)
   setAutoUpdate(FALSE);
   takeItem(item);
   appendChildItem(itemParent->childAt(--itemChildIndex), item);
+  setAutoUpdate(autoU);
   if(autoU && isVisible())
     repaint();
-  setAutoUpdate(autoU);
 }
 
 // removes the item from the tree without deleting it
@@ -2058,10 +2058,9 @@ void KTreeView::takeItem(KTreeViewItem* item)
 	bool autoU = autoUpdate();
 	setAutoUpdate(FALSE);
 	updateVisibleItems();
-
+	setAutoUpdate(autoU);
 	if (autoU && isVisible())
 	    repaint();
-	setAutoUpdate(autoU);
     }
 
     // re-seat the current item

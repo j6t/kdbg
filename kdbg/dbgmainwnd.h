@@ -7,7 +7,11 @@
 #define DBGMAINWND_H
 
 #include <qlistbox.h>
+#if QT_VERSION < 200
 #include <knewpanner.h>
+#else
+#include <qsplitter.h>
+#endif
 #include "mainwndbase.h"
 #include "winstack.h"
 
@@ -34,9 +38,15 @@ protected:
     void initToolbar();
 
     // view windows
+#if QT_VERSION < 200
     KNewPanner m_mainPanner;
     KNewPanner m_leftPanner;
     KNewPanner m_rightPanner;
+#else
+    QSplitter m_mainPanner;
+    QSplitter m_leftPanner;
+    QSplitter m_rightPanner;
+#endif
     WinStack m_filesWindow;
     QListBox m_btWindow;
     ExprWnd m_localVariables;

@@ -162,7 +162,11 @@ void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
 	    return;
 	}
 	const QString& typeName =
+#if QT_VERSION < 200
 	    QString(start+1, p-start-3+1) // minus 3 chars plus '\0'
+#else
+	    QString::fromLatin1(start+1, p-start-3) // minus 3 chars
+#endif
 		.stripWhiteSpace();
 	m_type = typeTable.lookup(typeName);
 	if (m_type == 0) {
@@ -232,8 +236,12 @@ ExprWnd::ExprWnd(QWidget* parent, const char* name) :
     connect(this, SIGNAL(expanded(int)), SLOT(slotExpandOrCollapse(int)));
     connect(this, SIGNAL(collapsed(int)), SLOT(slotExpandOrCollapse(int)));
 
+#if QT_VERSION < 200
     KIconLoader* loader = kapp->getIconLoader();
     m_pixPointer = loader->loadIcon("pointer.xpm");
+#else
+    m_pixPointer = BarIcon("pointer.xpm");
+#endif
     if (m_pixPointer.isNull())
 	TRACE("Can't load pointer.xpm");
 }

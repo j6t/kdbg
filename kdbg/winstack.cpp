@@ -38,6 +38,7 @@ FileWindow::FileWindow(const char* fileName, QWidget* parent, const char* name) 
     setFont(QFont("courier"));
 
     // load pixmaps
+#if QT_VERSION < 200
     KIconLoader* loader = kapp->getIconLoader();
     m_pcinner = loader->loadIcon("pcinner.xpm");
     m_pcup = loader->loadIcon("pcup.xpm");
@@ -45,6 +46,14 @@ FileWindow::FileWindow(const char* fileName, QWidget* parent, const char* name) 
     m_brkdis = loader->loadIcon("brkdis.xpm");
     m_brktmp = loader->loadIcon("brktmp.xpm");
     m_brkcond = loader->loadIcon("brkcond.xpm");
+#else
+    m_pcinner = BarIcon("pcinner");
+    m_pcup = BarIcon("pcup");
+    m_brkena = BarIcon("brkena");
+    m_brkdis = BarIcon("brkdis");
+    m_brktmp = BarIcon("brktmp");
+    m_brkcond = BarIcon("brkcond");
+#endif
 }
 
 FileWindow::~FileWindow()

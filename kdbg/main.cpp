@@ -7,8 +7,12 @@
 #include <kapp.h>
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
-#endif
+#include <kmessagebox.h>
+#include <kglobal.h>
+#include <kstddirs.h>
+#else
 #include <kmsgbox.h>
+#endif
 #include <kstdaccel.h>
 #include "dbgmainwnd.h"
 #include "typetable.h"
@@ -24,6 +28,10 @@
 int main(int argc, char** argv)
 {
     KApplication app(argc, argv, "kdbg");
+
+#if QT_VERSION >= 200
+    KGlobal::dirs()->addResourceType("types", "share/apps/kdbg/types");
+#endif
 
     keys = new KStdAccel(app.getConfig());
 
@@ -53,10 +61,14 @@ int main(int argc, char** argv)
 	if (!debugger.debugProgram(argv[1])) {
 	    // failed
 	    TRACE("cannot start debugger");
+#if QT_VERSION < 200
 	    KMsgBox::message(&debugger, kapp->appName(),
 			     i18n("Cannot start debugger."),
 			     KMsgBox::STOP,
 			     i18n("OK"));
+#else
+	    KMessageBox::error(&debugger, i18n("Cannot start debugger."));
+#endif
 	    debugger.setCoreFile("");
 //	    delete keys;
 	}

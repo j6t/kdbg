@@ -130,7 +130,7 @@ void PgmArgs::modifyVar()
 {
     QString name, value;
     parseEnvInput(name, value);
-    if (name.isEmpty())
+    if (name.isEmpty() || name.find(' ') >= 0)	/* disallow spaces in names */
 	return;
 
     // lookup the value in the dictionary
@@ -198,13 +198,17 @@ void PgmArgs::deleteVar()
 void PgmArgs::parseEnvInput(QString& name, QString& value)
 {
     // parse input from edit field
-    const char* input = m_envVar.text();
-    const char* equalSign = strchr(input, '=');
-    if (equalSign != 0) {
-	name = QString(input, equalSign-input+1).stripWhiteSpace();
-	value = equalSign+1;
+    QString input = m_envVar.text();
+    int equalSign = input.find('=');
+    if (equalSign >= 0) {
+	name = input.left(equalSign).stripWhiteSpace();
+#if QT_VERSION < 200
+	value = input.mid(equalSign+1,input.length());
+#else
+	value = input.mid(equalSign+1);
+#endif
     } else {
-	name = QString(input).stripWhiteSpace();
+	name = input.stripWhiteSpace();
 	value = QString();		/* value is empty */
     }
 }

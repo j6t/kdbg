@@ -24,7 +24,7 @@ PICTOGRAMS = \
 icon_DATA = kdbg.xpm
 icondir = $(kde_icondir)
 miniicon_DATA = mini-kdbg.xpm
-miniicondir = $(kde_minidir)
+miniicondir = $(kde_icondir)/mini
 pics_DATA = $(TOOLBAR) $(PICTOGRAMS)
 picsdir = $(kde_datadir)/kdbg/pics
 

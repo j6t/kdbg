@@ -5,7 +5,12 @@
 
 #include <qdir.h>
 #include <qlist.h>
+#if QT_VERSION < 200
 #include <kapp.h>
+#else
+#include <kglobal.h>
+#include <kstddirs.h>
+#endif
 #include <ksimpleconfig.h>
 #include "typetable.h"
 #include "mydebug.h"
@@ -30,8 +35,8 @@ void TypeTable::loadTypeTables()
 {
     typeTablesInited = true;
 
-    QDir dir(KApplication::kde_datadir() + "/kdbg/types");
 #if QT_VERSION < 200
+    QDir dir(KApplication::kde_datadir() + "/kdbg/types");
     const QStrList* files = dir.entryList("*.kdbgtt");
 	
     if (files == 0) {
@@ -39,7 +44,7 @@ void TypeTable::loadTypeTables()
 	return;
     }
 #else
-    const QStringList files = dir.entryList("*.kdbgtt");
+    const QStringList files = KGlobal::dirs()->findAllResources("types", "*.kdbgtt");
     
     if (files.isEmpty()) {
 	TRACE("no type tables found");
@@ -53,7 +58,7 @@ void TypeTable::loadTypeTables()
 	fileName = dir.filePath(it.current());
 #else
     for (QValueListConstIterator<QString> p = files.begin(); p != files.end(); ++p) {
-	fileName = dir.filePath(*p);
+	fileName = *p;
 #endif
 	TypeTable* newTable = new TypeTable;
 	newTable->loadFromFile(fileName);

@@ -7,6 +7,12 @@ To install:
 	make
 	make install
 
+To compile and install for KDE 2 and Qt 2.x:
+
+	./configure --with-kde-version=2
+	make
+	make install
+
 
 Problem reports as well as success stories are welcome!
 

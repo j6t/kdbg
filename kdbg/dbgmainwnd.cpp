@@ -6,6 +6,8 @@
 #include <kapp.h>
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
+#include <kmenubar.h>
+#include <kconfig.h>
 #endif
 #include <kiconloader.h>
 #include <kstdaccel.h>
@@ -21,9 +23,15 @@
 
 DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	DebuggerMainWndBase(name),
+#if QT_VERSION < 200
 	m_mainPanner(this, "main_pane", KNewPanner::Vertical, KNewPanner::Percent, 60),
 	m_leftPanner(&m_mainPanner, "left_pane", KNewPanner::Horizontal, KNewPanner::Percent, 70),
 	m_rightPanner(&m_mainPanner, "right_pane", KNewPanner::Horizontal, KNewPanner::Percent, 50),
+#else
+	m_mainPanner(QSplitter::Horizontal, this, "main_pane"),
+	m_leftPanner(QSplitter::Vertical, &m_mainPanner, "left_pane"),
+	m_rightPanner(QSplitter::Vertical, &m_mainPanner, "right_pane"),
+#endif
 	m_filesWindow(&m_leftPanner, "files"),
 	m_btWindow(&m_leftPanner, "backtrace"),
 	m_localVariables(&m_rightPanner, "locals"),
@@ -35,11 +43,12 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 
     setupDebugger(&m_localVariables, m_watches.watchVariables(), &m_btWindow);
 
+#if QT_VERSION < 200
     m_mainPanner.activate(&m_leftPanner, &m_rightPanner);
-    setView(&m_mainPanner, true);	/* show frame */
-
     m_leftPanner.activate(&m_filesWindow, &m_btWindow);
     m_rightPanner.activate(&m_localVariables, &m_watches);
+#endif
+    setView(&m_mainPanner, true);	/* show frame */
 
     connect(&m_watches, SIGNAL(addWatch()), SLOT(slotAddWatch()));
     connect(&m_watches, SIGNAL(deleteWatch()), m_debugger, SLOT(slotDeleteWatch()));
@@ -154,31 +163,36 @@ void DebuggerMainWnd::initMenu()
 		     kapp->getHelpMenu(false, about));
 }
 
+#if QT_VERSION < 200
+static QPixmap BarIcon(const char* name)
+{
+    return kapp->getIconLoader()->loadIcon(name);
+}
+#endif
+
 void DebuggerMainWnd::initToolbar()
 {
-    KIconLoader* loader = kapp->getIconLoader();
-
     KToolBar* toolbar = toolBar();
-    toolbar->insertButton(loader->loadIcon("execopen.xpm"),ID_FILE_EXECUTABLE, true,
+    toolbar->insertButton(BarIcon("execopen.xpm"),ID_FILE_EXECUTABLE, true,
 			   i18n("Executable"));
-    toolbar->insertButton(loader->loadIcon("fileopen.xpm"),ID_FILE_OPEN, true,
+    toolbar->insertButton(BarIcon("fileopen.xpm"),ID_FILE_OPEN, true,
 			   i18n("Open a source file"));
-    toolbar->insertButton(loader->loadIcon("reload.xpm"),ID_FILE_RELOAD, true,
+    toolbar->insertButton(BarIcon("reload.xpm"),ID_FILE_RELOAD, true,
 			   i18n("Reload source file"));
     toolbar->insertSeparator();
-    toolbar->insertButton(loader->loadIcon("pgmrun.xpm"),ID_PROGRAM_RUN, true,
+    toolbar->insertButton(BarIcon("pgmrun.xpm"),ID_PROGRAM_RUN, true,
 			   i18n("Run/Continue"));
-    toolbar->insertButton(loader->loadIcon("pgmstep.xpm"),ID_PROGRAM_STEP, true,
+    toolbar->insertButton(BarIcon("pgmstep.xpm"),ID_PROGRAM_STEP, true,
 			   i18n("Step into"));
-    toolbar->insertButton(loader->loadIcon("pgmnext.xpm"),ID_PROGRAM_NEXT, true,
+    toolbar->insertButton(BarIcon("pgmnext.xpm"),ID_PROGRAM_NEXT, true,
 			   i18n("Step over"));
-    toolbar->insertButton(loader->loadIcon("pgmfinish.xpm"),ID_PROGRAM_FINISH, true,
+    toolbar->insertButton(BarIcon("pgmfinish.xpm"),ID_PROGRAM_FINISH, true,
 			   i18n("Step out"));
     toolbar->insertSeparator();
-    toolbar->insertButton(loader->loadIcon("brkpt.xpm"),ID_BRKPT_SET, true,
+    toolbar->insertButton(BarIcon("brkpt.xpm"),ID_BRKPT_SET, true,
 			   i18n("Breakpoint"));
     toolbar->insertSeparator();
-    toolbar->insertButton(loader->loadIcon("search.xpm"),ID_VIEW_FINDDLG, true,
+    toolbar->insertButton(BarIcon("search.xpm"),ID_VIEW_FINDDLG, true,
 			   i18n("Search"));
 
     connect(toolbar, SIGNAL(clicked(int)), SLOT(menuCallback(int)));
@@ -229,6 +243,31 @@ void DebuggerMainWnd::readProperties(KConfig* config)
     }
 }
 
+#if QT_VERSION >= 200
+static int getPercentSize(QSplitter* w)
+{
+    const QValueList<int> sizes = w->sizes();
+    int total = *sizes.begin() + *sizes.at(1);
+    int p = *sizes.begin()*100/total;
+    return p;
+}
+
+static void restorePercentSize(QSplitter* w, int percent)
+{
+    QValueList<int> sizes = w->sizes();
+    if (sizes.count() < 2) {
+	w->setSizes(sizes);
+	// only now we have 2 sizes!
+	sizes = w->sizes();
+    }
+    int total = *sizes.begin() + *sizes.at(1);
+    int p1 = total*percent/100;
+    *sizes.begin() = p1;
+    *sizes.at(1) = total-p1;
+    w->setSizes(sizes);
+}
+#endif
+
 const char WindowGroup[] = "Windows";
 const char MainPane[] = "MainPane";
 const char LeftPane[] = "LeftPane";
@@ -239,9 +278,15 @@ void DebuggerMainWnd::saveSettings(KConfig* config)
 {
     KConfigGroupSaver g(config, WindowGroup);
     // panner positions
+#if QT_VERSION < 200
     int vsep = m_mainPanner.separatorPos();
     int lsep = m_leftPanner.separatorPos();
     int rsep = m_rightPanner.separatorPos();
+#else
+    int vsep = getPercentSize(&m_mainPanner);
+    int lsep = getPercentSize(&m_leftPanner);
+    int rsep = getPercentSize(&m_rightPanner);
+#endif
     config->writeEntry(MainPane, vsep);
     config->writeEntry(LeftPane, lsep);
     config->writeEntry(RightPane, rsep);
@@ -255,17 +300,23 @@ void DebuggerMainWnd::saveSettings(KConfig* config)
 void DebuggerMainWnd::restoreSettings(KConfig* config)
 {
     KConfigGroupSaver g(config, WindowGroup);
-    // panner positions
-    int vsep = config->readNumEntry(MainPane, 60);
-    int lsep = config->readNumEntry(LeftPane, 70);
-    int rsep = config->readNumEntry(RightPane, 50);
-    m_mainPanner.setSeparatorPos(vsep);
-    m_leftPanner.setSeparatorPos(lsep);
-    m_rightPanner.setSeparatorPos(rsep);
     // window position
     QRect pos(0,0,600,600);
     pos = config->readRectEntry(MainPosition, &pos);
     resize(pos.width(), pos.height());	/* only restore size */
+    // panner positions
+    int vsep = config->readNumEntry(MainPane, 60);
+    int lsep = config->readNumEntry(LeftPane, 70);
+    int rsep = config->readNumEntry(RightPane, 50);
+#if QT_VERSION < 200
+    m_mainPanner.setSeparatorPos(vsep);
+    m_leftPanner.setSeparatorPos(lsep);
+    m_rightPanner.setSeparatorPos(rsep);
+#else
+    restorePercentSize(&m_mainPanner, vsep);
+    restorePercentSize(&m_leftPanner, lsep);
+    restorePercentSize(&m_rightPanner, rsep);
+#endif
 
     DebuggerMainWndBase::restoreSettings(config);
 }

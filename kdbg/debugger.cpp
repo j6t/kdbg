@@ -15,12 +15,14 @@
 #include <qlistbox.h>
 #include <kapp.h>
 #include <kfiledialog.h>
-#include <kmsgbox.h>
 #include <ksimpleconfig.h>
 #include <kconfig.h>
 #include <kwm.h>
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
+#include <kmessagebox.h>
+#else
+#include <kmsgbox.h>
 #endif
 #include <ctype.h>
 
@@ -234,10 +236,14 @@ bool KDebugger::debugProgram(const QString& name)
 	QString msg;
 #endif
 	msg.sprintf(msgFmt, name.data());
+#if QT_VERSION < 200
 	KMsgBox::message(parentWidget(), kapp->appName(),
 			 msg,
 			 KMsgBox::STOP,
 			 i18n("OK"));
+#else
+	KMessageBox::sorry(parentWidget(), msg);
+#endif
 	return false;
     }
 
@@ -619,9 +625,13 @@ void KDebugger::gdbExited(KProcess*)
     if (m_explicitKill) {
 	TRACE("gdb exited normally");
     } else {
-	const char* msg = i18n("gdb exited unexpectedly.\n"
-			       "Restart the session (e.g. with File|Executable).");
+	QString msg = i18n("gdb exited unexpectedly.\n"
+			   "Restart the session (e.g. with File|Executable).");
+#if QT_VERSION < 200
 	KMsgBox::message(parentWidget(), kapp->appName(), msg, KMsgBox::EXCLAMATION);
+#else
+	KMessageBox::error(parentWidget(), msg);
+#endif
     }
 
     // reset state
@@ -758,7 +768,8 @@ bool KDebugger::createOutputWindow()
 	}
 
 	// remove whitespace
-	QString tty(ttyname, n+1);
+	ttyname[n] = '\0';
+	QString tty = ttyname;
 	m_outputTermName = tty.stripWhiteSpace();
 	m_outputTermPID = pid;
 	TRACE(QString().sprintf("tty=%s", m_outputTermName.data()));
@@ -1001,9 +1012,9 @@ void KDebugger::commandRead(KProcess*)
 
     // re-receive delayed output
     if (m_delayedOutput.current() != 0) {
-	QString* delayed;
+	DelayedStr* delayed;
 	while ((delayed = m_delayedOutput.dequeue()) != 0) {
-	    const char* str = *delayed;
+	    const char* str = delayed->data();
 	    receiveOutput(0, const_cast<char*>(str), delayed->length());
 	    delete delayed;
 	}
@@ -1029,7 +1040,7 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
 	 * output, it will be re-sent by commandRead when it gets the
 	 * acknowledgment for the uncommitted command.
 	 */
-	m_delayedOutput.enqueue(new QString(buffer, buflen+1));
+	m_delayedOutput.enqueue(new DelayedStr(buffer, buflen+1));
 	return;
     }
 #ifdef GDB_TRANSCRIPT
@@ -1048,7 +1059,7 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
      */
     if (m_activeCmd == 0 && m_state != DSinterrupted) {
 	// ignore the output
-	TRACE("ignoring stray output: " + QString(buffer, buflen+1));
+	TRACE("ignoring stray output: " + DelayedStr(buffer, buflen+1));
 	return;
     }
     ASSERT(m_state == DSrunning || m_state == DSrunningLow || m_state == DSinterrupted);
@@ -1115,7 +1126,7 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
 	*m_gdbOutput = '\0';
 	// also clear delayed output if interrupted
 	if (m_state == DSinterrupted) {
-	    QString* delayed;
+	    DelayedStr* delayed;
 	    while ((delayed = m_delayedOutput.dequeue()) != 0) {
 		delete delayed;
 	    }
@@ -1223,8 +1234,12 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	    }
 	} else {
 	    QString msg = "gdb: " + QString(m_gdbOutput);
+#if QT_VERSION < 200
 	    KMsgBox::message(parentWidget(), kapp->appName(), msg,
 			     KMsgBox::STOP, i18n("OK"));
+#else
+	    KMessageBox::sorry(parentWidget(), msg);
+#endif
 	    m_executable = "";
 	    m_corefile = "";		/* don't process core file */
 	    m_haveExecutable = false;
@@ -1241,8 +1256,12 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	} else {
 	    // report error
 	    QString msg = "gdb: " + QString(m_gdbOutput);
+#if QT_VERSION < 200
 	    KMsgBox::message(parentWidget(), kapp->appName(), msg,
 			     KMsgBox::EXCLAMATION, i18n("OK"));
+#else
+	    KMessageBox::sorry(parentWidget(), msg);
+#endif
 	    // if core file was loaded from command line, revert to info line main
 	    if (!cmd->m_byUser) {
 		queueCmd(DCinfolinemain, "info line main", QMnormal);
@@ -1372,7 +1391,11 @@ void KDebugger::handleRunCommands()
 	    if (endOfMessage == 0) {
 		msg = start;
 	    } else {
-		msg = QString(start, endOfMessage-start);
+#if QT_VERSION < 200
+		msg = QString(start, endOfMessage-start+1);
+#else
+		msg = QString::fromLatin1(start, endOfMessage-start);
+#endif
 	    }
 	} else if (strncmp(start, "Breakpoint ", 11) == 0) {
 	    /*
@@ -1539,6 +1562,9 @@ void KDebugger::handleLocals()
 	    // remove the new variable from the list
 	    newVars.remove();
 	    delete v;
+#if QT_VERSION >= 200
+	    repaintNeeded = true;
+#endif
 	}
     }
     // insert all remaining new variables
@@ -1549,9 +1575,9 @@ void KDebugger::handleLocals()
     }
 
     // repaint
+    m_localVariables.setAutoUpdate(autoU);
     if (repaintNeeded && autoU && m_localVariables.isVisible())
 	m_localVariables.repaint();
-    m_localVariables.setAutoUpdate(autoU);
 }
 
 void KDebugger::parseLocals(QList<VarTree>& newVars)
@@ -1856,6 +1882,13 @@ error:
     return variable;
 }
 
+#if QT_VERSION < 200
+#define ISSPACE(c) isspace((c))
+#else
+// c is a QChar
+#define ISSPACE(c) (c).isSpace()
+#endif
+
 bool parseFrame(const char*& s, int& frameNo, QString& func, QString& file, int& lineNo)
 {
     // Example:
@@ -1919,7 +1952,11 @@ bool parseFrame(const char*& s, int& frameNo, QString& func, QString& file, int&
 	do {
 	    --colon;
 	} while (*colon != ':');
+#if QT_VERSION < 200
 	file = QString(fileStart, colon-fileStart+1);
+#else
+	file = QString::fromLatin1(fileStart, colon-fileStart);
+#endif
 	lineNo = atoi(colon+1);
 	// skip new-line
 	if (*p != '\0')
@@ -1942,24 +1979,28 @@ bool parseFrame(const char*& s, int& frameNo, QString& func, QString& file, int&
     if (*p == '\0') {
 	func = start;
     } else {
+#if QT_VERSION < 200
 	func = QString(start, p-start);	/* don't include \n */
+#else
+	func = QString::fromLatin1(start, p-start-1);	/* don't include \n */
+#endif
     }
     s = p;
 
     // replace \n (and whitespace around it) in func by a blank
-    ASSERT(!isspace(func[0]));		/* there must be non-white before first \n */
+    ASSERT(!ISSPACE(func[0]));		/* there must be non-white before first \n */
     int nl = 0;
     while ((nl = func.find('\n', nl)) >= 0) {
 	// search back to the beginning of the whitespace
 	int startWhite = nl;
 	do {
 	    --startWhite;
-	} while (isspace(func[startWhite]));
+	} while (ISSPACE(func[startWhite]));
 	startWhite++;
 	// search forward to the end of the whitespace
 	do {
 	    nl++;
-	} while (isspace(func[nl]));
+	} while (ISSPACE(func[nl]));
 	// replace
 	func.replace(startWhite, nl-startWhite, " ");
 	/* continue searching for more \n's at this place: */
@@ -1967,6 +2008,8 @@ bool parseFrame(const char*& s, int& frameNo, QString& func, QString& file, int&
     }
     return true;
 }
+
+#undef ISSPACE
 
 // parse the output of bt
 void KDebugger::handleBacktrace()
@@ -2383,7 +2426,11 @@ void KDebugger::handleSharedLibs()
 	    if (str == 0) {
 		shlibName = start;
 	    } else {
+#if QT_VERSION < 200
 		shlibName = QString(start, str-start+1);
+#else
+		shlibName = QString::fromLatin1(start, str-start);
+#endif
 		str++;
 	    }
 	    m_sharedLibs.append(shlibName);

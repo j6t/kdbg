@@ -273,7 +273,12 @@ protected:
     char* m_gdbOutput;			/* normal gdb output */
     int m_gdbOutputLen;			/* current accumulated output */
     int m_gdbOutputAlloc;		/* space available in m_gdbOutput */
-    QQueue<QString> m_delayedOutput;	/* output colleced while we have receivedOutput */
+#if QT_VERSION < 200
+    typedef QString DelayedStr;
+#else
+    typedef QCString DelayedStr;
+#endif
+    QQueue<DelayedStr> m_delayedOutput;	/* output colleced while we have receivedOutput */
 					/* but before signal wroteStdin arrived */
     QList<VarTree> m_watchEvalExpr;	/* exprs to evaluate for watch windows */
 

@@ -167,7 +167,11 @@ void BreakpointTable::parseBreakList(const char* output)
 	    location = p;
 	    p += location.length();
 	} else {
+#if QT_VERSION < 200
 	    location = QString(p, end-p+1).stripWhiteSpace();
+#else
+	    location = QString::fromLatin1(p, end-p).stripWhiteSpace();
+#endif
 	    p = end+1;			/* skip over \n */
 	    // may be continued in next line
 	    QString continuation;
@@ -177,7 +181,11 @@ void BreakpointTable::parseBreakList(const char* output)
 		    continuation = QString(p).stripWhiteSpace();
 		    p += strlen(p);
 		} else {
+#if QT_VERSION < 200
 		    continuation = QString(p, end-p+1).stripWhiteSpace();
+#else
+		    continuation = QString::fromLatin1(p, end-p).stripWhiteSpace();
+#endif
 		    p = end+1;		/* skip '\n' */
 		}
 		if (strncmp(continuation, "breakpoint already hit", 22) == 0) {
@@ -285,7 +293,11 @@ void BreakpointTable::parseBreakpoint(const char* output)
     
     // line number
     char* numStart = strstr(fileStart, ", line ");
+#if QT_VERSION < 200
     QString fileName(fileStart, numStart-fileStart+1);
+#else
+    QString fileName = QString::fromLatin1(fileStart, numStart-fileStart);
+#endif
     numStart += 7;
     int lineNo = strtoul(numStart, &p, 10);
     if (numStart == p)
@@ -658,11 +670,18 @@ BreakpointListBox::BreakpointListBox(QWidget* parent, const char* name) :
     setSeparator('\t');
 
     // add pixmaps
+#if QT_VERSION < 200
     KIconLoader* loader = kapp->getIconLoader();
     QPixmap brkena = loader->loadIcon("brkena.xpm");
     QPixmap brkdis = loader->loadIcon("brkdis.xpm");
     QPixmap brktmp = loader->loadIcon("brktmp.xpm");
     QPixmap brkcond = loader->loadIcon("brkcond.xpm");
+#else
+    QPixmap brkena = BarIcon("brkena.xpm");
+    QPixmap brkdis = BarIcon("brkdis.xpm");
+    QPixmap brktmp = BarIcon("brktmp.xpm");
+    QPixmap brkcond = BarIcon("brkcond.xpm");
+#endif
     /*
      * There are 8 different pixmaps: The basic enabled or disabled
      * breakpoint, plus an optional overlaid brktmp icon plus an optional
