@@ -1725,7 +1725,7 @@ VarTree* KDebugger::parseQCharArray(const char* name, bool wantErrorValue)
 
     // check if this is an error indicating that gdb does not know about QString::null
     if (m_qstring2nullOk &&
-	strncmp(m_gdbOutput, "Internal error: could not find static variable null", 51))
+	strncmp(p, "Internal error: could not find static variable null", 51) == 0)
     {
 	m_qstring2nullOk = false;
 	// continue and let parseOffErrorExpr catch the error
