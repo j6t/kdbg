@@ -28,6 +28,9 @@
 #ifdef HAVE_LIBUTIL_H
 #include <libutil.h>			/* openpty on FreeBSD */
 #endif
+#ifdef HAVE_UTIL_H			/* openpty on NetBSD, OpenBSD */
+#include <util.h>
+#endif
 #include <errno.h>
 
 #include "mydebug.h"
