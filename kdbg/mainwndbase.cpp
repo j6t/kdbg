@@ -7,6 +7,7 @@
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
 #include <kinstance.h>
+#include <kconfig.h>
 #endif
 #include <kiconloader.h>
 #include <kstdaccel.h>
