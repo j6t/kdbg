@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 0.2.5\n"
+"Project-Id-Version: kdbg 0.3.0\n"
 "POT-Creation-Date: 1999-03-06 18:41+0100\n"
 "PO-Revision-Date: 1998-05-14 20:00-0500\n"
 "Last-Translator: Vladimir Vuksan <vuksan@veus.hr>\n"
@@ -317,12 +317,6 @@ msgstr ""
 #: main.cpp:56
 msgid "Cannot start debugger."
 msgstr "Ne mogu pokrenuti debugger."
-
-#~ msgid "Locals"
-#~ msgstr "Lokalni"
-
-#~ msgid "busy"
-#~ msgstr "zauzet"
 
 #~ msgid "&Remove"
 #~ msgstr "&Ukloni"

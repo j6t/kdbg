@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 0.2.5\n"
+"Project-Id-Version: kdbg 0.3.0\n"
 "POT-Creation-Date: 1999-03-06 18:41+0100\n"
 "PO-Revision-Date: 1998-08-11 20:15+0200\n"
 "Last-Translator: Wang Jian <lark@linux.ustc.edu.cn>\n"
@@ -316,12 +316,6 @@ msgstr ""
 #: main.cpp:56
 msgid "Cannot start debugger."
 msgstr "不能启动调试器."
-
-#~ msgid "Locals"
-#~ msgstr "本地的"
-
-#~ msgid "busy"
-#~ msgstr "忙"
 
 #~ msgid "&Remove"
 #~ msgstr "删除[&R]"

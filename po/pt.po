@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 0.2.5\n"
+"Project-Id-Version: kdbg 0.3.0\n"
 "POT-Creation-Date: 1999-03-06 18:41+0100\n"
 "PO-Revision-Date: 1998-05-26 12:00+0000\n"
 "Last-Translator: Pedro Morais <morais@kde.org>\n"
@@ -312,12 +312,6 @@ msgstr ""
 #: main.cpp:56
 msgid "Cannot start debugger."
 msgstr "Não consigo iniciar o depurador."
-
-#~ msgid "Locals"
-#~ msgstr "Locals"
-
-#~ msgid "busy"
-#~ msgstr "ocupado"
 
 #~ msgid "&Remove"
 #~ msgstr "&Remover"
