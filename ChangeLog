@@ -6,6 +6,8 @@ Version 1.9.0
 
 	The program counter can be changed via point and click.
 
+	Improved register formating by Daniel Kristjansson.
+
 Version 1.2.7
 
 	Fixed parsing of stack frames for recent gdbs.

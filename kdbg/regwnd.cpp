@@ -17,12 +17,57 @@
 #include "regwnd.h"
 #include "dbgdriver.h"
 
+/** 
+ * Register display modes
+ */
+class RegisterDisplay {
+public:
+    enum BitSize {
+	bits8   = 0x10,
+	bits16  = 0x20,
+	bits32  = 0x30,
+	bits64  = 0x40,
+	bits80  = 0x50,
+	bits128 = 0x60,
+	bitsUnknown = 0x70
+    };
+
+    enum Format {
+	nada    = 0x01,
+	binary  = 0x02,
+	octal   = 0x03,
+	decimal = 0x04,
+	hex     = 0x05,
+	bcd     = 0x06,
+	realE   = 0x07,
+	realG   = 0x08,
+	realF   = 0x09
+    };
+    RegisterDisplay() : mode(bitsUnknown|nada) { }
+    RegisterDisplay(uint newMode) : mode(newMode) { }
+
+    bool contains(uint pmode) const {
+	bool val=((mode&0xf0)==pmode)||((mode&0x0f)==pmode);    
+	return val;
+    }
+    uint bitsFlag() { return mode&0xf0; }
+    uint presentationFlag() const { return mode&0x0f; }
+    uint bits() const { return bitMap[(mode>>4)&0x07]; }
+    void changeFlag(uint code) {
+	uint mask=((code&0xf0)==code)?0x0f:0xf0;
+        mode = code | (mode & mask);
+    }
+private:
+    uint mode;
+    static uint bitMap[];
+};
+
 // helper struct
 struct MenuPair
 {
-    QString name;
-    RegisterDisplay mode;
-    bool isSeparator() { return name.isEmpty(); }
+    const char* name;
+    uint mode;
+    bool isSeparator() { return name == 0; }
 };
 
 static MenuPair menuitems[] = {
@@ -35,7 +80,7 @@ static MenuPair menuitems[] = {
     { I18N_NOOP("Real (&e)"),    RegisterDisplay::realE },
     { I18N_NOOP("Real (&f)"),    RegisterDisplay::realF },
     { I18N_NOOP("&Real (g)"),    RegisterDisplay::realG },
-    { QString(), 0 },
+    { 0, 0 },
     { "8 bits",  RegisterDisplay::bits8 },
     { "16 bits", RegisterDisplay::bits16 },
     { "32 bits", RegisterDisplay::bits32 },
@@ -49,12 +94,23 @@ uint RegisterDisplay::bitMap[] = {
   64, 80, 128, /*default*/32,
 };
 
-class GroupingViewItem : public QListViewItem
+class ModeItem : public QListViewItem 
+{
+public:
+    ModeItem(QListView* parent, const QString& name) : QListViewItem(parent, name) {}
+    ModeItem(QListViewItem* parent) : QListViewItem(parent) {}
+
+    virtual void setMode(RegisterDisplay mode) = 0;
+    virtual RegisterDisplay mode() = 0;
+};
+
+class GroupingViewItem : public ModeItem
 {
 public:
     GroupingViewItem(RegisterView* parent, 
-                     const QString& name, const QString& pattern) :
-        QListViewItem(parent, name), matcher(pattern)
+		     const QString& name, const QString& pattern,
+		     RegisterDisplay mode) :
+	ModeItem(parent, name), matcher(pattern), gmode(mode)
     {
         setExpandable(true);
         setOpen(true);
@@ -63,18 +119,31 @@ public:
     {
         return matcher.exactMatch(str);
     }
+    virtual void setMode(RegisterDisplay mode)
+    {
+	gmode=mode; 
+	QListViewItem *it=firstChild();
+	for (; 0!=it; it=it->nextSibling()) {
+	    (static_cast<ModeItem*>(it))->setMode(gmode);
+	}
+    }
+    virtual RegisterDisplay mode() { return gmode; }
+
 private:
     QRegExp matcher;
+    RegisterDisplay gmode;
 };
 
-class RegisterViewItem : public QListViewItem
+class RegisterViewItem : public ModeItem
 {
 public:
-    RegisterViewItem(QListViewItem* parent,
+    RegisterViewItem(GroupingViewItem* parent,
 		     const RegisterInfo& regInfo);
     ~RegisterViewItem();
 
     void setValue(const RegisterInfo& regInfo);
+    virtual void setMode(RegisterDisplay mode);
+    virtual RegisterDisplay mode() { return m_mode; }
     RegisterInfo m_reg;
     RegisterDisplay m_mode;		/* display mode */
     bool m_changes;
@@ -87,36 +156,16 @@ protected:
 };
 
 
-RegisterViewItem::RegisterViewItem(QListViewItem* parent,
+RegisterViewItem::RegisterViewItem(GroupingViewItem* parent,
 				   const RegisterInfo& regInfo) :
-	QListViewItem(parent),
+	ModeItem(parent),
 	m_reg(regInfo),
 	m_changes(false),
 	m_found(true)
 {
-    // for ia32 proc
-    if (m_reg.regName=="eflags" ||
-        m_reg.regName=="fctrl" || m_reg.regName=="mxcsr")
-	m_mode=RegisterDisplay::bits32|RegisterDisplay::binary;
-    if (m_reg.regName.left(3)=="xmm")
-	m_mode=RegisterDisplay::bits32|RegisterDisplay::realE;
-    if (m_reg.regName.left(2)=="mm")
-	m_mode=RegisterDisplay::bits32|RegisterDisplay::realE;
-    if (m_reg.regName.left(2)=="st")
-	m_mode=RegisterDisplay::bits80|RegisterDisplay::realE;
-    // for POWER AltiVec proc (vr is also for SPARC AltiVec)
-    if (m_reg.regName=="cr" || m_reg.regName=="fpscr" || m_reg.regName=="vscr")
-	m_mode=RegisterDisplay::bits32|RegisterDisplay::binary;
-    if (m_reg.regName.left(3)=="fpr")
-	m_mode=RegisterDisplay::bits64|RegisterDisplay::realE;
-    if (m_reg.regName.left(2)=="vr")
-	m_mode=RegisterDisplay::bits32|RegisterDisplay::realE;
-    // for MIPS VU proc (playstation2)
-    if (m_reg.regName.left(2)=="vu")
-	m_mode=RegisterDisplay::bits32|RegisterDisplay::realE;
-
     setValue(m_reg);
     setText(0, m_reg.regName);
+    setMode(parent->mode());
 }
 
 RegisterViewItem::~RegisterViewItem()
@@ -284,73 +333,55 @@ static QString toFloat(const QString& hex, char p)
     return cooked;
 }
 
-static void convertSingle(QString& cooked, const QString& raw,
-                          RegisterDisplay mode)
+static QString convertSingle(const QString& raw, const RegisterDisplay mode) 
 {
     switch (mode.presentationFlag()) {
-    case RegisterDisplay::binary:  cooked = toBinary(raw); break;
-    case RegisterDisplay::octal:   cooked = toOctal(raw); break;
-    case RegisterDisplay::decimal: cooked = toDecimal(raw); break;
-    case RegisterDisplay::hex:     cooked = raw; break;
-    case RegisterDisplay::bcd:     cooked = toBCD(raw); break;
-    case RegisterDisplay::realE:   cooked = toFloat(raw, 'e'); break;
-    case RegisterDisplay::realG:   cooked = toFloat(raw, 'g'); break;
-    case RegisterDisplay::realF:   cooked = toFloat(raw, 'f'); break;
+    case RegisterDisplay::binary:  return toBinary(raw);
+    case RegisterDisplay::octal:   return toOctal(raw);
+    case RegisterDisplay::decimal: return toDecimal(raw);
+    case RegisterDisplay::hex:     return raw;
+    case RegisterDisplay::bcd:     return toBCD(raw);
+    case RegisterDisplay::realE:   return toFloat(raw, 'e');
+    case RegisterDisplay::realG:   return toFloat(raw, 'g');
+    case RegisterDisplay::realF:   return toFloat(raw, 'f');
+    default: return raw;
     }
 }
 
-static void convertRaw(QString& cooked, const RegisterInfo& reg,
-		       RegisterDisplay mode)
+QString convertRaw(const RegisterInfo reg, RegisterDisplay mode)
 {
-    if (RegisterDisplay::nada==mode.presentationFlag()) {
-	if (cooked.at(0)!=' ' && cooked.at(0)!='-' && cooked.at(0)!='+')
-	    cooked.prepend(" ");
-	return;
-    }
+    QString cooked;
     uint totalNibles=0, nibles=mode.bits()>>2;
-    if (reg.rawValue.length() > 2 && 
-	reg.rawValue[0] == '0' && reg.rawValue[1] == 'x')
+    if (RegisterDisplay::nada!=mode.presentationFlag() &&
+        reg.rawValue.length() > 2 && reg.rawValue[0] == '0' && reg.rawValue[1] == 'x')
     {
-	if (reg.type=="uint128") totalNibles=32; 
-	else if (reg.type=="uint64") totalNibles=16;
-	else if (reg.type.isEmpty()) totalNibles=nibles;
-	else {
-	    cooked = "don't know how to handle vector type <"+reg.type+">";
-	    return;
-	}
+        if ("uint128"==reg.type) totalNibles=32; 
+        else if ("uint64"==reg.type) totalNibles=16;
+        else if (reg.type.isEmpty()) totalNibles=nibles;
+        else {
+            return "don't know how to handle vector type <"+reg.type+">";
+        }
+        if (0==nibles) nibles=8; // default to 4 byte, 32 bits values
+        if (nibles>totalNibles) totalNibles=nibles; // minimum one value
 
-	QString raw=reg.rawValue.right(reg.rawValue.length()-2); // clip off "0x"
-	while (raw.length()<totalNibles) raw.prepend("0"); // pad out to totalNibles
+        QString raw=reg.rawValue.right(reg.rawValue.length()-2); // clip off "0x"
+        while (raw.length()<totalNibles) raw.prepend("0"); // pad out to totalNibles
 
-	if (nibles>=totalNibles) {
-	    raw.prepend("0x");
-	    convertSingle(cooked, raw, mode);
-	    cooked=" "+cooked; // add space so that +/- sign is not clipped in rendering
-	    return;
-	}
-
-	// default to 4 byte, 32 bits values
-	if (nibles==(RegisterDisplay::bitsUnknown<<2) || nibles==0) nibles=8;
-
-	QString separator=",";
-	cooked="";
-
-	for (int nib=totalNibles-nibles;; nib-=nibles) {
-	    if (nib<0)
-		break;
-	    QString qstr;
-	    convertSingle(qstr, QString("0x")+raw.mid(nib, nibles), mode);
-
-	    if (nib==int(totalNibles-nibles))
-		cooked=qstr+cooked;
-	    else
-		cooked=qstr+separator+cooked;
-	}
-	if (!(mode.contains(RegisterDisplay::realE) ||
-	      mode.contains(RegisterDisplay::realF) ||
-	      mode.contains(RegisterDisplay::realG)))
-	    cooked=" "+cooked; // add space so that this is aligned with signed values
+	QString separator=",";	// locale-specific?
+        for (int nib=totalNibles-nibles; nib>=0; nib-=nibles) {
+            QString qstr=convertSingle(raw.mid(nib, nibles).prepend("0x"), mode);
+            
+            if (nib==int(totalNibles-nibles)) cooked=qstr+cooked;
+            else cooked=qstr+separator+cooked;
+        }
     }
+    else
+    {
+	cooked = reg.cookedValue;
+    }
+    if (cooked.at(0)!=' ' && cooked.at(0)!='-' && cooked.at(0)!='+')
+	cooked.prepend(" ");
+    return cooked;
 }
 
 void RegisterViewItem::setValue(const RegisterInfo& reg)
@@ -358,8 +389,15 @@ void RegisterViewItem::setValue(const RegisterInfo& reg)
     m_reg = reg;
 
     setText(1, reg.rawValue);
-    QString cookedValue=reg.cookedValue;
-    convertRaw(cookedValue, reg, m_mode);
+    QString cookedValue = convertRaw(reg, m_mode);
+    setText(2, cookedValue);
+}
+
+void RegisterViewItem::setMode(RegisterDisplay mode)
+{
+    m_mode = mode;
+
+    QString cookedValue = convertRaw(m_reg, mode);
     setText(2, cookedValue);
 }
 
@@ -377,8 +415,7 @@ void RegisterViewItem::paintCell(QPainter* p, const QColorGroup& cg,
 
 
 RegisterView::RegisterView(QWidget* parent, const char* name) :
-	QListView(parent, name),
-	m_mode(RegisterDisplay::bitsUnknown|RegisterDisplay::nada)
+	QListView(parent, name)
 {
     setSorting(-1);
     setFont(KGlobalSettings::fixedFont());
@@ -401,7 +438,7 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
     connect(this, SIGNAL(contextMenuRequested(QListViewItem*, const QPoint&, int)),
 	    SLOT(rightButtonClicked(QListViewItem*,const QPoint&,int)));
 
-    m_modemenu = new QPopupMenu(this, i18n("All Registers"));
+    m_modemenu = new QPopupMenu(this, "ERROR");
     for (uint i=0; i<sizeof(menuitems)/sizeof(MenuPair); i++) {
 	if (menuitems[i].isSeparator())
 	    m_modemenu->insertSeparator();
@@ -410,15 +447,26 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
     }
     connect(m_modemenu,SIGNAL(activated(int)),SLOT(slotModeChange(int)));
     
-    new GroupingViewItem(this, "MIPS VU", "^vu.*");
-    new GroupingViewItem(this, "AltiVec", "(^vr.*|^vscr$)");
-    new GroupingViewItem(this, "POWER real", "(^fpr.*|^fpscr$)");
-    new GroupingViewItem(this, "MMX", "^mm.*");
-    new GroupingViewItem(this, "SSE", "(^xmm.*|^mxcsr)");
-    new GroupingViewItem(this, "x87", 
-      "(^st.*|^fctrl$|^fop$|^fooff$|^foseg$|^fioff$|^fiseg$|^ftag$|^fstat$)");
-    new GroupingViewItem(this, i18n("x86 segment"), "(^cs$|^ss$|^ds$|^es$|^fs$|^gs$)");
-    new GroupingViewItem(this, i18n("GP and others"), "^$");
+    new GroupingViewItem(this, "MIPS VU", "^vu.*",
+                         RegisterDisplay::bits32|RegisterDisplay::realE);
+    new GroupingViewItem(this, "AltiVec", "^vr.*",
+                         RegisterDisplay::bits32|RegisterDisplay::realE);
+    new GroupingViewItem(this, "POWER real", "^fpr.*",
+                         RegisterDisplay::bits32|RegisterDisplay::realE);
+    new GroupingViewItem(this, "MMX", "^mm.*", 
+                         RegisterDisplay::bits32|RegisterDisplay::realE);
+    new GroupingViewItem(this, "SSE", "^xmm.*", 
+                         RegisterDisplay::bits32|RegisterDisplay::realE);
+    new GroupingViewItem(this, "x87", "^st.*",
+                         RegisterDisplay::bits80|RegisterDisplay::realE);
+    new GroupingViewItem(this, i18n("x86/x87 segment"), 
+                         "(^cs$|^ss$|^ds$|^es$|^fs$|^gs$|^fiseg$|^foseg$)",
+			 RegisterDisplay::nada);
+    new GroupingViewItem(this, i18n("Flags"), 
+                         "(^eflags$|^fctrl$|^mxcsr$|^cr$|^fpscr$|^vscr$|^ftag$|^fstat$)", 
+                         RegisterDisplay::bits32|RegisterDisplay::binary);
+    new GroupingViewItem(this, i18n("GP and others"), "^$",
+			 RegisterDisplay::nada);
 
     updateGroupVisibility();
     setRootIsDecorated(true);
@@ -430,24 +478,24 @@ RegisterView::~RegisterView()
 {
 }
 
-QListViewItem* RegisterView::findMatchingGroup(const QString& regName)
+GroupingViewItem* RegisterView::findMatchingGroup(const QString& regName)
 {
     for (QListViewItem* it = firstChild(); it != 0; it = it->nextSibling())
     {
 	GroupingViewItem* i = static_cast<GroupingViewItem*>(it);
 	if (i->matchName(regName))
-	    return it;
+	    return i;
     }
     // not better match found, so return "GP and others"
-    return firstChild();
+    return static_cast<GroupingViewItem*>(firstChild());
 }
 
-QListViewItem* RegisterView::findGroup(const QString& groupName)
+GroupingViewItem* RegisterView::findGroup(const QString& groupName)
 {
     for (QListViewItem* it = firstChild(); it != 0; it = it->nextSibling())
     {
 	if (it->text(0) == groupName)
-	    return it;
+	    return static_cast<GroupingViewItem*>(it);
     }
     return 0;
 }
@@ -500,7 +548,7 @@ void RegisterView::updateRegisters(QList<RegisterInfo>& regs)
 	}
 	else
 	{
-	    QListViewItem* group = findMatchingGroup(reg->regName);
+	    GroupingViewItem* group = findMatchingGroup(reg->regName);
 	    m_registers[reg->regName] =
 		new RegisterViewItem(group, *reg);
 	}
@@ -529,72 +577,30 @@ void RegisterView::updateRegisters(QList<RegisterInfo>& regs)
 
 void RegisterView::rightButtonClicked(QListViewItem* item, const QPoint& p, int)
 {
-    RegisterDisplay mode=m_mode;
-    
     if (item) {
+        RegisterDisplay mode=static_cast<ModeItem*>(item)->mode();        
+        for (unsigned int i = 0; i<sizeof(menuitems)/sizeof(MenuPair); i++) {
+            m_modemenu->setItemChecked(menuitems[i].mode, 
+                                       mode.contains(menuitems[i].mode));
+        }
         m_modemenu->setCaption(item->text(0));
-        if (m_registers.end()!=m_registers.find(m_modemenu->caption()))
-            mode=static_cast<RegisterViewItem*>(item)->m_mode;
-    } else m_modemenu->setCaption(i18n("All Registers"));
-    
-    for (unsigned int i = 0; i<sizeof(menuitems)/sizeof(MenuPair); i++) {
-        m_modemenu->setItemChecked(menuitems[i].mode, 
-                                   mode.contains(menuitems[i].mode));
-    }
-    
-    // show popup menu
-    m_modemenu->popup(p);
+        m_modemenu->popup(p);
+    }    
 }
 
 void RegisterView::slotModeChange(int pcode)
 {
-    RegisterDisplay old_mode = m_mode; // default to class mode
-    // create flag masks
-    uint code=(uint)pcode, mmask, cmask;
-
-    if ((code&0xf0)==code) { cmask=0xf0; mmask=0x0f; }
-    else if ((code&0x0f)==code) { cmask=0x0f; mmask=0xf0; }
-    else return;
-
-    // find register view
-    RegisterViewItem* view=0;
-    QListViewItem* gview=0;
     RegMap::iterator it=m_registers.find(m_modemenu->caption());
-    if (it!=m_registers.end()) {
-        view = it->second;
-        old_mode = view->m_mode;
-    } else gview=findGroup(m_modemenu->caption());
+    ModeItem* view;
+    if (it != m_registers.end())
+	view = it->second;
+    else
+	view = findGroup(m_modemenu->caption());
 
-    // set new mode
-    RegisterDisplay mode = (code&cmask) | (old_mode&mmask);
-  
-    // update menu
-    for (unsigned int i = 0; i<sizeof(menuitems)/sizeof(MenuPair); i++) {
-        m_modemenu->setItemChecked(menuitems[i].mode, 
-                                   mode.contains(menuitems[i].mode));
-    }
-  
-    // update register view[s]
     if (view) {
-        view->m_mode=mode;
-        view->setValue(view->m_reg);
-        repaintItem(view);
-    } else if (gview) {
-        QListViewItem* it=gview->firstChild(); 
-        for (; it!=0; it=it->nextSibling()) {
-            view = (RegisterViewItem*)it;
-            view->m_mode=mode;
-            view->setValue(view->m_reg);
-            repaintItem(view);
-        }
-    } else {
-        m_mode=mode;
-        for (it=m_registers.begin(); it!=m_registers.end(); ++it) {
-            view = it->second;
-            view->m_mode=mode;
-            view->setValue(view->m_reg);
-            repaintItem(view);
-        }
+	RegisterDisplay mode = view->mode();
+	mode.changeFlag(pcode);
+	view->setMode(mode);
     }
 }
 

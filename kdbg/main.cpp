@@ -45,6 +45,9 @@ int main(int argc, char** argv)
     aboutData.addCredit("Keith Isdale",
 			I18N_NOOP("XSLT debugging"),
 			"k_isdale@tpg.com.au");
+    aboutData.addCredit("Daniel Kristjansson",
+			I18N_NOOP("Register groups and formating"),
+			"danielk@cat.nyu.edu");
     KCmdLineArgs::init( argc, argv, &aboutData );
 
     static KCmdLineOptions options[] = {
