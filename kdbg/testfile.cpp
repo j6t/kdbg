@@ -1,4 +1,5 @@
 #include <iostream.h>
+#include <qstring.h>
 
 enum E { red, green, blue, yellow };
 struct S { int x, y; S* s; };
@@ -58,6 +59,10 @@ int main(int argc, char* argv[])
 		sin(i);
 	}
 	(*pf[0])(e, '\n');
+
+	QString s;
+
+	s = "Hi, there!";
 
 	Cl c1(13);
 	Dl d1(3214);
