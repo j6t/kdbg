@@ -1,6 +1,21 @@
 
 # add here all files
-data_DATA = index.html
+data_DATA = \
+	argspwdenv.html \
+	breakptlist.html \
+	globaloptions.html \
+	howdoi.html \
+	localvars.html \
+	memory.html \
+	pgmoutput.html \
+	pgmsettings.html \
+	registers.html \
+	sourcecode.html \
+	stack.html \
+	threads.html \
+	tips.html \
+	watches.html \
+	index.html
 
 # this is the directory, where all datas are installed
 # you have given the datas in data_DATA
