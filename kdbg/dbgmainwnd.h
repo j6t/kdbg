@@ -60,7 +60,7 @@ protected:
     virtual KStatusBar* dbgStatusBar();
     virtual QWidget* dbgMainWnd();
     virtual TTYWindow* ttyWindow();
-    virtual bool createOutputWindow();
+    virtual QString createOutputWindow();
 
     DockWidget* dockParent(QWidget* w);
     bool isDockVisible(QWidget* w);

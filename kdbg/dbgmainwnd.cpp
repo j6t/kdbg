@@ -671,14 +671,14 @@ void DebuggerMainWnd::slotEnaDisBreak(const QString& fileName, int lineNo)
     }
 }
 
-bool DebuggerMainWnd::createOutputWindow()
+QString DebuggerMainWnd::createOutputWindow()
 {
-    bool ok = DebuggerMainWndBase::createOutputWindow();
-    if (ok) {
+    QString tty = DebuggerMainWndBase::createOutputWindow();
+    if (!tty.isEmpty()) {
 	connect(m_outputTermProc, SIGNAL(processExited(KProcess*)),
 		SLOT(slotTermEmuExited()));
     }
-    return ok;
+    return tty;
 }
 
 void DebuggerMainWnd::slotTermEmuExited()

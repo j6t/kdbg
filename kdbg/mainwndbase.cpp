@@ -464,7 +464,7 @@ const char fifoNameBase[] = "/tmp/kdbgttywin%05d";
  * accidentally use the wrong close() function (I've been bitten ;-),
  * outch!) (We use it for all the libc functions, to be consistent...)
  */
-bool DebuggerMainWndBase::createOutputWindow()
+QString DebuggerMainWndBase::createOutputWindow()
 {
     // create a name for a fifo
     QString fifoName;
@@ -476,13 +476,13 @@ bool DebuggerMainWndBase::createOutputWindow()
     if (::mkfifo(fifoName, S_IRUSR|S_IWUSR) < 0) {
 	// failed
 	TRACE("mkfifo " + fifoName + " failed");
-	return false;
+	return QString();
     }
 #else
     if (::mknod(fifoName, S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
 	// failed
 	TRACE("mknod " + fifoName + " failed");
-	return false;
+	return QString();
     }
 #endif
 
@@ -550,7 +550,7 @@ bool DebuggerMainWndBase::createOutputWindow()
 	if (f < 0) {
 	    // error
 	    ::unlink(fifoName);
-	    return false;
+	    return QString();
 	}
 
 	char ttyname[50];
@@ -561,16 +561,14 @@ bool DebuggerMainWndBase::createOutputWindow()
 
 	if (n < 0) {
 	    // error
-	    return false;
+	    return QString();
 	}
 
 	// remove whitespace
 	ttyname[n] = '\0';
-	QString tty = ttyname;
-	m_outputTermName = tty.stripWhiteSpace();
-	TRACE("tty=" + m_outputTermName);
-
-	return true;
+	QString tty = QString(ttyname).stripWhiteSpace();
+	TRACE("tty=" + tty);
+	return tty;
     }
     else
     {
@@ -578,7 +576,7 @@ bool DebuggerMainWndBase::createOutputWindow()
 	TRACE("fork failed for fifo " + fifoName);
 	::unlink(fifoName);
 	shutdownTermWindow();
-	return false;
+	return QString();
     }
 }
 
@@ -586,7 +584,6 @@ void DebuggerMainWndBase::shutdownTermWindow()
 {
     delete m_outputTermProc;
     m_outputTermProc = 0;
-    m_outputTermName = QString();	/* no emulation available */
 }
 
 void DebuggerMainWndBase::setTerminalCmd(const QString& cmd)
@@ -624,26 +621,24 @@ void DebuggerMainWndBase::slotDebuggerStarting()
 
 	m_ttyLevel = m_debugger->ttyLevel();
 
+	QString ttyName;
 	switch (m_ttyLevel) {
 	case KDebugger::ttySimpleOutputOnly:
-	    m_outputTermName = ttyWindow()->activate();
+	    ttyName = ttyWindow()->activate();
 	    break;
 	case KDebugger::ttyFull:
 	    if (m_outputTermProc == 0) {
 		// create an output window
-		if (!createOutputWindow()) {
-		    TRACE("createOuputWindow failed");
-		    m_outputTermName = QString();
-		} else {
-		    TRACE("successfully created output window");
-		}
+		ttyName = createOutputWindow();
+		TRACE(ttyName.isEmpty() ?
+		      "createOuputWindow failed" : "successfully created output window");
 	    }
 	    break;
 	default: break;
 	}
-    }
 
-    m_debugger->setTerminal(m_outputTermName);
+	m_debugger->setTerminal(ttyName);
+    }
 }
 
 void DebuggerMainWndBase::setDebuggerCmdStr(const QString& cmd)

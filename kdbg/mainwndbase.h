@@ -102,11 +102,10 @@ protected:
 
     // output window
     QString m_outputTermCmdStr;
-    QString m_outputTermName;
     QString m_outputTermKeepScript;
     KProcess* m_outputTermProc;
     int m_ttyLevel;
-    virtual bool createOutputWindow();
+    virtual QString createOutputWindow();	/* returns terminal name */
     void shutdownTermWindow();
 
     QString m_lastDirectory;		/* the dir of the most recently opened file */
