@@ -526,15 +526,24 @@ bool SourceWindow::fileNameMatches(const QString& other)
     return strcmp(me.data() + sme, other.data() + sother) == 0;
 }
 
-void SourceWindow::disassembled(int lineNo, const ValArray<QString>& disass)
+void SourceWindow::disassembled(int lineNo, const QList<DisassembledCode>& disass)
 {
     TRACE("disassembled line " + QString().setNum(lineNo));
     if (lineNo < 0 || lineNo >= m_sourceCode.size())
 	return;
 
     SourceLine& sl = m_sourceCode[lineNo];
-    sl.disass = disass;
-    sl.canDisass = disass.size() > 0;
+
+    // copy disassembled code and its addresses
+    sl.disass.setSize(disass.count());
+    sl.disassAddr.setSize(disass.count());
+    sl.canDisass = disass.count() > 0;
+    for (int i = 0; i < disass.count(); i++) {
+	const DisassembledCode* c =
+	    const_cast<QList<DisassembledCode>&>(disass).at(i);
+	sl.disass[i] = c->address + ' ' + c->code;
+	sl.disassAddr[i] = c->address;
+    }
 
     int row = lineToRow(lineNo);
     if (sl.canDisass) {

@@ -26,6 +26,7 @@ class RegisterInfo;
 class DebuggerDriver;
 class CmdQueueItem;
 class Breakpoint;
+class DisassembledCode;
 class KProcess;
 
 
@@ -400,7 +401,7 @@ signals:
      * Provides the disassembled code of the location given by file and
      * line number (zero-based).
      */
-    void disassembled(const QString& file, int line, const QString& disass);
+    void disassembled(const QString& file, int line, const QList<DisassembledCode>& code);
 
 protected:
     ExprWnd& m_localVariables;

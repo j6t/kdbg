@@ -1814,13 +1814,16 @@ void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 	c->m_lineNo = cmd->m_lineNo;
     } else {
 	// no code
-	emit disassembled(cmd->m_fileName, cmd->m_lineNo, QString());
+	QList<DisassembledCode> empty;
+	emit disassembled(cmd->m_fileName, cmd->m_lineNo, empty);
     }
 }
 
 void KDebugger::handleDisassemble(CmdQueueItem* cmd, const char* output)
 {
-    QString code = m_d->parseDisassemble(output);
+    QList<DisassembledCode> code;
+    code.setAutoDelete(true);
+    m_d->parseDisassemble(output, code);
     emit disassembled(cmd->m_fileName, cmd->m_lineNo, code);
 }
 

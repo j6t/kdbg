@@ -142,6 +142,15 @@ struct RegisterInfo
 };
 
 /**
+ * Disassembled code
+ */
+struct DisassembledCode
+{
+    QString address;
+    QString code;
+};
+
+/**
  * This is an abstract base class for debugger process.
  *
  * This class represents the debugger program. It provides the low-level
@@ -375,7 +384,7 @@ public:
     /**
      * Parses the ouput of the DCdisassemble command.
      */
-    virtual QString parseDisassemble(const char* output) = 0;
+    virtual void parseDisassemble(const char* output, QList<DisassembledCode>& code) = 0;
 
 protected:
     /** Removes all commands from the low-priority queue. */

@@ -1832,17 +1832,22 @@ bool GdbDriver::parseInfoLine(const char* output, QString& addrFrom, QString& ad
     return true;
 }
 
-QString GdbDriver::parseDisassemble(const char* output)
+void GdbDriver::parseDisassemble(const char* output, QList<DisassembledCode>& code)
 {
+    code.clear();
+
     if (strncmp(output, "Dump of assembler", 17) != 0) {
 	// error message?
-	return output;
+	DisassembledCode c;
+	c.code = output;
+	code.append(new DisassembledCode(c));
+	return;
     }
 
     // remove first line
     const char* p = strchr(output, '\n');
     if (p == 0)
-	return QString();		/* not a regular output */
+	return;				/* not a regular output */
 
     p++;
 
@@ -1851,7 +1856,7 @@ QString GdbDriver::parseDisassemble(const char* output)
     if (end == 0)
 	end = p + strlen(p);
 
-    QString code;
+    QString address;
 
     // remove function offsets from the lines
     while (p != end)
@@ -1860,8 +1865,7 @@ QString GdbDriver::parseDisassemble(const char* output)
 	// address
 	while (p != end && !isspace(*p))
 	    p++;
-	code += FROM_LATIN1(start, p-start);
-	code += ' ';
+	address = FROM_LATIN1(start, p-start);
 
 	// function name (enclosed in '<>', followed by ':')
 	while (p != end && *p != '<')
@@ -1881,10 +1885,12 @@ QString GdbDriver::parseDisassemble(const char* output)
 	    p++;
 	if (p != end)			/* include '\n' */
 	    p++;
-	code += FROM_LATIN1(start, p-start);
-    }
 
-    return code;
+	DisassembledCode* c = new DisassembledCode;
+	c->address = address;
+	c->code = FROM_LATIN1(start, p-start);
+	code.append(c);
+    }
 }
 
 

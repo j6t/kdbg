@@ -65,7 +65,7 @@ public:
     virtual void parseRegisters(const char* output, QList<RegisterInfo>& regs);
     virtual bool parseInfoLine(const char* output,
 			       QString& addrFrom, QString& addrTo);
-    virtual QString parseDisassemble(const char* output);
+    virtual void parseDisassemble(const char* output, QList<DisassembledCode>& code);
 protected:
     int m_gdbMajor, m_gdbMinor;
     QString m_programWD;		/* just an intermediate storage */

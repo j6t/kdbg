@@ -19,6 +19,7 @@
 class KDebugger;
 class WinStack;
 class SourceWindow;
+class DisassembledCode;
 
 class FindDialog : public QDialog
 {
@@ -109,7 +110,7 @@ public slots:
 
     // Shows the disassembled code at the location given by file and lineNo
     void slotDisassembled(const QString& fileName, int lineNo,
-			  const QString& disass);
+			  const QList<DisassembledCode>& disass);
 
 protected:
     void initMenu();

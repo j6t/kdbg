@@ -381,7 +381,7 @@ void WinStack::slotShowValueTip(const QString& tipText)
 }
 
 void WinStack::slotDisassembled(const QString& fileName, int lineNo,
-				const QString& disass)
+				const QList<DisassembledCode>& disass)
 {
     // lookup the file
     SourceWindow* fw;
@@ -395,21 +395,7 @@ void WinStack::slotDisassembled(const QString& fileName, int lineNo,
 	return;
     }
 
-    // break up the code in pieces
-    ValArray<QString> disassLines;
-    int start = 0;
-    int p;
-    while ((p = disass.find('\n', start)) >= 0) {
-	QString l = disass.mid(start, p-start);
-	start = p+1;
-	disassLines.append(l);
-    }
-    QString l = disass.right(disass.length()-start);
-    if (!l.isEmpty())
-	disassLines.append(l);
-
-    // if there is no code, short-circuit out
-    fw->disassembled(lineNo, disassLines);
+    fw->disassembled(lineNo, disass);
 }
 
 

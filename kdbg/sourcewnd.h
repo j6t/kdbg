@@ -39,7 +39,7 @@ public:
     bool isRowDisassCode(int row);
 
     /** lineNo is zero-based */
-    void disassembled(int lineNo, const ValArray<QString>& disass);
+    void disassembled(int lineNo, const QList<DisassembledCode>& disass);
 
     virtual void cursorPosition(int* row, int* col);
 
@@ -71,6 +71,7 @@ protected:
     struct SourceLine {
 	QString code;			/* a line of text */
 	ValArray<QString> disass;	/* its disassembled code */
+	ValArray<QString> disassAddr;	/* the addresses thereof */
 	bool canDisass;			/* if line can be disassembled */
 	SourceLine() : canDisass(true) { }
     };
