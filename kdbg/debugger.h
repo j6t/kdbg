@@ -282,7 +282,6 @@ protected:
     QString m_attachedPid;		/* user input of attaching to pid */
     QString m_programArgs;
     QString m_remoteDevice;
-    unsigned m_runRedirect;
     QString m_programWD;		/* working directory of gdb */
     QDict<EnvVar> m_envVars;		/* environment variables set by user */
     QStrList m_sharedLibs;		/* shared libraries used by program */

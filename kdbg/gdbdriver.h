@@ -64,6 +64,7 @@ public:
 protected:
     int m_gdbMajor, m_gdbMinor;
     QString m_programWD;		/* just an intermediate storage */
+    QString m_redirect;			/* redirection to /dev/null */
     bool m_haveCoreFile;
 
     QString makeCmdString(DbgCommand cmd, QString strArg);

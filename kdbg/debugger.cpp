@@ -42,7 +42,6 @@ KDebugger::KDebugger(QWidget* parent,
 	m_programActive(false),
 	m_programRunning(false),
 	m_sharedLibsListed(false),
-	m_runRedirect(0),
 	m_typeTable(0),
 	m_programConfig(0),
 	m_d(driver),
@@ -205,7 +204,7 @@ void KDebugger::programRun()
 	m_d->executeCmd(DCcont, true);
     } else {
 	// gdb command: run
-	m_d->executeCmd(DCrun, m_runRedirect, true);
+	m_d->executeCmd(DCrun, true);
 	m_corefile = QString();
 	m_programActive = true;
     }
@@ -227,7 +226,7 @@ void KDebugger::attachProgram(const QString& pid)
 void KDebugger::programRunAgain()
 {
     if (canSingleStep()) {
-	m_d->executeCmd(DCrun, m_runRedirect, true);
+	m_d->executeCmd(DCrun, true);
 	m_corefile = QString();
 	m_programRunning = true;
     }
@@ -390,7 +389,7 @@ bool KDebugger::isIdle() const
 
 bool KDebugger::startGdb()
 {
-    emit debuggerStarting();
+    emit debuggerStarting();		/* must set m_inferiorTerminal */
 
     /*
      * If the per-program command string is empty, use the global setting
@@ -406,14 +405,26 @@ bool KDebugger::startGdb()
 
     /*
      * If we have an output terminal, we use it. Otherwise we will run the
-     * program with input and output redirected to /dev/null.
+     * program with input and output redirected to /dev/null. Other
+     * redirections are also necessary depending on the tty emulation
+     * level.
      */
-    m_runRedirect = 0;
+    int redirect = RDNstdin|RDNstdout|RDNstderr;	/* redirect everything */
     if (!m_inferiorTerminal.isEmpty()) {
-	m_d->executeCmd(DCtty, m_inferiorTerminal);
-    } else {
-	m_runRedirect = RDNstdin|RDNstdout|RDNstderr;
+	switch (m_ttyLevel) {
+	default:
+	case ttyNone:
+	    // redirect everything
+	    break;
+	case ttySimpleOutputOnly:
+	    redirect = RDNstdin;
+	    break;
+	case ttyFull:
+	    redirect = 0;
+	    break;
+	}
     }
+    m_d->executeCmd(DCtty, m_inferiorTerminal, redirect);
 
     return true;
 }

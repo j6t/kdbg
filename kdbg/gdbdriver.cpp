@@ -87,7 +87,7 @@ static GdbCmdInfo cmds[] = {
     { DCunsetenv, "unset env %s\n", GdbCmdInfo::argString },
     { DCcd, "cd %s\n", GdbCmdInfo::argString },
     { DCbt, "bt\n", GdbCmdInfo::argNone },
-    { DCrun, "%d", GdbCmdInfo::argNum },	/* DCrun is special */
+    { DCrun, "run\n", GdbCmdInfo::argNone },
     { DCcont, "cont\n", GdbCmdInfo::argNone },
     { DCstep, "step\n", GdbCmdInfo::argNone },
     { DCnext, "next\n", GdbCmdInfo::argNone },
@@ -348,6 +348,12 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg)
     if (cmd == DCcd) {
 	// need the working directory when parsing the output
 	m_programWD = strArg;
+    } else if (cmd == DCsetargs) {
+	// attach saved redirection
+#if QT_VERSION < 200
+	strArg.detach();
+#endif
+	strArg += m_redirect;
     }
 
     SIZED_QString(cmdString, MAX_FMTLEN+strArg.length());
@@ -360,32 +366,9 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, int intArg)
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == GdbCmdInfo::argNum);
 
-    // DCrun is special
     SIZED_QString(cmdString, MAX_FMTLEN+30);
-    if (cmd == DCrun)
-    {
-	/*
-	 * intArg specifies which channels should be redirected to
-	 * /dev/null. It is a value or'ed together from RDNstdin,
-	 * RDNstdout, RDNstderr.
-	 */
-	static const char* const runRedir[8] = {
-	    "run\n",
-	    "run </dev/null\n",
-	    "run >/dev/null\n",
-	    "run </dev/null >/dev/null\n",
-	    "run 2>/dev/null\n",
-	    "run </dev/null 2>/dev/null\n",
-	    "run >/dev/null 2>&1\n",
-	    "run </dev/null >/dev/null 2>&1\n"
-	};
-	cmdString = runRedir[intArg & 7];
-	m_haveCoreFile = false;
-    }
-    else
-    {
-	cmdString.sprintf(cmds[cmd].fmt, intArg);
-    }
+
+    cmdString.sprintf(cmds[cmd].fmt, intArg);
     return cmdString;
 }
 
@@ -393,9 +376,38 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
 {
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == GdbCmdInfo::argStringNum ||
-	   cmds[cmd].argsNeeded == GdbCmdInfo::argNumString);
+	   cmds[cmd].argsNeeded == GdbCmdInfo::argNumString ||
+	   cmd == DCtty);
 
     SIZED_QString(cmdString, MAX_FMTLEN+30+strArg.length());
+
+    if (cmd == DCtty)
+    {
+	/*
+	 * intArg specifies which channels should be redirected to
+	 * /dev/null. It is a value or'ed together from RDNstdin,
+	 * RDNstdout, RDNstderr. We store the value for a later DCsetargs
+	 * command.
+	 * 
+	 * Note: We rely on that after the DCtty a DCsetargs will follow,
+	 * which will ultimately apply the redirection.
+	 */
+	static const char* const runRedir[8] = {
+	    "",
+	    " </dev/null",
+	    " >/dev/null",
+	    " </dev/null >/dev/null",
+	    " 2>/dev/null",
+	    " </dev/null 2>/dev/null",
+	    " >/dev/null 2>&1",
+	    " </dev/null >/dev/null 2>&1"
+	};
+	if (strArg.isEmpty())
+	    intArg = 7;			/* failsafe if no tty */
+	m_redirect = runRedir[intArg & 7];
+
+	return makeCmdString(DCtty, strArg);   /* note: no problem if strArg empty */
+    }
 
     if (cmds[cmd].argsNeeded == GdbCmdInfo::argStringNum)
     {
@@ -435,6 +447,10 @@ CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, bool clearLow)
 {
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == GdbCmdInfo::argNone);
+
+    if (cmd == DCrun) {
+	m_haveCoreFile = false;
+    }
 
     return executeCmdString(cmd, cmds[cmd].fmt, clearLow);
 }
