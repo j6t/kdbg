@@ -146,17 +146,20 @@ public:
     void insertChild(int index, KTreeViewItem* newChild);
 
     /**
-     * Indicateds whether the item is expanded, that is, whether the child
+     * Indicates whether the item is expanded, that is, whether the child
      * items (if any) would be visible if this item were visible.
      * 
-     * Note: If this function returns true, it does not necessarily indicate that
-     * this item is visible or that this item has any children.
+     * Note: If this function returns true, it does not necessarily indicate
+     * that this item is visible or that this item has any children.
      */
     bool isExpanded() const;
 
     /**
      * Returns true if the item is visible. An item is visible if all its
      * ancestors are expanded.
+     * 
+     * Note: If this function returns true, it does not necessarily indicate
+     * that the widget is visible.
      */
     bool isVisible() const;
 
@@ -230,7 +233,8 @@ protected:
     /**
      * paints the expand button
      */
-    virtual void paintExpandButton(QPainter* p, int indent, int cellHeight) const;
+    virtual void paintExpandButton(QPainter* p, int indent, int cellHeight,
+				   const QColorGroup& cg) const;
 
     /**
      * paints the highlighted text

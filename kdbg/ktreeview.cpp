@@ -286,7 +286,7 @@ void KTreeViewItem::paint(QPainter* p, int indent, const QColorGroup& cg,
      * bounds checking, and draw the button.
      */
     if (doExpandButton && (child || delayedExpanding)) {
-	paintExpandButton(p, indent, cellHeight);
+	paintExpandButton(p, indent, cellHeight, cg);
     }
 
     // now draw the item pixmap and text, if applicable
@@ -300,13 +300,14 @@ void KTreeViewItem::paint(QPainter* p, int indent, const QColorGroup& cg,
     p->restore();
 }
 
-void KTreeViewItem::paintExpandButton(QPainter* p, int indent, int cellHeight) const
+void KTreeViewItem::paintExpandButton(QPainter* p, int indent, int cellHeight,
+				      const QColorGroup& cg) const
 {
     int parentLeaderX = indent - (22 / 2);
     int cellCenterY = cellHeight / 2;
 
     expandButton.setRect(parentLeaderX - 4, cellCenterY - 4, 9, 9);
-    p->setBrush(white);
+    p->setBrush(cg.base());
     p->drawRect(expandButton);
     if (expanded) {
 	p->drawLine(parentLeaderX - 2, cellCenterY, 
@@ -1090,19 +1091,20 @@ void KTreeView::setExpandButtonDrawing(bool enable)
 // redraws tree if auto update enabled
 void KTreeView::setExpandLevel(int level)
 {
-  if(expansion == level)
-    return;
-  expansion = level;
-  KTreeViewItem *item = getCurrentItem();
-  forEveryItem(&KTreeView::setItemExpanded, 0);
-  while(item) {
-    if(item->getParent()->isExpanded())
-      break;
-    item = item->getParent();
-  }
-  setCurrentItem(itemRow(item));
-  if(autoUpdate() && isVisible())
-    repaint();
+    if (expansion == level)
+	return;
+    expansion = level;
+    KTreeViewItem* item = getCurrentItem();
+    forEveryItem(&KTreeView::setItemExpanded, 0);
+    while (item != 0) {
+	if (item->getParent()->isExpanded())
+	    break;
+	item = item->getParent();
+    }
+    if (item != 0)
+	setCurrentItem(itemRow(item));
+    if (autoUpdate() && isVisible())
+	repaint();
 }
 
 // sets the indent margin for all branches and repaints if auto update enabled
