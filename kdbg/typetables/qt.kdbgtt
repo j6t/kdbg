@@ -4,14 +4,14 @@ Types2=QWidget,QTableView
 IdentifyingType=
 [QString]
 Display={ % }
-Expr1=((%s).shd->data)
+Expr1=(%s).shd->data
 [QWidget]
 Display={ name=% #chld=% #conn=% }
 Expr1=(%s).objname
 Expr2=(%s).childObjects->numNodes
 Expr3=(%s).connections->numItems
 [QTableView]
-Alias=QString
+Alias=QWidget
 [QDir]
 Display={ path=% filter=% }
 Expr1=((%s).dPath.shd->data)
