@@ -19,10 +19,14 @@ PgmArgs::PgmArgs(QWidget* parent, const char* pgm) :
     title += i18n(": Program arguments");
     setCaption(title);
 
-    m_label.setMinimumSize(330, 24);
     QString lab;
     lab.sprintf(i18n("Run %s with these arguments:"), pgm);
     m_label.setText(lab);
+    QSize s = m_label.sizeHint();
+    /* don't make the label too wide if pgm name is very long */
+    if (s.width() > 450)
+	s.setWidth(450);
+    m_label.setMinimumSize(s);
 
     m_programArgs.setMinimumSize(330, 24);
     m_programArgs.setMaxLength(10000);
@@ -50,7 +54,7 @@ PgmArgs::PgmArgs(QWidget* parent, const char* pgm) :
     m_layout.activate();
 
     m_programArgs.setFocus();
-    resize(350, 120);
+    resize(300, 100);
 }
 
 PgmArgs::~PgmArgs()

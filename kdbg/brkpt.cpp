@@ -739,10 +739,10 @@ ConditionalDlg::ConditionalDlg(QWidget* parent) :
     title += i18n(": Conditional breakpoint");
     setCaption(title);
 
-    m_conditionLabel.setMinimumSize(100, 24);
     m_conditionLabel.setText(i18n("&Condition:"));
-    m_ignoreLabel.setMinimumSize(100, 24);
+    m_conditionLabel.setMinimumSize(m_conditionLabel.sizeHint());
     m_ignoreLabel.setText(i18n("Ignore &next hits:"));
+    m_ignoreLabel.setMinimumSize(m_ignoreLabel.sizeHint());
 
     m_condition.setMinimumSize(150, 24);
     m_condition.setMaxLength(10000);
@@ -780,7 +780,7 @@ ConditionalDlg::ConditionalDlg(QWidget* parent) :
     m_layout.activate();
 
     m_condition.setFocus();
-    resize(350, 120);
+    resize(400, 100);
 }
 
 ConditionalDlg::~ConditionalDlg()
