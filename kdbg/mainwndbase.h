@@ -123,6 +123,8 @@ protected:
     bool m_popForeground;		/* whether main wnd raises when prog stops */
     int m_backTimeout;			/* when wnd goes back */
     int m_tabWidth;			/* tab width in characters (can be 0) */
+    QString m_sourceFilter;
+    QString m_headerFilter;
 
     // the debugger proper
     QString m_debuggerCmdStr;

@@ -118,6 +118,8 @@ static void splitCmdStr(const QString& cmd, ValArray<QString>& parts)
 
 
 const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
+const char defaultSourceFilter[] = "*.c *.cc *.cpp *.c++ *.C *.CC";
+const char defaultHeaderFilter[] = "*.h *.hh *.hpp *.h++";
 
 
 DebuggerMainWndBase::DebuggerMainWndBase() :
@@ -131,6 +133,8 @@ DebuggerMainWndBase::DebuggerMainWndBase() :
 	m_popForeground(false),
 	m_backTimeout(1000),
 	m_tabWidth(0),
+	m_sourceFilter(defaultSourceFilter),
+	m_headerFilter(defaultHeaderFilter),
 	m_debugger(0)
 {
     m_statusActive = i18n("active");
@@ -205,6 +209,8 @@ const char PreferencesGroup[] = "Preferences";
 const char PopForeground[] = "PopForeground";
 const char BackTimeout[] = "BackTimeout";
 const char TabWidth[] = "TabWidth";
+const char SourceFileFilter[] = "SourceFileFilter";
+const char HeaderFileFilter[] = "HeaderFileFilter";
 
 void DebuggerMainWndBase::saveSettings(KConfig* config)
 {
@@ -222,6 +228,8 @@ void DebuggerMainWndBase::saveSettings(KConfig* config)
     config->writeEntry(PopForeground, m_popForeground);
     config->writeEntry(BackTimeout, m_backTimeout);
     config->writeEntry(TabWidth, m_tabWidth);
+    config->writeEntry(SourceFileFilter, m_sourceFilter);
+    config->writeEntry(HeaderFileFilter, m_headerFilter);
 }
 
 void DebuggerMainWndBase::restoreSettings(KConfig* config)
@@ -246,6 +254,8 @@ void DebuggerMainWndBase::restoreSettings(KConfig* config)
     m_popForeground = config->readBoolEntry(PopForeground, false);
     m_backTimeout = config->readNumEntry(BackTimeout, 1000);
     m_tabWidth = config->readNumEntry(TabWidth, 0);
+    m_sourceFilter = config->readEntry(SourceFileFilter, m_sourceFilter);
+    m_headerFilter = config->readEntry(HeaderFileFilter, m_headerFilter);
 }
 
 bool DebuggerMainWndBase::debugProgram(const QString& executable)
@@ -500,6 +510,8 @@ void DebuggerMainWndBase::doGlobalOptions()
     prefMisc.setPopIntoForeground(m_popForeground);
     prefMisc.setBackTimeout(m_backTimeout);
     prefMisc.setTabWidth(m_tabWidth);
+    prefMisc.setSourceFilter(m_sourceFilter);
+    prefMisc.setHeaderFilter(m_headerFilter);
 
     dlg.addTab(&prefDebugger, i18n("&Debugger"));
     dlg.addTab(&prefMisc, i18n("&Miscellaneous"));
@@ -510,6 +522,12 @@ void DebuggerMainWndBase::doGlobalOptions()
 	m_popForeground = prefMisc.popIntoForeground();
 	m_backTimeout = prefMisc.backTimeout();
 	m_tabWidth = prefMisc.tabWidth();
+	m_sourceFilter = prefMisc.sourceFilter();
+	if (m_sourceFilter.isEmpty())
+	    m_sourceFilter = defaultSourceFilter;
+	m_headerFilter = prefMisc.headerFilter();
+	if (m_headerFilter.isEmpty())
+	    m_headerFilter = defaultHeaderFilter;
     }
 }
 

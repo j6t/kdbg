@@ -26,6 +26,14 @@ protected:
 
     QLabel m_tabWidthLabel;
     QLineEdit m_tabWidth;
+
+    QLabel m_sourceFilterLabel;
+    QLineEdit m_sourceFilter;
+    QLabel m_headerFilterLabel;
+    QLineEdit m_headerFilter;
+
+    void setupEditGroup(const QString& label, QLabel& labWidget, QLineEdit& edit, int row);
+
 public:
     bool popIntoForeground() const { return m_popForeground.isChecked(); }
     void setPopIntoForeground(bool pop) { m_popForeground.setChecked(pop); }
@@ -33,6 +41,10 @@ public:
     void setBackTimeout(int to);
     int tabWidth() const;
     void setTabWidth(int tw);
+    QString sourceFilter() const { return m_sourceFilter.text(); }
+    void setSourceFilter(const QString& f) { m_sourceFilter.setText(f); }
+    QString headerFilter() const { return m_headerFilter.text(); }
+    void setHeaderFilter(const QString& f) { m_headerFilter.setText(f); }
 };
 
 #endif // PREFMISC_H

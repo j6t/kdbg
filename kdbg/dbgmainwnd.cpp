@@ -17,7 +17,6 @@
 #include <qfileinfo.h>
 #include "dbgmainwnd.h"
 #include "debugger.h"
-#include "prefdebugger.h"
 #include "updateui.h"
 #include "commandids.h"
 #include "winstack.h"
@@ -319,19 +318,12 @@ void DebuggerMainWnd::readProperties(KConfig* config)
 }
 
 const char WindowGroup[] = "Windows";
-const char PreferencesGroup[] = "Preferences";
-const char SourceFileFilter[] = "SourceFileFilter";
-const char HeaderFileFilter[] = "HeaderFileFilter";
 
 void DebuggerMainWnd::saveSettings(KConfig* config)
 {
     KConfigGroupSaver g(config, WindowGroup);
 
     writeDockConfig(config);
-
-    config->setGroup(PreferencesGroup);
-    config->writeEntry(SourceFileFilter, m_sourceFilter);
-    config->writeEntry(HeaderFileFilter, m_headerFilter);
 
     DebuggerMainWndBase::saveSettings(config);
 }
@@ -341,18 +333,6 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
     KConfigGroupSaver g(config, WindowGroup);
 
     readDockConfig(config);
-
-    config->setGroup(PreferencesGroup);
-    m_sourceFilter = config->readEntry(SourceFileFilter);
-    if (m_sourceFilter.isEmpty()) {
-	m_sourceFilter =
-	    "*.c *.cc *.cpp *.c++ *.C *.CC";
-    }
-    m_headerFilter = config->readEntry(HeaderFileFilter);
-    if (m_headerFilter.isEmpty()) {
-	m_headerFilter =
-	    "*.h *.hh *.hpp *.h++";
-    }
 
     DebuggerMainWndBase::restoreSettings(config);
 

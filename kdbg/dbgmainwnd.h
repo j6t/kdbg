@@ -59,8 +59,6 @@ protected:
     QPopupMenu* m_menuWindow;
 
     QTimer m_backTimer;
-    QString m_sourceFilter;
-    QString m_headerFilter;
 
 protected:
     virtual void closeEvent(QCloseEvent* e);
