@@ -222,11 +222,13 @@ void KDebugger::readProperties(KConfig* config)
 }
 
 const char WindowGroup[] = "Windows";
+const char OutputWindowGroup[] = "OutputWindow";
 const char MainPane[] = "MainPane";
 const char LeftPane[] = "LeftPane";
 const char RightPane[] = "RightPane";
 const char BreaklistVisible[] = "BreaklistVisible";
 const char Breaklist[] = "Breaklist";
+const char KeepScript[] = "KeepScript";
 
 void KDebugger::saveSettings(KConfig* config)
 {
@@ -262,6 +264,14 @@ void KDebugger::restoreSettings(KConfig* config)
 	m_bpTable.setGeometry(r);
     }
     visible ? m_bpTable.show() : m_bpTable.hide();
+
+    /*
+     * For debugging and emergency purposes, let the config file override
+     * the shell script that is used to keep the output window open. This
+     * string must have EXACTLY 1 %s sequence in it.
+     */
+    config->setGroup(OutputWindowGroup);
+    m_outputTermKeepScript = config->readEntry(KeepScript);
 }
 
 
@@ -733,7 +743,7 @@ bool KDebugger::startGdb()
 
 void KDebugger::stopGdb()
 {
-    m_gdb.kill(SIGHUP);			/* gdb exits normally on SIGHUP */
+    m_gdb.kill(SIGTERM);
     m_state = DSidle;
 }
 
@@ -817,26 +827,31 @@ bool KDebugger::createOutputWindow()
     if (pid == 0) {
 	// child process
 	/*
-	 * Set up a special environment variable that is recognized by kdbg
-	 * when it is started by the output window, so that it will reserve
-	 * a tty, but do nothing otherwise (see main.cpp).
+	 * Spawn an xterm that in turn runs a shell script that passes us
+	 * back the terminal name and then only sits and waits.
 	 */
-#ifdef HAVE_PUTENV
-	QString specialVar = "_KDBG_TTYIOWIN=" + fifoName;
-	::putenv(specialVar);
-#else
-	::setenv("_KDBG_TTYIOWIN", fifoName, 1);
-#endif
+	static const char shellScriptFmt[] =
+	    "tty>%s;"
+	    "trap \"\" INT QUIT TSTP;"	/* ignore various signals */
+	    "exec<&-;exec>&-;"		/* close stdin and stdout */
+	    "while :;do sleep 3600;done";
+	// let config file override this script
+	const char* fmt = shellScriptFmt;
+	if (m_outputTermKeepScript.length() != 0) {
+	    fmt = m_outputTermKeepScript.data();
+	}
+	QString shellScript(strlen(fmt) + fifoName.length());
+	shellScript.sprintf(fmt, fifoName.data());
+	TRACE("output window script is " + shellScript);
 
-	// spawn "xterm -name kdbgio -title "KDbg: Program output" -e kdbg"
-	extern QString thisExecName;
+	// spawn "xterm -name kdbgio -title "KDbg: Program output" -e sh -c script"
 	QString title = kapp->getCaption();
 	title += i18n(": Program output");
 	::execlp("xterm",
 		 "xterm",
 		 "-name", "kdbgio",
 		 "-title", title.data(),
-		 "-e", thisExecName.data(),
+		 "-e", "sh", "-c", shellScript.data(),
 		 0);
 	
 	// failed; what can we do?
@@ -861,16 +876,12 @@ bool KDebugger::createOutputWindow()
 	    // error
 	    return false;
 	}
+
+	// remove whitespace
 	QString tty(ttyname, n+1);
-	
-	// parse the string: /dev/ttyp3,1234 (pid of xterm)
-	int comma = tty.find(',');
-	ASSERT(comma > 0);
-	m_outputTermName = tty.left(comma);
-	tty.remove(0, comma+1);
-	m_outputTermPID = tty.toInt();
-	TRACE(QString().sprintf("tty=%s, pid=%d",
-				m_outputTermName.data(), m_outputTermPID));
+	m_outputTermName = tty.stripWhiteSpace();
+	m_outputTermPID = pid;
+	TRACE(QString().sprintf("tty=%s", m_outputTermName.data()));
     }
     return true;
 }

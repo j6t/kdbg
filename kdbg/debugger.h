@@ -11,6 +11,7 @@
 #include <qlined.h>
 #include <qlayout.h>
 #include <qpushbt.h>
+#include <qtimer.h>
 #include <ktopwidget.h>
 #include <kprocess.h>
 #include <ktabctl.h>
@@ -85,6 +86,7 @@ public:
 protected:
     pid_t m_outputTermPID;
     QString m_outputTermName;
+    QString m_outputTermKeepScript;
     bool createOutputWindow();
     bool startGdb();
     void stopGdb();
