@@ -1745,6 +1745,23 @@ void KDebugger::handleFindType(CmdQueueItem* cmd)
 	ASSERT(cmd != 0 && cmd->m_expr != 0);
 
 	TypeInfo* info = typeTable()[type];
+
+	if (info == 0) {
+	    /*
+	     * We've asked gdb for the type of the expression in
+	     * cmd->m_expr, but it returned a name we don't know. The base
+	     * class (and member) types have been checked already (at the
+	     * time when we parsed that particular expression). Now it's
+	     * time to derive the type from the base classes as a last
+	     * resort.
+	     */
+	    info = cmd->m_expr->inferTypeFromBaseClass();
+	    // if we found a type through this method, register an alias
+	    if (info != 0) {
+		TRACE("infered alias: " + type);
+		typeTable().registerAlias(type, info);
+	    }
+	}
 	if (info == 0) {
 	    TRACE("unknown type");
 	    cmd->m_expr->m_type = TypeTable::unknownType();
