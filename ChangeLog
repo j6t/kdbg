@@ -6,6 +6,8 @@ Version 1.9.5
 	Added a command line option to attach to a process (thanks to
 	Matthew Allen for the initial code).
 
+	Fixed the "Using host libthread_db" error message properly.
+
 Version 1.9.4
 
 	Updated the build system to the latest auto* tools.
@@ -45,6 +47,10 @@ Version 1.9.0
 	"Orphaned breakpoints", i.e. breakpoints that gdb cannot set
 	immediately, can be set. This helps debug shared libraries and
 	dynamically loaded modules.
+
+Version 1.2.10
+
+	Fixed the "Using host libthread_db" error message.
 
 Version 1.2.9
 

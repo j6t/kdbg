@@ -1921,14 +1921,25 @@ bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
     m_haveCoreFile = false;
 
     /*
-     * The command is successful if there is no output or the single
-     * message (no debugging symbols found) or
-     * (Using host libthread_db library "/lib/tls/libthread_db.so.1".)
+     * Lines starting with the following do not indicate errors:
+     *     Using host libthread_db
+     *     (no debugging symbols found)
      */
-    return
-	output[0] == '\0' ||
-	strcmp(output, "(no debugging symbols found)...") == 0 ||
-	strncmp(output, "Using host libthread_db library", 31) == 0;
+    while (strncmp(output, "Using host libthread_db", 23) == 0 ||
+	   strncmp(output, "(no debugging symbols found)", 28) == 0)
+    {
+	// this line is good, go to the next one
+	const char* end = strchr(output, '\n');
+	if (end == 0)
+	    output += strlen(output);
+	else
+	    output = end+1;
+    }
+
+    /*
+     * If we've parsed all lines, there was no error.
+     */
+    return output[0] == '\0';
 }
 
 bool GdbDriver::parseCoreFile(const char* output)
