@@ -1,5 +1,5 @@
 %define name kdbg
-%define version 1.9.0
+%define version 1.9.4
 %define release 1.kde2
 %define prefix /usr
 
