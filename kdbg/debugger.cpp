@@ -598,11 +598,19 @@ bool KDebugger::createOutputWindow()
 
     // create a fifo that will pass in the tty name
     ::unlink(fifoName);			/* remove remnants */
+#ifdef HAVE_MKFIFO
+    if (::mkfifo(fifoName, S_IRUSR|S_IWUSR) < 0) {
+	// failed
+	TRACE("mkfifo " + fifoName + " failed");
+	return false;
+    }
+#else
     if (::mknod(fifoName, S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
 	// failed
 	TRACE("mknod " + fifoName + " failed");
 	return false;
     }
+#endif
 
     int pid = ::fork();
     if (pid < 0) {
