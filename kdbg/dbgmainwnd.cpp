@@ -15,6 +15,7 @@
 #include <kpopupmenu.h>
 #include <kfiledialog.h>
 #include <kprocess.h>
+#include <kkeydialog.h>
 #include <qlistbox.h>
 #include <qfileinfo.h>
 #include "dbgmainwnd.h"
@@ -205,6 +206,7 @@ void DebuggerMainWnd::initKAction()
     (void)new KAction(i18n("&Global Options..."), 0, this, 
                       SLOT(slotFileGlobalSettings()), actionCollection(),
                       "settings_global");
+    KStdAction::keyBindings(this, SLOT(slotConfigureKeys()), actionCollection());
     KStdAction::showToolbar(this, SLOT(slotViewToolbar()), actionCollection());
     KStdAction::showStatusbar(this, SLOT(slotViewStatusbar()), actionCollection());
 
@@ -864,6 +866,11 @@ void DebuggerMainWnd::slotExecArgs()
     if (m_debugger != 0) {
 	m_debugger->programArgs(this);
     }
+}
+
+void DebuggerMainWnd::slotConfigureKeys()
+{
+    KKeyDialog::configure(actionCollection(), this);
 }
 
 #include "dbgmainwnd.moc"
