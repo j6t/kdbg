@@ -6,7 +6,7 @@
 #include <kapp.h>
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
-#include <klibglobal.h>
+#include <kinstance.h>
 #endif
 #include <kiconloader.h>
 #include <kstdaccel.h>
@@ -230,8 +230,8 @@ void DebuggerMainWndBase::initAnimation()
     QPixmap pixmap;
     pixmap.load(path + "/kde1.xpm");
 #else
-    KLibGlobal libglobal("kdbg");
-    QPixmap pixmap = BarIcon("kde1", &libglobal);
+    KInstance instance("kdbg");
+    QPixmap pixmap = BarIcon("kde1", &instance);
 #endif
 
     KToolBar* toolbar = toolBar();
@@ -248,7 +248,7 @@ void DebuggerMainWndBase::initAnimation()
 	p->load(path + n);
 #else
 	n.sprintf("kde%d", i);
-	QPixmap* p = new QPixmap(BarIcon(n,&libglobal));
+	QPixmap* p = new QPixmap(BarIcon(n,&instance));
 #endif
 	if (!p->isNull()) {
 	    m_animation.append(p);
