@@ -772,6 +772,7 @@ parseVar(const char *&s)
             p = nextLine + 1;
             variable = new VarTree(nameBuffer, kind);
             if (variable != 0L) {
+		variable->m_varKind = VarTree::VKsimple;
                 variable->setDeleteChildren(true);
                 parseValue(p, variable);
             }
@@ -792,6 +793,7 @@ parseVar(const char *&s)
       }
       variable = new VarTree(name, kind);
       if (variable != 0L) {
+	  variable->m_varKind = VarTree::VKsimple;
         variable->setDeleteChildren(true);
       }
     }else{
@@ -805,7 +807,8 @@ parseVar(const char *&s)
       }
       variable = new VarTree(name, kind);
       if (variable != 0L) {
-        variable->setDeleteChildren(true);
+	  variable->m_varKind = VarTree::VKsimple;
+	  variable->setDeleteChildren(true);
       }
       if (*p == '\n')
 	p++;
@@ -879,14 +882,13 @@ parseValue(const char *&s, VarTree * variable)
 	 "xmlXPathEval:",
 	0		     				     
     };
-    static char valueBuffer[255];
+    static char valueBuffer[2048];
     int markerIndex = 0, foundEnd = 0;
     size_t copySize;
 
     if (variable == 0L)
         return false;           /* should never happen but .. */
 
-    variable->m_value = "";
     while (start && (*start != '\0')) {
         /* look for the next marker */
         for (markerIndex = 0; marker[markerIndex] != 0; markerIndex++) {
@@ -902,26 +904,39 @@ parseValue(const char *&s, VarTree * variable)
 
 
         end = strchr(start, '\n');
-        if (end) {
-            end++;
+        if (end) 
+            copySize = end - start;
+	else
+	    copySize = strlen(start);
+	if (copySize >= sizeof(valueBuffer))
+	    copySize = sizeof(valueBuffer)-1;
 
-            copySize = end - start - 1;
-            if (copySize > sizeof(valueBuffer))
-                copySize = sizeof(valueBuffer);
-
-            strncpy(valueBuffer, start, copySize);
-            valueBuffer[copySize] = '\0';
-	    TRACE("Got value :");
-	    TRACE(valueBuffer);
+	strncpy(valueBuffer, start, copySize);
+	valueBuffer[copySize] = '\0';
+	TRACE("Got value :");
+	TRACE(valueBuffer);
+	if ((variable->m_varKind == VarTree::VKsimple)) {
+	    if (!variable->m_value.isEmpty()){
+		variable->m_varKind = VarTree::VKarray;
+		childValue = new VarTree(variable->m_value, VarTree::NKplain);
+		variable->appendChild(childValue);
+		childValue = new VarTree(valueBuffer, VarTree::NKplain);
+		variable->appendChild(childValue);
+		variable->m_value = "";
+	    }else{
+		variable->m_value = valueBuffer;
+	    }
+	}else{
 	    childValue = new VarTree(valueBuffer, VarTree::NKplain);
-            variable->appendChild(childValue);
+	    variable->appendChild(childValue);
+	}
 
-            start = end;
-        } else {
-	    childValue = new VarTree(start, VarTree::NKplain);
-            variable->appendChild(childValue);
-            break;
-        }
+	if (*end =='\n'){
+	    start = end + 1;
+	}else{
+	    start = end + 1;
+	    break;
+	}
     }
 
     if (foundEnd == 0)
