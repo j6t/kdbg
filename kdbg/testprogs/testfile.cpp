@@ -68,7 +68,7 @@ void f(E e[3], char c)
 	emptyBase eb;
 	emptyDerived ed;
 	emptyNested en;
-	int ea[0];
+	int ea[3];
 	emptyVBase evb;
 	emptyVDerived evd;
 	emptyVNested evn;
