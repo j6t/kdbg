@@ -34,6 +34,7 @@ kdbg_SOURCES = \
 	brkpt.cpp \
 	exprwnd.cpp \
 	regwnd.cpp \
+	threadlist.cpp \
 	updateui.cpp \
 	sourcewnd.cpp \
 	winstack.cpp \
@@ -68,6 +69,7 @@ noinst_HEADERS = \
 	brkpt.h \
 	exprwnd.h \
 	regwnd.h \
+	threadlist.h \
 	ktreeview.h \
 	updateui.h \
 	sourcewnd.h \
@@ -93,6 +95,7 @@ BUILTSOURCES =	\
 	brkpt.moc \
 	exprwnd.moc \
 	regwnd.moc \
+	threadlist.moc \
 	ktreeview.moc \
 	sourcewnd.moc \
 	winstack.moc \
@@ -141,6 +144,10 @@ exprwnd.moc: $(srcdir)/exprwnd.h
 $(srcdir)/regwnd.cpp: regwnd.moc
 regwnd.moc: $(srcdir)/regwnd.h
 	$(MOC) $(srcdir)/regwnd.h -o regwnd.moc
+
+$(srcdir)/threadlist.cpp: threadlist.moc
+threadlist.moc: $(srcdir)/threadlist.h
+	$(MOC) $(srcdir)/threadlist.h -o threadlist.moc
 
 $(srcdir)/textvw.cpp: textvw.moc
 textvw.moc: $(srcdir)/textvw.h

@@ -23,6 +23,7 @@ class KConfig;
 class KSimpleConfig;
 class QListBox;
 class RegisterInfo;
+class ThreadInfo;
 class DebuggerDriver;
 class CmdQueueItem;
 class Breakpoint;
@@ -270,6 +271,7 @@ protected:
     void handleRegisters(const char* output);
     void handleInfoLine(CmdQueueItem* cmd, const char* output);
     void handleDisassemble(CmdQueueItem* cmd, const char* output);
+    void handleThreadList(const char* output);
     void evalExpressions();
     void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
@@ -322,6 +324,8 @@ protected slots:
     void slotDeleteWatch();
     void slotValuePopup(const QString&);
     void slotDisassemble(const QString&, int);
+public slots:
+    void setThread(int);
 
 signals:
     /**
@@ -401,6 +405,11 @@ signals:
      * Indicates that the register values have possibly changed.
      */
     void registersChanged(QList<RegisterInfo>&);
+
+    /**
+     * Indicates that the list of threads has possibly changed.
+     */
+    void threadsChanged(QList<ThreadInfo>&);
 
     /**
      * Indicates that the value for a value popup is ready.

@@ -871,6 +871,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCnext:
     case DCfinish:
     case DCuntil:
+    case DCthread:
 	handleRunCommands(output);
 	break;
     case DCkill:
@@ -910,6 +911,9 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCcondition:
     case DCignore:
 	// we are not interested in the output
+	break;
+    case DCinfothreads:
+	handleThreadList(output);
 	break;
     }
 }
@@ -965,6 +969,11 @@ void KDebugger::handleRunCommands(const char* output)
 	emit updatePC(QString(), -1, DbgAddr(), 0);
 	// dequeue any commands in the queues
 	m_d->flushCommands();
+    }
+
+    /* Update threads list */
+    if (flags & DebuggerDriver::SFrefreshThreads) {
+	m_d->queueCmd(DCinfothreads, DebuggerDriver::QMoverride);
     }
 
     m_programRunning = false;
@@ -1844,6 +1853,19 @@ void KDebugger::handleDisassemble(CmdQueueItem* cmd, const char* output)
     code.setAutoDelete(true);
     m_d->parseDisassemble(output, code);
     emit disassembled(cmd->m_fileName, cmd->m_lineNo, code);
+}
+
+void KDebugger::handleThreadList(const char* output)
+{
+    QList<ThreadInfo> threads;
+    threads.setAutoDelete(true);
+    m_d->parseThreadList(output, threads);
+    emit threadsChanged(threads);
+}
+
+void KDebugger::setThread(int id)
+{
+    m_d->queueCmd(DCthread, id, DebuggerDriver::QMoverrideMoreEqual);
 }
 
 

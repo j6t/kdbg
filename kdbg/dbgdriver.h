@@ -75,6 +75,8 @@ enum DbgCommand {
 	DCframe,
 	DCfindType,
 	DCinfosharedlib,
+	DCthread,
+	DCinfothreads,
 	DCinfobreak,
 	DCcondition,
 	DCignore
@@ -139,17 +141,35 @@ struct Breakpoint
 };
 
 /**
- * The information about a stack frame.
+ * Information about a stack frame.
  */
-struct StackFrame
+struct FrameInfo
 {
-    int frameNo;
     QString fileName;
     int lineNo;				/* zero-based line number */
     DbgAddr address;			/* exact address of PC */
+};
+
+/**
+ * The information about a stack frame as parsed from the backtrace.
+ */
+struct StackFrame : FrameInfo
+{
+    int frameNo;
     VarTree* var;			/* more information if non-zero */
     StackFrame() : var(0) { }
     ~StackFrame();
+};
+
+/**
+ * The information about a thread as parsed from the threads list.
+ */
+struct ThreadInfo : FrameInfo
+{
+    int id;				/* gdb's number */
+    QString threadName;			/* the SYSTAG */
+    QString function;			/* where thread is halted */
+    bool hasFocus;			/* the thread whose stack we are watching */
 };
 
 /**
@@ -316,6 +336,16 @@ public:
     virtual bool parseBreakList(const char* output, QList<Breakpoint>& brks) = 0;
 
     /**
+     * Parses a list of threads.
+     * @param output The output of the debugger.
+     * @param threads The list of new #ThreadInfo objects. The list
+     * must initially be empty.
+     * @return False if there was an error before the first thread entry
+     * was found. Even if true is returned, #threads may be empty.
+     */
+    virtual bool parseThreadList(const char* output, QList<ThreadInfo>& threads) = 0;
+
+    /**
      * Parses the output when the program stops to see whether this it
      * stopped due to a breakpoint.
      * @param output The output of the debugger.
@@ -372,7 +402,8 @@ public:
     enum StopFlags {
 	SFrefreshSource = 1,		/* refresh of source code is needed */
 	SFrefreshBreak = 2,		/* refresh breakpoints */
-	SFprogramActive = 4		/* program remains active */
+	SFrefreshThreads = 4,		/* refresh thread list */
+	SFprogramActive = 128		/* program remains active */
     };
     /**
      * Parses the output of commands that execute (a piece of) the program.

@@ -17,6 +17,7 @@ class QListBox;
 class ExprWnd;
 class DockWidget;
 class BreakpointTable;
+class ThreadList;
 struct DbgAddr;
 
 class DebuggerMainWnd : public DockMainWindow, public DebuggerMainWndBase
@@ -48,6 +49,7 @@ protected:
     RegisterView* m_registers;
     BreakpointTable* m_bpTable;
     TTYWindow* m_ttyWindow;
+    ThreadList* m_threads;
 
     // menus
     QPopupMenu* m_menuFile;

@@ -23,6 +23,7 @@
 #include "commandids.h"
 #include "winstack.h"
 #include "brkpt.h"
+#include "threadlist.h"
 #include "ttywnd.h"
 #include "mydebug.h"
 
@@ -58,6 +59,9 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     DockWidget* dw6 = createDockWidget("Output", p);
     dw6->setCaption(i18n("Output"));
     m_ttyWindow = new TTYWindow(dw6, "output");
+    DockWidget* dw7 = createDockWidget("Threads", p);
+    dw7->setCaption(i18n("Threads"));
+    m_threads = new ThreadList(dw7, "threads");
 
     initMenu();
     initToolbar();
@@ -121,6 +125,12 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 
     connect(m_debugger, SIGNAL(registersChanged(QList<RegisterInfo>&)),
 	    m_registers, SLOT(updateRegisters(QList<RegisterInfo>&)));
+
+    // thread window
+    connect(m_debugger, SIGNAL(threadsChanged(QList<ThreadInfo>&)),
+	    m_threads, SLOT(updateThreads(QList<ThreadInfo>&)));
+    connect(m_threads, SIGNAL(setThread(int)),
+	    m_debugger, SLOT(setThread(int)));
 
     // view menu changes when docking state changes
     connect(dockManager, SIGNAL(change()), SLOT(updateUI()));
@@ -385,7 +395,7 @@ void DebuggerMainWnd::menuCallback(int item)
 	showhideWindow(m_registers);
 	break;
     case ID_VIEW_THREADS:
-//	showhideWindow(m_btWindow);
+	showhideWindow(m_threads);
 	break;
     case ID_VIEW_OUTPUT:
 	showhideWindow(m_ttyWindow);
@@ -501,7 +511,7 @@ void DebuggerMainWnd::updateUIItem(UpdateUI* item)
 	dockUpdateHelper(item, m_registers);
 	break;
     case ID_VIEW_THREADS:
-//	dockUpdateHelper(item, m_filesWindow);
+	dockUpdateHelper(item, m_threads);
 	break;
     case ID_VIEW_OUTPUT:
 	dockUpdateHelper(item, m_ttyWindow);

@@ -110,6 +110,8 @@ static GdbCmdInfo cmds[] = {
     { DCframe, "frame %d\n", GdbCmdInfo::argNum },
     { DCfindType, "whatis %s\n", GdbCmdInfo::argString },
     { DCinfosharedlib, "info sharedlibrary\n", GdbCmdInfo::argNone },
+    { DCthread, "thread %d\n", GdbCmdInfo::argNum },
+    { DCinfothreads, "info threads\n", GdbCmdInfo::argNone },
     { DCinfobreak, "info breakpoints\n", GdbCmdInfo::argNone },
     { DCcondition, "condition %d %s\n", GdbCmdInfo::argNumString},
     { DCignore, "ignore %d %d\n", GdbCmdInfo::argNum2},
@@ -1249,25 +1251,14 @@ static bool parseValueSeq(const char*& s, VarTree* variable)
 #define ISSPACE(c) (c).isSpace()
 #endif
 
-static bool parseFrame(const char*& s, int& frameNo, QString& func,
-		       QString& file, int& lineNo, DbgAddr& address)
+/**
+ * Parses a stack frame.
+ */
+static void parseFrameInfo(const char*& s, QString& func,
+			   QString& file, int& lineNo, DbgAddr& address)
 {
-    // Example:
-    //  #1  0x8048881 in Dl::Dl (this=0xbffff418, r=3214) at testfile.cpp:72
-
-    // must start with a hash mark followed by number
-    if (s[0] != '#' || !isdigit(s[1]))
-	return false;
-
     const char* p = s;
-    p++;				/* skip the hash mark */
-    // frame number
-    frameNo = atoi(p);
-    while (isdigit(*p))
-	p++;
-    // space
-    while (isspace(*p))
-	p++;
+
     // next may be a hexadecimal address
     if (*p == '0') {
 	const char* start = p;
@@ -1289,7 +1280,7 @@ static bool parseFrame(const char*& s, int& frameNo, QString& func,
 	file = "";
 	lineNo = -1;
 	s = p;
-	return true;
+	return;
     }
     /*
      * Skip parameters. But notice that for complicated conversion
@@ -1342,7 +1333,12 @@ static bool parseFrame(const char*& s, int& frameNo, QString& func,
     }
     s = p;
 
-    // replace \n (and whitespace around it) in func by a blank
+    /*
+     * Replace \n (and whitespace around it) in func by a blank. We cannot
+     * use QString::simplifyWhiteSpace() for this because this would also
+     * simplify space that belongs to a string arguments that gdb sometimes
+     * prints in the argument lists of the function.
+     */
     ASSERT(!ISSPACE(func[0]));		/* there must be non-white before first \n */
     int nl = 0;
     while ((nl = func.find('\n', nl)) >= 0) {
@@ -1361,10 +1357,35 @@ static bool parseFrame(const char*& s, int& frameNo, QString& func,
 	/* continue searching for more \n's at this place: */
 	nl = startWhite+1;
     }
-    return true;
+    return;
 }
 
 #undef ISSPACE
+
+/**
+ * Parses a stack frame including its frame number
+ */
+static bool parseFrame(const char*& s, int& frameNo, QString& func,
+		       QString& file, int& lineNo, DbgAddr& address)
+{
+    // Example:
+    //  #1  0x8048881 in Dl::Dl (this=0xbffff418, r=3214) at testfile.cpp:72
+
+    // must start with a hash mark followed by number
+    if (s[0] != '#' || !isdigit(s[1]))
+	return false;
+
+    s++;				/* skip the hash mark */
+    // frame number
+    frameNo = atoi(s);
+    while (isdigit(*s))
+	s++;
+    // space
+    while (isspace(*s))
+	s++;
+    parseFrameInfo(s, func, file, lineNo, address);
+    return true;
+}
 
 void GdbDriver::parseBackTrace(const char* output, QList<StackFrame>& stack)
 {
@@ -1508,6 +1529,69 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	bp->ignoreCount = ignoreCount;
 	bp->condition = condition;
 	brks.append(bp);
+    }
+    return true;
+}
+
+bool GdbDriver::parseThreadList(const char* output, QList<ThreadInfo>& threads)
+{
+    if (strcmp(output, "\n") == 0 || strncmp(output, "No stack.", 9) == 0) {
+	// no threads
+	return true;
+    }
+
+    int id;
+    QString systag;
+    QString func, file;
+    int lineNo;
+    DbgAddr address;
+
+    const char* p = output;
+    while (*p != '\0') {
+	// seach look for thread id, watching out for  the focus indicator
+	bool hasFocus = false;
+	while (isspace(*p))
+	    p++;
+	if (*p == '*') {
+	    hasFocus = true;
+	    p++;
+	    // there follows only whitespace
+	}
+	char* end;
+	id = strtol(p, &end, 10);
+	if (p == end) {
+	    // syntax error: no number found; bail out
+	    return true;
+	}
+	p = end;
+
+	// skip space
+	while (isspace(*p))
+	    p++;
+
+	/*
+	 * Now follows the thread's SYSTAG. It is terminated by two blanks.
+	 */
+	end = strstr(p, "  ");
+	if (end == 0) {
+	    // syntax error; bail out
+	    return true;
+	}
+	systag = FROM_LATIN1(p, end-p);
+	p = end+2;
+
+	// now follows a standard stack frame
+	::parseFrameInfo(p, func, file, lineNo, address);
+
+	ThreadInfo* thr = new ThreadInfo;
+	thr->id = id;
+	thr->threadName = systag;
+	thr->hasFocus = hasFocus;
+	thr->function = func;
+	thr->fileName = file;
+	thr->lineNo = lineNo;
+	thr->address = address;
+	threads.append(thr);
     }
     return true;
 }
@@ -1690,6 +1774,13 @@ uint GdbDriver::parseProgramStopped(const char* output, QString& message)
 	// next line, please
 	start = strchr(start, '\n');
     } while (start != 0);
+
+    /*
+     * Gdb only notices when new threads have appeared, but not when a
+     * thread finishes. So we always have to assume that the list of
+     * threads has changed.
+     */
+    flags |= SFrefreshThreads;
 
     return flags;
 }
