@@ -1439,6 +1439,7 @@ void KDebugger::handleRunCommands()
     // go through the output, line by line, checking what we have
     char* start = m_gdbOutput - 1;
     bool refreshNeeded = false;
+    bool refreshBreaklist = false;
     QString msg;
     do {
 	start++;			/* skip '\n' */
@@ -1459,6 +1460,12 @@ void KDebugger::handleRunCommands()
 	    } else {
 		msg = QString(start, endOfMessage-start);
 	    }
+	} else if (strncmp(start, "Breakpoint ", 11) == 0) {
+	    /*
+	     * We stopped at a (permanent) breakpoint (gdb doesn't tell us
+	     * that it stopped at a temporary breakpoint).
+	     */
+	    refreshBreaklist = true;
 	} else if (strstr(start, "re-reading symbols.") != 0) {
 	    refreshNeeded = true;
 	}
@@ -1476,11 +1483,11 @@ void KDebugger::handleRunCommands()
     }
 
     /*
-     * If we have any temporary breakpoints, we must update the breakpoint
-     * list since this stop may be due to on of them, which would now go
-     * away.
+     * If we stopped at a breakpoint, we must update the breakpoint list
+     * because the hit count changes. Also, if the breakpoint was temporary
+     * it would go away now.
      */
-    if (refreshNeeded || m_bpTable.haveTemporaryBP()) {
+    if (refreshBreaklist || refreshNeeded || m_bpTable.haveTemporaryBP()) {
 	queueCmd(DCinfobreak, "info breakpoints", QMoverride);
     }
 
