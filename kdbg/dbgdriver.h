@@ -16,6 +16,7 @@
 class VarTree;
 class ExprWnd;
 class KDebugger;
+class QStrList;
 
 
 /**
