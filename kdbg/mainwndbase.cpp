@@ -242,6 +242,12 @@ void DebuggerMainWndBase::restoreSettings(KConfig* config)
     m_headerFilter = config->readEntry(HeaderFileFilter, m_headerFilter);
 }
 
+void DebuggerMainWndBase::setAttachPid(const QString& pid)
+{
+    assert(m_debugger != 0);
+    m_debugger->setAttachPid(pid);
+}
+
 bool DebuggerMainWndBase::debugProgram(const QString& executable,
 				       QCString lang, QWidget* parent)
 {

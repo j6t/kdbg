@@ -55,6 +55,7 @@ int main(int argc, char** argv)
 	{ "r <device>", I18N_NOOP("remote debugging via <device>"), 0 },
 	{ "l <language>", I18N_NOOP("specify language: C, XSLT"), ""},
 	{ "x", I18N_NOOP("use language XSLT (deprecated)"), 0 },
+	{ "p <pid>", I18N_NOOP("specify PID of process to debug"), 0},
 	{ "+[program]", I18N_NOOP("path of executable to debug"), 0 },
 	{ "+[core]", I18N_NOOP("a core file to use"), 0},
 	{ 0, 0, 0 }
@@ -106,16 +107,25 @@ int main(int argc, char** argv)
     }
     debugger.setTranscript(transcript);
 
+    QString pid = args->getOption("p");
+
     if (!restored && args->count() > 0) {
-	// check for core file
-	if (args->count() > 1) {
+	// attach to process?
+	if (!pid.isEmpty()) {
+	    TRACE("pid: " + pid);
+	    debugger.setAttachPid(pid);
+	}
+	// check for core file; use it only if we're not attaching to a process
+	else if (args->count() > 1 && pid.isEmpty()) {
 	    debugger.setCoreFile(args->arg(1));
 	}
 	if (!debugger.debugProgram(args->arg(0), lang)) {
 	    // failed
 	    TRACE("cannot start debugger");
 	    KMessageBox::error(&debugger, i18n("Cannot start debugger."));
-	    debugger.setCoreFile("");
+
+	    debugger.setCoreFile(QString());
+	    debugger.setAttachPid(QString());
 	}
     }
 

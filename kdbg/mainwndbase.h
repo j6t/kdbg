@@ -74,6 +74,10 @@ public:
      * driver.
      */
     bool debugProgram(const QString& executable, QCString lang, QWidget* parent);
+    /**
+     * Specifies the process to attach to after the program is loaded.
+     */
+    void setAttachPid(const QString& pid);
 
     // the following are needed to handle program arguments
     void setCoreFile(const QString& corefile);

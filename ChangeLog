@@ -3,6 +3,9 @@ Version 1.9.5
 	Fixed some issues when the items in the environment variable list
 	are selected.
 
+	Added a command line option to attach to a process (thanks to
+	Matthew Allen for the initial code).
+
 Version 1.9.4
 
 	Updated the build system to the latest auto* tools.

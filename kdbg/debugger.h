@@ -65,6 +65,11 @@ public:
     void useCoreFile(QString corefile, bool batch);
 
     /**
+     * Uses the specified pid to attach to the active program.
+     */
+    void setAttachPid(const QString& pid);
+
+    /**
      * Attaches to the specified process and debugs it.
      */
     void attachProgram(const QString& pid);

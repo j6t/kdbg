@@ -189,6 +189,11 @@ void KDebugger::useCoreFile(QString corefile, bool batch)
     }
 }
 
+void KDebugger::setAttachPid(const QString& pid)
+{
+    m_attachedPid = pid;
+}
+
 void KDebugger::programRun()
 {
     if (!isReady())
@@ -958,12 +963,24 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 		restoreProgramSettings();
 	    }
 	    // load file containing main() or core file
-	    if (m_corefile.isEmpty()) {
-		if (m_remoteDevice.isEmpty())
-		    m_d->queueCmd(DCinfolinemain, DebuggerDriver::QMnormal);
-	    } else {
+	    if (!m_corefile.isEmpty())
+	    {
 		// load core file
 		loadCoreFile();
+	    }
+	    else if (!m_attachedPid.isEmpty())
+	    {
+		m_d->queueCmd(DCattach, m_attachedPid, DebuggerDriver::QMoverride);
+		m_programActive = true;
+		m_programRunning = true;
+	    }
+	    else if (!m_remoteDevice.isEmpty())
+	    {
+		// handled elsewhere
+	    }
+	    else
+	    {
+		m_d->queueCmd(DCinfolinemain, DebuggerDriver::QMnormal);
 	    }
 	    if (!m_statusMessage.isEmpty())
 		emit updateStatusMessage();
