@@ -1,0 +1,14 @@
+## $Id$
+
+# types in libraries that we understand
+typesdir = $(kde_datadir)/kdbg/types
+types_DATA = \
+	qt.kdbgtt \
+	qt2.kdbgtt \
+	kdecore.kdbgtt \
+	kdecore3.kdbgtt \
+	glib.kdbgtt \
+	gtk+.kdbgtt \
+	X11.kdbgtt
+
+EXTRA_DIST = $(types_DATA)

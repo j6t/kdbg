@@ -17,7 +17,7 @@
 INCLUDES= $(all_includes)
 
 # claim, which subdirectories you want to install
-SUBDIRS = doc
+SUBDIRS = doc typetables
 
 ####### This part is very kdbg specific
 # you can add here more. This one gets installed 
@@ -98,13 +98,6 @@ XPMS = \
 	search.xpm \
 	pointer.xpm
 
-# types in libraries that we understand
-TYPES = \
-	qt.kdbgtt \
-	qt2.kdbgtt \
-	kdecore.kdbgtt \
-	kdecore3.kdbgtt \
-	X11.kdbgtt
 
 # if you "make clean", this files get removed. If you want to remove
 # them while "make distclean", use DISTCLEANFILES
@@ -119,8 +112,6 @@ miniicon_DATA = mini-kdbg.xpm
 miniicondir = $(kde_minidir)
 pics_DATA = $(XPMS)
 picsdir = $(kde_datadir)/kdbg/pics
-types_DATA = $(TYPES)
-typesdir = $(kde_datadir)/kdbg/types
 
 
 # make messages.po. Move this one to ../po/ and "make merge" in po
@@ -135,7 +126,7 @@ testfile_SOURCES = testfile.cpp
 testfile_LDFLAGS = $(all_libraries) $(KDE_RPATH)
 testfile_LDADD = -lqt -lXext -lX11 $(LIBSOCKET)
 
-EXTRA_DIST = $(pics_DATA) $(types_DATA) \
+EXTRA_DIST = $(pics_DATA) \
 	$(icon_DATA) $(miniicon_DATA) $(apps_DATA)
 
 # add a dependency for every moc file to be full portable

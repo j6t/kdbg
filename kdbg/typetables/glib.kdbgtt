@@ -1,0 +1,7 @@
+[Type Table]
+Types1=GString
+LibDisplayName=libglib
+ShlibRE=libglib.*\.so\.[0-9]+$
+[GString]
+Display={ % }
+Expr1=(%s).str

@@ -1,0 +1,7 @@
+[Type Table]
+Types1=GtkWidget
+LibDisplayName=libgtk+
+ShlibRE=libgtk.*\.so\.[0-9]+$
+[GtkWidget]
+Display={ name=% }
+Expr1=(%s).name
