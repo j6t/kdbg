@@ -43,7 +43,7 @@ protected:
     virtual int textCol() const;
     virtual int cellWidth(int col);
     virtual void paintCell(QPainter* p, int row, int col);
-    virtual void mouseReleaseEvent(QMouseEvent* ev);
+    virtual void mousePressEvent(QMouseEvent* ev);
     void updateLineItem(int i);
 
 signals:
@@ -140,7 +140,7 @@ protected:
     virtual bool activateWindow(FileWindow* fw, int lineNo = -1);	/* -1 doesnt change line */
     virtual void changeWindowMenu();
     virtual void openFile();
-    virtual void mouseReleaseEvent(QMouseEvent*);
+    virtual void mousePressEvent(QMouseEvent*);
     void setPC(bool set, const QString& fileName, int lineNo, int frameNo);
     QList<FileWindow> m_fileList;
     FileWindow* m_activeWindow;

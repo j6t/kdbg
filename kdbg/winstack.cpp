@@ -320,17 +320,20 @@ void FileWindow::find(const char* text, bool caseSensitive, FindDirection dir)
     scrollTo(line);
 }
 
-void FileWindow::mouseReleaseEvent(QMouseEvent* ev)
+void FileWindow::mousePressEvent(QMouseEvent* ev)
 {
     // Check if right button was clicked.
     if (ev->button() == RightButton)
     {
-	 emit clickedRight(ev->pos());
+	emit clickedRight(ev->pos());
+	return;
     }
 
     // check if event is in line item column
-    if (findCol(ev->x()) != 0)
+    if (findCol(ev->x()) != 0) {
+	KTextView::mousePressEvent(ev);
 	return;
+    }
 
     // get row
     int row = findRow(ev->y());
@@ -454,12 +457,14 @@ void WinStack::openFile()
     activateFI(fi, 0);
 }
 
-void WinStack::mouseReleaseEvent(QMouseEvent* mouseEvent)
+void WinStack::mousePressEvent(QMouseEvent* mouseEvent)
 {
     // Check if right button was clicked.
     if (mouseEvent->button() == RightButton)
     {
 	emit clickedRight(mouseEvent->pos());
+    } else {
+	QWidget::mousePressEvent(mouseEvent);
     }
 }
 
