@@ -92,5 +92,6 @@ AC_OUTPUT(Makefile \
 	kdbg/doc/Makefile \
 	kdbg/doc/en/Makefile \
 	kdbg/doc/ru/Makefile \
+	kdbg/pics/Makefile \
 	kdbg/typetables/Makefile \
 	po/Makefile)
