@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 0.3.0\n"
-"POT-Creation-Date: 1999-03-06 18:41+0100\n"
+"POT-Creation-Date: 1999-04-05 11:18+0200\n"
 "PO-Revision-Date: 1998-05-14 20:00-0500\n"
 "Last-Translator: Vladimir Vuksan <vuksan@veus.hr>\n"
 "Language-Team: Croatian <hr@li.org>\n"
@@ -26,35 +26,35 @@ msgstr "&Gledaj kod"
 msgid "&Conditional..."
 msgstr ""
 
-#: brkpt.cpp:620
+#: brkpt.cpp:644
 msgid "E"
 msgstr "E"
 
-#: brkpt.cpp:622
+#: brkpt.cpp:646
 msgid "Location"
 msgstr "Mjesto"
 
-#: brkpt.cpp:623
+#: brkpt.cpp:647
 msgid "Hits"
 msgstr ""
 
-#: brkpt.cpp:624
+#: brkpt.cpp:648
 msgid "Ignore"
 msgstr ""
 
-#: brkpt.cpp:625
+#: brkpt.cpp:649
 msgid "Condition"
 msgstr ""
 
-#: brkpt.cpp:789
+#: brkpt.cpp:813
 msgid ": Conditional breakpoint"
 msgstr ""
 
-#: brkpt.cpp:792
+#: brkpt.cpp:816
 msgid "&Condition:"
 msgstr ""
 
-#: brkpt.cpp:794
+#: brkpt.cpp:818
 msgid "Ignore &next hits:"
 msgstr ""
 
@@ -91,230 +91,230 @@ msgstr ""
 msgid "Specify the process number to attach to:"
 msgstr ""
 
-#: debugger.cpp:95
+#: debugger.cpp:92
 msgid "Breakpoints"
 msgstr "Mjesto prekida"
 
-#: debugger.cpp:198
+#: debugger.cpp:199
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "`%s' nije datoteka ili ne postoji"
 
-#: debugger.cpp:254
+#: debugger.cpp:263
 msgid "Select the executable to debug"
 msgstr "Izaberite izvr¹ni program za debugiranje"
 
-#: debugger.cpp:296
+#: debugger.cpp:305
 msgid "Select core dump"
 msgstr ""
 
-#: debugger.cpp:520
+#: debugger.cpp:540
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
 
-#: debugger.cpp:599
+#: debugger.cpp:623
 msgid ": Program output"
 msgstr ": Izlaz programa"
 
-#: dbgmainwnd.cpp:123 winstack.cpp:374 winstack.cpp:384
+#: dbgmainwnd.cpp:116 winstack.cpp:380 winstack.cpp:390
 msgid "&Open Source..."
 msgstr "&Otvori izvorni kod..."
 
-#: dbgmainwnd.cpp:139 winstack.cpp:376
+#: dbgmainwnd.cpp:132 winstack.cpp:382
 msgid "Step &into"
 msgstr ""
 
-#: dbgmainwnd.cpp:140 winstack.cpp:377
+#: dbgmainwnd.cpp:133 winstack.cpp:383
 msgid "Step &over"
 msgstr ""
 
-#: dbgmainwnd.cpp:141 winstack.cpp:378
+#: dbgmainwnd.cpp:134 winstack.cpp:384
 msgid "Step o&ut"
 msgstr ""
 
-#: dbgmainwnd.cpp:142 winstack.cpp:379
+#: dbgmainwnd.cpp:135 winstack.cpp:385
 msgid "Run to &cursor"
 msgstr "Izvr¹i do poka&zivaèa"
 
-#: dbgmainwnd.cpp:156 winstack.cpp:381
+#: dbgmainwnd.cpp:149 winstack.cpp:387
 msgid "Set/Clear &breakpoint"
 msgstr "Postavi/Obri¹i mjesta &prekida"
 
-#: dbgmainwnd.cpp:126 winstack.cpp:386
+#: dbgmainwnd.cpp:119 winstack.cpp:392
 msgid "&Executable..."
 msgstr "&Izvr¹ni program..."
 
-#: dbgmainwnd.cpp:127 winstack.cpp:387
+#: dbgmainwnd.cpp:120 winstack.cpp:393
 msgid "&Core dump..."
 msgstr ""
 
-#: winstack.cpp:739
+#: winstack.cpp:745
 msgid ": Open Windows"
 msgstr ""
 
-#: winstack.cpp:747
+#: winstack.cpp:753
 msgid "Show"
 msgstr ""
 
-#: winstack.cpp:815
+#: winstack.cpp:821
 msgid ": Search"
 msgstr ""
 
-#: winstack.cpp:821
+#: winstack.cpp:827
 msgid "&Case sensitive"
 msgstr ""
 
-#: winstack.cpp:823
+#: winstack.cpp:829
 msgid "&Forward"
 msgstr ""
 
-#: winstack.cpp:825
+#: winstack.cpp:831
 msgid "&Backward"
 msgstr ""
 
-#: dbgmainwnd.cpp:31
+#: dbgmainwnd.cpp:28
 msgid " Add "
 msgstr " Dodaj "
 
-#: dbgmainwnd.cpp:32
+#: dbgmainwnd.cpp:29
 msgid " Del "
 msgstr " Obri¹i "
 
-#: dbgmainwnd.cpp:42
+#: dbgmainwnd.cpp:39
 msgid "active"
 msgstr "aktivan"
 
-#: dbgmainwnd.cpp:124
+#: dbgmainwnd.cpp:117
 msgid "&Reload Source"
 msgstr ""
 
-#: dbgmainwnd.cpp:133
+#: dbgmainwnd.cpp:126
 msgid "&Find..."
 msgstr ""
 
-#: dbgmainwnd.cpp:134
+#: dbgmainwnd.cpp:127
 msgid "Toggle &Toolbar"
 msgstr "Uklj./isklj. &traku sa alatima"
 
-#: dbgmainwnd.cpp:135
+#: dbgmainwnd.cpp:128
 msgid "Toggle &Statusbar"
 msgstr "Uklj./isklj. traku sa &statusom"
 
-#: dbgmainwnd.cpp:138
+#: dbgmainwnd.cpp:131
 msgid "&Run"
 msgstr "Pok&reni"
 
-#: dbgmainwnd.cpp:144
+#: dbgmainwnd.cpp:137
 msgid "&Break"
 msgstr "&Prekid"
 
-#: dbgmainwnd.cpp:145
+#: dbgmainwnd.cpp:138
 msgid "Re&start"
 msgstr ""
 
-#: dbgmainwnd.cpp:146
+#: dbgmainwnd.cpp:139
 msgid "A&ttach..."
 msgstr ""
 
-#: dbgmainwnd.cpp:148
+#: dbgmainwnd.cpp:141
 msgid "&Arguments..."
 msgstr "&Argumenti..."
 
-#: dbgmainwnd.cpp:157
+#: dbgmainwnd.cpp:150
 msgid "Set &temporary breakpoint"
 msgstr "Postavi pri&vremena mjesta prekida"
 
-#: dbgmainwnd.cpp:158
+#: dbgmainwnd.cpp:151
 msgid "&Enable/Disable breakpoint"
 msgstr "&Uklj./isklj. mjesta prekida"
 
-#: dbgmainwnd.cpp:159
+#: dbgmainwnd.cpp:152
 msgid "&List..."
 msgstr "&Lista..."
 
-#: dbgmainwnd.cpp:164
+#: dbgmainwnd.cpp:157
 msgid "&More..."
 msgstr "&Jo¹..."
 
-#: dbgmainwnd.cpp:167
+#: dbgmainwnd.cpp:160
 msgid "&About"
 msgstr ""
 
-#: dbgmainwnd.cpp:178
+#: dbgmainwnd.cpp:172
 msgid "E&xecution"
 msgstr "I&zvr¹avanje"
 
-#: dbgmainwnd.cpp:179
+#: dbgmainwnd.cpp:173
 msgid "&Breakpoint"
 msgstr "&Mjesta prekida"
 
-#: dbgmainwnd.cpp:180
+#: dbgmainwnd.cpp:174
 msgid "&Window"
 msgstr "&Prozor"
 
-#: dbgmainwnd.cpp:184
+#: dbgmainwnd.cpp:178
 msgid ""
 "A Debugger\n"
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "with the help of many others"
 msgstr ""
 
-#: dbgmainwnd.cpp:196
+#: dbgmainwnd.cpp:191
 msgid "Executable"
 msgstr "Izvr¹ni program..."
 
-#: dbgmainwnd.cpp:198
+#: dbgmainwnd.cpp:193
 msgid "Open a source file"
 msgstr "Otvori datoteku sa izvornim kodom"
 
-#: dbgmainwnd.cpp:200
+#: dbgmainwnd.cpp:195
 msgid "Reload source file"
 msgstr ""
 
-#: dbgmainwnd.cpp:203
+#: dbgmainwnd.cpp:198
 msgid "Run/Continue"
 msgstr "Izvr¹i/Nastavi"
 
-#: dbgmainwnd.cpp:205
+#: dbgmainwnd.cpp:200
 msgid "Step into"
 msgstr ""
 
-#: dbgmainwnd.cpp:207
+#: dbgmainwnd.cpp:202
 msgid "Step over"
 msgstr ""
 
-#: dbgmainwnd.cpp:209
+#: dbgmainwnd.cpp:204
 msgid "Step out"
 msgstr ""
 
-#: dbgmainwnd.cpp:212
+#: dbgmainwnd.cpp:207
 msgid "Breakpoint"
 msgstr "Mjesto prekida"
 
-#: dbgmainwnd.cpp:215
+#: dbgmainwnd.cpp:210
 msgid "Search"
 msgstr ""
 
-#: dbgmainwnd.cpp:222
+#: dbgmainwnd.cpp:218
 msgid "Line 00000"
 msgstr ""
 
-#: dbgmainwnd.cpp:226
+#: dbgmainwnd.cpp:222
 msgid "Restart"
 msgstr ""
 
-#: dbgmainwnd.cpp:227
+#: dbgmainwnd.cpp:223
 msgid "Core dump"
 msgstr ""
 
-#: dbgmainwnd.cpp:589
+#: dbgmainwnd.cpp:597
 #, c-format
 msgid "Line %d"
 msgstr ""
 
-#: main.cpp:56
+#: main.cpp:54
 msgid "Cannot start debugger."
 msgstr "Ne mogu pokrenuti debugger."
 
