@@ -1,5 +1,7 @@
 Version 1.2.3
 
+	Fixed invisible toolbar under KDE 2.x (really, this time, I promise).
+
 	Fixed crash when no line has the cursor (empty files).
 
 	Don't display a blank page when a non-existing file was tried to open.
