@@ -8,7 +8,6 @@
 #include "commandids.h"
 #include "brkpt.h"
 #include <kfiledialog.h>
-#include <qpopmenu.h>
 #include <qtstream.h>
 #include <qpainter.h>
 #include <qbrush.h>
@@ -17,6 +16,7 @@
 #include <qlistbox.h>
 #include <kapp.h>
 #include <kiconloader.h>
+#include <kstdaccel.h>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -313,6 +313,12 @@ void FileWindow::find(const char* text, bool caseSensitive, FindDirection dir)
 
 void FileWindow::mouseReleaseEvent(QMouseEvent* ev)
 {
+    // Check if right button was clicked.
+    if (ev->button() == RightButton)
+    {
+	 emit clickedRight(ev->pos());
+    }
+
     // check if event is in line item column
     if (findCol(ev->x()) != 0)
 	return;
@@ -345,6 +351,9 @@ WinStack::WinStack(QWidget* parent, const char* name, const BreakpointTable& bpt
 	m_pcLine(-1),
 	m_bpTable(bpt)
 {
+    // Call menu implementation helper
+    initMenu();
+
     connect(&m_findDlg.m_buttonForward,
 	    SIGNAL(clicked()), SLOT(slotFindForward()));
     connect(&m_findDlg.m_buttonBackward,
@@ -353,6 +362,27 @@ WinStack::WinStack(QWidget* parent, const char* name, const BreakpointTable& bpt
 
 WinStack::~WinStack()
 {
+}
+
+// All menu initializations.
+void WinStack::initMenu()
+{
+    // Init float popup menu.
+    m_menuFloat.insertItem(i18n("&Run"), ID_PROGRAM_RUN);
+    m_menuFloat.insertItem(i18n("Step &into"), ID_PROGRAM_STEP);
+    m_menuFloat.insertItem(i18n("Step &over"), ID_PROGRAM_NEXT);
+    m_menuFloat.insertItem(i18n("Step o&ut"), ID_PROGRAM_FINISH);
+    m_menuFloat.insertItem(i18n("Run to &cursor"), ID_PROGRAM_UNTIL);
+    m_menuFloat.insertSeparator();
+    m_menuFloat.insertItem(i18n("&Break"), ID_PROGRAM_BREAK);
+    m_menuFloat.insertItem(i18n("Re&start"), ID_PROGRAM_RUN_AGAIN);
+    m_menuFloat.insertSeparator();
+    m_menuFloat.insertItem(i18n("Set/Clear &breakpoint"), ID_BRKPT_SET);
+    m_menuFloat.setAccel(Key_F5, ID_PROGRAM_RUN);
+    m_menuFloat.setAccel(Key_F8, ID_PROGRAM_STEP);
+    m_menuFloat.setAccel(Key_F10, ID_PROGRAM_NEXT);
+    m_menuFloat.setAccel(Key_F6, ID_PROGRAM_FINISH);
+    m_menuFloat.setAccel(Key_F7, ID_PROGRAM_UNTIL);
 }
 
 void WinStack::setWindowMenu(QPopupMenu* menu)
@@ -465,6 +495,10 @@ bool WinStack::activatePath(QString pathName, int lineNo)
 		SIGNAL(toggleBreak(const QString&,int)));
 	connect(fw, SIGNAL(clickedMid(const QString&, int)),
 		SIGNAL(enadisBreak(const QString&,int)));
+
+	// Comunication when right button is clicked.
+	connect(fw, SIGNAL(clickedRight(const QPoint &)),
+		SLOT(slotFileWindowRightClick(const QPoint &)));
 
 	changeWindowMenu();
 	
@@ -636,6 +670,19 @@ void WinStack::slotFindBackward()
     if (m_activeWindow != 0)
 	m_activeWindow->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
 			     FileWindow::findBackward);
+}
+
+void WinStack::slotFileWindowRightClick(const QPoint & pos)
+{
+    if (m_menuFloat.isVisible())
+    {
+	m_menuFloat.hide();
+    }
+    else
+    {
+	m_menuFloat.popup(mapToGlobal(pos));
+	//m_menuFloat.show();
+    }
 }
 
 

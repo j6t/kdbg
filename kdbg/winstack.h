@@ -14,6 +14,7 @@
 #include <qlayout.h>
 #include <qchkbox.h>
 #include <qpushbt.h>
+#include <qpopupmenu.h>
 #include "textvw.h"
 
 // forward declarations
@@ -48,6 +49,7 @@ protected:
 signals:
     void clickedLeft(const QString&, int);
     void clickedMid(const QString&, int);
+    void clickedRight(const QPoint &);
 
 protected:
     QString m_fileName;
@@ -124,8 +126,10 @@ public slots:
     virtual void menuCallback(int item);
     virtual void slotFindForward();
     virtual void slotFindBackward();
+    virtual void slotFileWindowRightClick(const QPoint &);
 
 protected:
+    void initMenu();
     bool activateFI(QFileInfo& fi, int lineNo);
     bool activatePath(QString pathname, int lineNo);
     virtual bool activateWindow(FileWindow* fw, int lineNo = -1);	/* -1 doesnt change line */
@@ -148,6 +152,9 @@ protected:
 public:
     // find dialog
     FindDialog m_findDlg;
+
+    // Popup menu
+    QPopupMenu m_menuFloat;
 };
 
 #endif // WINSTACK_H

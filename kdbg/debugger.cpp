@@ -160,6 +160,8 @@ KDebugger::KDebugger(const char* name) :
 	    SLOT(slotToggleBreak(const QString&,int)));
     connect(&m_filesWindow, SIGNAL(enadisBreak(const QString&, int)),
 	    SLOT(slotEnaDisBreak(const QString&,int)));
+    connect(&m_filesWindow.m_menuFloat, SIGNAL(activated(int)),
+	    SLOT(menuCallback(int)));
 
     m_bpTable.setCaption(i18n("Breakpoints"));
     connect(&m_bpTable, SIGNAL(closed()), SLOT(updateUI()));
@@ -484,6 +486,13 @@ void KDebugger::updateUI()
     }
     {
 	UpdateMenuUI updateMenu(&m_menuBrkpt, this, SLOT(updateUIItem(UpdateUI*)));
+	updateMenu.iterateMenu();
+    }
+
+    // Update file window float menu items
+    {
+	UpdateMenuUI updateMenu(&m_filesWindow.m_menuFloat, this,
+				SLOT(updateUIItem(UpdateUI*)));
 	updateMenu.iterateMenu();
     }
 
