@@ -70,7 +70,9 @@ public:
 	DCdelete,
 	DCenable,
 	DCdisable,
+#ifdef WANT_THIS_PANE
 	DCprintthis,
+#endif
 	DCprint,
 	DCprintStruct,
 	DCframe,
@@ -206,11 +208,18 @@ public slots:
     void slotDeleteWatch();
     void slotWatchHighlighted(int);
     void slotLocalsExpanding(KTreeViewItem*, bool&);
-    void slotThisExpanding(KTreeViewItem*, bool&);
     void slotWatchExpanding(KTreeViewItem*, bool&);
-    void slotFrameTabChanged(int);
     void slotFileChanged();
     void slotLineChanged();
+    /*
+     * Unless WANT_THIS_PANE is defined, the following slots are unused.
+     * Removing them with #ifdef ... #endif doesn't work because moc
+     * doesn't understand the preprocessor defines. Hence, we leave the
+     * declarations here and only remove the function body with #ifdef ...
+     * #endif.
+     */
+    void slotThisExpanding(KTreeViewItem*, bool&);
+    void slotFrameTabChanged(int);
     
 signals:
     void forwardMenuCallback(int item);
@@ -231,9 +240,13 @@ protected:
     KNewPanner m_rightPanner;
     WinStack m_filesWindow;
     QListBox m_btWindow;
+#ifdef WANT_THIS_PANE
     KTabCtl m_frameVariables;
+#endif
     ExprWnd m_localVariables;
+#ifdef WANT_THIS_PANE
     ExprWnd m_this;
+#endif
     
     QWidget m_watches;
     QLineEdit m_watchEdit;
