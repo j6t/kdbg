@@ -1,5 +1,5 @@
 # Translation Table for KDbg into Italian
-# 
+#
 # Tabella di traduzione per KDbg dall'inglese all'italiano
 #
 #
@@ -12,7 +12,7 @@
 # Regole Base
 #
 # Bisogna fissarsi delle regole da cui partire, per cui parto da
-# queste; se qualcuno me ne può suggerire di altre e/o di
+# queste; se qualcuno me ne puÃ² suggerire di altre e/o di
 # migliori....
 #
 # o  Uso sempre la seconda persona singolare in forma IMPERATIVA
@@ -20,20 +20,20 @@
 # o  Uso la prima persona singolare indicativa quando riferito al
 #    programma (compilo.... controllo....)
 # o  Parole che riferiscono a programmi all'interno di frasi le
-#    racchiudo in `' cosicchè non siano troppo ambigui
-# o  Cerco di evitare il più possibile ripetizioni di aggettivi
+#    racchiudo in `' cosicchÃ¨ non siano troppo ambigui
+# o  Cerco di evitare il piÃ¹ possibile ripetizioni di aggettivi
 #    possessivi quali "tuo, nostro..." per cui "your project" diventa "il
 #    progetto"
 # o  Gli avverbi come "here" e simili non hanno molto senso in
 #    italiano (sono proprio brutti ed ovvii) per cui se sono ripetitivi
 #    e inutili come "Add comments here" diviene "Aggiungi commenti" li
-#    tolgo 
+#    tolgo
 # o  Le parole inglesi sono ammesse in italiano ma non hanno plurale,
 #    per cui "file" diventa "il file" e "files" diventa "i file"
 # o  Non sono sicuro ma alcune parole inglesi si sono italianizzate,
-#    per cui "to click" è diventato "clickare" e "to debug"
+#    per cui "to click" Ã¨ diventato "clickare" e "to debug"
 #    "debuggare"... vedo di usare "the comon sense (tm)"
-# o  Le abbreviazioni le tengo uguali (CV, RFV) anche perchè
+# o  Le abbreviazioni le tengo uguali (CV, RFV) anche perchÃ¨
 #    molte volte non so come interpretarle....
 #
 #    (WAT) spiegazione (CV = class view - struttura di classe,
@@ -44,45 +44,45 @@
 # # o  Uso ' come apostrofo e ` come accento (non ho i caratteri a, e i
 # #    accentati per ora :( )
 # #
-# o  (WAT) Sempre usare la vocale e con ` per è (o con ´ per ó, o con ` per ò,
-#          u con ` per ù, ecc. ...)
-#          ... c'è un programma che cambierà poi queste combinazioni
+# o  (WAT) Sempre usare la vocale e con ` per Ã¨ (o con Â´ per Ã³, o con ` per Ã²,
+#          u con ` per Ã¹, ecc. ...)
+#          ... c'Ã¨ un programma che cambierÃ  poi queste combinazioni
 #              nelle vocali accentate
 #          ' <= usa questo tipo di accento come apostrofo
 #
 # Traduzioni mancate
 #
-# Secondo me alcune parole inglesi hanno più significato per i
+# Secondo me alcune parole inglesi hanno piÃ¹ significato per i
 # programmatori nella loro forma originale che non in una "possibile"
 # traduzione. Qui di seguito indico le parole non tradotte.
 #
 # -  file
 # -  directory
-# -  bug	detesto la parola "baco", anche perchè diciamo
-# 		debuggare e non debacare :)  
+# -  bug	detesto la parola "baco", anche perchÃ¨ diciamo
+# 		debuggare e non debacare :)
 # -  editor     what the heck we are talking with programmers not with
-# 		secretaries! 
+# 		secretaries!
 # -  ChangeLog	non mi viene niente di meglio
-# -  DistClean	è una opzione standard del make
+# -  DistClean	Ã¨ una opzione standard del make
 # -  window manager
-# -  warning 	sembra più bello di avvisi (quando non è attenzione!)
+# -  warning 	sembra piÃ¹ bello di avvisi (quando non Ã¨ attenzione!)
 # -  widget
-# -  syntax highlighting 
+# -  syntax highlighting
 # -  bookmark 	segnalibro non mi piace
-# -  clipboard 	è più bello di avagnetta
+# -  clipboard 	Ã¨ piÃ¹ bello di avagnetta
 # -  wizard	decisamente meglio che mago o stregone 8-)
 # -  stop	(vedi sotto)
 # -  breakpoint	meglio di "punto di interruzione"
 # -  database
 # -  logo
-# -  private protected public   sono keyword 
+# -  private protected public   sono keyword
 # -  team       non esiste un analogo in italiano
 # -  target     quando si riferisce a regola del makefile
 # -  symbol table
-# -  shared library librerie condivise?? È più bello inalterato
+# -  shared library librerie condivise?? Ãˆ piÃ¹ bello inalterato
 # -  touch 	quando si tratta del programma (touch)
 # -  job 	quando si tratta di job=task
-# -  cast 	promozione nei casi che ha senso, sennò invariato (eppoi si dice cast anche in italiano)
+# -  cast 	promozione nei casi che ha senso, sennÃ² invariato (eppoi si dice cast anche in italiano)
 # -  prototype  quando parliamo di prototype di funzione
 # -  signed/unsigned quando si tratta di modificatori
 # -  fixed point and floating point   non ha senso tradurre
@@ -91,83 +91,84 @@
 # -  breakpoint
 # -  process-id
 #
-# Ambiguità
+# AmbiguitÃ 
 #
 # Queste sono parole che traduco in parte ma non sono la "miglior traduzione
 # possibile" ma mi pare che il senso sia vicino (almeno nelle
-# intenzioni.... consigli???) 
+# intenzioni.... consigli???)
 #
-# -  source	lo traduco in `sorgente', solo se non è chiaro dal
+# -  source	lo traduco in `sorgente', solo se non Ã¨ chiaro dal
 #    		contesto altrimenti lascio inalterato
-# -  project	qualche volta ha più senso parlare di `project file'
-#    		che `file del progetto' 
+# -  project	qualche volta ha piÃ¹ senso parlare di `project file'
+#    		che `file del progetto'
 # -  report	in alcuni casi lo traduco in rapporto in altri lo
 # 		lascio inalterato (come Bug report)
 # -  tree	qualche volta `albero' va bene ma altre volte
 # 		preferisco `struttura'
 # -  dialog	qualche volta lo traduco in "finestra di dialogo" o
-#		semplicemente "finestra" ma in casi come "dialog
-#		editor" lo lascio inalterato 
-# -  history page 	la lascio come "history page" perché non so come
-# 		tradurla nel modo più sensato
-# -  view     	è vista o visualizzazione o visore???? Mah!!! Cerco
-# 		di esser consistente..... In linea di massima se è ...-View
-#		come in Output-View la traduco come Vista (Vista-Output)
-# -  All of Fame	che è l'Aula Magna??? Ahò facciamo meno i ganzi per
+# 		semplicemente "finestra" ma in casi come "dialog
+# 		editor" lo lascio inalterato
+# -  history page 	la lascio come "history page" perchÃ© non so come
+# 		tradurla nel modo piÃ¹ sensato
+# -  view     	Ã¨ vista o visualizzazione o visore???? Mah!!! Cerco
+# 		di esser consistente..... In linea di massima se Ã¨ ...-View
+# 		come in Output-View la traduco come Vista (Vista-Output)
+# -  All of Fame	che Ã¨ l'Aula Magna??? AhÃ² facciamo meno i ganzi per
 # 		favore ;)
-# -  Make	se è il programma lo lascio inalterato, altrimenti lo
+# -  Make	se Ã¨ il programma lo lascio inalterato, altrimenti lo
 # 		traduco in "Crea"
 # -  Build	preferirei lasciarlo in inglese ma penso che
 # 		"costruire" vada bene lo stesso
-# -  Clean	"elimina" mi pare più appropriato che "pulisci"
+# -  Clean	"elimina" mi pare piÃ¹ appropriato che "pulisci"
 # -  Access 	traduco con Accedi ma potrebbe essere anche "Entra" o
-# 		"Procedi" 
-# -  Severity 	=> severità ma non mi piace meglio gravità
+# 		"Procedi"
+# -  Severity 	=> severitÃ  ma non mi piace meglio gravitÃ 
 # -  Application 	"applicazione" ma certe volte lo lascio
 # 		inalterato come in "Application Wizard"
 # -  fail 	"fallire" ma non mi piace
 # -  stop	alcune volte rimane inalterato come semplicemente
 # 		"Stop" ma altre lo traduco con interrompi.
 # - togglebutton selettore o bottone di selezione
-# - machine   	lo traduco con sistema perchè mi pare più bello di macchina
+# - machine   	lo traduco con sistema perchÃ¨ mi pare piÃ¹ bello di macchina
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: Kdbg\n"
-"POT-Creation-Date: 2000-02-19 18:47+0100\n"
-"PO-Revision-Date: 1999-08-09 12:00+5\n"
+"POT-Creation-Date: 2001-04-28 22:45+0200\n"
+"PO-Revision-Date: 2001-08-19 20:24+MDT\n"
 "Last-Translator: Massimo Morin <mmorin@schedsys.com>\n"
 "Language-Team: Italiano <it@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
-"Content-Transfer-Encoding: ENCODING\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8-bit\n"
+"X-Generator: KBabel 0.8\n"
 
-#: pgmargs.cpp:34
+#: pgmargs.cpp:37
 msgid ": Program arguments"
 msgstr ": Argomenti del programma"
 
-#: pgmargs.cpp:37
+#: pgmargs.cpp:40
 #, c-format
 msgid "Run %s with these arguments:"
 msgstr "Esegui %s con questi argomenti:"
 
-#: pgmargs.cpp:55
+#: pgmargs.cpp:58
 msgid "Working directory:"
 msgstr "Directory di lavoro"
 
-#: pgmargs.cpp:65
+#: pgmargs.cpp:73
 msgid "Environment variables (NAME=value):"
 msgstr "Variabili di ambiente (NAME=valore):"
 
-#: pgmargs.cpp:74
+#: pgmargs.cpp:82
 msgid "Name"
 msgstr "Nome"
 
-#: pgmargs.cpp:75 regwnd.cpp:215 regwnd.cpp:223
+#: pgmargs.cpp:83 regwnd.cpp:210 regwnd.cpp:218
 msgid "Value"
 msgstr "Valore"
 
-#: pgmargs.cpp:93
+#: pgmargs.cpp:99
 msgid "&Modify"
 msgstr "&Modifica"
 
@@ -179,165 +180,212 @@ msgstr ": Connessione al processo"
 msgid "Specify the process number to attach to:"
 msgstr "Specifica il process-id al quale connettersi:"
 
-#: debugger.cpp:149
-#, c-format
-msgid "`%s' is not a file or does not exist"
-msgstr "`%s' non è un file oppure non esiste"
-
-#: debugger.cpp:222
-msgid "Select the executable to debug"
-msgstr "Seleziona l'eseguibile da debuggare"
-
-#: debugger.cpp:264
-msgid "Select core dump"
-msgstr "Seleziona il core dump"
-
-#: debugger.cpp:529
+#: debugger.cpp:507
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
-"gdb è terminato inaspettatamente.\n"
+"gdb Ã¨ terminato inaspettatamente.\n"
 "Riapri la sessione (ad esempio con File|Esegui)."
 
 # (WAT) corr: directory
-#: gdbdriver.cpp:1519
+#: gdbdriver.cpp:1799
 msgid "New working directory: "
 msgstr "Nuova directory di lavoro: "
 
-#: brkpt.cpp:57
-msgid "&Add"
-msgstr "&Aggiungi"
+#: brkpt.cpp:63
+#, fuzzy
+msgid "Add &Breakpoint"
+msgstr "&Breakpoint"
 
-#: brkpt.cpp:65
+#: brkpt.cpp:67
+msgid "Add &Watchpoint"
+msgstr ""
+
+#: brkpt.cpp:76 brkpt.cpp:228
+msgid "&Disable"
+msgstr ""
+
+#: brkpt.cpp:81 brkpt.cpp:230
+msgid "&Enable"
+msgstr ""
+
+#: brkpt.cpp:91
 msgid "&View Code"
 msgstr "&Mostra Codice"
 
-#: brkpt.cpp:69
+#: brkpt.cpp:95
 msgid "&Conditional..."
 msgstr "&Condizione..."
 
-#: brkpt.cpp:266
+#: brkpt.cpp:355 threadlist.cpp:44
 msgid "Location"
 msgstr "Posizione"
 
+#: brkpt.cpp:356 memwindow.cpp:30
+msgid "Address"
+msgstr ""
+
 # Penso si riferisca a breakpoint, per cui sono i "passaggi" di esecuzione dell'istruzione
-#: brkpt.cpp:267
+#: brkpt.cpp:357
 msgid "Hits"
 msgstr "Passaggi"
 
-#: brkpt.cpp:268
+#: brkpt.cpp:358
 msgid "Ignore"
 msgstr "Ignora"
 
-#: brkpt.cpp:269
+#: brkpt.cpp:359
 msgid "Condition"
 msgstr "Condizione"
 
 # (WAT) comm: titolo della finestra di dialogo, mentre mettere le impostazioni
 #                    meglio cominciare con una lettera maiuscola
-#: brkpt.cpp:370
+#: brkpt.cpp:467
 msgid ": Conditional breakpoint"
 msgstr ": Breakpoint condizionato"
 
-#: brkpt.cpp:373
+#: brkpt.cpp:470
 msgid "&Condition:"
 msgstr "&Condizione:"
 
-#: brkpt.cpp:375
+#: brkpt.cpp:472
 msgid "Ignore &next hits:"
 msgstr "Ignora il &prossimo passaggio:"
 
-#: regwnd.cpp:214 regwnd.cpp:222
+#: regwnd.cpp:209 regwnd.cpp:217
 #, fuzzy
 msgid "Register"
 msgstr "Riparti"
 
-#: regwnd.cpp:216 regwnd.cpp:224
+#: regwnd.cpp:211 regwnd.cpp:219
 msgid "Decoded value"
 msgstr ""
 
-#: regwnd.cpp:240
-msgid "Binary"
+#: memwindow.cpp:59 regwnd.cpp:235
+msgid "&Binary"
 msgstr ""
 
-#: regwnd.cpp:241
-msgid "Octal"
+#: memwindow.cpp:58 regwnd.cpp:236
+msgid "&Octal"
 msgstr ""
 
-#: regwnd.cpp:242
-msgid "Decimal"
+#: regwnd.cpp:237
+msgid "&Decimal"
 msgstr ""
 
-#: regwnd.cpp:243
-msgid "Hexadecimal"
+#: memwindow.cpp:55 regwnd.cpp:238
+msgid "He&xadecimal"
 msgstr ""
 
-#: regwnd.cpp:248
+#: memwindow.cpp:50
+msgid "B&ytes"
+msgstr ""
+
+#: memwindow.cpp:51
+msgid "Halfwords (&2 Bytes)"
+msgstr ""
+
+#: memwindow.cpp:52
+msgid "Words (&4 Bytes)"
+msgstr ""
+
+#: memwindow.cpp:53
+msgid "Giantwords (&8 Bytes)"
+msgstr ""
+
+#: memwindow.cpp:56
+msgid "Signed &decimal"
+msgstr ""
+
+#: memwindow.cpp:57
+msgid "&Unsigned decimal"
+msgstr ""
+
+#: memwindow.cpp:60
+msgid "&Addresses"
+msgstr ""
+
+#: memwindow.cpp:61
+msgid "&Character"
+msgstr ""
+
+#: memwindow.cpp:62
+msgid "&Floatingpoint"
+msgstr ""
+
+#: memwindow.cpp:63
 #, fuzzy
-msgid "Font..."
+msgid "&Strings"
 msgstr "&Trova..."
 
-#: regwnd.cpp:249
-#, fuzzy
-msgid "View mode"
-msgstr "&Mostra Codice"
+#: memwindow.cpp:64
+msgid "&Instructions"
+msgstr ""
 
-#: dbgmainwnd.cpp:139 winstack.cpp:475 winstack.cpp:485
+#: threadlist.cpp:43
+msgid "Thread ID"
+msgstr ""
+
+#: dbgmainwnd.cpp:196 winstack.cpp:58 winstack.cpp:68
 msgid "&Open Source..."
 msgstr "&Apri Sorgente..."
 
-#: dbgmainwnd.cpp:169 winstack.cpp:477
+#: dbgmainwnd.cpp:230 winstack.cpp:60
 msgid "Step &into"
 msgstr "Entra nella &funzione"
 
-#: dbgmainwnd.cpp:170 winstack.cpp:478
+#: dbgmainwnd.cpp:231 winstack.cpp:61
 msgid "Step &over"
 msgstr "&Salta la funzione"
 
-#: dbgmainwnd.cpp:171 winstack.cpp:479
+#: dbgmainwnd.cpp:232 winstack.cpp:62
 msgid "Step o&ut"
 msgstr "&Esci dalla funzione"
 
-#: dbgmainwnd.cpp:172 winstack.cpp:480
+#: dbgmainwnd.cpp:233 winstack.cpp:63
 msgid "Run to &cursor"
 msgstr "Esegui fino al &cursore"
 
-#: dbgmainwnd.cpp:187 winstack.cpp:482
+#: dbgmainwnd.cpp:252 winstack.cpp:65
 msgid "Set/Clear &breakpoint"
 msgstr "Imposta/Elimina &breakpoint"
 
-#: dbgmainwnd.cpp:142 winstack.cpp:487
+#: dbgmainwnd.cpp:199 winstack.cpp:70
 msgid "&Executable..."
 msgstr "&Eseguibile"
 
-#: dbgmainwnd.cpp:143 winstack.cpp:488
+#: dbgmainwnd.cpp:202 winstack.cpp:71
 msgid "&Core dump..."
 msgstr "&Core dump..."
 
-#: winstack.cpp:880
+#: winstack.cpp:504
 msgid ": Open Windows"
 msgstr ": Apri finestre"
 
-#: winstack.cpp:888
+#: winstack.cpp:512
 msgid "Show"
 msgstr "Mostra"
 
-#: winstack.cpp:956
+#: winstack.cpp:580
 msgid ": Search"
 msgstr ": Cerca"
 
-#: winstack.cpp:962
+#: winstack.cpp:586
 msgid "&Case sensitive"
 msgstr "&Maiuscole/Minuscole"
 
-#: winstack.cpp:964
+#: winstack.cpp:588
 msgid "&Forward"
 msgstr "&Avanti"
 
-#: winstack.cpp:966
+#: winstack.cpp:590
 msgid "&Backward"
 msgstr "&Indietro"
+
+#: ttywnd.cpp:158
+msgid "&Clear"
+msgstr ""
 
 #: prefdebugger.cpp:23
 msgid "To revert to the default settings, clear the entries."
@@ -353,160 +401,352 @@ msgid ""
 "%C will be replaced by a Bourne shell script that\n"
 "keeps the terminal window open."
 msgstr ""
-"%T verrà sostituita con il titolo,\n"
-"%C verrà sostituito da uno script Bourne shell\n"
-"che terrà la finestra del terminale aperta."
+"%T verrÃ  sostituita con il titolo,\n"
+"%C verrÃ  sostituito da uno script Bourne shell\n"
+"che terrÃ  la finestra del terminale aperta."
 
 #: prefdebugger.cpp:40
 msgid "&Terminal for program output:"
 msgstr "&Terminale per l'output del programma:"
 
-#: mainwndbase.cpp:44
+#: prefmisc.cpp:27
+msgid "&Pop into foreground when program stops"
+msgstr ""
+
+#: prefmisc.cpp:32
+msgid "Time until window goes &back (in milliseconds):"
+msgstr ""
+
+#: prefmisc.cpp:39
+msgid "&Tabstop every (characters):"
+msgstr ""
+
+#: prefmisc.cpp:41
+#, fuzzy
+msgid "File filter for &source files:"
+msgstr "Ricarica file sorgente"
+
+#: prefmisc.cpp:43
+msgid "File filter for &header files:"
+msgstr ""
+
+#: pgmsettings.cpp:26
+msgid ""
+"How to invoke &GDB - leave empty to use\n"
+"the default from the global options:"
+msgstr ""
+
+#: pgmsettings.cpp:61
+msgid "&No input and output"
+msgstr ""
+
+#: pgmsettings.cpp:66
+msgid "&Only output, simple terminal emulation"
+msgstr ""
+
+#: pgmsettings.cpp:71
+msgid "&Full terminal emulation"
+msgstr ""
+
+#: pgmsettings.cpp:111
+#, c-format
+msgid "%s: Settings for %s"
+msgstr ""
+
+#: mainwndbase.cpp:509 pgmsettings.cpp:122
+msgid "&Debugger"
+msgstr ""
+
+#: dbgmainwnd.cpp:221 pgmsettings.cpp:123
+msgid "&Output"
+msgstr ""
+
+#: mainwndbase.cpp:54
 msgid " Add "
 msgstr " Aggiungi "
 
-#: mainwndbase.cpp:45
+#: mainwndbase.cpp:55
 msgid " Del "
 msgstr " Elimina "
 
-#: mainwndbase.cpp:104
+#: mainwndbase.cpp:143
 msgid "active"
 msgstr "attiva"
 
-#: mainwndbase.cpp:363
+#: mainwndbase.cpp:313
+msgid "Select the executable to debug"
+msgstr "Seleziona l'eseguibile da debuggare"
+
+#: mainwndbase.cpp:329
+msgid "Select core dump"
+msgstr "Seleziona il core dump"
+
+#: mainwndbase.cpp:492
 msgid ": Global options"
 msgstr ": Impostazioni globali"
 
-#: mainwndbase.cpp:441
+#: mainwndbase.cpp:510
+msgid "&Miscellaneous"
+msgstr ""
+
+#: mainwndbase.cpp:582
 msgid ": Program output"
 msgstr ": Output del programma"
 
-#: dbgmainwnd.cpp:36
+#: mainwndbase.cpp:757
+#, c-format
+msgid "`%s' is not a file or does not exist"
+msgstr "`%s' non Ã¨ un file oppure non esiste"
+
+#: mainwndbase.cpp:773
+msgid ""
+"Could not start the debugger process.\n"
+"Please shut down KDbg and resolve the problem."
+msgstr ""
+
+#: dbgmainwnd.cpp:39
 #, fuzzy
 msgid "Source"
 msgstr "&Ricarica Sorgente"
 
-#: dbgmainwnd.cpp:41
+#: dbgmainwnd.cpp:44
 msgid "Stack"
 msgstr ""
 
-#: dbgmainwnd.cpp:44
+#: dbgmainwnd.cpp:47
 msgid "Locals"
 msgstr ""
 
-#: dbgmainwnd.cpp:47
+#: dbgmainwnd.cpp:50
 msgid "Watches"
 msgstr ""
 
-#: dbgmainwnd.cpp:50
+#: dbgmainwnd.cpp:53
 #, fuzzy
 msgid "Registers"
 msgstr "Riparti"
 
-#: dbgmainwnd.cpp:53
+#: dbgmainwnd.cpp:56
 msgid "Breakpoints"
 msgstr "Breakpoint"
 
-#: dbgmainwnd.cpp:140
+#: dbgmainwnd.cpp:59
+msgid "Output"
+msgstr ""
+
+#: dbgmainwnd.cpp:62
+msgid "Threads"
+msgstr ""
+
+#: dbgmainwnd.cpp:65
+msgid "Memory"
+msgstr ""
+
+#: dbgmainwnd.cpp:152
+msgid "Watch Expression"
+msgstr ""
+
+#: dbgmainwnd.cpp:197
 msgid "&Reload Source"
 msgstr "&Ricarica Sorgente"
 
-#: dbgmainwnd.cpp:145
+#: dbgmainwnd.cpp:200
+#, fuzzy
+msgid "Recent E&xecutables"
+msgstr "Eseguibile"
+
+#: dbgmainwnd.cpp:201
+#, fuzzy
+msgid "&Settings..."
+msgstr "&Trova..."
+
+#: dbgmainwnd.cpp:204
 msgid "&Global Options..."
 msgstr "&Impostazioni Globali..."
 
-#: dbgmainwnd.cpp:153
+#: dbgmainwnd.cpp:212
 msgid "&Find..."
 msgstr "&Trova..."
 
-#: dbgmainwnd.cpp:155
+#: dbgmainwnd.cpp:214
 msgid "Source &code"
 msgstr ""
 
-#: dbgmainwnd.cpp:156
+#: dbgmainwnd.cpp:215
 msgid "Stac&k"
 msgstr ""
 
-#: dbgmainwnd.cpp:157
+#: dbgmainwnd.cpp:216
 msgid "&Locals"
 msgstr ""
 
-#: dbgmainwnd.cpp:158
+#: dbgmainwnd.cpp:217
 msgid "&Watched expressions"
 msgstr ""
 
-#: dbgmainwnd.cpp:159
+#: dbgmainwnd.cpp:218
 #, fuzzy
 msgid "&Registers"
 msgstr "Riparti"
 
-#: dbgmainwnd.cpp:160
+#: dbgmainwnd.cpp:219
 #, fuzzy
 msgid "&Breakpoints"
 msgstr "Breakpoint"
 
-#: dbgmainwnd.cpp:161
+#: dbgmainwnd.cpp:220
 msgid "T&hreads"
 msgstr ""
 
-#: dbgmainwnd.cpp:163
+#: dbgmainwnd.cpp:222
+msgid "&Memory"
+msgstr ""
+
+#: dbgmainwnd.cpp:224
 msgid "Toggle &Toolbar"
 msgstr "Attiva/Disattiva &Toolbar"
 
-#: dbgmainwnd.cpp:164
+#: dbgmainwnd.cpp:225
 msgid "Toggle &Statusbar"
 msgstr "Attiva/Disattiva &Barra di Stato"
 
-#: dbgmainwnd.cpp:168
+#: dbgmainwnd.cpp:229
 msgid "&Run"
 msgstr "&Esegui"
 
-#: dbgmainwnd.cpp:174
+#: dbgmainwnd.cpp:234
+msgid "Step i&nto by instruction"
+msgstr ""
+
+#: dbgmainwnd.cpp:235
+msgid "Step o&ver by instruction"
+msgstr ""
+
+#: dbgmainwnd.cpp:237
 msgid "&Break"
 msgstr "&Interrompi"
 
-#: dbgmainwnd.cpp:175
+#: dbgmainwnd.cpp:238
 msgid "&Kill"
 msgstr ""
 
-#: dbgmainwnd.cpp:176
+#: dbgmainwnd.cpp:239
 msgid "Re&start"
 msgstr "&Riparti"
 
-#: dbgmainwnd.cpp:177
+#: dbgmainwnd.cpp:240
 msgid "A&ttach..."
 msgstr "Co&nnetti..."
 
-#: dbgmainwnd.cpp:179
+#: dbgmainwnd.cpp:242
 msgid "&Arguments..."
 msgstr "&Argomenti..."
 
 # (WAT) corr: mancanza del hotkey
-#: dbgmainwnd.cpp:188
+#: dbgmainwnd.cpp:253
 msgid "Set &temporary breakpoint"
 msgstr "Imposta breakpoint &temporaneo"
 
-#: dbgmainwnd.cpp:189
+#: dbgmainwnd.cpp:254
 msgid "&Enable/Disable breakpoint"
 msgstr "&Abilita/Disabilita breakpoint"
 
-#: dbgmainwnd.cpp:195
+#: dbgmainwnd.cpp:260
 msgid "&More..."
 msgstr "&Altri..."
 
-#: dbgmainwnd.cpp:206
+#: dbgmainwnd.cpp:271
 msgid "E&xecution"
 msgstr "E&secuzione"
 
-#: dbgmainwnd.cpp:207
+#: dbgmainwnd.cpp:272
 msgid "&Breakpoint"
 msgstr "&Breakpoint"
 
-#: dbgmainwnd.cpp:208
+#: dbgmainwnd.cpp:273
 msgid "&Window"
 msgstr "&Finestra"
 
-#: dbgmainwnd.cpp:212
+#: dbgmainwnd.cpp:287
+msgid "Executable"
+msgstr "Eseguibile"
+
+#: dbgmainwnd.cpp:289
+msgid "Open a source file"
+msgstr "Apri file sorgente"
+
+#: dbgmainwnd.cpp:291
+msgid "Reload source file"
+msgstr "Ricarica file sorgente"
+
+#: dbgmainwnd.cpp:294
+msgid "Run/Continue"
+msgstr "Esegui/Continua"
+
+#: dbgmainwnd.cpp:296
+msgid "Step into"
+msgstr "Entra nella funzione"
+
+#: dbgmainwnd.cpp:298
+msgid "Step over"
+msgstr "Salta la funzione"
+
+#: dbgmainwnd.cpp:300
+msgid "Step out"
+msgstr "Esci dalla funzione"
+
+#: dbgmainwnd.cpp:302
+msgid "Step into by instruction"
+msgstr ""
+
+#: dbgmainwnd.cpp:304
+msgid "Step over by instruction"
+msgstr ""
+
+#: dbgmainwnd.cpp:307
+msgid "Breakpoint"
+msgstr "Breakpoint"
+
+#: dbgmainwnd.cpp:310
+msgid "Search"
+msgstr "Cerca"
+
+#: dbgmainwnd.cpp:319
+msgid "Line 00000"
+msgstr "Linea 00000"
+
+#: dbgmainwnd.cpp:323
+msgid "Restart"
+msgstr "Riparti"
+
+#: dbgmainwnd.cpp:324
+msgid "Core dump"
+msgstr "Core dump"
+
+#: dbgmainwnd.cpp:662
+#, c-format
+msgid "Line %d"
+msgstr "Linea %d"
+
+#: dbgmainwnd.cpp:823
+#, fuzzy
+msgid "|All source files\n"
+msgstr "Ricarica file sorgente"
+
+#: dbgmainwnd.cpp:824
+#, fuzzy
+msgid "|Source files\n"
+msgstr "Apri file sorgente"
+
+#: dbgmainwnd.cpp:825
+msgid "|Header files\n"
+msgstr ""
+
+#: dbgmainwnd.cpp:826
+msgid "*|All files"
+msgstr ""
+
+#: main.cpp:45
 msgid ""
 "A Debugger\n"
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
@@ -516,65 +756,32 @@ msgstr ""
 "creato da Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "con l'aiuto di molti altri"
 
-#: dbgmainwnd.cpp:235
-msgid "Executable"
-msgstr "Eseguibile"
+#: main.cpp:50
+msgid "A Debugger"
+msgstr ""
 
-#: dbgmainwnd.cpp:237
-msgid "Open a source file"
-msgstr "Apri file sorgente"
+#: main.cpp:62
+msgid "Docking windows"
+msgstr ""
 
-#: dbgmainwnd.cpp:239
-msgid "Reload source file"
-msgstr "Ricarica file sorgente"
+#: main.cpp:67
+msgid "transcript of conversation with the debugger"
+msgstr ""
 
-#: dbgmainwnd.cpp:242
-msgid "Run/Continue"
-msgstr "Esegui/Continua"
+#: main.cpp:68
+msgid "remote debugging via <device>"
+msgstr ""
 
-#: dbgmainwnd.cpp:244
-msgid "Step into"
-msgstr "Entra nella funzione"
+#: main.cpp:69
+#, fuzzy
+msgid "path of executable to debug"
+msgstr "Seleziona l'eseguibile da debuggare"
 
-#: dbgmainwnd.cpp:246
-msgid "Step over"
-msgstr "Salta la funzione"
+#: main.cpp:70
+msgid "a core file to use"
+msgstr ""
 
-#: dbgmainwnd.cpp:248
-msgid "Step out"
-msgstr "Esci dalla funzione"
-
-#: dbgmainwnd.cpp:251
-msgid "Breakpoint"
-msgstr "Breakpoint"
-
-#: dbgmainwnd.cpp:254
-msgid "Search"
-msgstr "Cerca"
-
-#: dbgmainwnd.cpp:262
-msgid "Line 00000"
-msgstr "Linea 00000"
-
-#: dbgmainwnd.cpp:266
-msgid "Restart"
-msgstr "Riparti"
-
-#: dbgmainwnd.cpp:267
-msgid "Core dump"
-msgstr "Core dump"
-
-#: dbgmainwnd.cpp:556
-#, c-format
-msgid "Line %d"
-msgstr "Linea %d"
-
-#: main.cpp:85 main.cpp:89
+#: main.cpp:156 main.cpp:171
 msgid "Cannot start debugger."
 msgstr "Non riesco ad eseguire il debugger"
 
-#~ msgid "&List..."
-#~ msgstr "&Lista..."
-
-#~ msgid "E"
-#~ msgstr "A"
