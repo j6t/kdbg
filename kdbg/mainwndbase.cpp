@@ -286,6 +286,9 @@ bool DebuggerMainWndBase::handleCommand(int item)
 	    }
 	}
 	return true;
+    case ID_FILE_PROG_SETTINGS:
+	m_debugger->programSettings(dbgMainWnd());
+	return true;
     case ID_FILE_COREFILE:
 	if (m_debugger->canUseCoreFile())
 	{
@@ -327,7 +330,7 @@ bool DebuggerMainWndBase::handleCommand(int item)
 	m_debugger->programBreak();
 	return true;
     case ID_PROGRAM_ARGS:
-	m_debugger->programArgs();
+	m_debugger->programArgs(dbgMainWnd());
 	return true;
     }
     return false;
@@ -338,6 +341,9 @@ void DebuggerMainWndBase::updateUIItem(UpdateUI* item)
     switch (item->id) {
     case ID_FILE_EXECUTABLE:
 	item->enable(m_debugger->isIdle());
+	break;
+    case ID_FILE_PROG_SETTINGS:
+	item->enable(m_debugger->haveExecutable());
 	break;
     case ID_FILE_COREFILE:
 	item->enable(m_debugger->canUseCoreFile());

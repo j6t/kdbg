@@ -8,6 +8,7 @@
 #include "pgmargs.h"
 #include "typetable.h"
 #include "exprwnd.h"
+#include "pgmsettings.h"
 #include "valarray.h"
 #include <qregexp.h>
 #include <qfileinfo.h>
@@ -295,15 +296,32 @@ void KDebugger::programBreak()
     }
 }
 
-void KDebugger::programArgs()
+void KDebugger::programArgs(QWidget* parent)
 {
     if (m_haveExecutable) {
-	PgmArgs dlg(parentWidget(), m_executable, m_envVars);
+	PgmArgs dlg(parent, m_executable, m_envVars);
 	dlg.setArgs(m_programArgs);
 	dlg.setWd(m_programWD);
 	if (dlg.exec()) {
 	    updateProgEnvironment(dlg.args(), dlg.wd(), dlg.envVars());
 	}
+    }
+}
+
+void KDebugger::programSettings(QWidget* parent)
+{
+    if (!m_haveExecutable)
+	return;
+
+    ProgramSettings dlg(parent, m_executable);
+
+    dlg.m_chooseDriver.setDebuggerCmd(m_debuggerCmd);
+    dlg.m_output.setTTYLevel(m_ttyLevel);
+
+    if (dlg.exec() == QDialog::Accepted)
+    {
+	m_debuggerCmd = dlg.m_chooseDriver.debuggerCmd();
+	m_ttyLevel = TTYLevel(dlg.m_output.ttyLevel());
     }
 }
 
@@ -475,6 +493,7 @@ void KDebugger::gdbExited(KProcess*)
     m_explicitKill = false;
     m_debuggerCmd = QString();		/* use global setting at next start! */
     m_attachedPid = QString();		/* we are no longer attached to a process */
+    m_ttyLevel = ttyFull;
 
     // stop gear wheel and erase PC
     stopAnimation();

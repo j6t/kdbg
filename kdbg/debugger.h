@@ -99,7 +99,13 @@ public:
     /**
      * Queries the user for program arguments.
      */
-    void programArgs();
+    void programArgs(QWidget* parent);
+
+    /**
+     * Queries the user for program settings: Debugger command, terminal
+     * emulator.
+     */
+    void programSettings(QWidget* parent);
 
     /**
      * Setup remote debugging device

@@ -146,6 +146,7 @@ void DebuggerMainWnd::initMenu()
     m_menuFile->insertItem(i18n("&Reload Source"), ID_FILE_RELOAD);
     m_menuFile->insertSeparator();
     m_menuFile->insertItem(i18n("&Executable..."), ID_FILE_EXECUTABLE);
+    m_menuFile->insertItem(i18n("&Settings..."), ID_FILE_PROG_SETTINGS);
     m_menuFile->insertItem(i18n("&Core dump..."), ID_FILE_COREFILE);
     m_menuFile->insertSeparator();
     m_menuFile->insertItem(i18n("&Global Options..."), ID_FILE_GLOBAL_OPTIONS);

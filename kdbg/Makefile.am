@@ -39,6 +39,7 @@ kdbg_SOURCES = \
 	ttywnd.cpp \
 	typetable.cpp \
 	prefdebugger.cpp \
+	pgmsettings.cpp \
 	mainwndbase.cpp \
 	dbgmainwnd.cpp \
 	main.cpp
@@ -71,6 +72,7 @@ noinst_HEADERS = \
 	ttywnd.h \
 	typetable.h \
 	prefdebugger.h \
+	pgmsettings.h \
 	mainwndbase.h \
 	dbgmainwnd.h \
 	envvar.h \
@@ -90,6 +92,7 @@ BUILTSOURCES =	\
 	ktreeview.moc \
 	winstack.moc \
 	ttywnd.moc \
+	pgmsettings.moc \
 	mainwndbase.moc \
 	dbgmainwnd.moc \
 	updateui.moc
@@ -161,6 +164,10 @@ brkpt.moc: $(srcdir)/brkpt.h
 $(srcdir)/pgmargs.cpp: pgmargs.moc
 pgmargs.moc: $(srcdir)/pgmargs.h
 	$(MOC) $(srcdir)/pgmargs.h -o pgmargs.moc
+
+$(srcdir)/pgmsettings.cpp: pgmsettings.moc
+pgmsettings.moc: $(srcdir)/pgmsettings.h
+	$(MOC) $(srcdir)/pgmsettings.h -o pgmsettings.moc
 
 $(srcdir)/mainwndbase.cpp: mainwndbase.moc
 mainwndbase.moc: $(srcdir)/mainwndbase.h
