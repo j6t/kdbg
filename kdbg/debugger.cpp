@@ -522,13 +522,9 @@ void KDebugger::gdbExited(KProcess*)
     if (m_explicitKill) {
 	TRACE("gdb exited normally");
     } else {
-	QString msg = i18n("gdb exited unexpectedly.\n"
+	QString msg = i18n("%1 exited unexpectedly.\n"
 			   "Restart the session (e.g. with File|Executable).");
-#if QT_VERSION < 200
-	KMsgBox::message(parentWidget(), kapp->appName(), msg, KMsgBox::EXCLAMATION);
-#else
-	KMessageBox::error(parentWidget(), msg);
-#endif
+	KMessageBox::error(parentWidget(), msg.arg(m_d->driverName()));
     }
 
     // reset state
@@ -838,13 +834,8 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	    if (!m_statusMessage.isEmpty())
 		emit updateStatusMessage();
 	} else {
-	    QString msg = "gdb: " + m_statusMessage;
-#if QT_VERSION < 200
-	    KMsgBox::message(parentWidget(), kapp->appName(), msg,
-			     KMsgBox::STOP, i18n("OK"));
-#else
+	    QString msg = m_d->driverName() + ": " + m_statusMessage;
 	    KMessageBox::sorry(parentWidget(), msg);
-#endif
 	    m_executable = "";
 	    m_corefile = "";		/* don't process core file */
 	    m_haveExecutable = false;
