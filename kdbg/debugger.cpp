@@ -733,7 +733,7 @@ bool KDebugger::startGdb()
 
 void KDebugger::stopGdb()
 {
-    m_gdb.kill(SIGTERM);
+    m_gdb.kill(SIGHUP);			/* gdb exits normally on SIGHUP */
     m_state = DSidle;
 }
 
@@ -752,6 +752,17 @@ void KDebugger::gdbExited(KProcess*)
 	m_programConfig = 0;
     }
 
+    if (m_gdb.normalExit()) {
+	TRACE("gdb exited normally");
+    } else {
+	int status = m_gdb.exitStatus();
+	QString msgFmt = i18n("gdb exited unexpectedly (status 0x%x)\n"
+			      "Restart the session (e.g. with File|Executable).");
+	QString msg(msgFmt.length()+20);
+	msg.sprintf(msgFmt, status);
+	KMsgBox::message(this, kapp->appName(), msg, KMsgBox::EXCLAMATION);
+    }
+
     // reset state
     m_state = DSidle;
     m_haveExecutable = false;
@@ -761,6 +772,10 @@ void KDebugger::gdbExited(KProcess*)
     // empty buffer
     m_gdbOutputLen = 0;
     *m_gdbOutput = '\0';
+
+    // stop gear wheel and erase PC
+    stopAnimation();
+    m_filesWindow.updatePC(QString(), -1, 0);
 }
 
 const char fifoNameBase[] = "/tmp/kdbgttywin%05d";

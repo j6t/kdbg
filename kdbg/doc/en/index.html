@@ -14,21 +14,24 @@ Contents</H2>
 
 <UL>
 <LI>
-Introduction</LI>
+<A HREF="#Introduction">Introduction</A></LI>
 
 <LI>
-What's it that I see here?</LI>
+<A HREF="#WhatsThis">What's it that I see here?</A></LI>
 
 <LI>
-Using KDbg</LI>
+<A HREF="#UsingKDbg">Using KDbg</A></LI>
 
 <LI>
-Author</LI>
+<A HREF="#KnownProblems">Known problems</A></LI>
+
+<LI>
+<A HREF="#Author">Author</A></LI>
 </UL>
 
 <HR>
 <H2>
-Introduction</H2>
+<A NAME="Introduction"></A>Introduction</H2>
 KDbg is a front-end for <TT>gdb</TT>, the GNU debugger.
 
 <P>At the moment there is not much documentation available.
@@ -36,7 +39,7 @@ KDbg is a front-end for <TT>gdb</TT>, the GNU debugger.
 <P>For the really brave there's documentation about how <A HREF="types.html">KDbg
 can understand types</A> like <TT>QString</TT>.
 <H2>
-What's it that I see here?</H2>
+<A NAME="WhatsThis"></A>What's it that I see here?</H2>
 The main window of KDbg consist of four panes:
 
 <P>The <B>upper left</B> pane shows the source code. Mostly, source code
@@ -62,7 +65,7 @@ click on it (choose the root of the expression) and click <I>Del</I>.
 case it rotates. It rotates fast while KDbg wouldn't accept execution commands,
 and it rotates slowly while KDbg gets the variable values.
 <H2>
-Using KDbg</H2>
+<A NAME="UsingKDbg"></A>Using KDbg</H2>
 To <B>debug a program</B>, choose <I>File|Executable</I> from the menu.
 The program is loaded. An <TT>xterm</TT> window is opened which will show
 the output of the debuggee. If you want to debug a <B>core dump</B>, you
@@ -102,7 +105,15 @@ breakpoints are persistent (i.e. KDbg remembers them across invocations
 of a program), you get them back next time you invoke KDbg for that particular
 program.
 <H2>
-Author</H2>
+<A NAME="KnownProblems"></A>Known problems</H2>
+gdb 4.16 has problems in handling C++ classes with virtual base classes.
+(Such classes commonly occur in CORBA programs.) It dies quite often due
+to a segmentation violation. KDbg reports when gdb exits unexpectedly.
+Unfortunately, you cannot really do anything about it. You have to restart
+gdb by choosing <I>File|Executable</I>, which restarts your debugging session
+:-(.
+<H2>
+<A NAME="Author"></A>Author</H2>
 KDbg is written by <A HREF="mailto:Johannes.Sixt@telecom.at">Johannes Sixt</A>
 with the help of many others.
 </BODY>
