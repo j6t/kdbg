@@ -105,6 +105,11 @@ public:
     void programArgs();
 
     /**
+     * Setup remote debugging device
+     */
+    void setRemoteDevice(const QString& remoteDevice) { m_remoteDevice = remoteDevice; }
+
+    /**
      * Shows the breakpoint list if it isn't currently visible or hides it
      * if it is.
      */
@@ -372,6 +377,7 @@ protected:
     QString m_corefile;
     QString m_attachedPid;		/* user input of attaching to pid */
     QString m_programArgs;
+    QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
     QDict<EnvVar> m_envVars;		/* environment variables set by user */
     QStrList m_sharedLibs;		/* shared libraries used by program */

@@ -22,12 +22,18 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>			/* open(2) */
 #endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>			/* getopt(3) */
+#endif
 #include "mydebug.h"
 
 
 int main(int argc, char** argv)
 {
     KApplication app(argc, argv, "kdbg");
+    extern char *optarg;
+    extern int optind;
+    int ch;
 
 #if QT_VERSION >= 200
     KGlobal::dirs()->addResourceType("types", "share/apps/kdbg/types");
@@ -52,6 +58,19 @@ int main(int argc, char** argv)
     app.setMainWidget(&debugger);
 
     debugger.show();
+
+    // handle optional arguments
+    while ((ch = getopt(argc, argv, "r:")) != -1) {
+	switch (ch) {
+	case 'r':
+	    debugger.setRemoteDevice(optarg);
+	    break;
+	default:
+	    TRACE(QString().sprintf("ignoring option -%c", ch));
+	}
+    }
+    argc -= optind - 1;
+    argv += optind - 1;
 
     if (!restored && argc > 1) {
 	// check for core file

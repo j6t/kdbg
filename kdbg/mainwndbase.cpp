@@ -89,9 +89,16 @@ void DebuggerMainWndBase::setupDebugger(ExprWnd* localVars,
 
 void DebuggerMainWndBase::setCoreFile(const QString& corefile)
 {
+    assert(m_debugger != 0);
     m_debugger->setCoreFile(corefile);
 }
 
+void DebuggerMainWndBase::setRemoteDevice(const QString& remoteDevice)
+{
+    if (m_debugger != 0) {
+	m_debugger->setRemoteDevice(remoteDevice);
+    }
+}
 
 void DebuggerMainWndBase::saveSettings(KConfig* config)
 {

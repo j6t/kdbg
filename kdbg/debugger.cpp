@@ -258,6 +258,15 @@ bool KDebugger::debugProgram(const QString& name)
     executeCmd(DCexecutable, "file \"" + name + "\"");
     m_executable = name;
 
+    // set remote target
+    if (!m_remoteDevice.isEmpty()) {
+	 executeCmd(DCbt, "target remote " + m_remoteDevice);
+	 queueCmd(DCbt, "bt", QMoverride);
+	 queueCmd(DCframe, "frame 0", QMnormal);
+	 m_programActive = true;
+	 m_haveExecutable = true;
+    }
+
     // create the program settings object
     QString pgmConfigFile = fi.dirPath(false);
     if (!pgmConfigFile.isEmpty()) {
@@ -1227,7 +1236,8 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	    }
 	    // load file containing main() or core file
 	    if (m_corefile.isEmpty()) {
-		queueCmd(DCinfolinemain, "info line main", QMnormal);
+		if (m_remoteDevice.isEmpty())
+		    queueCmd(DCinfolinemain, "info line main", QMnormal);
 	    } else {
 		// load core file
 		loadCoreFile();

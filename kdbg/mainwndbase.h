@@ -56,6 +56,7 @@ public:
     // the following are needed to handle program arguments
     bool debugProgram(const QString& executable);
     void setCoreFile(const QString& corefile);
+    void setRemoteDevice(const QString &remoteDevice);
 
 protected:
     // settings
