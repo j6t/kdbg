@@ -319,12 +319,19 @@ void DebuggerMainWnd::readProperties(KConfig* config)
 }
 
 const char WindowGroup[] = "Windows";
+const char PreferencesGroup[] = "Preferences";
+const char SourceFileFilter[] = "SourceFileFilter";
+const char HeaderFileFilter[] = "HeaderFileFilter";
 
 void DebuggerMainWnd::saveSettings(KConfig* config)
 {
     KConfigGroupSaver g(config, WindowGroup);
 
     writeDockConfig(config);
+
+    config->setGroup(PreferencesGroup);
+    config->writeEntry(SourceFileFilter, m_sourceFilter);
+    config->writeEntry(HeaderFileFilter, m_headerFilter);
 
     DebuggerMainWndBase::saveSettings(config);
 }
@@ -334,6 +341,18 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
     KConfigGroupSaver g(config, WindowGroup);
 
     readDockConfig(config);
+
+    config->setGroup(PreferencesGroup);
+    m_sourceFilter = config->readEntry(SourceFileFilter);
+    if (m_sourceFilter.isEmpty()) {
+	m_sourceFilter =
+	    "*.c *.cc *.cpp *.c++ *.C *.CC";
+    }
+    m_headerFilter = config->readEntry(HeaderFileFilter);
+    if (m_headerFilter.isEmpty()) {
+	m_headerFilter =
+	    "*.h *.hh *.hpp *.h++";
+    }
 
     DebuggerMainWndBase::restoreSettings(config);
 
@@ -346,7 +365,8 @@ void DebuggerMainWnd::menuCallback(int item)
     case ID_FILE_OPEN:
 	{
 	    QString fileName = myGetFileName(i18n("Open"),
-					     m_lastDirectory, QString(), this);
+					     m_lastDirectory,
+					     makeSourceFilter(), this);
 
 	    if (!fileName.isEmpty())
 	    {
@@ -729,5 +749,16 @@ void DebuggerMainWnd::slotBackTimer()
 {
     ::XLowerWindow(x11Display(), winId());
 }
+
+QString DebuggerMainWnd::makeSourceFilter()
+{
+    QString f;
+    f = m_sourceFilter + " " + m_headerFilter + i18n("|All source files\n");
+    f += m_sourceFilter + i18n("|Source files\n");
+    f += m_headerFilter + i18n("|Header files\n");
+    f += i18n("*|All files");
+    return f;
+}
+
 
 #include "dbgmainwnd.moc"

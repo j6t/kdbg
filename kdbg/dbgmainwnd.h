@@ -59,6 +59,8 @@ protected:
     QPopupMenu* m_menuWindow;
 
     QTimer m_backTimer;
+    QString m_sourceFilter;
+    QString m_headerFilter;
 
 protected:
     virtual void closeEvent(QCloseEvent* e);
@@ -75,6 +77,8 @@ protected:
     void showhideWindow(QWidget* w);
     void dockUpdateHelper(UpdateUI* item, QWidget* w);
     void intoBackground();
+
+    QString makeSourceFilter();
 
 signals:
     void forwardMenuCallback(int item);
