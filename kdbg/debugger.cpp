@@ -380,7 +380,19 @@ bool KDebugger::setBreakpoint(QString file, int lineNo,
 void KDebugger::setBreakpoint(Breakpoint* bp)
 {
     CmdQueueItem* cmd;
-    if (bp->address.isEmpty())
+    if (!bp->text.isEmpty())
+    {
+	/*
+	 * The breakpoint was set using the text box in the breakpoint
+	 * list. This is the only way in which watchpoints are set.
+	 */
+	if (bp->type == Breakpoint::watchpoint) {
+	    cmd = m_d->executeCmd(DCwatchpoint, bp->text);
+	} else {
+	    cmd = m_d->executeCmd(DCbreaktext, bp->text);
+	}
+    }
+    else if (bp->address.isEmpty())
     {
 	// strip off directory part of file name
 	QString file = bp->fileName;
@@ -757,6 +769,7 @@ void KDebugger::restoreProgramSettings()
 const char BPGroup[] = "Breakpoint %d";
 const char File[] = "File";
 const char Line[] = "Line";
+const char Text[] = "Text";
 const char Address[] = "Address";
 const char Temporary[] = "Temporary";
 const char Enabled[] = "Enabled";
@@ -771,26 +784,32 @@ void KDebugger::saveBreakpoints(KSimpleConfig* config)
 	if (bp->type == Breakpoint::watchpoint)
 	    continue;			/* don't save watchpoints */
 	groupName.sprintf(BPGroup, i++);
+
+	/* remove remmants */
+	config->deleteGroup(groupName);
+
 	config->setGroup(groupName);
-	if (!bp->fileName.isEmpty()) {
+	if (!bp->text.isEmpty()) {
+	    /*
+	     * The breakpoint was set using the text box in the breakpoint
+	     * list. We do not save the location by filename+line number,
+	     * but instead honor what the user typed (a function name, for
+	     * example, which could move between sessions).
+	     */
+	    config->writeEntry(Text, bp->text);
+	} else if (!bp->fileName.isEmpty()) {
 	    config->writeEntry(File, bp->fileName);
 	    config->writeEntry(Line, bp->lineNo);
 	    /*
-	     * Addresses are hardly correct across sessions, so we remove
-	     * it since we have a file name and line number.
+	     * Addresses are hardly correct across sessions, so we don't
+	     * save it.
 	     */
-	    config->deleteEntry(Address, false);
 	} else {
 	    config->writeEntry(Address, bp->address.asString());
-	    /* remove remmants */
-	    config->deleteEntry(File, false);
-	    config->deleteEntry(Line, false);
 	}
 	config->writeEntry(Temporary, bp->temporary);
 	config->writeEntry(Enabled, bp->enabled);
-	if (bp->condition.isEmpty())
-	    config->deleteEntry(Condition, false);
-	else
+	if (!bp->condition.isEmpty())
 	    config->writeEntry(Condition, bp->condition);
 	// we do not save the ignore count
     }
@@ -824,8 +843,13 @@ void KDebugger::restoreBreakpoints(KSimpleConfig* config)
 	Breakpoint* bp = new Breakpoint;
 	bp->fileName = config->readEntry(File);
 	bp->lineNo = config->readNumEntry(Line, -1);
+	bp->text = config->readEntry(Text);
 	bp->address = config->readEntry(Address);
-	if ((bp->fileName.isEmpty() || bp->lineNo < 0) && bp->address.isEmpty()) {
+	// check consistency
+	if ((bp->fileName.isEmpty() || bp->lineNo < 0) &&
+	    bp->text.isEmpty() &&
+	    bp->address.isEmpty())
+	{
 	    delete bp;
 	    continue;
 	}
@@ -1836,6 +1860,7 @@ void KDebugger::updateBreakList(const char* output)
 	{
 	    if (bp->id == m_brkpts[i]->id) {
 		// keep accurate location
+		bp->text = m_brkpts[i]->text;
 		bp->fileName = m_brkpts[i]->fileName;
 		bp->lineNo = m_brkpts[i]->lineNo;
 		m_brkpts.insert(i, bp); // old object is deleted

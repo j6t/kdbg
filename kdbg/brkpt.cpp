@@ -15,7 +15,6 @@
 #include "debugger.h"
 #include "brkpt.h"
 #include "dbgdriver.h"
-#include "brkpt.moc"
 #include <ctype.h>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -169,13 +168,9 @@ void BreakpointTable::addBP()
     if (m_debugger->isReady())
     {
 	Breakpoint* bp = new Breakpoint;
-	bp->location = bpText;
+	bp->text = bpText;
 
-	CmdQueueItem* cmd =
-	    m_debugger->driver()->executeCmd(DCbreaktext, bpText);
-	cmd->m_brkpt = bp;
-	// clear text if successfully set
-	m_bpEdit.setText("");
+	m_debugger->setBreakpoint(bp);
     }
 }
 
@@ -187,11 +182,9 @@ void BreakpointTable::addWP()
     if (m_debugger->isReady()) {
 	Breakpoint* bp = new Breakpoint;
 	bp->type = Breakpoint::watchpoint;
-	bp->location = wpExpr;
+	bp->text = wpExpr;
 
-	CmdQueueItem* cmd =
-	    m_debugger->driver()->executeCmd(DCwatchpoint, wpExpr);
-	cmd->m_brkpt = bp;
+	m_debugger->setBreakpoint(bp);
     }
 }
 
@@ -403,6 +396,8 @@ void BreakpointItem::display()
     // more breakpoint info
     if (!location.isEmpty()) {
 	setText(0, location);
+    } else if (!Breakpoint::text.isEmpty()) {
+	setText(0, Breakpoint::text);
     } else if (!fileName.isEmpty()) {
 	// use only the file name portion
 	QString file = fileName;
@@ -520,3 +515,6 @@ void ConditionalDlg::setIgnoreCount(uint count)
     }
     m_ignoreCount.setText(text);
 }
+
+
+#include "brkpt.moc"

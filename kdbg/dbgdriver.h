@@ -175,6 +175,7 @@ struct Breakpoint
     bool temporary;
     bool enabled;
     QString location;
+    QString text;			/* text if set using DCbreaktext */
     DbgAddr address;			/* exact address of breakpoint */
     QString condition;			/* condition as printed by gdb */
     int ignoreCount;			/* ignore next that may hits */
