@@ -122,11 +122,8 @@ signals:
 
 public slots:
     virtual void menuCallback(int item);
-    virtual void slotLineChanged();
     virtual void slotFindForward();
     virtual void slotFindBackward();
-    virtual void slotToggleBreak(const QString&,int);
-    virtual void slotEnaDisBreak(const QString&,int);
 
 protected:
     bool activateFI(QFileInfo& fi, int lineNo);

@@ -460,11 +460,11 @@ bool WinStack::activatePath(QString pathName, int lineNo)
 	// not found, load it
 	fw = new FileWindow(pathName, this, "fileWindow");
 	m_fileList.insert(0, fw);
-	connect(fw, SIGNAL(lineChanged()),SLOT(slotLineChanged()));
+	connect(fw, SIGNAL(lineChanged()),SIGNAL(lineChanged()));
 	connect(fw, SIGNAL(clickedLeft(const QString&, int)),
-		SLOT(slotToggleBreak(const QString&,int)));
+		SIGNAL(toggleBreak(const QString&,int)));
 	connect(fw, SIGNAL(clickedMid(const QString&, int)),
-		SLOT(slotEnaDisBreak(const QString&,int)));
+		SIGNAL(enadisBreak(const QString&,int)));
 
 	changeWindowMenu();
 	
@@ -624,11 +624,6 @@ void WinStack::resizeEvent(QResizeEvent*)
     }
 }
 
-void WinStack::slotLineChanged()
-{
-    emit lineChanged();
-}
-
 void WinStack::slotFindForward()
 {
     if (m_activeWindow != 0)
@@ -641,16 +636,6 @@ void WinStack::slotFindBackward()
     if (m_activeWindow != 0)
 	m_activeWindow->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
 			     FileWindow::findBackward);
-}
-
-void WinStack::slotToggleBreak(const QString& fileName, int row)
-{
-    emit toggleBreak(fileName, row);
-}
-
-void WinStack::slotEnaDisBreak(const QString& fileName, int row)
-{
-    emit enadisBreak(fileName, row);
 }
 
 
