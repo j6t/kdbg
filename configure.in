@@ -90,6 +90,7 @@ dnl add here all your Makefiles. These are created by configure
 AC_OUTPUT(Makefile \
 	kdbg/Makefile \
 	kdbg/doc/Makefile \
+	kdbg/doc/de/Makefile \
 	kdbg/doc/en/Makefile \
 	kdbg/doc/ru/Makefile \
 	kdbg/pics/Makefile \
