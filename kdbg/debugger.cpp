@@ -815,11 +815,6 @@ bool KDebugger::debugProgram(const QString& name)
 	return false;
     }
 
-    /* change to directory; ignore error - it's not fatal */
-    if (chdir(fi.dirPath(true)) < 0) {
-	TRACE("debugProgram: cannot change to dir of " + name);
-    }
-
     if (!m_gdb.isRunning()) {
 	if (!startGdb()) {
 	    TRACE("startGdb failed");
@@ -832,7 +827,7 @@ bool KDebugger::debugProgram(const QString& name)
     m_executable = name;
 
     // create the program settings object
-    QString pgmConfigFile = fi.dirPath(true);
+    QString pgmConfigFile = fi.dirPath(false);
     if (!pgmConfigFile.isEmpty()) {
 	pgmConfigFile += '/';
     }
@@ -1180,8 +1175,13 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	}
 	break;
     case DCexecutable:
-	// there is no output if the command is successful
-	if (m_gdbOutput[0] == '\0') {
+	/*
+	 * The command is successful if there is no output or the single
+	 * message (no debugging symbols found)...
+	 */
+	if (m_gdbOutput[0] == '\0' ||
+	    strcmp(m_gdbOutput, "(no debugging symbols found)...") == 0)
+	{
 	    // success; restore breakpoints etc.
 	    restoreProgramSettings();
 	    // load file containing main() or core file
@@ -1201,9 +1201,9 @@ void KDebugger::parse(CmdQueueItem* cmd)
     case DCcorefile:
 	// in any event we have an executable at this point
 	m_haveExecutable = true;
-	// if command succeeded, gdb emits a marker
-	parseMarker = strstr(m_gdbOutput, "\032\032") != 0;
-	if (parseMarker) {		/* i.e. if we found it */
+	parseMarker = true;
+	// if command succeeded, gdb emits a line starting with "#0 "
+	if (strstr(m_gdbOutput, "\n#0 ")) {
 	    // loading a core is like stopping at a breakpoint
 	    handleRunCommands();
 	} else {

@@ -69,6 +69,7 @@ int main(int argc, char** argv)
 			     i18n("Cannot start debugger."),
 			     KMsgBox::STOP,
 			     i18n("OK"));
+	    debugger.setCoreFile("");
 //	    delete keys;
 	}
     }
