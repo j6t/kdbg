@@ -591,6 +591,12 @@ bool KDebugger::startGdb()
     // change prompt string and synchronize with gdb
     m_state = DSidle;
     executeCmd(DCinitialize, "set prompt " PROMPT);
+    /*
+     * Work around buggy gdbs that do command line editing even if they are
+     * not on a tty. The readline library echos every command back in this
+     * case, which is confusing for us.
+     */
+    executeCmd(DCinitialSet, "set editing off");
     executeCmd(DCinitialSet, "set confirm off");
     executeCmd(DCinitialSet, "set print static-members off");
     executeCmd(DCinitialSet, "tty " + m_outputTermName);
