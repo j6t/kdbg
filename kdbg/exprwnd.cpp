@@ -484,6 +484,7 @@ void ExprWnd::replaceChildren(VarTree* display, VarTree* newValues)
 	vNew->m_value = v->m_value;
 	vNew->m_type = v->m_type;
 	vNew->setDelayedExpanding(vNew->m_varKind == VarTree::VKpointer);
+	vNew->setExpanded(v->isExpanded());
 	display->appendChild(vNew);
 	// recurse
 	replaceChildren(vNew, v);

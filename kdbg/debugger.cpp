@@ -1203,6 +1203,8 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
 
 	dummyParent->appendChild(variable);
 	dummyParent->setDeleteChildren(true);
+	// expand the first level for convenience
+	variable->setExpanded(true);
 	TRACE("update ptr: " + cmd->m_expr->getText());
 	cmd->m_exprWnd->updateExpr(cmd->m_expr, dummyParent);
 	delete dummyParent;

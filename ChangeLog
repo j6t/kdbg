@@ -10,6 +10,8 @@ Version 1.2.6
 
 	Make mouse wheel work (again) in source, variables, and watch windows.
 
+	When a pointer to a struct is expanded the struct is also expanded.
+
 Version 1.2.5
 
 	Now compiles for KDE 3.
