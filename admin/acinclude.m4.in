@@ -4600,22 +4600,6 @@ Syntax Error
 fi
 ])
 
-dnl this is a redefinition of autoconf 2.5x's AC_FOREACH.
-dnl When the argument list becomes big, as in KDE for AC_OUTPUT in
-dnl big packages, m4_foreach is dog-slow.  So use our own version of
-dnl it.  (matz@kde.org)
-m4_define([mm_foreach],
-[m4_pushdef([$1])_mm_foreach($@)m4_popdef([$1])])
-m4_define([mm_car], [[$1]])
-m4_define([mm_car2], [[$@]])
-m4_define([_mm_foreach],
-[m4_if(m4_quote($2), [], [],
-       [m4_define([$1], [mm_car($2)])$3[]_mm_foreach([$1],
-                                                     mm_car2(m4_shift($2)),
-                                                     [$3])])])
-m4_define([AC_FOREACH],
-[mm_foreach([$1], m4_split(m4_normalize([$2])), [$3])])
-
 AC_DEFUN(KDE_NEED_FLEX,
 [
 kde_libs_safe=$LIBS
