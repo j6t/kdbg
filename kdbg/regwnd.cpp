@@ -237,16 +237,15 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
 	    SLOT(rightButtonClicked(QListViewItem*,const QPoint&,int)));
 
     m_modemenu = new QPopupMenu;
-    m_modemenu->insertItem(i18n("Binary"),0);
-    m_modemenu->insertItem(i18n("Octal"),1);
-    m_modemenu->insertItem(i18n("Decimal"),2);
-    m_modemenu->insertItem(i18n("Hexadecimal"),3);
+    m_modemenu->insertItem(i18n("&Binary"),0);
+    m_modemenu->insertItem(i18n("&Octal"),1);
+    m_modemenu->insertItem(i18n("&Decimal"),2);
+    m_modemenu->insertItem(i18n("He&xadecimal"),3);
     connect(m_modemenu,SIGNAL(activated(int)),SLOT(slotModeChange(int)));
 
     m_menu = new QPopupMenu();
-//    m_menu->setTitle(i18n("Register Setting"));
-    m_menu->insertItem(i18n("Font..."), this, SLOT(slotSetFont()));
-    m_menu->insertItem(i18n("View mode"), m_modemenu);
+    m_menu->insertItem(i18n("&Font..."), this, SLOT(slotSetFont()));
+    m_menu->insertItem(i18n("&View mode"), m_modemenu);
 
     resize(200,300);
 }
