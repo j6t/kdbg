@@ -1943,9 +1943,13 @@ void KDebugger::updateBreakList(const char* output)
 	{
 	    if (bp->id == m_brkpts[i]->id) {
 		// keep accurate location
+		// except that xsldbg doesn't have a location in
+		// the old breakpoint if it's just been set
 		bp->text = m_brkpts[i]->text;
-		bp->fileName = m_brkpts[i]->fileName;
-		bp->lineNo = m_brkpts[i]->lineNo;
+		if (!m_brkpts[i]->fileName.isEmpty()) {
+		    bp->fileName = m_brkpts[i]->fileName;
+		    bp->lineNo = m_brkpts[i]->lineNo;
+		}
 		m_brkpts.insert(i, bp); // old object is deleted
 		goto stillAlive;
 	    }

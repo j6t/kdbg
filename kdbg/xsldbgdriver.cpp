@@ -1251,10 +1251,30 @@ XsldbgDriver::parseThreadList(const char */*output*/,
 }
 
 bool
-XsldbgDriver::parseBreakpoint(const char */*output*/, int &/*id*/,
-                              QString & /*file*/, int &/*lineNo*/, QString&/*address*/)
+XsldbgDriver::parseBreakpoint(const char *output, int &id,
+                              QString &file, int &lineNo, QString &address)
 {
-    TRACE("parseBreakpoint");
+    // check for errors
+    if ( strncmp(output, "Error:", 6) == 0) {
+	return false;
+    }
+
+    char *dummy;
+    if (strncmp(output, "Breakpoint ", 11) != 0)
+	return false;
+
+    output += 11;
+    if (!isdigit(*output))
+	return false;
+
+    // get Num
+    id = strtol(output, &dummy, 10);     /* don't care about overflows */
+    if (output == dummy)
+	return false;
+
+    // the file name + lineNo will be filled in later from the breakpoint list
+    file = address = QString();
+    lineNo = 0;
     return true;
 }
 
