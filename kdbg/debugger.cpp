@@ -174,7 +174,7 @@ bool KDebugger::debugProgram(const QString& name,
 void KDebugger::shutdown()
 {
     // shut down debugger driver
-    if (m_d->isRunning())
+    if (m_d != 0 && m_d->isRunning())
     {
 	stopDriver();
     }
