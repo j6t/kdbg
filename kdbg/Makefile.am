@@ -84,6 +84,8 @@ XPMS = \
 	brktmp.xpm \
 	pcinner.xpm \
 	pcup.xpm \
+	green-bullet.xpm \
+	red-bullet.xpm \
 	pointer.xpm
 
 # if you "make clean", this files get removed. If you want to remove
