@@ -3,6 +3,9 @@ Version 1.9.2
 	The previous security fix only protects against accidents, not attacks,
 	as Matt Zimmerman pointed out. Did it right this time.
 
+	Basic editing of values in the local variables window is available.
+	More refinements are still necessary.
+
 Version 1.9.1
 
 	Fixed security flaw regarding the program specific debugger command.

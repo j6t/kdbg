@@ -118,6 +118,7 @@ static GdbCmdInfo cmds[] = {
     { DCcondition, "condition %d %s\n", GdbCmdInfo::argNumString},
     { DCsetpc, "set variable $pc=%s\n", GdbCmdInfo::argString },
     { DCignore, "ignore %d %d\n", GdbCmdInfo::argNum2},
+    { DCsetvariable, "set variable %s=%s\n", GdbCmdInfo::argString2 },
 };
 
 #define NUM_CMDS (int(sizeof(cmds)/sizeof(cmds[0])))

@@ -98,6 +98,7 @@ public slots:
     void slotRecentExec(const KURL& url);
     void slotLocalsPopup(int item, const QPoint& pt);
     void slotLocalsToWatch();
+    void slotEditValue();
 
     void slotFileOpen();
     void slotFileQuit();

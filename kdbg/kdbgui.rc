@@ -67,6 +67,7 @@
 </Menu>
 <Menu name="popup_locals">
   <Action name="watch_expression"/>
+  <Action name="edit_value"/>
 </Menu>
 <ToolBar name="mainToolBar">
   <Action name="file_reload"/>

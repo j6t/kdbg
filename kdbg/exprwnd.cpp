@@ -242,7 +242,8 @@ TypeInfo* VarTree::inferTypeFromBaseClass()
 
 ExprWnd::ExprWnd(QWidget* parent, const char* name) :
 	KTreeView(parent, name),
-	maxValueWidth(0)
+	maxValueWidth(0),
+	m_edit(this)
 {
     setNumCols(2);
     
@@ -674,4 +675,95 @@ bool ExprWnd::getMaxValueWidth(KTreeViewItem* item, void* user)
 void ExprWnd::slotExpandOrCollapse(int)
 {
     updateValuesWidth();
+}
+
+void ExprWnd::editValue(int row, const QString& text)
+{
+    int x;
+    colXPos(1, &x);
+    int y;
+    rowYPos(row, &y);
+    int w = cellWidth(1);
+    int h = cellHeight(row);
+
+    QRect rect(x,y, w,h);
+    m_edit.setText(text);
+
+    m_edit.setGeometry(rect);
+    m_edit.m_finished = false;
+    m_edit.m_row = row;
+    m_edit.show();
+    m_edit.setFocus();
+}
+
+bool ExprWnd::isEditing() const
+{
+    return m_edit.isVisible();
+}
+
+
+ValueEdit::ValueEdit(ExprWnd* parent) :
+	QLineEdit(parent, "valueedit")
+{
+    setFrame(false);
+    hide();
+    lower();	// lower the window below scrollbars
+    connect(parent, SIGNAL(selected(int)), SLOT(slotSelectionChanged()));
+    connect(parent, SIGNAL(collapsed(int)), SLOT(slotSelectionChanged()));
+    connect(parent, SIGNAL(expanded(int)), SLOT(slotSelectionChanged()));
+    connect(this, SIGNAL(done(int, const QString&)),
+	    parent, SIGNAL(editValueCommitted(int, const QString&)));
+}
+
+ValueEdit::~ValueEdit()
+{
+}
+
+void ValueEdit::terminate(bool commit)
+{
+    TRACE(commit?"ValueEdit::terminate(true)":"ValueEdit::terminate(false)");
+    if (!m_finished)
+    {
+	m_finished = true;
+	hide();	// will call focusOutEvent, that's why we need m_finished
+	if (commit) {
+	    emit done(m_row, text());
+	}
+    }
+}
+
+void ValueEdit::keyPressEvent(QKeyEvent *e)
+{
+    if(e->key() == Qt::Key_Return || e->key() == Qt::Key_Enter)
+	terminate(true);
+    else if(e->key() == Qt::Key_Escape)
+	terminate(false);
+    else
+	QLineEdit::keyPressEvent(e);
+}
+
+void ValueEdit::paintEvent(QPaintEvent* e)
+{
+    QLineEdit::paintEvent(e);
+
+    QPainter p(this);
+    p.drawRect(rect());
+}
+
+void ValueEdit::focusOutEvent(QFocusEvent* ev)
+{
+    TRACE("ValueEdit::focusOutEvent");
+    QFocusEvent* focusEv = static_cast<QFocusEvent*>(ev);
+    // Don't let a RMB close the editor
+    if (focusEv->reason() != QFocusEvent::Popup &&
+	focusEv->reason() != QFocusEvent::ActiveWindow)
+    {
+	terminate(true);
+    }
+}
+
+void ValueEdit::slotSelectionChanged()
+{   
+    TRACE("ValueEdit::slotSelectionChanged");
+    terminate(false);
 }

@@ -54,6 +54,8 @@ KDebugger::KDebugger(QWidget* parent,
 	    SLOT(slotLocalsExpanding(KTreeViewItem*,bool&)));
     connect(&m_watchVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
 	    SLOT(slotWatchExpanding(KTreeViewItem*,bool&)));
+    connect(&m_localVariables, SIGNAL(editValueCommitted(int, const QString&)),
+	    SLOT(slotLocalsValueEdited(int, const QString&)));
 
     connect(&m_btWindow, SIGNAL(highlighted(int)), SLOT(gotoFrame(int)));
 
@@ -931,6 +933,8 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     switch (cmd->m_cmd) {
     case DCtargetremote:
 	// the output (if any) is uninteresting
+    case DCsetvariable:
+	// the output is an error message that we should display
     case DCsetargs:
     case DCtty:
 	// there is no output
@@ -2203,6 +2207,27 @@ void KDebugger::handleSetPC(const char* /*output*/)
     // now go to the top-most frame
     // this also modifies the program counter indicator in the UI
     gotoFrame(0);
+}
+
+void KDebugger::editLocalValue(int row)
+{
+    if (m_localVariables.isEditing())	/* don't edit twice */
+	return;
+
+    // determine the text to edit
+    VarTree* expr = static_cast<VarTree*>(m_localVariables.itemAt(row));
+    QString text = m_d->editableValue(expr);
+    m_localVariables.editValue(row, text);
+}
+
+void KDebugger::slotLocalsValueEdited(int row, const QString& text)
+{
+    TRACE(QString().sprintf("Changing value at row %d to ", row) + text);
+
+    // determine the lvalue to edit
+    VarTree* expr = static_cast<VarTree*>(m_localVariables.itemAt(row));
+    QString lvalue = expr->computeExpr();
+    m_d->executeCmd(DCsetvariable, lvalue, text);
 }
 
 

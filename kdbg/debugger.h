@@ -308,6 +308,9 @@ public:
     /** Returns the pid that the debugger is currently attached to. */
     const QString& attachedPid() const { return m_attachedPid; }
 
+    /** Edit a value */
+    void editLocalValue(int row);
+
     /**
      * The memory at that the expression evaluates to is watched. Can be
      * empty. Triggers a redisplay even if the expression did not change.
@@ -415,6 +418,7 @@ protected slots:
     void slotDeleteWatch();
     void slotValuePopup(const QString&);
     void slotDisassemble(const QString&, int);
+    void slotLocalsValueEdited(int, const QString&);
 public slots:
     void setThread(int);
     void shutdown();

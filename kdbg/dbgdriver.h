@@ -89,7 +89,8 @@ enum DbgCommand {
 	DCinfobreak,
 	DCcondition,
 	DCsetpc,
-	DCignore
+	DCignore,
+	DCsetvariable
 };
 
 enum RunDevNull {
@@ -509,6 +510,11 @@ public:
      * otherwise it contains an error message.
      */
     virtual QString parseMemoryDump(const char* output, QList<MemoryDump>& memdump) = 0;
+
+    /**
+     * Returns a value that the user can edit.
+     */
+    virtual QString editableValue(VarTree* value);
 
 protected:
     /** Removes all commands from the low-priority queue. */

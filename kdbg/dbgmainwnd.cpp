@@ -294,6 +294,9 @@ void DebuggerMainWnd::initKAction()
     (void)new KAction(i18n("Watch Expression"), 0, this,
                       SLOT(slotLocalsToWatch()), actionCollection(),
                       "watch_expression");
+    (void)new KAction(i18n("Edit Value"), Key_F2, this,
+		      SLOT(slotEditValue()), actionCollection(),
+		      "edit_value");
 
     (void)new KActionMenu(i18n("&Window"), actionCollection(), "window");
 
@@ -430,6 +433,7 @@ void DebuggerMainWnd::updateUI()
     actionCollection()->action("exec_kill")->setEnabled(m_debugger->haveExecutable() && m_debugger->isProgramActive());
     actionCollection()->action("exec_break")->setEnabled(m_debugger->isProgramRunning());
     actionCollection()->action("exec_arguments")->setEnabled(m_debugger->haveExecutable());
+    actionCollection()->action("edit_value")->setEnabled(m_debugger->canSingleStep());
 
     // update statusbar
     QString newStatus;
@@ -732,6 +736,18 @@ void DebuggerMainWnd::slotLocalsToWatch()
     if (idx >= 0 && m_debugger != 0) {
 	QString text = m_localVariables->exprStringAt(idx);
 	m_debugger->addWatch(text);
+    }
+}
+
+/*
+ * Starts editing a value in a value display
+ */
+void DebuggerMainWnd::slotEditValue()
+{
+    int idx = m_localVariables->currentItem();
+    if (idx >= 0 && m_debugger != 0 && m_debugger->canSingleStep()) {
+	TRACE("edit value");
+	m_debugger->editLocalValue(idx);
     }
 }
 

@@ -7,6 +7,7 @@
 #define EXPRWND_H
 
 #include "ktreeview.h"
+#include <qlineedit.h>
 #include <qptrlist.h>
 #include <qstrlist.h>
 
@@ -50,6 +51,30 @@ public:
     TypeInfo* inferTypeFromBaseClass();
 };
 
+
+class ExprWnd;
+
+class ValueEdit : public QLineEdit
+{
+    Q_OBJECT
+public:
+    ValueEdit(ExprWnd* parent);
+    ~ValueEdit();
+
+    void terminate(bool commit);
+    int m_row;
+    bool m_finished;
+protected:
+    void keyPressEvent(QKeyEvent *e);
+    void focusOutEvent(QFocusEvent* ev);
+    void paintEvent(QPaintEvent* e);
+public slots:
+    void slotSelectionChanged();
+signals:
+    void done(int, const QString&);
+};
+
+
 class ExprWnd : public KTreeView
 {
     Q_OBJECT
@@ -80,6 +105,9 @@ public:
     VarTree* nextUpdatePtr();
     VarTree* nextUpdateType();
     VarTree* nextUpdateStruct();
+    void editValue(int row, const QString& text);
+    /** tells whether the a value is currently edited */
+    bool isEditing() const;
 
 protected:
     bool updateExprRec(VarTree* display, VarTree* newValues);
@@ -97,11 +125,16 @@ protected:
     QList<VarTree> m_updateType;	/* structs whose type must be determined */
     QList<VarTree> m_updateStruct;	/* structs whose nested value needs update */
 
+    ValueEdit m_edit;
+
     /** remove items that are in the subTree from the list */
     static void sweepList(QList<VarTree>& list, VarTree* subTree);
 
 protected slots:
     void slotExpandOrCollapse(int);
+
+signals:
+    void editValueCommitted(int, const QString&);
 };
 
 #endif // EXPRWND_H
