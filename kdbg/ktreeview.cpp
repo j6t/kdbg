@@ -91,7 +91,7 @@ KTreeViewItem::~KTreeViewItem()
 void KTreeViewItem::appendChild(KTreeViewItem* newChild)
 {
     newChild->parent = this;
-    newChild->owner = owner;
+    newChild->setOwner(owner);
     if (!getChild()) {
 	child = newChild;
     }
@@ -211,7 +211,6 @@ int KTreeViewItem::height() const
 }
 
 // returns the maximum height of text and pixmap including margins
-// or -1 if item is empty -- SHOULD NEVER BE -1!
 int KTreeViewItem::height(const QFontMetrics& fm) const
 {
     int maxHeight = pixmap.height();
@@ -228,7 +227,7 @@ void KTreeViewItem::insertChild(int index, KTreeViewItem* newChild)
 	return;
     }
     newChild->parent = this;
-    newChild->owner = owner;
+    newChild->setOwner(owner);
     if (index == 0) {
 	newChild->sibling = getChild();
 	child = newChild;
@@ -262,6 +261,16 @@ bool KTreeViewItem::isVisible() const
 	    return false;
     }
     return true;
+}
+
+bool KTreeViewItem::keyEvent(QKeyEvent* /*ev*/)
+{
+    return false;			/* not handled */
+}
+
+bool KTreeViewItem::mouseEvent(QMouseEvent* /*ev*/, const QPoint& /*itemCoord*/)
+{
+    return false;			/* not handled */
 }
 
 // paint this item, including tree branches and expand button
@@ -459,7 +468,7 @@ bool KTreeViewItem::removeChild(KTreeViewItem* theChild)
 	    prevItem->sibling = toRemove->getSibling();
 	}
 	numChildren--;
-	toRemove->owner = 0;
+	toRemove->setOwner(0);
     }
     assert((numChildren == 0) == (child == 0));
 
@@ -500,6 +509,17 @@ void KTreeViewItem::setDrawTree(bool doit)
 void KTreeViewItem::setExpanded(bool is)
 {
     expanded = is;
+}
+
+// sets the owner of this item and its children siblings
+void KTreeViewItem::setOwner(KTreeView* newOwner, bool includeSiblings)
+{
+    /* Note: set owner of children's siblings! */
+    owner = newOwner;
+    if (getChild())
+	getChild()->setOwner(newOwner, true);
+    if (includeSiblings && getSibling())
+	getSibling()->setOwner(newOwner, true);
 }
 
 // sets the item pixmap to the given pixmap
@@ -687,6 +707,15 @@ bool KTreeView::autoUpdate() const
 bool KTreeView::bottomScrollBar() const
 {
   return testTableFlags(Tbl_hScrollBar);
+}
+
+// translate mouse coord to cell coord
+QPoint KTreeView::cellCoords(int row, const QPoint& widgetCoord)
+{
+    int cellX = 0, cellY = 0;
+    colXPos(0, &cellX);
+    rowYPos(row, &cellY);
+    return QPoint(widgetCoord.x() - cellX, widgetCoord.y() - cellY);
 }
 
 // find item at specified index and change pixmap and/or text
@@ -1558,6 +1587,10 @@ void KTreeView::keyPressEvent(QKeyEvent* e)
     assert(currentItem() >= 0);		/* we need a current item */
     assert(itemAt(currentItem()) != 0);	/* we really need a current item */
 
+    // give currentItem a chance to handle the event
+    if (itemAt(currentItem())->keyEvent(e))
+	return;				/* handled */
+
     int pageSize, delta;
     KTreeViewItem* item;
     int key = e->key();
@@ -1637,6 +1670,13 @@ repeat:
     }
 }
 
+// handles keyboard interface
+void KTreeView::keyReleaseEvent(QKeyEvent* e)
+{
+    if (currentItem() >= 0 && itemAt(currentItem()) != 0)
+	itemAt(currentItem())->keyEvent(e);
+}
+
 int KTreeView::level(KTreeViewItem* item) const
 {
     assert(item != 0);
@@ -1669,89 +1709,92 @@ void KTreeView::lowerItem(KTreeViewItem *item)
 
 // handle mouse double click events by selecting the clicked item
 // and emitting the signal
-void KTreeView::mouseDoubleClickEvent(QMouseEvent *e)
+void KTreeView::mouseDoubleClickEvent(QMouseEvent* e)
 {
-  // find out which row has been clicked
-	
-  QPoint mouseCoord = e->pos();
-  int itemClicked = findRow(mouseCoord.y());
-  
-  // if a valid row was not clicked, do nothing
-  
-  if(itemClicked == -1) 
-    return;
+    // find out which row has been clicked
+    int itemClicked = findRow(e->y());
 
-  KTreeViewItem *item = itemAt(itemClicked);
-  if(!item) return;
-  
-  // translate mouse coord to cell coord
-  
-  int  cellX, cellY;
-  colXPos(0, &cellX);
-  rowYPos(itemClicked, &cellY);
-  QPoint cellCoord(mouseCoord.x() - cellX, mouseCoord.y() - cellY);
-  
-  // hit test item
+    if (itemClicked < 0)
+	return;				/* invalid row, do nothing */
 
+    KTreeViewItem* item = itemAt(itemClicked);
+    if (item == 0)
+	return;
+
+    // translate mouse coord to cell coord
+    QPoint cellCoord = cellCoords(itemClicked, e->pos());
+
+    // first ask item
+    if (item->mouseEvent(e, cellCoord))
+	return;
+
+    // hit test item
     int indent = indentation(item);
-  if(item->boundingRect(indent).contains(cellCoord))
-    emit selected(itemClicked);
+    if (item->boundingRect(indent).contains(cellCoord))
+	emit selected(itemClicked);
 }
 
 // handle mouse movement events
-void KTreeView::mouseMoveEvent(QMouseEvent *e)
+void KTreeView::mouseMoveEvent(QMouseEvent* e)
 {
-  // in rubberband_mode we actually scroll the window now
-  if (rubberband_mode) 
-	{
-	  move_rubberband(e->pos());
-	}
+    // in rubberband_mode we actually scroll the window now
+    if (rubberband_mode) {
+	move_rubberband(e->pos());
+    } else {
+	// else forward to current item
+	int current = currentItem();
+	if (current >= 0 && itemAt(current))
+	    itemAt(current)->mouseEvent(e, cellCoords(current, e->pos()));
+    }
 }
 
 
 // handle single mouse presses
-void KTreeView::mousePressEvent(QMouseEvent *e)
+void KTreeView::mousePressEvent(QMouseEvent* e)
 {
-    // first: check which button was pressed
+    /* first: cancel rubberbanding if it's on */
+    if (rubberband_mode)
+    {
+	// another button was pressed while rubberbanding, stop the move.
+	// RB: if we allow other buttons while rubberbanding the tree can expand
+	//     while rubberbanding - we then need to recalculate and resize the
+	//     rubberband rect and show the new size
+	end_rubberband();
+	return;
+    }
 
-    if (e->button() == MidButton) 
+    // find out which row has been clicked
+    int itemClicked = findRow(e->y());
+
+    // nothing to do if not on valid row
+    if (itemClicked < 0)
+	return;
+    KTreeViewItem* item = itemAt(itemClicked);
+    if (!item)
+	return;
+
+    // translate mouse coord to cell coord
+    QPoint cellCoord = cellCoords(itemClicked, e->pos());
+
+    // give the item a crack
+    if (item->mouseEvent(e, cellCoord))
+	return;				/* event eaten by item */
+
+    // check for rubberbanding
+    if (e->button() == MidButton)
     {
 	// RB: the MMB is hardcoded to the "rubberband" scroll mode
 	if (!rubberband_mode) {
 	    start_rubberband(e->pos());
 	}
 	return;
-    } 
-    else if (rubberband_mode) 
-    {
-	// another button was pressed while rubberbanding, stop the move.
-	// RB: if we allow other buttons while rubberbanding the tree can expand
-	//     while rubberbanding - we then need to reclaculate and resize the
-	//     rubberband rect and show the new size
-	end_rubberband();
-	return;  // should we process the button press?
     }
 
-    // find out which row has been clicked
-    QPoint mouseCoord = e->pos();
-    int itemClicked = findRow(mouseCoord.y());
-
-    // nothing to do if not on valid row  
-    if (itemClicked == -1)
-	return;
-
-    KTreeViewItem* item = itemAt(itemClicked);
-    if (!item)
-	return;
-
-    // translate mouse coord to cell coord
-    int  cellX, cellY;
-    colXPos(0, &cellX);
-    rowYPos(itemClicked, &cellY);
-    QPoint cellCoord(mouseCoord.x() - cellX, mouseCoord.y() - cellY);
-
+    if (e->button() == RightButton) {
+	emit rightPressed(itemClicked, e->pos());
+    }
     /* hit test expand button (doesn't set currentItem) */
-    if (item->expandButtonClicked(cellCoord)) {
+    else if (item->expandButtonClicked(cellCoord)) {
 	if (item->isExpanded()) {
 	    collapseSubTree(item, true);
 	} else {
@@ -1768,11 +1811,16 @@ void KTreeView::mousePressEvent(QMouseEvent *e)
 // handle mouse release events
 void KTreeView::mouseReleaseEvent(QMouseEvent *e)
 {
-  /* if it's the MMB end rubberbanding */
-  if (rubberband_mode && e->button()==MidButton) 
-	{
-	  end_rubberband();
-	}
+    /* if it's the MMB end rubberbanding */
+    if (rubberband_mode) {
+	if (e->button() == MidButton)
+	    end_rubberband();
+	return;
+    }
+    // forward to current item
+    int current = currentItem();
+    if (current >= 0 && itemAt(current))
+	itemAt(current)->mouseEvent(e, cellCoords(current, e->pos()));
 }
 
 // rubberband move: draw the rubberband
@@ -2029,6 +2077,14 @@ void KTreeView::updateCellWidth()
     forEveryVisibleItem(&KTreeView::getMaxItemWidth, &maxW);
     maxItemWidth = maxW;
     updateTableSize();
+
+    // correct offsets
+    int xoff = xOffset();
+    int yoff = yOffset();
+    if (xoff > maxXOffset()) xoff = maxXOffset();
+    if (yoff > maxYOffset()) yoff = maxYOffset();
+
+    setOffset(xoff, yoff);
 }
 
 void KTreeView::updateVisibleItems()

@@ -75,7 +75,7 @@ public:
      * administrative data in newChild except for its parent (which is this
      * item) and owner.
      */
-    void appendChild(KTreeViewItem* newChild);
+    virtual void appendChild(KTreeViewItem* newChild);
 
     /**
      * Returns a pointer to the child item at the given index in this
@@ -160,7 +160,7 @@ public:
      * @param index specifies the index of a direct child of this item
      * @param newChild specifies the new item to insert
      */
-    void insertChild(int index, KTreeViewItem* newChild);
+    virtual void insertChild(int index, KTreeViewItem* newChild);
 
     /**
      * Indicates whether the item is expanded, that is, whether the child
@@ -186,7 +186,7 @@ public:
      * false is returned. This function does not update the owning
      * KTreeView.
      */
-    bool removeChild(KTreeViewItem* child);
+    virtual bool removeChild(KTreeViewItem* child);
 
     /**
      * Sets the delayed-expanding flag. If this flag is true, the signal
@@ -203,25 +203,42 @@ public:
      */
     void setDeleteChildren(bool flag);
 
-    void setDrawExpandButton(bool doit);
+    /**
+     * Tells the item whether it should draw the expand button. The default
+     * is true. This function does not update the owning tree widget.
+     */
+    virtual void setDrawExpandButton(bool doit);
 
-    void setDrawText(bool doit);
+    /**
+     * Tells the item whether it should paint the text. The default is
+     * true. This function does not update the owning tree widget.
+     */
+    virtual void setDrawText(bool doit);
 
-    void setDrawTree(bool doit);
+    /**
+     * Tells the item whether it should draw the tree lines. The default is
+     * true. This function does not update the owning tree widget.
+     */
+    virtual void setDrawTree(bool doit);
 
-    void setExpanded(bool is);
+    /**
+     * Tells whether the item is expanded (i.e. whether its children are
+     * visible). The default is false. This function does not update the
+     * owning tree widget.
+     */
+    virtual void setExpanded(bool is);
 
     /**
      * Sets the item pixmap to the given pixmap. It does not redraw the
      * item or update the owning KTreeView.
      */
-    void setPixmap(const QPixmap& pm);
+    virtual void setPixmap(const QPixmap& pm);
 
     /**
      * Sets the item text. This function does not redraw the item or update
      * the owning KTreeView.
      */
-     void setText(const QString& t);
+    virtual void setText(const QString& t);
 
 protected:
     /**
@@ -240,6 +257,33 @@ protected:
      * metrics.
      */
     virtual int height(const QFontMetrics& fm) const;
+
+    /*
+     * The item is given a chance to process key events before the owning
+     * KTreeView processes the event.
+     * 
+     * @param ev specifies the key event; use ev->type() to find out whether
+     * this is a key down or up event (see @ref #QEvent).
+     * @return true if the event has been processed, false if it has not
+     * been processed. The default implementation just returns false to
+     * indicate that the event has not been processed.
+     */
+    virtual bool keyEvent(QKeyEvent* ev);
+
+    /*
+     * The item is given a chance to process mouse events before the owning
+     * KTreeView processes the event.
+     *
+     * @param ev specifies the mouse event; use ev->type() to find out whether
+     * this is a mouse press, release, double click, or move event (see
+     * @ref #QEvent).
+     * @param itemCoord specifies the mouse even coordinates relative to this
+     * item (the coordinates in ev are the original coordinates).
+     * @return true if the event has been processed, false if it has not
+     * been processed. The default implementation just returns false to
+     * indicate that the event has not been processed.
+     */
+    virtual bool mouseEvent(QMouseEvent* ev, const QPoint& itemCoord);
 
     /**
      * Paints the item: pixmap, text, expand button, parent branches
@@ -271,6 +315,12 @@ protected:
      */
     virtual void paintTree(QPainter* p, int indent, int cellHeight,
 			   const QColorGroup& cg) const;
+
+    /**
+     * Internal function that updates the owner of this item and its
+     * children and siblings (the latter only if requested).
+     */
+    void setOwner(KTreeView* newOwner, bool includeSiblings = false);
 
     /**
      * Internal function that counts the number of child items.
@@ -438,6 +488,16 @@ public:
 	horizontal scroll bar.
 	*/
   bool bottomScrollBar() const;
+
+    /**
+     * Computes coordinates relative to the specified row from the given
+     * coordinates. If the row is invalid, the input coordinates are
+     * returned unchanged.
+     * 
+     * @param widget specifies widget coordinates (e.g. from a mouse event)
+     * @return coordinates relative to the specified cell
+     */
+    virtual QPoint cellCoords(int row, const QPoint& widgetCoord);
 
   /**
 	Changes the text and/or pixmap of the given item at the specified
@@ -875,6 +935,16 @@ signals:
     void highlighted(int index);
 
     /**
+     * This signal is emitted when the user right-clicks.
+     * 
+     * @param index the row index of where the click occurred; it is -1 if
+     * the click was not on an item.
+     * @param pt the location (in widget coordinates) where the mouse click
+     * happened.
+     */
+    void rightPressed(int index, const QPoint& pt);
+
+    /**
      * This signal is emitted when an item in the tree is selected.
      * 
      * @param index the row index of the selected item.
@@ -966,13 +1036,53 @@ protected:
     void itemPath(KTreeViewItem* item, KPath& path) const;
 
   void join(KTreeViewItem *item);
-  virtual void keyPressEvent(QKeyEvent *e);
+
+    /**
+     * Reimplemented for key handling. If there are any items in the
+     * KTreeView, but there is no current item, the topmost item is made
+     * current. The key press event is first forwarded to the current item
+     * by calling @ref #KTreeViewItem::keyEvent.
+     */
+    virtual void keyPressEvent(QKeyEvent* e);
+
+    /**
+     * The key release event is first forwarded to the current item (if
+     * there is one) by calling @ref #KTreeViewItem::keyEvent.
+     */
+    virtual void keyReleaseEvent(QKeyEvent* e);
+
     int level(KTreeViewItem* item) const;
   void lowerItem(KTreeViewItem *item);
-  virtual void mouseDoubleClickEvent(QMouseEvent *e);
-  virtual void mouseMoveEvent(QMouseEvent *e);
-  virtual void mousePressEvent(QMouseEvent *e);
-  virtual void mouseReleaseEvent(QMouseEvent *e);
+
+    /**
+     * Reimplemented for mouse event handling. The mouse double click event
+     * is first forwarded to the item that has been clicked on (if there is
+     * one) by calling @ref #KTreeViewItem::mouseEvent.
+     */
+    virtual void mouseDoubleClickEvent(QMouseEvent* e);
+
+    /**
+     * Reimplemented for mouse event handling. The mouse move event is
+     * first forwarded to the current item (if there is one) by calling
+     * @ref #KTreeViewItem::mouseEvent.
+     */
+    virtual void mouseMoveEvent(QMouseEvent* e);
+
+    /**
+     * Reimplemented for mouse event handling. The mouse press event is
+     * first forwarded to the item that has been clicked on (if there is
+     * one) by calling @ref #KTreeViewItem::mouseEvent. The clicked on item
+     * is made the current item.
+     */
+    virtual void mousePressEvent(QMouseEvent* e);
+
+    /**
+     * Reimplemented for mouse event handling. The mouse release event is
+     * first forwarded to the current item (if there is one) by calling
+     * @ref #KTreeViewItem::mouseEvent.
+     */
+    virtual void mouseReleaseEvent(QMouseEvent* e);
+
   virtual void paintCell(QPainter *p, int row, int col);
     /*
      * virtual void paintItem(QPainter *p, KTreeViewItem *item, 
