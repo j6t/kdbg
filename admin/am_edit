@@ -1460,6 +1460,9 @@ sub tag_DIST () {
         $foundfiles{$file} = 0 if (defined $foundfiles{$file});
     }
 
+    # don't distribute programs and libraries
+    $foundfiles{$realname{$_}} = 0 foreach @programs;
+
     my $KDE_DIST = "";
     foreach $file (keys %foundfiles) {
         if ($foundfiles{$file} == 1) {
