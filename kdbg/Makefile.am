@@ -86,6 +86,7 @@ XPMS = \
 	pgmnext.xpm \
 	pgmrun.xpm \
 	pgmstep.xpm \
+	execopen.xpm \
 	brkena.xpm \
 	brkdis.xpm \
 	brktmp.xpm \
