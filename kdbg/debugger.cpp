@@ -1800,18 +1800,24 @@ Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo,
     // not found, so try basename
     // strip off directory part of file name
     int offset = file.findRev("/");
-    if (offset < 0) {
-	// that was already the basename, no need to scan the list again
-	return 0;
-    }
 #if QT_VERSION < 200
     file.detach();
 #endif
     file.remove(0, offset+1);
 
     for (i = m_brkpts.size()-1; i >= 0; i--) {
+	// get base name of breakpoint's file
+	QString basename = m_brkpts[i]->fileName;
+	int offset = basename.findRev("/");
+	if (offset >= 0) {
+#if QT_VERSION < 200
+	    basename.detach();
+#endif
+	    basename.remove(0, offset+1);
+	}
+
 	if (m_brkpts[i]->lineNo == lineNo &&
-	    m_brkpts[i]->fileName == file &&
+	    basename == file &&
 	    (address.isEmpty() || m_brkpts[i]->address == address))
 	{
 	    return m_brkpts[i];
