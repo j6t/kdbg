@@ -4,6 +4,7 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include <qsocketnotifier.h>
+#include <qpopupmenu.h>
 #include "ttywnd.h"
 #if QT_VERSION >= 200
 #include <kglobal.h>
@@ -149,7 +150,8 @@ TTYWindow::TTYWindow(QWidget* parent, const char* name) :
     setFocusPolicy(StrongFocus);
 
     // create a context menu
-    m_popmenu.insertItem(i18n("&Clear"), this, SLOT(clear()));
+    m_popmenu = new QPopupMenu;
+    m_popmenu->insertItem(i18n("&Clear"), this, SLOT(clear()));
 }
 
 TTYWindow::~TTYWindow()
@@ -231,10 +233,10 @@ void TTYWindow::mousePressEvent(QMouseEvent* mouseEvent)
     // Check if right button was clicked.
     if (mouseEvent->button() == RightButton)
     {
-	if (m_popmenu.isVisible()) {
-	    m_popmenu.hide();
+	if (m_popmenu->isVisible()) {
+	    m_popmenu->hide();
 	} else {
-	    m_popmenu.popup(mapToGlobal(mouseEvent->pos()));
+	    m_popmenu->popup(mapToGlobal(mouseEvent->pos()));
 	}
     } else {
 	QWidget::mousePressEvent(mouseEvent);

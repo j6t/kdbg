@@ -7,9 +7,9 @@
 #define TTYWND_H
 
 #include <textvw.h>
-#include <qpopupmenu.h>
 
 class QSocketNotifier;
+class QPopupMenu;
 
 /**
  * This class is cortesy Judin Max <novaprint@mtu-net.ru>.
@@ -57,7 +57,7 @@ public:
 
 protected:
     STTY* m_tty;
-    QPopupMenu m_popmenu;
+    QPopupMenu* m_popmenu;
     virtual void mousePressEvent(QMouseEvent* mouseEvent);
 
 protected slots:
