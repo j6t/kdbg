@@ -59,6 +59,7 @@ KDebugger::KDebugger(const char* name) :
 	m_gdbOutputLen(0),
 	m_gdbOutputAlloc(0),
 	m_activeCmd(0),
+	m_delayedPrintThis(false),
 	m_haveExecutable(false),
 	m_programActive(false),
 	m_programRunning(false),
@@ -275,37 +276,38 @@ void KDebugger::menuCallback(int item)
 	enableStatusBar();
 	break;
     case ID_PROGRAM_RUN:
-	if (m_haveExecutable && m_state == DSidle) {
+	if (isReady()) {
 	    if (m_programActive) {
 		// gdb command: continue
-		enqueueCmd(DCcont, "cont");
+		executeCmd(DCcont, "cont", true);
 	    } else {
 		// gdb command: run
-		enqueueCmd(DCrun, "run " + m_programArgs);
+		executeCmd(DCrun, "run " + m_programArgs, true);
+		m_programActive = true;
 	    }
-	    m_programActive = true;
+	    m_programRunning = true;
 	}
 	break;
     case ID_PROGRAM_STEP:
-	if (m_haveExecutable && m_state == DSidle && m_programActive) {
-	    enqueueCmd(DCstep, "step");
-	    m_programActive = true;
+	if (isReady() && m_programActive && !m_programRunning) {
+	    executeCmd(DCstep, "step", true);
+	    m_programRunning = true;
 	}
 	break;
     case ID_PROGRAM_NEXT:
-	if (m_haveExecutable && m_state == DSidle && m_programActive) {
-	    enqueueCmd(DCnext, "next");
-	    m_programActive = true;
+	if (isReady() && m_programActive && !m_programRunning) {
+	    executeCmd(DCnext, "next", true);
+	    m_programRunning = true;
 	}
 	break;
     case ID_PROGRAM_FINISH:
-	if (m_haveExecutable && m_state == DSidle && m_programActive) {
-	    enqueueCmd(DCfinish, "finish");
-	    m_programActive = true;
+	if (isReady() && m_programActive && !m_programRunning) {
+	    executeCmd(DCfinish, "finish", true);
+	    m_programRunning = true;
 	}
 	break;
     case ID_PROGRAM_UNTIL:
-	if (m_haveExecutable && m_state == DSidle && m_programActive) {
+	if (isReady() && m_programActive && !m_programRunning) {
 	    QString file;
 	    int lineNo;
 	    if (m_filesWindow.activeLine(file, lineNo)) {
@@ -317,8 +319,8 @@ void KDebugger::menuCallback(int item)
 		}
 		QString cmdString(file.length() + 30);
 		cmdString.sprintf("until %s:%d", file.data(), lineNo+1);
-		enqueueCmd(DCuntil, cmdString);
-		m_programActive = true;
+		executeCmd(DCuntil, cmdString, true);
+		m_programRunning = true;
 	    }
 	}
 	break;
@@ -339,7 +341,7 @@ void KDebugger::menuCallback(int item)
 	break;
     case ID_BRKPT_SET:
     case ID_BRKPT_TEMP:
-	if (m_haveExecutable && m_state == DSidle) {
+	if (isReady()) {
 	    QString file;
 	    int lineNo;
 	    if (m_filesWindow.activeLine(file, lineNo)) {
@@ -348,7 +350,7 @@ void KDebugger::menuCallback(int item)
 	}
 	break;
     case ID_BRKPT_ENABLE:
-	if (m_haveExecutable && m_state == DSidle) {
+	if (isReady()) {
 	    QString file;
 	    int lineNo;
 	    if (m_filesWindow.activeLine(file, lineNo)) {
@@ -368,12 +370,6 @@ void KDebugger::menuCallback(int item)
 	emit forwardMenuCallback(item);
     }
     emit updateUI();
-}
-
-// helper to work around Qt bug that exits app after user called menu
-void KDebugger::menuCallbackExecutable()
-{
-    menuCallback(ID_FILE_EXECUTABLE);
 }
 
 void KDebugger::updateUI()
@@ -416,10 +412,10 @@ void KDebugger::updateUIItem(UpdateUI* item)
     case ID_PROGRAM_NEXT:
     case ID_PROGRAM_FINISH:
     case ID_PROGRAM_UNTIL:
-	item->enable(m_haveExecutable && m_programActive && m_state == DSidle);
+	item->enable(isReady() && m_programActive && !m_programRunning);
 	break;
     case ID_PROGRAM_RUN:
-	item->enable(m_haveExecutable && m_state == DSidle);
+	item->enable(isReady());
 	break;
     case ID_PROGRAM_BREAK:
 	item->enable(m_haveExecutable && m_programRunning);
@@ -428,10 +424,10 @@ void KDebugger::updateUIItem(UpdateUI* item)
 	item->enable(m_haveExecutable);
     case ID_BRKPT_SET:
     case ID_BRKPT_TEMP:
-	item->enable(m_haveExecutable && m_state == DSidle);
+	item->enable(isReady());
 	break;
     case ID_BRKPT_ENABLE:
-	item->enable(m_haveExecutable && m_state == DSidle);
+	item->enable(isReady());
 	break;
     case ID_BRKPT_LIST:
 	item->setCheck(m_bpTable.isVisible());
@@ -534,13 +530,18 @@ void KDebugger::initToolbar()
     m_statusbar.insertItem("", ID_STATUS_MSG);	/* message pane */
 }
 
+bool KDebugger::isThisPaneVisible()
+{
+    return m_frameVariables.isTabEnabled("this");
+}
+
 
 //////////////////////////////////////////////////////////
 // debugger driver
 
-#define PROMPT "#kdbg%"
+#define PROMPT "(kdbg)"
 #define PROMPT_LEN 6
-#define PROMPT_LAST_CHAR '%'		/* needed when searching for prompt string */
+#define PROMPT_LAST_CHAR ')'		/* needed when searching for prompt string */
 
 bool KDebugger::startGdb()
 {
@@ -562,8 +563,8 @@ bool KDebugger::startGdb()
 
     // change prompt string and synchronize with gdb
     m_state = DSidle;
-    enqueueCmd(DCinitialize, "set prompt " PROMPT);
-    enqueueCmd(DCnoconfirm, "set confirm off");
+    executeCmd(DCinitialize, "set prompt " PROMPT);
+    executeCmd(DCnoconfirm, "set confirm off");
 
     // create an output window
     if (!createOutputWindow()) {
@@ -572,7 +573,7 @@ bool KDebugger::startGdb()
     }
     TRACE("successfully created output window");
 
-    enqueueCmd(DCtty, "tty " + m_outputTermName);
+    executeCmd(DCtty, "tty " + m_outputTermName);
 
     return true;
 }
@@ -709,7 +710,7 @@ bool KDebugger::debugProgram(const QString& name)
     }
 
     TRACE("before file cmd");
-    enqueueCmd(DCexecutable, "file " + name);
+    executeCmd(DCexecutable, "file " + name);
     m_executable = name;
 
     // create the program settings object
@@ -753,17 +754,68 @@ void KDebugger::restoreProgramSettings()
 }
 
 
-KDebugger::CmdQueueItem* KDebugger::enqueueCmd(KDebugger::DbgCommand cmd,
-					       QString cmdString, bool checkRunning)
+KDebugger::CmdQueueItem* KDebugger::executeCmd(KDebugger::DbgCommand cmd,
+					       QString cmdString, bool clearLow)
 {
-    // if checkRunning, report error if no executable or debugger not idle
-    if (checkRunning && !(m_haveExecutable && m_state == DSidle)) {
-	return 0;
+    // place a new command into the high-priority queue
+    CmdQueueItem* cmdItem = new CmdQueueItem(cmd, cmdString + "\n");
+    m_hipriCmdQueue.enqueue(cmdItem);
+
+    if (clearLow) {
+	if (m_state == DSrunningLow) {
+	    // take the liberty to interrupt the running command
+	    m_state = DSinterrupted;
+	    m_gdb.kill(SIGINT);
+	    ASSERT(m_activeCmd != 0);
+	    TRACE(QString().sprintf("interrupted the command %d",
+		  (m_activeCmd ? m_activeCmd->m_cmd : -1)));
+	    delete m_activeCmd;
+	    m_activeCmd = 0;
+	}
+	while (!m_lopriCmdQueue.isEmpty()) {
+	    delete m_lopriCmdQueue.take(0);
+	}
+    }
+    // if gdb is idle, send it the command
+    if (m_state == DSidle) {
+	ASSERT(m_activeCmd == 0);
+	writeCommand();
     }
 
-    // place a new command into the queue
-    CmdQueueItem* cmdItem = new CmdQueueItem(cmd, cmdString + "\n");
-    m_cmdQueue.enqueue(cmdItem);
+    return cmdItem;
+}
+
+KDebugger::CmdQueueItem* KDebugger::queueCmd(KDebugger::DbgCommand cmd,
+					     QString cmdString, QueueMode mode)
+{
+    // place a new command into the low-priority queue
+    cmdString.detach();
+    cmdString += "\n";
+
+    CmdQueueItem* cmdItem = 0;
+    switch (mode) {
+    case QMoverrideMoreEqual:
+    case QMoverride:
+	// check whether there is already the same command in the queue
+	for (cmdItem = m_lopriCmdQueue.first(); cmdItem != 0; cmdItem = m_lopriCmdQueue.next()) {
+	    if (cmdItem->m_cmd == cmd && cmdItem->m_cmdString == cmdString)
+		break;
+	}
+	if (cmdItem != 0) {
+	    // found one
+	    if (mode == QMoverrideMoreEqual) {
+		// All commands are equal, but some are more equal than others...
+		// put this command in front of all others
+		m_lopriCmdQueue.take();
+		m_lopriCmdQueue.insert(0, cmdItem);
+	    }
+	    break;
+	} // else none found, so add it
+	// drop through
+    case QMnormal:
+	cmdItem = new CmdQueueItem(cmd, cmdString);
+	m_lopriCmdQueue.append(cmdItem);
+    }
 
     // if gdb is idle, send it the command
     if (m_state == DSidle) {
@@ -777,12 +829,25 @@ KDebugger::CmdQueueItem* KDebugger::enqueueCmd(KDebugger::DbgCommand cmd,
 // dequeue a pending command, make it the active one and send it to gdb
 void KDebugger::writeCommand()
 {
-    ASSERT(m_activeCmd == 0);
+//    ASSERT(m_activeCmd == 0);
+    assert(m_activeCmd == 0);
 
-    CmdQueueItem* cmd = m_cmdQueue.dequeue();
+    // first check the high-priority queue - only if it is empty
+    // use a low-priority command.
+    CmdQueueItem* cmd = m_hipriCmdQueue.dequeue();
+    DebuggerState newState = DScommandSent;
+    if (cmd == 0) {
+	cmd = m_lopriCmdQueue.first();
+	m_lopriCmdQueue.removeFirst();
+	newState = DScommandSentLow;
+    }
+    if (cmd == 0) {
+	// nothing to do
+	m_state = DSidle;		/* is necessary if command was interrupted earlier */
+	return;
+    }
+
     m_activeCmd = cmd;
-    ASSERT(cmd != 0);
-    if (cmd == 0) return;		/* paranoia */
     TRACE("in writeCommand: " + cmd->m_cmdString);
 
     const char* str = cmd->m_cmdString;
@@ -792,7 +857,7 @@ void KDebugger::writeCommand()
     m_logFile.writeBlock(str, cmd->m_cmdString.length());
     m_logFile.flush();
 
-    m_state = DScommandSent;
+    m_state = newState;
 }
 
 void KDebugger::commandRead(KProcess*)
@@ -800,7 +865,7 @@ void KDebugger::commandRead(KProcess*)
     TRACE(__PRETTY_FUNCTION__);
 
     // there must be an active command which is not yet commited
-    ASSERT(m_state == DScommandSent);
+    ASSERT(m_state == DScommandSent || m_state == DScommandSentLow);
     ASSERT(m_activeCmd != 0);
     ASSERT(!m_activeCmd->m_cmdString.isEmpty());
 
@@ -808,7 +873,7 @@ void KDebugger::commandRead(KProcess*)
     m_activeCmd->m_cmdString = "";
 
     // now the debugger is officially working on the command
-    m_state = DSrunning;
+    m_state = m_state == DScommandSent ? DSrunning : DSrunningLow;
 
     // set the flag that reflects whether the program is really running
     switch (m_activeCmd->m_cmd) {
@@ -847,7 +912,7 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
      * wroteStdin signal yet, in which case there must be an active command
      * which is not commited.
      */
-    if (m_state == DScommandSent) {
+    if (m_state == DScommandSent || m_state == DScommandSentLow) {
 	ASSERT(m_activeCmd != 0);
 	ASSERT(!m_activeCmd->m_cmdString.isEmpty());
 	/*
@@ -864,14 +929,14 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
      * The user haltet kdbg with Ctrl-Z, then continues it with "fg", which
      * also continues gdb, which repeats the prompt!
      */
-    if (m_activeCmd == 0) {
+    if (m_activeCmd == 0 && m_state != DSinterrupted) {
 	// ignore the output
-	TRACE("ignoring stray output: " + QString(buffer, buflen));
+	TRACE("ignoring stray output: " + QString(buffer, buflen+1));
 	ASSERT(buflen >= PROMPT_LEN && strncmp(buffer, PROMPT, PROMPT_LEN) == 0);
 	return;
     }
-    ASSERT(m_state == DSrunning);
-    ASSERT(m_activeCmd != 0);
+    ASSERT(m_state == DSrunning || m_state == DSrunningLow || m_state == DSinterrupted);
+    ASSERT(m_activeCmd != 0 || m_state == DSinterrupted);
 
     // collect output until next prompt string is found
     
@@ -912,10 +977,15 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
 	// terminate output before the prompt
 	m_gdbOutput[m_gdbOutputLen-PROMPT_LEN] = '\0';
 
-	/* we've got output for the active command; now parse it */
-	parse(m_activeCmd);
-	delete m_activeCmd;
-	m_activeCmd = 0;
+	/*
+	 * We've got output for the active command. But if it was
+	 * interrupted, ignore it.
+	 */
+	if (m_state != DSinterrupted) {
+	    parse(m_activeCmd);
+	    delete m_activeCmd;
+	    m_activeCmd = 0;
+	}
 
 	// empty buffer
 	m_gdbOutputLen = 0;
@@ -927,7 +997,7 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
 	 * command.
 	 */
 	if (m_delayedOutput.current() == 0) {
-	    if (m_cmdQueue.isEmpty()) {
+	    if (m_hipriCmdQueue.isEmpty() && m_lopriCmdQueue.isEmpty()) {
 		// no pending commands
 		m_state = DSidle;
 		/*
@@ -973,7 +1043,7 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	// there is no output if the command is successful
 	if (m_gdbOutput[0] == '\0') {
 	    // success; now load file containing main()
-	    enqueueCmd(DCinfolinemain, "info line main");
+	    queueCmd(DCinfolinemain, "info line main", QMnormal);
 	    // restore breakpoints etc.
 	    restoreProgramSettings();
 	} else {
@@ -1024,7 +1094,7 @@ void KDebugger::parse(CmdQueueItem* cmd)
     case DCdelete:
     case DCenable:
     case DCdisable:
-	enqueueCmd(DCinfobreak, "info breakpoints");
+	queueCmd(DCinfobreak, "info breakpoints", QMoverride);
 	break;
     case DCinfobreak:
 	// note: this handler must not enqueue a command, since
@@ -1105,12 +1175,12 @@ void KDebugger::handleRunCommands()
      * away.
      */
     if (m_bpTable.haveTemporaryBP()) {
-	enqueueCmd(DCinfobreak, "info breakpoints");
+	queueCmd(DCinfobreak, "info breakpoints", QMoverride);
     }
 
     // get the backtrace
     if (m_programActive) {
-	enqueueCmd(DCbt, "bt");
+	queueCmd(DCbt, "bt", QMoverride);
     } else {
 	// program finished: erase PC
 	m_filesWindow.updatePC(QString(), -1, 0);
@@ -1125,7 +1195,7 @@ void KDebugger::updateAllExprs()
 	return;
 
     // retrieve local variables
-    enqueueCmd(DCinfolocals, "info locals");
+    queueCmd(DCinfolocals, "info locals", QMoverride);
 
     // update watch expressions
     KTreeViewItem* item = m_watchVariables.itemAt(0);
@@ -1137,7 +1207,7 @@ void KDebugger::updateAllExprs()
 void KDebugger::updateBreakptTable()
 {
     m_bpTable.parseBreakpoint(m_gdbOutput);
-    enqueueCmd(DCinfobreak, "info breakpoints");
+    queueCmd(DCinfobreak, "info breakpoints", QMoverride);
 }
 
 void KDebugger::handleLocals()
@@ -1188,8 +1258,14 @@ void KDebugger::handleLocals()
     }
     
     // update this
+    m_delayedPrintThis = false;
     if (thisPresent) {
-	enqueueCmd(DCprintthis, "print *this");
+	if (isThisPaneVisible()) {
+	    queueCmd(DCprintthis, "print *this", QMoverride);
+	} else {
+	    // delay "print *this" until the user makes the pane visible
+	    m_delayedPrintThis = true;
+	}
     } else {
 	m_this.removeExpr("this");
     }
@@ -1469,9 +1545,7 @@ void KDebugger::handleBacktrace()
 
 void KDebugger::gotoFrame(int frame)
 {
-    if (m_state == DSidle) {
-	enqueueCmd(DCframe, QString().sprintf("frame %d", frame));
-    }
+    executeCmd(DCframe, QString().sprintf("frame %d", frame));
 }
 
 void KDebugger::handleFrameChange()
@@ -1501,7 +1575,7 @@ void KDebugger::evalExpressions()
 	m_watchEvalExpr.remove();
 	QString expr = exprItem->computeExpr();
 	TRACE("watch expr: " + expr);
-	CmdQueueItem* cmd = enqueueCmd(DCprint, "print " + expr);
+	CmdQueueItem* cmd = queueCmd(DCprint, "print " + expr, QMoverride);
 	// remember which expr this was
 	cmd->m_expr = exprItem;
 	cmd->m_exprWnd = &m_watchVariables;
@@ -1520,17 +1594,24 @@ void KDebugger::evalExpressions()
 	    }
 	}
 	// we have an expression to send
-	dereferencePointer(wnd, exprItem);
+	dereferencePointer(wnd, exprItem, false);
     }
 }
 
-void KDebugger::dereferencePointer(ExprWnd* wnd, VarTree* exprItem)
+void KDebugger::dereferencePointer(ExprWnd* wnd, VarTree* exprItem,
+				   bool immediate)
 {
     ASSERT(exprItem->m_varKind == VarTree::VKpointer);
 
     QString expr = exprItem->computeExpr();
     TRACE("dereferencing pointer: " + expr);
-    CmdQueueItem* cmd = enqueueCmd(DCprint, "print *(" + expr + ")");
+    QString queueExpr = "print *(" + expr + ")";
+    CmdQueueItem* cmd;
+    if (immediate) {
+	cmd = executeCmd(DCprint, queueExpr);
+    } else {
+	cmd = queueCmd(DCprint, queueExpr, QMoverride);
+    }
     // remember which expr this was
     cmd->m_expr = exprItem;
     cmd->m_exprWnd = wnd;
@@ -1558,7 +1639,7 @@ void KDebugger::exprExpandingHelper(ExprWnd* wnd, KTreeViewItem* item, bool&)
 	return;
     }
     if (m_state == DSidle) {
-	dereferencePointer(wnd, exprItem);
+	dereferencePointer(wnd, exprItem, true);
     }
 }
 
@@ -1612,4 +1693,20 @@ void KDebugger::slotWatchHighlighted(int index)
     VarTree* expr = static_cast<VarTree*>(item);
     QString text = expr->computeExpr();
     m_watchEdit.setText(text);
+}
+
+/*
+ * When the user activates that "this" pane, print *this.
+ */
+void KDebugger::slotFrameTabChanged(int)
+{
+    if (m_delayedPrintThis && isThisPaneVisible()) {
+	/*
+	 * We do not use a high-priority command to display "this". This is
+	 * just a decision out of the stomach and we can change it if
+	 * necessary. But we put it in front of all other low-priority
+	 * commands.
+	 */
+	queueCmd(DCprintthis, "print *this", QMoverrideMoreEqual);
+    }
 }

@@ -260,7 +260,8 @@ void BreakpointTable::addBP()
     // set a breakpoint at the specified text
     QString bpText = m_bpEdit.text();
     bpText = bpText.stripWhiteSpace();
-    if (m_debugger.enqueueCmd(KDebugger::DCbreak, "break " + bpText, true)) {
+    if (m_debugger.isReady()) {
+	m_debugger.executeCmd(KDebugger::DCbreak, "break " + bpText);
 	// clear text if successfully set
 	m_bpEdit.setText("");
     }
@@ -275,7 +276,7 @@ void BreakpointTable::removeBP()
     Breakpoint* bp = m_brkpts[sel];
     QString cmdString(30);
     cmdString.sprintf("delete %d", bp->id);
-    m_debugger.enqueueCmd(KDebugger::DCdelete, cmdString);
+    m_debugger.executeCmd(KDebugger::DCdelete, cmdString);
 }
 
 // this handles the menu entry: toggles breakpoint on and off
@@ -294,7 +295,7 @@ void BreakpointTable::doBreakpoint(QString file, int lineNo, bool temporary)
 	QString cmdString(file.length() + 30);
 	cmdString.sprintf("%sbreak %s:%d", temporary ? "t" : "",
 			  file.data(), lineNo+1);
-	m_debugger.enqueueCmd(KDebugger::DCbreak, cmdString);
+	m_debugger.executeCmd(KDebugger::DCbreak, cmdString);
     }
     else
     {
@@ -305,10 +306,10 @@ void BreakpointTable::doBreakpoint(QString file, int lineNo, bool temporary)
 	QString cmdString(30);
 	if (bp->enabled) {
 	    cmdString.sprintf("delete %d", bp->id);
-	    m_debugger.enqueueCmd(KDebugger::DCdelete, cmdString);
+	    m_debugger.executeCmd(KDebugger::DCdelete, cmdString);
 	} else {
 	    cmdString.sprintf("enable %d", bp->id);
-	    m_debugger.enqueueCmd(KDebugger::DCenable, cmdString);
+	    m_debugger.executeCmd(KDebugger::DCenable, cmdString);
 	}
     }
 }
@@ -323,10 +324,10 @@ void BreakpointTable::doEnableDisableBreakpoint(const QString& file, int lineNo)
     QString cmdString(30);
     if (bp->enabled) {
 	cmdString.sprintf("disable %d", bp->id);
-	m_debugger.enqueueCmd(KDebugger::DCdisable, cmdString);
+	m_debugger.executeCmd(KDebugger::DCdisable, cmdString);
     } else {
 	cmdString.sprintf("enable %d", bp->id);
-	m_debugger.enqueueCmd(KDebugger::DCenable, cmdString);
+	m_debugger.executeCmd(KDebugger::DCenable, cmdString);
     }
 }
 
@@ -454,10 +455,10 @@ void BreakpointTable::restoreBreakpoints(KSimpleConfig* config)
 	QString cmdString(fileName.length() + 30);
 	cmdString.sprintf("%sbreak %s:%d", temporary ? "t" : "",
 			  fileName.data(), lineNo+1);
-	m_debugger.enqueueCmd(KDebugger::DCbreak, cmdString);
+	m_debugger.executeCmd(KDebugger::DCbreak, cmdString);
 	if (!enabled) {
 	    cmdString.sprintf("disable %d", i+1);
-	    m_debugger.enqueueCmd(KDebugger::DCdisable, cmdString);
+	    m_debugger.executeCmd(KDebugger::DCdisable, cmdString);
 	}
 
 	cmdString.sprintf("%s:%d", fileName.data(), lineNo);

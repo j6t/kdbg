@@ -41,7 +41,6 @@ public:
     ~KDebugger();
     
     bool debugProgram(const QString& executable);
-    void menuCallbackExecutable();	/* helper to work around Qt bug */
 
 protected:
     // session properties
@@ -85,8 +84,11 @@ protected:
     
     enum DebuggerState {
 	DSidle,				/* gdb waits for input */
+	DSinterrupted,			/* a command was interrupted */
+	DSrunningLow,			/* gdb is running a low-priority command */
 	DSrunning,			/* gdb waits for program */
 	DScommandSent,			/* command has been sent, we wait for wroteStdin signal */
+	DScommandSentLow,		/* low-prioritycommand has been sent */
     };
     DebuggerState m_state;
     char* m_gdbOutput;			/* normal gdb output */
@@ -122,10 +124,33 @@ public:
 		m_exprWnd(0)
 	{ }
     };
-    CmdQueueItem* enqueueCmd(DbgCommand cmd, QString cmdString, bool onlyRunning = false);
+    /**
+     * Enqueues a high-priority command. High-priority commands are
+     * executed before any low-priority commands. No user interaction is
+     * possible as long as there is a high-priority command in the queue.
+     */
+    CmdQueueItem* executeCmd(DbgCommand cmd, QString cmdString, bool clearLow = false);
+    enum QueueMode {
+	QMnormal,			/* queues the command last */
+	QMoverride,			/* removes an already queued command */
+	QMoverrideMoreEqual		/* ditto, also puts the command first in the queue */
+    };
+    /**
+     * Enqueues a low-priority command. Low-priority commands are executed
+     * after any high-priority commands.
+     */
+    CmdQueueItem* queueCmd(DbgCommand cmd, QString cmdString, QueueMode mode);
+    /**
+     * Is the debugger ready to receive another high-priority command?
+     */
+    bool isReady() const { return m_haveExecutable &&
+	    /*(m_state == DSidle || m_state == DSrunningLow)*/
+	    m_hipriCmdQueue.isEmpty(); }
 protected:
-    QQueue<CmdQueueItem> m_cmdQueue;
+    QQueue<CmdQueueItem> m_hipriCmdQueue;
+    QList<CmdQueueItem> m_lopriCmdQueue;
     CmdQueueItem* m_activeCmd;		/* the cmd we are working on */
+    bool m_delayedPrintThis;		/* whether we delayed "print *this" */
     void parse(CmdQueueItem* cmd);
     VarTree* parseExpr(const char* name);
     void handleRunCommands();
@@ -139,7 +164,7 @@ protected:
     void handleFrameChange();
     void evalExpressions();
     void exprExpandingHelper(ExprWnd* wnd, KTreeViewItem* item, bool& allow);
-    void dereferencePointer(ExprWnd* wnd, VarTree* var);
+    void dereferencePointer(ExprWnd* wnd, VarTree* var, bool immediate);
 
     bool m_haveExecutable;		/* has an executable been specified */
     bool m_programActive;		/* is the program active (possibly halting in a brkpt)? */
@@ -156,6 +181,11 @@ protected:
     // log file
     QFile m_logFile;
 
+    /**
+     * Is the window that shows "this" visible?
+     */
+    bool isThisPaneVisible();
+
 public slots:
     virtual void menuCallback(int item);
     virtual void updateUIItem(UpdateUI* item);
@@ -170,6 +200,7 @@ public slots:
     void slotLocalsExpanding(KTreeViewItem*, bool&);
     void slotThisExpanding(KTreeViewItem*, bool&);
     void slotWatchExpanding(KTreeViewItem*, bool&);
+    void slotFrameTabChanged(int);
     
 signals:
     void forwardMenuCallback(int item);
