@@ -54,7 +54,7 @@ static XsldbgCmdInfo cmds[] = {
     {DCexamine, "x %s %s\n", XsldbgCmdInfo::argString2},
     {DCinfoline, "templates %s:%d\n", XsldbgCmdInfo::argStringNum},
     {DCdisassemble, "disassemble %s %s\n", XsldbgCmdInfo::argString2},
-    {DCsetargs, "%s\n", XsldbgCmdInfo::argString},
+    {DCsetargs, "data %s\n", XsldbgCmdInfo::argString},
     {DCsetenv, "%s %s\n", XsldbgCmdInfo::argString2},
     {DCunsetenv, "unset env %s\n", XsldbgCmdInfo::argString},
     {DCcd, "chdir %s\n", XsldbgCmdInfo::argString},
@@ -364,9 +364,6 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg)
     if (cmd == DCcd) {
         // need the working directory when parsing the output
         m_programWD = strArg;
-    } else if (cmd == DCsetargs) {
-        // attach saved redirection
-        strArg += m_redirect;
     }
 
     SIZED_QString(cmdString, MAX_FMTLEN + strArg.length());
@@ -402,11 +399,7 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
         /*
          * intArg specifies which channels should be redirected to
          * /dev/null. It is a value or'ed together from RDNstdin,
-         * RDNstdout, RDNstderr. We store the value for a later DCsetargs
-         * command.
-         * 
-         * Note: We rely on that after the DCtty a DCsetargs will follow,
-         * which will ultimately apply the redirection.
+         * RDNstdout, RDNstderr.
          */
         static const char *const runRedir[8] = {
             "",
