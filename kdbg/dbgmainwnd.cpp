@@ -6,6 +6,7 @@
 #include <kapp.h>
 #include <klocale.h>			/* i18n */
 #include <kmenubar.h>
+#include <kmessagebox.h>
 #include <kconfig.h>
 #include <kstatusbar.h>
 #include <kiconloader.h>
@@ -680,7 +681,35 @@ TTYWindow* DebuggerMainWnd::ttyWindow()
 
 bool DebuggerMainWnd::debugProgram(const QString& exe)
 {
-    return DebuggerMainWndBase::debugProgram(exe, this);
+    // check the file name
+    QFileInfo fi(exe);
+
+    bool success = fi.isFile();
+    if (!success)
+    {
+	QString msg = i18n("`%1' is not a file or does not exist");
+	KMessageBox::sorry(this, msg.arg(exe));
+    }
+    else
+    {
+	success = DebuggerMainWndBase::debugProgram(fi.absFilePath(), this);
+    }
+
+    if (success)
+    {
+	addRecentExec(fi.absFilePath());
+
+	// keep the directory
+	m_lastDirectory = fi.dirPath(true);
+	m_filesWindow->setExtraDirectory(m_lastDirectory);
+    }
+    else
+    {
+	removeRecentExec(fi.absFilePath());
+    }
+    fillRecentExecMenu();
+
+    return true;
 }
 
 void DebuggerMainWnd::slotNewStatusMsg()
@@ -767,12 +796,7 @@ void DebuggerMainWnd::slotRecentExec(int item)
 {
     if (item >= 0 && item < int(m_recentExecList.count())) {
 	QString exe = m_recentExecList.at(item);
-	if (debugProgramInteractive(exe, this)) {
-	    addRecentExec(exe);
-	} else {
-	    removeRecentExec(exe);
-	}
-	fillRecentExecMenu();
+	debugProgram(exe);
     }
 }
 
@@ -876,12 +900,7 @@ void DebuggerMainWnd::slotFileExe()
 	if (executable.isEmpty())
 	    return;
 
-	if (debugProgramInteractive(executable, this)) {
-	    addRecentExec(executable);
-	}
-	// this may have changed m_lastDirectory
-	m_filesWindow->setExtraDirectory(m_lastDirectory);
-	fillRecentExecMenu();
+	debugProgram(executable);
     }
 }
 

@@ -705,21 +705,5 @@ void DebuggerMainWndBase::removeRecentExec(const QString& executable)
     }
 }
 
-bool DebuggerMainWndBase::debugProgramInteractive(const QString& executable,
-						  QWidget* parent)
-{
-    // check the file name
-    QFileInfo fi(executable);
-    m_lastDirectory = fi.dirPath(true);
-
-    if (!fi.isFile()) {
-	QString msg = i18n("`%1' is not a file or does not exist");
-	KMessageBox::sorry(parent, msg.arg(executable));
-	return false;
-    }
-
-    return debugProgram(executable, parent);
-}
-
 
 #include "mainwndbase.moc"

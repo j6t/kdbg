@@ -85,8 +85,6 @@ public:
     void addRecentExec(const QString& executable);
     /** remove recent executable */
     void removeRecentExec(const QString& executable);
-    /** start a new session; error popups appear on errors */
-    bool debugProgramInteractive(const QString& executable, QWidget* parent);
 
 protected:
     // settings
