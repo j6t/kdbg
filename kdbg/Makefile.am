@@ -15,11 +15,14 @@
 
 # just set the variable
 APPSDIR = $(kde_appsdir)/Applications
-# make double sure that PICSDIR is not a common location;
-# "make uninstall" removes it!
+# make double sure that the following directories are not common locations;
+# "make uninstall" removes them!
 PICSDIR = $(kde_datadir)/kdbg/pics
+TYPESDIR = $(kde_datadir)/kdbg/types
+
 # set the include path for X, qt and KDE
 INCLUDES= $(all_includes)
+
 # claim, which subdirectories you want to install
 SUBDIRS = doc
 
@@ -90,6 +93,11 @@ XPMS = \
 	red-bullet.xpm \
 	pointer.xpm
 
+# types in libraries that we understand
+TYPES = \
+	qt.kdbgtt \
+	kdecore.kdbgtt
+
 # if you "make clean", this files get removed. If you want to remove
 # them while "make distclean", use DISTCLEANFILES
 CLEANFILES = $(kdbg_METASOURCES)
@@ -118,6 +126,11 @@ install-data-local:
 		echo $(INSTALL_DATA) $$i $(PICSDIR)/$$i; \
 		$(INSTALL_DATA) $$i $(PICSDIR)/$$i; \
 	done
+	$(mkinstalldirs) $(TYPESDIR)
+	@for i in $(TYPES); do \
+		echo $(INSTALL_DATA) $$i $(TYPESDIR)/$$i; \
+		$(INSTALL_DATA) $$i $(TYPESDIR)/$$i; \
+	done
 
 # remove ALL you have installed in install-data-local or install-exec-local
 uninstall-local:
@@ -125,6 +138,7 @@ uninstall-local:
 	-rm -f $(kde_icondir)/kdbg.xpm
 	-rm -f $(kde_minidir)/kdbg.xpm
 	-rm -rf $(PICSDIR)
+	-rm -rf $(TYPESDIR)
 
 
 # compile a testfile
