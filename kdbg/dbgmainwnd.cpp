@@ -308,6 +308,7 @@ void DebuggerMainWnd::initToolbar()
 
     KStatusBar* statusbar = statusBar();
     statusbar->insertItem(m_statusActive, ID_STATUS_ACTIVE);
+    m_lastActiveStatusText = m_statusActive;
     statusbar->insertItem(i18n("Line 00000"), ID_STATUS_LINENO);
     statusbar->insertItem("", ID_STATUS_MSG);	/* message pane */
 
@@ -516,6 +517,16 @@ void DebuggerMainWnd::updateUI()
     UpdateToolbarUI updateToolbar(toolBar(), this, SLOT(updateUIItem(UpdateUI*)),
 				  toolIds, sizeof(toolIds)/sizeof(toolIds[0]));
     updateToolbar.iterateToolbar();
+
+    // update statusbar
+    QString newStatus;
+    if (m_debugger->isProgramActive())
+	newStatus = m_statusActive;
+    if (newStatus != m_lastActiveStatusText) {
+	statusBar()->changeItem(newStatus, ID_STATUS_ACTIVE);
+	m_lastActiveStatusText = newStatus;
+    }
+    // line number is updated in slotLineChanged
 }
 
 void DebuggerMainWnd::dockUpdateHelper(UpdateUI* item, QWidget* w)
@@ -573,12 +584,6 @@ void DebuggerMainWnd::updateUIItem(UpdateUI* item)
 	DebuggerMainWndBase::updateUIItem(item);
 	break;
     }
-    // line number is updated in slotLineChanged
-
-    // update statusbar
-    statusBar()->changeItem(m_debugger->isProgramActive() ?
-			    static_cast<const char*>(m_statusActive) : "",
-			    ID_STATUS_ACTIVE);
 }
 
 void DebuggerMainWnd::updateLineItems()

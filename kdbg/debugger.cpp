@@ -68,12 +68,10 @@ KDebugger::KDebugger(QWidget* parent,
     connect(m_d, SIGNAL(processExited(KProcess*)), SLOT(gdbExited(KProcess*)));
     connect(m_d, SIGNAL(commandReceived(CmdQueueItem*,const char*)),
 	    SLOT(parse(CmdQueueItem*,const char*)));
-    // we shouldn't do this, it's very unsafe (different arg lists):
-    connect(m_d, SIGNAL(receivedStdout(KProcess*,char*,int)),
-	    SIGNAL(updateUI()));
     connect(m_d, SIGNAL(wroteStdin(KProcess*)), SIGNAL(updateUI()));
     connect(m_d, SIGNAL(inferiorRunning()), SLOT(slotInferiorRunning()));
     connect(m_d, SIGNAL(enterIdleState()), SLOT(backgroundUpdate()));
+    connect(m_d, SIGNAL(enterIdleState()), SIGNAL(updateUI()));
 
     // animation
     connect(&m_animationTimer, SIGNAL(timeout()), SIGNAL(animationTimeout()));
@@ -532,7 +530,7 @@ void KDebugger::gdbExited(KProcess*)
 
 void KDebugger::openProgramConfig(const QString& name)
 {
-    ASSERT(m_programConfig = 0);
+    ASSERT(m_programConfig == 0);
 
     QFileInfo fi(name);
     QString pgmConfigFile = fi.dirPath(true);

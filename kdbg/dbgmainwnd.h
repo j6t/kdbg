@@ -83,6 +83,10 @@ protected:
     QString makeSourceFilter();
     void fillRecentExecMenu();
 
+    // to avoid flicker when the status bar is updated,
+    // we store the last string that we put there
+    QString m_lastActiveStatusText;
+
 signals:
     void forwardMenuCallback(int item);
     void setTabWidth(int tabWidth);
