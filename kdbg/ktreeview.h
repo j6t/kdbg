@@ -1,6 +1,5 @@
 /*
- * $Revision$
- * $Date$
+ * $Id$
  * 
  * KTreeView class interface
  * 
@@ -45,16 +44,25 @@ public:
      * Item constructor. While text defaults to a null string, and the
      * item can be constructed this way, the text has to be non-null when
      * the item is added to the tree, or it will not be inserted.
-     * 
+     *
      * The constructor sets the delete-children flag to false. This flag
      * tells the item whether it shall delete the child items when it is
      * itself deleted. By default the creator of the item is responsible to
-     * also delete the child items. (However, the versions of
-     * KTreeView::appendChildItem and KTreeView::insertChildItem that do
-     * not take a KTreeViewItem set the delete-children flag to true.)
+     * also delete the child items. (However, the versions of @ref
+     * #appendChildItem and @ref #insertChildItem that do not take a
+     * KTreeViewItem set the delete-children flag to true.)
+     *
+     * @param text specifies the new item's text
      */
-    KTreeViewItem(const QString& theText = QString()); // text can not be null when added to the list!
-    KTreeViewItem(const QString& theText, const QPixmap& thePixmap);
+    KTreeViewItem(const QString& text = QString()); // text can not be null when added to the list!
+    /**
+     * This overloaded constructor allows to specify a pixmap for the new
+     * item.
+     *
+     * @param text specifies the item's text
+     * @param pixmap specifies the item's pixmap
+     */
+    KTreeViewItem(const QString& text, const QPixmap& pixmap);
 
     /**
      * Destructor. It destroys its children if this item has been marked
@@ -72,6 +80,9 @@ public:
     /**
      * Returns a pointer to the child item at the given index in this
      * item's sub tree, or 0 if not found.
+     *
+     * @param index specifies the index of the direct child to return
+     * @return the direct child at the specified index
      */	
     KTreeViewItem* childAt(int index) const;
 
@@ -82,7 +93,10 @@ public:
 
     /**
      * Returns the index in this items sub tree of the given item or -1 if
-     * not found. The specified child must not be 0.
+     * the specified item is not a direct child of this item.
+     * 
+     * @param child specifies the child to look up; must not be 0
+     * @returns the index of the specified direct child
      */
     int childIndex(KTreeViewItem* child) const;
 
@@ -110,8 +124,8 @@ public:
     const QPixmap& getPixmap() const;
 
     /**
-     * Returns a pointer to the next item in the same branch below this
-     * one, or 0 if none.
+     * Returns a pointer to the next sibling item in the same branch below this
+     * one, or 0 if this item has no siblings below it.
      */
     KTreeViewItem* getSibling() const;
 
@@ -142,6 +156,9 @@ public:
      * at the specified index, the item is appended. It does not update
      * administrative data in newChild except for its parent (which is this
      * item) and owner.
+     * 
+     * @param index specifies the index of a direct child of this item
+     * @param newChild specifies the new item to insert
      */
     void insertChild(int index, KTreeViewItem* newChild);
 
@@ -155,8 +172,8 @@ public:
     bool isExpanded() const;
 
     /**
-     * Returns true if the item is visible. An item is visible if all its
-     * ancestors are expanded.
+     * Returns true if the item is visible. An item is visible if @ref
+     * #isExpanded() returns true for all its ancestors.
      * 
      * Note: If this function returns true, it does not necessarily indicate
      * that the widget is visible.
@@ -172,10 +189,10 @@ public:
     bool removeChild(KTreeViewItem* child);
 
     /**
-     * Sets the delayed-expanding flag. If this flag is true, the expanding
-     * signal is emitted when the item is about to be expanded. The expand
-     * button is always painted for this item, even if it doesn't have
-     * children.
+     * Sets the delayed-expanding flag. If this flag is true, the signal
+     * @ref #expanding is emitted when the item is about to be expanded.
+     * The expand button is always painted for this item, even if it
+     * doesn't have children.
      */
     void setDelayedExpanding(bool flag);
 
@@ -213,7 +230,7 @@ protected:
     virtual QRect boundingRect(int indent) const;
 
     /**
-     * Returns the hieght of the item. The default implementation uses font
+     * Returns the height of the item. The default implementation uses font
      * metrics of the owning KTreeView widget.
      */
     virtual int height() const;
@@ -296,122 +313,55 @@ protected:
     bool deleteChildren;
 };
 
-// easier declarations of function prototypes for forEvery type functions
-typedef bool (KTreeView::*KForEveryM)
-  (KTreeViewItem *, void *);
-typedef bool (*KForEvery)
-  (KTreeViewItem *, void *);
-
-/** 
-  A collapsible treelist widget.
-
-  1. Introduction
-  2. Features
-  3. Installation
-  4. Public interface
-
-  1. Introduction
-  ================================================================================
-
-  KTreeView is a class inherited from QTableView in the Qt user interface
-  library. It provides a way to display hierarchical data in a single-inheritance
-  tree, similar to tree controls in Microsoft Windows and other GUI's. It is most
-  suitable for directory trees or outlines, but I'm sure other uses will come to
-  mind. Frankly, it was designed mostly with the above two functions in mind, but
-  I have tried to make it as flexible as I know how to make it easy to adapt to
-  other uses. 
-
-  In case of problems, I encourage you to read all of the other documentation
-  files in this package before contacting me  as you may find the answer to your
-  question in one of them. Also read the source code if you have time. I have
-  tried to comment it adequately and make the source understandable.
-
-  2. Features
-  ================================================================================
-
-  * Displays both text and optional pixmap supplied by the programmer. A support
-  class, KTreeViewItem, can be inherited and modified to draw items as needed
-  by the programmer.
-
-  * The list items can be returned by index or logical path and the tree
-  navigated by parent, child or sibling references contained in them. Also,
-  item information such as text, pixmap, branch level can be obtained.
-  
-  * Items can be inserted, changed and removed either by index in the visible
-  structure, or by logical paths through the tree hierarchy. 
-
-  * The logical path through the tree for any item can be obtained with the index
-  of the item.
-
-  * Tree structure display and expanding/collapsing of sub-trees is handled with
-  no intervention from the programmer.
-  
-  * entire tree can be expanded or collapsed to a specified sub-level (handy for
-  outline views)
-  
-  * Configuration as follows:
-
-  enable/disable item text display (if you only want to display pixmaps)
-  
-  enable/disable drawing of expand/collapse button
-  
-  enable/disable drawing of tree structure
-  
-  * Keyboard support as follows:
-
-  up/down arrows move the highlight appropriately and scroll the list an item at
-  a time, if necessary
-  
-  pgup/pgdn move the highlight a 'page' up or down as applicable and scroll the
-  view
-  
-  +/- keys expand/collapse the highlighted item if it appropriate
-  
-  enter key selects the highlighted item
-  
-  * Mouse support as follows:
-
-  left click on item highlights it
-  
-  left click on an item "hot button" expands or collapses its sub-tree, as
-  applicable
-  
-  double click on item selects it
-  
-  normal scrolling functions in conjunction with scrollbars if present
-
-  2nd scrolling with the middle mouse button: pressing MMB inserts a
-  rubberband, showing which part of the whole tree is currently visible.
-  moving the mouse will scroll the visible part
-  
-  * Signals/Slots
-
-  signal void highlighted(int) - emitted when an item in the tree is
-  highlighted; sends the index of the item
-  
-  signal void selected(int) - emitted when an item in the tree is
-  selected; sends the index of the item
-  
-  signal void expanded(int) - emitted when an item in the tree is expanded;
-  sends the index of the item
-  
-  signal void collpased(int) - emitted when an item in the tree is collapsed;
-  sends the index of the item
-  */
+/**
+ * KTreeView is a class that provides a way to display hierarchical data in
+ * a single-inheritance tree, similar to tree controls in Microsoft Windows
+ * and other GUIs. It is most suitable for directory trees or outlines, but
+ * I'm sure other uses will come to mind. It was designed mostly with the
+ * above two functions in mind, but I have tried to make it as flexible as
+ * I can to make it easy to adapt to other uses.
+ *
+ * Please read the source code if you have time. I have tried to comment it
+ * adequately and make the source understandable.
+ *
+ * The class features the following:
+ *
+ * - Displays both text and an optional pixmap supplied by the programmer.
+ * A support class, KTreeViewItem, can be inherited and modified to draw
+ * items as needed by the programmer.
+ *
+ * - The list items can be returned by index or logical path and the tree
+ * navigated by parent, child or sibling references contained in them.
+ * Also, item information such as text, pixmap, branch level can be
+ * obtained.
+ *
+ * - Items can be inserted, changed and removed either by index in the
+ * visible structure, or by logical paths through the tree hierarchy.
+ *
+ * - The logical path through the tree for any item can be obtained with
+ * the index of the item.
+ *
+ * - Tree structure display and expanding/collapsing of sub-trees is
+ * handled with no intervention from the programmer.
+ *
+ * - entire tree can be expanded or collapsed to a specified sub-level
+ *  (handy for outline views)
+ *
+ * @short A collapsible treelist widget
+ * @author Johannes Sixt <Johannes.Sixt@telecom.at>, Keith Brown
+ */
 class KTreeView : public QTableView
 {
     friend class KTreeViewItem;
     Q_OBJECT
 public:
     /**
-     * Widget contructor. Passes all parameters on to base QTableView, and
-     * does not use them directly. Does internal initialization, sets the
-     * current item to -1, and sets default values for scroll bars (both
-     * auto).
+     * Widget contructor. All parameters are passed on to base QTableView,
+     * and are not used directly.
      */
     KTreeView(QWidget* parent = 0, const char* name = 0, WFlags f = 0);
 
-    /*
+    /**
      * Desctructor. Deletes all items from the topmost level that have been
      * marked with setDeleteChildren(true).
      */
@@ -422,27 +372,46 @@ public:
      * item already has children, the new item is appended below these
      * children. A KTreeViewItem is created for which the delete-children
      * flag is set to true.
+     * 
+     * @param text specifies text for the new item; must not be 0
+     * @param pixmap specifies a pixmap for the new item
+     * @param index specifies the item of which the new item will be a child
      */
-    void appendChildItem(const char* theText, const QPixmap& thePixmap,
+    void appendChildItem(const char* text, const QPixmap& pixmap,
 		      int index);
 
     /**
-     * Same as above except that the parent item is specified by a path.
+     * This overloaded function appends a new item to an item, which is
+     * specified by a path.
+     * 
+     * @param text specifies text for the new item; must not be 0
+     * @param pixmap specifies a pixmap for the new item
+     * @param path specifies the item of which the new item will be a child
+     * @see #appendChildItem
      */
-    void appendChildItem(const char* theText, const QPixmap& thePixmap,
-		      const KPath& thePath); 
+    void appendChildItem(const char* text, const QPixmap& pixmap,
+		      const KPath& path); 
 
     /**
-     * Appendss the specified item as a child of the item that is at the
+     * Appends the specified item as a child of the item that is at the
      * specified row. If that item already has children, the new item is
      * appended below these children.
+     * 
+     * @param newItem specifies the new item
+     * @param index specifies the item of which the new item will be a child
+     * @see #appendChildItem
      */
     void appendChildItem(KTreeViewItem* newItem, int index);
 
     /**
-     * Same as above except that the parent item is specified by a path.
+     * This overloaded function appends a new item to an item, which is
+     * specified by a path.
+     * 
+     * @param newItem specifies the new item
+     * @param path specifies the item of which the new item will be a child
+     * @see #appendChildItem
      */
-    void appendChildItem(KTreeViewItem* newItem, const KPath& thePath);                                                             
+    void appendChildItem(KTreeViewItem* newItem, const KPath& path);
 
     /**
 	Returns a bool value indicating whether the list will display a
@@ -506,15 +475,25 @@ public:
 	*/
   int currentItem() const;
 
-  /**
-	Collapses the sub-tree at the specified index. 
-	*/
-  void collapseItem(int index);
+    /**
+     * Collapses the sub-tree at the specified row index. If the index is
+     * out of range, or the item is already collpased, nothing happens.
+     * 
+     * @param index specifies the row index
+     * @param emitSignal specifies whether the signal @ref #collapsed
+     * should be emitted
+     */
+    void collapseItem(int index, bool emitSignal);
 
-  /**
-	Expands the sub-tree at the specified index. 
-	*/
-  void expandItem(int index);
+    /**
+     * Expands the sub-tree at the specified row index. If the index is
+     * out of range, or the item is already expanded, nothing happens.
+     * 
+     * @param index specifies the row index
+     * @param emitSignal specifies whether the signal @ref #collapsed
+     * should be emitted
+     */
+    void expandItem(int index, bool emitSignal);
 
   /**
 	Returns the depth to which all parent items are automatically
@@ -529,27 +508,46 @@ public:
   void expandOrCollapseItem(int index);
 
     /**
+     * The type of member functions that is called by @ref #forEveryItem and
+     * @ref #forEveryVisibleItem.
+     */
+    typedef bool (KTreeView::*KForEveryM)(KTreeViewItem*, void*);
+
+    /**
      * Iterates every item in the tree, visible or not, and applies the
      * function func with a pointer to each item and user data supplied as
      * parameters. The children of the specified root item are visited
      * (root itself is not visited!). If root is 0 all items in the tree
-     * are visited. KForEveryFunc is defined as:
+     * are visited. KForEveryM is defined as:
      * 
-     * typedef bool (*KForEvery)(KTreeViewItem*, void*); 
+     * typedef bool (KTreeView::*KForEveryM)(KTreeViewItem*, void*); 
      * 
-     * That is, a function that returns bool and takes a pointer to a
-     * KTreeViewItem and pointer to void as parameters. The traversal ends
-     * earlier if the supplied function returns bool. In this case the
+     * That is, a member function that returns bool and takes a pointer to
+     * a KTreeViewItem and pointer to void as parameters. The traversal
+     * ends earlier if the supplied function returns bool. In this case the
      * return value is also true.
+     *
+     * @param func the member function to call for every visited item
+     * @param user extra data that is passed to func
+     * @param root the root item of the subtree to scan; this item itself
+     * is not scanned
+     * @see #forEveryVisibleItem
      */
-    bool forEveryItem(KForEvery func, void* user,
+    bool forEveryItem(KForEveryM func, void* user,
 		      KTreeViewItem* root = 0);
 
     /**
-     * Same as above, but only iterates visible items, in order. If the
-     * specified root item is invisible no items are visited.
+     * This function is like @ref #forEveryItem, but only iterates visible
+     * items, in order. If the specified root item is invisible no items
+     * are visited.
+     *
+     * @param func the member function to call for every visited item
+     * @param user extra data that is passed to func
+     * @param root the root item of the subtree to scan; this item itself
+     * is not scanned
+     * @see #forEveryItem
      */
-    bool forEveryVisibleItem(KForEvery func, void *user,
+    bool forEveryVisibleItem(KForEveryM func, void *user,
 			     KTreeViewItem* root = 0);
 
   /**
@@ -561,38 +559,76 @@ public:
      * Returns the number of pixels an item is indented for each level. If,
      * in a derived class, the levels are indented differently this value
      * may be ignored.
+     * 
+     * @return the number of pixels of indentation for a level
      */
     int indentSpacing();
 
     /**
      * Inserts an item into the tree with the given text and pixmap either
-     * before or after the item currently at the given row, depending on
-     * the value of prefix. The new item is added to the same branch as the
-     * referenced item. If row is -1, the item is simply appended to the
-     * tree at the topmost level. A KTreeViewItem is created for which the
-     * delete-children flag is set to true. Returns true if the item has
-     * been successfully inserted in the tree, otherwise false.
+     * before or after the item at the given row. The new item is added to
+     * the same branch as the referenced item (that is, the new item will
+     * be sibling of the reference item). If row is -1, the item is simply
+     * appended to the tree at the topmost level. A KTreeViewItem is
+     * created for which the delete-children flag is set to true.
+     * 
+     * @param text specifies text for the new item; must not be 0
+     * @param pixmap specifies a pixmap for the new item
+     * @param index specifies the insert position
+     * @param prefix if true, the new item is inserted before the reference
+     * item, otherwise after it
+     * @return true if the item has been successfully inserted in the tree,
+     * otherwise false.
      */
-    bool insertItem(const char* theText, const QPixmap& thePixmap,
+    bool insertItem(const char* text, const QPixmap& pixmap,
 		    int row = -1, bool prefix = true);
 
     /**
-     * Same as above, but uses a path through the tree to reference the
-     * insert position. If there is no item at the specified path, the item
-     * is simply appended to the tree at the topmost level.
+     * This overloaded function inserts a new item into the tree, but a
+     * path through the tree specifies the reference insert position. If
+     * there is no item at the specified path, the item is simply appended
+     * to the tree at the topmost level.
+     * 
+     * @param text specifies text for the new item; must not be 0
+     * @param pixmap specifies a pixmap for the new item
+     * @param path specifies the insert position
+     * @param prefix if true, the new item is inserted before the reference
+     * item, otherwise after it
+     * @return true if the item has been successfully inserted in the tree,
+     * otherwise false.
+     * @see #insertItem
      */
-    bool insertItem(const char* theText, const QPixmap& thePixmap,
-		    const KPath& thePath, bool prefix = true);
+    bool insertItem(const char* text, const QPixmap& pixmap,
+		    const KPath& path, bool prefix = true);
 
     /**
-     * Same as above, but an item is specified instead of a text and a pixmap.
+     * This overloaded function inserts a new item into the tree, but the
+     * new item is specified directly. The reference item is specified as a
+     * row index.
+     * 
+     * @param newItem specifies the item to insert
+     * @param path specifies the insert position
+     * @param prefix if true, the new item is inserted before the reference
+     * item, otherwise after it
+     * @return true if the item has been successfully inserted in the tree,
+     * otherwise false.
+     * @see #insertItem
      */
     bool insertItem(KTreeViewItem *newItem, 
 		    int row = -1, bool prefix = true); 
 
     /**
-     * Same as above, but uses a path through the tree to reference the
-     * insert position.
+     * This overloaded function inserts a new item into the tree, but the
+     * new item is specified directly. The reference item is specified by a
+     * path.
+     * 
+     * @param newItem specifies the item to insert
+     * @param path specifies the insert position
+     * @param prefix if true, the new item is inserted before the reference
+     * item, otherwise after it
+     * @return true if the item has been successfully inserted in the tree,
+     * otherwise false.
+     * @see #insertItem
      */
     bool insertItem(KTreeViewItem *newItem,
 		    const KPath& thePath, bool prefix = true);
@@ -600,17 +636,33 @@ public:
     /**
      * Returns a pointer to the item in the specified row, or 0 if the
      * specified row is outside the limits. This is a cheap operation.
+     * 
+     * @param row specifies the row index
+     * @return the item at the specified row
+     * @see #itemRow
+     * @see #itemPath
      */
     KTreeViewItem* itemAt(int row);
 
     /**
-     * Returns a pointer to the item at the end of the path.
+     * Returns a pointer to the item at the end of the path, or 0 if there
+     * is no such item.
+     * 
+     * @param path specifies a path through the tree
+     * @return the item at the end of the specified path
+     * @see #itemRow
+     * @see #itemPath
      */
     KTreeViewItem* itemAt(const KPath& path);
 
     /**
-     * Returns the row at which the specified item is found in the visible
-     * tree or -1 if the item is not visible or not in the tree.
+     * Looks up the row index at which the specified item is found in the
+     * visible tree or -1 if the item is not visible or not in the tree.
+     * 
+     * @param specifies the item to search
+     * @return the row index of the item
+     * @see #itemAt
+     * @see #itemPath
      */
     int itemRow(KTreeViewItem* item);
 
@@ -619,6 +671,11 @@ public:
      * The specified path variable should be empty. Any strings popped from
      * the path must be deleted by the caller. If the row is invalid, path
      * remains unchanged (i.e. empty).
+     * 
+     * @param row specifies the row index
+     * @param path receives the path of the specified item
+     * @see #itemAt
+     * @see #itemRow
      */
     void itemPath(int row, KPath& path);
 
@@ -671,7 +728,18 @@ public:
 	*/
   bool scrollBar() const;
 
-  /**
+    /**
+     * The specified item is scrolled into view.  If the specified item is
+     * already visible, nothing happens, unless children is true, in which
+     * case the display is scrolled such that the item and as many of its
+     * child items as possible are visible.
+     * 
+     * @param item specifies the item to make visible
+     * @param children specifies whether children should be made visible
+     */
+    void scrollVisible(KTreeViewItem* item, bool children);
+
+    /**
 	If enable is TRUE (default), enables auto update, else disables it.
 	*/
   void setAutoUpdate(bool enable);
@@ -682,8 +750,10 @@ public:
   void setBottomScrollBar(bool enable);
 
     /**
-     * Makes the item at row current and highlights it. The signal
-     * highlighted is emitted if the current item changes.
+     * Makes the item at specifies row the current item and highlights it.
+     * The signal @ref #highlighted is emitted if the current item changes.
+     * 
+     * @param row specifies the row to make the current item
      */
     void setCurrentItem(int row);
 
@@ -694,6 +764,8 @@ public:
     /**
      * Sets the indentation stepping, in pixels.  If, in a derived class,
      * the levels are indented differently this value may be ignored.
+     * 
+     * @param spacing specifies the new indentation spacing, in pixels
      */
     void setIndentSpacing(int spacing);
 
@@ -758,80 +830,130 @@ public:
 
 public:
     /**
-     * This function is deprecated. Use numRows() instead.
-     * Returns the number of items that are visible (their parents are
-     * expanded).  
+     * Use numRows() instead.
+     * 
+     * @return the number of items that are visible (their parents are
+     * expanded).
+     * @deprecated
      */
     int visibleCount() const { return numRows(); }
 
 signals:
-    void collapsed(int index);
-    void expanded(int index);
     /**
-     * The expanding signal is emitted when an item that has the
-     * delayedExpanding flag set is about to be expanded. The
-     * delayedExpanding flag is not reset; the slot that the signal is
-     * connected to should do so. The item being expanded is passed to the
-     * slot. The slot gets the opportunity to insert child items into that
-     * item. It should not change the item any other way. It can allow or
-     * disallow the expansion by setting the second parameter allow. If it
-     * is set to false, the item is not expanded.
+     * This signal is emitted when an item in the tree is collapsed.
+     * The signal is not emitted for items that are invisible.
+     * 
+     * @param index the row index of the collapsed item
+     */
+    void collapsed(int index);
+    
+    /**
+     * This signal is emitted when an item in the tree is expanded.
+     * The signal is not emitted for items that are invisible.
+     * 
+     * @param index the row index of the expanded item
+     */
+    void expanded(int index);
+
+    /**
+     * This signal is emitted when an item that has the delayedExpanding
+     * flag set is about to be expanded. The delayedExpanding flag is not
+     * reset; the slot that the signal is connected to should do so if
+     * necessary. The item being expanded is passed to the slot. The slot
+     * gets the opportunity to insert child items into that item. It should
+     * not change the item any other way. It can disallow the expansion by
+     * setting allow to false; in this case the item is not expanded.
      *
      * The signal is always emitted, regardless whether the expansion was
      * triggered by the user or by the program.
+     * 
+     * @param item specifies the item that is about to be expanded
+     * @param allow can be set to false to disallow expansion; no further
+     * actions are taken then
      */
     void expanding(KTreeViewItem* item, bool& allow);
+
+    /**
+     * This signal is emitted when an item in the tree is highlighted.
+     * 
+     * @param index the row index of the highlighted item.
+     */
     void highlighted(int index);
+
+    /**
+     * This signal is emitted when an item in the tree is selected.
+     * 
+     * @param index the row index of the selected item.
+     */
     void selected(int index);
+  
 protected:
     /**
-     * Appends theChild to theParent as a new direct child. All internal
-     * state is updated and the widget is repainted as necessary. theChild
-     * remains invisible if any ancestor of theParent is collapsed.
+     * Appends a new child item to a parent item as a new direct child. All
+     * internal state is updated and the widget is repainted as necessary.
+     * The new child remains invisible if any ancestor of it (including the
+     * parent) is collapsed.
+     * 
+     * @param parent specifies the parent of which the new item will become
+     * a child
+     * @param child specifies the new child item
+     * @see #appendChildItem
      */
-    void appendChildItem(KTreeViewItem* theParent,
-			 KTreeViewItem* theChild);
+    void appendChildItem(KTreeViewItem* parent,
+			 KTreeViewItem* child);
     virtual int cellHeight(int row);
     virtual int cellWidth(int col);
     void changeItem(KTreeViewItem* toChange,
 		    int itemRow, const char* newText,
 		    const QPixmap* newPixmap);
     /**
-     * Collapses the specified subtree and updates the display. subRoot
-     * need not be visible.
+     * Collapses the specified subtree and updates the display. The
+     * specified item need not be visible. This function does nothing if
+     * the item is already collapsed.
+     * 
+     * @param item specifies the item to collapse.
+     * @param emitSignal specifies whether the signal @ref #collapsed should be emitted.
      */
-    void collapseSubTree(KTreeViewItem* subRoot);
+    virtual void collapseSubTree(KTreeViewItem* item, bool emitSignal);
+
     /** Internal function used for counting items */
     bool countItem(KTreeViewItem* item, void* total);
 
-    void expandOrCollapse(KTreeViewItem *parentItem);
     /**
-     * Expands the specified subtree and updates the display. subRoot need
-     * not be visible.
+     * Expands the specified subtree and updates the display. The specified
+     * item need not be visible. This function does nothing if the item is
+     * already expanded.
+     * 
+     * @param item specifies the item to expand.
+     * @param emitSignal specifies whether the signal @ref #expanded should be emitted.
      */
-    void expandSubTree(KTreeViewItem* subRoot);
+    virtual void expandSubTree(KTreeViewItem* item, bool emitSignal);
   void fixChildren(KTreeViewItem *parentItem);
   virtual void focusInEvent(QFocusEvent *e);
-  void forEveryItem(KForEveryM func, 
-					void *user);
-  void forEveryVisibleItem(KForEveryM func,
-						   void *user);
 
     /** internal function used to determine maximum item width */
     bool getMaxItemWidth(KTreeViewItem* item, void *user);
 
     /**
-     * Returns the indentation of the specified item in pixels.
+     * @param specifies a tree item of this tree
+     * @return the total indentation of the specified item, in pixels
      */
     virtual int indentation(KTreeViewItem* item) const;
 
     /**
-     * Inserts the specified newItem before or after the specified
-     * referenceItem. If referenceItem is 0, the newItem is appended at the
-     * topmost level. If referenceItem is not 0, it must be an item that is
-     * already in the KTreeView. Internal data is updated and the display
-     * is refreshed as necessary. The inserted item may still be invisible
-     * if any of the parents is collapsed. newItem must not be 0.
+     * Inserts a new item before or after a reference item. (That is, the
+     * new item will become a sibling of the reference item.) If the
+     * reference item is 0, the new item is appended at the topmost level.
+     * If the reference item is not 0, it must be an item that is already
+     * in this KTreeView. Internal data is updated and the display is
+     * refreshed as necessary. The inserted item may still be invisible if
+     * any of the parents is collapsed.
+     * 
+     * @param referenceItem specifies the reference item
+     * @param newItem specifies the new item; must not be 0.
+     * @return true if the item has been successfully inserted in the tree,
+     * otherwise false.
+     * @see #insertItem
      */
     bool insertItem(KTreeViewItem* referenceItem, KTreeViewItem* newItem,
 		    bool prefix);
@@ -839,6 +961,12 @@ protected:
     /**
      * Finds the logical path of the specified item. The specified path
      * variable should be empty.
+     * 
+     * @param item specifies the item whose path is to determine
+     * @param path receives the path of the item
+     * @see #itemPath
+     * @see #itemRow
+     * @see #itemAt
      */
     void itemPath(KTreeViewItem* item, KPath& path) const;
 
