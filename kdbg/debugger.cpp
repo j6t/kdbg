@@ -273,11 +273,11 @@ bool KDebugger::debugProgram(const QString& name)
     if (openit) {
 	m_programConfig = new KSimpleConfig(pgmConfigFile, readonly);
 	// it is read in later in the handler of DCexecutable
-
-	// create a type table
-	m_typeTable = new ProgramTypeTable;
-	m_sharedLibsListed = false;
     }
+
+    // create a type table
+    m_typeTable = new ProgramTypeTable;
+    m_sharedLibsListed = false;
 
     emit updateUI();
 
