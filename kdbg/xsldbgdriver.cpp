@@ -83,6 +83,7 @@ static XsldbgCmdInfo cmds[] = {
     {DCenable, "enable %d\n", XsldbgCmdInfo::argNum},
     {DCdisable, "disable %d\n", XsldbgCmdInfo::argNum},
     {DCprint, "print %s\n", XsldbgCmdInfo::argString},
+    {DCprintDeref, "print 'print (*%s)'\n", XsldbgCmdInfo::argString},
     {DCprintStruct, "print 'print %s'\n", XsldbgCmdInfo::argString},
     {DCprintQStringStruct, "print 'print %s'\n", XsldbgCmdInfo::argString},
     {DCframe, "frame %d\n", XsldbgCmdInfo::argNum},

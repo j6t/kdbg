@@ -79,6 +79,7 @@ enum DbgCommand {
 	DCenable,
 	DCdisable,
 	DCprint,
+	DCprintDeref,
 	DCprintStruct,
 	DCprintQStringStruct,
 	DCframe,

@@ -1026,6 +1026,9 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCprint:
 	handlePrint(cmd, output);
 	break;
+    case DCprintDeref:
+	handlePrintDeref(cmd, output);
+	break;
     case DCattach:
     case DCrun:
     case DCcont:
@@ -1365,7 +1368,29 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
     // set expression "name"
     variable->setText(cmd->m_expr->getText());
 
-    if (cmd->m_expr->m_varKind == VarTree::VKpointer) {
+    {
+	TRACE("update expr: " + cmd->m_expr->getText());
+	cmd->m_exprWnd->updateExpr(cmd->m_expr, variable);
+	delete variable;
+    }
+
+    evalExpressions();			/* enqueue dereferenced pointers */
+
+    return true;
+}
+
+bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
+{
+    ASSERT(cmd->m_expr != 0);
+
+    VarTree* variable = parseExpr(output, true);
+    if (variable == 0)
+	return false;
+
+    // set expression "name"
+    variable->setText(cmd->m_expr->getText());
+
+    {
 	/*
 	 * We must insert a dummy parent, because otherwise variable's value
 	 * would overwrite cmd->m_expr's value.
@@ -1384,10 +1409,6 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
 	TRACE("update ptr: " + cmd->m_expr->getText());
 	cmd->m_exprWnd->updateExpr(cmd->m_expr, dummyParent);
 	delete dummyParent;
-    } else {
-	TRACE("update expr: " + cmd->m_expr->getText());
-	cmd->m_exprWnd->updateExpr(cmd->m_expr, variable);
-	delete variable;
     }
 
     evalExpressions();			/* enqueue dereferenced pointers */
@@ -1542,12 +1563,11 @@ void KDebugger::dereferencePointer(ExprWnd* wnd, VarTree* exprItem,
 
     QString expr = exprItem->computeExpr();
     TRACE("dereferencing pointer: " + expr);
-    QString queueExpr = "*(" + expr + ")";
     CmdQueueItem* cmd;
     if (immediate) {
-	cmd = m_d->queueCmd(DCprint, queueExpr, DebuggerDriver::QMoverrideMoreEqual);
+	cmd = m_d->queueCmd(DCprintDeref, expr, DebuggerDriver::QMoverrideMoreEqual);
     } else {
-	cmd = m_d->queueCmd(DCprint, queueExpr, DebuggerDriver::QMoverride);
+	cmd = m_d->queueCmd(DCprintDeref, expr, DebuggerDriver::QMoverride);
     }
     // remember which expr this was
     cmd->m_expr = exprItem;

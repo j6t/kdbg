@@ -107,6 +107,7 @@ static GdbCmdInfo cmds[] = {
     { DCenable, "enable %d\n", GdbCmdInfo::argNum },
     { DCdisable, "disable %d\n", GdbCmdInfo::argNum },
     { DCprint, "print %s\n", GdbCmdInfo::argString },
+    { DCprintDeref, "print *(%s)\n", GdbCmdInfo::argString },
     { DCprintStruct, "print %s\n", GdbCmdInfo::argString },
     { DCprintQStringStruct, printQStringStructFmt, GdbCmdInfo::argString},
     { DCframe, "frame %d\n", GdbCmdInfo::argNum },
