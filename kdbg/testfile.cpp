@@ -129,6 +129,7 @@ int main(int argc, char* argv[])
 	strtest(s);
 	s += "rst";
 	strtest(s);
+	s = "";
 
 	Cl c1(13);
 	Dl d1(3214);
