@@ -1,26 +1,41 @@
 
+SHELL=/bin/sh
+
 cvs:
+	if test -x /usr/bin/autoconf2.50 ; then \
+	   AUTOCONF="/usr/bin/autoconf2.50" ;\
+	else \
+	   AUTOCONF="autoconf" ;\
+	fi; \
+	AUTOCONF_VERSION=`$$AUTOCONF --version` ;\
+	if test "x$$AUTOCONF_VERSION" = "xAutoconf version 2.13"; then \
+	   echo "*** YOU'RE USING AUTOCONF 2.13. We suggest updating." ;\
+	   echo "*** autoconf 2.5x works best for now, we will drop" ;\
+	   echo "*** support for autoconf 2.13 soon."; \
+	   test ! -f admin/libtool.m4.in || mv admin/libtool.m4.in admin/new-libtool.m4.in ;\
+	   test ! -f admin/ltmain.sh || mv admin/ltmain.sh admin/new-ltmain.sh ;\
+	   for file in libtool.m4.in ltcf-c.sh ltcf-cxx.sh ltcf-gcj.sh ltconfig ltmain.sh; do \
+		rm -f admin/$$file ;\
+		ln -s old-$$file admin/$$file ;\
+	   done ;\
+	fi 
 	@if grep '$$(top_srcdir)/acinclude.m4:' Makefile.am >/dev/null; then \
-	  echo "*** Concatenating configure tests into acinclude.m4" ;\
+	  echo "*** Creating acinclude.m4" ;\
 	  rm -f acinclude.m4 configure.files ;\
 	  $(MAKE) -f Makefile.am top_srcdir=. acinclude.m4 ;\
 	fi
+	@echo "!!! If you get recursion errors from autoconf, it is advisable to set the"
+	@echo "    environment variable M4 to something including \"--nesting-limit=500\""
 	@if test -r configure.in.in; then \
 	  rm -f subdirs configure.in ;\
-	  echo "*** Creating list of subdirectories in subdirs" ;\
+	  echo "*** Creating list of subdirectories" ;\
 	  $(MAKE) -f Makefile.am top_srcdir=. subdirs ;\
-	  echo "*** Searching for subdirectories..." ;\
+	  echo "*** Creating configure.in" ;\
 	  $(MAKE) -f Makefile.am top_srcdir=. configure.in ;\
 	fi
-	@echo "*** Retrieving configure tests needed by configure.in"
+	@echo "*** Creating aclocal.m4"
 	@aclocal
-	@echo "*** Scanning for include statements"
-	@autoheader
-	@echo "*** Building Makefile templates"
-	@automake
-	@echo "*** Scanning for moc files and kde tags"
-	@perl admin/am_edit
-	@echo "*** Building configure"
+	@echo "*** Creating configure"
 	@autoconf
 	@if test -r configure.in.in ; then \
 	  perl -pi -e 'print "if test \"x\$$with_fast_perl\" = \"xyes\" ;\
@@ -29,14 +44,22 @@ cvs:
 	  \n  rm -f \$$CONFIG_STATUS.bak;\nfi\
 	  \n" if /^\s*chmod\s+.*\+x\s+.*CONFIG_STATUS/;' configure ;\
 	fi
-	@echo "*** Creating date/time stamp"
-	@touch stamp-h.in
-	@if egrep "^cvs-local:" Makefile.am >/dev/null; then \
-	  $(MAKE) -f Makefile.am cvs-local ;\
-	fi
 	@if grep '} \$$ac_kw foo' configure >/dev/null 2>&1; then perl -p -i -e "s/ac_kw foo/ac_kw int foo/" configure; fi
 #David's hack for autoconf bug when $INSTALL is set
 	@perl -pi -e 'if (/\[\/\$$\]\*. INSTALL=/) { print $$_ ; $$_ = "\"\") ;;\n"; }' configure
+	@if egrep "^AM_CONFIG_HEADER" configure.in >/dev/null 2>&1; then \
+	  echo "*** Creating config.h template" ;\
+		autoheader ;\
+	fi
+	@echo "*** Creating Makefile templates"
+	@automake
+	@echo "*** Postprocessing Makefile templates"
+	@perl admin/am_edit
+	@if egrep "^cvs-local:" Makefile.am >/dev/null; then \
+	  $(MAKE) -f Makefile.am cvs-local ;\
+	fi
+	@echo "*** Creating date/time stamp"
+	@touch stamp-h.in
 	@echo "*** Finished"
 	@echo "    Don't forget to run ./configure"
 	@echo "    If you haven't done so in a while, run ./configure --help"
@@ -81,34 +104,89 @@ cvs-clean:
 	  echo "You don't have a toplevel CVS directory."; \
 	  echo "You most certainly didn't use cvs to get these sources."; \
 	  echo "But this function depends on cvs's information."; \
-	  exit 1 ;\
-	fi;\
-	pwd=`pwd` ;\
-	dirs=`find . -type d | grep -v CVS | sed -e "s#^./##"` ;\
-	for i in $$dirs; do \
-	  if test ! -d "$$pwd/$$i/CVS"; then \
-	    echo "D $$i" ;\
-	    rm -rf "$$pwd/$$i"; \
-	    continue; \
-	  fi ;\
-	  cd $$pwd/$$i ;\
-	  for f in * .*; do \
-	    if test ! -d "$$f"; then \
-	      if grep "^/$$f/" CVS/Entries > /dev/null; then \
-		a="b"; \
-	      else \
-	        echo "F $$i/$$f"; \
-		rm -f "$$pwd/$$i/$$f"; \
-	      fi; \
-	    fi ; \
-	  done; \
-	done
+	  exit 1; \
+	fi; \
+	perl -e '\
+	sub rmrf() \
+	{ \
+	  my $$fn = shift; \
+	  lstat ($$fn); \
+	  if (-d _) { \
+	    if (opendir (DIR, $$fn)) { \
+	      for my $$efn (grep (!/^\.\.?$$/, readdir (DIR))) { \
+	        &rmrf ($$fn."/".$$efn); \
+	      } \
+	      closedir (DIR); \
+	      rmdir ($$fn); \
+	    } \
+	  } else { \
+	    unlink ($$fn); \
+	  } \
+	} \
+	 \
+	sub newfiles() \
+	{ \
+	  my ($$indir, $$incvs) = @_; \
+	  for my $$n (keys (%$$incvs)) { delete $$$$indir{$$n} } \
+	  return sort (keys (%$$indir)); \
+	} \
+	 \
+	sub cvsclean() \
+	{ \
+	  my $$dir = shift; \
+	  my (%dirsdir, %filesdir, %dirscvs, %filescvs); \
+	  my $$dnam = $$dir ? $$dir : "."; \
+	  if (!opendir (DIR, $$dnam)) { \
+	    print STDERR "Cannot enter \"".$$dnam."\".\n"; \
+	    return; \
+	  } \
+	  for my $$fn (grep (!/^\.\.?$$/, readdir (DIR))) { \
+	    if (-d $$dir.$$fn) { \
+	      $$fn eq "CVS" or $$dirsdir{$$fn} = 1; \
+	    } else { \
+	      $$filesdir{$$fn} = 1; \
+	    } \
+	  } \
+	  closedir (DIR); \
+	  if (!open (FILE, "<".$$dir."CVS/Entries")) { \
+	    print STDERR "No CVS information in \"".$$dnam."\".\n"; \
+	    return; \
+	  } \
+	  while (<FILE>) { \
+	    m%^D/([^/]+)/.*$$% and $$dirscvs{$$1} = 1; \
+	    m%^/([^/]+)/.*$$% and $$filescvs{$$1} = 1; \
+	  } \
+	  close (FILE); \
+	  if (open (FILE, "<".$$dir."CVS/Entries.Log")) { \
+	    while (<FILE>) { \
+	      m%^A D/([^/]+)/.*$$% and $$dirscvs{$$1} = 1; \
+	      m%^A /([^/]+)/.*$$% and $$filescvs{$$1} = 1; \
+	      m%^R D/([^/]+)/.*$$% and delete $$dirscvs{$$1}; \
+	      m%^R /([^/]+)/.*$$% and delete $$filescvs{$$1}; \
+	    } \
+	    close (FILE); \
+	  } \
+	  for my $$fn (&newfiles (\%filesdir, \%filescvs)) { \
+	    print ("F ".$$dir.$$fn."\n"); \
+	    &rmrf ($$dir.$$fn); \
+	  } \
+	  for my $$fn (&newfiles (\%dirsdir, \%dirscvs)) { \
+	    print ("D ".$$dir.$$fn."\n"); \
+	    &rmrf ($$dir.$$fn); \
+	  } \
+	  for my $$fn (sort (keys (%dirscvs))) { \
+	    &cvsclean ($$dir.$$fn."/"); \
+	  } \
+	} \
+	 \
+	&cvsclean ("");'
 
 
 # The Makefiles have to be sorted for slashes, since configure creates
 # only one directory per Makefile not the whole hierarchy
 configure.in: configure.files $(shell test -f configure.files && cat configure.files) subdirs
-	@rm -f configure.in rm -f configure.in.new ;\
+	@rm -f configure.in configure.in.new ;\
+	kde_use_qt_param= ; \
 	cat `cat configure.files | egrep -v "^configure.in.bot"` >> configure.in.new ;\
 	echo "KDE_CREATE_SUBDIRSLIST" >> configure.in.new ;\
 	echo "AC_OUTPUT( \\" >> configure.in.new ;\
@@ -128,11 +206,17 @@ configure.in: configure.files $(shell test -f configure.files && cat configure.f
 	  fi ;\
 	  echo "$$i/Makefile \\" >> configure.in.new ;\
 	done ;\
-	egrep '^dnl AC_OUTPUT\(.*\)' `cat configure.files` | sed -e "s#^.*dnl AC_OUTPUT(\(.*\))#\1#" >> configure.in.new ;\
-	echo ")" >> configure.in.new 
+	egrep '^dnl AC_OUTPUT\(.*\)' `cat configure.files` | sed -e "s#^.*dnl AC_OUTPUT(\(.*\))#\1 \\\\#" >> configure.in.new ;\
+	echo ")" >> configure.in.new
 	@modulename= ;\
 	if test -f configure.in.in; then \
-	   if head -2 configure.in.in | egrep "^#MIN_CONFIG$$" > /dev/null; then \
+	   if head -2 configure.in.in | egrep "^#MIN_CONFIG\(.*\)$$" > /dev/null; then \
+	      line=`egrep "^#MIN_CONFIG\(" configure.in.in` ;\
+	      if test -n "$$line"; then \
+		  kde_use_qt_param=`echo $$line | sed -e "s/#MIN_CONFIG(\(.*\))/\1/"` ;\
+	      fi ;\
+	   fi ;\
+	   if head -2 configure.in.in | egrep "^#MIN_CONFI(G|G\(.*\))$$" > /dev/null; then \
 	      line=`egrep "^AM_INIT_AUTOMAKE\(" configure.in.in` ;\
 	      if test -n "$$line"; then \
 		  modulename=`echo $$line | sed -e "s#AM_INIT_AUTOMAKE(\([^,]*\),.*#\1#"` ;\
@@ -146,8 +230,12 @@ configure.in: configure.files $(shell test -f configure.files && cat configure.f
 	   modulename=`pwd`; modulename=`basename $$modulename`; \
 	fi ;\
 	if test -z "$$VERSION" || test "$$VERSION" = "@VERSION@"; then \
-	     VERSION="\"2.1 beta 2\"";  \
+	     VERSION="\"3.0.3\"";  \
 	fi ;\
+	if test -n "$$kde_use_qt_param"; then \
+	      sed -e "s#^dnl KDE_USE_QT#KDE_USE_QT($$kde_use_qt_param)#" configure.in.new > configure.in \
+		  && mv configure.in configure.in.new ;\
+	fi ; \
 	sed -e "s#@MODULENAME@#$$modulename#" configure.in.new | \
 		sed -e "s#@VERSION@#$$VERSION#" > configure.in
 	@if test -f configure.in.bot ; then cat configure.in.bot >> configure.in ; fi
@@ -159,7 +247,7 @@ configure.files: subdirs
 	  if test -x $$i/admin; then admindir=$$i/admin; break; fi; \
 	done ;\
 	rm -rf configure.files ;\
-	if test -f configure.in.in && head -2 configure.in.in | egrep "^#MIN_CONFIG$$" > /dev/null; then \
+	if test -f configure.in.in && head -2 configure.in.in | egrep "^#MIN_CONFI(G|G\(.*\))$$" > /dev/null; then \
 		echo $$admindir/configure.in.min >> configure.files  ;\
 	fi
 	@test -f configure.in.in && echo configure.in.in >> configure.files
@@ -167,7 +255,7 @@ configure.files: subdirs
 	for i in $$list; do if test -f $$i && test ! `dirname $$i` = "." ; then \
 	  echo $$i >> configure.files ;\
 	fi; done
-	@if test -f configure.in.mid ; then echo configure.in.mid >> configure.files ; fi 
+	@if test -f configure.in.mid ; then echo configure.in.mid >> configure.files ; fi
 	@if test -f configure.in.bot ; then echo configure.in.bot >> configure.files ; fi
 
 subdirs:
@@ -191,14 +279,14 @@ subdirs:
 	     fi ;\
 	   fi; \
 	done ;\
-	rm -f SUBDIRS ;\
+	rm -f _SUBDIRS ;\
 	for i in $$dirs; do \
-	echo $$i >> ./SUBDIRS; \
+	echo $$i >> ./_SUBDIRS; \
 	done
-	@if test -r subdirs && diff subdirs SUBDIRS > /dev/null; then \
-	  rm -f SUBDIRS; \
+	@if test -r subdirs && diff subdirs _SUBDIRS > /dev/null; then \
+	  rm -f _SUBDIRS; \
 	fi
-	@test -r SUBDIRS && mv SUBDIRS subdirs || true
+	@test -r _SUBDIRS && mv _SUBDIRS subdirs || true
 
 package-merge:
 	@catalogs='$(POFILES)'; \
@@ -231,11 +319,14 @@ package-messages:
 	files=`find . -name Makefile.am | xargs egrep -l '^messages:' `; \
 	dirs=`for i in $$files; do echo \`dirname $$i\`; done`; \
 	tmpname="$$PWD/messages.log" ;\
+	if test -z "$$EXTRACTRC"; then EXTRACTRC=extractrc ; fi ;\
+	if test -z "$$PREPARETIPS"; then PREPARETIPS=preparetips ; fi ;\
+	export EXTRACTRC PREPARETIPS ;\
 	for subdir in $$dirs; do \
 	  test -z "$$VERBOSE" || echo "Making messages in $$subdir"; \
 	  (cd $$subdir ;\
 	   if test -n "`grep -e '^messages:.*rc.cpp' Makefile.am`"; then \
-	   	$${EXTRACTRC:-extractrc} *.rc *.ui > rc.cpp ;\
+	   	$$EXTRACTRC *.rc *.ui > rc.cpp ;\
 	   else \
 		candidates=`ls -1 *.rc *.ui 2>/dev/null` ;\
 		if test -n "$$candidates"; then \
@@ -247,11 +338,11 @@ package-messages:
 	   else echo " " > _translatorinfo.cpp ;\
 	   fi; \
 	   perl -e '$$mes=0; while (<STDIN>) { if (/^messages:/) { $$mes=1; print $$_; next; } if ($$mes) { if (/$$\\(XGETTEXT\)/ && / -o/) { s/ -o \$$\(podir\)/ _translatorinfo.cpp -o \$$\(podir\)/ } print $$_; } else { print $$_; } }' < Makefile.am > _transMakefile ;\
-	   $(MAKE) -s -f _transMakefile podir=$$podir \
-	   XGETTEXT="$${XGETTEXT:-xgettext} -C -ki18n \
+	   $(MAKE) -s -f _transMakefile podir=$$podir EXTRACTRC="$$EXTRACTRC" PREPARETIPS="$$PREPARETIPS" \
+	   XGETTEXT="$${XGETTEXT:-xgettext} -C -ki18n -ktr2i18n \
 	   -kI18N_NOOP -ktranslate -kaliasLocale \
 	   -x $${includedir:-$$KDEDIR/include}/kde.pot" \
-	   messages ) >$$tmpname 2>&1 ;\
+	   messages ) 2>&1 | grep -v '^make\[1\]' > $$tmpname; \
 	   test -s $$tmpname && (echo $$subdir ; cat $$tmpname) ;\
 	   test ! -f $$subdir/rc.cpp || rm -f $$subdir/rc.cpp ;\
 	   rm -f $$subdir/_translatorinfo.cpp ;\
@@ -262,6 +353,7 @@ package-messages:
 	  if test ! -f po/$$i; then echo "disappeared: $$i"; fi ;\
 	done
 	@for  i in `ls -1 po/*.pot 2>/dev/null | sed -e "s#po/##"`; do \
+	   msgmerge -q -o po/$$i po/$$i po/$$i ;\
 	   egrep -v '^#([^:]|$)' po/$$i | egrep '^.*[^ ]+.*$$' | grep -v "\"POT-Creation" > temp.pot ;\
 	  if test -f po.backup/$$i && test -n "`diff temp.pot po.backup/$$i`"; then \
 	 	echo "will update $$i"; \
@@ -281,6 +373,9 @@ package-messages:
 	@rm -rf po.backup
 
 test:
-	perl -e '$$mes=0; while (<STDIN>) { if (/^messages:/) { $$mes=1; print $$_; next; } if ($$mes) { if (! /^\t/) { exit(0); } if (/$$\\(XGETTEXT\)/ && / -o/) { s/ -o/ _translatorinfo.cpp -o/ } print $$_;  } }' < Makefile.am 
+	perl -e '$$mes=0; while (<STDIN>) { if (/^messages:/) { $$mes=1; print $$_; next; } if ($$mes) { if (! /^\t/) { exit(0); } if (/$$\\(XGETTEXT\)/ && / -o/) { s/ -o/ _translatorinfo.cpp -o/ } print $$_;  } }' < Makefile.am
 
 .SILENT:
+
+.PHONY: cvs test dist cvs-clean package-merge package-messages
+

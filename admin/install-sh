@@ -93,11 +93,11 @@ while [ x"$1" != x ]; do
 
 	*)  if [ x"$src" = x ]
 	    then
-		src="$1"
+		src=$1
 	    else
 		# this colon is to work around a 386BSD /bin/sh bug
 		:
-		dst="$1"
+		dst=$1
 	    fi
 	    shift
 	    continue;;
@@ -113,11 +113,12 @@ else
 fi
 
 if [ x"$dir_arg" != x ]; then
-	dst="$src"
+	dst=$src
 	src=""
 	
 	if [ -d $dst ]; then
 		instcmd=:
+		chmodcmd=""
 	else
 		instcmd=mkdir
 	fi
@@ -127,7 +128,7 @@ else
 # might cause directories to be created, which would be especially bad 
 # if $src (and thus $dsttmp) contains '*'.
 
-	if [ -f "$src" -o -d "$src" ]
+	if [ -f $src -o -d $src ]
 	then
 		true
 	else
@@ -146,7 +147,7 @@ else
 # If destination is a directory, append the input filename; if your system
 # does not like double slashes in filenames, you may need to add some logic
 
-	if [ -d "$dst" ]
+	if [ -d $dst ]
 	then
 		dst="$dst"/`basename $src`
 	else
@@ -203,9 +204,9 @@ else
 
 	if [ x"$transformarg" = x ] 
 	then
-		dstfile=`basename "$dst"`
+		dstfile=`basename $dst`
 	else
-		dstfile=`basename "$dst" $transformbasename | 
+		dstfile=`basename $dst $transformbasename | 
 			sed $transformarg`$transformbasename
 	fi
 
@@ -213,7 +214,7 @@ else
 
 	if [ x"$dstfile" = x ] 
 	then
-		dstfile=`basename "$dst"`
+		dstfile=`basename $dst`
 	else
 		true
 	fi
@@ -224,9 +225,9 @@ else
 
 # Move or copy the file name to the temp name
 
-	$doit $instcmd "$src" "$dsttmp" &&
+	$doit $instcmd $src $dsttmp &&
 
-	trap "rm -f \"${dsttmp}\"" 0 &&
+	trap "rm -f ${dsttmp}" 0 &&
 
 # and set any options; do chmod last to preserve setuid bits
 
@@ -240,8 +241,10 @@ else
 	if [ x"$chmodcmd" != x ]; then $doit $chmodcmd $dsttmp; else true;fi &&
 
 # Now rename the file to the real destination.
-	$doit $rmcmd -f "$dstdir/$dstfile" &&
-	$doit $mvcmd "$dsttmp" "$dstdir/$dstfile"
+
+	$doit $rmcmd -f $dstdir/$dstfile &&
+	$doit $mvcmd $dsttmp $dstdir/$dstfile 
+
 fi &&
 
 
