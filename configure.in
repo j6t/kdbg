@@ -9,7 +9,7 @@ dnl the argument
 AM_CONFIG_HEADER(config.h)
 
 dnl insert here your program name and version number
-KDE_DO_IT_ALL(kdbg, 0.1.4)
+KDE_DO_IT_ALL(kdbg, 0.2.0)
 
 dnl in this space add everything you want to check for
 dnl examples are specific headers, libraries, etc.
@@ -32,7 +32,7 @@ dnl Checks for typedefs, structures, and compiler characteristics.
 AC_HEADER_TIME
 
 dnl Checks for library functions.
-AC_CHECK_FUNCS(setpgid putenv socket vsnprintf)
+AC_CHECK_FUNCS(setpgid putenv socket vsnprintf mkfifo)
 AC_CHECK_SETENV
 AC_LANG_CPLUSPLUS
 
