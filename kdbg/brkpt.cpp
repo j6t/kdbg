@@ -616,7 +616,7 @@ BreakpointListBox::BreakpointListBox(QWidget* parent, const char* name) :
 	KTabListBox(parent, name, 5)
 {
     setColumn(0, i18n("E"),		/* Enabled/disabled */
-	      16, KTabListBox::PixmapColumn);
+	      20, KTabListBox::PixmapColumn);
     setColumn(1, i18n("Location"), 300);
     setColumn(2, i18n("Hits"), 30);
     setColumn(3, i18n("Ignore"), 30);
@@ -630,8 +630,46 @@ BreakpointListBox::BreakpointListBox(QWidget* parent, const char* name) :
 
     // add pixmaps
     KIconLoader* loader = kapp->getIconLoader();
-    dict().insert("E", new QPixmap(loader->loadIcon("green-bullet.xpm")));
-    dict().insert("D", new QPixmap(loader->loadIcon("red-bullet.xpm")));
+    QPixmap brkena = loader->loadIcon("brkena.xpm");
+    QPixmap brkdis = loader->loadIcon("brkdis.xpm");
+    QPixmap brktmp = loader->loadIcon("brktmp.xpm");
+    QPixmap brkcond = loader->loadIcon("brkcond.xpm");
+    /*
+     * There are 8 different pixmaps: The basic enabled or disabled
+     * breakpoint, plus an optional overlaid brktmp icon plus an optional
+     * overlaid brkcond icon.
+     */
+    QPixmap canvas(16,16);
+    // get this widgets background color
+    QBrush bg = lbox.backgroundColor();
+
+    QString code(5);
+    for (int i = 0; i < 8; i++) {
+	{
+	    QPainter p(&canvas);
+	    // clear canvas
+	    p.fillRect(0,0, canvas.width(),canvas.height(), bg);
+	    // basic icon
+	    if (i & 1) {
+		code = "E";
+		p.drawPixmap(1,1, brkena);
+	    } else {
+		code = "D";
+		p.drawPixmap(1,1, brkdis);
+	    }
+	    // temporary overlay
+	    if (i & 2) {
+		code += "t";
+		p.drawPixmap(1,1, brktmp);
+	    }
+	    // conditional overlay
+	    if (i & 4) {
+		code += "c";
+		p.drawPixmap(1,1, brkcond);
+	    }
+	}
+	dict().insert(code, new QPixmap(canvas));
+    }
 }
 
 BreakpointListBox::~BreakpointListBox()
@@ -652,8 +690,18 @@ void BreakpointListBox::changeItem(int id, Breakpoint* bp)
 
 QString BreakpointListBox::constructListText(Breakpoint* bp)
 {
-    static const char ED[][4] = { "D\t\0", "E\t\0" };
-    QString result = ED[bp->enabled] + bp->location;
+    QString result(200);		/* should fit most cases */
+
+    /* breakpoint icon code; keep order the same as in this class's constructor */
+    result = bp->enabled ? "E" : "D";
+    if (bp->temporary)
+	result += "t";
+    if (!bp->condition.isEmpty() || bp->ignoreCount > 0)
+	result += "c";
+    result += "\t";
+
+    // more breakpoint info
+    result += bp->location;
     QString tmp;
     if (bp->hitCount == 0) {
 	result += "\t ";
