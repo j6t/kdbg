@@ -73,6 +73,17 @@
                             <bool>true</bool>
                         </property>
                     </column>
+                    <column>
+                        <property name="text">
+                            <string>PPID</string>
+                        </property>
+                        <property name="clickable">
+                            <bool>true</bool>
+                        </property>
+                        <property name="resizable">
+                            <bool>true</bool>
+                        </property>
+                    </column>
                     <property name="name">
                         <cstring>processList</cstring>
                     </property>

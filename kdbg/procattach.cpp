@@ -16,13 +16,17 @@
 
 ProcAttachPS::ProcAttachPS(QWidget* parent) :
 	ProcAttachBase(parent),
-	m_pidCol(-1)
+	m_pidCol(-1),
+	m_ppidCol(-1)
 {
     m_ps = new KProcess;
     connect(m_ps, SIGNAL(receivedStdout(KProcess*, char*, int)),
 	    this, SLOT(slotTextReceived(KProcess*, char*, int)));
 
+    processList->setColumnWidth(0, 300);
+    processList->setColumnWidthMode(0, QListView::Manual);
     processList->setColumnAlignment(1, Qt::AlignRight);
+    processList->setColumnAlignment(2, Qt::AlignRight);
 
     // set the command line
     static const char* const psCommand[] = {
@@ -51,6 +55,7 @@ void ProcAttachPS::runPS()
     m_token = "";
     m_line.clear();
     m_pidCol = -1;
+    m_ppidCol = -1;
 
     m_ps->start(KProcess::NotifyOnExit, KProcess::Stdout);
 }
@@ -101,22 +106,24 @@ void ProcAttachPS::slotTextReceived(KProcess*, char* buffer, int buflen)
 
 void ProcAttachPS::pushLine()
 {
-    if (m_line.size() < 2)	// we need the PID and COMMAND columns
+    if (m_line.size() < 3)	// we need the PID, PPID, and COMMAND columns
 	return;
 
     if (m_pidCol < 0)
     {
 	// create columns if we don't have them yet
-	bool allocate =	processList->columns() == 2;
+	bool allocate =	processList->columns() == 3;
 
 	// we assume that the last column is the command
 	m_line.pop_back();
 
 	for (uint i = 0; i < m_line.size(); i++) {
-	    // we don't allocate a PID column,
-	    // but we need to know which column it is
+	    // we don't allocate the PID and PPID columns,
+	    // but we need to know where in the ps output they are
 	    if (m_line[i] == "PID") {
 		m_pidCol = i;
+	    } else if (m_line[i] == "PPID") {
+		m_ppidCol = i;
 	    } else if (allocate) {
 		processList->addColumn(m_line[i]);
 		// these columns are normally numbers
@@ -128,17 +135,51 @@ void ProcAttachPS::pushLine()
     else
     {
 	// insert a line
+	// find the parent process
+	QListViewItem* parent = 0;
+	if (m_ppidCol >= 0 && m_ppidCol < int(m_line.size())) {
+	    parent = processList->findItem(m_line[m_ppidCol], 1);
+	}
+
 	// we assume that the last column is the command
-	QListViewItem* item = new QListViewItem(processList, m_line.back());
+	QListViewItem* item;
+	if (parent == 0) {
+	    item = new QListViewItem(processList, m_line.back());
+	} else {
+	    item = new QListViewItem(parent, m_line.back());
+	}
+	item->setOpen(true);
 	m_line.pop_back();
-	int k = 2;
+	int k = 3;
 	for (uint i = 0; i < m_line.size(); i++)
 	{
-	    // display the pid column's content in the second column
+	    // display the pid and ppid columns' contents in columns 1 and 2
 	    if (int(i) == m_pidCol)
 		item->setText(1, m_line[i]);
+	    else if (int(i) == m_ppidCol)
+		item->setText(2, m_line[i]);
 	    else
 		item->setText(k++, m_line[i]);
+	}
+
+	if (m_ppidCol >= 0 && m_pidCol >= 0) {	// need PID & PPID for this
+	    /*
+	     * It could have happened that a process was earlier inserted,
+	     * whose parent process is the current process. Such processes
+	     * were placed at the root. Here we go through all root items
+	     * and check whether we must reparent them.
+	     */
+	    QListViewItem* i = processList->firstChild();
+	    while (i != 0)
+	    {
+		// advance before we reparent the item
+		QListViewItem* it = i;
+		i = i->nextSibling();
+		if (it->text(2) == m_line[m_pidCol]) {
+		    processList->takeItem(it);
+		    item->insertItem(it);
+		}
+	    }
 	}
     }
 }
