@@ -5,6 +5,11 @@
 
 #include <qsocketnotifier.h>
 #include "ttywnd.h"
+#if QT_VERSION >= 200
+#include <kglobal.h>
+#else
+#include <kapp.h>
+#endif
 
 #include "config.h"
 #ifdef HAVE_FCNTL_H
@@ -115,9 +120,11 @@ void STTY::outReceived(int f)
 	char buf[1024];
 	int n = ::read(f, buf, sizeof(buf));
 	if (n < 0) {
-	    // ugh! error! somebody disconnect this signal please!
-	    int e = errno;
-	    TRACE(QString().sprintf("error reading tty: %d", e));
+	    if (errno != EAGAIN) {	/* this is not an error */
+		// ugh! error! somebody disconnect this signal please!
+		int e = errno;
+		TRACE(QString().sprintf("error reading tty: %d", e));
+	    }
 	    break;
 	}
 	emit output(buf, n);
@@ -129,10 +136,15 @@ void STTY::outReceived(int f)
 
 
 TTYWindow::TTYWindow(QWidget* parent, const char* name) :
-	QMultiLineEdit(parent, name),
+	KTextView(parent, name),
 	m_tty(0)
 {
-    setReadOnly(true);
+#if QT_VERSION < 200
+    setFont(kapp->fixedFont);
+#else
+    setFont(KGlobal::fixedFont());
+#endif
+    clear();
 }
 
 TTYWindow::~TTYWindow()
@@ -167,12 +179,45 @@ void TTYWindow::deactivate()
 
 void TTYWindow::slotAppend(char* buffer, int count)
 {
+    // is last line visible?
+    bool bottomVisible = lastRowVisible() == m_texts.size()-1;
+
+    // parse off lines
+    char* start = buffer;
+    while (count > 0) {
+	int len = 0;
+	while (count > 0 && start[len] != '\n') {
+	    --count;
+	    ++len;
+	}
+	if (len > 0) {
 #if QT_VERSION < 200
-    QString str(buffer, count+1);
+	    QString str(start, len+1);
 #else
-    QString str = QString::fromLatin1(buffer, count);
+	    QString str = QString::fromLatin1(start, len);
 #endif
-    append(str);
+	    // update last line
+	    str = m_texts[m_texts.size()-1] + str;
+	    replaceLine(m_texts.size()-1, str);
+	    start += len;
+	    len = 0;
+	}
+	if (count > 0 && *start == '\n') {
+	    insertLine(QString());
+	    ++start;
+	    --count;
+	}
+    }
+
+    // if last row was visible, scroll down to make it visible again
+    if (bottomVisible)
+	setTopCell(m_texts.size()-1);
+}
+
+void TTYWindow::clear()
+{
+    m_texts.setSize(0);
+    insertLine(QString());
 }
 
 #include "ttywnd.moc"

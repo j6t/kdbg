@@ -6,7 +6,7 @@
 #ifndef TTYWND_H
 #define TTYWND_H
 
-#include <qmultilinedit.h>
+#include <textvw.h>
 
 class QSocketNotifier;
 
@@ -44,7 +44,7 @@ protected:
     bool findTTY();
 };
 
-class TTYWindow : public QMultiLineEdit
+class TTYWindow : public KTextView
 {
     Q_OBJECT
 public:
@@ -59,6 +59,7 @@ protected:
 
 protected slots:
     void slotAppend(char* buffer, int count);
+    void clear();
 };
 
 #endif // TTYWND_H
