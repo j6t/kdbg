@@ -5,4 +5,4 @@ SUBDIRS = STabCtl DockWidget kdbg po
 # have all needed files, that a GNU package needs
 AUTOMAKE_OPTIONS = foreign 
 
-EXTRA_DIST = BUGS ChangeLog
+EXTRA_DIST = BUGS ChangeLog COPYING
