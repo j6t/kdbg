@@ -9,7 +9,6 @@
 #include <qlistview.h>
 
 class QPopupMenu;
-class KPopupMenu;
 class RegisterView;
 
 class RegisterViewItem : public QListViewItem
@@ -22,8 +21,6 @@ public:
 
     QString m_reg;
     QString m_value;
-    QString m_codedValue;
-    QString m_decodedValue;
     bool m_changes;
     bool m_found;
 
@@ -51,7 +48,7 @@ protected slots:
 
 private:
     QListViewItem* m_lastInsert;
-    KPopupMenu* m_menu;
+    QPopupMenu* m_menu;
     QPopupMenu* m_modemenu;
     int m_mode;
 

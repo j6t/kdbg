@@ -8,12 +8,14 @@
 #include <kglobal.h>
 #include <klocale.h>			/* i18n */
 #include <kiconloader.h>
+#include <qfontdialog.h>
+#include <qmessagebox.h>
+#else
+#include <kapp.h>			/* i18n */
 #endif
-#include <kpopmenu.h>
+#include <qpopmenu.h>
 #include <ctype.h>
 #include "regwnd.h"
-#include <qmessagebox.h>
-#include <qfontdialog.h>
 
 
 RegisterViewItem::RegisterViewItem(RegisterView* parent, QString reg, QString value) :
@@ -110,7 +112,7 @@ static QString toOctal(QString hex)
     if (v != 0) {
 	result.insert(0, v + '0');
     }
-    return '0' + result;
+    return "0" + result;
 }
 
 static QString toDecimal(QString hex)
@@ -136,10 +138,10 @@ void RegisterViewItem::setValue(QString value)
     int pos = value.find(' ');
     if (pos < 0) {
 	coded = value;
-	m_decodedValue = QString();
+	decoded = QString();
     } else {
 	coded = value.left(pos);
-	decoded = value.mid(pos+1).stripWhiteSpace();
+	decoded = value.mid(pos+1,value.length()).stripWhiteSpace();
     }
     if (coded.length() > 2 && coded[0] == '0' && coded[1] == 'x') {
 	switch (static_cast<RegisterView*>(listView())->m_mode) {
@@ -158,8 +160,14 @@ void RegisterViewItem::paintCell(QPainter* p, const QColorGroup& cg,
 				 int column, int width, int alignment)
 {
     if (m_changes) {
+#if QT_VERSION >= 200
 	QColorGroup newcg = cg;
 	newcg.setColor(QColorGroup::Text, red);
+#else
+	QColorGroup newcg(cg.foreground(), cg.background(),
+			  cg.light(), cg.dark(), cg.mid(),
+			  red, cg.base());
+#endif
 	QListViewItem::paintCell(p, newcg, column, width, alignment);
     } else {
 	QListViewItem::paintCell(p, cg, column, width, alignment);
@@ -175,9 +183,9 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
     setSorting(-1);
 
 #if QT_VERSION < 200
-    addColumn(QIconSet(regs), i18n("Register"));
-    addColumn(QIconSet(watch), i18n("Value"));
-    addColumn(QIconSet(watch), i18n("Decoded value"));
+    addColumn(i18n("Register"));
+    addColumn(i18n("Value"));
+    addColumn(i18n("Decoded value"));
 #else
     QPixmap iconRegs = BarIcon("regs.xpm");
     QPixmap iconWatchcoded = BarIcon("watchcoded.xpm");
@@ -207,15 +215,11 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
     m_modemenu->insertItem(i18n("Hexadecimal"),3);
     connect(m_modemenu,SIGNAL(activated(int)),SLOT(slotModeChange(int)));
 
-    m_menu = new KPopupMenu();
+    m_menu = new QPopupMenu();
 //    m_menu->setTitle(i18n("Register Setting"));
     m_menu->insertItem(i18n("Font..."), this, SLOT(slotSetFont()));
     m_menu->insertItem(i18n("View mode"), m_modemenu);
 
-//    setFont(QFont("courier",14,QFont::Bold));
-#if QT_VERSION >= 200
-//    header()->setFont(*KGlobal::_generalFont);
-#endif
     resize(200,300);
 }
 
@@ -324,9 +328,11 @@ void RegisterView::updateRegisters( const char* output )
 
 void RegisterView::doubleClicked( QListViewItem* item )
 {
+#if QT_VERSION >= 200
     RegisterViewItem* it = static_cast<RegisterViewItem*>(item);
     QMessageBox::information(this, "work in progress...",
 			     QString("Prepare for change register value\nregister: %1    current value: %2").arg(it->m_reg).arg(it->m_value));
+#endif
 }
 
 void RegisterView::rightButtonClicked(QListViewItem* item, const QPoint& p, int c)
@@ -340,14 +346,14 @@ void RegisterView::rightButtonClicked(QListViewItem* item, const QPoint& p, int 
 
 void RegisterView::slotSetFont()
 {
+#if QT_VERSION >= 200
     bool ok;
     QFont f = QFontDialog::getFont(&ok, font());
     if (ok) {
 	setFont(f);
-#if QT_VERSION >= 200
 	header()->setFont(*KGlobal::_generalFont);
-#endif
     }
+#endif
 }
 
 void RegisterView::slotModeChange(int code)
