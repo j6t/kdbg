@@ -30,8 +30,6 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	m_watches(&m_rightPanner, "watches")
 				 
 {
-    m_statusActive = i18n("active");
-
     initMenu();
     initToolbar();
 
