@@ -65,7 +65,7 @@ AC_BEFORE([$0],[AC_LIBTOOL_GCJ])dnl
 LIBTOOL_DEPS="$ac_aux_dir/ltmain.sh"
 
 # Always use our own libtool.
-LIBTOOL='$(SHELL) $(top_builddir)/libtool'
+LIBTOOL='$(SHELL) $(top_builddir)/libtool --silent'
 AC_SUBST(LIBTOOL)dnl
 
 # Prevent multiple expansion
@@ -453,6 +453,22 @@ ia64-*-hpux*)
   rm -rf conftest*
   ;;
 
+*-*-linux*)
+  # Test if the compiler is 64bit
+  echo 'int i;' > conftest.$ac_ext
+  if AC_TRY_EVAL(ac_compile); then
+    case `/usr/bin/file conftest.$ac_objext` in
+    *"ELF 32"*)
+      LINUX_64_MODE="32"
+      ;;
+    *"ELF 64"*)
+      LINUX_64_MODE="64"
+      ;;
+    esac
+  fi
+  rm -rf conftest*
+  ;;
+  
 *-*-sco3.2v5*)
   # On SCO OpenServer 5, we need -belf to get full-featured binaries.
   SAVE_CFLAGS="$CFLAGS"
@@ -1251,8 +1267,17 @@ linux*)
   library_names_spec='${libname}${release}.so$versuffix ${libname}${release}.so$major $libname.so'
   soname_spec='${libname}${release}.so$major'
   finish_cmds='PATH="\$PATH:/sbin" ldconfig -n $libdir'
+  libsuff=
+  if test "x$LINUX_64_MODE" = x64; then
+    # Some platforms are per default 64-bit, so there's no /lib64
+    if test -d /lib64; then
+      libsuff=64
+    fi
+  fi
   shlibpath_var=LD_LIBRARY_PATH
   shlibpath_overrides_runpath=no
+  sys_lib_dlsearch_path_spec="/lib${libsuff} /usr/lib${libsuff}"
+  sys_lib_search_path_spec="/lib${libsuff} /usr/lib${libsuff} /usr/local/lib${libsuff}"
   # This implies no fast_install, which is unacceptable.
   # Some rework will be needed to allow for fast_install
   # before this can be enabled.

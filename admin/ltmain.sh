@@ -2383,9 +2383,6 @@ EOF
 		    $echo "$modename: \`$deplib' is not a valid libtool archive" 1>&2
 		    exit 1
 		  fi
-		  if test "$absdir" != "$libdir"; then
-		    $echo "$modename: warning: \`$deplib' seems to be moved" 1>&2
-		  fi
 		  path="-L$absdir"
 		fi
 		;;
