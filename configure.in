@@ -76,8 +76,8 @@ dnl Check where the communication with gdb should be logged
 AC_MSG_CHECKING([where communication with gdb should be logged])
 dnl Default is ./gdb-transcript until kdbg is released
 AC_ARG_WITH(transcript,
-  [  --with-transcript=file  log communication with gdb [default=./gdb-transcript]],
-  GDB_TRANSCRIPT=$withval, GDB_TRANSCRIPT=yes)
+  [  --with-transcript=file  log communication with gdb [default=not logged]],
+  GDB_TRANSCRIPT=$withval, GDB_TRANSCRIPT=no)
 if test "x$GDB_TRANSCRIPT" = "xyes"; then
   GDB_TRANSCRIPT="./gdb-transcript"
 fi
