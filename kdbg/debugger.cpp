@@ -37,6 +37,7 @@ KDebugger::KDebugger(QWidget* parent,
 		     DebuggerDriver* driver
 		     ) :
 	QObject(parent, "debugger"),
+	m_ttyLevel(ttyFull),
 	m_haveExecutable(false),
 	m_programActive(false),
 	m_programRunning(false),
@@ -112,6 +113,7 @@ void KDebugger::restoreSettings(KConfig* /*config*/)
 
 const char GeneralGroup[] = "General";
 const char DebuggerCmdStr[] = "DebuggerCmdStr";
+const char TTYLevelEntry[] = "TTYLevel";
 
 bool KDebugger::debugProgram(const QString& name)
 {
@@ -150,6 +152,8 @@ bool KDebugger::debugProgram(const QString& name)
     if (m_programConfig != 0) {
 	m_programConfig->setGroup(GeneralGroup);
 	m_debuggerCmd = m_programConfig->readEntry(DebuggerCmdStr);
+	// get terminal emulation level
+	m_ttyLevel = TTYLevel(m_programConfig->readNumEntry(TTYLevelEntry, ttyFull));
     }
     // the rest is read in later in the handler of DCexecutable
 
@@ -510,6 +514,7 @@ void KDebugger::saveProgramSettings()
     m_programConfig->writeEntry(ProgramArgs, m_programArgs);
     m_programConfig->writeEntry(WorkingDirectory, m_programWD);
     m_programConfig->writeEntry(DebuggerCmdStr, m_debuggerCmd);
+    m_programConfig->writeEntry(TTYLevelEntry, int(m_ttyLevel));
 
     // write environment variables
     m_programConfig->deleteGroup(EnvironmentGroup);
@@ -549,6 +554,7 @@ void KDebugger::restoreProgramSettings()
      * distinguish different versions of this configuration file.
      */
     m_debuggerCmd = m_programConfig->readEntry(DebuggerCmdStr);
+    // m_ttyLevel has been read in already
     QString pgmArgs = m_programConfig->readEntry(ProgramArgs);
     QString pgmWd = m_programConfig->readEntry(WorkingDirectory);
 

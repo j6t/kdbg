@@ -36,6 +36,7 @@ kdbg_SOURCES = \
 	regwnd.cpp \
 	updateui.cpp \
 	winstack.cpp \
+	ttywnd.cpp \
 	typetable.cpp \
 	prefdebugger.cpp \
 	mainwndbase.cpp \
@@ -67,6 +68,7 @@ noinst_HEADERS = \
 	ktreeview.h \
 	updateui.h \
 	winstack.h \
+	ttywnd.h \
 	typetable.h \
 	prefdebugger.h \
 	mainwndbase.h \
@@ -87,6 +89,7 @@ BUILTSOURCES =	\
 	regwnd.moc \
 	ktreeview.moc \
 	winstack.moc \
+	ttywnd.moc \
 	mainwndbase.moc \
 	dbgmainwnd.moc \
 	updateui.moc
@@ -142,6 +145,10 @@ ktreeview.moc: $(srcdir)/ktreeview.h
 $(srcdir)/winstack.cpp: winstack.moc
 winstack.moc: $(srcdir)/winstack.h
 	$(MOC) $(srcdir)/winstack.h -o winstack.moc
+
+$(srcdir)/ttywnd.cpp: ttywnd.moc
+ttywnd.moc: $(srcdir)/ttywnd.h
+	$(MOC) $(srcdir)/ttywnd.h -o ttywnd.moc
 
 $(srcdir)/updateui.cpp: updateui.moc
 updateui.moc: $(srcdir)/updateui.h

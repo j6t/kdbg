@@ -200,6 +200,20 @@ public:
     void setDebuggerCmd(const QString& cmd)
     { m_generalDebuggerCmd = cmd; }
 
+    /**
+     * Terminal emulation level.
+     */
+    enum TTYLevel {
+	ttyNone = 0,			/* ignore output, input triggers EOF */
+	ttySimpleOutputOnly = 1,	/* minmal output emulation, input triggers EOF */
+	ttyFull = 7			/* program needs full emulation */
+    };
+
+    /**
+     * Returns the level of terminal emulation requested by the inferior.
+     */
+    TTYLevel ttyLevel() const { return m_ttyLevel; }
+
     /** Sets the terminal that is to be used by the debugger. */
     void setTerminal(const QString& term) { m_inferiorTerminal = term; }
 
@@ -217,6 +231,7 @@ protected:
     QString m_inferiorTerminal;
     QString m_debuggerCmd;		/* per-program setting */
     QString m_generalDebuggerCmd;	/* global setting */
+    TTYLevel m_ttyLevel;		/* level of terminal emulation */
     bool startGdb();
     void stopGdb();
     void writeCommand();

@@ -23,6 +23,7 @@
 #include "gdbdriver.h"
 #include "prefdebugger.h"
 #include "procattach.h"
+#include "ttywnd.h"
 #include "updateui.h"
 #include "commandids.h"
 #include "valarray.h"
@@ -98,6 +99,8 @@ const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
 DebuggerMainWndBase::DebuggerMainWndBase() :
 	m_animationCounter(0),
 	m_outputTermCmdStr(defaultTermCmdStr),
+	m_outputTermProc(0),
+	m_ttyLevel(-1),			/* no tty yet */
 #ifdef GDB_TRANSCRIPT
 	m_transcriptFile(GDB_TRANSCRIPT),
 #endif
@@ -597,18 +600,50 @@ void DebuggerMainWndBase::setTerminalCmd(const QString& cmd)
 
 void DebuggerMainWndBase::slotDebuggerStarting()
 {
-    if (m_outputTermProc == 0) {
-	// create an output window
-	if (!createOutputWindow()) {
-	    TRACE("createOuputWindow failed");
-	    m_outputTermName = QString();
-	} else {
-	    TRACE("successfully created output window");
+    if (m_debugger == 0)		/* paranoia check */
+	return;
+
+    if (m_ttyLevel == m_debugger->ttyLevel())
+    {
+    }
+    else
+    {
+	// shut down terminal emulations we will not need
+	switch (m_ttyLevel) {
+	case KDebugger::ttySimpleOutputOnly:
+	    ttyWindow()->deactivate();
+	    break;
+	case KDebugger::ttyFull:
+	    if (m_outputTermProc != 0) {
+		m_outputTermProc->kill();
+		// will be deleted in slot
+	    }
+	    break;
+	default: break;
+	}
+
+	m_ttyLevel = m_debugger->ttyLevel();
+
+	switch (m_ttyLevel) {
+	case KDebugger::ttySimpleOutputOnly:
+	    m_outputTermName = ttyWindow()->activate();
+	    break;
+	case KDebugger::ttyFull:
+	    if (m_outputTermProc == 0) {
+		// create an output window
+		if (!createOutputWindow()) {
+		    TRACE("createOuputWindow failed");
+		    m_outputTermName = QString();
+		} else {
+		    TRACE("successfully created output window");
+		}
+	    }
+	    break;
+	default: break;
 	}
     }
-    if (m_debugger != 0) {
-	m_debugger->setTerminal(m_outputTermName);
-    }
+
+    m_debugger->setTerminal(m_outputTermName);
 }
 
 void DebuggerMainWndBase::setDebuggerCmdStr(const QString& cmd)

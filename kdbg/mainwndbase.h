@@ -14,6 +14,7 @@
 
 // forward declarations
 class KDebugger;
+class TTYWindow;
 class UpdateUI;
 class KStdAccel;
 class KToolBar;
@@ -88,6 +89,8 @@ protected:
     virtual KStatusBar* dbgStatusBar() = 0;
     // override must return the main window (usually this)
     virtual QWidget* dbgMainWnd() = 0;
+    // override must return the integrated output window
+    virtual TTYWindow* ttyWindow() = 0;
 
     // statusbar texts
     QString m_statusActive;
@@ -102,6 +105,7 @@ protected:
     QString m_outputTermName;
     QString m_outputTermKeepScript;
     KProcess* m_outputTermProc;
+    int m_ttyLevel;
     virtual bool createOutputWindow();
     void shutdownTermWindow();
 

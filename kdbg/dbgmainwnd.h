@@ -45,6 +45,7 @@ protected:
     WatchWindow* m_watches;
     RegisterView* m_registers;
     BreakpointTable* m_bpTable;
+    TTYWindow* m_ttyWindow;
 
     // menus
     QPopupMenu* m_menuFile;
@@ -58,6 +59,7 @@ protected:
     virtual KToolBar* dbgToolBar();
     virtual KStatusBar* dbgStatusBar();
     virtual QWidget* dbgMainWnd();
+    virtual TTYWindow* ttyWindow();
     virtual bool createOutputWindow();
 
     DockWidget* dockParent(QWidget* w);

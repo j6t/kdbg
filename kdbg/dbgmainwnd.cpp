@@ -23,6 +23,7 @@
 #include "commandids.h"
 #include "winstack.h"
 #include "brkpt.h"
+#include "ttywnd.h"
 #include "mydebug.h"
 
 
@@ -54,6 +55,9 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     DockWidget* dw5 = createDockWidget("Breakpoints", p);
     dw5->setCaption(i18n("Breakpoints"));
     m_bpTable = new BreakpointTable(dw5, "breakpoints");
+    DockWidget* dw6 = createDockWidget("Output", p);
+    dw6->setCaption(i18n("Output"));
+    m_ttyWindow = new TTYWindow(dw6, "output");
 
     initMenu();
     initToolbar();
@@ -161,6 +165,7 @@ void DebuggerMainWnd::initMenu()
     m_menuView->insertItem(i18n("&Registers"), ID_VIEW_REGISTERS);
     m_menuView->insertItem(i18n("&Breakpoints"), ID_BRKPT_LIST);
     m_menuView->insertItem(i18n("T&hreads"), ID_VIEW_THREADS);
+    m_menuView->insertItem(i18n("&Output"), ID_VIEW_OUTPUT);
     m_menuView->insertSeparator();
     m_menuView->insertItem(i18n("Toggle &Toolbar"), ID_VIEW_TOOLBAR);
     m_menuView->insertItem(i18n("Toggle &Statusbar"), ID_VIEW_STATUSBAR);
@@ -388,6 +393,9 @@ void DebuggerMainWnd::menuCallback(int item)
     case ID_VIEW_THREADS:
 //	showhideWindow(m_btWindow);
 	break;
+    case ID_VIEW_OUTPUT:
+	showhideWindow(m_ttyWindow);
+	break;
     default:
 	// forward all others
 	if (!handleCommand(item))
@@ -488,6 +496,9 @@ void DebuggerMainWnd::updateUIItem(UpdateUI* item)
 	break;
     case ID_VIEW_THREADS:
 //	dockUpdateHelper(item, m_filesWindow);
+	break;
+    case ID_VIEW_OUTPUT:
+	dockUpdateHelper(item, m_ttyWindow);
 	break;
     default:
 	DebuggerMainWndBase::updateUIItem(item);
@@ -617,6 +628,11 @@ KStatusBar* DebuggerMainWnd::dbgStatusBar()
 QWidget* DebuggerMainWnd::dbgMainWnd()
 {
     return this;
+}
+
+TTYWindow* DebuggerMainWnd::ttyWindow()
+{
+    return m_ttyWindow;
 }
 
 void DebuggerMainWnd::slotNewStatusMsg()
