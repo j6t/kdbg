@@ -641,6 +641,7 @@ void KDebugger::restoreProgramSettings()
 const char BPGroup[] = "Breakpoint %d";
 const char File[] = "File";
 const char Line[] = "Line";
+const char Address[] = "Address";
 const char Temporary[] = "Temporary";
 const char Enabled[] = "Enabled";
 const char Condition[] = "Condition";
@@ -653,8 +654,20 @@ void KDebugger::saveBreakpoints(KSimpleConfig* config)
 	groupName.sprintf(BPGroup, i);
 	config->setGroup(groupName);
 	Breakpoint* bp = m_brkpts[i];
-	config->writeEntry(File, bp->fileName);
-	config->writeEntry(Line, bp->lineNo);
+	if (!bp->fileName.isEmpty()) {
+	    config->writeEntry(File, bp->fileName);
+	    config->writeEntry(Line, bp->lineNo);
+	    /*
+	     * Addresses are hardly correct across sessions, so we remove
+	     * it since we have a file name and line number.
+	     */
+	    config->deleteEntry(Address, false);
+	} else {
+	    config->writeEntry(Address, bp->address);
+	    /* remove remmants */
+	    config->deleteEntry(File, false);
+	    config->deleteEntry(Line, false);
+	}
 	config->writeEntry(Temporary, bp->temporary);
 	config->writeEntry(Enabled, bp->enabled);
 	if (bp->condition.isEmpty())
@@ -680,6 +693,7 @@ void KDebugger::restoreBreakpoints(KSimpleConfig* config)
 {
     QString groupName;
     QString fileName;
+    QString address;
     int lineNo;
     bool enabled, temporary;
     QString condition;
@@ -696,7 +710,8 @@ void KDebugger::restoreBreakpoints(KSimpleConfig* config)
 	}
 	fileName = config->readEntry(File);
 	lineNo = config->readNumEntry(Line, -1);
-	if (lineNo < 0 || fileName.isEmpty())
+	address = config->readEntry(Address);
+	if ((fileName.isEmpty() || lineNo < 0) && address.isEmpty())
 	    continue;
 	enabled = config->readBoolEntry(Enabled, true);
 	temporary = config->readBoolEntry(Temporary, false);
@@ -709,8 +724,13 @@ void KDebugger::restoreBreakpoints(KSimpleConfig* config)
 	 * because this isn't a fresh gdb at all), we disable the wrong
 	 * breakpoint! Oh well... for now it works.
 	 */
-	m_d->executeCmd(temporary ? DCtbreakline : DCbreakline,
-			fileName, lineNo);
+	if (!fileName.isEmpty()) {
+	    m_d->executeCmd(temporary ? DCtbreakline : DCbreakline,
+			    fileName, lineNo);
+	} else {
+	    m_d->executeCmd(temporary ? DCtbreakaddr : DCbreakaddr,
+			    address);
+	}
 	if (!enabled) {
 	    m_d->executeCmd(DCdisable, i+1);
 	}
@@ -847,6 +867,8 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCbreaktext:
     case DCbreakline:
     case DCtbreakline:
+    case DCbreakaddr:
+    case DCtbreakaddr:
 	newBreakpoint(output);
 	// fall through
     case DCdelete:
