@@ -801,10 +801,16 @@ void KDebugger::restoreProgramSettings()
     emit restoreProgramSpecific(m_programConfig);
 }
 
+/**
+ * Reads the debugger command line from the program settings. The config
+ * group must have been set by the caller.
+ */
 QString KDebugger::readDebuggerCmd()
 {
     QString debuggerCmd = m_programConfig->readEntry(DebuggerCmdStr);
-    if (m_programConfig->isReadOnly())
+    if (m_programConfig->isReadOnly() ||
+	// always let the user confirm the debugger cmd if we are root
+	::geteuid() == 0)
     {
 	/*
 	 * The permissions don't allow write access. We do not trust the
