@@ -1445,7 +1445,7 @@ sub tag_DIST () {
     }
     closedir (THISDIR);
 
-    my @marks = ("EXTRA_DIST", "DIST_COMMON", '\S*_SOURCES', '\S*_HEADERS', 'MAINTAINERCLEANFILES', 'CLEANFILES', 'DISTCLEANFILES', '\S*_OBJECTS');
+    my @marks = ("EXTRA_DIST", "DIST_COMMON", '\S*_SOURCES', '\S*_HEADERS', 'CLEANFILES', 'DISTCLEANFILES', '\S*_OBJECTS');
     foreach $mark (@marks) {
         while ($MakefileData =~ /\n($mark)\s*=\s*([^\n]*)/g) {
             foreach $file (split('[\034\s]', $2)) {
