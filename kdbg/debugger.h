@@ -42,11 +42,16 @@ public:
     
     bool debugProgram(const QString& executable);
     void menuCallbackExecutable();	/* helper to work around Qt bug */
-    
-    // instance specific properties
+
+protected:
+    // session properties
     virtual void saveProperties(KConfig*);
     virtual void readProperties(KConfig*);
-    
+    // settings
+    void saveSettings(KConfig*);
+    void restoreSettings(KConfig*);
+
+public:
     // debugger driver
     enum DbgCommand {
 	DCinitialize,
@@ -141,6 +146,9 @@ protected:
     bool m_programRunning;		/* is the program executing (not stopped)? */
     QString m_executable;
     QString m_programArgs;
+    KSimpleConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
+    void saveProgramSettings();
+    void restoreProgramSettings();
 
     // debugger process
     GdbProcess m_gdb;

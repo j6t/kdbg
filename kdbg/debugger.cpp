@@ -10,12 +10,13 @@
 #include "parsevar.h"
 #include "pgmargs.h"
 #include <qregexp.h>
+#include <qfileinf.h>
 #include <kapp.h>
 #include <kfiledialog.h>		/* must come before kapp.h */
 #include <kiconloader.h>
 #include <kmsgbox.h>
 #include <kstdaccel.h>
-#include <qfileinf.h>
+#include <ksimpleconfig.h>
 #include <ctype.h>
 
 #ifdef HAVE_CONFIG_H
@@ -61,6 +62,7 @@ KDebugger::KDebugger(const char* name) :
 	m_haveExecutable(false),
 	m_programActive(false),
 	m_programRunning(false),
+	m_programConfig(0),
 	m_gdb(),
 	m_logFile("./gdb-transcript"),
 	m_menu(this, "menu"),
@@ -144,7 +146,8 @@ KDebugger::KDebugger(const char* name) :
 	    SLOT(receiveOutput(KProcess*,char*,int)));
     connect(&m_gdb, SIGNAL(wroteStdin(KProcess*)), SLOT(commandRead(KProcess*)));
     connect(&m_gdb, SIGNAL(processExited(KProcess*)), SLOT(gdbExited(KProcess*)));
-    
+
+    restoreSettings(kapp->getConfig());
     resize(700, 700);
 
     emit updateUI();
@@ -153,11 +156,19 @@ KDebugger::KDebugger(const char* name) :
 KDebugger::~KDebugger()
 {
     TRACE(__PRETTY_FUNCTION__);
+
+    saveSettings(kapp->getConfig());
+
     // if the output window is open, close it
     if (m_outputTermPID != 0) {
 	kill(m_outputTermPID, SIGTERM);
     }
 
+    if (m_programConfig != 0) {
+	saveProgramSettings();
+	m_programConfig->sync();
+	delete m_programConfig;
+    }
     delete[] m_gdbOutput;
 }
 
@@ -178,6 +189,49 @@ void KDebugger::readProperties(KConfig* config)
     if (!execName.isEmpty()) {
 	debugProgram(execName);
     }
+}
+
+const char WindowGroup[] = "Windows";
+const char MainPane[] = "MainPane";
+const char LeftPane[] = "LeftPane";
+const char RightPane[] = "RightPane";
+const char BreaklistVisible[] = "BreaklistVisible";
+const char Breaklist[] = "Breaklist";
+
+void KDebugger::saveSettings(KConfig* config)
+{
+    KConfigGroupSaver g(config, WindowGroup);
+    // panner positions
+    int vsep = m_mainPanner.separatorPos();
+    int lsep = m_leftPanner.separatorPos();
+    int rsep = m_rightPanner.separatorPos();
+    config->writeEntry(MainPane, vsep);
+    config->writeEntry(LeftPane, lsep);
+    config->writeEntry(RightPane, rsep);
+    // breakpoint window
+    bool visible = m_bpTable.isVisible();
+    const QRect& r = m_bpTable.geometry();
+    config->writeEntry(BreaklistVisible, visible);
+    config->writeEntry(Breaklist, r);
+}
+
+void KDebugger::restoreSettings(KConfig* config)
+{
+    KConfigGroupSaver g(config, WindowGroup);
+    // panner positions
+    int vsep = config->readNumEntry(MainPane, 60);
+    int lsep = config->readNumEntry(LeftPane, 70);
+    int rsep = config->readNumEntry(RightPane, 50);
+    m_mainPanner.setSeparatorPos(vsep);
+    m_leftPanner.setSeparatorPos(lsep);
+    m_rightPanner.setSeparatorPos(rsep);
+    // breakpoint window
+    bool visible = config->readBoolEntry(BreaklistVisible, false);
+    if (config->hasKey(Breaklist)) {
+	QRect r = config->readRectEntry(Breaklist);
+	m_bpTable.setGeometry(r);
+    }
+    visible ? m_bpTable.show() : m_bpTable.hide();
 }
 
 
@@ -650,10 +704,46 @@ bool KDebugger::debugProgram(const QString& name)
     enqueueCmd(DCexecutable, "file " + name);
     m_executable = name;
 
+    // create the program settings object
+    QString pgmConfigFile = fi.dirPath(true);
+    if (!pgmConfigFile.isEmpty()) {
+	pgmConfigFile += '/';
+    }
+    pgmConfigFile += ".kdbgrc." + fi.fileName();
+    TRACE("program config file = " + pgmConfigFile);
+    m_programConfig = new KSimpleConfig(pgmConfigFile);
+    // it is read in later in the handler of DCexecutable
+
     emit updateUI();
 
     return true;
 }
+
+const char GeneralGroup[] = "General";
+const char FileVersion[] = "FileVersion";
+const char ProgramArgs[] = "ProgramArgs";
+
+void KDebugger::saveProgramSettings()
+{
+    m_programConfig->setGroup(GeneralGroup);
+    m_programConfig->writeEntry(FileVersion, 1);
+    m_programConfig->writeEntry(ProgramArgs, m_programArgs);
+
+    m_bpTable.saveBreakpoints(m_programConfig);
+}
+
+void KDebugger::restoreProgramSettings()
+{
+    m_programConfig->setGroup(GeneralGroup);
+    /*
+     * We ignore file version for now we will use it in the future to
+     * distinguish different versions of this configuration file.
+     */
+    m_programArgs = m_programConfig->readEntry(ProgramArgs);
+
+    m_bpTable.restoreBreakpoints(m_programConfig);
+}
+
 
 KDebugger::CmdQueueItem* KDebugger::enqueueCmd(KDebugger::DbgCommand cmd,
 					       QString cmdString, bool checkRunning)
@@ -876,6 +966,8 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	if (m_gdbOutput[0] == '\0') {
 	    // success; now load file containing main()
 	    enqueueCmd(DCinfolinemain, "info line main");
+	    // restore breakpoints etc.
+	    restoreProgramSettings();
 	} else {
 	    QString msg = "gdb: " + QString(m_gdbOutput);
 	    KMsgBox::message(this, kapp->appName(), msg,
@@ -927,6 +1019,8 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	enqueueCmd(DCinfobreak, "info breakpoints");
 	break;
     case DCinfobreak:
+	// note: this handler must not enqueue a command, since
+	// DCinfobreak is used at various different places.
 	m_bpTable.updateBreakList(m_gdbOutput);
 	m_filesWindow.updateLineItems(m_bpTable);
 	break;
@@ -996,6 +1090,15 @@ void KDebugger::handleRunCommands()
     } while (start != 0);
 
     m_statusbar.changeItem(msg, ID_STATUS_MSG);
+
+    /*
+     * If we have any temporary breakpoints, we must update the breakpoint
+     * list since this stop may be due to on of them, which would now go
+     * away.
+     */
+    if (m_bpTable.haveTemporaryBP()) {
+	enqueueCmd(DCinfobreak, "info breakpoints");
+    }
 
     // get the backtrace
     if (m_programActive) {
