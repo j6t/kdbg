@@ -686,6 +686,15 @@ QString QChar::toQString(QChar* unicode, int len)
     return result;
 }
 #endif
+#if QT_VERSION >= 300
+union Qt2QChar {
+    short s;
+    struct {
+	uchar row;
+	uchar cell;
+    } qch;
+};
+#endif
 
 VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, bool qt3like)
 {
@@ -780,7 +789,14 @@ VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, boo
 	    if (qt3like) {
 		ch = QChar(value);
 	    } else {
+#if QT_VERSION < 300
 		(unsigned short&)ch = value;
+#else
+		Qt2QChar c;
+		c.s = value;
+		ch.setRow(c.qch.row);
+		ch.setCell(c.qch.cell);
+#endif
 	    }
 
 	    // escape a few frequently used characters
