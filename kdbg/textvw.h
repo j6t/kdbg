@@ -24,6 +24,7 @@ protected:
     virtual void paintCell(QPainter* p, int row, int col);
     virtual void activateLine(int row);
     virtual int textCol() const;
+    virtual bool updateCellSize(const char* text, int length);
 
 signals:
     void lineChanged();
