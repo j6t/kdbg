@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 0.2.3\n"
-"POT-Creation-Date: 1998-09-15 23:22+0200\n"
+"POT-Creation-Date: 1998-08-30 18:03+0200\n"
 "PO-Revision-Date: 1998-09-15 13:10+EDT\n"
 "Last-Translator: Éric Plante <plante@iro.umontreal.ca>\n"
 "Language-Team: none\n"
@@ -68,7 +68,7 @@ msgstr "Choisissez l'exécutable à déboguer"
 
 #: debugger.cpp:316
 msgid "Select core dump"
-msgstr ""
+msgstr "Choisissez le core dump"
 
 #: debugger.cpp:518
 msgid "&Open Source..."
@@ -84,7 +84,7 @@ msgstr "&Exécutable..."
 
 #: debugger.cpp:522
 msgid "&Core dump..."
-msgstr ""
+msgstr "&Core dump..."
 
 #: debugger.cpp:528
 msgid "&Find..."
@@ -168,6 +168,9 @@ msgid ""
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "with the help of many others"
 msgstr ""
+"Un débogueur\n"
+"par Johannes Sixt <Johannes.Sixt@telecom.at>\n"
+"with the help of many others"
 
 #: debugger.cpp:590
 msgid "Open a source file"
@@ -211,11 +214,12 @@ msgstr "Continuer"
 
 #: debugger.cpp:618
 msgid "Executable"
-msgstr "Exécutable..."
+msgstr "Exécutable"
 
 #: debugger.cpp:619
 msgid "Core dump"
-msgstr ""
+msgstr "Core dump"
+
 
 #: debugger.cpp:756
 msgid ": Program output"
