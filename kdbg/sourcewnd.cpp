@@ -134,11 +134,6 @@ void SourceWindow::reloadFile()
 	// remove the excessive lines
 	m_texts.setSize(lineNo);
 	m_lineItems.setSize(lineNo);
-	// if the cursor is in the deleted lines, move it to the last line
-	if (m_curRow >= lineNo) {
-	    m_curRow = -1;		/* at this point don't have an active row */
-	    activateLine(lineNo-1);	/* now we have */
-	}
     }
     f.close();
 
@@ -150,7 +145,14 @@ void SourceWindow::reloadFile()
 
     setAutoUpdate(autoU);
     if (autoU && isVisible()) {
+	updateTableSize();
 	repaint();
+    }
+
+    // if the cursor is in the deleted lines, move it to the last line
+    if (m_curRow >= m_texts.size()) {
+	m_curRow = -1;			/* at this point don't have an active row */
+	activateLine(m_texts.size()-1);	/* now we have */
     }
 }
 
@@ -702,8 +704,10 @@ void SourceWindow::expandRow(int row)
     emit expanded(line);		/* must set PC */
 
     setAutoUpdate(autoU);
-    if (autoU && isVisible())
+    if (autoU && isVisible()) {
+	updateTableSize();
 	update();
+    }
 }
 
 void SourceWindow::collapseRow(int row)

@@ -37,10 +37,6 @@
     The parent indicates whether all members are visible. Provide a context menu
     to display the hidden entries. Save the settings somewhere.
 
-27. Fix array display: buf[256]:
-      [0]  -1 <repeats 20 times>
-      [1]  100             <-- should be [20] 100
-
 28. Better support for remote debugging and special versions of gdb, e.g.
     "target pilot localhost:2000".
 

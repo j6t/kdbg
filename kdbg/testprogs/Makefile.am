@@ -6,7 +6,7 @@ INCLUDES= $(all_includes)
 CXXFLAGS = -g
 
 if BUILDTESTPROGS
-PROGS = testfile locals maths std
+PROGS = testfile locals maths repeats std
 else
 PROGS =
 endif
@@ -22,6 +22,10 @@ locals_LDFLAGS = -g
 
 maths_SOURCES = maths.cpp
 maths_LDFLAGS = -g
+
+repeats_SOURCES = repeats.cpp
+repeats_LDFLAGS = -g $(all_libraries) $(KDE_RPATH)
+repeats_LDADD = $(LIB_QT)
 
 std_SOURCES = std.cpp
 std_LDFLAGS = -g

@@ -1204,7 +1204,10 @@ repeat:
 	    if (*p == '"' || *p == '\'') {
 		skipString(p);
 	    } else if (*p == '<') {
-		skipNested(p, '<', '>');
+		// if this value is part of an array, it might be followed
+		// by <repeats 15 times>, which we don't skip here
+		if (strncmp(p, "<repeats ", 9) != 0)
+		    skipNested(p, '<', '>');
 	    }
 	    if (p != start) {
 		// there is always a blank before the string,
@@ -1318,7 +1321,6 @@ static bool parseValueSeq(const char*& s, VarTree* variable)
     for (;;) {
 	QString name;
 	name.sprintf("[%d]", index);
-	index++;
 	VarTree* var = new VarTree(name, VarTree::NKplain);
 	var->setDeleteChildren(true);
 	good = parseValue(s, var);
@@ -1326,11 +1328,34 @@ static bool parseValueSeq(const char*& s, VarTree* variable)
 	    delete var;
 	    return false;
 	}
+	// a value may be followed by "<repeats 45 times>"
+	if (strncmp(s, "<repeats ", 9) == 0) {
+	    s += 9;
+	    char* end;
+	    int l = strtol(s, &end, 10);
+	    if (end == s || strncmp(end, " times>", 7) != 0) {
+		// should not happen
+		delete var;
+		return false;
+	    }
+	    TRACE(QString().sprintf("found <repeats %d times> in array", l));
+	    // replace name and advance index
+	    name.sprintf("[%d .. %d]", index, index+l-1);
+	    var->setText(name);
+	    index += l;
+	    // skip " times>" and space
+	    s = end+7;
+	    // possible final space
+	    while (isspace(*s))
+		s++;
+	} else {
+	    index++;
+	}
 	variable->appendChild(var);
 	if (*s != ',') {
 	    break;
 	}
-	// skip the command and whitespace
+	// skip the comma and whitespace
 	s++;
 	while (isspace(*s))
 	    s++;
@@ -1367,14 +1392,26 @@ static void parseFrameInfo(const char*& s, QString& func,
 	address = FROM_LATIN1(start, p-start);
 	if (strncmp(p, " in ", 4) == 0)
 	    p += 4;
+    } else {
+	address = DbgAddr();
     }
     const char* start = p;
+    // check for special signal handler frame
+    if (strncmp(p, "<signal handler called>", 23) == 0) {
+	func = FROM_LATIN1(start, 23);
+	file = QString();
+	lineNo = -1;
+	s = p+23;
+	if (*s == '\n')
+	    s++;
+	return;
+    }
     // search opening parenthesis
     while (*p != '\0' && *p != '(')
 	p++;
     if (*p == '\0') {
 	func = start;
-	file = "";
+	file = QString();
 	lineNo = -1;
 	s = p;
 	return;
@@ -1454,7 +1491,6 @@ static void parseFrameInfo(const char*& s, QString& func,
 	/* continue searching for more \n's at this place: */
 	nl = startWhite+1;
     }
-    return;
 }
 
 #undef ISSPACE

@@ -4,6 +4,13 @@ Version 1.2.4
 
 	Support QString of Qt 3.x.
 
+	Improved (and fixed) the display of arrays with repeated values.
+
+	Fixed crash when a file is reloaded while disassembled code is
+	displayed.
+
+	Fixed parsing of stack frames involving signal handler invocations.
+
 Version 1.2.3
 
 	Fixed invisible toolbar under KDE 2.x (really, this time, I promise).

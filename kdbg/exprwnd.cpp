@@ -81,7 +81,22 @@ QString VarTree::computeExpr() const
     }
     switch (par->m_varKind) {
     case VKarray:
-	result = "(" + parentExpr + ")" + getText();
+	{
+	    QString index = getText();
+	    int i = 1;
+	    // skip past the index
+	    while (index[i].isDigit())
+		i++;
+	    /*
+	     * Some array indices are actually ranges due to repeated array
+	     * values. We use the first index in these cases.
+	     */
+	    if (index[i] != ']') {
+		// remove second index
+		index.remove(i, index.length()-i-1);
+	    }
+	    result = "(" + parentExpr + ")" + index;
+	}
 	break;
     case VKstruct:
 	result = "(" + parentExpr + ")." + getText();
@@ -448,8 +463,8 @@ void ExprWnd::updateStructValue(VarTree* display)
     if (display->updateValue(display->m_partialValue)) {
 	int i = itemRow(display);
 	if (i >= 0) {
-	    updateCell(i, 1, true);
 	    updateValuesWidth();
+	    updateCell(i, 1, true);
 	}
     }
     // reset the value

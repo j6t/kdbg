@@ -1,0 +1,32 @@
+// test <repeats 30 times> in arrays
+
+#include <qstring.h>
+
+struct Big {
+    struct bog {
+	short b[40];
+    } a[40];
+    short c[40][40];
+};
+
+static void f(int)
+{
+}
+
+
+int main()
+{
+    struct Big big = {{{ 2,}}};
+    big.a[0].b[39]=7;
+    big.a[38].b[39]=6;
+
+    // array of pointer to function
+    void (*apf[30])(int);
+
+    for (int i = 1; i < 29; i++)
+	apf[i] = f;
+
+    QString s[15];
+
+    exit(0);
+}
