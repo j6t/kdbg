@@ -96,13 +96,14 @@ XPMS = \
 # types in libraries that we understand
 TYPES = \
 	qt.kdbgtt \
-	kdecore.kdbgtt
+	kdecore.kdbgtt \
+	X11.kdbgtt
 
 # if you "make clean", this files get removed. If you want to remove
 # them while "make distclean", use DISTCLEANFILES
 CLEANFILES = $(kdbg_METASOURCES)
 
-EXTRA_DIST = testfile testfile.cpp $(XPMS) kdbg.xpm mini-kdbg.xpm kdbg.kdelnk
+EXTRA_DIST = testfile.cpp $(XPMS) $(TYPES) kdbg.xpm mini-kdbg.xpm kdbg.kdelnk
 
 # make messages.po. Move this one to ../po/ and "make merge" in po
 # the -x is for skipping messages already translated in kdelibs
@@ -144,6 +145,7 @@ uninstall-local:
 # compile a testfile
 noinst_PROGRAMS = testfile
 testfile_SOURCES = testfile.cpp
+testfile_LDFLAGS = $(all_libraries) $(KDE_RPATH)
 testfile_LDADD = -lqt -lXext -lX11 $(LIBSOCKET)
 
 # add a dependency for every moc file to be full portable
