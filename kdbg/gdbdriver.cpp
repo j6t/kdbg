@@ -1551,9 +1551,8 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	// get Type
 	while (isspace(*p))
 	    p++;
-	Breakpoint::Type bpType;
+	Breakpoint::Type bpType = Breakpoint::breakpoint;
 	if (strncmp(p, "breakpoint", 10) == 0) {
-	    bpType = Breakpoint::breakpoint;
 	    p += 10;
 	} else if (strncmp(p, "hw watchpoint", 13) == 0) {
 	    bpType = Breakpoint::watchpoint;
@@ -2003,43 +2002,84 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 	// skip space
 	while (isspace(*output))
 	    output++;
-	// the rest of the line is the register value
-	start = output;
-	output = strchr(output,'\n');
-	if (output == 0)
-	    output = start + strlen(start);
-	value = FROM_LATIN1(start, output-start).simplifyWhiteSpace();
-
-	if (*output != '\0')
-	    output++;			/* skip '\n' */
 
 	RegisterInfo* reg = new RegisterInfo;
 	reg->regName = regName;
 
 	/*
-	 * We split the raw from the cooked values. For this purpose, we
-	 * split off the first token (separated by whitespace). It is the
-	 * raw value. The remainder of the line is the cooked value.
+	 * If we find a brace now, this is a vector register. We look for
+	 * the closing brace and treat the result as cooked value.
 	 */
-	int pos = value.find(' ');
-	if (pos < 0) {
-	    reg->rawValue = value;
-	    reg->cookedValue = QString();
-	} else {
-	    reg->rawValue = value.left(pos);
-	    reg->cookedValue = value.mid(pos+1,value.length());
+	if (*output == '{')
+	{
+	    start = output;
+	    skipNested(output, '{', '}');
+	    value = FROM_LATIN1(start, output-start).simplifyWhiteSpace();
+	    // skip space, but not the end of line
+	    while (isspace(*output) && *output != '\n')
+		output++;
+	    // get rid of the braces at the begining and the end
+	    value.remove(0, 1);
+	    if (value[value.length()-1] == '}') {
+		value = value.left(value.length()-1);
+	    }
+	    // gdb 5.3 doesn't print a separate set of raw values
+	    if (*output == '{') {
+		// another set of vector follows
+		// what we have so far is the raw value
+		reg->rawValue = value;
+
+		start = output;
+		skipNested(output, '{', '}');
+		value = FROM_LATIN1(start, output-start).simplifyWhiteSpace();
+		// skip to the end of line
+		while (*output != '\0' && *output != '\n')
+		    output++;
+		// get rid of the braces at the begining and the end
+		value.remove(0, 1);
+		if (value[value.length()-1] == '}') {
+		    value = value.left(value.length()-1);
+		}
+	    }
+	    reg->cookedValue = value;
+	}
+	else
+	{
+	    // the rest of the line is the register value
+	    start = output;
+	    output = strchr(output,'\n');
+	    if (output == 0)
+		output = start + strlen(start);
+	    value = FROM_LATIN1(start, output-start).simplifyWhiteSpace();
+
 	    /*
-	     * Some modern gdbs explicitly say: "0.1234 (raw 0x3e4567...)".
-	     * Here the raw value is actually in the second part.
+	     * We split the raw from the cooked values. For this purpose,
+	     * we split off the first token (separated by whitespace). It
+	     * is the raw value. The remainder of the line is the cooked
+	     * value.
 	     */
-	    if (reg->cookedValue.left(5) == "(raw ") {
-		QString raw = reg->cookedValue.right(reg->cookedValue.length()-5);
-		if (raw[raw.length()-1] == ')')	/* remove closing bracket */
-		    raw = raw.left(raw.length()-1);
-		reg->cookedValue = reg->rawValue;
-		reg->rawValue = raw;
+	    int pos = value.find(' ');
+	    if (pos < 0) {
+		reg->rawValue = value;
+		reg->cookedValue = QString();
+	    } else {
+		reg->rawValue = value.left(pos);
+		reg->cookedValue = value.mid(pos+1);
+		/*
+		 * Some modern gdbs explicitly say: "0.1234 (raw 0x3e4567...)".
+		 * Here the raw value is actually in the second part.
+		 */
+		if (reg->cookedValue.left(5) == "(raw ") {
+		    QString raw = reg->cookedValue.right(reg->cookedValue.length()-5);
+		    if (raw[raw.length()-1] == ')')	/* remove closing bracket */
+			raw = raw.left(raw.length()-1);
+		    reg->cookedValue = reg->rawValue;
+		    reg->rawValue = raw;
+		}
 	    }
 	}
+	if (*output != '\0')
+	    output++;			/* skip '\n' */
 
 	regs.append(reg);
     }
