@@ -231,6 +231,7 @@ public:
 	DCattach,
 	DCinfolinemain,
 	DCinfolocals,
+	DCinfoargs,
 	DCsetargs,
 	DCsetenv,
 	DCcd,
@@ -286,6 +287,7 @@ protected:
     QQueue<DelayedStr> m_delayedOutput;	/* output colleced while we have receivedOutput */
 					/* but before signal wroteStdin arrived */
     QList<VarTree> m_watchEvalExpr;	/* exprs to evaluate for watch windows */
+    QList<VarTree> m_parsedLocals;	/* local variables that have just been parsed */
 
 public:
     /**

@@ -98,6 +98,7 @@ KDebugger::KDebugger(QWidget* parent,
 
     m_hipriCmdQueue.setAutoDelete(true);
     m_envVars.setAutoDelete(true);
+    m_parsedLocals.setAutoDelete(true);
 
     connect(&m_localVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
 	    SLOT(slotLocalsExpanding(KTreeViewItem*,bool&)));
@@ -1290,6 +1291,18 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	    handleLocals();
 	}
 	break;
+    case DCinfoargs:
+	// parse arguments
+	if (m_gdbOutput[0] != '\0') {
+	    /*
+	     * m_parsedLocals collects arguments and local variables.
+	     * Arguments are retrieved first, so we clear the list here.
+	     */
+	    m_parsedLocals.clear();
+
+	    parseLocals(m_parsedLocals);
+	}
+	break;
     case DCframe:
 	handleFrameChange();
 	parseMarker = true;
@@ -1468,6 +1481,10 @@ void KDebugger::updateAllExprs()
     if (!m_programActive)
 	return;
 
+    // retrieve parameters
+    // we must be sure that this command is executed before info locals!
+    queueCmd(DCinfoargs, "info args", QMoverrideMoreEqual);
+
     // retrieve local variables
     queueCmd(DCinfolocals, "info locals", QMoverride);
 
@@ -1538,6 +1555,30 @@ void KDebugger::handleLocals()
      */
     QList<VarTree> newVars;
     parseLocals(newVars);
+
+    /*
+     * Merge previously parsed local variables into newVars, but eliminate
+     * duplicates in such a way that variables in newVars prevail.
+     */
+    { VarTree* a;
+	/*
+	 * Note that the while loop will take out the variables from
+	 * m_parsedLocals starting from the end of the list, since the list
+	 * was created in parseLocals using append (which makes the last
+	 * item the current item).
+	 */
+	while ((a = m_parsedLocals.take()) != 0) {
+	    for (VarTree* b = newVars.first(); b != 0; b = newVars.next()) {
+		if (a->getText() == b->getText()) {
+		    delete a;
+		    goto alreadyPresent;
+		}
+	    }
+	    // place variable at the front
+	    newVars.insert(0, a);
+	alreadyPresent:;
+	}
+    }
 
     /*
      * Clear any old VarTree item pointers, so that later we don't access
