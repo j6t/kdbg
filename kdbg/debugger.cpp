@@ -1049,6 +1049,8 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	handlePrintDeref(cmd, output);
 	break;
     case DCattach:
+	m_haveExecutable = true;
+	// fall through
     case DCrun:
     case DCcont:
     case DCstep:
