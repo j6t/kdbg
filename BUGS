@@ -5,5 +5,3 @@ Here is an unsorted list of known deficiencies of kdbg.
 - Cannot handle source file names which contain new-lines or
   a sequence of the form
 	:[0-9]+:[0-9]+:beg
-
-- Cannot handle string values of the form "abc", 'd' <repeats 20 times>, "xyz".
