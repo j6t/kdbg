@@ -270,7 +270,7 @@ bool KDebugger::debugProgram(const QString& name)
     }
 
     // create the program settings object
-    QString pgmConfigFile = fi.dirPath(false);
+    QString pgmConfigFile = fi.dirPath(true);
     if (!pgmConfigFile.isEmpty()) {
 	pgmConfigFile += '/';
     }
