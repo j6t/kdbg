@@ -12,6 +12,8 @@ Version 1.2.6
 
 	When a pointer to a struct is expanded the struct is also expanded.
 
+	Improved toolbar and application icons.
+
 Version 1.2.5
 
 	Now compiles for KDE 3.
