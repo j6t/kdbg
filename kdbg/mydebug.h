@@ -13,14 +13,15 @@
 # ifdef NDEBUG
 #  define ASSERT(x) ((void)0)
 # else
-#  define ASSERT(x) ((x) ? (void)0 : kDebug((QString("assertion failed: ") + #x).ascii()))
+#  define ASSERT(x) ((x) ? (void)0 : kDebugInfo("%s", (QString("assertion failed: ") + #x).ascii()))
 # endif
 #endif
 #ifdef WANT_TRACE_OUTPUT
 # ifndef KDEBUG
-#  define KDEBUG(Level, Area, String) kdebug((Level), (Area), (String));
+#  define TRACE(x) kDebugInfo("%s", (const char*)(x));
+# else  
+#  define TRACE(x) KDEBUG(KDEBUG_INFO,0,(x))
 # endif
-#define TRACE(x) KDEBUG(KDEBUG_INFO,0,(x))
 #else
 #define TRACE(x) ((void)0)
 #endif
