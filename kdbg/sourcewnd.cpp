@@ -9,6 +9,7 @@
 #include <qpainter.h>
 #include <qbrush.h>
 #include <qfile.h>
+#include <qkeycode.h>
 #include <kapp.h>
 #include <kiconloader.h>
 #if QT_VERSION >= 200
@@ -388,24 +389,10 @@ void SourceWindow::mousePressEvent(QMouseEvent* ev)
 	return;
 
     if (col == 1) {
-	// disassemble
-	if (isRowDisassCode(row)) {
-	    // do nothing
-	    return;
-	}
-	if (isRowExpanded(row))
-	{
-	    collapseRow(row);
-	}
-	else
-	{
-	    int line = rowToLine(row);
-	    const SourceLine& sl = m_sourceCode[line];
-	    if (sl.disass.size() == 0 && sl.canDisass) {
-		emit disassemble(m_fileName, line);
-	    } else {
-		expandRow(row);
-	    }
+	if (isRowExpanded(row)) {
+	    actionCollapseRow(row);
+	} else {
+	    actionExpandRow(row);
 	}
 	return;
     }
@@ -433,6 +420,20 @@ void SourceWindow::mousePressEvent(QMouseEvent* ev)
 	break;
     default:;
     }
+}
+
+void SourceWindow::keyPressEvent(QKeyEvent* ev)
+{
+    switch (ev->key()) {
+    case Key_Plus:
+	actionExpandRow(m_curRow);
+	return;
+    case Key_Minus:
+	actionCollapseRow(m_curRow);
+	return;
+    }
+
+    KTextView::keyPressEvent(ev);
 }
 
 #if QT_VERSION < 200
@@ -759,6 +760,35 @@ int SourceWindow::SourceLine::findAddressRowOffset(const DbgAddr& address) const
     }
     // not found
     return 0;
+}
+
+void SourceWindow::actionExpandRow(int row)
+{
+    if (isRowExpanded(row) || isRowDisassCode(row)) {
+	// do nothing
+	return;
+    }
+
+    // disassemble
+    int line = rowToLine(row);
+    const SourceLine& sl = m_sourceCode[line];
+    if (!sl.canDisass)
+	return;
+    if (sl.disass.size() == 0) {
+	emit disassemble(m_fileName, line);
+    } else {
+	expandRow(row);
+    }
+}
+
+void SourceWindow::actionCollapseRow(int row)
+{
+    if (!isRowExpanded(row) || isRowDisassCode(row)) {
+	// do nothing
+	return;
+    }
+
+    collapseRow(row);
 }
 
 

@@ -54,6 +54,7 @@ protected:
     virtual int cellWidth(int col);
     virtual void paintCell(QPainter* p, int row, int col);
     virtual void mousePressEvent(QMouseEvent* ev);
+    virtual void keyPressEvent(QKeyEvent* ev);
     virtual void paletteChange(const QPalette&);
     void updateLineItem(int i);
     void expandRow(int row);
@@ -61,6 +62,9 @@ protected:
     void scrollToRow(int row);
     /** translates (0-based) line number plus a code address into a row number */
     int lineToRow(int row, const DbgAddr& address);
+
+    void actionExpandRow(int row);
+    void actionCollapseRow(int row);
 
 signals:
     void clickedLeft(const QString&, int, const DbgAddr& address, bool);
