@@ -54,6 +54,10 @@ int main(int argc, char* argv[])
 	if (argc > 1) {
 		if (*argv[1] == 's') {
 			segFault();
+		} else if (*argv[1] == 'a') {
+			// let debugger attach
+			int junk;
+			cin >> junk;
 		}
 	}
 
@@ -115,4 +119,5 @@ int Dl::f(int x)
 int Dl::operator()(const QString& x, int& y) const
 {
 	cout << "ha! I know!" << endl;
+	return 1;
 }
