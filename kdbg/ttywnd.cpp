@@ -27,7 +27,10 @@
 #include <sys/stat.h>
 #endif
 #ifdef HAVE_PTY_H
-#include <pty.h>			/* openpty */
+#include <pty.h>			/* openpty on Linux */
+#endif
+#ifdef HAVE_LIBUTIL_H
+#include <libutil.h>			/* openpty on FreeBSD */
 #endif
 #include <errno.h>
 
