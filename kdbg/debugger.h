@@ -238,7 +238,7 @@ public:
     bool isIdle() const;
 
     /** The list of breakpoints. */
-    int numBreakpoints() const { return m_brkpts.count(); }
+    int numBreakpoints() const { return m_brkpts.size(); }
     const Breakpoint* breakpoint(int i) const { return m_brkpts[i]; }
 
     const QString& executable() const { return m_executable; }

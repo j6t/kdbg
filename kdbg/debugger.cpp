@@ -704,7 +704,7 @@ void KDebugger::saveBreakpoints(KSimpleConfig* config)
 {
     QString groupName;
     int i = 0;
-    for (uint j = 0; j < m_brkpts.count(); j++) {
+    for (uint j = 0; j < m_brkpts.size(); j++) {
 	Breakpoint* bp = m_brkpts[j];
 	if (bp->type == Breakpoint::watchpoint)
 	    continue;			/* don't save watchpoints */
@@ -1746,7 +1746,7 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 	// yes, add it
 	cmd->m_brkpt->id = id;
 
-	int n = m_brkpts.count();
+	int n = m_brkpts.size();
 	m_brkpts.resize(n+1);
 	m_brkpts.insert(n, cmd->m_brkpt);
 
@@ -1760,7 +1760,7 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
     }
 
     // see if it is new
-    for (int i = m_brkpts.count()-1; i >= 0; i--) {
+    for (int i = m_brkpts.size()-1; i >= 0; i--) {
 	if (m_brkpts[i]->id == id) {
 	    // not new; update
 	    m_brkpts[i]->fileName = file;
@@ -1776,7 +1776,7 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
     bp->fileName = file;
     bp->lineNo = lineNo;
     bp->address = address;
-    int n = m_brkpts.count();
+    int n = m_brkpts.size();
     m_brkpts.resize(n+1);
     m_brkpts.insert(n, bp);
 }
@@ -1790,30 +1790,31 @@ void KDebugger::updateBreakList(const char* output)
 
     // merge new information into existing breakpoints
 
-    // move parsed breakpoints into a QPtrVector
-    QPtrVector<Breakpoint> newbrks(brks.count());
-    newbrks.setAutoDelete(false);
-    int n = 0;
-    for (Breakpoint* bp = brks.first(); bp != 0; bp = brks.next())
+    for (int i = m_brkpts.size()-1; i >= 0; i--)	// decrement!
     {
-	newbrks.insert(n++, bp);
-    }
-
-    // go through all old breakpoints
-    for (int i = m_brkpts.count()-1; i >= 0; i--) {
-	// is this one still alive?
-	for (int j = newbrks.count()-1; j >= 0; j--)
+	for (Breakpoint* bp = brks.first(); bp != 0; bp = brks.next())
 	{
-	    if (newbrks[j]->id == m_brkpts[i]->id) {
-		// yes, it is
+	    if (bp->id == m_brkpts[i]->id) {
 		// keep accurate location
-		newbrks[j]->fileName = m_brkpts[i]->fileName;
-		newbrks[j]->lineNo = m_brkpts[i]->lineNo;
-		break;
+		bp->fileName = m_brkpts[i]->fileName;
+		bp->lineNo = m_brkpts[i]->lineNo;
+		m_brkpts.insert(i, bp); // old object is deleted
+		goto stillAlive;
 	    }
 	}
+	/*
+	 * If we get here, this breakpoint is no longer present.
+	 * 
+	 * To delete the breakpoint at i, we place the last breakpoint in
+	 * the list into the slot i. This will delete the old object at i.
+	 * Then we shorten the list by one.
+	 */
+	m_brkpts.insert(i, m_brkpts.take(m_brkpts.size()-1));
+	m_brkpts.resize(m_brkpts.size()-1);
+	TRACE(QString().sprintf("deleted brkpt %d, have now %d brkpts", i, m_brkpts.size()));
+
+	stillAlive:;
     }
-    m_brkpts = newbrks;		// old Breakpoint objects are deleted
 
     emit breakpointsChanged();
 }
@@ -1822,7 +1823,7 @@ void KDebugger::updateBreakList(const char* output)
 // or a watchpoint
 bool KDebugger::stopMayChangeBreakList() const
 {
-    for (int i = m_brkpts.count()-1; i >= 0; i--) {
+    for (int i = m_brkpts.size()-1; i >= 0; i--) {
 	Breakpoint* bp = m_brkpts[i];
 	if (bp->temporary || bp->type == Breakpoint::watchpoint)
 	    return true;
@@ -1835,7 +1836,7 @@ Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo,
 {
     // look for exact file name match
     int i;
-    for (i = m_brkpts.count()-1; i >= 0; i--) {
+    for (i = m_brkpts.size()-1; i >= 0; i--) {
 	if (m_brkpts[i]->lineNo == lineNo &&
 	    m_brkpts[i]->fileName == file &&
 	    (address.isEmpty() || m_brkpts[i]->address == address))
@@ -1848,7 +1849,7 @@ Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo,
     int offset = file.findRev("/");
     file.remove(0, offset+1);
 
-    for (i = m_brkpts.count()-1; i >= 0; i--) {
+    for (i = m_brkpts.size()-1; i >= 0; i--) {
 	// get base name of breakpoint's file
 	QString basename = m_brkpts[i]->fileName;
 	int offset = basename.findRev("/");
