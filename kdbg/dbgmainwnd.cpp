@@ -324,8 +324,8 @@ void DebuggerMainWnd::menuCallback(int item)
     switch (item) {
     case ID_FILE_OPEN:
 	{
-	    QString fileName =
-		KFileDialog::getOpenFileName(m_lastDirectory, QString(), this);
+	    QString fileName = myGetFileName(i18n("Open"),
+					     m_lastDirectory, QString(), this);
 
 	    if (!fileName.isEmpty())
 	    {

@@ -214,12 +214,12 @@ bool DebuggerMainWndBase::debugProgram(const QString& executable)
 }
 
 // helper that gets a file name (it only differs in the caption of the dialog)
-static QString getFileName(QString caption,
+QString DebuggerMainWndBase::myGetFileName(QString caption,
 			   QString dir, QString filter,
 			   QWidget* parent)
 {
     QString filename;
-    KFileDialog dlg(dir, filter, parent, 0, true);
+    KFileDialog dlg(dir, filter, parent, "filedialog", true);
 
     dlg.setCaption(caption);
 
@@ -247,7 +247,7 @@ bool DebuggerMainWndBase::handleCommand(int item)
 	if (m_debugger->isIdle())
 	{
 	    // open a new executable
-	    QString executable = getFileName(i18n("Select the executable to debug"),
+	    QString executable = myGetFileName(i18n("Select the executable to debug"),
 					     m_lastDirectory, 0, dbgMainWnd());
 	    if (executable.isEmpty())
 		return true;
@@ -292,7 +292,7 @@ bool DebuggerMainWndBase::handleCommand(int item)
     case ID_FILE_COREFILE:
 	if (m_debugger->canUseCoreFile())
 	{
-	    QString corefile = getFileName(i18n("Select core dump"),
+	    QString corefile = myGetFileName(i18n("Select core dump"),
 					   m_lastDirectory, 0, dbgMainWnd());
 	    if (!corefile.isEmpty()) {
 		m_debugger->useCoreFile(corefile, false);

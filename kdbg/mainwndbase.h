@@ -76,6 +76,10 @@ public:
     void setRemoteDevice(const QString &remoteDevice);
     /** returns true if the command was handled */
     bool handleCommand(int item);
+    /** helper around KFileDialog */
+    static QString myGetFileName(QString caption,
+				 QString dir, QString filter,
+				 QWidget* parent);
 
 protected:
     // settings
