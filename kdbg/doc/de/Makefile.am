@@ -24,6 +24,7 @@ datadir = $(kde_htmldir)/de/kdbg
 EXTRA_DIST = $(data_DATA)
 
 install-data-local:
+	$(mkinstalldirs) $(DESTDIR)$(datadir)
 	cd $(DESTDIR)$(datadir) && ln -s -f ../../en/kdbg/types.html .
 
 uninstall-local:
