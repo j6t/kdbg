@@ -48,6 +48,7 @@ KDebugger::KDebugger(QWidget* parent,
 	m_animationInterval(0)
 {
     m_envVars.setAutoDelete(true);
+    m_brkpts.setAutoDelete(true);
 
     connect(&m_localVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
 	    SLOT(slotLocalsExpanding(KTreeViewItem*,bool&)));
@@ -70,10 +71,6 @@ KDebugger::~KDebugger()
 	saveProgramSettings();
 	m_programConfig->sync();
 	delete m_programConfig;
-    }
-    // delete breakpoint objects
-    for (int i = m_brkpts.size()-1; i >= 0; i--) {
-	delete m_brkpts[i];
     }
 
     delete m_typeTable;
@@ -530,6 +527,7 @@ void KDebugger::gdbExited(KProcess*)
     m_debuggerCmd = QString();		/* use global setting at next start! */
     m_attachedPid = QString();		/* we are no longer attached to a process */
     m_ttyLevel = ttyFull;
+    m_brkpts.clear();
 
     // stop gear wheel and erase PC
     stopAnimation();
@@ -706,7 +704,7 @@ void KDebugger::saveBreakpoints(KSimpleConfig* config)
 {
     QString groupName;
     int i = 0;
-    for (uint j = 0; j < m_brkpts.size(); j++) {
+    for (uint j = 0; j < m_brkpts.count(); j++) {
 	Breakpoint* bp = m_brkpts[j];
 	if (bp->type == Breakpoint::watchpoint)
 	    continue;			/* don't save watchpoints */
@@ -1751,9 +1749,9 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 	// yes, add it
 	cmd->m_brkpt->id = id;
 
-	int n = m_brkpts.size();
+	int n = m_brkpts.count();
 	m_brkpts.resize(n+1);
-	m_brkpts[n] = cmd->m_brkpt;
+	m_brkpts.insert(n, cmd->m_brkpt);
 
 	// set the remaining properties
 	if (!cmd->m_brkpt->enabled) {
@@ -1765,7 +1763,7 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
     }
 
     // see if it is new
-    for (int i = m_brkpts.size()-1; i >= 0; i--) {
+    for (int i = m_brkpts.count()-1; i >= 0; i--) {
 	if (m_brkpts[i]->id == id) {
 	    // not new; update
 	    m_brkpts[i]->fileName = file;
@@ -1785,9 +1783,9 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
     bp->fileName = file;
     bp->lineNo = lineNo;
     bp->address = address;
-    int n = m_brkpts.size();
+    int n = m_brkpts.count();
     m_brkpts.resize(n+1);
-    m_brkpts[n] = bp;
+    m_brkpts.insert(n, bp);
 }
 
 void KDebugger::updateBreakList(const char* output)
@@ -1799,36 +1797,30 @@ void KDebugger::updateBreakList(const char* output)
 
     // merge new information into existing breakpoints
 
-    QArray<Breakpoint*> oldbrks = m_brkpts;
-
-    // move parsed breakpoints into m_brkpts
-    m_brkpts.detach();
-    m_brkpts.resize(brks.count());
+    // move parsed breakpoints into a QPtrVector
+    QPtrVector<Breakpoint> newbrks(brks.count());
+    newbrks.setAutoDelete(false);
     int n = 0;
     for (Breakpoint* bp = brks.first(); bp != 0; bp = brks.next())
     {
-	m_brkpts[n++] = bp;
+	newbrks.insert(n++, bp);
     }
 
     // go through all old breakpoints
-    for (int i = oldbrks.size()-1; i >= 0; i--) {
+    for (int i = m_brkpts.count()-1; i >= 0; i--) {
 	// is this one still alive?
-	for (int j = m_brkpts.size()-1; j >= 0; j--)
+	for (int j = newbrks.count()-1; j >= 0; j--)
 	{
-	    if (m_brkpts[j]->id == oldbrks[i]->id) {
+	    if (newbrks[j]->id == m_brkpts[i]->id) {
 		// yes, it is
 		// keep accurate location
-		m_brkpts[j]->fileName = oldbrks[i]->fileName;
-		m_brkpts[j]->lineNo = oldbrks[i]->lineNo;
+		newbrks[j]->fileName = m_brkpts[i]->fileName;
+		newbrks[j]->lineNo = m_brkpts[i]->lineNo;
 		break;
 	    }
 	}
     }
-
-    // delete old breakpoints
-    for (int i = oldbrks.size()-1; i >= 0; i--) {
-	delete oldbrks[i];
-    }
+    m_brkpts = newbrks;		// old Breakpoint objects are deleted
 
     emit breakpointsChanged();
 }
@@ -1837,7 +1829,7 @@ void KDebugger::updateBreakList(const char* output)
 // or a watchpoint
 bool KDebugger::stopMayChangeBreakList() const
 {
-    for (int i = m_brkpts.size()-1; i >= 0; i--) {
+    for (int i = m_brkpts.count()-1; i >= 0; i--) {
 	Breakpoint* bp = m_brkpts[i];
 	if (bp->temporary || bp->type == Breakpoint::watchpoint)
 	    return true;
@@ -1850,7 +1842,7 @@ Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo,
 {
     // look for exact file name match
     int i;
-    for (i = m_brkpts.size()-1; i >= 0; i--) {
+    for (i = m_brkpts.count()-1; i >= 0; i--) {
 	if (m_brkpts[i]->lineNo == lineNo &&
 	    m_brkpts[i]->fileName == file &&
 	    (address.isEmpty() || m_brkpts[i]->address == address))
@@ -1863,7 +1855,7 @@ Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo,
     int offset = file.findRev("/");
     file.remove(0, offset+1);
 
-    for (i = m_brkpts.size()-1; i >= 0; i--) {
+    for (i = m_brkpts.count()-1; i >= 0; i--) {
 	// get base name of breakpoint's file
 	QString basename = m_brkpts[i]->fileName;
 	int offset = basename.findRev("/");

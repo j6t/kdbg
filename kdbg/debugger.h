@@ -8,6 +8,7 @@
 
 #include <qtimer.h>
 #include <qdict.h>
+#include <qptrvector.h>
 #include <qstringlist.h>
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
@@ -237,7 +238,7 @@ public:
     bool isIdle() const;
 
     /** The list of breakpoints. */
-    int numBreakpoints() const { return m_brkpts.size(); }
+    int numBreakpoints() const { return m_brkpts.count(); }
     const Breakpoint* breakpoint(int i) const { return m_brkpts[i]; }
 
     const QString& executable() const { return m_executable; }
@@ -290,7 +291,7 @@ protected:
     void writeCommand();
     
     QList<VarTree> m_watchEvalExpr;	/* exprs to evaluate for watch windows */
-    QArray<Breakpoint*> m_brkpts;
+    QPtrVector<Breakpoint> m_brkpts;
     QString m_memoryExpression;		/* memory location to watch */
     unsigned m_memoryFormat;		/* how that output should look */
 
