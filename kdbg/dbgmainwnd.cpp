@@ -321,7 +321,9 @@ void DebuggerMainWnd::initToolbar()
     toolbar->setBarPos(KToolBar::Top);
     //moveToolBar(toolbar);
     
-    toolbar->insertAnimatedWidget(ID_STATUS_BUSY, 0, 0, "pulse", -1);
+    toolbar->insertAnimatedWidget(ID_STATUS_BUSY,
+	actionCollection()->action("exec_break"), SLOT(activate()),
+	"pulse", -1);
     toolbar->alignItemRight(ID_STATUS_BUSY, true);
     m_animRunning = false;
 
