@@ -1550,7 +1550,7 @@ bool GdbDriver::parseThreadList(const char* output, QList<ThreadInfo>& threads)
     while (*p != '\0') {
 	// seach look for thread id, watching out for  the focus indicator
 	bool hasFocus = false;
-	while (isspace(*p))
+	while (isspace(*p))		/* may be \n from prev line: see "No stack" below */
 	    p++;
 	if (*p == '*') {
 	    hasFocus = true;
@@ -1580,8 +1580,19 @@ bool GdbDriver::parseThreadList(const char* output, QList<ThreadInfo>& threads)
 	systag = FROM_LATIN1(p, end-p);
 	p = end+2;
 
-	// now follows a standard stack frame
-	::parseFrameInfo(p, func, file, lineNo, address);
+	/*
+	 * Now follows a standard stack frame. Sometimes, however, gdb
+	 * catches a thread at an instant where it doesn't have a stack.
+	 */
+	if (strncmp(p, "[No stack.]", 11) != 0) {
+	    ::parseFrameInfo(p, func, file, lineNo, address);
+	} else {
+	    func = "[No stack]";
+	    file = QString();
+	    lineNo = -1;
+	    address = QString();
+	    p += 11;			/* \n is skipped above */
+	}
 
 	ThreadInfo* thr = new ThreadInfo;
 	thr->id = id;
