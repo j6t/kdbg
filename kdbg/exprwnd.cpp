@@ -177,17 +177,7 @@ void VarTree::inferTypesOfChildren()
 
 	    /* if we don't have a type yet, get it from the base class */
 	    if (m_type == 0) {
-		child = static_cast<VarTree*>(getChild());
-		while (child != 0 &&
-		       // only check base class parts (i.e. type names)
-		       child->m_nameKind == NKtype)
-		{
-		    m_type = child->m_type;
-		    // if there is a known type
-		    if (m_type != 0 && m_type != TypeTable::unknownType())
-			break;
-		    child = static_cast<VarTree*>(child->getSibling());
-		}
+		m_type = inferTypeFromBaseClass();
 		/*
 		 * If there is a known type now, it is the one from the
 		 * first base class whose type we know.
@@ -206,6 +196,29 @@ void VarTree::inferTypesOfChildren()
 	     * that later we can ask gdb.
 	     */
     }
+}
+
+/*
+ * Get the type of the first base class whose type we know.
+ */
+TypeInfo* VarTree::inferTypeFromBaseClass()
+{
+    if (m_varKind == VKstruct) {
+	VarTree* child = static_cast<VarTree*>(getChild());
+	while (child != 0 &&
+	       // only check base class parts (i.e. type names)
+	       child->m_nameKind == NKtype)
+	{
+	    if (child->m_type != 0 &&
+		child->m_type != TypeTable::unknownType())
+	    {
+		// got a type!
+		return child->m_type;
+	    }
+	    child = static_cast<VarTree*>(child->getSibling());
+	}
+    }
+    return 0;
 }
 
 

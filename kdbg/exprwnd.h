@@ -43,6 +43,8 @@ public:
     bool updateValue(const QString& newValue);
     /** find out the type of this value using the child values */
     void inferTypesOfChildren();
+    /** get the type from base class part */
+    TypeInfo* inferTypeFromBaseClass();
 };
 
 class ExprWnd : public KTreeView
