@@ -13,7 +13,6 @@
 
 class KRecentFilesAction;
 class WinStack;
-class QPopupMenu;
 class QListBox;
 class QCString;
 class ExprWnd;
@@ -56,8 +55,6 @@ protected:
     TTYWindow* m_ttyWindow;
     ThreadList* m_threads;
     MemoryWindow* m_memoryWindow;
-
-    QPopupMenu* m_menuWindow;
 
     QTimer m_backTimer;
 

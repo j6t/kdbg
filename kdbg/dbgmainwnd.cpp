@@ -13,6 +13,7 @@
 #include <kstdaccel.h>
 #include <kstdaction.h>
 #include <kaction.h>
+#include <kpopupmenu.h>
 #include <kfiledialog.h>
 #include <kprocess.h>
 #include <qlistbox.h>
@@ -77,7 +78,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(m_watches, SIGNAL(addWatch()), SLOT(slotAddWatch()));
     connect(m_watches, SIGNAL(deleteWatch()), m_debugger, SLOT(slotDeleteWatch()));
 
-    m_filesWindow->setWindowMenu(m_menuWindow);
+    KAction* windowMenu = actionCollection()->action("window");
+    m_filesWindow->setWindowMenu(static_cast<KActionMenu*>(windowMenu)->popupMenu());
     connect(&m_filesWindow->m_findDlg, SIGNAL(closed()), SLOT(updateUI()));
     connect(m_filesWindow, SIGNAL(newFileLoaded()),
 	    SLOT(slotNewFileLoaded()));
@@ -287,9 +289,7 @@ void DebuggerMainWnd::initKAction()
                       SLOT(slotLocalsToWatch()), actionCollection(),
                       "watch_expression");
 
-    KActionMenu* menu = new KActionMenu(i18n("&Window"), actionCollection(), "window");
-    m_menuWindow = menu->popupMenu();
-    m_menuWindow->insertItem(i18n("&More..."), WinStack::WindowMore);
+    (void)new KActionMenu(i18n("&Window"), actionCollection(), "window");
 
     // all actions force an UI update
     QValueList<KAction*> actions = actionCollection()->actions();

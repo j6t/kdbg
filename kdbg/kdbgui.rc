@@ -45,8 +45,6 @@
     <Action name="settings_program"/>
     <Action name="settings_global"/>
   </Menu>
-<!--  <Menu name="window" append="settings_merge"><text>&amp;Window</text>
-  </Menu> -->
   <Action name="window"/>
 </MenuBar>
 <Menu name="popup_files">
