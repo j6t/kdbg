@@ -8,6 +8,9 @@
 #include <kglobal.h>
 #include <kstddirs.h>
 #include <ksimpleconfig.h>
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 #include "typetable.h"
 #include "mydebug.h"
 
