@@ -142,6 +142,7 @@ cat > conftest.$ac_ext <<EOF
 #include <kapp.h>
 
 int main() {
+    printf("kde_qt_used_ver=\"" QT_VERSION_STR "\"\n");
     printf("kde_htmldir=\\"%s\\"\n", KApplication::kde_htmldir().data());
     printf("kde_appsdir=\\"%s\\"\n", KApplication::kde_appsdir().data());
     printf("kde_icondir=\\"%s\\"\n", KApplication::kde_icondir().data());
@@ -281,6 +282,7 @@ else
 fi
 
 KDEDIR= ./conftest 2> /dev/null >&5 # make an echo for config.log
+echo "found Qt $kde_qt_used_ver" >&5 # also log Qt version
 kde_have_all_paths=yes
 AC_LANG_CPLUSPLUS
 
@@ -518,7 +520,7 @@ cat > conftest.$ac_ext <<EOF
 #include <qapplication.h>
 #include <qobjcoll.h>
 EOF
-echo "#if ! ($kde_qt_verstring)" >> conftest.$ac_ext
+echo "#if ! ($1)" >> conftest.$ac_ext
 cat >> conftest.$ac_ext <<EOF
 #error 1
 #endif
@@ -534,7 +536,7 @@ AC_DEFUN(KDE_USE_QT,
 if test -z "$1"; then
   kde_qtver=2
 else
-  kde_qtver=$1
+  kde_qtver="$1"
 fi
 
 if test -z "$2"; then
@@ -544,7 +546,7 @@ if test -z "$2"; then
     kde_qt_minversion=">= 1.42 and < 2.0"
   fi
 else
-   kde_qt_minversion=$2
+   kde_qt_minversion="$2"
 fi
 
 if test -z "$3"; then
@@ -554,7 +556,7 @@ if test -z "$3"; then
     kde_qt_verstring="QT_VERSION >= 142 && QT_VERSION < 200"
   fi
 else
-   kde_qt_verstring=$3
+   kde_qt_verstring="$3"
 fi
 ])
 
@@ -578,7 +580,7 @@ export LD_LIBRARY_PATH
 LIBRARY_PATH=
 export LIBRARY_PATH
 
-KDE_PRINT_QT_PROGRAM
+KDE_PRINT_QT_PROGRAM($kde_qt_verstring)
 
 if AC_TRY_EVAL(ac_link) && test -s conftest; then
   kde_cv_qt_direct="yes"
@@ -682,7 +684,7 @@ CXXFLAGS="$CXXFLAGS -I$qt_incdir $all_includes"
 LDFLAGS="-L$qt_libdir $all_libraries"
 LIBS="$LIBS $LIBQT"
 
-KDE_PRINT_QT_PROGRAM
+KDE_PRINT_QT_PROGRAM($kde_qt_verstring)
 
 if AC_TRY_EVAL(ac_link) && test -s conftest; then
   rm -f conftest*
@@ -987,6 +989,15 @@ AC_DEFUN(KDE_CREATE_LIBS_ALIASES,
    AC_REQUIRE([KDE_CHECK_LIBDL])
    AC_REQUIRE([K_PATH_X])
 
+   dnl Check for KDE version (derived from Qt version)
+   if test "`echo $kde_qt_used_ver | sed -e 's/\..*//'`" = "2"; then
+      LIB_KIO_LINK='-lkio'
+      LIB_KDEUTIL='-lkdeutil'
+   else
+      LIB_KIO_LINK='-lkfm'
+      LIB_KDEUTIL=''
+   fi
+
    LIB_KDECORE='-lkdecore -lXext $(LIB_QT) $(LIBDL)'
    AC_SUBST(LIB_KDECORE)
    LIB_KDEUI='-lkdeui $(LIB_KDECORE)'
@@ -995,9 +1006,8 @@ AC_DEFUN(KDE_CREATE_LIBS_ALIASES,
    AC_SUBST(LIB_KFORMULA)
    LIB_KFM='-lkfm $(LIB_KDECORE)'
    AC_SUBST(LIB_KFM)
-   LIB_KDEUTIL='-lkdeutil'
    AC_SUBST(LIB_KDEUTIL)
-   LIB_KIO='-lkio $(LIB_KDEUI) $(LIB_KDEUTIL)'
+   LIB_KIO="$LIB_KIO_LINK"' $(LIB_KDEUI) $(LIB_KDEUTIL)'
    AC_SUBST(LIB_KIO)
    LIB_KFILE='-lkfile $(LIB_KIO)'
    AC_SUBST(LIB_KFILE)
