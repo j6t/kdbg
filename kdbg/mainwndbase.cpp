@@ -206,6 +206,7 @@ void DebuggerMainWndBase::updateUIItem(UpdateUI* item)
 	break;
     case ID_PROGRAM_ARGS:
 	item->enable(m_debugger->haveExecutable());
+	break;
     case ID_BRKPT_LIST:
 	item->setCheck(m_debugger->isBreakListVisible());
 	break;
