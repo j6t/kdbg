@@ -12,6 +12,7 @@
 #include <qlayout.h>
 #include <qdict.h>
 #include <qlist.h>
+#include <qmap.h>
 
 class KDebugger;
 class KSimpleConfig;
@@ -29,7 +30,10 @@ public:
 protected:
     KDebugger* m_debugger;
     QComboBox m_expression;
+
     QListView m_memory;
+    QMap<QString,QString> m_old_memory;
+
     QVBoxLayout m_layout;
 
     unsigned m_format;

@@ -14,6 +14,41 @@
 #include "debugger.h"
 #include "dbgdriver.h"			/* memory dump formats */
 
+
+class MemoryViewItem : public QListViewItem
+{
+public:
+    MemoryViewItem(QListView* parent, QListViewItem* insertAfter, QString raw, QString cooked)
+        : QListViewItem(parent, insertAfter, raw, cooked), m_changed(8) {}
+
+    void setChanged(uint pos, bool b) { m_changed[pos] = b; }
+
+protected:
+    virtual void paintCell(QPainter* p, const QColorGroup& cg,
+			   int column, int width, int alignment);
+
+    QArray<bool> m_changed;
+};
+
+void MemoryViewItem::paintCell(QPainter* p, const QColorGroup& cg,
+			       int column, int width, int alignment)
+{
+    if( column > 0 && m_changed[column - 1] ) {
+#if QT_VERSION >= 200
+	QColorGroup newcg = cg;
+	newcg.setColor(QColorGroup::Text, red);
+#else
+	QColorGroup newcg(cg.foreground(), cg.background(),
+			  cg.light(), cg.dark(), cg.mid(),
+			  red, cg.base());
+#endif
+	QListViewItem::paintCell(p, newcg, column, width, alignment);
+    } else {
+	QListViewItem::paintCell(p, cg, column, width, alignment);
+    }
+}
+
+
 MemoryWindow::MemoryWindow(QWidget* parent, const char* name) :
 	QWidget(parent, name),
 	m_debugger(0),
@@ -28,7 +63,7 @@ MemoryWindow::MemoryWindow(QWidget* parent, const char* name) :
     m_expression.setMaxCount(15);
 
     m_memory.addColumn(i18n("Address"), 80);
-    m_memory.addColumn(i18n("Contents"), 200);
+
     m_memory.setSorting(-1);		/* don't sort */
     m_memory.setAllColumnsShowFocus(true);
     m_memory.header()->setClickEnabled(false);
@@ -156,11 +191,14 @@ void MemoryWindow::displayNewExpression(const QString& expr)
     // clear memory dump if no dump wanted
     if (expr.isEmpty()) {
 	m_memory.clear();
+	m_old_memory.clear();
     }
 }
 
 void MemoryWindow::slotTypeChange(int id)
 {
+    m_old_memory.clear();
+
     // compute new type
     if (id & MDTsizemask)
 	m_format = (m_format & ~MDTsizemask) | id;
@@ -187,12 +225,49 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, QList<MemoryDump>& memd
 	return;
     }
 
-    QListViewItem* after = 0;
+    MemoryViewItem* after = 0;
     MemoryDump* md = memdump.first();
-    for (; md != 0; md = memdump.next()) {
+
+    // remove all columns, except the address column
+    for(int k = m_memory.columns() - 1; k > 0; k--)
+	m_memory.removeColumn(k);
+
+    //add the needed columns
+    QStringList sl = QStringList::split( "\t", md->dump );
+    for (uint i = 0; i < sl.count(); i++)
+	m_memory.addColumn("", -1);
+
+    QMap<QString,QString> tmpMap;
+
+    for (; md != 0; md = memdump.next())
+    {
 	QString addr = md->address.asString() + " " + md->address.fnoffs;
-	after = new QListViewItem(&m_memory, after, addr, md->dump);
+	QStringList sl = QStringList::split( "\t", md->dump );
+
+	// save memory
+	tmpMap[addr] = md->dump;
+
+	after = new MemoryViewItem(&m_memory, after, addr, "");
+
+	QStringList tmplist;
+	QMap<QString,QString>::Iterator pos = m_old_memory.find( addr );
+
+	if( pos != m_old_memory.end() )
+	    tmplist = QStringList::split( "\t", pos.data() );
+
+	for (uint i = 0; i < sl.count(); i++)
+	{
+            after->setText( i+1, *sl.at(i) );
+
+	    bool changed =
+		tmplist.count() > 0 &&
+		*sl.at(i) != *tmplist.at(i);
+	    after->setChanged(i, changed);
+	}
     }
+
+    m_old_memory.clear();
+    m_old_memory = tmpMap;
 }
 
 static const char MemoryGroup[] = "Memory";
