@@ -125,30 +125,30 @@ messages:
 # don't install a list of file. Just one file per install.
 # if you have more of them, create a subdirectory with an extra Makefile 
 install-data-local: 
-	$(mkinstalldirs) $(APPSDIR)
-	$(INSTALL_DATA) kdbg.kdelnk $(APPSDIR)
-	$(mkinstalldirs) $(kde_icondir)
-	$(INSTALL_DATA) kdbg.xpm $(kde_icondir)
-	$(mkinstalldirs) $(kde_minidir)
-	$(INSTALL_DATA) mini-kdbg.xpm $(kde_minidir)/kdbg.xpm
-	$(mkinstalldirs) $(PICSDIR)
+	$(mkinstalldirs) $(DESTDIR)$(APPSDIR)
+	$(INSTALL_DATA) kdbg.kdelnk $(DESTDIR)$(APPSDIR)
+	$(mkinstalldirs) $(DESTDIR)$(kde_icondir)
+	$(INSTALL_DATA) kdbg.xpm $(DESTDIR)$(kde_icondir)
+	$(mkinstalldirs) $(DESTDIR)$(kde_minidir)
+	$(INSTALL_DATA) mini-kdbg.xpm $(DESTDIR)$(kde_minidir)/kdbg.xpm
+	$(mkinstalldirs) $(DESTDIR)$(PICSDIR)
 	@for i in $(XPMS); do \
-		echo $(INSTALL_DATA) $$i $(PICSDIR)/$$i; \
-		$(INSTALL_DATA) $$i $(PICSDIR)/$$i; \
+		echo $(INSTALL_DATA) $$i $(DESTDIR)$(PICSDIR)/$$i; \
+		$(INSTALL_DATA) $$i $(DESTDIR)$(PICSDIR)/$$i; \
 	done
-	$(mkinstalldirs) $(TYPESDIR)
+	$(mkinstalldirs) $(DESTDIR)$(TYPESDIR)
 	@for i in $(TYPES); do \
-		echo $(INSTALL_DATA) $$i $(TYPESDIR)/$$i; \
-		$(INSTALL_DATA) $$i $(TYPESDIR)/$$i; \
+		echo $(INSTALL_DATA) $$i $(DESTDIR)$(TYPESDIR)/$$i; \
+		$(INSTALL_DATA) $$i $(DESTDIR)$(TYPESDIR)/$$i; \
 	done
 
 # remove ALL you have installed in install-data-local or install-exec-local
 uninstall-local:
-	-rm -f $(APPSDIR)/kdbg.kdelnk
-	-rm -f $(kde_icondir)/kdbg.xpm
-	-rm -f $(kde_minidir)/kdbg.xpm
-	-rm -rf $(PICSDIR)
-	-rm -rf $(TYPESDIR)
+	-rm -f $(DESTDIR)$(APPSDIR)/kdbg.kdelnk
+	-rm -f $(DESTDIR)$(kde_icondir)/kdbg.xpm
+	-rm -f $(DESTDIR)$(kde_minidir)/kdbg.xpm
+	-rm -rf $(DESTDIR)$(PICSDIR)
+	-rm -rf $(DESTDIR)$(TYPESDIR)
 
 
 # compile a testfile
