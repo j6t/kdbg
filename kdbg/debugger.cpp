@@ -590,10 +590,16 @@ void KDebugger::gdbExited(KProcess*)
     m_logFile.writeBlock(txt,sizeof(txt)-1);
 #endif
 
-    // save settings
+    /*
+     * Save settings, but only if gdb has already processed "info line
+     * main", otherwise we would save an empty config file, because it
+     * isn't read in until then!
+     */
     if (m_programConfig != 0) {
-	saveProgramSettings();
-	m_programConfig->sync();
+	if (m_haveExecutable) {
+	    saveProgramSettings();
+	    m_programConfig->sync();
+	}
 	delete m_programConfig;
 	m_programConfig = 0;
     }
@@ -718,8 +724,8 @@ bool KDebugger::createOutputWindow()
 	    argv[i] = str;
 	}
 
-	::execvp(argv[0], argv);
-	
+	::execvp(argv[0], const_cast<char* const*>(argv));
+
 	// failed; what can we do?
 	::exit(0);
     } else {
