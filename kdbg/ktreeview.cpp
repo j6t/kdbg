@@ -624,7 +624,7 @@ KTreeView::KTreeView(QWidget *parent,
 	setFrameStyle(QFrame::Panel | QFrame::Plain);
 	setLineWidth(1);
     }
-#if QT_VESION < 200
+#if QT_VERSION < 200
     setFocusPolicy(StrongFocus);
 #else
     setFocusPolicy(WheelFocus);
