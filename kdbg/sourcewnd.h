@@ -21,7 +21,7 @@ public:
     SourceWindow(const char* fileName, QWidget* parent, const char* name);
     ~SourceWindow();
     
-    void loadFile();
+    bool loadFile();
     void reloadFile();
     bool fileNameMatches(const QString& other);
     void scrollTo(int lineNo, const DbgAddr& address);

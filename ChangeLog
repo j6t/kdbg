@@ -1,3 +1,9 @@
+Version 1.2.3
+
+	Fixed crash when no line has the cursor (empty files).
+
+	Don't display a blank page when a non-existing file was tried to open.
+
 Version 1.2.2
 
 	Fixed a special, but common case where removing a breakpoint didn't

@@ -54,19 +54,21 @@ SourceWindow::~SourceWindow()
 {
 }
 
-void SourceWindow::loadFile()
+bool SourceWindow::loadFile()
 {
     // first we load the code into KTextView::m_texts
     QFile f(m_fileName);
-    if (f.open(IO_ReadOnly)) {
-	QTextStream t(&f);
-	QString s;
-	while (!t.eof()) {
-	    s = t.readLine();
-	    insertLine(s);
-	}
-	f.close();
+    if (!f.open(IO_ReadOnly)) {
+	return false;
     }
+
+    QTextStream t(&f);
+    QString s;
+    while (!t.eof()) {
+	s = t.readLine();
+	insertLine(s);
+    }
+    f.close();
 
     // then we copy it into our own m_sourceCode
     m_sourceCode.setSize(m_texts.size());
@@ -77,6 +79,8 @@ void SourceWindow::loadFile()
 	m_rowToLine[i] = i;
 	m_lineItems[i] = 0;
     }
+
+    return true;
 }
 
 void SourceWindow::reloadFile()
@@ -573,7 +577,7 @@ void SourceWindow::disassembled(int lineNo, const QList<DisassembledCode>& disas
 
 int SourceWindow::rowToLine(int row, int* sourceRow)
 {
-    int line = m_rowToLine[row];
+    int line = row >= 0  ?  m_rowToLine[row]  :  -1;
     if (sourceRow != 0) {
 	// search back until we hit the first entry with the current line number
 	while (row > 0 && m_rowToLine[row-1] == line)

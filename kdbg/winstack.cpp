@@ -190,6 +190,14 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
     if (fw == 0) {
 	// not found, load it
 	fw = new SourceWindow(pathName, this, "fileWindow");
+
+	// slurp the file in
+	if (!fw->loadFile()) {
+	    // read failed
+	    delete fw;
+	    return false;
+	}
+
 	m_fileList.insert(0, fw);
 	connect(fw, SIGNAL(lineChanged()),SIGNAL(lineChanged()));
 	connect(fw, SIGNAL(clickedLeft(const QString&,int,const DbgAddr&,bool)),
@@ -212,9 +220,6 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 	fw->setTabWidth(m_tabWidth);
 
 	changeWindowMenu();
-	
-	// slurp the file in
-	fw->loadFile();
 	
 	// set PC if there is one
 	emit newFileLoaded();
