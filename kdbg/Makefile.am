@@ -43,10 +43,16 @@ kdbg_LDFLAGS = \
 	$(all_libraries) $(KDE_RPATH)
 
 # the libraries to link against.
+if BUILD_FOR_KDE3
+MYKDELIBS=$(LIB_KIO)
+else
+MYKDELIBS=$(LIB_KFILE)
+endif
+
 kdbg_LDADD   = \
 	$(top_builddir)/DockWidget/libdock_library.a \
 	$(top_builddir)/STabCtl/libtab_library.a \
-	$(LIB_KFILE)
+	$(MYKDELIBS)
 
 # this option you can leave out. Just, if you use "make dist", you need it
 noinst_HEADERS = \

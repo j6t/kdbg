@@ -79,3 +79,23 @@ AC_MSG_RESULT($ac_cv_have_placement_new)
 if eval "test \"`echo `$ac_cv_have_placement_new\" = yes"; then
   AC_DEFINE(HAVE_PLACEMENT_NEW)
 fi
+
+AC_MSG_CHECKING(for KDE 3)
+
+AC_LANG_CPLUSPLUS
+ac_cxxflags_safe="$CXXFLAGS"
+CXXFLAGS="$CXXFLAGS -I$qt_includes $all_includes"
+
+AC_TRY_COMPILE([
+#include <kapp.h>
+], [
+#if KDE_VERSION < 292
+give me an error, this is KDE 2
+#endif
+], [this_is_kde3=yes],[this_is_kde3=no])
+
+AM_CONDITIONAL(BUILD_FOR_KDE3, test x$this_is_kde3 = xyes)
+
+CXXFLAGS="$ac_cxxflags_safe"
+
+AC_MSG_RESULT($this_is_kde3)
