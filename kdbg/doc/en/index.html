@@ -1,38 +1,104 @@
-<html>
-  <head>
-    <title>KDbg</title>
-  </head>
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.05 [en] (X11; I; Linux 2.0.35 i586) [Netscape]">
+   <TITLE>KDbg</TITLE>
+</HEAD>
+<BODY>
 
-  <body>
-      <h1>KDbg</h1>
+<H1>
+KDbg</H1>
 
-<H2>Contents</H2>
+<H2>
+Contents</H2>
+
 <UL>
-<LI>Introduction</LI>
+<LI>
+Introduction</LI>
 
-<LI>Author</LI>
+<LI>
+What's it that I see here?</LI>
+
+<LI>
+Using KDbg</LI>
+
+<LI>
+Author</LI>
 </UL>
-<hr>
 
-<H2 ALIGN=CENTER>Introduction</H2>
+<HR>
+<H2>
+Introduction</H2>
+KDbg is a front-end for <TT>gdb</TT>, the GNU debugger.
 
-<P><TT>KDbg</TT> is a front-end for <TT>gdb</TT>, the GNU debugger.
-</P>
+<P>At the moment there is not much documentation available.
 
-<P>At the moment there is no documentation available. In fact,
-I intend to make the user interface as clear and simple as possible
-so that no documentation is needed.
-</P>
+<P>For the really brave there's documentation about how <A HREF="types.html">KDbg
+can understand types</A> like <TT>QString</TT>.
+<H2>
+What's it that I see here?</H2>
+The main window of KDbg consist of four panes:
 
-<p>
-For the really brave there's documentation about how
-<a href="types.html">KDbg can understand types</a> like
-<code>QString</code>.
-</p>
+<P>The <B>upper left</B> pane shows the source code. Mostly, source code
+windows are opened automatically. To open a souce code window manually
+choose <I>File|Open Source</I> from the menu. You can switch the opened
+source code windows by choosing an open source file from the <I>Window</I>
+menu.
 
-<H2 ALIGN=CENTER>Author</H2>
-<P><TT>KDbg</TT> is written by <A HREF="mailto:Johannes.Sixt@telecom.at">Johannes Sixt</A>.</P>
-  </body>
-</html>
+<P>The <B>lower left</B> pane displays the backtrace (aka stack frames),
+i.e. the functions that the program has entered, but not left yet. The
+innermost frame (where the program currently executes) is shown at the
+top. Double-click on a stack frame to inspect the variables of that frame.
 
+<P>The <B>upper right</B> pane displays the local variables. Whenever the
+progam stops, KDbg displays the values of the local variables in this pane.
 
+<P>The <B>lower right</B> pane displays expressions of your choice (such
+expression is also called a <I>watch</I>). To add an expression, type it
+into the edit field and press Enter or click <I>Add</I>. To remove an expression,
+click on it (choose the root of the expression) and click <I>Del</I>.
+<BR>&nbsp;
+<H2>
+Using KDbg</H2>
+To <B>debug a program</B>, choose <I>File|Executable</I> from the menu.
+The program is loaded. An <TT>xterm</TT> window is opened which will show
+the output of the debuggee. If you want to debug a <B>core dump</B>, you
+must first load the executable that produced the core dump, then choose
+<I>File|Core Dump</I> from the menu. Now KDbg goes to the point in the
+program that caused the core dump.
+
+<P>To run the <B>program with arguments</B>, choose <I>Execution|Arguments</I>
+and type in the arguments. Next time the program is started, the arguments
+will be passed on.
+
+<P>In the menu <I>Execution</I> you find the commands that you need to
+<B>run</B> the program, <B>step</B> through code, and to <B>interrupt</B>
+the program (<I>Break</I>) while it is running. The important commands
+(<I>Run</I> and all kinds of <I>Step</I>) are bound to function keys. For
+efficient debugging I strongly recommend that you get used to using them.
+<BR><FONT SIZE=-1>The functions are not configurable, but perhaps you want
+to contribute a bit of code that does it?</FONT>
+
+<P>In the menu <I>Breakpoint</I> you find commands to set, clear, disable,
+and enable permanent and temporary <B>breakpoints</B>. You can display
+a list of active breakpoints.
+<BR>&nbsp;
+<H3>
+The breakpoint list</H3>
+The breakpoint list can be displayed using <I>Breakpoint|List</I>. The
+breakpoint location is shown for each breakpoint. A red icon in front of
+the entry indicates that the breakpoint is disabled, a green icon indicates
+an enabled breakpoint.
+
+<P>Tip: You can use breakpoints as bookmarks: Just set a breakpoint and
+disable it. Later, you can quickly come back to that breakpoint by double-clicking
+it in the breakpoint list (or select it and click <I>View Code</I>). Since
+breakpoints are persistent (i.e. KDbg remembers them across invocations
+of a program), you get them back next time you invoke KDbg for that particular
+program.
+<H2>
+Author</H2>
+KDbg is written by <A HREF="mailto:Johannes.Sixt@telecom.at">Johannes Sixt</A>
+with the help of many others.
+</BODY>
+</HTML>

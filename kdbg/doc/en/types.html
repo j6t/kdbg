@@ -1,107 +1,113 @@
-<html>
-<head>
-<title>KDbg's type table</title>
-</head>
+<HTML>
+<HEAD>
+   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
+   <META NAME="GENERATOR" CONTENT="Mozilla/4.05 [en] (X11; I; Linux 2.0.35 i586) [Netscape]">
+   <TITLE>KDbg's type table</TITLE>
+</HEAD>
+<BODY>
 
-<body>
-<h1>KDbg's type table</h1>
+<H1>
+KDbg's type table</H1>
+KDbg's type tables are located under <TT>$KDEDIR/share/apps/kdbg/types</TT>.
+By convention, there is one table for each library like Qt, kdecore, X11,
+etc. The files are named after the library file and end with <TT>.kdbgtt</TT>.
+Example: The type table for <TT>libqt.a</TT> is named <TT>qt.kdbgtt</TT>.
 
-<p>
-KDbg's type tables are located under
-<code>$KDEDIR/share/apps/kdbg/types</code>. By convention, there is one
-table for each library like Qt, kdecore, X11, etc.
-The files are named after the library file and end with
-<code>.kdbgtt</code>. Example: The type table for <code>libqt.a</code> is
-named <code>qt.kdbgtt</code>.
-</p>
+<P>A type table file obeys the regular KDE configuration file syntax. The
+file has the following groups:
+<UL>
+<LI>
+A group <TT>[Type Table]</TT> which lists the types and information how
+the debugger can identify whether the program is linked against the library.</LI>
 
-<p>
-A type table file obeys the regular KDE configuration file syntax. The file
-has the following groups:
-<il>
-<li> A group <code>[Type Table]</code> which lists the types and information
-how the debugger can identify whether the program is linked against the
-library.
-<li> A group for each type which has information about how the value of such
-a type is displayed by KDbg.
-</il></p>
+<LI>
+A group for each type which has information about how the value of such
+a type is displayed by KDbg.</LI>
+</UL>
 
-<h2>The <code>[Type Table]</code> group</h2>
-
-<p>
+<H2>
+The <TT>[Type Table]</TT> group</H2>
 This group contains the following entries:
-<il>
-<li> <code>Types1</code>, <code>Types2</code>, etc. These entries name the
-types. Each of them is a comma-separated list of type names. Each of the
-entries can name any number of types. (The types names can be distributed to
-several lines just so that the lines don't get excessivly long.) No blank
-space is allowed in these lines. The entries must be numbered consecutively
-(KDbg stops reading at the first gap), although an entry may be empty (i.e.
-name no type at all). Sometimes the order in which the names are listed is
-important (see <code>Alias</code> types below).
-<li> One of the following:<br>
-<code>IdentifyingType</code> or<br>
-<code>IdentifyingVariable</code> or<br>
-<code>IdentifyingPrint</code> and <code>IndentifyingPrintResult</code><br>
+<UL>
+<LI>
+<TT>Types1</TT>, <TT>Types2</TT>, etc. These entries name the types. Each
+of them is a comma-separated list of type names. Each of the entries can
+list any number of types. (The types names can be distributed to several
+lines just so that the lines don't get excessivly long.) No blank space
+is allowed in these lines. The entries must be numbered consecutively (KDbg
+stops reading at the first gap), although an entry may be empty (i.e. contain
+no type at all). Sometimes the order in which the names are listed is important
+(see <TT>Alias</TT> types below).</LI>
+
+<LI>
+One of the following:</LI>
+
+<BR><TT>IdentifyingType</TT> or
+<BR><TT>IdentifyingVariable</TT> or
+<BR><TT>IdentifyingPrint</TT> and <TT>IndentifyingPrintResult</TT>
+<LI>
 These entries tell KDbg how it can determine whether the program is linked
-against library (to which this type table applies).
-<code>IdentifyingType</code> names a sufficiently unique type.
-<code>IdentifyingVariable</code> names a (global) variable of the library.
-<code>IdentifyingPrint</code> is a print statement (e.g. a variable that
-contains a version number) and <code>IdentifyingPrintResult</code> is a
-regular expression that must match the print statement's result.<br>
-<emph>Currently this information is not used. KDbg just assumes that the
-program is linked against this library - in effect, all type tables
-available are applied for every program. This usually doesn't hurt.</emph>
-</il>
-</il></p>
+against the library (to which this type table applies). <TT>IdentifyingType</TT>
+names a sufficiently unique type. <TT>IdentifyingVariable</TT> names a
+(global) variable of the library. <TT>IdentifyingPrint</TT> is a print
+statement (e.g. a variable that contains a version number) and <TT>IdentifyingPrintResult</TT>
+is a regular expression that must match the print statement's result.</LI>
 
-<h2>The type's group</h2>
+<BR><FONT SIZE=-1>Currently this information is not used. KDbg just assumes
+that the program is linked against this library - so in effect, all type
+tables available are applied for every program. This usually doesn't hurt
+as long as there are no overlapping type names.</FONT></UL>
 
-<p>
-There is one group for each type that is named exactly as the type. <emph>At
-the moment C++ template classes are not supported.</emph> Each group
-contains the following entries:
-<il>
-<li><code>Display</code> determines how the value of the type is displayed
-by KDbg. The string must contain 1 to 5 percent characters '<code>%</code>'.
-These are replaced by the results of the expressions printed by the
-<code>Expr</code><emph>x</emph> entries.
-<li>One or more of <code>Expr1</code>, <code>Expr2</code>, etc. These
-entries specify partial expressions that will be submitted to gdb, and the
-result substituted back for the corresponding percent character in the
-<code>Display</code> string. The partial expression must contain
-<strong>exactly one</strong> <code>%s</code> sequence. It will be replaced
-by the variable name before the expression is submitted to gdb.
-<li><code>Alias</code> names an alias type. If this entry is present, the
-type is treated like the named type. That alias type must appear before this
-type in the <code>Types</code><emph>x</emph> entries in the <code>Type
-Table</code>.
-</il>
-<p>
-<emph>Currently the number of expressions per type is limited to&nbsp;5.
-This can easily be changed if it's too restrictive, but I recommend not to
-go to that limit at all - it will slow down the debugging process.</emph>
-</p>
+<H2>
+The type's group</H2>
+There is one group for each type that is named exactly as the type. <FONT SIZE=-1>At
+the moment C++ template classes are not supported.</FONT> Each group contains
+the following entries:
+<UL>
+<LI>
+<TT>Display</TT> determines how the value of the type is displayed by KDbg.
+The string must contain 1 to 5 percent characters '<TT>%</TT>'. These are
+replaced by the results of the expressions printed by the <TT>Expr</TT><I>x</I>
+entries.</LI>
 
-<h2>An example</h2>
-The example shows how <code>QString</code> and <code>QWidget</code> are
-defined in <code>qt.kdbgtt</code>. Additionally, <code>QTableView</code> is
-defined as an alias of <code>QWidget</code>.
-<pre>[Type Table]
+<LI>
+One or more of <TT>Expr1</TT>, <TT>Expr2</TT>, etc. Each of them must contain
+<B>exactly one</B> <TT>%s</TT> sequence, which will be replaced by the
+expression whose value is investigate. The so constructed expressions is
+submitted to gdb, and the result substituted back for the corresponding
+percent character in the <TT>Display</TT> string.</LI>
+
+<LI>
+<TT>Alias</TT> names an alias type. If this entry is present, the type
+is treated like the specified type. That alias type must appear before
+this type in the <TT>Types</TT><I>x</I> entries in the <TT>Type Table</TT>.</LI>
+</UL>
+<FONT SIZE=-1>Currently the number of expressions per type is limited to
+5. This can easily be changed if it's too restrictive, but I recommend
+not to go to that limit at all - it will slow down the debugging process.</FONT>
+
+<P>Tip: It is not necessary to define derived types if they ought to be
+treated the same as the base class - KDbg can deduce derived types and
+uses the type specification of the (leftmost) base class. You can use the
+<TT>Alias</TT> entry to quickly specify that a type should be treated like
+a non-leftmost base class for a multiple-inheritance class.
+<H2>
+An example</H2>
+The example shows how <TT>QString</TT> and <TT>QObject</TT> are defined
+in <TT>qt.kdbgtt</TT>. Additionally, <TT>QTableView</TT> is defined as
+an alias of <TT>QObject</TT>.
+<PRE>[Type Table]
 Types1=QString
-Types2=QWidget,QTableView
+Types2=QObject,QTableView
 [QString]
 Display={ % }
 Expr1=(%s).shd->data
-[QWidget]
-Display={ name=% #chld=% #conn=% }
+[QObject]
+Display={ name=% #chld=% }
 Expr1=(%s).objname
 Expr2=(%s).childObjects->numNodes
-Expr3=(%s).connections->numItems
 [QTableView]
-Alias=QWidget
-</pre>
-Note that it is safer to wrap the <code>%s</code> in parentheses.
-
-</body>
+Alias=QObject</PRE>
+Note that it is safer to wrap the <TT>%s</TT> in parentheses.
+</BODY>
+</HTML>
