@@ -1,3 +1,7 @@
+Version 1.9.0
+
+	Added XSLT debugging (using xsldbg) by Keith Isdale.
+
 Version 1.2.4
 
 	Now compiles for KDE 3 (Beta1).

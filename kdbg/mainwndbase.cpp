@@ -22,6 +22,7 @@
 #include "mainwndbase.h"
 #include "debugger.h"
 #include "gdbdriver.h"
+#include "xsldbgdriver.h"
 #include "prefdebugger.h"
 #include "prefmisc.h"
 #include "ttywnd.h"
@@ -309,7 +310,7 @@ DebuggerDriver* DebuggerMainWndBase::driverFromLang(const QCString& lang)
 	{ "c",       "c++",     1 },
 	{ "f",       "fortran", 1 },
 	{ "p",       "python",  3 },
-	{ "x",       "xsl",     2 },
+	{ "x",       "xslt",    2 },
     };
     const int N = sizeof(langs)/sizeof(langs[0]);
 
@@ -340,6 +341,9 @@ DebuggerDriver* DebuggerMainWndBase::driverFromLang(const QCString& lang)
 	    gdb->setDefaultInvocation(m_debuggerCmdStr);
 	    driver = gdb;
 	}
+	break;
+    case 2:
+	driver = new XsldbgDriver;
 	break;
     default:
 	// unknown language

@@ -20,6 +20,7 @@ kdbg_SOURCES = \
 	debugger.cpp \
 	dbgdriver.cpp \
 	gdbdriver.cpp \
+	xsldbgdriver.cpp \
 	brkpt.cpp \
 	exprwnd.cpp \
 	regwnd.cpp \
@@ -57,6 +58,7 @@ noinst_HEADERS = \
 	debugger.h \
 	dbgdriver.h \
 	gdbdriver.h \
+	xsldbgdriver.h \
 	brkpt.h \
 	exprwnd.h \
 	regwnd.h \

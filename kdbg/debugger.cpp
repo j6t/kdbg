@@ -518,7 +518,7 @@ void KDebugger::gdbExited(KProcess*)
     m_typeTable = 0;
 
     if (m_explicitKill) {
-	TRACE("gdb exited normally");
+	TRACE(m_d->driverName() + " exited normally");
     } else {
 	QString msg = i18n("%1 exited unexpectedly.\n"
 			   "Restart the session (e.g. with File|Executable).");

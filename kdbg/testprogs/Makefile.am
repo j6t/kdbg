@@ -1,5 +1,8 @@
 ## $Id$
 
+## This is the example XSL and XML files for debugging with xsldbg 
+EXTRA_DIST = xsldoc.xsl xsldoc.xml
+
 # set the include path for X, qt and KDE
 INCLUDES= $(all_includes)
 # always compile with debugging info switched on

@@ -536,9 +536,9 @@ protected:
     QFile m_logFile;
 
 protected slots:
-    void slotReceiveOutput(KProcess*, char* buffer, int buflen);
-    void slotCommandRead(KProcess*);
-    void slotExited(KProcess*);
+    virtual void slotReceiveOutput(KProcess*, char* buffer, int buflen);
+    virtual void slotCommandRead(KProcess*);
+    virtual void slotExited(KProcess*);
     
 signals:
     /**

@@ -1,0 +1,667 @@
+<?xml version="1.0"?>
+<!DOCTYPE xsldoc SYSTEM "xsldoc.dtd">
+<!-- 
+     File : xsldoc.xml     
+     Author: Keith Isdale <k_isdale@tpg.com.au>
+     Description: Xml Data to be processed generate help text and other 
+                  documentation
+     Copyright Reserved Under GPL     
+-->
+<xsldoc>
+<overview>
+<header>xsldbg help</header>
+<body>
+<para>xsldbg is similar to gdb. It has three modes of execution 
+of stylesheets.
+<list>
+<li>Run the whole stylesheet</li>
+<li>Step to next xsl instruction</li>
+<li>Continue to next break point is found</li>
+</list>
+</para>
+<para title="xsldbg command line">
+On systems with readline library available you can use the back/forward
+keys to navigate the history of entered commands.
+On all systems the last entered command can be repeated by just pressing
+the &lt;ENTER&gt; key. 
+</para>
+<para title="Legend :">
+<list><li>TEMPLATENAME : a valid template name</li>
+<li>FILENAME : a valid URL for a stylesheet</li>
+<li>LINENO : a valid line number in associated FILENAME</li>
+<li>NUMBER_OF_FRAMES : a valid line number frames to change position by</li>
+<li>BREAKPOINT_ID : a valid break point number</li>
+<li>SPEED: speed to walk through code at, between 0 to 9</li>
+<li><comment>(Comment)</comment>: a comment about command meaning or usage</li>
+<li>{ opt1 | opt2 | opt2 .. etc} : Choose one of the opt's</li>
+<li>XPATH : a xpath selection of node(s)</li>
+<li>PARAM_ID : a valid parameter number as indicated by showparam command</li>
+<li>PATH : a path to change working directory to</li>
+<li>TEXT : free form text <comment>(no restricttions)</comment></li>
+<li>COMMAND : a valid command for the xsdbg</li>
+<li>QNAME : a valid variable/parameter name</li>
+<li>SOURCE : the stylesheet being/tobe executed</li>
+<li>DATA : the xml data being/tobe processed by the stylesheet
+</li>
+</list>
+</para>
+
+<!-- - - - - Start help summary - - - - - -->
+<para title="Within xsldbg these commands are available:">
+<list>
+
+<li>Help related : help</li>
+
+<li>Running related : {<link href="bye">bye</link>|<link href="exit">exit</link>|
+<link href="quit">quit</link>}, <link href="step">step</link>, 
+<link href="stepup">stepup</link>, <link href="stepdown">stepdown</link>,
+<link href="continue">continue</link>, <link href="run">run</link>,
+<link href="trace">trace</link>
+</li>
+
+<li>Libxslt parameter related :
+<link href="addparam">addparam</link>,<link href="delparam">delparam</link>,
+<link href="showparam">showparam</link>
+</li>
+
+<li>Template related : <link href="templates">templates</link>,
+<link href="where">where</link>, <link href="frame">frame</link>
+</li>
+
+<li>Break point related : <link href="break">break</link>, 
+<link href="showbreak">showbreak</link>,
+<link href="delete">delete</link>, <link href="enable">enable</link>
+</li>
+
+<li>Expression viewing(xpath) : <link href="cat">cat</link></li>
+<li>Node viewing : <link href="ls">ls</link>, <link href="dir">dir</link>, 
+<link href="du">du</link>, <link href="cat">cat</link>, <link href="pwd">pwd</link></li>
+<li>Variable viewing : <link href="globals">globals</link>, 
+<link href="locals">locals</link>, 
+<link href="cat">cat</link>
+</li>
+
+<li>Node selection : <link href="source">source</link>, 
+<link href="data">data</link>, 
+<link href="cd">cd</link>
+</li>
+
+<li>Searching :<link href="search">search</link>
+</li>
+
+<li>Operating system related :
+<link href="chdir">chdir</link>,
+<link href="shell">shell</link> 
+</li>
+
+<li>File related :  
+<link href="validate">validate</link>, <link href="load">load</link>, 
+<link href="save">save</link>, <link href="write">write</link>, 
+<link href="free">free</link>
+</li>
+</list>
+</para>
+<para>nb: At the moment the file related commands as disabled because
+they are not completed.</para>
+</body>
+
+<footer></footer>
+</overview>
+
+<!-- - - - - -  Help related commands - - - - - - - - -  - -->
+<cmd name="help" title="Help">
+<summary>Display help on command or overiew</summary>
+<usage>
+<li>help   <comment>(Show overview of product)</comment></li>
+<li>help &lt;COMMAND&gt; <comment>(Show help about a command)</comment></li>
+</usage>
+</cmd>
+
+<!-- - - - - - -  Running related commands - - - - - - - - -->
+<cmd name="bye" title="Bye">
+<summary>Exit processing stylesheet as soon as possible.</summary>
+<usage>
+<li>
+<text>bye</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="quit" title="Quit">
+<summary>Exit processing stylesheet as soon as possible.</summary>
+<para>Shortcut name: q</para>
+<usage>
+<li>
+<text>quit</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="exit" title="Exit">
+<summary>Exit processing stylesheet as soon as possible.</summary>
+<usage>
+<li>
+<text>exit</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="step" title="Step">
+<summary>Step until next stylesheet instruction.</summary>
+<body>
+<para>Shortcut name: s</para>
+</body>
+<usage>
+<li>
+<text>step</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="stepup" title="Stepup">
+<summary>Step up to a older "call frame".  </summary>
+<body>
+<para>Shortcut name: up</para>
+</body>
+    <usage>
+      <li>
+	<text>stepup </text>
+	<comment>(step up one frame)</comment></li>
+      <li>
+	<text>stepup &lt;NUMBER_OF_FRAMES&gt; </text>
+	<comment>(step up specified number of frames)</comment>
+      </li>
+    </usage>
+</cmd>
+
+<cmd name="stepdown" title="Stepdown">
+<summary>Step down to a newer "call frame".  </summary>
+<body>
+<para>Shortcut name: down</para>
+</body>
+    <usage>
+      <li>
+	<text>stepdown </text>
+	<comment>(step down one frame)</comment>
+      </li>
+      <li>
+	<text>stepdown &lt;NUMBER_OF_FRAMES&gt;</text>
+	<comment>(step down specified number of frames)</comment>
+      </li>
+    </usage>
+</cmd>
+
+<cmd name="continue" title="Continue">
+<summary>Continue running stylesheet, stopping at any break points found.</summary>
+<para>Shortcut name: c</para>
+<usage>
+<li>
+<text>continue</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="run" title="Run">
+<summary>Restart the stylesheet.</summary>
+<para>Shortcut name: r</para>
+<usage>
+<li>
+<text>run</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="trace" title="Trace">
+<summary>Trace one execution of the stylesheet</summary>
+<usage>
+<li>
+<text>trace</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="walk" title="Walk">
+<summary>Walk through code using a range of speeds</summary>
+<usage>
+<li>
+<text>walk &lt;SPEED&gt;</text>
+<comment>(Use Ctrl-c to stop execution, &lt;SPEED&gt; is a value between 0 and 9. Where 0 means stop, 1 is very fast, 9 is very slow)</comment>
+</li>
+</usage>
+</cmd>
+
+<!-- - - - - - - - libxslt Parameter related - - - - -->
+<cmd name="addparam" title="Addparam">
+<summary>Add a libxslt parameter</summary>
+<usage>
+<li>
+<text>addparam &lt;QNAME&gt; &lt;XPATH&gt;</text>
+<comment>(No error checking done on the validity of &lt;QNAME&gt; nor &lt;XPATH&gt;. This is equivalent to providing --param &lt;QNAME&gt; &lt;XPATH&gt; via command line)</comment>
+</li>
+</usage>
+</cmd>
+
+<cmd name="delparam" title="Delparam">
+<summary>Delete a libxslt parameter</summary>
+<usage>
+<li>
+<text>delparam</text>
+<comment>(Delete all parameters present)</comment>
+</li>
+<li>
+<text>delparam &lt;PARAM_ID&gt;</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="showparam" title="Showparam">
+<summary>Print the libxslt parameters present</summary>
+<usage>
+<li>
+<text>showparam</text>
+</li>
+</usage>
+</cmd>
+
+<!-- - - - - - - Template related commands - - - - - - - -->
+<cmd name="templates" title="Templates">
+<summary>Print a list of available templates. Search for a template</summary>
+<para>Shortcut name: t</para>
+<usage>
+<li>
+<text>templates</text>
+</li>
+<li>
+<text>templates &lt;TEMPLATE&gt;</text>
+<comment>(Print details of template named &lt;TEMPLATE&gt; if it can be found)</comment>
+</li>
+</usage>
+</cmd>
+
+<cmd name="where" title="Where">
+<summary>Print a trace of templates calls (frame stack) and print the working directory.</summary>
+<para>Shortcut name: w</para>
+<usage>
+<li>
+<text>where</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="frame" title="Frame">
+<summary>Print the stack frame at a given depth</summary>
+<para>Shortcut name: f</para>
+<usage>
+<li>
+<text>frame &lt;FRAME_DEPTH&gt;</text>
+<comment>(Depth is a number from 0 to the current depth of call stack)</comment>
+ 
+</li>
+</usage>
+</cmd>
+
+<cmd name="stylesheets" title="Stylesheets">
+<summary>Print out a list of stylesheets loaded</summary>
+<body>
+<para>Shortcut name: style</para>
+</body>
+<usage>
+<li>
+<text>stylesheets</text>
+</li>
+</usage>
+</cmd>
+
+<!-- - - - -  Break point related commands - - - - - - - -->
+<cmd name="break" title="Break">
+<summary>Break at a template, at a location in any file loaded, or at the current node. </summary>
+<body>
+<para>Shortcut name: b</para>
+<para>xsldbg will try to guess the complete URL given a 
+<list>
+<li>file name without a path specified.</li>
+<li>a file name in the same directory as the &quot;top&quot; stylesheet loaded</li>
+<li>a file name relative to the current working directory of xsldbg</li>
+</list>
+Ie if you have loaded a stylsheet file of ../en/xsldoc.xsl you can do this
+</para>
+<para> break -l xsldoc.xsl 26
+</para>
+</body>
+<usage>
+<li>
+	<text>break -l &lt;FILENAME&gt; &lt;LINENO&gt;</text>
+</li>
+<li>
+	<text>break &lt;TEMPLATENAME&gt;</text>
+	<comment>(To break at named template.)</comment>
+</li>
+<li>
+	<text>break *</text>
+	<comment>(To break at any template found.)</comment>
+</li>
+<li>
+	<text>break </text>
+	<comment>(To break point at current node. Yes that includes xml data nodes!)</comment>
+</li>
+</usage>
+</cmd>
+
+<cmd name="showbreak" title="Showbreak">
+<summary>To display list of template break points.</summary>
+<para>Shortcut name: show</para>
+<usage>
+<li>
+<text>showbreak</text>
+</li>
+</usage>
+</cmd>
+
+
+<cmd name="delete" title="Delete">
+<summary>Delete a template breakpoint</summary>
+<body>
+<para>Shortcut name: d</para>
+</body>
+<usage>
+<li>
+	<text>delete</text>
+	<comment>(To delete breakpoint at current node)</comment>
+</li>
+<li>
+	<text>delete   &lt;BREAKPOINT_ID&gt;</text>
+	<comment>(To delete breakpoint at specified break point number)</comment>
+</li>
+<li>
+	<text>delete -l &lt;FILENAME&gt; &lt;LINENO&gt;</text>
+	<comment>(Delete at specifed file, line number)</comment>
+</li>
+<li>
+	<text>delete &lt;TEMMPLATENAME&gt;</text>
+	<comment>(To delete break point at named template.)</comment>
+</li>
+<li>
+	<text>delete *</text>
+	<comment>(To delete all break points.)</comment>
+</li>
+</usage>
+</cmd>
+
+<cmd name="enable" title="Enable">
+<summary>Enable or disable a breakpoint (Toggle enable/disable/)</summary>
+<body>
+<para>Shortcut name: e</para>
+</body>
+<usage>
+<li>
+	<text>enable</text>
+	<comment>(To enable/disable breakpoint at current node)</comment>
+</li>
+<li>
+	<text>enable   &lt;BREAKPOINT_ID&gt;</text>
+	<comment>(To enable/disable breakpoint at specified break point number</comment>
+</li>
+<li>
+	<text>enable -l &lt;FILENAME&gt; &lt;LINENO&gt;</text>
+	<comment>(Enable/disable breakpoint at specifed file, line number)</comment>
+</li>
+</usage>
+</cmd>
+
+<cmd name="disable" title="Disable">
+<summary>Disable a breakpoint</summary>
+<usage>
+<li>
+	<text>disable</text>
+	<comment>(To disable breakpoint at current node)</comment>
+</li>
+<li>
+	<text>disable   &lt;BREAKPOINT_ID&gt;</text>
+	<comment>(To disable breakpoint at specified break point number</comment>
+</li>
+<li>
+	<text>disable -l &lt;FILENAME&gt; &lt;LINENO&gt;</text>
+	<comment>(Disable breakpoint at specifed file, line number)</comment>
+</li>
+</usage>
+</cmd>
+
+
+<!-- - - - - - - Node view related commands -  - - - - - - - -->
+<cmd name="ls" title="Ls">
+<summary>List nodes in a brief format</summary>
+<usage>
+<li>
+<text>ls</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="dir" title="Dir">
+<summary>Print list of nodes in a similary way to the dir shell command.</summary>
+<body>
+<para></para>
+</body>
+<usage>
+<li>
+<text>dir</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="du" title="Du">
+<summary>Print a summary of child nodes in a tree format.</summary>
+<usage>
+<li>
+<text>du</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="cat" title="Cat">
+<summary>Print the result of a xpath expression on relative current node.</summary>
+<body>
+<para>Usage : cat &lt;XPATH&gt;</para>
+<para>Usage : cat $&lt;QNAME&gt;       (To view a varaible or parameter)</para>
+</body>
+</cmd>
+
+<cmd name="pwd" title="Pwd">
+<summary>Print the current working directory.</summary>
+<usage>
+<li>
+<text>pwd</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="base" title="Base">
+<summary>Print the base for this node</summary>
+<usage>
+<li>
+<text>base</text>
+</li>
+</usage>
+</cmd>
+
+<cmd name="dump" title="Dump">
+<summary>Dump the gory details of this node</summary>
+<usage>
+<li>
+<text>dump</text>
+</li>
+</usage>
+</cmd>
+
+<!-- - - - - - - Variable related commands - - - - - - - - - -->
+<cmd name="globals" title="Globals">
+<summary>Print a list of global stylesheet variables or parameters. Print the value of a global variable</summary>
+<usage>
+<li>
+	<text>globals</text>
+	<comment>(Print list of all globaly available variables)</comment>
+</li>
+<li>
+	<text>globals &lt;QNAME&gt;</text>
+	<comment>(Print the value of variable specified)</comment>
+</li>
+</usage>
+</cmd>
+
+<cmd name="locals" title="Locals">
+<summary>Print a list of local stylesheet variables or parameters. Print the value of a local variable</summary>
+<usage>
+<li>
+	<text>locals</text>
+	<comment>(Print list of all locally available variables)</comment>
+</li>
+<li>
+	<text>locals &lt;QNAME&gt;</text>
+	<comment>(Print the value of variable specified)</comment>
+</li>
+</usage>
+</cmd>
+
+<!-- - - - - - - Node selection related commands - - - - - - - -->
+<cmd name="source" title="Source">
+<summary>Switch to displaying the current node in stylesheet. Or change stylesheet used</summary>
+<usage>
+<li>
+<text>source</text>
+<comment>(Switch to the current node in stylesheet.)</comment>
+</li>
+<li>
+<text>source &lt;SOURCE&gt;</text>
+<comment>(To change to a new source file.  A leading '~' is replaced by the $HOME environment variable value. May need to use run command to execute it)</comment>
+</li>
+</usage>
+</cmd>
+
+<cmd name="data" title="Data">
+<summary>Switch to displaying the current node in xml data. Or change xml data used</summary>
+<usage>
+<li>
+<text>data</text>
+<comment>(Switch to the current document node.)</comment>
+</li>
+<li>
+<text>data &lt;DATA&gt;</text>
+<comment>(To change to a new xml data file.  A leading '~' is replaced by the $HOME environment variable value. May need to use run command to process it)</comment>
+</li>
+</usage>
+</cmd>
+
+<cmd name="cd" title="Cd">
+<summary>Change to the path specified by a xpath.</summary>
+<usage>
+<li>
+	<text>cd &lt;XPATH&gt;</text>
+</li>
+<li>
+	<text>cd -t&lt;TEMPLATENAME&gt;</text>
+	<comment>(To changes current SOURCE node to a be xsl template with name &lt;NAME&gt;, but does execute source command)</comment>
+</li>
+<li>
+	<text>cd -s&lt;XPATH&gt;</text>
+	<comment>(An absolute xPath to node within stylesheet)</comment>
+</li>
+<li>
+	<text>cd   &lt;SHORTCUT&gt; &lt;XPATH&gt;</text>
+</li>
+<li>
+	<text>     Where SHORTCUT can be either</text>
+</li>
+<li>
+<list>
+<li><text>&lt;&lt;         = preceding-sibling::node()</text>
+</li>
+<li><text>&gt;&gt;         = following-sibling::node()</text>
+</li>
+<li><text>&lt;-         = ancestor::node()</text>
+</li>
+<li><text>-&gt;         = decendant::node()</text>
+</li>
+</list>
+</li>
+</usage>
+</cmd>
+
+
+<!-- - - - - - File related commands - - - - - -  -->
+<cmd name="validate" title="Validate">
+<summary>Validate the output file generated by stylesheet    (Disabled)</summary>
+</cmd>
+
+<cmd name="load" title="Load">
+<summary>Reload stylesheet and data file(s)      (Disabled see run)</summary>
+</cmd>
+
+<cmd name="save" title="Save">
+<summary>Save the generated data file       (Disabled)</summary>
+</cmd>
+
+<cmd name="write" title="Write">
+<summary>To be completed</summary>
+</cmd>
+
+<cmd name="free" title="Free">
+<summary>Free stylesheet and data        (Disabled see run)</summary>
+</cmd>
+
+<!-- - - - - - - Searching related - - - - - -->
+<cmd name="search" title="Search">
+<summary>Search a database of all information gathered from styleets loaded</summary>
+<body>
+<para>When the search command is issued a file (search.data) will be created in the current directory. You can then process this file with your own stylessheet to present data in a other ways than displayed by default.
+</para>
+<para>Depending on the amount of data collected it might take a while to compled this command.
+</para>
+<para>At the moment breakpoints are not being sorted properly. Which is being looked at.
+</para>
+</body>
+<usage>
+<li>
+<text>search &lt;XPATH&gt;</text><comment>(See what xpath can be used see search.dtd)</comment>
+</li>
+<li>
+<text>search -sort &lt;XPATH&gt;</text><comment>(Enable tell search.xsl to sort the result before outputing it)</comment>
+</li>
+</usage>
+</cmd>
+
+<!-- - - - - Operating system related - - - - -->
+<cmd name="chdir" title="Chdir">
+<summary>Change the working directory</summary>
+<usage>
+<li>
+<text>chdir &lt;PATH&gt;</text>
+<comment>(A relative or absolute path for operating system)</comment>
+</li>
+</usage>
+</cmd>
+
+<cmd name="shell" title="Shell">
+<summary>Execute shell command</summary>
+<usage>
+<li>
+<text>shell &lt;TEXT&gt;</text>
+<comment>(&lt;TEXT&gt; is the text to be passed to operating system for execution)</comment>
+</li>
+</usage>
+</cmd>
+
+</xsldoc>
+
+
+<!-- initialization code for xemacs -->
+<!--
+Local Variables:
+mode: sgml
+sgml-minimize-attributes:nil
+sgml-general-insert-case:lower
+sgml-indent-step:0
+sgml-indent-data:nil
+End:
+-->
+
+
