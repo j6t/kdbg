@@ -20,6 +20,7 @@
 #include <kstdaccel.h>
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
+#include <kglobal.h>
 #else
 #include <ctype.h>
 #endif
@@ -38,7 +39,6 @@ FileWindow::FileWindow(const char* fileName, QWidget* parent, const char* name) 
 	m_fileName(fileName)
 {
     setNumCols(2);
-    setFont(QFont("courier"));
 
     // load pixmaps
 #if QT_VERSION < 200
@@ -49,6 +49,7 @@ FileWindow::FileWindow(const char* fileName, QWidget* parent, const char* name) 
     m_brkdis = loader->loadIcon("brkdis.xpm");
     m_brktmp = loader->loadIcon("brktmp.xpm");
     m_brkcond = loader->loadIcon("brkcond.xpm");
+    setFont(kapp->fixedFont);
 #else
     m_pcinner = BarIcon("pcinner");
     m_pcup = BarIcon("pcup");
@@ -56,6 +57,7 @@ FileWindow::FileWindow(const char* fileName, QWidget* parent, const char* name) 
     m_brkdis = BarIcon("brkdis");
     m_brktmp = BarIcon("brktmp");
     m_brkcond = BarIcon("brkcond");
+    setFont(KGlobal::fixedFont());
 #endif
 }
 
@@ -438,6 +440,15 @@ bool FileWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 	start = end;
     }
     return false;
+}
+
+void FileWindow::paletteChange(const QPalette&)
+{
+#if QT_VERSION < 200
+    setFont(kapp->fixedFont);
+#else
+    setFont(KGlobal::fixedFont());
+#endif
 }
 
 

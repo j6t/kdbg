@@ -47,6 +47,7 @@ protected:
     virtual int cellWidth(int col);
     virtual void paintCell(QPainter* p, int row, int col);
     virtual void mousePressEvent(QMouseEvent* ev);
+    virtual void paletteChange(const QPalette&);
     void updateLineItem(int i);
 
 signals:
