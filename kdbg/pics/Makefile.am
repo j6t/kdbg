@@ -28,12 +28,36 @@ PICTOGRAMS = \
 	pointer.xpm
 
 
+KDE2_ICONS = \
+	hi32-app-kdbg.png hi16-app-kdbg.png \
+	lo32-app-kdbg.png lo16-app-kdbg.png
+
+if BUILDFORKDE2
+kde2_icon_install = yes
+else
 icon_DATA = kdbg.xpm
 icondir = $(kde_icondir)
 miniicon_DATA = mini-kdbg.xpm
 miniicondir = $(kde_icondir)/mini
+kde2_icon_install = no
+endif
 pics_DATA = $(TOOLBAR) $(PICTOGRAMS)
 picsdir = $(kde_datadir)/kdbg/pics
 
 
-EXTRA_DIST = $(pics_DATA) $(icon_DATA) $(miniicon_DATA)
+EXTRA_DIST = $(pics_DATA) kdbg.xpm mini-kdbg.xpm $(KDE2_ICONS)
+
+install-data-local:
+	@if test "x$(kde2_icon_install)" = "xyes"; then \
+	set -x; \
+	$(INSTALL_DATA) hi32-app-kdbg.png $(DESTDIR)$(kde_icondir)/hicolor/32x32/apps/kdbg.png; \
+	$(INSTALL_DATA) hi16-app-kdbg.png $(DESTDIR)$(kde_icondir)/hicolor/16x16/apps/kdbg.png; \
+	$(INSTALL_DATA) lo32-app-kdbg.png $(DESTDIR)$(kde_icondir)/locolor/32x32/apps/kdbg.png; \
+	$(INSTALL_DATA) lo16-app-kdbg.png $(DESTDIR)$(kde_icondir)/locolor/16x16/apps/kdbg.png; \
+	fi
+
+uninstall-local:
+	-rm -f $(DESTDIR)$(kde_icondir)/hicolor/32x32/apps/kdbg.png
+	-rm -f $(DESTDIR)$(kde_icondir)/hicolor/16x16/apps/kdbg.png
+	-rm -f $(DESTDIR)$(kde_icondir)/locolor/32x32/apps/kdbg.png
+	-rm -f $(DESTDIR)$(kde_icondir)/locolor/16x16/apps/kdbg.png
