@@ -43,6 +43,7 @@ kdbg_SOURCES = \
 	updateui.cpp \
 	winstack.cpp \
 	typetable.cpp \
+	prefdebugger.cpp \
 	dbgmainwnd.cpp \
 	main.cpp
 
@@ -67,6 +68,7 @@ noinst_HEADERS = \
 	updateui.h \
 	winstack.h \
 	typetable.h \
+	prefdebugger.h \
 	dbgmainwnd.h \
 	envvar.h \
 	commandids.h \

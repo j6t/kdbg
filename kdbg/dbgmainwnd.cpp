@@ -10,8 +10,10 @@
 #include <kiconloader.h>
 #include <kstdaccel.h>
 #include <qpainter.h>
+#include <qtabdialog.h>
 #include "dbgmainwnd.h"
 #include "debugger.h"
+#include "prefdebugger.h"
 #include "updateui.h"
 #include "commandids.h"
 #include "mydebug.h"
@@ -122,6 +124,8 @@ void DebuggerMainWnd::initMenu()
     m_menuFile.insertSeparator();
     m_menuFile.insertItem(i18n("&Executable..."), ID_FILE_EXECUTABLE);
     m_menuFile.insertItem(i18n("&Core dump..."), ID_FILE_COREFILE);
+    m_menuFile.insertSeparator();
+    m_menuFile.insertItem(i18n("&Global Options..."), ID_FILE_GLOBAL_OPTIONS);
     m_menuFile.insertSeparator();
     m_menuFile.insertItem(i18n("&Quit"), ID_FILE_QUIT);
     m_menuFile.setAccel(keys->open(), ID_FILE_OPEN);
@@ -320,6 +324,9 @@ void DebuggerMainWnd::menuCallback(int item)
     case ID_FILE_COREFILE:
 	if (m_debugger != 0)
 	    m_debugger->fileCoreFile();
+	break;
+    case ID_FILE_GLOBAL_OPTIONS:
+	slotGlobalOptions();
 	break;
     case ID_FILE_QUIT:
 	kapp->quit();
@@ -617,6 +624,25 @@ void DebuggerMainWnd::updateLineStatus(int lineNo)
 	QString strLine;
 	strLine.sprintf(i18n("Line %d"), lineNo + 1);
 	statusBar()->changeItem(strLine, ID_STATUS_LINENO);
+    }
+}
+
+void DebuggerMainWnd::slotGlobalOptions()
+{
+    QTabDialog dlg(0, "global_options", true);
+    QString title = kapp->getCaption();
+    title += i18n(": Global options");
+    dlg.setCaption(title);
+    dlg.setCancelButton();
+
+    PrefDebugger prefDebugger(&dlg);
+    prefDebugger.setDebuggerCmd(m_debugger->debuggerCmd());
+    prefDebugger.setTerminal(m_debugger->terminalCmd());
+    
+    dlg.addTab(&prefDebugger, "&Debugger");
+    if (dlg.exec() == QDialog::Accepted) {
+	m_debugger->setDebuggerCmd(prefDebugger.debuggerCmd());
+	m_debugger->setTerminalCmd(prefDebugger.terminal());
     }
 }
 

@@ -99,6 +99,7 @@ public slots:
     void slotAddWatch();
     void slotWatchHighlighted(int);
     void slotNewFileLoaded();
+    void slotGlobalOptions();
 };
 
 #endif // DBGMAINWND_H
