@@ -7,14 +7,18 @@
 #include <kapp.h>
 #include <kfiledialog.h>
 #include <klocale.h>			/* i18n */
+#include "config.h"
 #include "mydebug.h"
 
-PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
+PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars,
+		 const QStringList& allOptions) :
 	QDialog(parent, "pgmargs", true),
 	m_envVars(envVars),
 	m_label(this, "label"),
 	m_programArgs(this, "args"),
 	m_fileBrowse(this, "args_browse"),
+	m_optionsLabel(this, "options_label"),
+	m_options(this, "options"),
 	m_wdLabel(this, "wd_label"),
 	m_wd(this, "wd"),
 	m_wdBrowse(this, "wd_browse"),
@@ -57,10 +61,37 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     m_fileBrowse.setMinimumSize(s);
     connect(&m_fileBrowse, SIGNAL(clicked()), SLOT(browseArgs()));
 
+    int btnSpace = 0, numSpace = 0;    /* used to shift env buttons down */
+
+    // add options only if the option list is non-empty
+    if (!allOptions.isEmpty()) 
+    {
+	m_optionsLabel.setText(i18n("Options:"));
+	s = m_optionsLabel.sizeHint();
+	m_optionsLabel.setMinimumSize(s);
+	btnSpace += s.height();
+
+	m_options.setSelectionMode(QListBox::Multi);
+
+	// add 5 entries, then get size hint, then add the rest
+	QStringList rest = allOptions;
+	for (int i = 0; i < 5 && !rest.isEmpty(); i++) {
+	    m_options.insertItem(rest.first());
+	    rest.remove(rest.begin());
+	}
+	s = m_options.sizeHint();
+	m_options.insertStringList(rest);
+
+	m_options.setMinimumSize(s);
+	m_options.setMaximumHeight(s.height());
+	btnSpace += s.height();
+	numSpace += 2;
+    }
+
     m_wdLabel.setText(i18n("Working directory:"));
     s = m_wdLabel.sizeHint();
     m_wdLabel.setMinimumSize(s);
-    int btnSpace = s.height();
+    btnSpace += s.height();
 
     m_wdBrowse.setText("...");
     s = m_wdBrowse.sizeHint();
@@ -112,6 +143,14 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     m_layout.addLayout(&m_buttons);
     m_edits.addWidget(&m_label);
     m_edits.addLayout(&m_pgmArgsEdit);
+    if (!allOptions.isEmpty()) {
+	m_edits.addWidget(&m_optionsLabel);
+	m_edits.addWidget(&m_options);
+    } else {
+	m_optionsLabel.hide();
+	m_options.hide();
+	m_options.setEnabled(false);
+    }
     m_edits.addWidget(&m_wdLabel);
     m_edits.addLayout(&m_wdEdit);
     m_edits.addWidget(&m_envLabel);
@@ -119,7 +158,7 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     m_edits.addWidget(&m_envList, 10);
     m_buttons.addWidget(&m_buttonOK);
     m_buttons.addWidget(&m_buttonCancel);
-    m_buttons.addSpacing(btnSpace + 2*m_edits.defaultBorder());
+    m_buttons.addSpacing(btnSpace + numSpace*m_edits.defaultBorder());
     m_buttons.addWidget(&m_buttonModify);
     m_buttons.addWidget(&m_buttonDelete);
     m_buttons.addStretch(10);
@@ -128,14 +167,36 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     m_wdEdit.addWidget(&m_wd, 10);
     m_wdEdit.addWidget(&m_wdBrowse);
 
-    m_layout.activate();
-
     m_programArgs.setFocus();
-    resize(300, 300);
 }
 
 PgmArgs::~PgmArgs()
 {
+}
+
+// initializes the selected options
+void PgmArgs::setOptions(const QStringList& selectedOptions)
+{
+    QStringList::ConstIterator it;
+    for (it = selectedOptions.begin(); it != selectedOptions.end(); ++it) {
+	for (uint i = 0; i < m_options.count(); i++) {
+	    if (m_options.text(i) == *it) {
+		m_options.setSelected(i, true);
+		break;
+	    }
+	}
+    }
+}
+
+// returns the selected options
+QStringList PgmArgs::options() const
+{
+    QStringList sel;
+    for (uint i = 0; i < m_options.count(); i++) {
+	if (m_options.isSelected(i))
+	    sel.append(m_options.text(i));
+    }
+    return sel;
 }
 
 void PgmArgs::modifyVar()

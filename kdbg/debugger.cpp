@@ -13,6 +13,7 @@
 #include <qregexp.h>
 #include <qfileinfo.h>
 #include <qlistbox.h>
+#include <qstringlist.h>
 #include <kapp.h>
 #include <ksimpleconfig.h>
 #include <kconfig.h>
@@ -305,7 +306,8 @@ void KDebugger::programBreak()
 void KDebugger::programArgs(QWidget* parent)
 {
     if (m_haveExecutable) {
-	PgmArgs dlg(parent, m_executable, m_envVars);
+	QStringList allOptions;
+	PgmArgs dlg(parent, m_executable, m_envVars, allOptions);
 	dlg.setArgs(m_programArgs);
 	dlg.setWd(m_programWD);
 	if (dlg.exec()) {
