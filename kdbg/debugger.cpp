@@ -1968,6 +1968,23 @@ void KDebugger::updateBreakList(const char* output)
 	stillAlive:;
     }
 
+    // brks may contain new breakpoints not already in m_brkpts
+    for (const Breakpoint* bp = brks.first(); bp != 0; bp = brks.next())
+    {
+	bool found = false;
+	for (uint i = 0; i < m_brkpts.size(); i++)      {
+	    if (bp->id == m_brkpts[i]->id) {
+		found = true;
+		break;
+	    }
+	}
+	if (!found){
+	    int n = m_brkpts.size();
+	    m_brkpts.resize(n+1);
+	    m_brkpts.insert(n, bp);
+	}
+    }
+
     emit breakpointsChanged();
 }
 
