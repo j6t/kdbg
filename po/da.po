@@ -101,7 +101,7 @@ msgstr "'%s' er ikke en fil eller findes ikke"
 
 #: debugger.cpp:263
 msgid "Select the executable to debug"
-msgstr "Vælg progrem der skal debugges"
+msgstr "Vælg program der skal debugges"
 
 #: debugger.cpp:305
 msgid "Select core dump"
@@ -113,7 +113,7 @@ msgid ""
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
 "gdb afsluttede uventet.\n"
-"Genstart sesionen (eks. med fil|Eksekverbar)."
+"Genstart sesionen (eks. med fil|Applikation)."
 
 #: debugger.cpp:623
 msgid ": Program output"
@@ -145,7 +145,7 @@ msgstr "Sæt/fjern &breakpoint"
 
 #: dbgmainwnd.cpp:119 winstack.cpp:392
 msgid "&Executable..."
-msgstr "&Eksekverbar..."
+msgstr "&Applikation..."
 
 #: dbgmainwnd.cpp:120 winstack.cpp:393
 msgid "&Core dump..."
@@ -266,7 +266,7 @@ msgstr "En Debugger\n"
 
 #: dbgmainwnd.cpp:191
 msgid "Executable"
-msgstr "Eksekverbar"
+msgstr "Applikation"
 
 #: dbgmainwnd.cpp:193
 msgid "Open a source file"
