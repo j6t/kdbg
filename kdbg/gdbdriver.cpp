@@ -1922,11 +1922,13 @@ bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
 
     /*
      * The command is successful if there is no output or the single
-     * message (no debugging symbols found)...
+     * message (no debugging symbols found) or
+     * (Using host libthread_db library "/lib/tls/libthread_db.so.1".)
      */
     return
 	output[0] == '\0' ||
-	strcmp(output, "(no debugging symbols found)...") == 0;
+	strcmp(output, "(no debugging symbols found)...") == 0 ||
+	strncmp(output, "Using host libthread_db library", 31) == 0;
 }
 
 bool GdbDriver::parseCoreFile(const char* output)
