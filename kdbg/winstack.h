@@ -83,6 +83,7 @@ public:
     bool activeLine(QString& filename, int& lineNo);
     bool activeLine(QString& filename, int& lineNo, DbgAddr& address);
     void maybeTip(const QPoint& p);
+    bool hasWindows() const { return !m_fileList.isEmpty(); }
 
     virtual void resizeEvent(QResizeEvent*);
 

@@ -206,7 +206,7 @@ void DebuggerMainWnd::initKAction()
     KStdAction::showStatusbar(this, SLOT(slotViewStatusbar()), actionCollection());
 
     // view menu
-    (void)new KToggleAction(i18n("&Find"), "search", 0, m_filesWindow,
+    (void)new KToggleAction(i18n("&Find"), "find", 0, m_filesWindow,
 			    SLOT(slotViewFind()), actionCollection(),
 			    "view_find");
     i18n("Source &code");
@@ -389,8 +389,10 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
 
 void DebuggerMainWnd::updateUI()
 {
-    static_cast<KToggleAction*>(actionCollection()->action("view_find"))->
-	setChecked(m_filesWindow->m_findDlg.isVisible());
+    KToggleAction* viewFind =
+	static_cast<KToggleAction*>(actionCollection()->action("view_find"));
+    viewFind->setChecked(m_filesWindow->m_findDlg.isVisible());
+    viewFind->setEnabled(m_filesWindow->hasWindows());
     actionCollection()->action("breakpoint_set")->setEnabled(m_debugger->canChangeBreakpoints());
     actionCollection()->action("breakpoint_set_temporary")->setEnabled(m_debugger->canChangeBreakpoints());
     actionCollection()->action("breakpoint_enable")->setEnabled(m_debugger->canChangeBreakpoints());
