@@ -6,7 +6,6 @@
 #include "debugger.h"
 #include "dbgdriver.h"
 #include "pgmargs.h"
-#include "procattach.h"
 #include "typetable.h"
 #include "exprwnd.h"
 #include "valarray.h"
@@ -209,20 +208,16 @@ void KDebugger::programRun()
     m_programRunning = true;
 }
 
-void KDebugger::programAttach()
+void KDebugger::attachProgram(const QString& pid)
 {
     if (!isReady())
 	return;
 
-    ProcAttach dlg(parentWidget());
-    dlg.setText(m_attachedPid);
-    if (dlg.exec()) {
-	m_attachedPid = dlg.text();
-	TRACE("Attaching to " + m_attachedPid);
-	m_d->executeCmd(DCattach, m_attachedPid);
-	m_programActive = true;
-	m_programRunning = true;
-    }
+    m_attachedPid = pid;
+    TRACE("Attaching to " + m_attachedPid);
+    m_d->executeCmd(DCattach, m_attachedPid);
+    m_programActive = true;
+    m_programRunning = true;
 }
 
 void KDebugger::programRunAgain()
@@ -464,6 +459,7 @@ void KDebugger::gdbExited(KProcess*)
     m_programRunning = false;
     m_explicitKill = false;
     m_debuggerCmd = QString();		/* use global setting at next start! */
+    m_attachedPid = QString();		/* we are no longer attached to a process */
 
     // stop gear wheel and erase PC
     stopAnimation();

@@ -22,6 +22,7 @@
 #include "debugger.h"
 #include "gdbdriver.h"
 #include "prefdebugger.h"
+#include "procattach.h"
 #include "updateui.h"
 #include "commandids.h"
 #include "valarray.h"
@@ -296,7 +297,13 @@ bool DebuggerMainWndBase::handleCommand(int item)
 	m_debugger->programRun();
 	return true;
     case ID_PROGRAM_ATTACH:
-	m_debugger->programAttach();
+	{
+	    ProcAttach dlg(dbgMainWnd());
+	    dlg.setText(m_debugger->attachedPid());
+	    if (dlg.exec()) {
+		m_debugger->attachProgram(dlg.text());
+	    }
+	}
 	return true;
     case ID_PROGRAM_RUN_AGAIN:
 	m_debugger->programRunAgain();

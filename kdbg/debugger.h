@@ -62,9 +62,9 @@ public:
     void programRun();
 
     /**
-     * Attaches to a process and debugs it.
+     * Attaches to the specified process and debugs it.
      */
-    void programAttach();
+    void attachProgram(const QString& pid);
 
     /**
      * Restarts the debuggee.
@@ -205,6 +205,9 @@ public:
 
     /** Returns the debugger driver. */
     DebuggerDriver* driver() { return m_d; }
+
+    /** Returns the pid that the debugger is currently attached to. */
+    const QString& attachedPid() const { return m_attachedPid; }
 
     // settings
     void saveSettings(KConfig*);
