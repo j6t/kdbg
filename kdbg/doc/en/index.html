@@ -30,6 +30,9 @@ Contents</h2>
 <li>
 <a href="#Environment">Specifying program arguments, working directory,
 environment variables</a></li>
+
+<li>
+<a href="#GlobalOptions">Global options</a></li>
 </ul>
 
 <li>
@@ -81,7 +84,8 @@ Dump</i> from the menu. Now KDbg goes to the point in the program that
 caused the core dump.
 <p>To run the <b>program with arguments</b>, set the <b>working directory</b>,
 or set <b>environment variables</b>, choose <i>Execution|Arguments</i>.
-<a href="#Environment">See below</a> for more details.
+<a href="#Environment">See
+below</a> for more details.
 <p>In the menu <i>Execution</i> you find the commands that you need to
 <b>run</b>
 the program, <b>step</b> through code, and to <b>interrupt</b> the program
@@ -133,14 +137,40 @@ will be used by your program the next time it is run.
 Linux is <tt>LD_BIND_NOW</tt>. It is very important that you set this variable
 to <tt>1</tt> for all your debugging sessions. If it is not set, gdb cannot
 step into and out of system functions that are imported from the shared
-<tt>libc</tt> and other libraries.
+<tt>libc</tt>
+and other libraries.
+<h3>
+<a NAME="GlobalOptions"></a>Global options</h3>
+To specify some global options, choose <i>File|Global Options</i>. You
+can set the following:
+<ul>
+<li>
+the command by which gdb is invoked,</li>
+
+<li>
+the command that opens a terminal for the program's output.</li>
+</ul>
+If you want to use a different version of gdb, you can specify it under
+<i>How to invoke GDB</i>. The default command is <tt>gdb -fullname -nx</tt>.
+Be sure to also specify these options if you change the gdb executable.
+If you leave them away, KDbg will not work. If you messed up the entry,
+you can clear it to revert to the default setting.
+<p>If you want to use a different terminal program to show the output of
+the program, specify it under <i>Terminal for program output</i>. The default
+setting is <tt>xterm -name kdbgio -title %T -e sh -c %C</tt>. In this entry,
+<tt>%T</tt> will be replaced by a title string, <tt>%C</tt> will be replaced
+by a Bourne shell script that loops infinitely so that the terminal window
+doesn't close. (No, it doesn't use CPU, it calls <tt>sleep 3600</tt> in
+a loop :) An alternative for this setting could be <tt>konsole -nowelcome
+-name kdbgio -caption %T -e sh -c %C</tt>.
 <h2>
 <a NAME="TipsTricks"></a>Tips and Tricks</h2>
 
 <ul>
 <li>
 Always set the environment variable <tt>LD_BIND_NOW=1</tt> on glibc2 systems.
-<a href="#Environment">See above</a>.</li>
+<a href="#Environment">See
+above</a>.</li>
 
 <li>
 You can use breakpoints as bookmarks: Just set a breakpoint and disable
