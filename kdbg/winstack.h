@@ -99,6 +99,7 @@ signals:
     void initiateValuePopup(const QString&);
     void disassemble(const QString&, int);
     void setTabWidth(int numChars);
+    void moveProgramCounter(const QString&, int, const DbgAddr&);
 
 public slots:
     void selectWindow(int id);		/* 1-based index, 0 means dialog More... */
@@ -115,6 +116,7 @@ public slots:
     void slotBrkptSet();
     void slotBrkptSetTemp();
     void slotBrkptEnable();
+    void slotMoveProgramCounter();
 
     // Displays the value tip at m_tipLocation
     void slotShowValueTip(const QString& tipText);

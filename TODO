@@ -23,8 +23,6 @@
 19. Improve support of breakpoints in source files having directories in their
     names.
 
-20. Provide means to change the program counter.
-
 22. Allow to change whether signals are handled or ignored.
 
 23. Deactivate "Recent Executable" when list is empty.

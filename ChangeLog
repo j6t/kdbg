@@ -4,6 +4,8 @@ Version 1.9.0
 
 	Added XSLT debugging (using xsldbg) by Keith Isdale.
 
+	The program counter can be changed via point and click.
+
 Version 1.2.7
 
 	Fixed parsing of stack frames for recent gdbs.

@@ -28,6 +28,7 @@
     <Action name="exec_run_to_cursor"/>
     <Action name="exec_step_into_by_insn"/>
     <Action name="exec_step_over_by_insn"/>
+    <Action name="exec_movepc"/>
     <Separator/>
     <Action name="exec_break"/>
     <Action name="exec_kill"/>
@@ -54,6 +55,7 @@
   <Action name="exec_step_over"/>
   <Action name="exec_step_out"/>
   <Action name="exec_step_run_to_cursor"/>
+  <Action name="exec_movepc"/>
   <Separator/>
   <Action name="breakpoint_set"/>
 </Menu>

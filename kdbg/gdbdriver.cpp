@@ -116,6 +116,7 @@ static GdbCmdInfo cmds[] = {
     { DCinfothreads, "info threads\n", GdbCmdInfo::argNone },
     { DCinfobreak, "info breakpoints\n", GdbCmdInfo::argNone },
     { DCcondition, "condition %d %s\n", GdbCmdInfo::argNumString},
+    { DCsetpc, "set variable $pc=%s\n", GdbCmdInfo::argString },
     { DCignore, "ignore %d %d\n", GdbCmdInfo::argNum2},
 };
 
@@ -2095,19 +2096,22 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 
 bool GdbDriver::parseInfoLine(const char* output, QString& addrFrom, QString& addrTo)
 {
-    const char* start = strstr(output, "starts at address ");
+    // "is at address" or "starts at address"
+    const char* start = strstr(output, "s at address ");
     if (start == 0)
 	return false;
 
-    start += 18;
+    start += 13;
     const char* p = start;
     while (*p != '\0' && !isspace(*p))
 	p++;
     addrFrom = FROM_LATIN1(start, p-start);
 
     start = strstr(p, "and ends at ");
-    if (start == 0)
-	return false;
+    if (start == 0) {
+	addrTo = addrFrom;
+	return true;
+    }
 
     start += 12;
     p = start;
@@ -2138,7 +2142,7 @@ void GdbDriver::parseDisassemble(const char* output, QList<DisassembledCode>& co
     p++;
 
     // remove last line
-    const char* end = strstr(output, "\nEnd of assembler");
+    const char* end = strstr(output, "End of assembler");
     if (end == 0)
 	end = p + strlen(p);
 

@@ -92,6 +92,7 @@ static XsldbgCmdInfo cmds[] = {
     {DCinfothreads, "print 'info threads'\n", XsldbgCmdInfo::argNone},
     {DCinfobreak, "show\n", XsldbgCmdInfo::argNone},
     {DCcondition, "print 'condition %d %s'\n", XsldbgCmdInfo::argNumString},
+    {DCsetpc, "print 'set variable $pc=%s'\n", XsldbgCmdInfo::argString},
     {DCignore, "print 'ignore %d %d'\n", XsldbgCmdInfo::argNum2},
 };
 
@@ -1434,7 +1435,7 @@ bool
 XsldbgDriver::parseInfoLine(const char */*output*/, QString & /*addrFrom*/,
                             QString & /*addrTo*/)
 {
-    return true;
+    return false;
 }
 
 void

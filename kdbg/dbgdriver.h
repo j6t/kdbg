@@ -88,6 +88,7 @@ enum DbgCommand {
 	DCinfothreads,
 	DCinfobreak,
 	DCcondition,
+	DCsetpc,
 	DCignore
 };
 

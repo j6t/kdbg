@@ -956,6 +956,9 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCinfothreads:
 	handleThreadList(output);
 	break;
+    case DCsetpc:
+	handleSetPC(output);
+	break;
     }
 }
 
@@ -1906,16 +1909,25 @@ void KDebugger::slotDisassemble(const QString& fileName, int lineNo)
 void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 {
     QString addrFrom, addrTo;
-    if (m_d->parseInfoLine(output, addrFrom, addrTo)) {
-	// got the address range, now get the real code
-	CmdQueueItem* c = m_d->queueCmd(DCdisassemble, addrFrom, addrTo,
-					DebuggerDriver::QMoverrideMoreEqual);
-	c->m_fileName = cmd->m_fileName;
-	c->m_lineNo = cmd->m_lineNo;
+    if (cmd->m_lineNo >= 0) {
+	// disassemble
+	if (m_d->parseInfoLine(output, addrFrom, addrTo)) {
+	    // got the address range, now get the real code
+	    CmdQueueItem* c = m_d->queueCmd(DCdisassemble, addrFrom, addrTo,
+					    DebuggerDriver::QMoverrideMoreEqual);
+	    c->m_fileName = cmd->m_fileName;
+	    c->m_lineNo = cmd->m_lineNo;
+	} else {
+	    // no code
+	    QList<DisassembledCode> empty;
+	    emit disassembled(cmd->m_fileName, cmd->m_lineNo, empty);
+	}
     } else {
-	// no code
-	QList<DisassembledCode> empty;
-	emit disassembled(cmd->m_fileName, cmd->m_lineNo, empty);
+	// set program counter
+	if (m_d->parseInfoLine(output, addrFrom, addrTo)) {
+	    // move the program counter to the start address
+	    m_d->executeCmd(DCsetpc, addrFrom);
+	}
     }
 }
 
@@ -1966,6 +1978,27 @@ void KDebugger::handleMemoryDump(const char* output)
     memdump.setAutoDelete(true);
     QString msg = m_d->parseMemoryDump(output, memdump);
     emit memoryDumpChanged(msg, memdump);
+}
+
+void KDebugger::setProgramCounter(const QString& file, int line, const DbgAddr& addr)
+{
+    if (addr.isEmpty()) {
+	// find address of the specified line
+	CmdQueueItem* cmd = m_d->executeCmd(DCinfoline, file, line);
+	cmd->m_lineNo = -1;		/* indicates "Set PC" UI command */
+    } else {
+	// move the program counter to that address
+	m_d->executeCmd(DCsetpc, addr.asString());
+    }
+}
+
+void KDebugger::handleSetPC(const char* /*output*/)
+{
+    // TODO: handle errors
+
+    // now go to the top-most frame
+    // this also modifies the program counter indicator in the UI
+    gotoFrame(0);
 }
 
 

@@ -405,6 +405,15 @@ void WinStack::slotBrkptEnable()
 	emit enadisBreak(file, lineNo, address);
 }
 
+void WinStack::slotMoveProgramCounter()
+{
+    QString file;
+    int lineNo;
+    DbgAddr address;
+    if (activeLine(file, lineNo, address))
+	emit moveProgramCounter(file, lineNo, address);
+}
+
 
 ValueTip::ValueTip(WinStack* parent) :
 	QToolTip(parent)

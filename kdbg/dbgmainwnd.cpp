@@ -103,6 +103,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	    m_debugger, SLOT(slotDisassemble(const QString&, int)));
     connect(m_debugger, SIGNAL(disassembled(const QString&,int,const QList<DisassembledCode>&)),
 	    m_filesWindow, SLOT(slotDisassembled(const QString&,int,const QList<DisassembledCode>&)));
+    connect(m_filesWindow, SIGNAL(moveProgramCounter(const QString&,int,const DbgAddr&)),
+	    m_debugger, SLOT(setProgramCounter(const QString&,int,const DbgAddr&)));
     // program stopped
     connect(m_debugger, SIGNAL(programStopped()), SLOT(slotProgramStopped()));
     connect(&m_backTimer, SIGNAL(timeout()), SLOT(slotBackTimer()));
@@ -255,6 +257,9 @@ void DebuggerMainWnd::initKAction()
 		      SHIFT+Key_F10, m_debugger, SLOT(programNexti()), 
 		      actionCollection(), "exec_step_over_by_insn");
     connect(a, SIGNAL(activated()), this, SLOT(intoBackground()));
+    (void)new KAction(i18n("&Program counter to current line"), 0,
+		      m_filesWindow, SLOT(slotMoveProgramCounter()),
+		      actionCollection(), "exec_movepc");
     (void)new KAction(i18n("&Break"), 0, m_debugger,
                       SLOT(programBreak()), actionCollection(),
                       "exec_break");
@@ -415,6 +420,7 @@ void DebuggerMainWnd::updateUI()
     actionCollection()->action("exec_step_over_by_insn")->setEnabled(m_debugger->canSingleStep());
     actionCollection()->action("exec_step_out")->setEnabled(m_debugger->canSingleStep());
     actionCollection()->action("exec_run_to_cursor")->setEnabled(m_debugger->canSingleStep());
+    actionCollection()->action("exec_movepc")->setEnabled(m_debugger->canSingleStep());
     actionCollection()->action("exec_restart")->setEnabled(m_debugger->canSingleStep());
     actionCollection()->action("exec_attach")->setEnabled(m_debugger->isReady());
     actionCollection()->action("exec_run")->setEnabled(m_debugger->isReady());

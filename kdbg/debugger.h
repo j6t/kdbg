@@ -128,6 +128,12 @@ public slots:
      */
     void programBreak();
 
+    /**
+     * Moves the program counter to the specified line.
+     * If an address is given, it is moved to the address.
+     */
+    void setProgramCounter(const QString&, int, const DbgAddr&);
+
 public:
     /**
      * Queries the user for program arguments.
@@ -310,6 +316,7 @@ protected:
     void handleInfoLine(CmdQueueItem* cmd, const char* output);
     void handleDisassemble(CmdQueueItem* cmd, const char* output);
     void handleThreadList(const char* output);
+    void handleSetPC(const char* output);
     void evalExpressions();
     void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
