@@ -439,6 +439,23 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
 	char formatSpec = format[(intArg & MDTformatmask) >> 4];
 	assert(sizeSpec != '\0');
 	assert(formatSpec != '\0');
+	// adjust count such that 16 lines are printed
+	switch (intArg & MDTformatmask) {
+	case MDTstring: case MDTinsn:
+	    break;			/* no modification needed */
+	default:
+	    // all cases drop through:
+	    switch (intArg & MDTsizemask) {
+	    case MDTbyte:
+	    case MDThalfword:
+		count *= 2;
+	    case MDTword:
+		count *= 2;
+	    case MDTgiantword:
+		count *= 2;
+	    }
+	    break;
+	}
 	QString spec;
 	spec.sprintf("/%d%c%c", count, sizeSpec, formatSpec);
 
