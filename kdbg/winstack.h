@@ -6,9 +6,7 @@
 #ifndef WINSTACK_H
 #define WINSTACK_H
 
-#include <qmultilinedit.h>
 #include <qlist.h>
-#include <qpixmap.h>
 #include <qdialog.h>
 #include <qlineedit.h>
 #include <qlayout.h>
@@ -16,60 +14,11 @@
 #include <qpushbutton.h>
 #include <qpopupmenu.h>
 #include <qtooltip.h>
-#include "textvw.h"
 
 // forward declarations
-class QPopupMenu;
-class QFileInfo;
 class KDebugger;
 class WinStack;
-
-//class FileWindow : public QMultiLineEdit
-class FileWindow : public KTextView
-{
-    Q_OBJECT
-public:
-    FileWindow(const char* fileName, QWidget* parent, const char* name);
-    ~FileWindow();
-    
-    void loadFile();
-    void reloadFile();
-    void scrollTo(int lineNo);
-    const QString& fileName() const { return m_fileName; }
-    void updateLineItems(const KDebugger* dbg);
-    void setPC(bool set, int lineNo, int frameNo);
-    enum FindDirection { findForward = 1, findBackward = -1 };
-    void find(const char* text, bool caseSensitive, FindDirection dir);
-    bool wordAtPoint(const QPoint& p, QString& word, QRect& r);
-
-protected:
-    virtual int textCol() const;
-    virtual int cellWidth(int col);
-    virtual void paintCell(QPainter* p, int row, int col);
-    virtual void mousePressEvent(QMouseEvent* ev);
-    virtual void paletteChange(const QPalette&);
-    void updateLineItem(int i);
-
-signals:
-    void clickedLeft(const QString&, int);
-    void clickedMid(const QString&, int);
-    void clickedRight(const QPoint &);
-
-protected:
-    QString m_fileName;
-    enum LineItem { liPC = 1, liPCup = 2,
-	liBP = 4, liBPdisabled = 8, liBPtemporary = 16,
-	liBPconditional = 32,
-	liBPany = liBP|liBPdisabled|liBPtemporary|liBPconditional
-    };
-    QArray<uchar> m_lineItems;
-    QPixmap m_pcinner;			/* PC at innermost frame */
-    QPixmap m_pcup;			/* PC at frame up the stack */
-    QPixmap m_brkena;			/* enabled breakpoint */
-    QPixmap m_brkdis;			/* disabled breakpoint */
-    QPixmap m_brktmp;			/* temporary breakpoint marker */
-    QPixmap m_brkcond;			/* conditional breakpoint marker */
-};
+class SourceWindow;
 
 class FindDialog : public QDialog
 {
@@ -79,7 +28,7 @@ public:
     ~FindDialog();
 
     bool caseSensitive() const { return m_caseCheck.isChecked(); }
-    const char* searchText() const { return m_searchText.text(); }
+    QString searchText() const { return m_searchText.text(); }
     virtual void done(int result);
 
     QLineEdit m_searchText;
@@ -160,12 +109,12 @@ public slots:
 protected:
     void initMenu();
     bool activatePath(QString pathname, int lineNo);
-    virtual bool activateWindow(FileWindow* fw, int lineNo = -1);	/* -1 doesnt change line */
+    virtual bool activateWindow(SourceWindow* fw, int lineNo = -1);	/* -1 doesnt change line */
     virtual void changeWindowMenu();
     virtual void mousePressEvent(QMouseEvent*);
     void setPC(bool set, const QString& fileName, int lineNo, int frameNo);
-    QList<FileWindow> m_fileList;
-    FileWindow* m_activeWindow;
+    QList<SourceWindow> m_fileList;
+    SourceWindow* m_activeWindow;
     QString m_lastOpenDir;		/* where user opened last file */
     QPopupMenu* m_windowMenu;
     int m_itemMore;
