@@ -67,13 +67,14 @@ KDebugger::KDebugger(const char* name) :
 	m_programConfig(0),
 	m_gdb(),
 	m_logFile("./gdb-transcript"),
+	m_bpTable(*this),
 	m_menu(this, "menu"),
 	m_toolbar(this, "toolbar"),
 	m_statusbar(this, "statusbar"),
 	m_mainPanner(this, "main_pane", KNewPanner::Vertical, KNewPanner::Percent, 60),
 	m_leftPanner(&m_mainPanner, "left_pane", KNewPanner::Horizontal, KNewPanner::Percent, 70),
 	m_rightPanner(&m_mainPanner, "right_pane", KNewPanner::Horizontal, KNewPanner::Percent, 50),
-	m_filesWindow(&m_leftPanner, "files"),
+	m_filesWindow(&m_leftPanner, "files", m_bpTable),
 	m_btWindow(&m_leftPanner, "backtrace"),
 	m_frameVariables(&m_rightPanner, "frame_variables"),
 	m_localVariables(&m_frameVariables, "locals"),
@@ -84,8 +85,7 @@ KDebugger::KDebugger(const char* name) :
 	m_watchDelete(i18n(" Del "), &m_watches, "watch_delete"),
 	m_watchVariables(&m_watches, "watch_variables"),
 	m_watchV(&m_watches, 0),
-	m_watchH(0),
-	m_bpTable(*this)
+	m_watchH(0)
 {
     m_statusBusy = i18n("busy");
     m_statusActive = i18n("active");
@@ -289,6 +289,12 @@ void KDebugger::menuCallback(int item)
 	    m_programRunning = true;
 	}
 	break;
+    case ID_PROGRAM_RUN_AGAIN:
+	if (isReady() && m_programActive && !m_programRunning) {
+	    executeCmd(DCrun, "run " + m_programArgs, true);
+	    m_programRunning = true;
+	}
+	break;
     case ID_PROGRAM_STEP:
 	if (isReady() && m_programActive && !m_programRunning) {
 	    executeCmd(DCstep, "step", true);
@@ -413,6 +419,7 @@ void KDebugger::updateUIItem(UpdateUI* item)
     case ID_PROGRAM_NEXT:
     case ID_PROGRAM_FINISH:
     case ID_PROGRAM_UNTIL:
+    case ID_PROGRAM_RUN_AGAIN:
 	item->enable(isReady() && m_programActive && !m_programRunning);
 	break;
     case ID_PROGRAM_RUN:
@@ -463,6 +470,7 @@ void KDebugger::initMenu()
     m_menuProgram.insertItem(i18n("Run to &cursor"), ID_PROGRAM_UNTIL);
     m_menuProgram.insertSeparator();
     m_menuProgram.insertItem(i18n("&Break"), ID_PROGRAM_BREAK);
+    m_menuProgram.insertItem(i18n("Re&start"), ID_PROGRAM_RUN_AGAIN);
     m_menuProgram.insertSeparator();
     m_menuProgram.insertItem(i18n("&Arguments..."), ID_PROGRAM_ARGS);
     m_menuProgram.setAccel(Key_F5, ID_PROGRAM_RUN);
@@ -523,6 +531,7 @@ void KDebugger::initToolbar()
     m_toolbar.insertSeparator();
     m_toolbar.insertButton(loader->loadIcon("brkpt.xpm"),ID_BRKPT_SET, true,
 			   i18n("Breakpoint"));
+    i18n("Restart");			/* to have a translation right from the beginning */
 
     connect(&m_toolbar, SIGNAL(clicked(int)), SLOT(menuCallback(int)));
 
@@ -1101,7 +1110,7 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	// note: this handler must not enqueue a command, since
 	// DCinfobreak is used at various different places.
 	m_bpTable.updateBreakList(m_gdbOutput);
-	m_filesWindow.updateLineItems(m_bpTable);
+	m_filesWindow.updateLineItems();
 	break;
     case DCfindType:
 	handleFindType(cmd);
@@ -1309,6 +1318,8 @@ bool KDebugger::parseLocals(QList<VarTree>& newVars)
 	if (variable == 0) {
 	    break;
 	}
+	// get some types
+	variable->inferTypesOfChildren();
 	/*
 	 * When gdb prints local variables, those from the innermost block
 	 * come first. We run through the list of already parsed variables
@@ -1436,6 +1447,8 @@ VarTree* KDebugger::parseExpr(const char* name, bool wantErrorValue)
 	}
 	// set name
 	variable->setText(name);
+	// get some types
+	variable->inferTypesOfChildren();
     }
     return variable;
 }

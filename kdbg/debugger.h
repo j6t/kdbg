@@ -213,6 +213,8 @@ signals:
     void forwardMenuCallback(int item);
     
 protected:
+    BreakpointTable m_bpTable;
+    
     KMenuBar m_menu;
     KToolBar m_toolbar;
     KStatusBar m_statusbar;
@@ -238,8 +240,6 @@ protected:
     QVBoxLayout m_watchV;
     QHBoxLayout m_watchH;
 
-    BreakpointTable m_bpTable;
-    
     // menus
     QPopupMenu m_menuFile;
     QPopupMenu m_menuView;
