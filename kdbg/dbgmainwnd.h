@@ -6,6 +6,7 @@
 #ifndef DBGMAINWND_H
 #define DBGMAINWND_H
 
+#include <qtimer.h>
 #include "dockmainwindow.h"
 #include "mainwndbase.h"
 #include "regwnd.h"

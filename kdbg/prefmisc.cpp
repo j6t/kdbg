@@ -3,13 +3,13 @@
 // Copyright by Johannes Sixt
 // This file is under GPL, the GNU General Public Licence
 
+#include "prefmisc.h"
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
 #else
 #include <kapp.h>			/* i18n */
 #endif
 #include <stdlib.h>			/* atoi */
-#include "prefmisc.h"
 
 PrefMisc::PrefMisc(QWidget* parent) :
 	QWidget(parent, "debugger"),
