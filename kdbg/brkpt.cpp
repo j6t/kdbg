@@ -166,8 +166,14 @@ void BreakpointTable::addBP()
     // set a breakpoint at the specified text
     QString bpText = m_bpEdit.text();
     bpText = bpText.stripWhiteSpace();
-    if (m_debugger->isReady()) {
-	m_debugger->driver()->executeCmd(DCbreaktext, bpText);
+    if (m_debugger->isReady())
+    {
+	Breakpoint* bp = new Breakpoint;
+	bp->location = bpText;
+
+	CmdQueueItem* cmd =
+	    m_debugger->driver()->executeCmd(DCbreaktext, bpText);
+	cmd->m_brkpt = bp;
 	// clear text if successfully set
 	m_bpEdit.setText("");
     }
@@ -189,7 +195,10 @@ void BreakpointTable::removeBP()
     if (bp == 0)
 	return;
 
-    m_debugger->driver()->executeCmd(DCdelete, bp->id);
+    Breakpoint* brk = m_debugger->breakpointById(bp->id);
+    if (brk != 0) {
+	m_debugger->deleteBreakpoint(brk);
+    }
 }
 
 void BreakpointTable::enadisBP()
@@ -198,8 +207,10 @@ void BreakpointTable::enadisBP()
     if (bp == 0)
 	return;
 
-    DbgCommand cmd = bp->enabled() ? DCdisable : DCenable;
-    m_debugger->driver()->executeCmd(cmd, bp->id);
+    Breakpoint* brk = m_debugger->breakpointById(bp->id);
+    if (brk != 0) {
+	m_debugger->enableDisableBreakpoint(brk);
+    }
 }
 
 void BreakpointTable::viewBP()
@@ -243,10 +254,12 @@ bool BreakpointTable::eventFilter(QObject* ob, QEvent* ev)
 	    // enable or disable the clicked-on item
 	    BreakpointItem* bp =
 		static_cast<BreakpointItem*>(m_list.itemAt(mev->pos()));
-	    if (bp != 0 && m_debugger->canChangeBreakpoints())
+	    if (bp != 0)
 	    {
-		DbgCommand cmd = bp->enabled() ? DCdisable : DCenable;
-		m_debugger->driver()->executeCmd(cmd, bp->id);
+		Breakpoint* brk = m_debugger->breakpointById(bp->id);
+		if (brk != 0) {
+		    m_debugger->enableDisableBreakpoint(brk);
+		}
 	    }
 	    return true;
 	}
@@ -307,39 +320,10 @@ void BreakpointTable::updateBreakpointCondition(int id,
 						const QString& condition,
 						int ignoreCount)
 {
-    BreakpointItem* bp = itemByBreakId(id);
-    if (bp == 0)
-	return;				/* breakpoint no longer exists */
-
-    bool changed = false;
-
-    if (bp->condition != condition) {
-	// change condition
-	m_debugger->driver()->executeCmd(DCcondition, condition, bp->id);
-	bp->condition = condition;
-	changed = true;
+    Breakpoint* brk = m_debugger->breakpointById(id);
+    if (brk != 0) {
+	m_debugger->conditionalBreakpoint(brk, condition, ignoreCount);
     }
-    if (bp->ignoreCount != ignoreCount) {
-	// change ignore count
-	m_debugger->driver()->executeCmd(DCignore, bp->id, ignoreCount);
-	changed = true;
-    }
-    if (changed) {
-	// get the changes
-	m_debugger->driver()->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
-    }
-}
-
-
-BreakpointItem* BreakpointTable::itemByBreakId(int id)
-{
-    for (QListViewItem* it = m_list.firstChild(); it != 0; it = it->nextSibling()) {
-	BreakpointItem* bp = static_cast<BreakpointItem*>(it);
-	if (bp->id == id) {
-	    return bp;
-	}
-    }
-    return 0;
 }
 
 

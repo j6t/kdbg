@@ -348,21 +348,19 @@ bool KDebugger::setBreakpoint(QString file, int lineNo,
 	 * set the breakpoint exactly there. Otherwise we use the file name
 	 * plus line no.
 	 */
+	Breakpoint* bp = new Breakpoint;
+	bp->temporary = temporary;
+
 	if (address.isEmpty())
 	{
-	    // strip off directory part of file name
-	    int offset = file.findRev("/");
-	    if (offset >= 0) {
-		file.remove(0, offset+1);
-	    }
-	    m_d->executeCmd(temporary ? DCtbreakline : DCbreakline,
-			    file, lineNo);
+	    bp->fileName = file;
+	    bp->lineNo = lineNo;
 	}
 	else
 	{
-	    m_d->executeCmd(temporary ? DCtbreakaddr : DCbreakaddr,
-			    address.asString());
+	    bp->address = address;
 	}
+	setBreakpoint(bp);
     }
     else
     {
@@ -371,32 +369,96 @@ bool KDebugger::setBreakpoint(QString file, int lineNo,
 	 * delete that breakpoint.
 	 */
 	if (bp->enabled) {
-	    m_d->executeCmd(DCdelete, bp->id);
+	    deleteBreakpoint(bp);
 	} else {
-	    m_d->executeCmd(DCenable, bp->id);
+	    enableDisableBreakpoint(bp);
 	}
     }
     return true;
 }
 
+void KDebugger::setBreakpoint(Breakpoint* bp)
+{
+    CmdQueueItem* cmd;
+    if (bp->address.isEmpty())
+    {
+	// strip off directory part of file name
+	QString file = bp->fileName;
+	int offset = file.findRev("/");
+	if (offset >= 0) {
+	    file.remove(0, offset+1);
+	}
+	cmd = m_d->executeCmd(bp->temporary ? DCtbreakline : DCbreakline,
+			      file, bp->lineNo);
+    }
+    else
+    {
+	cmd = m_d->executeCmd(bp->temporary ? DCtbreakaddr : DCbreakaddr,
+			      bp->address.asString());
+    }
+    cmd->m_brkpt = bp;	// used in newBreakpoint()
+}
+
 bool KDebugger::enableDisableBreakpoint(QString file, int lineNo,
 					const DbgAddr& address)
 {
-    if (!isReady()) {
-	return false;
-    }
-
     Breakpoint* bp = breakpointByFilePos(file, lineNo, address);
-    if (bp == 0)
-	return true;
+    return bp == 0 || enableDisableBreakpoint(bp);
+}
 
-    // toggle enabled/disabled state
-    if (bp->enabled) {
-	m_d->executeCmd(DCdisable, bp->id);
-    } else {
-	m_d->executeCmd(DCenable, bp->id);
+bool KDebugger::enableDisableBreakpoint(Breakpoint* bp)
+{
+    /*
+     * Toggle enabled/disabled state.
+     */
+    if (canChangeBreakpoints()) {
+	m_d->executeCmd(bp->enabled ? DCdisable : DCenable, bp->id);
+	return true;
     }
-    return true;
+    return false;
+}
+
+bool KDebugger::conditionalBreakpoint(Breakpoint* bp,
+				      const QString& condition,
+				      int ignoreCount)
+{
+    /*
+     * Change the condition and ignore count.
+     */
+
+    if (canChangeBreakpoints())
+    {
+	bool changed = false;
+
+	if (bp->condition != condition) {
+	    // change condition
+	    m_d->executeCmd(DCcondition, condition, bp->id);
+	    changed = true;
+	}
+	if (bp->ignoreCount != ignoreCount) {
+	    // change ignore count
+	    m_d->executeCmd(DCignore, bp->id, ignoreCount);
+	    changed = true;
+	}
+	if (changed) {
+	    // get the changes
+	    m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
+	}
+	return true;
+    }
+    return false;
+}
+
+bool KDebugger::deleteBreakpoint(Breakpoint* bp)
+{
+    /*
+     * Remove the breakpoint.
+     */
+    if (canChangeBreakpoints()) {
+	m_d->executeCmd(DCdelete, bp->id);
+	return true;
+    }
+    return false;
 }
 
 bool KDebugger::canSingleStep()
@@ -774,17 +836,9 @@ void KDebugger::restoreBreakpoints(KSimpleConfig* config)
 	/*
 	 * Add the breakpoint.
 	 */
-	CmdQueueItem* cmd;
-	if (!bp->fileName.isEmpty()) {
-	    cmd = m_d->executeCmd(bp->temporary ? DCtbreakline : DCbreakline,
-				  bp->fileName, bp->lineNo);
-	} else {
-	    cmd = m_d->executeCmd(bp->temporary ? DCtbreakaddr : DCbreakaddr,
-				  bp->address.asString());
-	}
+	setBreakpoint(bp);
 	// the new breakpoint is disabled or conditionalized later
-	// in newBreakpoint() using this reference:
-	cmd->m_brkpt = bp;
+	// in newBreakpoint()
     }
     m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
 }
@@ -1729,6 +1783,11 @@ void KDebugger::handleRegisters(const char* output)
  */
 void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 {
+    Breakpoint* bp = cmd->m_brkpt;
+    assert(bp != 0);
+    if (bp == 0)
+	return;
+
     int id;
     QString file;
     int lineNo;
@@ -1739,12 +1798,9 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 	return;
     }
 
-    // is this a breakpoint restored from the settings?
-    if (cmd->m_brkpt != 0)
+    // The breakpoint was successfully set.
     {
-	// yes, add it
-	cmd->m_brkpt->id = id;
-
+	// add it
 	int n = m_brkpts.size();
 	m_brkpts.resize(n+1);
 	m_brkpts.insert(n, cmd->m_brkpt);
@@ -1758,26 +1814,11 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 	}
     }
 
-    // see if it is new
-    for (int i = m_brkpts.size()-1; i >= 0; i--) {
-	if (m_brkpts[i]->id == id) {
-	    // not new; update
-	    m_brkpts[i]->fileName = file;
-	    m_brkpts[i]->lineNo = lineNo;
-	    if (!address.isEmpty())
-		m_brkpts[i]->address = address;
-	    return;
-	}
-    }
-    // yes, new
-    Breakpoint* bp = new Breakpoint;
     bp->id = id;
     bp->fileName = file;
     bp->lineNo = lineNo;
-    bp->address = address;
-    int n = m_brkpts.size();
-    m_brkpts.resize(n+1);
-    m_brkpts.insert(n, bp);
+    if (!address.isEmpty())
+	bp->address = address;
 }
 
 void KDebugger::updateBreakList(const char* output)
@@ -1864,6 +1905,18 @@ Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo,
 	}
     }
 
+    // not found
+    return 0;
+}
+
+Breakpoint* KDebugger::breakpointById(int id)
+{
+    for (int i = m_brkpts.size()-1; i >= 0; i--)
+    {
+	if (m_brkpts[i]->id == id) {
+	    return m_brkpts[i];
+	}
+    }
     // not found
     return 0;
 }

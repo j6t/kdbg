@@ -175,6 +175,13 @@ public:
 		       const DbgAddr& address, bool temporary);
 
     /**
+     * Set a breakpoint.
+     * 
+     * @param bp Describes the breakpoint.
+     */
+    void setBreakpoint(Breakpoint* bp);
+
+    /**
      * Enable or disable a breakpoint at the specified location.
      * 
      * @param fileName The source file in which the breakpoint is.
@@ -185,6 +192,32 @@ public:
      */
     bool enableDisableBreakpoint(QString fileName, int lineNo,
 				 const DbgAddr& address);
+
+    /**
+     * Enables or disables the specified breakpoint.
+     *
+     * @return false if the command was not executed, e.g. because the
+     * debuggee is running at the moment.
+     */
+    bool enableDisableBreakpoint(Breakpoint* bp);
+
+    /**
+     * Removes the specified breakpoint.
+     *
+     * @return false if the command was not executed, e.g. because the
+     * debuggee is running at the moment.
+     */
+    bool deleteBreakpoint(Breakpoint* bp);
+
+    /**
+     * Changes the specified breakpoint's condition and ignore count.
+     *
+     * @return false if the command was not executed, e.g. because the
+     * debuggee is running at the moment.
+     */
+    bool conditionalBreakpoint(Breakpoint* bp,
+			       const QString& condition,
+			       int ignoreCount);
 
     /**
      * Tells whether one of the single stepping commands can be invoked
@@ -240,6 +273,11 @@ public:
     /** The list of breakpoints. */
     int numBreakpoints() const { return m_brkpts.size(); }
     const Breakpoint* breakpoint(int i) const { return m_brkpts[i]; }
+
+    /**
+     * Returns the breakpoint with the specified \a id.
+     */
+    Breakpoint* breakpointById(int id);
 
     const QString& executable() const { return m_executable; }
 

@@ -45,7 +45,6 @@ protected:
 			  QString fileName = 0, int lineNo = -1,
 			  int hits = 0, uint ignoreCount = 0,
 			  QString condition = QString());
-    BreakpointItem* itemByBreakId(int id);
     void initListAndIcons();
     void updateBreakpointCondition(int id, const QString& condition,
 				   int ignoreCount);
