@@ -138,6 +138,7 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 //    dockManager->activate();
 
     updateUI();
+    m_bpTable->updateUI();
     slotFileChanged();
 }
 

@@ -32,6 +32,7 @@ protected:
     QListView m_list;
     QPushButton m_btAdd;
     QPushButton m_btRemove;
+    QPushButton m_btEnaDis;
     QPushButton m_btViewCode;
     QPushButton m_btConditional;
     QHBoxLayout m_layout;
@@ -47,6 +48,7 @@ protected:
     void initListAndIcons();
     void updateBreakpointCondition(int id, const QString& condition,
 				   int ignoreCount);
+    virtual bool eventFilter(QObject* ob, QEvent* ev);
 
     friend class BreakpointItem;
     
@@ -65,6 +67,7 @@ signals:
 public slots:
     virtual void addBP();
     virtual void removeBP();
+    virtual void enadisBP();
     virtual void viewBP();
     virtual void conditionalBP();
     void updateUI();

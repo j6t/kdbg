@@ -41,6 +41,7 @@ BreakpointTable::BreakpointTable(QWidget* parent, const char* name) :
 	m_list(this, "bptable"),
 	m_btAdd(this, "add"),
 	m_btRemove(this, "remove"),
+	m_btEnaDis(this, "enadis"),
 	m_btViewCode(this, "view"),
 	m_btConditional(this, "conditional"),
 	m_layout(this, 8),
@@ -51,8 +52,12 @@ BreakpointTable::BreakpointTable(QWidget* parent, const char* name) :
     connect(&m_bpEdit, SIGNAL(returnPressed()), this, SLOT(addBP()));
 
     initListAndIcons();
+    connect(&m_list, SIGNAL(currentChanged(QListViewItem*)), SLOT(updateUI()));
     // double click on item is same as View code
     connect(&m_list, SIGNAL(doubleClicked(QListViewItem*)), this, SLOT(viewBP()));
+
+    // need mouse button events
+    m_list.viewport()->installEventFilter(this);
 
     m_btAdd.setText(i18n("&Add"));
     m_btAdd.setMinimumSize(m_btAdd.sizeHint());
@@ -61,6 +66,22 @@ BreakpointTable::BreakpointTable(QWidget* parent, const char* name) :
     m_btRemove.setText(i18n("&Remove"));
     m_btRemove.setMinimumSize(m_btRemove.sizeHint());
     connect(&m_btRemove, SIGNAL(clicked()), this, SLOT(removeBP()));
+
+    // the Enable/Disable button changes its label
+    m_btEnaDis.setText(i18n("&Disable"));
+    // make a dummy button to get the size of the alternate label
+    {
+	QSize size = m_btEnaDis.sizeHint();
+	QPushButton dummy(this);
+	dummy.setText(i18n("&Enable"));
+	QSize sizeAlt = dummy.sizeHint();
+	if (sizeAlt.width() > size.width())
+	    size.setWidth(sizeAlt.width());
+	if (sizeAlt.height() > size.height())
+	    size.setHeight(sizeAlt.height());
+	m_btEnaDis.setMinimumSize(size);
+    }
+    connect(&m_btEnaDis, SIGNAL(clicked()), this, SLOT(enadisBP()));
 
     m_btViewCode.setText(i18n("&View Code"));
     m_btViewCode.setMinimumSize(m_btViewCode.sizeHint());
@@ -76,6 +97,7 @@ BreakpointTable::BreakpointTable(QWidget* parent, const char* name) :
     m_listandedit.addWidget(&m_list, 10);
     m_buttons.addWidget(&m_btAdd);
     m_buttons.addWidget(&m_btRemove);
+    m_buttons.addWidget(&m_btEnaDis);
     m_buttons.addWidget(&m_btViewCode);
     m_buttons.addWidget(&m_btConditional);
     m_buttons.addStretch(10);
@@ -155,6 +177,16 @@ void BreakpointTable::removeBP()
     m_debugger->driver()->executeCmd(DCdelete, bp->id);
 }
 
+void BreakpointTable::enadisBP()
+{
+    BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
+    if (bp == 0)
+	return;
+
+    DbgCommand cmd = bp->enabled ? DCdisable : DCenable;
+    m_debugger->driver()->executeCmd(cmd, bp->id);
+}
+
 void BreakpointTable::viewBP()
 {
     BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
@@ -168,8 +200,48 @@ void BreakpointTable::updateUI()
 {
     bool enableChkpt = m_debugger->canChangeBreakpoints();
     m_btAdd.setEnabled(enableChkpt);
+
+    BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
+    m_btViewCode.setEnabled(bp != 0);
+
+    if (bp == 0) {
+	enableChkpt = false;
+    } else {
+	if (bp->enabled) {
+	    m_btEnaDis.setText(i18n("&Disable"));
+	} else {
+	    m_btEnaDis.setText(i18n("&Enable"));
+	}
+    }
     m_btRemove.setEnabled(enableChkpt);
+    m_btEnaDis.setEnabled(enableChkpt);
     m_btConditional.setEnabled(enableChkpt);
+}
+
+#if QT_VERSION < 200
+# define MOUSEPRESS Event_MouseButtonPress
+#else
+# define MOUSEPRESS QEvent::MouseButtonPress
+#endif
+
+bool BreakpointTable::eventFilter(QObject* ob, QEvent* ev)
+{
+    if (ev->type() == MOUSEPRESS)
+    {
+	QMouseEvent* mev = static_cast<QMouseEvent*>(ev);
+	if (mev->button() == MidButton) {
+	    // enable or disable the clicked-on item
+	    BreakpointItem* bp =
+		static_cast<BreakpointItem*>(m_list.itemAt(mev->pos()));
+	    if (bp != 0 && m_debugger->canChangeBreakpoints())
+	    {
+		DbgCommand cmd = bp->enabled ? DCdisable : DCenable;
+		m_debugger->driver()->executeCmd(cmd, bp->id);
+	    }
+	    return true;
+	}
+    }
+    return QWidget::eventFilter(ob, ev);
 }
 
 class ConditionalDlg : public QDialog
