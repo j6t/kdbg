@@ -147,6 +147,13 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     // view menu changes when docking state changes
     connect(dockManager, SIGNAL(change()), SLOT(updateUI()));
 
+    // popup menu of the local variables window
+    m_popupLocals = new QPopupMenu;
+    m_popupLocals->insertItem(i18n("Watch Expression"),
+			      this, SLOT(slotLocalsToWatch()));
+    connect(m_localVariables, SIGNAL(rightPressed(int, const QPoint&)),
+	    this, SLOT(slotLocalsPopup(int, const QPoint&)));
+
     restoreSettings(kapp->getConfig());
 
     connect(m_menuRecentExecutables, SIGNAL(activated(int)), SLOT(slotRecentExec(int)));
@@ -818,6 +825,31 @@ QString DebuggerMainWnd::makeSourceFilter()
     f += m_headerFilter + i18n("|Header files\n");
     f += i18n("*|All files");
     return f;
+}
+
+/*
+ * Pop up the context menu in the locals window
+ */
+void DebuggerMainWnd::slotLocalsPopup(int, const QPoint& pt)
+{
+    if (m_popupLocals->isVisible()) {
+	m_popupLocals->hide();
+    } else {
+	m_popupLocals->popup(m_localVariables->mapToGlobal(pt));
+    }
+}
+
+/*
+ * Copies the currently selected item to the watch window.
+ */
+void DebuggerMainWnd::slotLocalsToWatch()
+{
+    int idx = m_localVariables->currentItem();
+
+    if (idx >= 0 && m_debugger != 0) {
+	QString text = m_localVariables->exprStringAt(idx);
+	m_debugger->addWatch(text);
+    }
 }
 
 

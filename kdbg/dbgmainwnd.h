@@ -62,6 +62,8 @@ protected:
 
     QPopupMenu* m_menuRecentExecutables;
 
+    QPopupMenu* m_popupLocals;
+
     QTimer m_backTimer;
 
 protected:
@@ -109,6 +111,8 @@ public slots:
     void slotProgramStopped();
     void slotBackTimer();
     void slotRecentExec(int item);
+    void slotLocalsPopup(int item, const QPoint& pt);
+    void slotLocalsToWatch();
 };
 
 #endif // DBGMAINWND_H
