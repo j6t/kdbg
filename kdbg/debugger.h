@@ -289,6 +289,7 @@ protected slots:
     void slotWatchExpanding(KTreeViewItem*, bool&);
     void slotUpdateAnimation();
     void slotDeleteWatch();
+    void slotValuePopup(const QString&);
     
 signals:
     /**
@@ -364,6 +365,11 @@ signals:
      * Indicates that the register values have possibly changed.
      */
     void registersChanged(QList<RegisterInfo>&);
+
+    /**
+     * Indicates that the value for a value popup is ready.
+     */
+    void valuePopup(const QString&);
 
 protected:
     ExprWnd& m_localVariables;

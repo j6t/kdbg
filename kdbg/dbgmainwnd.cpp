@@ -69,6 +69,11 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	    &m_filesWindow, SLOT(reloadAllFiles()));
     connect(m_debugger, SIGNAL(updatePC(const QString&,int,int)),
 	    &m_filesWindow, SLOT(updatePC(const QString&,int,int)));
+    // value popup communication
+    connect(&m_filesWindow, SIGNAL(initiateValuePopup(const QString&)),
+	    m_debugger, SLOT(slotValuePopup(const QString&)));
+    connect(m_debugger, SIGNAL(valuePopup(const QString&)),
+	    &m_filesWindow, SLOT(slotShowValueTip(const QString&)));
 
     // Establish communication when right clicked on file window.
     connect(&m_filesWindow.m_menuFloat, SIGNAL(activated(int)),

@@ -1748,5 +1748,42 @@ Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo)
     return 0;
 }
 
+void KDebugger::slotValuePopup(const QString& expr)
+{
+    // search the local variables for a match
+    VarTree* v = m_localVariables.topLevelExprByName(expr);
+    if (v == 0) {
+	// not found, check watch expressions
+	v = m_watchVariables.topLevelExprByName(expr);
+	if (v == 0) {
+	    // nothing found; do nothing
+	    return;
+	}
+    }
+
+    // construct the tip
+    QString tip = v->getText() + " = ";
+    if (!v->m_value.isEmpty())
+    {
+	tip += v->m_value;
+    }
+    else
+    {
+	// no value: we use some hint
+	switch (v->m_varKind) {
+	case VarTree::VKstruct:
+	    tip += "{...}";
+	    break;
+	case VarTree::VKarray:
+	    tip += "[...]";
+	    break;
+	default:
+	    tip += "???";
+	    break;
+	}
+    }
+    emit valuePopup(tip);
+}
+
 
 #include "debugger.moc"

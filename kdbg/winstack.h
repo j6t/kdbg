@@ -15,12 +15,14 @@
 #include <qcheckbox.h>
 #include <qpushbutton.h>
 #include <qpopupmenu.h>
+#include <qtooltip.h>
 #include "textvw.h"
 
 // forward declarations
 class QPopupMenu;
 class QFileInfo;
 class KDebugger;
+class WinStack;
 
 //class FileWindow : public QMultiLineEdit
 class FileWindow : public KTextView
@@ -38,6 +40,7 @@ public:
     void setPC(bool set, int lineNo, int frameNo);
     enum FindDirection { findForward = 1, findBackward = -1 };
     void find(const char* text, bool caseSensitive, FindDirection dir);
+    bool wordAtPoint(const QPoint& p, QString& word, QRect& r);
 
 protected:
     virtual int textCol() const;
@@ -93,6 +96,16 @@ protected:
     QHBoxLayout m_buttons;
 };
 
+
+class ValueTip : public QToolTip
+{
+public:
+    ValueTip(WinStack* parent);
+    virtual void maybeTip(const QPoint& p);
+    using QToolTip::tip;
+};
+
+
 class WinStack : public QWidget
 {
     Q_OBJECT
@@ -109,6 +122,7 @@ public:
     void setWindowMenu(QPopupMenu* menu);
     void selectWindow(int index);	/* 1-based index, 0 means dialog More... */
     bool activeLine(QString& filename, int& lineNo);
+    void maybeTip(const QPoint& p);
 
     virtual void resizeEvent(QResizeEvent*);
 
@@ -119,6 +133,7 @@ signals:
     void enadisBreak(const QString&, int);
     void clickedRight(const QPoint&);
     void newFileLoaded();
+    void initiateValuePopup(const QString&);
 
 public slots:
     virtual void menuCallback(int item);
@@ -132,6 +147,9 @@ public slots:
 
     // Right click on file panner when no file is loaded.
     virtual void slotWidgetRightClick(const QPoint &);
+
+    // Displays the value tip at m_tipLocation
+    void slotShowValueTip(const QString& tipText);
 
 protected:
     void initMenu();
@@ -153,6 +171,9 @@ protected:
     QString m_pcFile;
     int m_pcLine;			/* -1 if no PC */
     int m_pcFrame;
+
+    ValueTip m_valueTip;
+    QRect m_tipLocation;		/* where tip should appear */
 
 public:
     // find dialog

@@ -20,6 +20,8 @@
 #include <kstdaccel.h>
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
+#else
+#include <ctype.h>
 #endif
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -363,6 +365,81 @@ void FileWindow::mousePressEvent(QMouseEvent* ev)
     }
 }
 
+#if QT_VERSION < 200
+#define ISIDENT(c) (isalnum((c)) || (c) == '_')
+#else
+#define ISIDENT(c) ((c).isLetterOrNumber() || (c) == '_')
+#endif
+
+bool FileWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
+{
+    if (findCol(p.x()) != textCol())
+	return false;
+    int row = findRow(p.y());
+    if (row < 0)
+	return false;
+
+    // find top-left corner of text cell
+    int top, left;
+    if (!colXPos(textCol(), &left))
+	return false;
+    if (!rowYPos(row, &top))
+	return false;
+
+    // get the bounding rect of the text
+    QPainter painter(this);
+    const QString& text = m_texts[row];
+    QRect bound =
+	painter.boundingRect(left+2, top, 0,0,
+			     AlignLeft | SingleLine | DontClip | ExpandTabs,
+			     text, text.length());
+    if (!bound.contains(p))
+	return false;			/* p is outside text */
+
+    /*
+     * We split the line into words and check each whether it contains
+     * the point p. We must do it the hard way (measuring substrings)
+     * because we cannot rely on that the font is mono-spaced.
+     */
+    uint start = 0;
+    while (start < text.length()) {
+	while (start < text.length() && !ISIDENT(text[start]))
+	    start++;
+	if (start >= text.length())
+	    return false;
+	/*
+	 * If p is in the rectangle that ends at 'start', it is in the
+	 * last non-word part that we have just skipped.
+	 */
+	bound = 
+	    painter.boundingRect(left+2, top, 0,0,
+				 AlignLeft | SingleLine | DontClip | ExpandTabs,
+				 text, start);
+	if (bound.contains(p))
+	    return false;
+	// a word starts now
+	int startWidth = bound.width();
+	uint end = start;
+	while (end < text.length() && ISIDENT(text[end]))
+	    end++;
+	bound =
+	    painter.boundingRect(left+2, top, 0,0,
+				 AlignLeft | SingleLine | DontClip | ExpandTabs,
+				 text, end);
+	if (bound.contains(p)) {
+	    // we found a word!
+	    // extract the word
+	    word = text.mid(start, end-start);
+	    // and the rectangle
+	    r = QRect(bound.x()+startWidth,bound.y(),
+		      bound.width()-startWidth, bound.height());
+	    return true;
+	}
+	start = end;
+    }
+    return false;
+}
+
 
 
 WinStack::WinStack(QWidget* parent, const char* name) :
@@ -370,7 +447,9 @@ WinStack::WinStack(QWidget* parent, const char* name) :
 	m_activeWindow(0),
 	m_windowMenu(0),
 	m_itemMore(0),
-	m_pcLine(-1)
+	m_pcLine(-1),
+	m_valueTip(this),
+	m_tipLocation(1,1,10,10)
 {
     // Call menu implementation helper
     initMenu();
@@ -730,6 +809,44 @@ void WinStack::slotWidgetRightClick(const QPoint & pos)
     {
 	m_menuFileFloat.popup(mapToGlobal(pos));
     }
+}
+
+void WinStack::maybeTip(const QPoint& p)
+{
+    if (m_activeWindow == 0)
+	return;
+
+    // get the word at the point
+    QString word;
+    QRect r;
+    if (!m_activeWindow->wordAtPoint(p, word, r))
+	return;
+
+    // must be valid
+    assert(!word.isEmpty());
+    assert(r.isValid());
+
+    // remember the location
+    m_tipLocation = r;
+
+    emit initiateValuePopup(word);
+}
+
+void WinStack::slotShowValueTip(const QString& tipText)
+{
+    m_valueTip.tip(m_tipLocation, tipText);
+}
+
+
+ValueTip::ValueTip(WinStack* parent) :
+	QToolTip(parent)
+{
+}
+
+void ValueTip::maybeTip(const QPoint& p)
+{
+    WinStack* w = static_cast<WinStack*>(parentWidget());
+    w->maybeTip(p);
 }
 
 
