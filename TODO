@@ -42,3 +42,6 @@
 
 29. "Crash report" function: Stack trace with excerpts of the source code and
     variable dumps for every frame.
+
+30. Grey out watch window expressions if there are variables that are not
+    in scope.
