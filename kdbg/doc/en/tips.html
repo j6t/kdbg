@@ -1,23 +1,16 @@
-<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
    <meta name="Author" content="Johannes Sixt">
    <title>KDbg - User's Manual - Tips and Tricks</title>
 </head>
-<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
-<a href="index.html">Contents</a>
+<body text="#000000" bgcolor="#FFFFFF">
+<p><a href="index.html">Contents</a></p>
 <h1>
 Tips and Tricks</h1>
 
 <ul>
-<li>
-Always set the environment variable <tt>LD_BIND_NOW=1</tt> on glibc2 systems.
-
-<a href="argspwdenv.html#Environment">See here</a> how to set environment
-variables.</li>
-
 <li>
 You can use breakpoints as bookmarks: Just set a breakpoint and disable
 it. Later, you can quickly come back to that breakpoint by double-clicking
@@ -27,18 +20,27 @@ of a program), you get them back next time you invoke KDbg for that particular
 program.</li>
 
 <li>
-You can change a program variable's value: In the variable watch section
-(in the lower right) type an assignment like this: <tt>var.member=17</tt>
-and click <i>Add</i>. This immediately changes the value of the variable.
-You should delete the expression from the list right away (by selecting
-it in the window below and clicking <i>Del</i>). This is because the watch
-expressions are evaluate each time the program stops, and by this the variable
-would be changed to the specified value again and again!</li>
-
-<li>
 You can display a value in the watch section in different ways by prepending
 gdb's format specifiers in front of the variable to display. E.g. <tt>/x
 var.member</tt> displays the <tt>var.member</tt> in hexadecimal notation.</li>
+
+<li>
+You can set breakpoints in a source files that belong to a shared library.
+Such breakpoints will be marked as <em>orphaned</em> if the program is not active.
+<A href="breakptlist.html#orphanedbp">Orphaned breakpoints</A> are not effective.
+In order to make them effective, the program must stop at a time when the shared
+library is loaded. For this it is usually sufficient to set a breakpoint in
+<tt>main()</tt>. At the time when this breakpoint is hit, the orphaned breakpoints
+in the shared library become effective.</li>
+
+<li>
+Debugging multi-threaded programs on NPTL-enabled Linux systems (kernel 2.6.x
+or later and glibc 2.3.x or later) may sometimes fails; gdb stops the program
+at unexpected instances. In this case the following may help (using bash):
+<pre>
+LD_ASSUME_KERNEL=2.4.19 kdbg myprogram
+</pre>I.e. you run KDbg from the command line such that the old
+Linuxthreads implementation is used.</li>
 </ul>
 
 </body>

@@ -1,12 +1,11 @@
-<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
    <meta name="Author" content="Johannes Sixt">
    <title>KDbg - User's Manual</title>
 </head>
-<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<body text="#000000" bgcolor="#FFFFFF">
 
 <h1>
 KDbg - User's Manual</h1>
@@ -31,7 +30,7 @@ Contents</h2>
 Advanced topic: <a href="types.html">Type tables</a></li>
 
 <li>
-<a href="#KnownProblems">Known problems</a></li>
+<a href="invocation.html">How to invoke KDbg from the command line</a></li>
 
 <li>
 <a href="#Author">Author</a></li>
@@ -39,55 +38,59 @@ Advanced topic: <a href="types.html">Type tables</a></li>
 
 <hr>
 <h2>
-<a NAME="Introduction"></a>Introduction</h2>
-KDbg is a front-end for <tt>gdb</tt>, the GNU debugger.
+<a name="Introduction"></a>Introduction</h2>
+<p>KDbg is a front-end for <tt>gdb</tt>, the GNU debugger.</p>
 <p>This means that KDbg itself is not the debugger. Rather, it communicates
 with <tt>gdb</tt>, a command line debugger, by sending commands to it and
 receiving the output, such as variable values. The menu commands and mouse
 clicks are translated into <tt>gdb</tt> commands, and the output of <tt>gdb</tt>
 is translated into (more or less) visible information, such as structured
-variable contents.
+variable contents.</p>
 <p>The upshot of all this is that KDbg completely relies on the capabilities
 of the underlying command line debugger, <tt>gdb</tt>. KDbg can do no more
-than <tt>gdb</tt> can. For example, if you have a <tt>gdb</tt> that does
+than <tt>gdb</tt> can. For example, if you have a<tt>gdb</tt> that does
 not supports debugging of threaded programs, KDbg cannot, either (even
-though it offers a threads window).
+though it offers a threads window).</p>
 <h2>
-<a NAME="UsingKDbg"></a>Using KDbg</h2>
-Before you start using KDbg, you may want to review the options in the
+<a name="UsingKDbg"></a>Using KDbg</h2>
+<p>Before you start using KDbg, you may want to review the options in the
 <a href="globaloptions.html">Global Options</a> dialog that you invoke
-with <i>File|Global Options</i>.
+with <i>Settings|Global Options</i>.</p>
 <h4>
 Specifying a debugging target</h4>
-To debug a program, choose <i>File|Executable</i> from the menu. If you
+<p>To debug a program, choose <i>File|Executable</i> from the menu. If you
 have debugged the program earlier, you can choose it from <i>File|Recent
-Executables</i>. The program is loaded.
+Executables</i>. The program is loaded.</p>
 <p>If you want to debug a core dump, you must first load the executable
 that produced the core dump, then choose
 <i>File|Core Dump</i> from the
-menu. Now KDbg goes to the point in the program that caused the core dump.
+menu. Now KDbg goes to the point in the program that caused the core dump.</p>
 <p>You can now set breakpoints, using the <i>Breakpoint</i> menu, the right
-mouse button menu, or the <a href="breakptlist.html">breakpoint window</a>.
+mouse button menu, or the <a href="breakptlist.html">breakpoint window</a>.</p>
 <p>You can also choose program specific settings that apply only to the
-currently loaded executable using <i>File|Settings</i>, in the <a href="pgmsettings.html">Program
-Settings</a> dialog.
+currently loaded executable using <i>Settings|This Program</i>, in the
+<a href="pgmsettings.html">Program Settings</a> dialog.</p>
 <h4>
 Running the program</h4>
-Now run the program by selecting <i>Execution|Run</i>. The program now
+<p>Now run the program by selecting <i>Execution|Run</i>. The program now
 executes as usual until it either exits, hits a breakpoint or watchpoint,
-or receives a signal.
+or receives a signal.</p>
 <p>You can run the program with arguments, set a working directory, or
 set environment variables. To do this, choose <i>Execution|Arguments</i>
 and specify your options in the <a href="argspwdenv.html">Program Arguments</a>
-dialog (before you start the program).
+dialog (before you start the program).</p>
 <p>You can also attach to a program that is currently running. To do this,
 first load the executable file like above. Then choose <i>Execution|Attach</i>.
-Specify the process number and click <i>OK</i>. The running program is
+From the list processes specify the one you want to attach to
+and click <i>OK</i>. The running program is
 halted (not terminated), and the current point of execution is displayed
-in the source window.
+in the source window.</p>
+<p><font size="-1">On some systems the list of processes may not be available.
+In this case a simple edit box is available where the process number can be
+specified.</font></p>
 <h4>
 The program stopped - now what?</h4>
-When the program stops at a breakpoint, watchpoint, or due to a signal,
+<p>When the program stops at a breakpoint, watchpoint, or due to a signal,
 the <a href="sourcecode.html">source code window</a> displays the line
 where the program stopped. It is very common that the program stops due
 to a signal (usually a <tt>SIGSEGV</tt>, segmentation violation) in a function
@@ -95,30 +98,30 @@ that is not part of the program, that you have written. In this case you
 investigate the <a href="stack.html">stack window</a> and look for a function
 that you have written (start at the top of the list) and click on it. This
 will bring you to a location that you can start your search for the real
-bug.
+bug.</p>
 <p>In the menu <i>Execution</i> you find the commands that you need to
 run
 the program, step through code, and to interrupt the program (<i>Break</i>)
 while it is running. The important commands (<i>Run</i> and all kinds of
 <i>Step</i>) are bound to function keys. For efficient debugging it is
-strongly recommend that you get used to using them.
-<br><font size=-1>The functions are not configurable, but perhaps you want
-to contribute a bit of code that does it?</font>
+strongly recommend that you get used to using them. You can use
+<i>Settings|Configure Shortcuts</i> if you want to bind the functions
+to different keys.</p>
 <p>In the menu <i>Breakpoint</i> you find commands to set, clear, disable,
 and enable permanent and temporary breakpoints. You can display a list
 of breakpoints in the <a href="breakptlist.html">breakpoints window</a>.
 You can also set a breakpoint by clicking at the left end of the source
 line (using the left mouse button), and you can enable and disable a breakpoint
-by clicking it using the middle mouse button.
-<p>The gearwheel in the toolbar indicates whether gdb is working, in which
+by clicking it using the middle mouse button.</p>
+<p><font size="-1">The gearwheel in the toolbar indicates whether gdb is working, in which
 case it rotates. It rotates fast while KDbg wouldn't accept execution commands,
-and it rotates slowly while KDbg retrieves the values of variable.
+and it rotates slowly while KDbg retrieves the values of variable.</font></p>
 <h2>
-<a NAME="InfoWindows"></a>KDbg's information windows</h2>
-KDbg displays information and accepts commands in number of different windows.
+<a name="InfoWindows"></a>KDbg's information windows</h2>
+<p>KDbg displays information and accepts commands in number of different windows.
 In the menu <i>View</i> you find commands to show and hide these windows.
 They are docking windows, which means that you can drag them around and
-arrange them in any manner you like.
+arrange them in any manner you like.</p>
 <ul>
 <li>
 <a href="sourcecode.html">The source code window</a></li>
@@ -127,7 +130,7 @@ arrange them in any manner you like.
 <a href="localvars.html">The local variables window</a></li>
 
 <li>
-<a href="stack.html">The statck window</a></li>
+<a href="stack.html">The stack window</a></li>
 
 <li>
 <a href="watches.html">The watched expressions window</a></li>
@@ -149,8 +152,8 @@ arrange them in any manner you like.
 </ul>
 
 <h2>
-<a NAME="Tips"></a>Tips and such</h2>
-The following topics give some useful hints on using KDbg.
+<a name="Tips"></a>Tips and such</h2>
+<p>The following topics give some useful hints on using KDbg.</p>
 <ul>
 <li>
 <a href="tips.html">Tips and Tricks</a></li>
@@ -160,19 +163,21 @@ The following topics give some useful hints on using KDbg.
 </ul>
 
 <h2>
-<a NAME="KnownProblems"></a>Known problems</h2>
-gdb 4.16 has problems in handling C++ classes with virtual base classes.
-(Such classes commonly occur in CORBA programs.) It dies quite often due
-to a segmentation violation. KDbg reports when gdb exits unexpectedly.
-Unfortunately, you cannot really do anything about it. You have to restart
-gdb by choosing <i>File|Executable</i>, which restarts your debugging session
-:-(.
-<p>KDbg's type recognition only works for libraries that are linked dynamically
-to the program being debugged.
-<h2>
-<a NAME="Author"></a>Author</h2>
-KDbg is written by <a href="mailto:Johannes.Sixt@telecom.at">Johannes Sixt</a>
-with the help of many others.
-<br>KDbg homepage is at <a href="http://members.nextra.at/johsixt/kdbg.html">http://members.nextra.at/johsixt/kdbg.html</a>.
+<a name="Author"></a>Author</h2>
+<p>KDbg is written by <a href="mailto:Johannes.Sixt@telecom.at">Johannes Sixt</a>
+with contributions from these people (in no particular order):</p>
+<ul>
+<li>Keith Isdale</li>
+<li>Ben Burton</li>
+<li>Daniel Thor Kristjansson</li>
+<li>Matthew Allen</li>
+<li>Ron Lerech</li>
+<li>Neil Butterworth</li>
+<li>Thomas Sparr</li>
+<li>Max Judin</li>
+<li>Johnny Chan</li>
+<li>Ilmar S. Habibulin</li>
+</ul>
+<p>KDbg homepage is at <a href="http://members.nextra.at/johsixt/kdbg.html">http://members.nextra.at/johsixt/kdbg.html</a>.</p>
 </body>
 </html>

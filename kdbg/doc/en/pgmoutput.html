@@ -1,32 +1,31 @@
-<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
    <meta name="Author" content="Johannes Sixt">
    <title>KDbg - User's Manual - Program Output</title>
 </head>
-<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
-<a href="index.html">Contents</a>
+<body text="#000000" bgcolor="#FFFFFF">
+<p><a href="index.html">Contents</a></p>
 <h1>
 The Program Output Window</h1>
-The program output window is displayed using <i>View|Output</i>. The output
+<p>The program output window is displayed using <i>View|Output</i>. The output
 window captures text that is written to stdout and stderr by the program
-being debugged.
+being debugged.</p>
 <p>The output window does not allow to type input for the program and it
 features only minimal terminal emulation: <tt>\n</tt> (line-feed) is treated
 like a carriage-return-line-feed combination, and <tt>\r</tt> (carriage-return)
 is ignored. These capabilities are usually sufficient to debug GUI programs
-which only write debugging output to stdout and stderr.
+which only write debugging output to stdout and stderr.</p>
 <p>When a program is debugged with KDbg for the first time, the program
-output window is <i>not</i> used. The reason for this is that KDbg cannot
+output window is <em>not</em> used. The reason for this is that KDbg cannot
 know whether the program requires sophisticated terminal emulation or if
 it expects input through a terminal. So, a terminal emulator program is
 used by default. In order to redirect the output to the output window,
-you must do the following:
+you must do the following:</p>
 <ol>
 <li>
-Open the <a href="pgmsettings.html">Settings dialog</a> by selecting <i>File|Settings</i>.</li>
+Open the <a href="pgmsettings.html">Settings dialog</a> by selecting <i>Settings|This Program</i>.</li>
 
 <li>
 Switch to the <i>Output</i> tab.</li>
@@ -37,11 +36,11 @@ Choose <i>Only output, simple terminal emulation</i> and click <i>OK</i>.</li>
 <li>
 Reload the program by selecting it from the list in <i>File|Recent Executables</i>.</li>
 </ol>
-You can clear the contents of the output window by selecting <i>Clear</i>
-from the popup menu that appears when you click the right mouse button.
+<p>You can clear the contents of the output window by selecting <i>Clear</i>
+from the popup menu that appears when you click the right mouse button.</p>
 <p>If the last line of the output is visible, the window always scrolls
-automatically so that the last line remains visible when new output arrives..
+automatically so that the last line remains visible when new output arrives.
 If, however, you manually scroll up so that the last line is not visible,
-the visible portion of text will not change.
+the visible portion of text will not change.</p>
 </body>
 </html>

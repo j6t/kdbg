@@ -1,18 +1,17 @@
-<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
    <meta name="Author" content="Johannes Sixt">
    <title>KDbg - User's Manual - Register Dump</title>
 </head>
-<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
-<a href="index.html">Contents</a>
+<body text="#000000" bgcolor="#FFFFFF">
+<p><a href="index.html">Contents</a></p>
 <h1>
 The Register Dump Window</h1>
-Whenever the program stops, KDbg displays the contents of the CPU registers
-in the register dump window. To display this window, choose <i>View|Registers</i>.
-<p>The window contains 3 columns:
+<p>Whenever the program stops, KDbg displays the contents of the CPU registers
+in the register dump window. To display this window, choose <i>View|Registers</i>.</p>
+<p>The registers are grouped by the kind of register. The window contains 3 columns:</p>
 <ol>
 <li>
 The column <i>Register</i> displays the register name.</li>
@@ -28,7 +27,9 @@ in a decoded form. For arithmetic registers this is generally a signed
 decimal value, floating point registers are displayed as floating point
 numbers, the flag registers are sometimes decoded into named flags.</li>
 </ol>
-By clicking the right mouse button a context menu is popped up which lets
-you select how the value in the second column is displayed.
+<p>By clicking the right mouse button a context menu is popped up which lets
+you select how the value in the third column is displayed.
+You can change the type to use for all registers of a group at once if you
+choose the format for the group header.</p>
 </body>
 </html>

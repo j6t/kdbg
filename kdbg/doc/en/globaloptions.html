@@ -1,17 +1,16 @@
-<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
    <meta name="Author" content="Johannes Sixt">
    <title>KDbg - User's Manual - Global Options</title>
 </head>
-<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
-<a href="index.html">Contents</a>
+<body text="#000000" bgcolor="#ffffff">
+<p><a href="index.html">Contents</a></p>
 <h1>
 Global Options Dialog</h1>
-To specify some global options, choose <i>File|Global Options</i>. You
-can set the following:
+<p>To specify some global options, choose <i>Settings|Global Options</i>. You
+can set the following:</p>
 <ul>
 <li>
 the command by which gdb is invoked,</li>
@@ -24,7 +23,10 @@ whether the KDbg shall pop into the foreground when the program stops and
 a timeout when it shall go back again,</li>
 
 <li>
-the tab width.</li>
+the tab width,</li>
+
+<li>
+filters for source file names.</li>
 </ul>
 
 <h4>
@@ -64,6 +66,13 @@ background when the program is continued by any command, but it does so
 only after a timeout that can be specified. This avoids that the debugger
 window flashes back and forth each time you click any of the <i>Step</i>
 commands.</blockquote>
+
+<h4>
+File filters</h4>
+
+<blockquote>You can specify wildcards for source files and header files,
+which are used in the file dialog of the <i>File|Open Source</i>
+command.</blockquote>
 
 </body>
 </html>

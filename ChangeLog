@@ -5,6 +5,8 @@ Version 1.9.6
 	Fixed that variable popup location was computed incorrectly if tab
 	width is not 0.
 
+	Updated the manual.
+
 Version 1.9.5
 
 	Fixed some issues when the items in the environment variable list

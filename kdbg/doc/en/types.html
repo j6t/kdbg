@@ -1,25 +1,24 @@
-<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
    <meta name="Author" content="Johannes Sixt">
    <title>KDbg - User's Manual - Type Tables</title>
 </head>
-<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
-<a href="index.html">Contents</a>
+<body text="#000000" bgcolor="#FFFFFF">
+<p><a href="index.html">Contents</a></p>
 <h1>
 KDbg's Type Table</h1>
-KDbg can display the contents of single members of structured types, so
+<p>KDbg can display the contents of single members of structured types, so
 that it is not necessary to expand the variable in the <a href="localvars.html">local
 variables window</a> or <a href="watches.html">watched expressions window</a>.
-The information which member variable is displayed is stored in <i>type
-tables</i>. There is generally one type table per shared library.
-<p>KDbg's type tables are located under <tt>$KDEDIR/share/apps/kdbg/types</tt>.
+The information which member variable is displayed is stored in <em>type
+tables</em>. There is generally one type table per shared library.</p>
+<p>KDbg's type tables are located under <tt>$prefix/share/apps/kdbg/types</tt>.
 The file names end with <tt>.kdbgtt</tt>. Example: The type table for <tt>libqt.so</tt>
-is named <tt>qt.kdbgtt</tt>.
+is named <tt>qt.kdbgtt</tt>.</p>
 <p>A type table file obeys the regular KDE configuration file syntax. The
-file has the following groups:
+file has the following groups:</p>
 <ul>
 <li>
 A group <tt>[Type Table]</tt> which lists the types and information how
@@ -29,14 +28,16 @@ the debugger can identify whether the program is linked against the library.</li
 A group for each type which has information about how the value of such
 a type is displayed by KDbg.</li>
 </ul>
-In order to determine which type tables apply to the program being debugged
-KDbg list the shared libraries it is linked to. Then it matches the names
+<p>In order to determine which type tables apply to the program being debugged
+KDbg lists the shared libraries it is linked to. Then it matches the names
 against the <tt>ShlibRE</tt> entries of all type tables. Those that match
 are used. If a type appears in several type tables, it is unspecified which
-one will be used.
+one will be used.</p>
+<p>KDbg's type recognition only works for libraries that are linked dynamically
+to the program being debugged.</p>
 <h2>
 The <tt>[Type Table]</tt> group</h2>
-This group contains the following entries:
+<p>This group contains the following entries:</p>
 <ul>
 <li>
 <tt>Types1</tt>, <tt>Types2</tt>, etc. These entries name the types. Each
@@ -58,15 +59,27 @@ usual way, but there is no possibility to group characters.)</li>
 
 <li>
 <tt>LibDisplayName</tt>. This entry is used in lists where the available
-type tables are listed to identify this type table.</li>
+type tables are listed to identify this type table.
 
-<br><font size=-1>This is not used currently.</font></ul>
+<br><font size=-1>This is not used currently.</font></li>
+
+<li>
+<tt>EnableBuiltin</tt> lists extensions that must be enabled if this
+library is used. Currently, two builtins are supported:
+<ul>
+<li>
+<tt>QString::Data</tt> is used to display unicode strings of Qt's <tt>QString</tt>
+class. See below.</li>
+<li><tt>QCharIsShort</tt> is used only in connection with <tt>QString::Data</tt>
+to specify that a unicode character is stored in an object of type <tt>short</tt>.
+See <tt>qt3.kdbgtt</tt> for examples.</li></ul></li>
+</ul>
 
 <h2>
 The type's group</h2>
-There is one group for each type that is named exactly as the type. <font size=-1>At
+<p>There is one group for each type that is named exactly as the type. <font size=-1>At
 the moment C++ template classes are not supported.</font> Each group contains
-the following entries:
+the following entries:</p>
 <ul>
 <li>
 <tt>Display</tt> determines how the value of the type is displayed by KDbg.
@@ -78,7 +91,7 @@ entries.</li>
 One or more of <tt>Expr1</tt>, <tt>Expr2</tt>, etc. Each of them must contain
 <b>exactly
 one</b> <tt>%s</tt> sequence, which will be replaced by the expression
-whose value is investigate. The so constructed expressions is submitted
+whose value is investigate. The so constructed expression is submitted
 to gdb, and the result substituted back for the corresponding percent character
 in the <tt>Display</tt> string.</li>
 
@@ -87,28 +100,28 @@ in the <tt>Display</tt> string.</li>
 is treated like the specified type. That alias type must appear before
 this type in the <tt>Types</tt><i>x</i> entries in the <tt>Type Table</tt>.</li>
 </ul>
-<font size=-1>Currently the number of expressions per type is limited to
+<p><font size=-1>Currently the number of expressions per type is limited to
 5. This can easily be changed if it's too restrictive, but I recommend
-not to go to that limit at all - it will slow down the debugging process.</font>
-<p>KDbg recognizes a special extension that is used to display Qt 2.0's
+not to go to that limit at all - it will slow down the debugging process.</font></p>
+<p>KDbg recognizes a special extension that is used to display Qt 2.x's and Qt 3.x's
 unicode strings: If an <tt>Expr</tt><i>x</i> is prepended with <tt>/QString::Data</tt>,
 it is assumed that the result of the expression is a pointer to a <tt>QString::Data</tt>.
 The value displayed is the unicode string that this instance of <tt>QString::Data</tt>
 represents (which can be <tt>QString::null</tt> if it is Qt's well-defined
 null string or <tt>(null)</tt> if the <tt>unicode</tt> member is the null
-pointer). See <tt>qt2.kdbgtt</tt> for examples.
+pointer). See <tt>qt2.kdbgtt</tt> for examples.</p>
 <p>Tip: It is not necessary to define derived types if they ought to be
 treated the same as the base class - KDbg can deduce derived types and
 uses the type specification of the (leftmost) base class. You can use the
 <tt>Alias</tt>
 entry to quickly specify that a type should be treated like a non-leftmost
-base class for a multiple-inheritance class.
+base class for a multiple-inheritance class.</p>
 <h2>
 An example</h2>
-The example shows how <tt>QString</tt> and <tt>QObject</tt> are defined
+<p>The example shows how <tt>QString</tt> and <tt>QObject</tt> are defined
 in <tt>qt.kdbgtt</tt>. Additionally, <tt>QTableView</tt> is defined as
 an alias of <tt>QObject</tt>. This example applies to Qt 1.x, which is
-located in shared library whose name ends in <tt>libqt.so.1</tt>.
+located in shared library whose name ends in <tt>libqt.so.1</tt>.</p>
 <pre>[Type Table]
 Types1=QString
 Types2=QObject,QTableView
@@ -123,6 +136,6 @@ Expr1=(%s).objname
 Expr2=(%s).childObjects->numNodes
 [QTableView]
 Alias=QObject</pre>
-Note that it is safer to wrap the <tt>%s</tt> in parentheses.
+<p>Note that it is safer to wrap the <tt>%s</tt> in parentheses.</p>
 </body>
 </html>

@@ -1,23 +1,22 @@
-<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
    <meta name="Author" content="Johannes Sixt">
-   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
    <title>KDbg - User's Manual - Program Settings</title>
 </head>
-<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
-<a href="index.html">Contents</a>
+<body text="#000000" bgcolor="#FFFFFF">
+<p><a href="index.html">Contents</a></p>
 <h1>
 The Program Settings Dialog</h1>
-In this dialog, program specific settings can be selected. It is invoked
-by <i>File|Settings</i>. The settings apply only to the currently loaded
-executable and will be saved across sessions.
+<p>In this dialog, program specific settings can be selected. It is invoked
+by <i>Settings|This Program</i>. The settings apply only to the currently loaded
+executable and will be saved across sessions.</p>
 <blockquote><b><i>Important note:</i></b> The chosen settings will only
 apply the next time the executable is loaded into KDbg. This means that
 after pressing
 <i>OK</i> in this dialog, you must reload the executable
-using <i>File|Executable</i>!!</blockquote>
+using <i>File|Recent Executables</i>!!</blockquote>
 
 <ul>
 <li>
@@ -28,8 +27,8 @@ using <i>File|Executable</i>!!</blockquote>
 </ul>
 
 <h2>
-<a NAME="driver"></a>Debugger</h2>
-In this section, the debugger to be used for the program can be chosen.
+<a name="driver"></a>Debugger</h2>
+<p>In this section, the debugger to be used for the program can be chosen.</p>
 <h4>
 How to invoke GDB</h4>
 
@@ -37,14 +36,14 @@ How to invoke GDB</h4>
 use the default gdb command as specified in the <a href="globaloptions.html">global
 options</a>. When you are cross-compiling and remote-debugging, you will
 probably want to use a different gdb suitable for the target platform.
-The default command is <tt>gdb --fullname --nx</tt>. Be sure to also specify
-these options if you change the gdb command. If you leave them away, KDbg
+The default command is <tt>gdb --fullname --nx</tt>. Be sure to specify
+at least <tt>--fullname</tt> if you change the gdb command. If you leave it away, KDbg
 will not work.</blockquote>
 
 <h2>
-<a NAME="output"></a>Output</h2>
-In this section, the terminal emulation under which the program will run
-can be selected.
+<a name="output"></a>Output</h2>
+<p>In this section, the terminal emulation under which the program will run
+can be selected.</p>
 <h4>
 No input and output</h4>
 
@@ -61,10 +60,10 @@ Only output, simple terminal emulation</h4>
 the terminal (<tt>stdin</tt> will be redirected to <tt>/dev/null</tt>),
 and the output that it writes to <tt>stdout</tt> and <tt>stderr</tt> does
 not require sophisticated terminal emulation. The output will be shown
-in the <i>Output</i> window.
+in the <a href="pgmoutput.html">Output window</a>.
 <br><i>Important:</i> The integrated terminal emulator will only interpret
 the line-feed character <tt>\n</tt> (ASCII 10) to break lines. It will
-<i>not</i>
+<em>not</em>
 handle the carriage-return character <tt>\r</tt> (ASCII 13). This is sufficient
 for displaying plain debugging output that is often used by developers
 of GUI programs.</blockquote>
