@@ -602,6 +602,7 @@ KTreeView::KTreeView(QWidget *parent,
 	goingDown(false),
 	itemIndent(18),
 	showText(true),
+	moveCurrentToSibling(false),
 	itemCapacity(500),
 	visibleItems(0),
 	rubberband_mode(false)
@@ -1203,6 +1204,11 @@ void KTreeView::setIndentSpacing(int spacing)
     updateCellWidth();
     if (autoUpdate() && isVisible())
 	repaint();
+}
+
+void KTreeView::setMoveCurrentToSibling(bool m)
+{
+    moveCurrentToSibling = m;
 }
 
 // enables/disables vertical scrollbar
@@ -2039,6 +2045,7 @@ void KTreeView::takeItem(KTreeViewItem* item)
      * the taken-out subtree is at least partially visible.
      */
     KTreeViewItem* cur = current >= 0  ?  itemAt(current)  :  0;
+    KTreeViewItem* oldCurrent = cur;
     if (wasVisible && cur != 0) {
 	KTreeViewItem* c = cur;
 	while (c != 0 && c != item) {
@@ -2047,8 +2054,19 @@ void KTreeView::takeItem(KTreeViewItem* item)
 	if (c != 0) {
 	    // move current item to parent
 	    cur = item->getParent();
-	    if (cur == treeRoot)
+	    if (cur == treeRoot) {
 		cur = 0;
+		// move it to next or previous sibling
+		if (moveCurrentToSibling) {
+		    if (item->getSibling() != 0) {
+			cur = item->getSibling();
+		    } else if (treeRoot->getChild() != item) {
+			cur = treeRoot->getChild();
+			while (cur != 0 && cur->getSibling() != item)
+			    cur = cur->getSibling();
+		    }
+		}
+	    }
 	}
     }
     KTreeViewItem* parentItem = item->getParent();
@@ -2064,7 +2082,13 @@ void KTreeView::takeItem(KTreeViewItem* item)
     }
 
     // re-seat the current item
-    setCurrentItem(cur != 0  ?  itemRow(cur)  :  -1);
+    // row changes if cur is below the taken item
+    current = cur != 0  ?  itemRow(cur)  :  -1;
+    // signal must be emitted only if item really changed
+    if (cur != oldCurrent) {
+	updateCell(current, 0, false);
+	emit highlighted(current);
+    }
 }
 
 // visits each item, calculates the maximum width  

@@ -826,6 +826,14 @@ public:
      */
     void setIndentSpacing(int spacing);
 
+    /**
+     * If true, removing a top-level item that contains the current item
+     * will move the current item to the following sibling (or to the
+     * previous if there is none). Otherwise, there will not be a current
+     * item.
+     */
+    void setMoveCurrentToSibling(bool m = true);
+
   /**
 	If enable is TRUE, displays a vertical scroll bar, else hides it.                                        
 	*/
@@ -1124,6 +1132,7 @@ protected:
     int itemIndent;
     int maxItemWidth;
     bool showText;
+    bool moveCurrentToSibling;
     // list of visible items
     int itemCapacity;			/* for how many items we've space allocated */
     KTreeViewItem** visibleItems;

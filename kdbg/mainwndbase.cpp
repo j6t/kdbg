@@ -69,6 +69,7 @@ WatchWindow::WatchWindow(QWidget* parent, const char* name, WFlags f) :
     connect(&m_watchDelete, SIGNAL(clicked()), SIGNAL(deleteWatch()));
     connect(&m_watchVariables, SIGNAL(highlighted(int)), SLOT(slotWatchHighlighted(int)));
 
+    m_watchVariables.setMoveCurrentToSibling(true);
     m_watchVariables.installEventFilter(this);
 }
 
