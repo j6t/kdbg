@@ -1,0 +1,231 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.51 [en] (X11; I; Linux 2.2.5 i586) [Netscape]">
+   <title>KDbg</title>
+</head>
+<body>
+
+<h1>
+KDbg - Benutzerhandbuch</h1>
+
+<h2>
+Inhalt</h2>
+
+<ul>
+<li>
+<a href="#Introduction">Einleitung</a></li>
+
+<li>
+<a href="#WhatsThis">Was gibt's hier zu sehen?</a></li>
+
+<li>
+<a href="#UsingKDbg">Benutzung von KDbg</a></li>
+
+<ul>
+<li>
+<a href="#BrkptList">Die Liste der Haltepunkte</a></li>
+
+<li>
+<a href="#Environment">Programmargumente, Arbeitsverzeichnis, Umgebungsvariablen
+setzen</a></li>
+
+<li>
+<a href="#GlobalOptions">Global Einstellungen</a></li>
+</ul>
+
+<li>
+<a href="#TipsTricks">Tipps und Tricks</a></li>
+
+<li>
+<a href="#KnownProblems">Bekannte Probleme</a></li>
+
+<li>
+<a href="#Author">Autor</a></li>
+</ul>
+
+<hr>
+<h2>
+<a NAME="Introduction"></a>Einleitung</h2>
+KDbg ist eine grafische Benutzeroberfl&auml;che f&uuml;r <tt>gdb</tt>,
+den GNU-Debugger.
+<p>Dieses Dokument bietet einige (leider wenige) Hinweise zur Benutzung
+von KDbg.
+<p>F&uuml;r die experimentierfreudigen Benutzer gibt's ein bisschen Dokumentation,
+wie <a href="../../en/kdbg/types.html">KDbg Typen versteht</a>, etwa <tt>QString</tt>.
+(Leider nur in englischer Sprache, aber das sollte kein Problem darstellen.)
+<h2>
+<a NAME="WhatsThis"></a>Was gibt's hier zu sehen?</h2>
+KDbg's Hauptfenster besteht aus vier Teilen:
+<p><b>Links oben</b> wird der Quellcode angezeigt. Meistens werden Quellcode-Dateien
+automatisch ge&ouml;ffnet. Mit <i>Datei|Quellcode</i> &ouml;ffnen k&ouml;nnen
+Sie Dateien manuell &ouml;ffnen. Alle offenen Dateien werden im Menu <i>Fenster</i>
+angezeigt, mit dem Sie auch gleich zwischen den offenen Dateien hin- und
+herschalten k&ouml;nnen.
+<p><b>Links unten</b> wird der Backtrace (Call Stack, Stack Frames), d.h.
+die Funktionnen, die das Programm im Augenblick betreten und noch nicht
+verlassen hat, angezeigt. Das innerste Frame (in dem sich das Programm
+gerade befindet) befindet sich an erster Stelle. Klicken Sie auf ein Frame,
+um die lokalen Variablen in diesem Frame anzuzeigen.
+<p><b>Rechts oben</b> werden die lokalen Variablen angezeigt. Sobald das
+Programm angehalten wird (z.B. durch einen Breakpoint), wird diese Anzeige
+aktualisiert.
+<p><b>Rechts unten</b> zeigt beliebige Ausdr&uuml;cke an (diese bezeichnet
+man auch als <i>Watches</i>). Ein neuer Ausdruck wird hinzugef&uuml;gt,
+indem dieser im Eingabefeld eingegeben wird und dann auf <i>Neu</i> geklickt
+wird. Um einen Ausdruck zu entfernen, klicken Sie diesen an (an der Wurzel
+des entsprechenden Baums) und klicken dann auf <i>Entf</i>.
+<p>Das Zahnrad in der Werkzeugleiste zeigt an, ob gdb gerade arbeitet:
+Dies ist der Fall, wenn es rotiert. Solange es schnell rotiert, nimmt KDbg
+kein Eingaben an; wenn es langsam rotiert, aktualisiert KDbg gerade alle
+Variablenanzeigen.
+<h2>
+<a NAME="UsingKDbg"></a>Benutzung von KDbg</h2>
+Um ein <b>Programm zu debuggen</b>, w&auml;hlen Sie <i>Datei|Programm</i>.
+Das Programm wird jetzt geladen. Ein <tt>xterm</tt>-Fenster wird ge&ouml;ffnet,
+das die Ausgabe des Programms anzeigen wird. Wenn Sie einen <b>Core-Dump</b>
+verwenden wollen, m&uuml;ssen Sie zuerst das Programm, das den Core-Dump
+erzeugt hat wie gerade erw&auml;hnt laden, dann w&auml;hlen Sie <i>Datei|Core
+dump</i> aus dem Menu. Kdbg zeigt die Stelle an, die den Core-Dump verursacht
+hat.
+<p>Mit dem Menupunkt <i>Ausf&uuml;hrung|Argumente</i> k&ouml;nnen Sie auch
+<b>Programmargumente</b>,
+das <b>Arbeitsverzeichnis</b> sowie&nbsp; <b>Umgebungsvariablen</b> setzen..
+<a href="#Environment">Siehe
+unten</a>.
+<p>Im Menu <i>Ausf&uuml;hrung</i> finden Sie Befehle, die Sie zum <b>Ausf&uuml;hren</b>
+und <b>schrittweisen</b> Abarbeiten des Programms verwenden. Weiters k&ouml;nnen
+Sie das laufende Programm <b>unterbrechen</b>. Die wichtigen Befehle k&ouml;nnen
+auch mit Funktionstasten gegeben werden. Zum effizienten Arbeiten empfehle
+ich, dass Sie sich diese Tasten eingew&ouml;hnen.
+<br><font size=-1>Diese Funktionen sind nicht konfigurierbar, aber vielleicht
+wollen Sie ein St&uuml;ckchen Code beisteuern, mit dem das geht?</font>
+<p>Im Menu <i>Haltepunkt</i> finden Sie Befehle zum Setzen, Entfernen,
+Aktivieren und Inaktivieren von permanenten und tempor&auml;ren <b>Haltepunkten</b>.
+Sie k&ouml;nnen einen Haltepunkt auch setzen, indem Sie mit der Maus in
+den Freiraum links der entsprechenden Quellcode-Zeile klicken (mit der
+linken Maustaste); weiters k&ouml;nnen sie einen vorhandenen Haltepunkt
+mit der mittleren Maustaste aktivieren und deaktivieren.
+<h3>
+<a NAME="BrkptList"></a>Die Liste der Haltepunkte</h3>
+Die Liste der Haltepunkte k&ouml;nnen Sie mit dem Menupunkt <i>Haltepunkt|Liste</i>
+anzeigen. Diese zeigt f&uuml;r jeden Haltepunkt folgendes an: Den Ort,
+die Anzahl der Stopps, die Anzahl der n&auml;chsten zu ignorierenden Stopps
+(falls gesetzt) sowie eine Haltebedingung (falls gesetzt). Das Piktogramm
+links zeigt an, ob der Haltepunkt aktiviert (voller roter Punkt) oder deaktiviert
+(roter Kreis) ist, ob es sich um einen tempor&auml;ren Haltepunkt handelt
+(eine winzige Uhr ist sichtbar) und ob der Haltepunkt bedingt ist (ein
+Fragezeichen ist sichtbar).
+<p>Sie k&ouml;nnen eine <b>Bedingung</b> (sodass das Programm nur stehen
+bleibt, wenn die Bedingung erf&uuml;llt ist) oder die Anzahl der zu <b>ignorierenden
+Stopps</b> (sodass das Programm die n&auml;chsten n Male nicht stehen bleibt,
+die es &uuml;ber diesen Haltepunkt l&auml;uft) setzen. Dazu w&auml;hlen
+sie den Schalter <i>Bedingt</i> und geben die Anzahl der zu ignorierenden
+Treffer und/oder die Bedingung ein.
+<h3>
+<a NAME="Environment"></a>Programmargumente, Arbeitsverzeichnis, Umgebungsvariablen
+setzen</h3>
+Mit <i>Ausf&uuml;hren|Argumente</i> &ouml;ffnen Sie einen Dialog, in dem
+Sie Programmargumente, das Arbeitsverzeichnis sowie Umgebungsvariablen
+setzen k&ouml;nnen.
+<p>In der obersten Eingabezeile k&ouml;nnen Sie die Programmargumente eingeben,
+die an das Programm &uuml;bergeben werden sollen. Diese werden beim n&auml;chsten
+Programmstart verwendet.
+<p>Im Eingabefeld darunter k&ouml;nnen Sie das Arbeitsverzeichnis angeben.
+Dieses wird sofort an gdb &uuml;bergeben, sobald Sie <i>OK</i> dr&uuml;cken.
+Das Programm verwendet das neue Arbeitsverzeichnis allerdings erst beim
+n&auml;chsten Start.
+<p>Im Bereich f&uuml;r Umgebungsvariablen k&ouml;nnen Sie einen Ausdruck
+in der Form
+<tt>VARIABLE=Wert</tt> eingeben und dann <i>&Auml;ndern</i>
+klicken, um der Umgebungsvariablen <tt>VARIABLE</tt> einen <tt>Wert</tt>
+zuzuweisen. Um eine Variable zu entfernen, w&auml;hlen Sie diese zuerst
+aus der Liste darunter aus und klicken dan <i>L&ouml;schen</i>. Um einen
+Wert zu &auml;ndern, geben Sie einfach den neuen Wert ein und klicken <i>&Auml;ndern</i>.
+Wenn Sie den Namen der Variable &auml;ndern und <i>&Auml;ndern</i> clicken,
+erzeugen Sie eine neue Variable! Die neuen Umgebungsvariablen werden erst
+beim n&auml;chsten Programmstart verwendet.
+<p>Wenn Sie glibc2 unter Linux verwenden, ist es sehr wichtig, dass Sie
+der Umgebungsvariablen <tt>LD_BIND_NOW</tt> den Wert <tt>1</tt> zuweisen.
+Wenn diese Variable nicht gesetzt ist, k&ouml;nnen solche Funktionen nicht
+betreten werden, die von der Bibliothek <tt>libc</tt> und anderen Shared
+Libraries importiert werden.
+<h3>
+<a NAME="GlobalOptions"></a>Globale Einstellungen</h3>
+Mit dem Menupunkt <i>Datei|Globale Einstellungen</i> k&ouml;nnen Sie folgende
+Optionen einstellen:
+<ul>
+<li>
+den Befehl, mit dem gdb aufgerufen wird;</li>
+
+<li>
+den Befehl, der das Fenster f&uuml;r die Programmausgabe &ouml;ffnet.</li>
+</ul>
+Wenn Sie eine alternative Version von gdb verwenden wollen, geben sie diese
+unter <i>Aufruf von GDB</i> an. Die Standardeinstellung ist <tt>gdb -fullname
+-nx</tt>. Achtung: Sie m&uuml;ssen jedenfalls diese beiden Argumente &uuml;bergeben;
+wenn Sie sie weglassen, kann KDbg nicht funktionieren. Wenn Sie das Eingabefeld
+leer lassen, wird die Standardeinstellung verwendet.
+<p>Falls Sie ein anderes Terminal-Programm verwenden wollen, das die Ausgabe
+des Programms anzeigt, geben Sie dieses unter <i>Terminal f&uuml;r die
+Programmausgabe</i> an. Die Standardeinstellung ist <tt>xterm -name kdbgio
+-title %T -e sh -c %C</tt>. In diesem Eintrag wird <tt>%T</tt> durch eine
+&Uuml;berschrift und <tt>%C</tt> durch ein Bourne-Shell-Skript ersetzt,
+das in eine Endlosschleife landet, damit sich das Fenster nicht schlie&szlig;t.
+(Keine Sorge, das Skript frisst keine CPU-Zeit, sondern ruft einfach nur
+
+<tt>sleep 3600</tt> in einer Schleife auf :) Eine alternative f&uuml;r
+diesen Eintrag w&auml;re zm Beispiel <tt>konsole -nowelcome -name kdbgio
+-caption %T -e sh -c %C</tt>.
+<h2>
+<a NAME="TipsTricks"></a>Tips und Tricks</h2>
+
+<ul>
+<li>
+Setzen Sie immer die Umgebungsvariable <tt>LD_BIND_NOW=1</tt> auf glibc2-Systems.
+<a href="#Environment">Siehe
+oben</a>.</li>
+
+<li>
+Sie k&ouml;nnen Haltepunkte als Lesezeichen verwenden: Setzen Sie einfach
+einen Haltepunkt und deaktivieren Sie diesen. Sp&auml;ter k&ouml;nnen Sie
+rasch an die entsprechende Stelle zur&uuml;ckkehren, indem Sie in der Liste
+der Haltepunkte doppel-klicken (oder&nbsp; <i>Code anzeigen</i> klicken).
+Da sich KDbg alle Haltepunkte &uuml;ber Sitzungen hinaus merkt, werden
+sie sofort wieder gesetzt, sobald sie das entsprechende Programm das n&auml;chste
+Mal debuggen.</li>
+
+<li>
+Auf folgende Weise k&ouml;nnen Sie Programmvariablen &auml;ndern: Im Watch-Bereich
+(rechts unten) geben Sie eine Zuweisung ein, z.B. <tt>var.member=17</tt>
+und Klicken <i>Neu</i>. Die entsprechende Variable wird sofort ge&auml;ndert.
+Sie sollten die Variable nun sofort l&ouml;schen (indem Sie sie ausw&auml;hlen
+und <i>Entf</i> klicken). Das ist notwendig, weil der Ausdruck (d.h die
+Zuweisung) sonst bei jedem Programmstopp ausgewertet wird.</li>
+
+<li>
+Sie k&ouml;nnen Werte im Watch-Bereich in den verschiedenen Formaten anzeigen
+lassen, die gdb versteht. Z.B. zeigt <tt>/x var.member</tt> die Variable
+<tt>var.member</tt>
+in hexadezimaler Notation an.</li>
+</ul>
+
+<h2>
+<a NAME="KnownProblems"></a>Bekannte Probleme</h2>
+gdb 4.16 hat Probleme bei der Handhabung von C++-Klassen mit virtuellen
+Basisklassen. (Diese kommen h&auml;ufig in CORBA-Programmen vor.) Gdb st&uuml;rzt
+dabei h&auml;ufig aufgrund eines Speicherzugriffsfehlers ab. KDbg erkennt,
+wenn gdb unerwartet beendet wird. Leider l&auml;sst sich nicht wirklich
+was dagegen unternehmen. Sie m&uuml;ssen gdb mittels <i>Datei|Programm</i>
+neu starten, das hei&szlig;t auch f&uuml;r die Debug-Sitzung zur&uuml;ck
+an den Start :-(.
+<p>Die Typerkennung von KDbg arbeitet nur, wenn die Bibilotheken dynamisch
+ins Programm gebunden sind.
+<h2>
+<a NAME="Author"></a>Autor</h2>
+KDbg wurde von <a href="mailto:Johannes.Sixt@telecom.at">Johannes Sixt</a>
+mit vielen weiteren Helfern geschrieben.
+<br>Die KDbg-Homepage befindet sich unter <a href="http://members.telecom.at/~johsixt/kdbg.html">http://members.telecom.at/~johsixt/kdbg.html</a>.
+</body>
+</html>
