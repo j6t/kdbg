@@ -53,7 +53,7 @@ class WinStack : public QWidget
 {
     Q_OBJECT
 public:
-    WinStack(QWidget* parent, const char* name);
+    WinStack(QWidget* parent, const char* name, const BreakpointTable& bpt);
     virtual ~WinStack();
     
     /**
@@ -66,7 +66,7 @@ public:
     void selectWindow(int index);	/* 1-based index, 0 means dialog More... */
     bool activate(QString filename, int lineNo);
     bool activeLine(QString& filename, int& lineNo);
-    void updateLineItems(const BreakpointTable& bpt);
+    void updateLineItems();
     void updatePC(const QString& filename, int lineNo, int frameNo);
     
     virtual void resizeEvent(QResizeEvent*);
@@ -90,6 +90,7 @@ protected:
     QString m_pcFile;
     int m_pcLine;			/* -1 if no PC */
     int m_pcFrame;
+    const BreakpointTable& m_bpTable;
 };
 
 #endif // WINSTACK_H

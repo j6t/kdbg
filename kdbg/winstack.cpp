@@ -232,12 +232,13 @@ void FileWindow::setPC(bool set, int lineNo, int frameNo)
 
 
 
-WinStack::WinStack(QWidget* parent, const char* name) :
+WinStack::WinStack(QWidget* parent, const char* name, const BreakpointTable& bpt) :
 	QWidget(parent, name),
 	m_activeWindow(0),
 	m_windowMenu(0),
 	m_itemMore(0),
-	m_pcLine(-1)
+	m_pcLine(-1),
+	m_bpTable(bpt)
 {
 }
 
@@ -316,8 +317,9 @@ bool WinStack::activatePath(QString pathName, int lineNo)
 	
 	// slurp the file in
 	fw->loadFile();
-
+	
 	// set PC if there is one
+	updateLineItems();
 	if (m_pcLine >= 0) {
 	    setPC(true, m_pcFile, m_pcLine, m_pcFrame);
 	}
@@ -418,11 +420,11 @@ void WinStack::selectWindow(int id)
     }
 }
 
-void WinStack::updateLineItems(const BreakpointTable& bpt)
+void WinStack::updateLineItems()
 {
     FileWindow* fw = 0;
     for (fw = m_fileList.first(); fw != 0; fw = m_fileList.next()) {
-	fw->updateLineItems(bpt);
+	fw->updateLineItems(m_bpTable);
     }
 }
 
