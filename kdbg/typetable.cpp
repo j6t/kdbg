@@ -5,12 +5,8 @@
 
 #include <qdir.h>
 #include <qlist.h>
-#if QT_VERSION < 200
-#include <kapp.h>
-#else
 #include <kglobal.h>
 #include <kstddirs.h>
-#endif
 #include <ksimpleconfig.h>
 #include "typetable.h"
 #include "mydebug.h"
@@ -35,31 +31,16 @@ void TypeTable::loadTypeTables()
 {
     typeTablesInited = true;
 
-#if QT_VERSION < 200
-    QDir dir(KApplication::kde_datadir() + "/kdbg/types");
-    const QStrList* files = dir.entryList("*.kdbgtt");
-	
-    if (files == 0) {
-	TRACE("no type tables found");
-	return;
-    }
-#else
     const QStringList files = KGlobal::dirs()->findAllResources("types", "*.kdbgtt");
     
     if (files.isEmpty()) {
 	TRACE("no type tables found");
 	return;
     }
-#endif
 
     QString fileName;
-#if QT_VERSION < 200
-    for (QListIterator<char> it(*files); it != 0; ++it) {
-	fileName = dir.filePath(it.current());
-#else
     for (QValueListConstIterator<QString> p = files.begin(); p != files.end(); ++p) {
 	fileName = *p;
-#endif
 	TypeTable* newTable = new TypeTable;
 	newTable->loadFromFile(fileName);
 	typeTables.append(newTable);
@@ -275,10 +256,6 @@ void ProgramTypeTable::registerAlias(const QString& name, TypeInfo* type)
     ASSERT(lookup(name) == 0 || lookup(name) == type);
     m_aliasDict.insert(name, type);
 }
-
-#if QT_VERSION < 200
-typedef QListIterator<char> QStrListIterator;
-#endif
 
 void ProgramTypeTable::loadLibTypes(const QStrList& libs)
 {

@@ -5,11 +5,7 @@
 
 #include "memwindow.h"
 #include <qheader.h>
-#if QT_VERSION >= 200
 #include <klocale.h>
-#else
-#include <kapp.h>
-#endif
 #include <ksimpleconfig.h>
 #include "debugger.h"
 #include "dbgdriver.h"			/* memory dump formats */
@@ -34,14 +30,8 @@ void MemoryViewItem::paintCell(QPainter* p, const QColorGroup& cg,
 			       int column, int width, int alignment)
 {
     if( column > 0 && m_changed[column - 1] ) {
-#if QT_VERSION >= 200
 	QColorGroup newcg = cg;
 	newcg.setColor(QColorGroup::Text, red);
-#else
-	QColorGroup newcg(cg.foreground(), cg.background(),
-			  cg.light(), cg.dark(), cg.mid(),
-			  red, cg.base());
-#endif
 	QListViewItem::paintCell(p, newcg, column, width, alignment);
     } else {
 	QListViewItem::paintCell(p, cg, column, width, alignment);
@@ -73,13 +63,8 @@ MemoryWindow::MemoryWindow(QWidget* parent, const char* name) :
     m_layout.addWidget(&m_memory, 10);
     m_layout.activate();
 
-#if QT_VERSION < 200
-    connect(&m_expression, SIGNAL(activated(const char*)),
-	    this, SLOT(slotNewExpression(const char*)));
-#else
     connect(&m_expression, SIGNAL(activated(const QString&)),
 	    this, SLOT(slotNewExpression(const QString&)));
-#endif
 
     // the popup menu
     m_popup.insertItem(i18n("B&ytes"), MDTbyte);
@@ -112,15 +97,9 @@ MemoryWindow::~MemoryWindow()
 {
 }
 
-#if QT_VERSION < 200
-# define MOUSEPRESS Event_MouseButtonPress
-#else
-# define MOUSEPRESS QEvent::MouseButtonPress
-#endif
-
-bool MemoryWindow::eventFilter(QObject* o, QEvent* ev)
+bool MemoryWindow::eventFilter(QObject*, QEvent* ev)
 {
-    if (ev->type() == MOUSEPRESS) {
+    if (ev->type() == QEvent::MouseButtonRelease) {
 	handlePopup(static_cast<QMouseEvent*>(ev));
 	return true;
     }
@@ -142,12 +121,6 @@ void MemoryWindow::handlePopup(QMouseEvent* ev)
 	}
 	return;
     }
-}
-
-// this slot is only needed for Qt 1.44
-void MemoryWindow::slotNewExpression(const char* newText)
-{
-    slotNewExpression(QString(newText));
 }
 
 void MemoryWindow::slotNewExpression(const QString& newText)

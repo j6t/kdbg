@@ -5,9 +5,7 @@
 
 #include "procattach.h"
 #include <kapp.h>
-#if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
-#endif
 #include "mydebug.h"
 
 ProcAttach::ProcAttach(QWidget* parent) :
@@ -19,7 +17,7 @@ ProcAttach::ProcAttach(QWidget* parent) :
 	m_layout(this, 8),
 	m_buttons(4)
 {
-    QString title = kapp->getCaption();
+    QString title = kapp->caption();
     title += i18n(": Attach to process");
     setCaption(title);
 

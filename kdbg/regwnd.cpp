@@ -4,17 +4,12 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include <qheader.h>
-#if QT_VERSION >= 200
 #include <kglobalsettings.h>
 #include <klocale.h>			/* i18n */
 #include <kiconloader.h>
 #include <qfontdialog.h>
 #include <qmessagebox.h>
-#else
-#include <kapp.h>			/* i18n */
-#endif
 #include <qpopmenu.h>
-#include <ctype.h>
 #include <stdlib.h>			/* strtoul */
 #include "regwnd.h"
 #include "dbgdriver.h"
@@ -74,11 +69,6 @@ inline int hexCharToDigit(char h)
 	return h - ('a' - 10);
     return -1;
 }
-#if QT_VERSION < 200
-#define DIGIT(c) hexCharToDigit(c)
-#else
-#define DIGIT(c) hexCharToDigit(c.latin1())
-#endif
 
 static QString toBinary(QString hex)
 {
@@ -89,7 +79,7 @@ static QString toBinary(QString hex)
     QString result;
     
     for (unsigned i = 2; i < hex.length(); i++) {
-	int idx = DIGIT(hex[i]);
+	int idx = hexCharToDigit(hex[i].latin1());
 	if (idx < 0) {
 	    // not a hex digit; no conversion
 	    return hex;
@@ -98,7 +88,7 @@ static QString toBinary(QString hex)
 	result += bindigits;
     }
     // remove leading zeros
-    switch (DIGIT(hex[2])) {
+    switch (hexCharToDigit(hex[2].latin1())) {
     case 0: case 1: result.remove(0, 3); break;
     case 2: case 3: result.remove(0, 2); break;
     case 4: case 5:
@@ -113,7 +103,7 @@ static QString toOctal(QString hex)
     int shift = 0;
     unsigned v = 0;
     for (int i = hex.length()-1; i >= 2; i--) {
-	int idx = DIGIT(hex[i]);
+	int idx = hexCharToDigit(hex[i].latin1());
 	if (idx < 0)
 	    return hex;
 	v += idx << shift;
@@ -141,11 +131,7 @@ static QString toDecimal(QString hex)
     if (hex.length() > sizeof(unsigned long)*2+2)	/*  count in leading "0x" */
 	return hex;
 
-#if QT_VERSION >= 200
     const char* start = hex.latin1();
-#else
-    const char* start = hex;
-#endif
     char* end;
     unsigned long val = strtoul(start, &end, 0);
     if (start == end)
@@ -153,8 +139,6 @@ static QString toDecimal(QString hex)
     else
 	return QString().setNum(val);
 }
-
-#undef DIGIT
 
 void RegisterViewItem::setValue(QString raw, QString cooked)
 {
@@ -183,14 +167,8 @@ void RegisterViewItem::paintCell(QPainter* p, const QColorGroup& cg,
 				 int column, int width, int alignment)
 {
     if (m_changes) {
-#if QT_VERSION >= 200
 	QColorGroup newcg = cg;
 	newcg.setColor(QColorGroup::Text, red);
-#else
-	QColorGroup newcg(cg.foreground(), cg.background(),
-			  cg.light(), cg.dark(), cg.mid(),
-			  red, cg.base());
-#endif
 	QListViewItem::paintCell(p, newcg, column, width, alignment);
     } else {
 	QListViewItem::paintCell(p, cg, column, width, alignment);
@@ -205,11 +183,6 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
 {
     setSorting(-1);
 
-#if QT_VERSION < 200
-    addColumn(i18n("Register"));
-    addColumn(i18n("Value"));
-    addColumn(i18n("Decoded value"));
-#else
     QPixmap iconRegs = BarIcon("regs.xpm");
     QPixmap iconWatchcoded = BarIcon("watchcoded.xpm");
     QPixmap iconWatch = BarIcon("watch.xpm");
@@ -217,7 +190,6 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
     addColumn(QIconSet(iconRegs), i18n("Register"));
     addColumn(QIconSet(iconWatchcoded), i18n("Value"));
     addColumn(QIconSet(iconWatch), i18n("Decoded value"));
-#endif
 
     setColumnAlignment(0,AlignLeft);
     setColumnAlignment(1,AlignLeft);
@@ -226,8 +198,6 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
     setAllColumnsShowFocus( true );
     header()->setClickEnabled(false);
 
-    connect(this, SIGNAL(doubleClicked(QListViewItem*)),
-	    SLOT(doubleClicked(QListViewItem*)));
     connect(this, SIGNAL(rightButtonClicked(QListViewItem*,const QPoint&,int)),
 	    SLOT(rightButtonClicked(QListViewItem*,const QPoint&,int)));
 
@@ -305,16 +275,7 @@ void RegisterView::updateRegisters(QList<RegisterInfo>& regs)
     triggerUpdate();
 }
 
-void RegisterView::doubleClicked( QListViewItem* item )
-{
-#if QT_VERSION >= 200
-    RegisterViewItem* it = static_cast<RegisterViewItem*>(item);
-    QMessageBox::information(this, "work in progress...",
-			     QString("Prepare for change register value\nregister: %1    current value: %2").arg(it->m_reg.regName).arg(it->m_reg.rawValue));
-#endif
-}
-
-void RegisterView::rightButtonClicked(QListViewItem* item, const QPoint& p, int c)
+void RegisterView::rightButtonClicked(QListViewItem*, const QPoint& p, int)
 {
     m_modemenu->setItemChecked(0, m_mode ==  2);
     m_modemenu->setItemChecked(1, m_mode ==  8);

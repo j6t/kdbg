@@ -221,7 +221,7 @@ void STabCtl::show()
   }
 }
 
-void STabCtl::resizeEvent(QResizeEvent *evt )
+void STabCtl::resizeEvent(QResizeEvent * )
 {
   QRect r = getChildRect();
 

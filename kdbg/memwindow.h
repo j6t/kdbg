@@ -46,7 +46,6 @@ protected:
     void displayNewExpression(const QString& expr);
 
 public slots:
-    void slotNewExpression(const char*);
     void slotNewExpression(const QString&);
     void slotTypeChange(int id);
     void slotNewMemoryDump(const QString&, QList<MemoryDump>&);

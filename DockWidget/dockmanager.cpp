@@ -11,9 +11,6 @@
 #include <qpopupmenu.h>
 #include <qapplication.h>
 #include <kapp.h>
-#if QT_VERSION < 200
-#include <qkeycode.h>
-#endif
 
 #include <qobjcoll.h>
 #include <qframe.h>
@@ -28,6 +25,11 @@
 #include "close.xpm"
 #include "notclose.xpm"
 
+// remove Xlib's defines
+#ifdef KeyPress
+#undef KeyPress
+#endif
+
 SDockButton::SDockButton( QWidget *parent, const char * name )
 :QPushButton( parent, name )
 {
@@ -40,11 +42,7 @@ SDockButton::~SDockButton()
 
 void SDockButton::drawButton( QPainter* p )
 {
-#if QT_VERSION >= 200
   QBrush bgBrush = colorGroup().brush(QColorGroup::Background);
-#else
-  QBrush bgBrush(colorGroup().background());
-#endif
   p->fillRect( 0,0, width(), height(), bgBrush );
   p->drawPixmap( (width() - pixmap()->width()) / 2, (height() - pixmap()->height()) / 2, *pixmap() );
   if ( moveMouse && !isDown() ){
@@ -164,11 +162,7 @@ void DockWidget::applyToWidget( QWidget* s, const QPoint& p )
 {
   if ( parent() != s ){
     hide();
-#if QT_VERSION >= 200
     reparent(s, 0, QPoint(0,0), false);
-#else
-    recreate(s, 0, QPoint(0,0), false);
-#endif
     QApplication::syncX();
   }
 
@@ -178,10 +172,8 @@ void DockWidget::applyToWidget( QWidget* s, const QPoint& p )
     ((DockMainWindow*)s)->setDockView( this );
   }
 
-#if QT_VERSION >= 200	// does not work with KDE 1
   if ( s == manager->main )
       setGeometry( QRect(QPoint(0,0), manager->main->geometry().size()) );
-#endif
 
   if ( !s ){
     XSetTransientForHint( qt_xdisplay(), winId(), manager->main->topLevelWidget()->winId());
@@ -211,25 +203,19 @@ void DockWidget::show()
     }
 }
 
-#if QT_VERSION >= 200
-#define EV(a,b) a
-#else
-#define EV(a,b) b
-#endif
-
 bool DockWidget::event( QEvent *event )
 {
   switch ( event->type() )
   {
-    case EV(QEvent::ChildInserted,Event_ChildInserted):
+  case QEvent::ChildInserted:
       if ( ((QChildEvent*)event)->child()->inherits("SDockButton") ) break;
         widget = (QWidget*)((QChildEvent*)event)->child();
         widget->setGeometry( crect() );
       break;
-    case EV(QEvent::ChildRemoved,Event_ChildRemoved):
+  case QEvent::ChildRemoved:
       if ( widget == ((QChildEvent*)event)->child() ) widget = 0L;
       break;
-    case EV(QEvent::Resize,Event_Resize):
+  case QEvent::Resize:
       closeButton->move( width() - closeButton->width() - 1, 0 );
       stayButton->move( closeButton->x() - stayButton->width() - 1, 0 );
       if ( widget ){
@@ -238,16 +224,16 @@ bool DockWidget::event( QEvent *event )
       if ( drawBuffer ) delete drawBuffer;
       drawBuffer = new QPixmap( width(), height() );
       break;
-    case EV(QEvent::Paint,Event_Paint):
+  case QEvent::Paint:
       paintCaption();
       break;
-    case EV(QEvent::Show,Event_Show):
+  case QEvent::Show:
       if ( widget ) widget->show();
       break;
-    case EV(QEvent::Hide,Event_Hide):
+  case QEvent::Hide:
       if ( widget ) widget->hide();
       break;
-    default:
+  default:
       break;
   }
   return QWidget::event( event );
@@ -265,11 +251,7 @@ void DockWidget::paintCaption()
   QPainter paint;
   int delta = ( parent() ) ? 24:0;
 
-#if QT_VERSION >= 200
   QBrush bgBrush = colorGroup().brush(QColorGroup::Background);
-#else
-  QBrush bgBrush(colorGroup().background());
-#endif
 
   paint.begin( drawBuffer );
   paint.fillRect( drawBuffer->rect(), bgBrush );
@@ -620,7 +602,7 @@ void DockManager::activate()
 
 bool DockManager::eventFilter( QObject *obj, QEvent *event )
 {
-  if ( obj == main && event->type() == EV(QEvent::Resize,Event_Resize) && main->children() ){
+  if ( obj == main && event->type() == QEvent::Resize && main->children() ){
     QWidget* fc = (QWidget*)main->children()->getFirst();
     if ( fc )
       fc->setGeometry( QRect(QPoint(0,0), main->geometry().size()) );
@@ -631,7 +613,6 @@ bool DockManager::eventFilter( QObject *obj, QEvent *event )
     DockWidget* curdw = (DockWidget*)obj;
     switch ( event->type() )
     {
-#if QT_VERSION >= 200
       case QEvent::CaptionChange:
         curdw->repaint( false );
         if ( curdw->parentWidget() ){
@@ -644,15 +625,14 @@ bool DockManager::eventFilter( QObject *obj, QEvent *event )
           }
         }
         break;
-#endif
-      case EV(QEvent::MouseButtonRelease,Event_MouseButtonRelease):
+      case QEvent::MouseButtonRelease:
         if ( draging && !dropCancel ){
           draging = false;
           drop();
         }
         dropCancel = false;
         break;
-      case EV(QEvent::MouseMove,Event_MouseMove):
+      case QEvent::MouseMove:
         if ( draging ) {
           ww = findDockWidgetAt( QCursor::pos() );
           DockWidget* oldMoveWidget = currentMoveWidget;
@@ -692,8 +672,8 @@ bool DockManager::eventFilter( QObject *obj, QEvent *event )
           }
         }
         break;
-      case 6/*QEvent::KeyPress*/:
-        if ( ((QKeyEvent*)event)->key() == EV(Qt::Key_Escape,Key_Escape) ){
+      case QEvent::KeyPress:
+        if ( ((QKeyEvent*)event)->key() == Qt::Key_Escape ){
           if ( draging ){
             dropCancel = true;
             draging = false;
@@ -701,8 +681,8 @@ bool DockManager::eventFilter( QObject *obj, QEvent *event )
           }
         }
         break;
-      case EV(QEvent::Hide,Event_Hide):
-      case EV(QEvent::Show,Event_Show):
+      case QEvent::Hide:
+      case QEvent::Show:
         emit change();
         break;
       default:
@@ -875,11 +855,7 @@ void DockManager::drop()
 void DockManager::writeConfig( KConfig* c, QString group )
 {
 //debug("BEGIN Write Config");
-#if QT_VERSION >= 200
   if ( !c ) c = kapp->config();
-#else
-  if ( !c ) c = kapp->getConfig();
-#endif
   if ( group.isEmpty() ) group = "dock_setting_default";
 
   c->setGroup( group );
@@ -996,11 +972,7 @@ void DockManager::writeConfig( KConfig* c, QString group )
 
 void DockManager::readConfig( KConfig* c, QString group )
 {
-#if QT_VERSION >= 200
   if ( !c ) c = kapp->config();
-#else
-  if ( !c ) c = kapp->getConfig();
-#endif
   if ( group.isEmpty() ) group = "dock_setting_default";
 
   c->setGroup( group );

@@ -5,7 +5,6 @@
 
 
 #include <kapp.h>
-#if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
 #include <kglobal.h>
@@ -14,9 +13,6 @@
 #include <kaboutdata.h>
 #include <khelpmenu.h>
 #include <kpopupmenu.h>
-#else // QT_VERSION < 200
-#include <kmsgbox.h>
-#endif
 #include <kmenubar.h>
 #include "dbgmainwnd.h"
 #include "typetable.h"
@@ -38,14 +34,6 @@
 
 int main(int argc, char** argv)
 {
-#if QT_VERSION < 200
-    KApplication app(argc, argv, "kdbg");
-
-    QString about = "KDbg " VERSION " - ";
-    about += i18n("A Debugger\n"
-		  "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
-		  "with the help of many others");
-#else
     static const char* description =
 	i18n("A Debugger");
 
@@ -77,18 +65,13 @@ int main(int argc, char** argv)
     KApplication app;
 
     KGlobal::dirs()->addResourceType("types", "share/apps/kdbg/types");
-#endif
 
     DebuggerMainWnd debugger("kdbg_main");
 
     // insert help menu
     QPopupMenu* helpMenu;
-#if QT_VERSION < 200
-    helpMenu = kapp->getHelpMenu(false, about);
-#else
     KHelpMenu* khm = new KHelpMenu(&debugger, &aboutData, false);
     helpMenu = khm->menu();
-#endif
     debugger.menuBar()->insertSeparator();
     debugger.menuBar()->insertItem(i18n("&Help"), helpMenu);
 
@@ -110,27 +93,6 @@ int main(int argc, char** argv)
 
     // handle options
 
-#if QT_VERSION < 200
-    extern char *optarg;
-    extern int optind;
-    int ch;
-
-    const char* transcript = 0;
-    while ((ch = getopt(argc, argv, "r:t:")) != -1) {
-	switch (ch) {
-	case 'r':
-	    debugger.setRemoteDevice(optarg);
-	    break;
-	case 't':
-	    transcript = optarg;
-	    break;
-	default:
-	    TRACE(QString().sprintf("ignoring option -%c", ch));
-	}
-    }
-    argc -= optind - 1;
-    argv += optind - 1;
-#else
     KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
     QCString t = args->getOption("t");
     const char* transcript = t.data();
@@ -145,30 +107,13 @@ int main(int argc, char** argv)
     }
 
     debugger.setLanguage(args->getOption("l"));
-#endif
+
     // check environment variable for transcript file name
     if (transcript == 0) {
 	transcript = getenv("KDBG_TRANSCRIPT");
     }
     debugger.setTranscript(transcript);
 
-#if QT_VERSION < 200
-    if (!restored && argc > 1) {
-	// check for core file
-	if (argc > 2) {
-	    debugger.setCoreFile(argv[2]);
-	}
-	if (!debugger.debugProgram(argv[1])) {
-	    // failed
-	    TRACE("cannot start debugger");
-	    KMsgBox::message(&debugger, kapp->appName(),
-			     i18n("Cannot start debugger."),
-			     KMsgBox::STOP,
-			     i18n("OK"));
-	    debugger.setCoreFile("");
-	}
-    }
-#else
     if (!restored && args->count() > 0) {
 	// check for core file
 	if (args->count() > 1) {
@@ -181,7 +126,6 @@ int main(int argc, char** argv)
 	    debugger.setCoreFile("");
 	}
     }
-#endif
 
     int rc = app.exec();
     return rc;

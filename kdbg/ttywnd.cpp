@@ -6,12 +6,8 @@
 #include <qsocketnotifier.h>
 #include <qpopupmenu.h>
 #include "ttywnd.h"
-#if QT_VERSION >= 200
 #include <kglobalsettings.h>
 #include <klocale.h>
-#else
-#include <kapp.h>
-#endif
 
 #include "config.h"
 #ifdef HAVE_FCNTL_H
@@ -144,13 +140,8 @@ TTYWindow::TTYWindow(QWidget* parent, const char* name) :
 	KTextView(parent, name),
 	m_tty(0)
 {
-#if QT_VERSION < 200
-    setFont(kapp->fixedFont);
-    setFocusPolicy(StrongFocus);
-#else
     setFont(KGlobalSettings::fixedFont());
     setFocusPolicy(WheelFocus);
-#endif
     clear();
 
     // create a context menu
@@ -202,11 +193,7 @@ void TTYWindow::slotAppend(char* buffer, int count)
 	    ++len;
 	}
 	if (len > 0) {
-#if QT_VERSION < 200
-	    QString str(start, len+1);
-#else
 	    QString str = QString::fromLatin1(start, len);
-#endif
 	    // update last line
 	    str = m_texts[m_texts.size()-1] + str;
 	    replaceLine(m_texts.size()-1, str);

@@ -16,12 +16,8 @@
 #include <kapp.h>
 #include <ksimpleconfig.h>
 #include <kconfig.h>
-#if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
-#else
-#include <kmsgbox.h>
-#endif
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
 #ifdef HAVE_UNISTD_H
@@ -286,9 +282,6 @@ bool KDebugger::runUntil(const QString& fileName, int lineNo)
     if (isReady() && m_programActive && !m_programRunning) {
 	// strip off directory part of file name
 	QString file = fileName;
-#if QT_VERSION < 200
-	file.detach();
-#endif
 	int offset = file.findRev("/");
 	if (offset >= 0) {
 	    file.remove(0, offset+1);
@@ -355,9 +348,6 @@ bool KDebugger::setBreakpoint(QString file, int lineNo,
 	if (address.isEmpty())
 	{
 	    // strip off directory part of file name
-#if QT_VERSION < 200
-	    file.detach();
-#endif
 	    int offset = file.findRev("/");
 	    if (offset >= 0) {
 		file.remove(0, offset+1);
@@ -850,12 +840,8 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	} else {
 	    // report error
 	    QString msg = m_d->driverName() + ": " + QString(output);
-#if QT_VERSION < 200
-	    KMsgBox::message(parentWidget(), kapp->appName(), msg,
-			     KMsgBox::EXCLAMATION, i18n("OK"));
-#else
 	    KMessageBox::sorry(parentWidget(), msg);
-#endif
+
 	    // if core file was loaded from command line, revert to info line main
 	    if (!cmd->m_byUser) {
 		m_d->queueCmd(DCinfolinemain, DebuggerDriver::QMnormal);
@@ -1131,9 +1117,7 @@ void KDebugger::handleLocals(const char* output)
 	    // remove the new variable from the list
 	    newVars.remove();
 	    delete v;
-#if QT_VERSION >= 200
 	    repaintNeeded = true;
-#endif
 	}
     }
     // insert all remaining new variables
@@ -1481,9 +1465,6 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
     if (errorValue || !var->m_exprIndexUseGuard)
     {
 	// add current partValue (which might be the question marks)
-#if QT_VERSION < 200
-	var->m_partialValue.detach();
-#endif
 	var->m_partialValue += partValue;
 	var->m_exprIndex++;		/* next part */
 	var->m_exprIndexUseGuard = true;
@@ -1808,9 +1789,6 @@ Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo,
     // not found, so try basename
     // strip off directory part of file name
     int offset = file.findRev("/");
-#if QT_VERSION < 200
-    file.detach();
-#endif
     file.remove(0, offset+1);
 
     for (i = m_brkpts.size()-1; i >= 0; i--) {
@@ -1818,9 +1796,6 @@ Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo,
 	QString basename = m_brkpts[i]->fileName;
 	int offset = basename.findRev("/");
 	if (offset >= 0) {
-#if QT_VERSION < 200
-	    basename.detach();
-#endif
 	    basename.remove(0, offset+1);
 	}
 

@@ -20,7 +20,6 @@ public:
     ~RegisterView();
 
 protected slots:
-    void doubleClicked(QListViewItem*);
     void rightButtonClicked(QListViewItem*, const QPoint&, int);
     void slotModeChange(int);
     void updateRegisters(QList<RegisterInfo>&);

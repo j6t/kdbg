@@ -12,11 +12,7 @@
 #include <qkeycode.h>
 #include <kapp.h>
 #include <kiconloader.h>
-#if QT_VERSION >= 200
 #include <kglobalsettings.h>
-#else
-#include <ctype.h>
-#endif
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -30,16 +26,6 @@ SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* na
     setNumCols(3);
 
     // load pixmaps
-#if QT_VERSION < 200
-    KIconLoader* loader = kapp->getIconLoader();
-    m_pcinner = loader->loadIcon("pcinner.xpm");
-    m_pcup = loader->loadIcon("pcup.xpm");
-    m_brkena = loader->loadIcon("brkena.xpm");
-    m_brkdis = loader->loadIcon("brkdis.xpm");
-    m_brktmp = loader->loadIcon("brktmp.xpm");
-    m_brkcond = loader->loadIcon("brkcond.xpm");
-    setFont(kapp->fixedFont);
-#else
     m_pcinner = BarIcon("pcinner");
     m_pcup = BarIcon("pcup");
     m_brkena = BarIcon("brkena");
@@ -47,7 +33,6 @@ SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* na
     m_brktmp = BarIcon("brktmp");
     m_brkcond = BarIcon("brkcond");
     setFont(KGlobalSettings::fixedFont());
-#endif
 }
 
 SourceWindow::~SourceWindow()
@@ -450,11 +435,10 @@ void SourceWindow::keyPressEvent(QKeyEvent* ev)
     KTextView::keyPressEvent(ev);
 }
 
-#if QT_VERSION < 200
-#define ISIDENT(c) (isalnum((c)) || (c) == '_')
-#else
-#define ISIDENT(c) ((c).isLetterOrNumber() || (c) == '_')
-#endif
+static inline bool isident(QChar c)
+{
+    return c.isLetterOrNumber() || c.latin1() == '_';
+}
 
 bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 {
@@ -488,7 +472,7 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
      */
     uint start = 0;
     while (start < text.length()) {
-	while (start < text.length() && !ISIDENT(text[start]))
+	while (start < text.length() && !isident(text[start]))
 	    start++;
 	if (start >= text.length())
 	    return false;
@@ -505,7 +489,7 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 	// a word starts now
 	int startWidth = bound.width();
 	uint end = start;
-	while (end < text.length() && ISIDENT(text[end]))
+	while (end < text.length() && isident(text[end]))
 	    end++;
 	bound =
 	    painter.boundingRect(left+2, top, 0,0,
@@ -527,11 +511,7 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 
 void SourceWindow::paletteChange(const QPalette& oldPal)
 {
-#if QT_VERSION < 200
-    setFont(kapp->fixedFont);
-#else
     setFont(KGlobalSettings::fixedFont());
-#endif
     KTextView::paletteChange(oldPal);
 }
 

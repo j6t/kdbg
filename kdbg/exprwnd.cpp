@@ -249,12 +249,7 @@ ExprWnd::ExprWnd(QWidget* parent, const char* name) :
     connect(this, SIGNAL(expanded(int)), SLOT(slotExpandOrCollapse(int)));
     connect(this, SIGNAL(collapsed(int)), SLOT(slotExpandOrCollapse(int)));
 
-#if QT_VERSION < 200
-    KIconLoader* loader = kapp->getIconLoader();
-    m_pixPointer = loader->loadIcon("pointer.xpm");
-#else
     m_pixPointer = BarIcon("pointer.xpm");
-#endif
     if (m_pixPointer.isNull())
 	TRACE("Can't load pointer.xpm");
 }

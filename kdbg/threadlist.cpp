@@ -5,11 +5,7 @@
 
 #include "threadlist.h"
 #include "dbgdriver.h"
-#if QT_VERSION < 200
-#include <kapp.h>
-#else
 #include <klocale.h>
-#endif
 #include <kiconloader.h>
 #include <qbitmap.h>
 #include <qpainter.h>
@@ -45,12 +41,7 @@ ThreadList::ThreadList(QWidget* parent, const char* name) :
     addColumn(i18n("Location"));
 
     // load pixmaps
-#if QT_VERSION < 200
-    KIconLoader* loader = kapp->getIconLoader();
-    m_focusIcon = loader->loadIcon("pcinner.xpm");
-#else
     m_focusIcon = BarIcon("pcinner");
-#endif
     makeNoFocusIcon();
 
     connect(this, SIGNAL(currentChanged(QListViewItem*)),

@@ -518,11 +518,7 @@ QString DbgAddr::asString() const
 
 bool operator==(const DbgAddr& a1, const DbgAddr& a2)
 {
-#if QT_VERSION < 200
-    return strcmp(a1.a, a2.a) == 0;
-#else
     return QString::compare(a1.a, a2.a) == 0;
-#endif
 }
 
 bool operator>(const DbgAddr& a1, const DbgAddr& a2)
@@ -531,11 +527,7 @@ bool operator>(const DbgAddr& a1, const DbgAddr& a2)
 	return true;
     if (a1.a.length() < a2.a.length())
 	return false;
-#if QT_VERSION < 200
-    return strcmp(a1.a, a2.a) > 0;
-#else
     return QString::compare(a1.a, a2.a) > 0;
-#endif
 }
 
 

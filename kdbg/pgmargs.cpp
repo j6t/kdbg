@@ -6,9 +6,7 @@
 #include "pgmargs.h"
 #include <kapp.h>
 #include <kfiledialog.h>
-#if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
-#endif
 #include "mydebug.h"
 
 PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
@@ -33,18 +31,12 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
 {
     m_envVars.setAutoDelete(false);
 
-    QString title = kapp->getCaption();
+    QString title = kapp->caption();
     title += i18n(": Program arguments");
     setCaption(title);
 
-    QString fmt = i18n("Run %s with these arguments:");
-#if QT_VERSION < 200
-    QString lab(fmt.length() + pgm.length());
-#else
-    QString lab;
-#endif
-    lab.sprintf(fmt, pgm.data());
-    m_label.setText(lab);
+    QString lab = i18n("Run %1 with these arguments:");
+    m_label.setText(lab.arg(pgm));
     QSize s = m_label.sizeHint();
     /* don't make the label too wide if pgm name is very long */
     if (s.width() > 450)
@@ -200,11 +192,7 @@ void PgmArgs::parseEnvInput(QString& name, QString& value)
     int equalSign = input.find('=');
     if (equalSign >= 0) {
 	name = input.left(equalSign).stripWhiteSpace();
-#if QT_VERSION < 200
-	value = input.mid(equalSign+1,input.length());
-#else
 	value = input.mid(equalSign+1);
-#endif
     } else {
 	name = input.stripWhiteSpace();
 	value = QString();		/* value is empty */
@@ -248,11 +236,7 @@ void PgmArgs::accept()
 void PgmArgs::browseWd()
 {
     // browse for the working directory
-#if QT_VERSION < 200
-    QString newDir = KDirDialog::getDirectory(wd(), this);
-#else
     QString newDir = KFileDialog::getExistingDirectory(wd(), this);
-#endif
     if (!newDir.isEmpty()) {
 	setWd(newDir);
     }

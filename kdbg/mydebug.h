@@ -7,28 +7,15 @@
 #undef ASSERT
 #endif
 
-#ifdef KASSERT3
-#define ASSERT(x) KASSERT3((x), KDEBUG_INFO, 0, "assertion failed: %s in %s:%d", #x, __FILE__,__LINE__)
+#ifdef NDEBUG
+# define ASSERT(x) ((void)0)
 #else
-# ifdef NDEBUG
-#  define ASSERT(x) ((void)0)
-# else
-#  define ASSERT(x) ((x) ? void(0) : void(kdDebug() << \
+# define ASSERT(x) ((x) ? void(0) : void(kdDebug() << \
 					(QString("assertion failed: ") + #x).ascii() << "\n"))
-# endif
-#endif
-#ifdef WANT_TRACE_OUTPUT
-#ifndef KDEBUG 
-# define TRACE(x) (kdDebug() << (const char*)(x) << "\n")
-#else
-# define TRACE(x) KDEBUG(KDEBUG_INFO,0,(x))
-#endif
-#else
-#define TRACE(x) ((void)0)
 #endif
 
-// KDE 2 compatibility; placed here because this file is included everywhere
-#if QT_VERSION >= 200
-#define getCaption caption
-#define getConfig config
+#ifdef WANT_TRACE_OUTPUT
+# define TRACE(x) (kdDebug() << (const char*)(x) << "\n")
+#else
+# define TRACE(x) ((void)0)
 #endif

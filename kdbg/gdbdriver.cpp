@@ -6,11 +6,7 @@
 #include "gdbdriver.h"
 #include "exprwnd.h"
 #include <qregexp.h>
-#if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
-#else
-#include <kapp.h>
-#endif
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
 #include <string.h>			/* strcpy */
@@ -373,12 +369,6 @@ static void normalizeStringArg(QString& arg)
 }
 
 
-#if QT_VERSION < 200
-#define LATIN1(str) ((str).isNull() ? "" : (str).data())
-#else
-#define LATIN1(str) (str).latin1()
-#endif
-
 QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg)
 {
     assert(cmd >= 0 && cmd < NUM_CMDS);
@@ -391,14 +381,11 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg)
 	m_programWD = strArg;
     } else if (cmd == DCsetargs) {
 	// attach saved redirection
-#if QT_VERSION < 200
-	strArg.detach();
-#endif
 	strArg += m_redirect;
     }
 
     SIZED_QString(cmdString, MAX_FMTLEN+strArg.length());
-    cmdString.sprintf(cmds[cmd].fmt, LATIN1(strArg));
+    cmdString.sprintf(cmds[cmd].fmt, strArg.latin1());
     return cmdString;
 }
 
@@ -507,11 +494,11 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
 	    if (slash >= 0)
 		strArg = strArg.right(strArg.length()-slash-1);
 	}
-	cmdString.sprintf(cmds[cmd].fmt, LATIN1(strArg), intArg);
+	cmdString.sprintf(cmds[cmd].fmt, strArg.latin1(), intArg);
     }
     else
     {
-	cmdString.sprintf(cmds[cmd].fmt, intArg, LATIN1(strArg));
+	cmdString.sprintf(cmds[cmd].fmt, intArg, strArg.latin1());
     }
     return cmdString;
 }
@@ -525,7 +512,7 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg1, QString strArg
     normalizeStringArg(strArg2);
 
     SIZED_QString(cmdString, MAX_FMTLEN+strArg1.length()+strArg2.length());
-    cmdString.sprintf(cmds[cmd].fmt, LATIN1(strArg1), LATIN1(strArg2));
+    cmdString.sprintf(cmds[cmd].fmt, strArg1.latin1(), strArg2.latin1());
     return cmdString;
 }
 
@@ -667,29 +654,6 @@ static bool parseErrorMessage(const char* output,
     return false;
 }
 
-#if QT_VERSION < 200
-struct QChar {
-    // this is the XChar2b on X11
-    uchar row;
-    uchar cell;
-    static QString toQString(QChar* unicode, int len);
-    QChar() : row(0), cell(0) { }
-    QChar(char c) : row(0), cell(c) { }
-    operator char() const { return row ? 0 : cell; }
-};
-
-QString QChar::toQString(QChar* unicode, int len)
-{
-    QString result(len+1);
-    char* data = result.data();
-    data[len] = '\0';
-    while (len >= 0) {
-	data[len] = unicode[len].cell;
-	--len;
-    }
-    return result;
-}
-#endif
 #if QT_VERSION >= 300
 union Qt2QChar {
     short s;
@@ -805,19 +769,14 @@ VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, boo
 
 	    // escape a few frequently used characters
 	    char escapeCode = '\0';
-	    switch (char(ch)) {
+	    switch (ch.latin1()) {
 	    case '\n': escapeCode = 'n'; break;
 	    case '\r': escapeCode = 'r'; break;
 	    case '\t': escapeCode = 't'; break;
 	    case '\b': escapeCode = 'b'; break;
 	    case '\"': escapeCode = '\"'; break;
 	    case '\\': escapeCode = '\\'; break;
-#if QT_VERSION < 200
-		// since we only deal with ascii values must always escape '\0'
-	    case '\0': escapeCode = '0'; break;
-#else
 	    case '\0': if (value == 0) { escapeCode = '0'; } break;
-#endif
 	    }
 
 	    // add separator
@@ -1370,13 +1329,6 @@ static bool parseValueSeq(const char*& s, VarTree* variable)
     return true;
 }
 
-#if QT_VERSION < 200
-#define ISSPACE(c) isspace((c))
-#else
-// c is a QChar
-#define ISSPACE(c) (c).isSpace()
-#endif
-
 /**
  * Parses a stack frame.
  */
@@ -1477,19 +1429,19 @@ static void parseFrameInfo(const char*& s, QString& func,
      * simplify space that belongs to a string arguments that gdb sometimes
      * prints in the argument lists of the function.
      */
-    ASSERT(!ISSPACE(func[0]));		/* there must be non-white before first \n */
+    ASSERT(!isspace(func[0].latin1()));		/* there must be non-white before first \n */
     int nl = 0;
     while ((nl = func.find('\n', nl)) >= 0) {
 	// search back to the beginning of the whitespace
 	int startWhite = nl;
 	do {
 	    --startWhite;
-	} while (ISSPACE(func[startWhite]));
+	} while (isspace(func[startWhite].latin1()));
 	startWhite++;
 	// search forward to the end of the whitespace
 	do {
 	    nl++;
-	} while (ISSPACE(func[nl]));
+	} while (isspace(func[nl].latin1()));
 	// replace
 	func.replace(startWhite, nl-startWhite, " ");
 	/* continue searching for more \n's at this place: */
@@ -1497,7 +1449,6 @@ static void parseFrameInfo(const char*& s, QString& func,
     }
 }
 
-#undef ISSPACE
 
 /**
  * Parses a stack frame including its frame number

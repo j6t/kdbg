@@ -9,11 +9,7 @@
 #include <qfileinfo.h>
 #include <qlistbox.h>
 #include <kapp.h>
-#if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
-#else
-#include <ctype.h>
-#endif
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -190,11 +186,7 @@ bool WinStack::activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& addre
 
     // set the focus to the new active window
     QWidget* oldActive = m_activeWindow;
-#if QT_VERSION < 200
-    fw->setFocusPolicy(QWidget::StrongFocus);
-#else
     fw->setFocusPolicy(QWidget::WheelFocus);
-#endif
     m_activeWindow = fw;
     if (oldActive != 0 && oldActive != fw) {
 	// disable focus on non-active windows
@@ -456,7 +448,7 @@ MoreWindowsDialog::MoreWindowsDialog(QWidget* parent) :
 	m_layout(this, 8),
 	m_buttons(4)
 {
-    QString title = kapp->getCaption();
+    QString title = kapp->caption();
     title += i18n(": Open Windows");
     setCaption(title);
 
@@ -540,7 +532,7 @@ FindDialog::FindDialog() :
 	m_layout(this, 8),
 	m_buttons(4)
 {
-    setCaption(QString(kapp->getCaption()) + i18n(": Search"));
+    setCaption(QString(kapp->caption()) + i18n(": Search"));
 
     m_searchText.setMinimumSize(330, 24);
     m_searchText.setMaxLength(10000);
@@ -557,11 +549,9 @@ FindDialog::FindDialog() :
 
     // get maximum size of buttons
     QSize maxSize(80,30);
-#if QT_VERSION >= 140
     maxSize.expandedTo(m_buttonForward.sizeHint());
     maxSize.expandedTo(m_buttonBackward.sizeHint());
     maxSize.expandedTo(m_buttonClose.sizeHint());
-#endif
 
     m_buttonForward.setMinimumSize(maxSize);
     m_buttonBackward.setMinimumSize(maxSize);

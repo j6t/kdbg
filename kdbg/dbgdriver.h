@@ -283,11 +283,7 @@ protected:
     char* m_output;			/* normal gdb output */
     size_t m_outputLen;			/* amount of data so far accumulated in m_output */
     size_t m_outputAlloc;		/* space available in m_output */
-#if QT_VERSION < 200
-    typedef QString DelayedStr;
-#else
     typedef QCString DelayedStr;
-#endif
     QQueue<DelayedStr> m_delayedOutput;	/* output colleced while we have receivedOutput */
 					/* but before signal wroteStdin arrived */
 

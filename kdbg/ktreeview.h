@@ -36,10 +36,7 @@ typedef QStack<QString> KPath;
 class KTreeView;			/* forward declaration */
 
 /** Items for the KTreeView widget */
-class KTreeViewItem
-#if QT_VERSION >= 200
-: public Qt
-#endif
+class KTreeViewItem : public Qt
 {
     friend class KTreeView;
 public:

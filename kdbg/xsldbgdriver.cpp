@@ -5,11 +5,7 @@
 
 #include "xsldbgdriver.h"
 #include "exprwnd.h"
-#if QT_VERSION >= 200
 #include <klocale.h>            /* i18n */
-#else
-#include <kapp.h>
-#endif
 #include <ctype.h>
 #include <stdlib.h>             /* strtol, atoi */
 #include <string.h>             /* strcpy */
@@ -357,12 +353,6 @@ normalizeStringArg(QString & arg)
 }
 
 
-#if QT_VERSION < 200
-#define LATIN1(str) ((str).isNull() ? "" : (str).data())
-#else
-#define LATIN1(str) (str).latin1()
-#endif
-
 QString
 XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg)
 {
@@ -376,14 +366,11 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg)
         m_programWD = strArg;
     } else if (cmd == DCsetargs) {
         // attach saved redirection
-#if QT_VERSION < 200
-        strArg.detach();
-#endif
         strArg += m_redirect;
     }
 
     SIZED_QString(cmdString, MAX_FMTLEN + strArg.length());
-    cmdString.sprintf(cmds[cmd].fmt, LATIN1(strArg));
+    cmdString.sprintf(cmds[cmd].fmt, strArg.latin1());
     return cmdString;
 }
 
@@ -495,9 +482,9 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
             if (slash >= 0)
                 strArg = strArg.right(strArg.length() - slash - 1);
         }
-        cmdString.sprintf(cmds[cmd].fmt, LATIN1(strArg), intArg);
+        cmdString.sprintf(cmds[cmd].fmt, strArg.latin1(), intArg);
     } else {
-        cmdString.sprintf(cmds[cmd].fmt, intArg, LATIN1(strArg));
+        cmdString.sprintf(cmds[cmd].fmt, intArg, strArg.latin1());
     }
     return cmdString;
 }
@@ -514,7 +501,7 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg1,
 
     SIZED_QString(cmdString,
                   MAX_FMTLEN + strArg1.length() + strArg2.length());
-    cmdString.sprintf(cmds[cmd].fmt, LATIN1(strArg1), LATIN1(strArg2));
+    cmdString.sprintf(cmds[cmd].fmt, strArg1.latin1(), strArg2.latin1());
     return cmdString;
 }
 

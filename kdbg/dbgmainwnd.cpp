@@ -4,12 +4,10 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include <kapp.h>
-#if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
 #include <kmenubar.h>
 #include <kconfig.h>
 #include <kstatusbar.h>
-#endif
 #include <kiconloader.h>
 #include <kstdaccel.h>
 #include <kfiledialog.h>
@@ -159,7 +157,7 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(m_localVariables, SIGNAL(rightPressed(int, const QPoint&)),
 	    this, SLOT(slotLocalsPopup(int, const QPoint&)));
 
-    restoreSettings(kapp->getConfig());
+    restoreSettings(kapp->config());
 
     connect(m_menuRecentExecutables, SIGNAL(activated(int)), SLOT(slotRecentExec(int)));
     fillRecentExecMenu();
@@ -171,7 +169,7 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 
 DebuggerMainWnd::~DebuggerMainWnd()
 {
-    saveSettings(kapp->getConfig());
+    saveSettings(kapp->config());
     // must delete m_debugger early since it references our windows
     delete m_debugger;
     m_debugger = 0;
@@ -329,13 +327,6 @@ void DebuggerMainWnd::initFileWndMenus()
 				  0, ID_FILE_COREFILE);
 }
 
-#if QT_VERSION < 200
-static QPixmap BarIcon(const char* name)
-{
-    return kapp->getIconLoader()->loadIcon(name);
-}
-#endif
-
 void DebuggerMainWnd::initToolbar()
 {
     KToolBar* toolbar = toolBar();
@@ -399,9 +390,7 @@ void DebuggerMainWnd::initToolbar()
  */
 void DebuggerMainWnd::closeEvent(QCloseEvent* e)
 {
-#if QT_VERSION >= 200
     clearWFlags(WDestructiveClose);
-#endif
 
     if (m_debugger != 0) {
 	m_debugger->shutdown();
@@ -604,11 +593,8 @@ void DebuggerMainWnd::slotAddWatch()
 void DebuggerMainWnd::slotFileChanged()
 {
     // set caption
-#if QT_VERSION < 200
-    QString caption = kapp->getCaption();
-#else
     QString caption;
-#endif
+
     if (m_debugger->haveExecutable()) {
 	// basename part of executable
 	QString executable = m_debugger->executable();
@@ -616,9 +602,6 @@ void DebuggerMainWnd::slotFileChanged()
 	int lastSlash = executable.findRev('/');
 	if (lastSlash >= 0)
 	    execBase += lastSlash + 1;
-#if QT_VERSION < 200
-	caption += ": ";
-#endif
 	caption += execBase;
     }
     QString file;

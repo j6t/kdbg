@@ -4,14 +4,9 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include <kapp.h>
-#if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
 #include <kconfig.h>
 #include <kmessagebox.h>
-#else
-#include <kmsgbox.h>
-#include <qkeycode.h>
-#endif
 #include <kiconloader.h>
 #include <kstatusbar.h>
 #include <ktoolbar.h>
@@ -78,13 +73,7 @@ WatchWindow::~WatchWindow()
 
 bool WatchWindow::eventFilter(QObject*, QEvent* ev)
 {
-    if (ev->type() ==
-#if QT_VERSION < 200
-	Event_KeyPress
-#else
-	QEvent::KeyPress
-#endif
-	)
+    if (ev->type() == QEvent::KeyPress)
     {
 	QKeyEvent* kev = static_cast<QKeyEvent*>(ev);
 	if (kev->key() == Key_Delete) {
@@ -416,15 +405,8 @@ void DebuggerMainWndBase::updateLineItems()
 
 void DebuggerMainWndBase::initAnimation()
 {
-#if QT_VERSION < 200
-    QString path = kapp->kde_datadir() + "/kfm/pics/";
-    QPixmap pixmap;
-    pixmap.load(path + "/kde1.xpm");
-    int numPix = 9;
-#else
     QPixmap pixmap = BarIcon("kde1");
     int numPix = 6;
-#endif
 
     KToolBar* toolbar = dbgToolBar();
     toolbar->insertButton(pixmap, ID_STATUS_BUSY);
@@ -434,14 +416,8 @@ void DebuggerMainWndBase::initAnimation()
     m_animation.setAutoDelete(true);
     QString n;
     for (int i = 1; i <= numPix; i++) {
-#if QT_VERSION < 200
-	n.sprintf("/kde%d.xpm", i);
-	QPixmap* p = new QPixmap();
-	p->load(path + n);
-#else
 	n.sprintf("kde%d", i);
 	QPixmap* p = new QPixmap(BarIcon(n));
-#endif
 	if (!p->isNull()) {
 	    m_animation.append(p);
 	} else {
@@ -452,11 +428,7 @@ void DebuggerMainWndBase::initAnimation()
     if (m_animation.count() == 0) {
 	QPixmap* pix = new QPixmap(2,2);
 	QPainter p(pix);
-#if QT_VERSION < 200
-	p.fillRect(0,0,2,2,QBrush(white));
-#else
 	p.fillRect(0,0,2,2,QBrush(Qt::white));
-#endif
 	m_animation.append(pix);
     }
 }
@@ -480,7 +452,7 @@ void DebuggerMainWndBase::slotNewStatusMsg()
 void DebuggerMainWndBase::doGlobalOptions(QWidget* parent)
 {
     QTabDialog dlg(parent, "global_options", true);
-    QString title = kapp->getCaption();
+    QString title = kapp->caption();
     title += i18n(": Global options");
     dlg.setCaption(title);
     dlg.setCancelButton(i18n("Cancel"));
@@ -562,15 +534,12 @@ QString DebuggerMainWndBase::createOutputWindow()
 	if (m_outputTermKeepScript.length() != 0) {
 	    fmt = m_outputTermKeepScript.data();
 	}
-#if QT_VERSION < 200
-	QString shellScript(strlen(fmt) + fifoName.length());
-#else
+
 	QString shellScript;
-#endif
 	shellScript.sprintf(fmt, fifoName.data());
 	TRACE("output window script is " + shellScript);
 
-	QString title = kapp->getCaption();
+	QString title = kapp->caption();
 	title += i18n(": Program output");
 
 	// parse the command line specified in the preferences
@@ -744,18 +713,8 @@ bool DebuggerMainWndBase::debugProgramInteractive(const QString& executable,
     m_lastDirectory = fi.dirPath(true);
 
     if (!fi.isFile()) {
-	QString msgFmt = i18n("`%s' is not a file or does not exist");
-	SIZED_QString(msg, msgFmt.length() + executable.length() + 20);
-#if QT_VERSION < 200
-	msg.sprintf(msgFmt, executable.data());
-	KMsgBox::message(parent, kapp->appName(),
-			 msg,
-			 KMsgBox::STOP,
-			 i18n("OK"));
-#else
-	msg.sprintf(msgFmt, executable.latin1());
-	KMessageBox::sorry(parent, msg);
-#endif
+	QString msg = i18n("`%1' is not a file or does not exist");
+	KMessageBox::sorry(parent, msg.arg(executable));
 	return false;
     }
 

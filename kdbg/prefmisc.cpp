@@ -4,12 +4,7 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include "prefmisc.h"
-#if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
-#else
-#include <kapp.h>			/* i18n */
-#endif
-#include <stdlib.h>			/* atoi */
 
 PrefMisc::PrefMisc(QWidget* parent) :
 	QWidget(parent, "debugger"),
@@ -61,12 +56,7 @@ void PrefMisc::setupEditGroup(const QString& label, QLabel& labWidget, QLineEdit
 static int readNumeric(const QLineEdit& edit)
 {
     QString str = edit.text();
-#if QT_VERSION < 200
-    const char* s = str;
-#else
-    const char* s = str.latin1();
-#endif
-    return atoi(s);
+    return str.toInt();
 }
 
 int PrefMisc::backTimeout() const

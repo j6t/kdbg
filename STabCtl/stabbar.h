@@ -23,11 +23,7 @@ struct TabBarData
     label = _label;
     pix = 0L;
     enabled = true;
-#if QT_VERSION >= 200
     textColor = Qt::black;
-#else
-    textColor = black;
-#endif
   }
   ~TabBarData()
   {

@@ -4,9 +4,7 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include <kapp.h>			/* i18n */
-#if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
-#endif
 #include <kiconloader.h>
 #include <ksimpleconfig.h>
 #include <qdialog.h>
@@ -236,15 +234,9 @@ void BreakpointTable::updateUI()
     m_btConditional.setEnabled(enableChkpt);
 }
 
-#if QT_VERSION < 200
-# define MOUSEPRESS Event_MouseButtonPress
-#else
-# define MOUSEPRESS QEvent::MouseButtonPress
-#endif
-
 bool BreakpointTable::eventFilter(QObject* ob, QEvent* ev)
 {
-    if (ev->type() == MOUSEPRESS)
+    if (ev->type() == QEvent::MouseButtonPress)
     {
 	QMouseEvent* mev = static_cast<QMouseEvent*>(ev);
 	if (mev->button() == MidButton) {
@@ -364,22 +356,13 @@ void BreakpointTable::initListAndIcons()
     m_list.setSorting(-1);
 
     // add pixmaps
-#if QT_VERSION < 200
-    KIconLoader* loader = kapp->getIconLoader();
-    QPixmap brkena = loader->loadIcon("brkena.xpm");
-    QPixmap brkdis = loader->loadIcon("brkdis.xpm");
-    QPixmap watchena = loader->loadIcon("watchena.xpm");
-    QPixmap watchdis = loader->loadIcon("watchdis.xpm");
-    QPixmap brktmp = loader->loadIcon("brktmp.xpm");
-    QPixmap brkcond = loader->loadIcon("brkcond.xpm");
-#else
     QPixmap brkena = BarIcon("brkena.xpm");
     QPixmap brkdis = BarIcon("brkdis.xpm");
     QPixmap watchena = BarIcon("watchena.xpm");
     QPixmap watchdis = BarIcon("watchdis.xpm");
     QPixmap brktmp = BarIcon("brktmp.xpm");
     QPixmap brkcond = BarIcon("brkcond.xpm");
-#endif
+
     /*
      * There are 16 different pixmaps: The basic enabled or disabled
      * breakpoint, plus an optional overlaid brktmp icon plus an optional
@@ -464,7 +447,7 @@ ConditionalDlg::ConditionalDlg(QWidget* parent) :
 	m_inputs(2, 2, 10),
 	m_buttons(4)
 {
-    QString title = kapp->getCaption();
+    QString title = kapp->caption();
     title += i18n(": Conditional breakpoint");
     setCaption(title);
 

@@ -44,7 +44,7 @@ void BarPainter::paintEvent( QPaintEvent* )
   }
 }
 
-void BarPainter::resizeEvent( QResizeEvent *e )
+void BarPainter::resizeEvent( QResizeEvent * )
 {
   delete buffer;
   switch ( ((STabBar*)parent())->tabPos )
@@ -86,11 +86,7 @@ void BarPainter::drawBuffer()
   QPainter paint;
   paint.begin(buffer);
   paint.setBrushOrigin(0,0);
-#if QT_VERSION >= 200
   QBrush bgBrush = colorGroup().brush(QColorGroup::Background);
-#else
-  QBrush bgBrush(colorGroup().background());
-#endif
   paint.fillRect( 0, 0, W, H, bgBrush);
 
   int x = 2;
@@ -414,11 +410,7 @@ void STabBar::paintEvent(QPaintEvent *)
 
   if ( curWidth == 0 ) curx = 0; // no tab selected
 
-#if QT_VERSION >= 200
   QBrush bgBrush = colorGroup().brush(QColorGroup::Background);
-#else
-  QBrush bgBrush(colorGroup().background());
-#endif
 
   // paint button line
   switch ( tabPos ){

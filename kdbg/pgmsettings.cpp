@@ -4,9 +4,7 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include "pgmsettings.h"
-#if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
-#endif
 #include <kapp.h>
 #include <qlayout.h>
 #include <qlineedit.h>
@@ -102,12 +100,9 @@ ProgramSettings::ProgramSettings(QWidget* parent, QString exeName, bool modal) :
     // construct title
     int slash = exeName.findRev('/');
     if (slash >= 0) {
-#if QT_VERSION < 200
-	exeName.detach();
-#endif
 	exeName.remove(0, slash+1);
     }
-    QString cap = kapp->getCaption();
+    QString cap = kapp->caption();
     QString fmt = i18n("%s: Settings for %s");
     SIZED_QString(title, fmt.length() + cap.length() + exeName.length());
     title.sprintf(fmt, cap.data(), exeName.data());
@@ -127,13 +122,11 @@ void ProgramSettings::slotHelp()
 {
     QString section;
 
-#if QT_VERSION >= 200
     // find active page and jump to its section
     QWidget* curWidget = currentPage();
     if (curWidget != 0) {
 	section = curWidget->name();
     }
-#endif
     TRACE("invoking help: pgmsettings.html section #" + section);
     kapp->invokeHTMLHelp("kdbg/pgmsettings.html", section);
 }
