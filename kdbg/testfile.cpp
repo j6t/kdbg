@@ -46,6 +46,13 @@ void f(E e[3], char c)
 
 int main(int argc, char* argv[])
 {
+	if (argc > 1) {
+		if (*argv[1] = 's') {
+			// seg fault
+			*(char*)0 = 's';
+		}
+	}
+
 	char a[6] = { 'a', 'B', '\'', '\"' };
 	char a1[1] = { '1' };
 	E e[3] = { red, green, blue };
