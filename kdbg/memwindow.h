@@ -11,6 +11,7 @@
 #include <qcombobox.h>
 #include <qlayout.h>
 #include <qdict.h>
+#include <qlist.h>
 
 class KDebugger;
 class KSimpleConfig;
