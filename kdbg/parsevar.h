@@ -10,3 +10,4 @@ class VarTree;
 extern VarTree* parseVar(const char*& s);
 
 void skipNestedWithString(const char*& s, char opening, char closing);
+void skipNested(const char*& s, char opening, char closing);
