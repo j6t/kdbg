@@ -352,6 +352,23 @@ void GdbDriver::parseMarker()
 }
 
 
+/*
+ * Escapes characters that might lead to problems when they appear on gdb's
+ * command line.
+ */
+static void normalizeStringArg(QString& arg)
+{
+    /*
+     * Remove trailing backslashes. This approach is a little simplistic,
+     * but we know that there is at the moment no case where a trailing
+     * backslash would make sense.
+     */
+    while (!arg.isEmpty() && arg[arg.length()-1] == '\\') {
+	arg = arg.left(arg.length()-1);
+    }
+}
+
+
 #if QT_VERSION < 200
 #define LATIN1(str) ((str).isNull() ? "" : (str).data())
 #else
@@ -362,6 +379,8 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg)
 {
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == GdbCmdInfo::argString);
+
+    normalizeStringArg(strArg);
 
     if (cmd == DCcd) {
 	// need the working directory when parsing the output
@@ -397,6 +416,8 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
 	   cmds[cmd].argsNeeded == GdbCmdInfo::argNumString ||
 	   cmd == DCexamine ||
 	   cmd == DCtty);
+
+    normalizeStringArg(strArg);
 
     SIZED_QString(cmdString, MAX_FMTLEN+30+strArg.length());
 
@@ -495,6 +516,9 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg1, QString strArg
 {
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == GdbCmdInfo::argString2);
+
+    normalizeStringArg(strArg1);
+    normalizeStringArg(strArg2);
 
     SIZED_QString(cmdString, MAX_FMTLEN+strArg1.length()+strArg2.length());
     cmdString.sprintf(cmds[cmd].fmt, LATIN1(strArg1), LATIN1(strArg2));
