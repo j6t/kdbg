@@ -248,6 +248,7 @@ protected:
     QList<QPixmap> m_animation;
     QTimer m_animationTimer;
     uint m_animationCounter;
+    int m_animationInterval;
     
     // view windows
     KNewPanner m_mainPanner;
@@ -284,7 +285,7 @@ protected:
     void initMenu();
     void initToolbar();
     void initAnimation();
-    void startAnimation();
+    void startAnimation(bool fast);
     void stopAnimation();
 
     friend class BreakpointTable;

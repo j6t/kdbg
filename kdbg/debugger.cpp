@@ -79,6 +79,7 @@ KDebugger::KDebugger(const char* name) :
 	m_statusbar(this, "statusbar"),
 	m_animationTimer(this),
 	m_animationCounter(0),
+	m_animationInterval(0),
 	m_mainPanner(this, "main_pane", KNewPanner::Vertical, KNewPanner::Percent, 60),
 	m_leftPanner(&m_mainPanner, "left_pane", KNewPanner::Horizontal, KNewPanner::Percent, 70),
 	m_rightPanner(&m_mainPanner, "right_pane", KNewPanner::Horizontal, KNewPanner::Percent, 50),
@@ -469,7 +470,12 @@ void KDebugger::updateUI()
     if (m_state == DSidle) {
 	stopAnimation();
     } else {
-	startAnimation();
+	/*
+	 * Slow animation while program is stopped (i.e. while variables
+	 * are displayed)
+	 */
+	bool slow = isReady() && m_programActive && !m_programRunning;
+	startAnimation(!slow);
     }
 }
 
@@ -2250,17 +2256,21 @@ void KDebugger::slotAnimationTimeout()
 			      *m_animation.at(m_animationCounter));
 }
 
-void KDebugger::startAnimation()
+void KDebugger::startAnimation(bool fast)
 {
+    int interval = fast ? 50 : 150;
     if (!m_animationTimer.isActive()) {
-	m_animationTimer.start(50);
+	m_animationTimer.start(interval);
+    } else if (m_animationInterval != interval) {
+	m_animationTimer.changeInterval(interval);
     }
+    m_animationInterval = interval;
 }
 
 void KDebugger::stopAnimation()
 {
     if (m_animationTimer.isActive()) {
 	m_animationTimer.stop();
-	m_toolbar.setButtonPixmap(ID_STATUS_BUSY, *m_animation.at(0));
+	m_animationInterval = 0;
     }
 }
