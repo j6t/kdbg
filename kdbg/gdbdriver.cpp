@@ -216,8 +216,6 @@ bool GdbDriver::startup()
     return true;
 }
 
-static QRegExp MarkerRE(":[0-9]+:[0-9]+:beg");
-
 void GdbDriver::commandFinished(CmdQueueItem* cmd)
 {
     // command string must be committed
@@ -281,9 +279,9 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
 }
 
 /*
- * The -fullname option makes gdb send a special normalized sequence print
+ * The --fullname option makes gdb send a special normalized sequence print
  * each time the program stops and at some other points. The sequence has
- * the form "\032\032filename:lineno:???:beg:address".
+ * the form "\032\032filename:lineno:charoffset:(beg|middle):address".
  */
 void GdbDriver::parseMarker()
 {
@@ -301,6 +299,8 @@ void GdbDriver::parseMarker()
     *endMarker = '\0';
 
     // extract filename and line number
+    static QRegExp MarkerRE(":[0-9]+:[0-9]+:[begmidl]+:0x");
+
     int lineNoStart = MarkerRE.match(startMarker);
     if (lineNoStart >= 0) {
 	int lineNo = atoi(startMarker + lineNoStart+1);
@@ -313,9 +313,9 @@ void GdbDriver::parseMarker()
 
 
 #if QT_VERSION < 200
-#define LATIN1(str) str.data()
+#define LATIN1(str) ((str).isNull() ? "" : (str).data())
 #else
-#define LATIN1(str) str.latin1()
+#define LATIN1(str) (str).latin1()
 #endif
 
 QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg)
