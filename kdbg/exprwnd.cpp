@@ -111,6 +111,24 @@ bool VarTree::isAncestorEq(const VarTree* child) const
     return c != 0;
 }
 
+bool VarTree::updateValue(const QString& newValue)
+{
+    // check whether the value changed
+    bool prevValueChanged = m_valueChanged;
+    m_valueChanged = false;
+    if (m_value != newValue) {
+	m_value = newValue;
+	m_valueChanged = true;
+    }
+    /*
+     * We must repaint the cell if the value changed. If it did not change,
+     * we still must repaint the cell if the value changed previously,
+     * because the color of the display must be changed (from red to
+     * black).
+     */
+    return m_valueChanged || prevValueChanged;
+}
+
 
 ExprWnd::ExprWnd(QWidget* parent, const char* name) :
 	KTreeView(parent, name),
@@ -312,20 +330,7 @@ void ExprWnd::updateSingleExpr(VarTree* display, VarTree* newValue)
     }
     else
     {
-	// check whether the value changed
-	bool prevValueChanged = display->m_valueChanged;
-	display->m_valueChanged = false;
-	if (display->m_value != newValue->m_value) {
-	    display->m_value = newValue->m_value;
-	    display->m_valueChanged = true;
-	}
-	/*
-	 * We must repaint the cell if the value changed. If it did not
-	 * change, we still must repaint the cell if the value changed
-	 * previously, because the color of the display must be changed
-	 * (from red to black).
-	 */
-	if (display->m_valueChanged || prevValueChanged) {
+	if (display->updateValue(newValue->m_value)) {
 	    int i = itemRow(display);
 	    if (i >= 0) {
 		updateCell(i, 1, true);
@@ -338,23 +343,11 @@ void ExprWnd::updateStructValue(VarTree* display)
 {
     ASSERT(display->m_varKind == VarTree::VKstruct);
 
-    // check whether the value changed
-    bool prevValueChanged = display->m_valueChanged;
-    display->m_valueChanged = false;
-    if (display->m_value != display->m_partialValue) {
-	display->m_value = display->m_partialValue;
-	display->m_valueChanged = true;
-    }
-    /*
-     * We must repaint the cell if the value changed. If it did not
-     * change, we still must repaint the cell if the value changed
-     * previously, because the color of the display must be changed
-     * (from red to black).
-     */
-    if (display->m_valueChanged || prevValueChanged) {
+    if (display->updateValue(display->m_partialValue)) {
 	int i = itemRow(display);
 	if (i >= 0) {
 	    updateCell(i, 1, true);
+	    updateValuesWidth();
 	}
     }
     // reset the value

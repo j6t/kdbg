@@ -39,6 +39,8 @@ public:
     bool isToplevelExpr() const;
     /** is this element an ancestor of (or equal to) child? */
     bool isAncestorEq(const VarTree* child) const;
+    /** update the value; return if repaint is necessary */
+    bool updateValue(const QString& newValue);
 };
 
 class ExprWnd : public KTreeView
