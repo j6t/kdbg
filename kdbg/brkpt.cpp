@@ -32,6 +32,9 @@ BreakpointTable::BreakpointTable(KDebugger& deb) :
     m_bpEdit.setMinimumSize(m_bpEdit.sizeHint());
     connect(&m_bpEdit, SIGNAL(returnPressed()), this, SLOT(addBP()));
 
+    // double click on item is same as View code
+    connect(&m_list, SIGNAL(selected(int,int)), this, SLOT(viewBP()));
+
     m_btAdd.setText(i18n("&Add"));
     m_btAdd.setMinimumSize(m_btAdd.sizeHint());
     connect(&m_btAdd, SIGNAL(clicked()), this, SLOT(addBP()));
