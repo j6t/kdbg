@@ -45,49 +45,50 @@ static XsldbgCmdInfo cmds[] = {
     {DCinitialize, "init\n", XsldbgCmdInfo::argNone},
     {DCtty, "tty %s\n", XsldbgCmdInfo::argString},
     {DCexecutable, "source %s\n", XsldbgCmdInfo::argString},    /* force a restart */
-    {DCtargetremote, "target remote %s\n", XsldbgCmdInfo::argString},
+    {DCtargetremote, "print 'target remote %s'\n", XsldbgCmdInfo::argString},
     {DCcorefile, "data  %s\n", XsldbgCmdInfo::argString},       /* force a restart */
-    {DCattach, "attach %s\n", XsldbgCmdInfo::argString},
-    {DCinfolinemain, "info main line\n", XsldbgCmdInfo::argNone},
+    {DCattach, "print 'attach %s'\n", XsldbgCmdInfo::argString},
+    {DCinfolinemain, "print 'info main line'\n", XsldbgCmdInfo::argNone},
     {DCinfolocals, "locals\n", XsldbgCmdInfo::argNone},
-    {DCinforegisters, "info reg\n", XsldbgCmdInfo::argNone},
-    {DCexamine, "x %s %s\n", XsldbgCmdInfo::argString2},
-    {DCinfoline, "templates %s:%d\n", XsldbgCmdInfo::argStringNum},
-    {DCdisassemble, "disassemble %s %s\n", XsldbgCmdInfo::argString2},
+    {DCinforegisters, "print 'info reg'\n", XsldbgCmdInfo::argNone},
+    {DCexamine, "print 'x %s %s'\n", XsldbgCmdInfo::argString2},
+    {DCinfoline, "print 'templates %s:%d'\n", XsldbgCmdInfo::argStringNum},
+    {DCdisassemble, "print 'disassemble %s %s'\n", XsldbgCmdInfo::argString2},
     {DCsetargs, "data %s\n", XsldbgCmdInfo::argString},
     {DCsetenv, "%s %s\n", XsldbgCmdInfo::argString2},
     {DCunsetenv, "unset env %s\n", XsldbgCmdInfo::argString},
     {DCcd, "chdir %s\n", XsldbgCmdInfo::argString},
     {DCbt, "where\n", XsldbgCmdInfo::argNone},
-    {DCrun, "run\n", XsldbgCmdInfo::argNone},
+    {DCrun, "run\nsource\n", XsldbgCmdInfo::argNone}, /* Ensure that at the start
+							 of executing XSLT we show the XSLT file */
     {DCcont, "continue\n", XsldbgCmdInfo::argNone},
     {DCstep, "step\n", XsldbgCmdInfo::argNone},
     {DCstepi, "trace\n", XsldbgCmdInfo::argNone},
     {DCnext, "walk\n", XsldbgCmdInfo::argNone},
-    {DCnexti, "nexti\n", XsldbgCmdInfo::argNone},
+    {DCnexti, "print 'nexti'\n", XsldbgCmdInfo::argNone},
     {DCfinish, "quit\n", XsldbgCmdInfo::argNone},
     {DCuntil, "continue %s:%d\n", XsldbgCmdInfo::argStringNum},
     {DCkill, "quit\n", XsldbgCmdInfo::argNone},
     {DCbreaktext, "break %s\n", XsldbgCmdInfo::argString},
     {DCbreakline, "break -l %s %d\n", XsldbgCmdInfo::argStringNum},
-    {DCtbreakline, "tbreak -l %s %d\n", XsldbgCmdInfo::argStringNum},
-    {DCbreakaddr, "break *%s\n", XsldbgCmdInfo::argString},
-    {DCtbreakaddr, "tbreak *%s\n", XsldbgCmdInfo::argString},
-    {DCwatchpoint, "watch %s\n", XsldbgCmdInfo::argString},
+    {DCtbreakline, "print 'tbreak -l %s %d'\n", XsldbgCmdInfo::argStringNum},
+    {DCbreakaddr, "print 'break *%s'\n", XsldbgCmdInfo::argString},
+    {DCtbreakaddr, "print 'tbreak *%s'\n", XsldbgCmdInfo::argString},
+    {DCwatchpoint, "print 'watch %s'\n", XsldbgCmdInfo::argString},
     {DCdelete, "delete %d\n", XsldbgCmdInfo::argNum},
     {DCenable, "enable %d\n", XsldbgCmdInfo::argNum},
     {DCdisable, "disable %d\n", XsldbgCmdInfo::argNum},
     {DCprint, "print %s\n", XsldbgCmdInfo::argString},
-    {DCprintStruct, "print %s\n", XsldbgCmdInfo::argString},
-    {DCprintQStringStruct, "print %s\n", XsldbgCmdInfo::argString},
+    {DCprintStruct, "print 'print %s'\n", XsldbgCmdInfo::argString},
+    {DCprintQStringStruct, "print 'print %s'\n", XsldbgCmdInfo::argString},
     {DCframe, "frame %d\n", XsldbgCmdInfo::argNum},
-    {DCfindType, "whatis %s\n", XsldbgCmdInfo::argString},
+    {DCfindType, "print 'whatis %s'\n", XsldbgCmdInfo::argString},
     {DCinfosharedlib, "stylesheets\n", XsldbgCmdInfo::argNone},
-    {DCthread, "thread %d\n", XsldbgCmdInfo::argNum},
-    {DCinfothreads, "info threads\n", XsldbgCmdInfo::argNone},
+    {DCthread, "print 'thread %d'\n", XsldbgCmdInfo::argNum},
+    {DCinfothreads, "print 'info threads'\n", XsldbgCmdInfo::argNone},
     {DCinfobreak, "show\n", XsldbgCmdInfo::argNone},
-    {DCcondition, "condition %d %s\n", XsldbgCmdInfo::argNumString},
-    {DCignore, "ignore %d %d\n", XsldbgCmdInfo::argNum2},
+    {DCcondition, "print 'condition %d %s'\n", XsldbgCmdInfo::argNumString},
+    {DCignore, "print 'ignore %d %d'\n", XsldbgCmdInfo::argNum2},
 };
 
 #define NUM_CMDS (int(sizeof(cmds)/sizeof(cmds[0])))
@@ -1316,6 +1317,7 @@ XsldbgDriver::parseProgramStopped(const char *output, QString & message)
 void
 XsldbgDriver::parseSharedLibs(const char */*output*/, QStrList & /*shlibs*/)
 {
+    /* empty */
 }
 
 bool
