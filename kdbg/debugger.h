@@ -154,7 +154,7 @@ protected:
     CmdQueueItem* m_activeCmd;		/* the cmd we are working on */
     bool m_delayedPrintThis;		/* whether we delayed "print *this" */
     void parse(CmdQueueItem* cmd);
-    VarTree* parseExpr(const char* name);
+    VarTree* parseExpr(const char* name, bool wantErrorValue = true);
     void handleRunCommands();
     void updateAllExprs();
     void updateBreakptTable();

@@ -1408,7 +1408,7 @@ bool KDebugger::handlePrint(const char* var, ExprWnd* wnd)
     return true;
 }
 
-VarTree* KDebugger::parseExpr(const char* name)
+VarTree* KDebugger::parseExpr(const char* name, bool wantErrorValue)
 {
     VarTree* variable;
 
@@ -1417,12 +1417,16 @@ VarTree* KDebugger::parseExpr(const char* name)
 	strncmp(m_gdbOutput, "Attempt to dereference a generic pointer", 40) == 0 ||
 	strncmp(m_gdbOutput, "No symbol \"", 11) == 0)
     {
-	// put the error message as value in the variable
-	char* endMsg = strchr(m_gdbOutput, '\n');
-	if (endMsg != 0)
-	    *endMsg = '\0';
-	variable = new VarTree(name, VarTree::NKplain);
-	variable->m_value = m_gdbOutput;
+	if (wantErrorValue) {
+	    // put the error message as value in the variable
+	    char* endMsg = strchr(m_gdbOutput, '\n');
+	    if (endMsg != 0)
+		*endMsg = '\0';
+	    variable = new VarTree(name, VarTree::NKplain);
+	    variable->m_value = m_gdbOutput;
+	} else {
+	    variable = 0;
+	}
     } else {
 	// parse the variable
 	const char* p = m_gdbOutput;
@@ -1732,35 +1736,36 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd)
     ASSERT(var != 0);
     ASSERT(var->m_varKind == VarTree::VKstruct);
 
-    VarTree* partExpr = parseExpr(cmd->m_expr->getText());
+    QString partValue;
+    VarTree* partExpr = parseExpr(cmd->m_expr->getText(), false);
     if (partExpr == 0 ||
 	/* we only allow simple values at the moment */
 	partExpr->childCount() != 0)
     {
-	// syntax error: reset this struct value
-	var->m_value = "";
-	var->m_exprIndex = -1;
-	delete partExpr;
+	partValue = "???";
     } else {
-	/*
-	 * Updating a struct value works like this: var->m_partialValue
-	 * holds the value that we have gathered so far (it's been
-	 * initialized with var->m_type->m_displayString[0] earlier). Each
-	 * time we arrive here, we append the printed result followed by
-	 * the next var->m_type->m_displayString to var->m_partialValue.
-	 */
-	ASSERT(var->m_exprIndex >= 0 && var->m_exprIndex <= typeInfoMaxExpr);
-	var->m_partialValue.detach();
-	var->m_partialValue += partExpr->m_value;
-	var->m_exprIndex++;		/* next part */
-	var->m_partialValue += var->m_type->m_displayString[var->m_exprIndex];
+	partValue = partExpr->m_value;
+    }
+    delete partExpr;
 
-	/* go for more sub-expressions if needed */
-	if (var->m_exprIndex < var->m_type->m_numExprs) {
-	    /* queue a new print command with quite high priority */
-	    evalStructExpression(var, cmd->m_exprWnd, true);
-	    return;
-	}
+    /*
+     * Updating a struct value works like this: var->m_partialValue holds
+     * the value that we have gathered so far (it's been initialized with
+     * var->m_type->m_displayString[0] earlier). Each time we arrive here,
+     * we append the printed result followed by the next
+     * var->m_type->m_displayString to var->m_partialValue.
+     */
+    ASSERT(var->m_exprIndex >= 0 && var->m_exprIndex <= typeInfoMaxExpr);
+    var->m_partialValue.detach();
+    var->m_partialValue += partValue;
+    var->m_exprIndex++;			/* next part */
+    var->m_partialValue += var->m_type->m_displayString[var->m_exprIndex];
+
+    /* go for more sub-expressions if needed */
+    if (var->m_exprIndex < var->m_type->m_numExprs) {
+	/* queue a new print command with quite high priority */
+	evalStructExpression(var, cmd->m_exprWnd, true);
+	return;
     }
 
     cmd->m_exprWnd->updateStructValue(var);
