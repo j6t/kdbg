@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.0\n"
-"POT-Creation-Date: 2000-08-18 21:22+0200\n"
-"PO-Revision-Date: 2000-08-18 22:35+0200\n"
+"POT-Creation-Date: 2000-11-05 18:19+0100\n"
+"PO-Revision-Date: 2000-11-05 18:35+0200\n"
 "Last-Translator: Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -34,7 +34,7 @@ msgstr "Umgebungsvariablen (NAME=Wert)"
 msgid "Name"
 msgstr "Name"
 
-#: pgmargs.cpp:75 regwnd.cpp:215 regwnd.cpp:223
+#: pgmargs.cpp:75 regwnd.cpp:210 regwnd.cpp:218
 msgid "Value"
 msgstr "Wert"
 
@@ -50,7 +50,7 @@ msgstr ": An Prozess attachen"
 msgid "Specify the process number to attach to:"
 msgstr "Geben Sie die Prozessnummer ein:"
 
-#: debugger.cpp:509
+#: debugger.cpp:507
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
@@ -118,35 +118,35 @@ msgstr "&Bedingung:"
 msgid "Ignore &next hits:"
 msgstr "Ignoriere &nächste Treffer:"
 
-#: regwnd.cpp:214 regwnd.cpp:222
+#: regwnd.cpp:209 regwnd.cpp:217
 msgid "Register"
 msgstr "Register"
 
-#: regwnd.cpp:216 regwnd.cpp:224
+#: regwnd.cpp:211 regwnd.cpp:219
 msgid "Decoded value"
 msgstr "Dekodierter Wert"
 
-#: memwindow.cpp:59 regwnd.cpp:240
+#: memwindow.cpp:59 regwnd.cpp:235
 msgid "&Binary"
 msgstr "&Binär"
 
-#: memwindow.cpp:58 regwnd.cpp:241
+#: memwindow.cpp:58 regwnd.cpp:236
 msgid "&Octal"
 msgstr "&Oktal"
 
-#: regwnd.cpp:242
+#: regwnd.cpp:237
 msgid "&Decimal"
 msgstr "&Dezimal"
 
-#: memwindow.cpp:55 regwnd.cpp:243
+#: memwindow.cpp:55 regwnd.cpp:238
 msgid "He&xadecimal"
 msgstr "He&xadezimal"
 
-#: regwnd.cpp:247
+#: regwnd.cpp:242
 msgid "&Font..."
 msgstr "&Schriftart..."
 
-#: regwnd.cpp:248
+#: regwnd.cpp:243
 msgid "&View mode"
 msgstr "&Anzeigemodus"
 
@@ -260,7 +260,8 @@ msgstr "&Löschen"
 
 #: prefdebugger.cpp:23
 msgid "To revert to the default settings, clear the entries."
-msgstr "Standardeinstellungen werden verwendet, wenn die Einträge leer sind."
+msgstr ""
+"Wenn die Einträge leer sind, werden Standardeinstellungen werden verwendet."
 
 #: prefdebugger.cpp:27
 msgid "How to invoke &GDB:"
@@ -327,7 +328,7 @@ msgstr "&Volle Terminalemulation"
 msgid "%s: Settings for %s"
 msgstr "%s: Einstellungen für %s"
 
-#: mainwndbase.cpp:507 pgmsettings.cpp:122
+#: mainwndbase.cpp:509 pgmsettings.cpp:122
 msgid "&Debugger"
 msgstr "&Debugger"
 
@@ -355,24 +356,24 @@ msgstr "Ausführbares Programm zum Debuggen wählen"
 msgid "Select core dump"
 msgstr "Core dump wählen"
 
-#: mainwndbase.cpp:490
+#: mainwndbase.cpp:492
 msgid ": Global options"
 msgstr ": Globale Einstellungen"
 
-#: mainwndbase.cpp:508
+#: mainwndbase.cpp:510
 msgid "&Miscellaneous"
 msgstr "&Verschiedenes"
 
-#: mainwndbase.cpp:580
+#: mainwndbase.cpp:582
 msgid ": Program output"
 msgstr ": Programmausgabe"
 
-#: mainwndbase.cpp:755
+#: mainwndbase.cpp:757
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "`%s' ist keine Datei oder existiert nicht"
 
-#: mainwndbase.cpp:771
+#: mainwndbase.cpp:773
 msgid ""
 "Could not start the debugger process.\n"
 "Please shut down KDbg and resolve the problem."
@@ -576,36 +577,36 @@ msgstr "Haltepunkt"
 msgid "Search"
 msgstr "Suche"
 
-#: dbgmainwnd.cpp:311
+#: dbgmainwnd.cpp:312
 msgid "Line 00000"
 msgstr "Zeile 00000"
 
-#: dbgmainwnd.cpp:315
+#: dbgmainwnd.cpp:316
 msgid "Restart"
 msgstr "Erneut ausführen"
 
-#: dbgmainwnd.cpp:316
+#: dbgmainwnd.cpp:317
 msgid "Core dump"
 msgstr "Core dump"
 
-#: dbgmainwnd.cpp:650
+#: dbgmainwnd.cpp:655
 #, c-format
 msgid "Line %d"
 msgstr "Zeile %d"
 
-#: dbgmainwnd.cpp:811
+#: dbgmainwnd.cpp:816
 msgid "|All source files\n"
 msgstr "|Alle Quellcodedateien\n"
 
-#: dbgmainwnd.cpp:812
+#: dbgmainwnd.cpp:817
 msgid "|Source files\n"
 msgstr "|Quellcodedateien\n"
 
-#: dbgmainwnd.cpp:813
+#: dbgmainwnd.cpp:818
 msgid "|Header files\n"
 msgstr "|Header-Dateien\n"
 
-#: dbgmainwnd.cpp:814
+#: dbgmainwnd.cpp:819
 msgid "*|All files"
 msgstr "*|Alle Dateien"
 
@@ -626,6 +627,22 @@ msgstr "Ein Debugger"
 #: main.cpp:62
 msgid "Docking windows"
 msgstr "Dockende Fenster"
+
+#: main.cpp:67
+msgid "transcript of conversation with the debugger"
+msgstr "Mitschrift der Kommunikation zw. KDbg und gdb"
+
+#: main.cpp:68
+msgid "remote debugging via <device>"
+msgstr "entferntes Debuggen über <device>"
+
+#: main.cpp:69
+msgid "path of executable to debug"
+msgstr "Pfad zum zu debuggenden Programm"
+
+#: main.cpp:70
+msgid "a core file to use"
+msgstr "ein zu verwendender Core-Dump"
 
 #: main.cpp:156 main.cpp:171
 msgid "Cannot start debugger."
