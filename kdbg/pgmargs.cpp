@@ -73,8 +73,6 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     m_envList.setMinimumSize(330, 40);
     m_envList.addColumn(i18n("Name"), 100);
     m_envList.addColumn(i18n("Value"), 260);
-    /* work around a non-feature of KTabListBox: */
-    m_envList.setFocusPolicy(QWidget::StrongFocus);
     connect(&m_envList, SIGNAL(currentChanged(QListViewItem*)),
 	    SLOT(envListCurrentChanged(QListViewItem*)));
     initEnvList();

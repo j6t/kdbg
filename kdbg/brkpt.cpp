@@ -359,7 +359,6 @@ void BreakpointTable::initListAndIcons()
     m_list.addColumn(i18n("Condition"), 200);
 
     m_list.setMinimumSize(200, 100);
-    setFocusPolicy(QWidget::StrongFocus);
 
     m_list.setSorting(-1);
 

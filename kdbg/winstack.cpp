@@ -254,7 +254,11 @@ bool WinStack::activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& addre
 
     // set the focus to the new active window
     QWidget* oldActive = m_activeWindow;
+#if QT_VERSION < 200
     fw->setFocusPolicy(QWidget::StrongFocus);
+#else
+    fw->setFocusPolicy(QWidget::WheelFocus);
+#endif
     m_activeWindow = fw;
     if (oldActive != 0 && oldActive != fw) {
 	// disable focus on non-active windows

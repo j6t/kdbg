@@ -624,7 +624,11 @@ KTreeView::KTreeView(QWidget *parent,
 	setFrameStyle(QFrame::Panel | QFrame::Plain);
 	setLineWidth(1);
     }
+#if QT_VESION < 200
     setFocusPolicy(StrongFocus);
+#else
+    setFocusPolicy(WheelFocus);
+#endif
     treeRoot = new KTreeViewItem;
     treeRoot->setExpanded(true);
     treeRoot->owner = this;

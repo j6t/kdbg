@@ -143,11 +143,12 @@ TTYWindow::TTYWindow(QWidget* parent, const char* name) :
 {
 #if QT_VERSION < 200
     setFont(kapp->fixedFont);
+    setFocusPolicy(StrongFocus);
 #else
     setFont(KGlobalSettings::fixedFont());
+    setFocusPolicy(WheelFocus);
 #endif
     clear();
-    setFocusPolicy(StrongFocus);
 
     // create a context menu
     m_popmenu = new QPopupMenu;
