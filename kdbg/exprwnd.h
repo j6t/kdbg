@@ -7,7 +7,7 @@
 #define EXPRWND_H
 
 #include "ktreeview.h"
-#include <qlist.h>
+#include <qptrlist.h>
 #include <qstrlist.h>
 
 class ProgramTypeTable;

@@ -6,7 +6,7 @@
 #ifndef WINSTACK_H
 #define WINSTACK_H
 
-#include <qlist.h>
+#include <qptrlist.h>
 #include <qdialog.h>
 #include <qlineedit.h>
 #include <qlayout.h>

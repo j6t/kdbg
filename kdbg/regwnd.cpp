@@ -10,7 +10,7 @@
 #include <kiconloader.h>
 #include <qfontdialog.h>
 #include <qmessagebox.h>
-#include <qpopmenu.h>
+#include <qpopupmenu.h>
 #include <qregexp.h>
 #include <qstringlist.h>
 #include <stdlib.h>			/* strtoul */

@@ -7,7 +7,7 @@
 #define THREADLIST_H
 
 #include <qlistview.h>
-#include <qlist.h>
+#include <qptrlist.h>
 #include <qpixmap.h>
 
 class ThreadInfo;

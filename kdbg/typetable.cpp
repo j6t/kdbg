@@ -4,7 +4,7 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include <qdir.h>
-#include <qlist.h>
+#include <qptrlist.h>
 #include <kglobal.h>
 #include <kstddirs.h>
 #include <ksimpleconfig.h>
