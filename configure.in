@@ -26,7 +26,7 @@ AM_CONDITIONAL(BUILDFORKDE2, test "x$with_kde_version" = "x2")
 
 dnl insert here your program name and version number
 KDE_USE_QT($with_kde_version)
-KDE_DO_IT_ALL(kdbg, 1.1.6)
+KDE_DO_IT_ALL(kdbg, 1.1.7beta1)
 
 dnl in this space add everything you want to check for
 dnl examples are specific headers, libraries, etc.
