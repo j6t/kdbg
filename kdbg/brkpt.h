@@ -32,6 +32,10 @@ struct Breakpoint
     bool temporary;
     bool enabled;
     QString location;
+    QString conditionInput;		/* condition as input by the user */
+    QString condition;			/* condition as printed by gdb */
+    uint ignoreCount;			/* ignore next that may hits */
+    int hitCount;			/* as reported by gdb */
     // the following items repeat the location, but in a better usable way
     QString fileName;
     int lineNo;				/* zero-based line number */
@@ -85,6 +89,7 @@ protected:
     QPushButton m_btAdd;
     QPushButton m_btRemove;
     QPushButton m_btViewCode;
+    QPushButton m_btConditional;
     QPushButton m_btClose;
     QHBoxLayout m_layout;
     QVBoxLayout m_listandedit;
@@ -95,9 +100,13 @@ protected:
 
     void parseBreakList(const char* output);
     void insertBreakpoint(int num, char disp, char enable, const char* location,
-			  const char* fileName = 0, int lineNo = -1);
+			  const char* fileName = 0, int lineNo = -1,
+			  int hits = 0, uint ignoreCount = 0,
+			  QString condition = QString());
     void insertBreakpoint(int num, const QString& fileName, int lineNo);
     int breakpointById(int id);		/* returns index into m_brkpts */
+    void updateBreakpointCondition(int id, const QString& condition,
+				   uint ignoreCount);
 
     void closeEvent(QCloseEvent*);
     
@@ -108,6 +117,7 @@ public slots:
     virtual void addBP();
     virtual void removeBP();
     virtual void viewBP();
+    virtual void conditionalBP();
 };
 
 #endif // BRKPT_H

@@ -24,6 +24,7 @@ BreakpointTable::BreakpointTable(KDebugger& deb) :
 	m_btAdd(this, "add"),
 	m_btRemove(this, "remove"),
 	m_btViewCode(this, "view"),
+	m_btConditional(this, "conditional"),
 	m_btClose(this, "close"),
 	m_layout(this, 8),
 	m_listandedit(8),
@@ -47,6 +48,10 @@ BreakpointTable::BreakpointTable(KDebugger& deb) :
     m_btViewCode.setMinimumSize(m_btViewCode.sizeHint());
     connect(&m_btViewCode, SIGNAL(clicked()), this, SLOT(viewBP()));
 
+    m_btConditional.setText(i18n("&Conditional..."));
+    m_btConditional.setMinimumSize(m_btConditional.sizeHint());
+    connect(&m_btConditional, SIGNAL(clicked()), this, SLOT(conditionalBP()));
+
     m_btClose.setText(i18n("Close"));
     m_btClose.setMinimumSize(m_btClose.sizeHint());
     connect(&m_btClose, SIGNAL(clicked()), this, SLOT(hide()));
@@ -58,6 +63,7 @@ BreakpointTable::BreakpointTable(KDebugger& deb) :
     m_buttons.addWidget(&m_btAdd);
     m_buttons.addWidget(&m_btRemove);
     m_buttons.addWidget(&m_btViewCode);
+    m_buttons.addWidget(&m_btConditional);
     m_buttons.addWidget(&m_btClose);
     m_buttons.addStretch(10);
 
@@ -114,6 +120,9 @@ void BreakpointTable::parseBreakList(const char* output)
 	return;
     // split up a line
     QString location;
+    int hits = 0;
+    uint ignoreCount = 0;
+    QString condition;
     char* end;
     while (*p != '\0') {
 	// get Num
@@ -144,7 +153,10 @@ void BreakpointTable::parseBreakList(const char* output)
 	    p++;
 	if (*p == '\0')
 	    break;
-	// remainder is location
+	// remainder is location, hit and ignore count, condition
+	hits = 0;
+	ignoreCount = 0;
+	condition = "";
 	end = strchr(p, '\n');
 	if (end == 0) {
 	    location = p;
@@ -163,13 +175,26 @@ void BreakpointTable::parseBreakList(const char* output)
 		    continuation = QString(p, end-p+1).stripWhiteSpace();
 		    p = end+1;		/* skip '\n' */
 		}
-		if (strncmp(continuation, "breakpoint already hit", 22) != 0) {
+		if (strncmp(continuation, "breakpoint already hit", 22) == 0) {
+		    // extract the hit count
+		    hits = strtol(continuation.data()+22, &end, 10);
+		    TRACE(QString().sprintf("hit count %d", hits));
+		} else if (strncmp(continuation, "stop only if ", 13) == 0) {
+		    // extract condition
+		    condition = continuation.data()+13;
+		    TRACE("condition: "+condition);
+		} else if (strncmp(continuation, "ignore next ", 12) == 0) {
+		    // extract ignore count
+		    ignoreCount = strtol(continuation.data()+12, &end, 10);
+		    TRACE(QString().sprintf("ignore count %d", ignoreCount));
+		} else {
 		    // indeed a continuation
 		    location += " " + continuation;
 		}
 	    }
 	}
-	insertBreakpoint(bpNum, disp, enable, location);
+	insertBreakpoint(bpNum, disp, enable, location, 0, -1,
+			 hits, ignoreCount, condition);
     }
 }
 
@@ -182,7 +207,8 @@ void BreakpointTable::insertBreakpoint(int num, const QString& fileName, int lin
 }
 
 void BreakpointTable::insertBreakpoint(int num, char disp, char enable, const char* location,
-				       const char* fileName, int lineNo)
+				       const char* fileName, int lineNo,
+				       int hits, uint ignoreCount, QString condition)
 {
     assert(lineNo != 0);		/* line numbers are 1-based */
     TRACE("insert bp " + QString().setNum(num));
@@ -206,6 +232,11 @@ void BreakpointTable::insertBreakpoint(int num, char disp, char enable, const ch
 	bp->fileName = fileName;
     if (lineNo > 0)
 	bp->lineNo = lineNo-1;
+    bp->hitCount = hits;
+    bp->ignoreCount = ignoreCount;
+    bp->condition = condition;
+    if (bp->conditionInput.isEmpty())
+	bp->conditionInput = condition;
     bp->del = false;
     if (i < 0) {
 	// add to list
@@ -300,6 +331,57 @@ void BreakpointTable::viewBP()
     m_debugger.m_filesWindow.activate(bp->fileName, bp->lineNo);
 }
 
+class ConditionalDlg : public QDialog
+{
+public:
+    ConditionalDlg(QWidget* parent);
+    ~ConditionalDlg();
+
+    void setCondition(const char* text) { m_condition.setText(text); }
+    const char* condition() { return m_condition.text(); }
+    void setIgnoreCount(uint count);
+    uint ignoreCount();
+
+protected:
+    QLabel m_conditionLabel;
+    QLineEdit m_condition;
+    QLabel m_ignoreLabel;
+    QLineEdit m_ignoreCount;
+    QPushButton m_buttonOK;
+    QPushButton m_buttonCancel;
+    QVBoxLayout m_layout;
+    QGridLayout m_inputs;
+    QHBoxLayout m_buttons;
+};
+
+void BreakpointTable::conditionalBP()
+{
+    int sel = m_list.currentItem();
+    if (sel < 0 || uint(sel) >= m_brkpts.size())
+	return;
+
+    Breakpoint* bp = m_brkpts[sel];
+    /*
+     * Important: we must not keep a pointer to the Breakpoint around,
+     * since it may vanish while the modal dialog is open through other
+     * user interactions (like clicking at the breakpoint in the source
+     * window)!
+     */
+    int id = bp->id;
+
+    ConditionalDlg dlg(this);
+    dlg.setCondition(bp->conditionInput);
+    dlg.setIgnoreCount(bp->ignoreCount);
+
+    if (dlg.exec() != QDialog::Accepted)
+	return;
+
+    QString conditionInput = dlg.condition();
+    int ignoreCount = dlg.ignoreCount();
+    updateBreakpointCondition(id, conditionInput.simplifyWhiteSpace(),
+			      ignoreCount);
+}
+
 // this handles the menu entry: toggles breakpoint on and off
 void BreakpointTable::doBreakpoint(QString file, int lineNo, bool temporary)
 {
@@ -349,6 +431,35 @@ void BreakpointTable::doEnableDisableBreakpoint(const QString& file, int lineNo)
     } else {
 	cmdString.sprintf("enable %d", bp->id);
 	m_debugger.executeCmd(KDebugger::DCenable, cmdString);
+    }
+}
+
+void BreakpointTable::updateBreakpointCondition(int id,
+						const QString& condition,
+						uint ignoreCount)
+{
+    int idx = breakpointById(id);
+    if (idx < 0)
+	return;				/* breakpoint no longer exists */
+
+    Breakpoint* bp = m_brkpts[idx];
+    QString cmdString;
+
+    if (bp->conditionInput != condition) {
+	// change condition
+	cmdString.sprintf("condition %d ", bp->id);
+	m_debugger.executeCmd(KDebugger::DCcondition, cmdString + condition);
+	bp->conditionInput = condition;
+    }
+    if (bp->ignoreCount != ignoreCount) {
+	// change ignore count
+	cmdString.sprintf("ignore %d %u", bp->id, ignoreCount);
+	m_debugger.executeCmd(KDebugger::DCignore, cmdString);
+    }
+    if (!cmdString.isEmpty()) {
+	// get the changes
+	m_debugger.queueCmd(KDebugger::DCinfobreak,
+			    "info breakpoints", KDebugger::QMoverride);
     }
 }
 
@@ -415,6 +526,7 @@ const char File[] = "File";
 const char Line[] = "Line";
 const char Temporary[] = "Temporary";
 const char Enabled[] = "Enabled";
+const char Condition[] = "Condition";
 
 void BreakpointTable::saveBreakpoints(KSimpleConfig* config)
 {
@@ -428,6 +540,11 @@ void BreakpointTable::saveBreakpoints(KSimpleConfig* config)
 	config->writeEntry(Line, bp->lineNo);
 	config->writeEntry(Temporary, bp->temporary);
 	config->writeEntry(Enabled, bp->enabled);
+	if (bp->condition.isEmpty())
+	    config->deleteEntry(Condition, false);
+	else
+	    config->writeEntry(Condition, bp->condition);
+	// we do not save the ignore count
     }
     // delete remaining groups
     // we recognize that a group is present if there is an Enabled entry
@@ -448,6 +565,7 @@ void BreakpointTable::restoreBreakpoints(KSimpleConfig* config)
     QString fileName;
     int lineNo;
     bool enabled, temporary;
+    QString condition;
     /*
      * We recognize the end of the list if there is no Enabled entry
      * present.
@@ -465,6 +583,7 @@ void BreakpointTable::restoreBreakpoints(KSimpleConfig* config)
 	    continue;
 	enabled = config->readBoolEntry(Enabled, true);
 	temporary = config->readBoolEntry(Temporary, false);
+	condition = config->readEntry(Condition);
 	/*
 	 * Add the breakpoint. We assume that we have started a new
 	 * instance of gdb, because we assign the breakpoint ids ourselves,
@@ -481,20 +600,27 @@ void BreakpointTable::restoreBreakpoints(KSimpleConfig* config)
 	    cmdString.sprintf("disable %d", i+1);
 	    m_debugger.executeCmd(KDebugger::DCdisable, cmdString);
 	}
+	if (!condition.isEmpty()) {
+	    cmdString.sprintf("condition %d ", i+1);
+	    m_debugger.executeCmd(KDebugger::DCcondition, cmdString+condition);
+	}
 
 	cmdString.sprintf("%s:%d", fileName.data(), lineNo);
 	insertBreakpoint(i+1, !temporary, enabled,
-			 cmdString, fileName, lineNo);
+			 cmdString, fileName, lineNo, 0, 0, condition);
     }
 }
 
 
 BreakpointListBox::BreakpointListBox(QWidget* parent, const char* name) :
-	KTabListBox(parent, name, 2)
+	KTabListBox(parent, name, 5)
 {
     setColumn(0, i18n("E"),		/* Enabled/disabled */
 	      16, KTabListBox::PixmapColumn);
     setColumn(1, i18n("Location"), 300);
+    setColumn(2, i18n("Hits"), 30);
+    setColumn(3, i18n("Ignore"), 30);
+    setColumn(4, i18n("Condition"), 200);
 
     setMinimumSize(200, 100);
     /* work around a non-feature of KTabListBox: */
@@ -527,7 +653,27 @@ void BreakpointListBox::changeItem(int id, Breakpoint* bp)
 QString BreakpointListBox::constructListText(Breakpoint* bp)
 {
     static const char ED[][4] = { "D\t\0", "E\t\0" };
-    return ED[bp->enabled] + bp->location;
+    QString result = ED[bp->enabled] + bp->location;
+    QString tmp;
+    if (bp->hitCount == 0) {
+	result += "\t ";
+    } else {
+	result += "\t";
+	result += tmp.setNum(bp->hitCount);
+    }
+    if (bp->ignoreCount == 0) {
+	result += "\t ";
+    } else {
+	result += "\t";
+	result += tmp.setNum(bp->ignoreCount);
+    }
+    if (bp->condition.isEmpty()) {
+	result += "\t ";
+    } else {
+	result += "\t";
+	result += bp->condition;
+    }
+    return result;
 }
 
 /* Grrr! Why doesn't do KTablistBox the keyboard handling? */
@@ -575,4 +721,86 @@ void BreakpointListBox::keyPressEvent(QKeyEvent* e)
 	QWidget::keyPressEvent(e);
 	break;
     }
+}
+
+ConditionalDlg::ConditionalDlg(QWidget* parent) :
+	QDialog(parent, "conditional", true),
+	m_conditionLabel(this, "condLabel"),
+	m_condition(this, "condition"),
+	m_ignoreLabel(this, "ignoreLabel"),
+	m_ignoreCount(this, "ignoreCount"),
+	m_buttonOK(this, "ok"),
+	m_buttonCancel(this, "cancel"),
+	m_layout(this, 10),
+	m_inputs(2, 2, 10),
+	m_buttons(4)
+{
+    QString title = kapp->getCaption();
+    title += i18n(": Conditional breakpoint");
+    setCaption(title);
+
+    m_conditionLabel.setMinimumSize(100, 24);
+    m_conditionLabel.setText(i18n("&Condition:"));
+    m_ignoreLabel.setMinimumSize(100, 24);
+    m_ignoreLabel.setText(i18n("Ignore &next hits:"));
+
+    m_condition.setMinimumSize(150, 24);
+    m_condition.setMaxLength(10000);
+    m_condition.setFrame(true);
+    m_ignoreCount.setMinimumSize(150, 24);
+    m_ignoreCount.setMaxLength(10000);
+    m_ignoreCount.setFrame(true);
+
+    m_conditionLabel.setBuddy(&m_condition);
+    m_ignoreLabel.setBuddy(&m_ignoreCount);
+
+    m_buttonOK.setMinimumSize(100, 30);
+    connect(&m_buttonOK, SIGNAL(clicked()), SLOT(accept()));
+    m_buttonOK.setText(i18n("OK"));
+    m_buttonOK.setDefault(true);
+
+    m_buttonCancel.setMinimumSize(100, 30);
+    connect(&m_buttonCancel, SIGNAL(clicked()), SLOT(reject()));
+    m_buttonCancel.setText(i18n("Cancel"));
+
+    m_layout.addLayout(&m_inputs);
+    m_inputs.addWidget(&m_conditionLabel, 0, 0);
+    m_inputs.addWidget(&m_condition, 0, 1);
+    m_inputs.addWidget(&m_ignoreLabel, 1, 0);
+    m_inputs.addWidget(&m_ignoreCount, 1, 1);
+    m_inputs.setColStretch(1, 10);
+    m_layout.addLayout(&m_buttons);
+    m_layout.addStretch(10);
+    m_buttons.addStretch(10);
+    m_buttons.addWidget(&m_buttonOK);
+    m_buttons.addSpacing(40);
+    m_buttons.addWidget(&m_buttonCancel);
+    m_buttons.addStretch(10);
+
+    m_layout.activate();
+
+    m_condition.setFocus();
+    resize(350, 120);
+}
+
+ConditionalDlg::~ConditionalDlg()
+{
+}
+
+uint ConditionalDlg::ignoreCount()
+{
+    bool ok;
+    QString input = m_ignoreCount.text();
+    uint result = input.toUInt(&ok);
+    return ok ? result : 0;
+}
+
+void ConditionalDlg::setIgnoreCount(uint count)
+{
+    QString text;
+    // set empty if ignore count is zero
+    if (count > 0) {
+	text.setNum(count);
+    }
+    m_ignoreCount.setText(text);
 }
