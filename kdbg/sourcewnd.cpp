@@ -733,8 +733,10 @@ void SourceWindow::collapseRow(int row)
     emit collapsed(line);
 
     setAutoUpdate(autoU);
-    if (autoU && isVisible())
+    if (autoU && isVisible()) {
+	updateTableSize();
 	update();
+    }
 }
 
 void SourceWindow::activeLine(int& line, DbgAddr& address)
