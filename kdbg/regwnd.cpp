@@ -153,6 +153,7 @@ void RegisterViewItem::setValue(QString value)
      * The rest of the value we treat as "decoded" value and display in
      * the third column.
      */
+    value = value.simplifyWhiteSpace();
     int pos = value.find(' ');
     if (pos < 0) {
 	coded = value;
