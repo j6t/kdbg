@@ -5,6 +5,9 @@
 
 // an array template class that holds values (not pointers to values)
 
+#ifndef VALARRAY_H
+#define VALARRAY_H
+
 // need a placement new
 #include "config.h"
 #ifdef HAVE_PLACEMENT_NEW
@@ -85,3 +88,5 @@ void ValArray<T>::expand(const T& newElem, int newSize)
 	m_size++;
     }
 }
+
+#endif // VALARRAY_H
