@@ -7,7 +7,7 @@
 #define COMMANDIDS_H
 
 #define ID_FILE_OPEN 1
-#define ID_FILE_OPEN_URL 2
+#define ID_FILE_RELOAD 2
 #define ID_FILE_SAVE 3
 #define ID_FILE_SAVEAS 4
 #define ID_FILE_SAVE_URL 5
@@ -43,7 +43,7 @@
 #define ID_HELP_ABOUT 100
 #define ID_HELP_HELP  101
 
-// 0x401..0x40f are window menu entries
+// 0x101..0x10f are window menu entries
 #define ID_WINDOW_MORE 0x100
 #define ID_WINDOW_INDEX_MASK 0xf
 
