@@ -801,7 +801,7 @@ void DebuggerMainWnd::fillRecentExecMenu()
 {
     m_menuRecentExecutables->clear();
     for (uint i = 0; i < m_recentExecList.count(); i++) {
-	m_menuRecentExecutables->insertItem(m_recentExecList.at(i));
+	m_menuRecentExecutables->insertItem(m_recentExecList.at(i), i);
     }
 }
 
