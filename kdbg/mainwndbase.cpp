@@ -260,7 +260,7 @@ bool DebuggerMainWndBase::handleCommand(int item)
 				 KMsgBox::STOP,
 				 i18n("OK"));
 #else
-		msg.sprintf(msgFmt, executable.toLatin1());
+		msg.sprintf(msgFmt, executable.latin1());
 		KMessageBox::sorry(dbgMainWnd(), msg);
 #endif
 		return true;
