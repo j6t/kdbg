@@ -15,7 +15,6 @@
 #include <kprocess.h>
 #include <qlistbox.h>
 #include <qfileinfo.h>
-#include <kwm.h>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "prefdebugger.h"
@@ -709,6 +708,8 @@ void DebuggerMainWnd::slotTermEmuExited()
 {
     shutdownTermWindow();
 }
+
+#include <X11/Xlib.h>			/* XRaiseWindow, XLowerWindow */
 
 void DebuggerMainWnd::slotProgramStopped()
 {

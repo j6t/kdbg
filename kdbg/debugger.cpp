@@ -16,7 +16,6 @@
 #include <kapp.h>
 #include <ksimpleconfig.h>
 #include <kconfig.h>
-#include <kwm.h>
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>

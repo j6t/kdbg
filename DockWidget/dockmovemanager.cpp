@@ -30,7 +30,6 @@
 #include <qwidget.h>
 #include <qtimer.h>
 #include <qrect.h>
-#include <kwm.h>
 
 #include "dockmovemanager.h"
 
@@ -69,7 +68,7 @@ void DockMoveManager::doMove (bool hot_static, bool _dynamic, bool dontmove)
   
   working=true;
 
-  QRect rr = KWM::geometry(widget->winId(), true);
+  QRect rr = QRect( widget->mapToGlobal(QPoint(0,0)), widget->size() );
   QPoint p(rr.topLeft());
 
   offX = QCursor::pos().x() - p.x();
@@ -149,8 +148,6 @@ void DockMoveManager::stop ()
 
   QPoint p(xp, yp);
   if (widget->parent() != 0) p=widget->parentWidget()->mapFromGlobal(p);
-
-  widget->move(p);
 
   working = false;
 }
