@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.0\n"
-"POT-Creation-Date: 2002-03-03 15:48+0100\n"
+"POT-Creation-Date: 2002-03-03 21:23+0100\n"
 "PO-Revision-Date: 2002-03-03 15:57MDT\n"
 "Last-Translator: Steen Rabol <rabol@get2net.dk>\n"
 "Language-Team: da <LL@li.org>\n"
@@ -117,30 +117,34 @@ msgstr ""
 msgid "Cannot start debugger."
 msgstr "Kan ikke starte debugger"
 
-#: pgmargs.cpp:35
+#: pgmargs.cpp:37
 msgid ": Program arguments"
 msgstr ": Program argumenter"
 
-#: pgmargs.cpp:38
+#: pgmargs.cpp:40
 #, ycp-format
 msgid "Run %1 with these arguments:"
 msgstr "Udfør %1 med disse parametre"
 
-#: pgmargs.cpp:50
+#: pgmargs.cpp:60
 msgid "Working directory:"
 msgstr ""
 
-#: pgmargs.cpp:65
+#: pgmargs.cpp:75
 msgid "Environment variables (NAME=value):"
 msgstr "Enviroment variable(NAVN=værdi)"
 
-#: pgmargs.cpp:74
+#: pgmargs.cpp:84
 msgid "Name"
 msgstr "Navn"
 
-#: pgmargs.cpp:75 regwnd.cpp:191
+#: pgmargs.cpp:85 regwnd.cpp:191
 msgid "Value"
 msgstr "Værdi"
+
+#: pgmargs.cpp:259
+msgid "Select a file name to insert as program argument"
+msgstr ""
 
 #: mainwndbase.cpp:46
 msgid " Add "
@@ -641,4 +645,3 @@ msgstr ""
 #: ttywnd.cpp:149
 msgid "&Clear"
 msgstr ""
-

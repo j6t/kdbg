@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-03-03 15:48+0100\n"
+"POT-Creation-Date: 2002-03-03 21:23+0100\n"
 "PO-Revision-Date: 2002-03-03 16:14MDT\n"
 "Last-Translator: Strahinja Radić <mr99164@alas.matf.bg.ac.yu>\n"
 "Language-Team: Serbian <LL@kde.org.yu>\n"
@@ -118,30 +118,34 @@ msgstr ""
 msgid "Cannot start debugger."
 msgstr "Ne mogu da pokrenem trebilicu."
 
-#: pgmargs.cpp:35
+#: pgmargs.cpp:37
 msgid ": Program arguments"
 msgstr ": Argumenti programa"
 
-#: pgmargs.cpp:38
+#: pgmargs.cpp:40
 #, ycp-format
 msgid "Run %1 with these arguments:"
 msgstr "Pokreni %1 sa sledećim argumentima:"
 
-#: pgmargs.cpp:50
+#: pgmargs.cpp:60
 msgid "Working directory:"
 msgstr "Radni direktorijum:"
 
-#: pgmargs.cpp:65
+#: pgmargs.cpp:75
 msgid "Environment variables (NAME=value):"
 msgstr "Promenljive ljuske (IME=vrednost):"
 
-#: pgmargs.cpp:74
+#: pgmargs.cpp:84
 msgid "Name"
 msgstr "Ime"
 
-#: pgmargs.cpp:75 regwnd.cpp:191
+#: pgmargs.cpp:85 regwnd.cpp:191
 msgid "Value"
 msgstr "Vrednost"
+
+#: pgmargs.cpp:259
+msgid "Select a file name to insert as program argument"
+msgstr ""
 
 #: mainwndbase.cpp:46
 msgid " Add "
@@ -645,4 +649,3 @@ msgstr ""
 #: ttywnd.cpp:149
 msgid "&Clear"
 msgstr ""
-

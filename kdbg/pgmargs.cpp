@@ -14,6 +14,7 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
 	m_envVars(envVars),
 	m_label(this, "label"),
 	m_programArgs(this, "args"),
+	m_fileBrowse(this, "args_browse"),
 	m_wdLabel(this, "wd_label"),
 	m_wd(this, "wd"),
 	m_wdBrowse(this, "wd_browse"),
@@ -27,6 +28,7 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
 	m_layout(this, 8),
 	m_edits(8),
 	m_buttons(8),
+	m_pgmArgsEdit(0),
 	m_wdEdit(0)
 {
     m_envVars.setAutoDelete(false);
@@ -36,7 +38,10 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     setCaption(title);
 
     QString lab = i18n("Run %1 with these arguments:");
-    m_label.setText(lab.arg(pgm));
+    {
+	QFileInfo fi = pgm;
+	m_label.setText(lab.arg(fi.fileName()));
+    }
     QSize s = m_label.sizeHint();
     /* don't make the label too wide if pgm name is very long */
     if (s.width() > 450)
@@ -46,6 +51,11 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     s = m_programArgs.sizeHint();
     m_programArgs.setMinimumSize(s);
     m_programArgs.setMaxLength(10000);
+
+    m_fileBrowse.setText("...");
+    s = m_fileBrowse.sizeHint();
+    m_fileBrowse.setMinimumSize(s);
+    connect(&m_fileBrowse, SIGNAL(clicked()), SLOT(browseArgs()));
 
     m_wdLabel.setText(i18n("Working directory:"));
     s = m_wdLabel.sizeHint();
@@ -101,7 +111,7 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     m_layout.addLayout(&m_edits, 10);
     m_layout.addLayout(&m_buttons);
     m_edits.addWidget(&m_label);
-    m_edits.addWidget(&m_programArgs);
+    m_edits.addLayout(&m_pgmArgsEdit);
     m_edits.addWidget(&m_wdLabel);
     m_edits.addLayout(&m_wdEdit);
     m_edits.addWidget(&m_envLabel);
@@ -113,6 +123,8 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     m_buttons.addWidget(&m_buttonModify);
     m_buttons.addWidget(&m_buttonDelete);
     m_buttons.addStretch(10);
+    m_pgmArgsEdit.addWidget(&m_programArgs, 10);
+    m_pgmArgsEdit.addWidget(&m_fileBrowse);
     m_wdEdit.addWidget(&m_wd, 10);
     m_wdEdit.addWidget(&m_wdBrowse);
 
@@ -239,6 +251,20 @@ void PgmArgs::browseWd()
     QString newDir = KFileDialog::getExistingDirectory(wd(), this);
     if (!newDir.isEmpty()) {
 	setWd(newDir);
+    }
+}
+
+void PgmArgs::browseArgs()
+{
+    QString caption = i18n("Select a file name to insert as program argument");
+
+    // use the selection as default
+    QString f = m_programArgs.markedText();
+    f = KFileDialog::getSaveFileName(f, QString::null,
+				     this, caption);
+    // don't clear the selection of no file was selected
+    if (!f.isEmpty()) {
+	m_programArgs.insert(f);
     }
 }
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.0\n"
-"POT-Creation-Date: 2002-03-03 15:48+0100\n"
+"POT-Creation-Date: 2002-03-03 21:23+0100\n"
 "PO-Revision-Date: 2002-03-03 16:12MDT\n"
 "Last-Translator: Vatafu Valerica <wally@socrates.tlnet.de>\n"
 "Language-Team: Romanian <LL@li.org>\n"
@@ -115,29 +115,33 @@ msgstr ""
 msgid "Cannot start debugger."
 msgstr "Nu pot porni debugger-ul."
 
-#: pgmargs.cpp:35
+#: pgmargs.cpp:37
 msgid ": Program arguments"
 msgstr ": Argumentele programului"
 
-#: pgmargs.cpp:38
+#: pgmargs.cpp:40
 #, ycp-format
 msgid "Run %1 with these arguments:"
 msgstr "Rulează %1 cu aceste argumente:"
 
-#: pgmargs.cpp:50
+#: pgmargs.cpp:60
 msgid "Working directory:"
 msgstr ""
 
-#: pgmargs.cpp:65
+#: pgmargs.cpp:75
 msgid "Environment variables (NAME=value):"
 msgstr ""
 
-#: pgmargs.cpp:74
+#: pgmargs.cpp:84
 msgid "Name"
 msgstr ""
 
-#: pgmargs.cpp:75 regwnd.cpp:191
+#: pgmargs.cpp:85 regwnd.cpp:191
 msgid "Value"
+msgstr ""
+
+#: pgmargs.cpp:259
+msgid "Select a file name to insert as program argument"
 msgstr ""
 
 #: mainwndbase.cpp:46
@@ -637,4 +641,3 @@ msgstr ""
 #: ttywnd.cpp:149
 msgid "&Clear"
 msgstr ""
-

@@ -36,6 +36,7 @@ protected:
 
     QLabel m_label;
     QLineEdit m_programArgs;
+    QPushButton m_fileBrowse;
     QLabel m_wdLabel;
     QLineEdit m_wd;
     QPushButton m_wdBrowse;
@@ -49,6 +50,7 @@ protected:
     QHBoxLayout m_layout;
     QVBoxLayout m_edits;
     QVBoxLayout m_buttons;
+    QHBoxLayout m_pgmArgsEdit;
     QHBoxLayout m_wdEdit;
 
 protected slots:
@@ -57,6 +59,7 @@ protected slots:
     void envListCurrentChanged(QListViewItem*);
     void accept();
     void browseWd();
+    void browseArgs();
 };
 
 #endif // PgmArgs_included

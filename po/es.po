@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.0\n"
-"POT-Creation-Date: 2002-03-03 15:48+0100\n"
+"POT-Creation-Date: 2002-03-03 21:23+0100\n"
 "PO-Revision-Date: 2002-03-03 15:59MDT\n"
 "Last-Translator: Manuel Soriano<manu@europa3.com>\n"
 "Language-Team: none\n"
@@ -117,30 +117,34 @@ msgstr ""
 msgid "Cannot start debugger."
 msgstr "Imposible iniciar el DGB."
 
-#: pgmargs.cpp:35
+#: pgmargs.cpp:37
 msgid ": Program arguments"
 msgstr ": Argumentos del programa"
 
-#: pgmargs.cpp:38
+#: pgmargs.cpp:40
 #, fuzzy, ycp-format
 msgid "Run %1 with these arguments:"
 msgstr "Ejecutar %1 con estos argumentoss : "
 
-#: pgmargs.cpp:50
+#: pgmargs.cpp:60
 msgid "Working directory:"
 msgstr "Repertorio de trabajo"
 
-#: pgmargs.cpp:65
+#: pgmargs.cpp:75
 msgid "Environment variables (NAME=value):"
 msgstr "Variables de entorno (Nombre=Valor):"
 
-#: pgmargs.cpp:74
+#: pgmargs.cpp:84
 msgid "Name"
 msgstr "Nombre"
 
-#: pgmargs.cpp:75 regwnd.cpp:191
+#: pgmargs.cpp:85 regwnd.cpp:191
 msgid "Value"
 msgstr "Valor"
+
+#: pgmargs.cpp:259
+msgid "Select a file name to insert as program argument"
+msgstr ""
 
 #: mainwndbase.cpp:46
 msgid " Add "
@@ -646,4 +650,3 @@ msgstr "&Hebras"
 #: ttywnd.cpp:149
 msgid "&Clear"
 msgstr ""
-

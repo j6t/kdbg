@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2002-03-03 15:48+0100\n"
+"POT-Creation-Date: 2002-03-03 21:23+0100\n"
 "PO-Revision-Date: 2000-05-12 20:54+0900\n"
 "Last-Translator: Eri Ishida <>\n"
 "Language-Team: Japanese <Kdeveloper@kde.gr.jp>\n"
@@ -117,30 +117,34 @@ msgstr ""
 msgid "Cannot start debugger."
 msgstr "デバッガを起動できません"
 
-#: pgmargs.cpp:35
+#: pgmargs.cpp:37
 msgid ": Program arguments"
 msgstr "プログラムの引数"
 
-#: pgmargs.cpp:38
+#: pgmargs.cpp:40
 #, fuzzy, ycp-format
 msgid "Run %1 with these arguments:"
 msgstr "これらの引数で %s を実行"
 
-#: pgmargs.cpp:50
+#: pgmargs.cpp:60
 msgid "Working directory:"
 msgstr "作業ディレクトリ:"
 
-#: pgmargs.cpp:65
+#: pgmargs.cpp:75
 msgid "Environment variables (NAME=value):"
 msgstr "環境変数 (NAME=values):"
 
-#: pgmargs.cpp:74
+#: pgmargs.cpp:84
 msgid "Name"
 msgstr "名前"
 
-#: pgmargs.cpp:75 regwnd.cpp:191
+#: pgmargs.cpp:85 regwnd.cpp:191
 msgid "Value"
 msgstr "値"
+
+#: pgmargs.cpp:259
+msgid "Select a file name to insert as program argument"
+msgstr ""
 
 #: mainwndbase.cpp:46
 msgid " Add "

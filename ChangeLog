@@ -1,5 +1,7 @@
 Version 1.9.0
 
+	Program arguments that are file names can be browsed for.
+
 	Added XSLT debugging (using xsldbg) by Keith Isdale.
 
 Version 1.2.4
