@@ -25,6 +25,7 @@ class ProgramTypeTable;
 class KTreeViewItem;
 class KConfig;
 class QListBox;
+class RegisterView;
 
 
 class GdbProcess : public KProcess
@@ -227,6 +228,7 @@ public:
 	DCinfolinemain,
 	DCinfolocals,
 	DCinfoargs,
+	DCinforegisters,
 	DCsetargs,
 	DCsetenv,
 	DCcd,
@@ -354,6 +356,7 @@ protected:
     void handleFindType(CmdQueueItem* cmd);
     void handlePrintStruct(CmdQueueItem* cmd);
     void handleSharedLibs();
+    void handleRegisters();
     void evalExpressions();
     void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
@@ -476,7 +479,8 @@ protected:
     ExprWnd& m_localVariables;
     ExprWnd& m_watchVariables;
     QListBox& m_btWindow;
-    
+    RegisterView* m_regView;
+
     // animation
     QTimer m_animationTimer;
     int m_animationInterval;

@@ -32,6 +32,7 @@ kdbg_SOURCES = \
 	textvw.cpp \
 	debugger.cpp \
 	exprwnd.cpp \
+	regwnd.cpp \
 	updateui.cpp \
 	winstack.cpp \
 	typetable.cpp \
@@ -56,6 +57,7 @@ noinst_HEADERS = \
 	valarray.h \
 	debugger.h \
 	exprwnd.h \
+	regwnd.h \
 	ktreeview.h \
 	updateui.h \
 	winstack.h \
@@ -73,6 +75,7 @@ BUILTSOURCES =	\
 	textvw.moc \
 	debugger.moc \
 	exprwnd.moc \
+	regwnd.moc \
 	ktreeview.moc \
 	winstack.moc \
 	mainwndbase.moc \
@@ -112,6 +115,10 @@ debugger.moc: $(srcdir)/debugger.h
 $(srcdir)/exprwnd.cpp: exprwnd.moc
 exprwnd.moc: $(srcdir)/exprwnd.h
 	$(MOC) $(srcdir)/exprwnd.h -o exprwnd.moc
+
+$(srcdir)/regwnd.cpp: regwnd.moc
+regwnd.moc: $(srcdir)/regwnd.h
+	$(MOC) $(srcdir)/regwnd.h -o regwnd.moc
 
 $(srcdir)/textvw.cpp: textvw.moc
 textvw.moc: $(srcdir)/textvw.h

@@ -9,6 +9,7 @@
 #include "procattach.h"
 #include "typetable.h"
 #include "exprwnd.h"
+#include "regwnd.h"
 #include "valarray.h"
 #include <qregexp.h>
 #include <qfileinfo.h>
@@ -79,6 +80,9 @@ KDebugger::KDebugger(QWidget* parent,
 	m_animationTimer(this),
 	m_animationInterval(0)
 {
+    m_regView = new RegisterView(0);
+    m_regView->show();
+    
     m_gdbOutputAlloc = 4000;
     m_gdbOutput = new char[m_gdbOutputAlloc];
 
@@ -1159,6 +1163,9 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	    parseLocals(m_parsedLocals);
 	}
 	break;
+    case DCinforegisters:
+	handleRegisters();
+	break;
     case DCframe:
 	handleFrameChange();
 	parseMarker = true;
@@ -1355,6 +1362,9 @@ void KDebugger::updateAllExprs()
 
     // retrieve local variables
     queueCmd(DCinfolocals, "info locals", QMoverride);
+
+    // retrieve registers
+    queueCmd(DCinforegisters, "info all-registers", QMoverride);
 
     // update watch expressions
     KTreeViewItem* item = m_watchVariables.itemAt(0);
@@ -2499,6 +2509,12 @@ void KDebugger::slotUpdateAnimation()
 	bool slow = isReady() && m_programActive && !m_programRunning;
 	startAnimation(!slow);
     }
+}
+
+void KDebugger::handleRegisters()
+{
+    const char* str = m_gdbOutput;
+    m_regView->updateRegisters(str);
 }
 
 #include "debugger.moc"
