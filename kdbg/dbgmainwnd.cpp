@@ -5,7 +5,6 @@
 
 #include <kapp.h>
 #include <klocale.h>			/* i18n */
-#include <kmenubar.h>
 #include <kmessagebox.h>
 #include <kconfig.h>
 #include <kstatusbar.h>
@@ -165,8 +164,6 @@ DebuggerMainWnd::~DebuggerMainWnd()
     // must delete m_debugger early since it references our windows
     delete m_debugger;
     m_debugger = 0;
-    // must disconnect from dockManager since it keeps emitting signals
-    dockManager->disconnect(this);
 
     delete m_memoryWindow;
     delete m_threads;
