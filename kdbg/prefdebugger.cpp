@@ -20,11 +20,11 @@ PrefDebugger::PrefDebugger(QWidget* parent) :
 	m_terminalLabel(this, "terminal_label"),
 	m_terminal(this, "terminal")
 {
-    m_defaultHint.setText(i18n("To revert to the default, clear the entries."));
+    m_defaultHint.setText(i18n("To revert to the default settings, clear the entries."));
     m_defaultHint.setMinimumHeight(m_defaultHint.sizeHint().height());
     m_grid.addWidget(&m_defaultHint, 0, 1);
 
-    m_debuggerCCppLabel.setText(i18n("&Debugger for C/C++/Fortran:"));
+    m_debuggerCCppLabel.setText(i18n("How to invoke &GDB:"));
     m_debuggerCCppLabel.setMinimumSize(m_debuggerCCppLabel.sizeHint());
     m_debuggerCCppLabel.setBuddy(&m_debuggerCCpp);
     m_debuggerCCpp.setMinimumSize(m_debuggerCCpp.sizeHint());
@@ -33,7 +33,7 @@ PrefDebugger::PrefDebugger(QWidget* parent) :
 
     m_terminalHint.setText(i18n("%T will be replaced with a title string,\n"
 				"%C will be replaced by a Bourne shell script that\n"
-				"keeps the terminal running"));
+				"keeps the terminal window open."));
     m_terminalHint.setMinimumHeight(m_terminalHint.sizeHint().height());
     m_grid.addWidget(&m_terminalHint, 2, 1);
 
