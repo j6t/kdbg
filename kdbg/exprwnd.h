@@ -23,7 +23,7 @@ public:
     };
     VarKind m_varKind;
     enum NameKind { NKplain, NKstatic, NKtype,
-	NKaddress,			/* a dereferenced pointer */
+	NKaddress			/* a dereferenced pointer */
     };
     NameKind m_nameKind;
     QString m_value;

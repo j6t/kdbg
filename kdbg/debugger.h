@@ -274,7 +274,7 @@ protected:
 	DSrunningLow,			/* gdb is running a low-priority command */
 	DSrunning,			/* gdb waits for program */
 	DScommandSent,			/* command has been sent, we wait for wroteStdin signal */
-	DScommandSentLow,		/* low-prioritycommand has been sent */
+	DScommandSentLow		/* low-prioritycommand has been sent */
     };
     DebuggerState m_state;
     char* m_gdbOutput;			/* normal gdb output */
