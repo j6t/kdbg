@@ -233,7 +233,8 @@ TypeInfo::~TypeInfo()
 
 
 ProgramTypeTable::ProgramTypeTable() :
-	m_parseQt2QStrings(false)
+	m_parseQt2QStrings(false),
+	m_QCharIsShort(false)
 {
     m_types.setAutoDelete(false);	/* paranoia */
     m_aliasDict.setAutoDelete(false);	/* paranoia */
@@ -254,6 +255,9 @@ void ProgramTypeTable::loadTypeTable(TypeTable* table)
     // check whether to enable builtin QString support
     if (!m_parseQt2QStrings) {
 	m_parseQt2QStrings = table->isEnabledBuiltin("QString::Data");
+    }
+    if (!m_QCharIsShort) {
+	m_QCharIsShort = table->isEnabledBuiltin("QCharIsShort");
     }
 }
 

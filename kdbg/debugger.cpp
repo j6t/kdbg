@@ -1453,7 +1453,7 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
     if (cmd->m_cmd != DCprintQStringStruct) {
 	partExpr = parseExpr(output, false);
     } else {
-	partExpr = m_d->parseQCharArray(output, false);
+	partExpr = m_d->parseQCharArray(output, false, m_typeTable->qCharIsShort());
     }
     bool errorValue =
 	partExpr == 0 ||

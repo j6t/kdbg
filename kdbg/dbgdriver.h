@@ -355,7 +355,7 @@ public:
     /**
      * Parses the output as an array of QChars.
      */
-    virtual VarTree* parseQCharArray(const char* output, bool wantErrorValue) = 0;
+    virtual VarTree* parseQCharArray(const char* output, bool wantErrorValue, bool qt3like) = 0;
 
     /**
      * Parses a back-trace (the output of the DCbt command).

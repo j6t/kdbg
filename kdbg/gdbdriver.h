@@ -47,7 +47,7 @@ public:
     virtual void terminate();
     virtual void detachAndTerminate();
     virtual void interruptInferior();
-    virtual VarTree* parseQCharArray(const char* output, bool wantErrorValue);
+    virtual VarTree* parseQCharArray(const char* output, bool wantErrorValue, bool qt3like);
     virtual void parseBackTrace(const char* output, QList<StackFrame>& stack);
     virtual bool parseFrameChange(const char* output, int& frameNo,
 				  QString& file, int& lineNo, DbgAddr& address);

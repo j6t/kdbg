@@ -5,6 +5,7 @@ typesdir = $(kde_datadir)/kdbg/types
 types_DATA = \
 	qt.kdbgtt \
 	qt2.kdbgtt \
+	qt3.kdbgtt \
 	kdecore.kdbgtt \
 	kdecore3.kdbgtt \
 	glib.kdbgtt \

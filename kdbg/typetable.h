@@ -150,8 +150,14 @@ public:
      */
     bool parseQt2QStrings() const { return m_parseQt2QStrings; }
 
+    /**
+     * Tells whether QChar are defined like in Qt3.
+     */
+    bool qCharIsShort() const { return m_QCharIsShort; }
+
 protected:
     QDict<TypeInfo> m_types;
     QDict<TypeInfo> m_aliasDict;
     bool m_parseQt2QStrings;
+    bool m_QCharIsShort;
 };

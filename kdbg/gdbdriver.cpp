@@ -687,7 +687,7 @@ QString QChar::toQString(QChar* unicode, int len)
 }
 #endif
 
-VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue)
+VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, bool qt3like)
 {
     VarTree* variable = 0;
 
@@ -777,7 +777,11 @@ VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue)
 	    // interpret the value as a QChar
 	    // TODO: make cross-architecture compatible
 	    QChar ch;
-	    (unsigned short&)ch = value;
+	    if (qt3like) {
+		ch = QChar(value);
+	    } else {
+		(unsigned short&)ch = value;
+	    }
 
 	    // escape a few frequently used characters
 	    char escapeCode = '\0';

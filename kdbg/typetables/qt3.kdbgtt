@@ -1,0 +1,27 @@
+[Type Table]
+Types1=QString,QCString,QDir,QFileInfo,QFile
+Types2=QObject
+LibDisplayName=libqt 3.x
+ShlibRE=libqt-mt\.so\.3$
+EnableBuiltin=QString::Data,QCharIsShort
+[QString]
+Display={ % }
+Expr1=/QString::Data (%s).d
+[QCString]
+Display={ % }
+Expr1=(%s).shd->data
+[QObject]
+Display={ name=% }
+Expr1=(%s).objname
+[QTableView]
+Alias=QObject
+[QDir]
+Display={ path=% filter=% }
+Expr1=/QString::Data (%s).dPath.d
+Expr2=/QString::Data (%s).nameFilt.d
+[QFileInfo]
+Display={ name=% }
+Expr1=/QString::Data (%s).fn.d
+[QFile]
+Display={ name=% }
+Expr1=/QString::Data (%s).fn.d
