@@ -1349,7 +1349,7 @@ QString
 XsldbgDriver::parseMemoryDump(const char */*output*/,
                               QList < MemoryDump > &/*memdump*/)
 {
-    return QString();
+    return i18n("No memory dump available");
 }
 
 
