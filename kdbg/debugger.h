@@ -324,6 +324,10 @@ public:
      * after any high-priority commands.
      */
     CmdQueueItem* queueCmd(DbgCommand cmd, QString cmdString, QueueMode mode);
+    /** Removes all commands from the low-priority queue. */
+    void flushLoPriQueue();
+    /** Removes all commands from  the high-priority queue. */
+    void flushHiPriQueue();
 
 protected:
     QQueue<CmdQueueItem> m_hipriCmdQueue;

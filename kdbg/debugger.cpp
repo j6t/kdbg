@@ -436,6 +436,8 @@ void KDebugger::programBreak()
 {
     if (m_haveExecutable && m_programRunning) {
 	m_gdb.kill(SIGINT);
+	// remove accidentally queued commands
+	flushHiPriQueue();
     }
 }
 
@@ -860,9 +862,7 @@ KDebugger::CmdQueueItem* KDebugger::executeCmd(KDebugger::DbgCommand cmd,
 	    delete m_activeCmd;
 	    m_activeCmd = 0;
 	}
-	while (!m_lopriCmdQueue.isEmpty()) {
-	    delete m_lopriCmdQueue.take(0);
-	}
+	flushLoPriQueue();
     }
     // if gdb is idle, send it the command
     if (m_state == DSidle) {
@@ -958,6 +958,21 @@ void KDebugger::writeCommand()
 #endif
 
     m_state = newState;
+}
+
+void KDebugger::flushLoPriQueue()
+{
+    while (!m_lopriCmdQueue.isEmpty()) {
+	delete m_lopriCmdQueue.take(0);
+    }
+}
+
+void KDebugger::flushHiPriQueue()
+{
+    CmdQueueItem* cmd;
+    while ((cmd = m_hipriCmdQueue.dequeue()) != 0) {
+	delete cmd;
+    }
 }
 
 void KDebugger::commandRead(KProcess*)
@@ -1407,6 +1422,9 @@ void KDebugger::handleRunCommands()
     } else {
 	// program finished: erase PC
 	emit updatePC(QString(), -1, 0);
+	// dequeue any commands in the queues
+	flushHiPriQueue();
+	flushLoPriQueue();
     }
 
     m_programRunning = false;
