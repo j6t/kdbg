@@ -15,71 +15,22 @@
 #include <qlineedit.h>
 #include "valarray.h"
 
-class KSimpleConfig;
-
-/*
- * This widget is so closely related to the KDebugger main widget that it
- * in fact is part of it. However, since it's technically easily possible
- * to keep this part of the debugger in it's own class, we do so. But now
- * we need a backpointer to the debugger (which means that debugger.cpp and
- * brkpt.cpp #include each other's header - mutal and recursive #includes!)
- * and we must be a friend of KDebugger.
- */
 class KDebugger;
-
-// todo: a forward should be sufficient
-struct WndBreakpoint;
-#include "dbgdriver.h"
-struct WndBreakpoint : Breakpoint
-{
-    QString conditionInput;		/* condition as input by the user */
-
-    bool del;				/* used when list is parsed */
-    QListViewItem* listItem;		/* the corresponding table item */
-};
-
-
-
-/*
- * The class BreakpointListBox provides a customized interface to the
- * QListView.
- */
-class BreakpointListBox : public QListView
-{
-public:
-    BreakpointListBox(QWidget* parent, const char* name);
-    ~BreakpointListBox();
-
-    void changeItem(WndBreakpoint* bp);
-
-protected:
-    ValArray<QPixmap> m_icons;
-};
+class BreakpointItem;
 
 
 class BreakpointTable : public QDialog
 {
     Q_OBJECT
 public:
-    BreakpointTable(KDebugger& deb);
+    BreakpointTable();
     ~BreakpointTable();
-
-    void insertBreakpoint(int num, const QString& fileName, int lineNo);
-    void updateBreakList(const char* output);
-    int numBreakpoints() const { return m_brkpts.size(); }
-    const WndBreakpoint* breakpoint(int i) const { return m_brkpts[i]; }
-    void doBreakpoint(QString file, int lineNo, bool temporary);
-    void doEnableDisableBreakpoint(const QString& file, int lineNo);
-    WndBreakpoint* breakpointByFilePos(QString file, int lineNo);
-    bool haveTemporaryBP() const;
-
-    void saveBreakpoints(KSimpleConfig* config);
-    void restoreBreakpoints(KSimpleConfig* config);
+    void setDebugger(KDebugger* deb) { m_debugger = deb; }
 
 protected:
-    KDebugger& m_debugger;
+    KDebugger* m_debugger;
     QLineEdit m_bpEdit;
-    BreakpointListBox m_list;
+    QListView m_list;
     QPushButton m_btAdd;
     QPushButton m_btRemove;
     QPushButton m_btViewCode;
@@ -88,20 +39,20 @@ protected:
     QHBoxLayout m_layout;
     QVBoxLayout m_listandedit;
     QVBoxLayout m_buttons;
-
-    // table of breakpoints; must correspond to items in list box
-    QArray<WndBreakpoint*> m_brkpts;
+    ValArray<QPixmap> m_icons;
 
     void insertBreakpoint(int num, bool temp, bool enabled, QString location,
 			  QString fileName = 0, int lineNo = -1,
 			  int hits = 0, uint ignoreCount = 0,
 			  QString condition = QString());
-    WndBreakpoint* breakpointById(int id);
-    WndBreakpoint* breakpointByItem(QListViewItem* item);
+    BreakpointItem* itemByBreakId(int id);
+    void initListAndIcons();
     void updateBreakpointCondition(int id, const QString& condition,
 				   int ignoreCount);
 
     void closeEvent(QCloseEvent*);
+
+    friend class BreakpointItem;
     
 signals:
     /**
@@ -122,6 +73,7 @@ public slots:
     virtual void viewBP();
     virtual void conditionalBP();
     void updateUI();
+    void updateBreakList();
 };
 
 #endif // BRKPT_H

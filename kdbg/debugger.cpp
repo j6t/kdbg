@@ -52,7 +52,6 @@ KDebugger::KDebugger(QWidget* parent,
 	m_typeTable(0),
 	m_programConfig(0),
 	m_d(driver),
-	m_bpTable(*this),
 	m_localVariables(*localVars),
 	m_watchVariables(*watchVars),
 	m_btWindow(*backtrace),
@@ -72,13 +71,8 @@ KDebugger::KDebugger(QWidget* parent,
 
     connect(&m_btWindow, SIGNAL(highlighted(int)), SLOT(gotoFrame(int)));
 
-    m_bpTable.setCaption(i18n("Breakpoints"));
-    connect(&m_bpTable, SIGNAL(closed()), SIGNAL(updateUI()));
-    connect(&m_bpTable, SIGNAL(activateFileLine(const QString&,int)),
-	    this, SIGNAL(activateFileLine(const QString&,int)));
     connect(m_d, SIGNAL(activateFileLine(const QString&,int)),
 	    this, SIGNAL(activateFileLine(const QString&,int)));
-    connect(this, SIGNAL(updateUI()), &m_bpTable, SLOT(updateUI()));
 
     // debugger process
     connect(m_d, SIGNAL(processExited(KProcess*)), SLOT(gdbExited(KProcess*)));
@@ -101,42 +95,26 @@ KDebugger::KDebugger(QWidget* parent,
 
 KDebugger::~KDebugger()
 {
-    TRACE(__PRETTY_FUNCTION__);
-
     if (m_programConfig != 0) {
 	saveProgramSettings();
 	m_programConfig->sync();
 	delete m_programConfig;
     }
+    // delete breakpoint objects
+    for (int i = m_brkpts.size()-1; i >= 0; i--) {
+	delete m_brkpts[i];
+    }
+
     delete m_typeTable;
 }
 
 
-const char WindowGroup[] = "Windows";
-const char BreaklistVisible[] = "BreaklistVisible";
-const char Breaklist[] = "Breaklist";
-
-void KDebugger::saveSettings(KConfig* config)
+void KDebugger::saveSettings(KConfig* /*config*/)
 {
-    KConfigGroupSaver g(config, WindowGroup);
-    // breakpoint window
-    bool visible = m_bpTable.isVisible();
-    // ask window manager for position
-    const QRect& r = KWM::geometry(m_bpTable.winId());
-    config->writeEntry(BreaklistVisible, visible);
-    config->writeEntry(Breaklist, r);
 }
 
-void KDebugger::restoreSettings(KConfig* config)
+void KDebugger::restoreSettings(KConfig* /*config*/)
 {
-    KConfigGroupSaver g(config, WindowGroup);
-    // breakpoint window
-    bool visible = config->readBoolEntry(BreaklistVisible, false);
-    if (config->hasKey(Breaklist)) {
-	QRect r = config->readRectEntry(Breaklist);
-	m_bpTable.setGeometry(r);
-    }
-    visible ? m_bpTable.show() : m_bpTable.hide();
 }
 
 
@@ -418,33 +396,59 @@ void KDebugger::programArgs()
     }
 }
 
-void KDebugger::breakListToggleVisible()
+bool KDebugger::setBreakpoint(QString file, int lineNo, bool temporary)
 {
-    if (m_bpTable.isVisible()) {
-	m_bpTable.hide();
-    } else {
-	m_bpTable.show();
-    }
-}
-
-bool KDebugger::setBreakpoint(const QString& fileName, int lineNo, bool temporary)
-{
-    if (isReady()) {
-	m_bpTable.doBreakpoint(fileName, lineNo, temporary);
-	return true;
-    } else {
+    if (!isReady()) {
 	return false;
     }
+
+    Breakpoint* bp = breakpointByFilePos(file, lineNo);
+    if (bp == 0)
+    {
+	// no such breakpoint, so set a new one
+	// strip off directory part of file name
+#if QT_VERSION < 200
+	file.detach();
+#endif
+	int offset = file.findRev("/");
+	if (offset >= 0) {
+	    file.remove(0, offset+1);
+	}
+	m_d->executeCmd(temporary ? DCtbreakline : DCbreakline,
+			file, lineNo);
+    }
+    else
+    {
+	/*
+	 * If the breakpoint is disabled, enable it; if it's enabled,
+	 * delete that breakpoint.
+	 */
+	if (bp->enabled) {
+	    m_d->executeCmd(DCdelete, bp->id);
+	} else {
+	    m_d->executeCmd(DCenable, bp->id);
+	}
+    }
+    return true;
 }
 
-bool KDebugger::enableDisableBreakpoint(const QString& fileName, int lineNo)
+bool KDebugger::enableDisableBreakpoint(QString file, int lineNo)
 {
-    if (isReady()) {
-	m_bpTable.doEnableDisableBreakpoint(fileName, lineNo);
-	return true;
-    } else {
+    if (!isReady()) {
 	return false;
     }
+
+    Breakpoint* bp = breakpointByFilePos(file, lineNo);
+    if (bp == 0)
+	return true;
+
+    // toggle enabled/disabled state
+    if (bp->enabled) {
+	m_d->executeCmd(DCdisable, bp->id);
+    } else {
+	m_d->executeCmd(DCenable, bp->id);
+    }
+    return true;
 }
 
 bool KDebugger::canSingleStep()
@@ -580,7 +584,7 @@ void KDebugger::saveProgramSettings()
 	m_programConfig->writeEntry(varValue, var->value);
     }
 
-    m_bpTable.saveBreakpoints(m_programConfig);
+    saveBreakpoints(m_programConfig);
 
     // watch expressions
     // first get rid of whatever was in this group
@@ -633,7 +637,7 @@ void KDebugger::restoreProgramSettings()
 
     updateProgEnvironment(pgmArgs, pgmWd, pgmVars);
 
-    m_bpTable.restoreBreakpoints(m_programConfig);
+    restoreBreakpoints(m_programConfig);
 
     // watch expressions
     m_programConfig->setGroup(WatchGroup);
@@ -651,6 +655,92 @@ void KDebugger::restoreProgramSettings()
 	}
 	addWatch(expr);
     }
+}
+
+/*
+ * Breakpoints are saved one per group.
+ */
+const char BPGroup[] = "Breakpoint %d";
+const char File[] = "File";
+const char Line[] = "Line";
+const char Temporary[] = "Temporary";
+const char Enabled[] = "Enabled";
+const char Condition[] = "Condition";
+
+void KDebugger::saveBreakpoints(KSimpleConfig* config)
+{
+    QString groupName;
+    int i;
+    for (i = 0; uint(i) < m_brkpts.size(); i++) {
+	groupName.sprintf(BPGroup, i);
+	config->setGroup(groupName);
+	Breakpoint* bp = m_brkpts[i];
+	config->writeEntry(File, bp->fileName);
+	config->writeEntry(Line, bp->lineNo);
+	config->writeEntry(Temporary, bp->temporary);
+	config->writeEntry(Enabled, bp->enabled);
+	if (bp->condition.isEmpty())
+	    config->deleteEntry(Condition, false);
+	else
+	    config->writeEntry(Condition, bp->condition);
+	// we do not save the ignore count
+    }
+    // delete remaining groups
+    // we recognize that a group is present if there is an Enabled entry
+    for (;; i++) {
+	groupName.sprintf(BPGroup, i);
+	config->setGroup(groupName);
+	if (!config->hasKey(Enabled)) {
+	    /* group not present, assume that we've hit them all */
+	    break;
+	}
+	config->deleteGroup(groupName);
+    }
+}
+
+void KDebugger::restoreBreakpoints(KSimpleConfig* config)
+{
+    QString groupName;
+    QString fileName;
+    int lineNo;
+    bool enabled, temporary;
+    QString condition;
+    /*
+     * We recognize the end of the list if there is no Enabled entry
+     * present.
+     */
+    for (int i = 0;; i++) {
+	groupName.sprintf(BPGroup, i);
+	config->setGroup(groupName);
+	if (!config->hasKey(Enabled)) {
+	    /* group not present, assume that we've hit them all */
+	    break;
+	}
+	fileName = config->readEntry(File);
+	lineNo = config->readNumEntry(Line, -1);
+	if (lineNo < 0 || fileName.isEmpty())
+	    continue;
+	enabled = config->readBoolEntry(Enabled, true);
+	temporary = config->readBoolEntry(Temporary, false);
+	condition = config->readEntry(Condition);
+	/*
+	 * Add the breakpoint. We assume that we have started a new
+	 * instance of gdb, because we assign the breakpoint ids ourselves,
+	 * starting with 1. Then we use this id to disable the breakpoint,
+	 * if necessary. If this assignment of ids doesn't work, (maybe
+	 * because this isn't a fresh gdb at all), we disable the wrong
+	 * breakpoint! Oh well... for now it works.
+	 */
+	m_d->executeCmd(temporary ? DCtbreakline : DCbreakline,
+			fileName, lineNo);
+	if (!enabled) {
+	    m_d->executeCmd(DCdisable, i+1);
+	}
+	if (!condition.isEmpty()) {
+	    m_d->executeCmd(DCcondition, condition, i+1);
+	}
+    }
+    m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
 }
 
 
@@ -786,17 +876,18 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCbreaktext:
     case DCbreakline:
     case DCtbreakline:
-	updateBreakptTable(output);
-	break;
+	newBreakpoint(output);
+	// fall through
     case DCdelete:
     case DCenable:
     case DCdisable:
-	m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
+	// these commands need immediate response
+	m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverrideMoreEqual);
 	break;
     case DCinfobreak:
 	// note: this handler must not enqueue a command, since
 	// DCinfobreak is used at various different places.
-	m_bpTable.updateBreakList(output);
+	updateBreakList(output);
 	emit lineItemsChanged();
 	break;
     case DCfindType:
@@ -844,7 +935,7 @@ void KDebugger::handleRunCommands(const char* output)
      * it would go away now.
      */
     if ((flags & (DebuggerDriver::SFrefreshBreak|DebuggerDriver::SFrefreshSource)) ||
-	m_bpTable.haveTemporaryBP())
+	haveTemporaryBP())
     {
 	m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
     }
@@ -898,17 +989,6 @@ void KDebugger::updateAllExprs()
     for (; item != 0; item = item->getSibling()) {
 	m_watchEvalExpr.append(static_cast<VarTree*>(item));
     }
-}
-
-void KDebugger::updateBreakptTable(const char* output)
-{
-    int id;
-    QString file;
-    int lineNo;
-    if (m_d->parseBreakpoint(output, id, file, lineNo)) {
-	m_bpTable.insertBreakpoint(id, file, lineNo);
-    }
-    m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
 }
 
 void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
@@ -1566,22 +1646,6 @@ void KDebugger::stopAnimation()
     }
 }
 
-void KDebugger::slotToggleBreak(const QString& fileName, int lineNo)
-{
-    // lineNo is zero-based
-    if (isReady()) {
-	m_bpTable.doBreakpoint(fileName, lineNo, false);
-    }
-}
-
-void KDebugger::slotEnaDisBreak(const QString& fileName, int lineNo)
-{
-    // lineNo is zero-based
-    if (isReady()) {
-	m_bpTable.doEnableDisableBreakpoint(fileName, lineNo);
-    }
-}
-
 void KDebugger::slotUpdateAnimation()
 {
     if (m_d->isIdle()) {
@@ -1601,5 +1665,129 @@ void KDebugger::handleRegisters(const char* output)
     const char* str = output;
     m_regView->updateRegisters(str);
 }
+
+/*
+ * The output of the DCbreak* commands has more accurate information about
+ * the file and the line number.
+ */
+void KDebugger::newBreakpoint(const char* output)
+{
+    int id;
+    QString file;
+    int lineNo;
+    if (!m_d->parseBreakpoint(output, id, file, lineNo))
+	return;
+
+    // see if it is new
+    for (int i = m_brkpts.size()-1; i >= 0; i--) {
+	if (m_brkpts[i]->id == id) {
+	    // not new; update
+	    m_brkpts[i]->fileName = file;
+	    m_brkpts[i]->lineNo = lineNo;
+	    return;
+	}
+    }
+    // yes, new
+    Breakpoint* bp = new Breakpoint;
+    bp->id = id;
+    bp->temporary = false;
+    bp->enabled = true;
+    bp->hitCount = 0;
+    bp->ignoreCount = 0;
+    bp->fileName = file;
+    bp->lineNo = lineNo;
+    int n = m_brkpts.size();
+    m_brkpts.resize(n+1);
+    m_brkpts[n] = bp;
+}
+
+void KDebugger::updateBreakList(const char* output)
+{
+    // get the new list
+    QList<Breakpoint> brks;
+    brks.setAutoDelete(false);
+    m_d->parseBreakList(output, brks);
+
+    // merge new information into existing breakpoints
+
+    QArray<Breakpoint*> oldbrks = m_brkpts;
+
+    // move parsed breakpoints into m_brkpts
+    m_brkpts.detach();
+    m_brkpts.resize(brks.count());
+    int n = 0;
+    for (Breakpoint* bp = brks.first(); bp != 0; bp = brks.next())
+    {
+	m_brkpts[n++] = bp;
+    }
+
+    // go through all old breakpoints
+    for (int i = oldbrks.size()-1; i >= 0; i--) {
+	// is this one still alive?
+	for (int j = m_brkpts.size()-1; j >= 0; j--)
+	{
+	    if (m_brkpts[j]->id == oldbrks[i]->id) {
+		// yes, it is
+		// keep accurate location
+		m_brkpts[j]->fileName = oldbrks[i]->fileName;
+		m_brkpts[j]->lineNo = oldbrks[i]->lineNo;
+		break;
+	    }
+	}
+    }
+
+    // delete old breakpoints
+    for (int i = oldbrks.size()-1; i >= 0; i--) {
+	delete oldbrks[i];
+    }
+
+    emit breakpointsChanged();
+}
+
+// look if there is at least one temporary breakpoint
+bool KDebugger::haveTemporaryBP() const
+{
+    for (int i = m_brkpts.size()-1; i >= 0; i--) {
+	if (m_brkpts[i]->temporary)
+	    return true;
+    }
+    return false;
+}
+
+Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo)
+{
+    // look for exact file name match
+    int i;
+    for (i = m_brkpts.size()-1; i >= 0; i--) {
+	if (m_brkpts[i]->lineNo == lineNo &&
+	    m_brkpts[i]->fileName == file)
+	{
+	    return m_brkpts[i];
+	}
+    }
+    // not found, so try basename
+    // strip off directory part of file name
+    int offset = file.findRev("/");
+    if (offset < 0) {
+	// that was already the basename, no need to scan the list again
+	return 0;
+    }
+#if QT_VERSION < 200
+    file.detach();
+#endif
+    file.remove(0, offset+1);
+
+    for (i = m_brkpts.size()-1; i >= 0; i--) {
+	if (m_brkpts[i]->lineNo == lineNo &&
+	    m_brkpts[i]->fileName == file)
+	{
+	    return m_brkpts[i];
+	}
+    }
+
+    // not found
+    return 0;
+}
+
 
 #include "debugger.moc"

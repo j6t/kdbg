@@ -6,7 +6,8 @@
 #include "winstack.h"
 #include "winstack.moc"
 #include "commandids.h"
-#include "brkpt.h"	// todo: this should be "debugger.h" finally!
+#include "debugger.h"
+#include "dbgdriver.h"
 #include <kfiledialog.h>
 #include <qtextstream.h>
 #include <qpainter.h>
@@ -218,7 +219,7 @@ void FileWindow::paintCell(QPainter* p, int row, int col)
     }
 }
 
-void FileWindow::updateLineItems(const BreakpointTable& bpt)
+void FileWindow::updateLineItems(const KDebugger* dbg)
 {
     // clear outdated breakpoints
     for (int i = m_lineItems.size()-1; i >= 0; i--) {
@@ -226,8 +227,8 @@ void FileWindow::updateLineItems(const BreakpointTable& bpt)
 	    // check if this breakpoint still exists
 	    TRACE(QString().sprintf("checking for bp at %d", i));
 	    int j;
-	    for (j = bpt.numBreakpoints()-1; j >= 0; j--) {
-		const Breakpoint* bp = bpt.breakpoint(j);
+	    for (j = dbg->numBreakpoints()-1; j >= 0; j--) {
+		const Breakpoint* bp = dbg->breakpoint(j);
 		if (bp->lineNo == i && fileNamesMatch(bp->fileName, fileName())) {
 		    // yes it exists; mode is changed below
 		    break;
@@ -242,8 +243,8 @@ void FileWindow::updateLineItems(const BreakpointTable& bpt)
     }
 
     // add new breakpoints
-    for (int j = bpt.numBreakpoints()-1; j >= 0; j--) {
-	const Breakpoint* bp = bpt.breakpoint(j);
+    for (int j = dbg->numBreakpoints()-1; j >= 0; j--) {
+	const Breakpoint* bp = dbg->breakpoint(j);
 	if (fileNamesMatch(bp->fileName, fileName())) {
 	    TRACE(QString().sprintf("updating %s:%d", bp->fileName.data(), bp->lineNo));
 	    int i = bp->lineNo;
@@ -630,11 +631,11 @@ void WinStack::changeWindowMenu()
     }
 }
 
-void WinStack::updateLineItems(const BreakpointTable& bpt)
+void WinStack::updateLineItems(const KDebugger* dbg)
 {
     FileWindow* fw = 0;
     for (fw = m_fileList.first(); fw != 0; fw = m_fileList.next()) {
-	fw->updateLineItems(bpt);
+	fw->updateLineItems(dbg);
     }
 }
 

@@ -20,7 +20,7 @@
 // forward declarations
 class QPopupMenu;
 class QFileInfo;
-class BreakpointTable;
+class KDebugger;
 
 //class FileWindow : public QMultiLineEdit
 class FileWindow : public KTextView
@@ -34,7 +34,7 @@ public:
     void reloadFile();
     void scrollTo(int lineNo);
     const QString& fileName() const { return m_fileName; }
-    void updateLineItems(const BreakpointTable& bpt);
+    void updateLineItems(const KDebugger* dbg);
     void setPC(bool set, int lineNo, int frameNo);
     enum FindDirection { findForward = 1, findBackward = -1 };
     void find(const char* text, bool caseSensitive, FindDirection dir);
@@ -128,7 +128,7 @@ public slots:
     virtual void activate(const QString& filename, int lineNo);
     void updatePC(const QString& filename, int lineNo, int frameNo);
     void reloadAllFiles();
-    void updateLineItems(const BreakpointTable& bpt);
+    void updateLineItems(const KDebugger* deb);
 
     // Right click on file panner when no file is loaded.
     virtual void slotWidgetRightClick(const QPoint &);

@@ -8,7 +8,7 @@
 
 #include <qtimer.h>
 #include <qdict.h>
-#include "brkpt.h"
+#include "valarray.h"
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
 
@@ -21,10 +21,12 @@ class VarTree;
 class ProgramTypeTable;
 class KTreeViewItem;
 class KConfig;
+class KSimpleConfig;
 class QListBox;
 class RegisterView;
 class DebuggerDriver;
 class CmdQueueItem;
+class Breakpoint;
 class KProcess;
 
 
@@ -110,12 +112,6 @@ public:
     void setRemoteDevice(const QString& remoteDevice) { m_remoteDevice = remoteDevice; }
 
     /**
-     * Shows the breakpoint list if it isn't currently visible or hides it
-     * if it is.
-     */
-    void breakListToggleVisible();
-
-    /**
      * Run the debuggee until the specified line in the specified file is
      * reached.
      * 
@@ -133,7 +129,7 @@ public:
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.
      */
-    bool setBreakpoint(const QString& fileName, int lineNo, bool temporary);
+    bool setBreakpoint(QString fileName, int lineNo, bool temporary);
 
     /**
      * Enable or disable a breakpoint at the specified location.
@@ -143,7 +139,7 @@ public:
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.
      */
-    bool enableDisableBreakpoint(const QString& fileName, int lineNo);
+    bool enableDisableBreakpoint(QString fileName, int lineNo);
 
     /**
      * Tells whether one of the single stepping commands can be invoked
@@ -191,11 +187,9 @@ public:
      */
     bool isProgramActive() { return m_programActive; }
 
-    /** Is the breakpoint table visible? */
-    bool isBreakListVisible() { return m_bpTable.isVisible(); }
-
-    /** The table of breakpoints. */
-    BreakpointTable& breakList() { return m_bpTable; }
+    /** The list of breakpoints. */
+    int numBreakpoints() const { return m_brkpts.size(); }
+    const Breakpoint* breakpoint(int i) const { return m_brkpts[i]; }
 
     const QString& executable() const { return m_executable; }
 
@@ -227,6 +221,7 @@ protected:
     
     QList<VarTree> m_watchEvalExpr;	/* exprs to evaluate for watch windows */
     QList<VarTree> m_parsedLocals;	/* local variables that have just been parsed */
+    QArray<Breakpoint*> m_brkpts;
 
 protected slots:
     void parse(CmdQueueItem* cmd, const char* output);
@@ -234,7 +229,6 @@ protected:
     VarTree* parseExpr(const char* output, bool wantErrorValue);
     void handleRunCommands(const char* output);
     void updateAllExprs();
-    void updateBreakptTable(const char* output);
     void updateProgEnvironment(const QString& args, const QString& wd,
 			       const QDict<EnvVar>& newVars);
     void parseLocals(const char* output, QList<VarTree>& newVars);
@@ -254,6 +248,13 @@ protected:
     void determineType(ExprWnd* wnd, VarTree* var);
     void removeExpr(ExprWnd* wnd, VarTree* var);
     CmdQueueItem* loadCoreFile();
+
+    Breakpoint* breakpointByFilePos(QString file, int lineNo);
+    void newBreakpoint(const char* output);
+    void updateBreakList(const char* output);
+    bool haveTemporaryBP() const;
+    void saveBreakpoints(KSimpleConfig* config);
+    void restoreBreakpoints(KSimpleConfig* config);
 
     QString m_lastDirectory;		/* the dir of the most recently opened file */
     bool m_haveExecutable;		/* has an executable been specified */
@@ -287,8 +288,6 @@ protected slots:
     void gotoFrame(int);
     void slotLocalsExpanding(KTreeViewItem*, bool&);
     void slotWatchExpanding(KTreeViewItem*, bool&);
-    void slotToggleBreak(const QString&, int);
-    void slotEnaDisBreak(const QString&, int);
     void slotUpdateAnimation();
     void slotDeleteWatch();
     
@@ -357,8 +356,12 @@ signals:
      */
     void updateUI();
 
+    /**
+     * Indicates that the list of breakpoints has possibly changed.
+     */
+    void breakpointsChanged();
+
 protected:
-    BreakpointTable m_bpTable;
     ExprWnd& m_localVariables;
     ExprWnd& m_watchVariables;
     QListBox& m_btWindow;

@@ -37,12 +37,12 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	m_btWindow(&m_leftPanner, "backtrace"),
 	m_localVariables(&m_rightPanner, "locals"),
 	m_watches(&m_rightPanner, "watches")
-				 
 {
     initMenu();
     initToolbar();
 
     setupDebugger(&m_localVariables, m_watches.watchVariables(), &m_btWindow);
+    m_bpTable.setDebugger(m_debugger);
 
 #if QT_VERSION < 200
     m_mainPanner.activate(&m_leftPanner, &m_rightPanner);
@@ -59,9 +59,9 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(&m_filesWindow, SIGNAL(newFileLoaded()),
 	    SLOT(slotNewFileLoaded()));
     connect(&m_filesWindow, SIGNAL(toggleBreak(const QString&, int)),
-	    m_debugger, SLOT(slotToggleBreak(const QString&,int)));
+	    this, SLOT(slotToggleBreak(const QString&,int)));
     connect(&m_filesWindow, SIGNAL(enadisBreak(const QString&, int)),
-	    m_debugger, SLOT(slotEnaDisBreak(const QString&,int)));
+	    this, SLOT(slotEnaDisBreak(const QString&,int)));
     connect(m_debugger, SIGNAL(activateFileLine(const QString&,int)),
 	    &m_filesWindow, SLOT(activate(const QString&,int)));
     connect(m_debugger, SIGNAL(executableUpdated()),
@@ -83,6 +83,13 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     // file/line updates
     connect(&m_filesWindow, SIGNAL(fileChanged()), SLOT(slotFileChanged()));
     connect(&m_filesWindow, SIGNAL(lineChanged()), SLOT(slotLineChanged()));
+
+    m_bpTable.setCaption(i18n("Breakpoints"));
+    connect(&m_bpTable, SIGNAL(closed()), SLOT(updateUI()));
+    connect(&m_bpTable, SIGNAL(activateFileLine(const QString&,int)),
+	    &m_filesWindow, SLOT(activate(const QString&,int)));
+    connect(m_debugger, SIGNAL(updateUI()), &m_bpTable, SLOT(updateUI()));
+    connect(m_debugger, SIGNAL(breakpointsChanged()), &m_bpTable, SLOT(updateBreakList()));
 
     restoreSettings(kapp->getConfig());
 
@@ -286,6 +293,9 @@ const char MainPane[] = "MainPane";
 const char LeftPane[] = "LeftPane";
 const char RightPane[] = "RightPane";
 const char MainPosition[] = "MainPosition";
+const char BreaklistVisible[] = "BreaklistVisible";
+const char Breaklist[] = "Breaklist";
+
 
 void DebuggerMainWnd::saveSettings(KConfig* config)
 {
@@ -304,8 +314,15 @@ void DebuggerMainWnd::saveSettings(KConfig* config)
     config->writeEntry(LeftPane, lsep);
     config->writeEntry(RightPane, rsep);
     // window position
-    const QRect& r = KWM::geometry(winId());
+    QRect r = KWM::geometry(winId());
     config->writeEntry(MainPosition, r);
+
+    // breakpoint window
+    bool visible = m_bpTable.isVisible();
+    // ask window manager for position
+    r = KWM::geometry(m_bpTable.winId());
+    config->writeEntry(BreaklistVisible, visible);
+    config->writeEntry(Breaklist, r);
 
     DebuggerMainWndBase::saveSettings(config);
 }
@@ -330,6 +347,14 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
     restorePercentSize(&m_leftPanner, lsep);
     restorePercentSize(&m_rightPanner, rsep);
 #endif
+
+    // breakpoint window
+    bool visible = config->readBoolEntry(BreaklistVisible, false);
+    if (config->hasKey(Breaklist)) {
+	QRect r = config->readRectEntry(Breaklist);
+	m_bpTable.setGeometry(r);
+    }
+    visible ? m_bpTable.show() : m_bpTable.hide();
 
     DebuggerMainWndBase::restoreSettings(config);
 }
@@ -372,6 +397,14 @@ void DebuggerMainWnd::menuCallback(int item)
 	    int lineNo;
 	    if (m_filesWindow.activeLine(file, lineNo))
 		m_debugger->enableDisableBreakpoint(file, lineNo);
+	}
+	break;
+    case ID_BRKPT_LIST:
+	// toggle visibility
+	if (m_bpTable.isVisible()) {
+	    m_bpTable.hide();
+	} else {
+	    m_bpTable.show();
 	}
 	break;
     default:
@@ -439,6 +472,9 @@ void DebuggerMainWnd::updateUIItem(UpdateUI* item)
     case ID_BRKPT_ENABLE:
 	item->enable(m_debugger->canChangeBreakpoints());
 	break;
+    case ID_BRKPT_LIST:
+	item->setCheck(m_bpTable.isVisible());
+	break;
     default:
 	DebuggerMainWndBase::updateUIItem(item);
 	break;
@@ -453,7 +489,7 @@ void DebuggerMainWnd::updateUIItem(UpdateUI* item)
 
 void DebuggerMainWnd::updateLineItems()
 {
-    m_filesWindow.updateLineItems(m_debugger->breakList());
+    m_filesWindow.updateLineItems(m_debugger);
 }
 
 void DebuggerMainWnd::slotAddWatch()
@@ -501,7 +537,7 @@ void DebuggerMainWnd::slotLineChanged()
 void DebuggerMainWnd::slotNewFileLoaded()
 {
     // updates program counter in the new file
-    m_filesWindow.updateLineItems(m_debugger->breakList());
+    m_filesWindow.updateLineItems(m_debugger);
 }
 
 void DebuggerMainWnd::updateLineStatus(int lineNo)
@@ -548,6 +584,22 @@ void DebuggerMainWnd::slotGlobalOptions()
 void DebuggerMainWnd::slotDebuggerStarting()
 {
     DebuggerMainWndBase::slotDebuggerStarting();
+}
+
+void DebuggerMainWnd::slotToggleBreak(const QString& fileName, int lineNo)
+{
+    // lineNo is zero-based
+    if (m_debugger != 0) {
+	m_debugger->setBreakpoint(fileName, lineNo, false);
+    }
+}
+
+void DebuggerMainWnd::slotEnaDisBreak(const QString& fileName, int lineNo)
+{
+    // lineNo is zero-based
+    if (m_debugger != 0) {
+	m_debugger->enableDisableBreakpoint(fileName, lineNo);
+    }
 }
 
 #include "dbgmainwnd.moc"

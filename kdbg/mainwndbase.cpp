@@ -249,9 +249,6 @@ bool DebuggerMainWndBase::handleCommand(int item)
     case ID_PROGRAM_ARGS:
 	m_debugger->programArgs();
 	return true;
-    case ID_BRKPT_LIST:
-	m_debugger->breakListToggleVisible();
-	return true;
     }
     return false;
 }
@@ -284,9 +281,6 @@ void DebuggerMainWndBase::updateUIItem(UpdateUI* item)
 	break;
     case ID_PROGRAM_ARGS:
 	item->enable(m_debugger->haveExecutable());
-	break;
-    case ID_BRKPT_LIST:
-	item->setCheck(m_debugger->isBreakListVisible());
 	break;
     }
     

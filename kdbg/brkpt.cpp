@@ -13,7 +13,8 @@
 #include <qpainter.h>
 #include <qlabel.h>
 #include <qbitmap.h>
-#include "debugger.h"			/* #includes brkpt.h */
+#include "debugger.h"
+#include "brkpt.h"
 #include "dbgdriver.h"
 #include "brkpt.moc"
 #include <ctype.h>
@@ -23,9 +24,18 @@
 #include "mydebug.h"
 
 
-BreakpointTable::BreakpointTable(KDebugger& deb) :
+class BreakpointItem : public QListViewItem, public Breakpoint
+{
+public:
+    BreakpointItem(QListView* list, const Breakpoint& bp);
+    void updateFrom(const Breakpoint& bp);
+    void display();			/* sets icon and visible texts */
+};
+
+
+BreakpointTable::BreakpointTable() :
 	QDialog(0, "breakpoints"),
-	m_debugger(deb),
+	m_debugger(0),
 	m_bpEdit(this, "bpedit"),
 	m_list(this, "bptable"),
 	m_btAdd(this, "add"),
@@ -40,6 +50,7 @@ BreakpointTable::BreakpointTable(KDebugger& deb) :
     m_bpEdit.setMinimumSize(m_bpEdit.sizeHint());
     connect(&m_bpEdit, SIGNAL(returnPressed()), this, SLOT(addBP()));
 
+    initListAndIcons();
     // double click on item is same as View code
     connect(&m_list, SIGNAL(doubleClicked(QListViewItem*)), this, SLOT(viewBP()));
 
@@ -83,85 +94,49 @@ BreakpointTable::BreakpointTable(KDebugger& deb) :
 
 BreakpointTable::~BreakpointTable()
 {
-    // delete breakpoint objects
-    for (int i = m_brkpts.size()-1; i >= 0; i--) {
-	delete m_brkpts[i];
-    }
 }
 
-void BreakpointTable::updateBreakList(const char* output)
+void BreakpointTable::updateBreakList()
 {
-    int i;
+    QList<BreakpointItem> deletedItems;
 
-    // mark all breakpoints as being updated
-    for (i = m_brkpts.size()-1; i >= 0; i--) {
-	m_brkpts[i]->del = true;
+    for (QListViewItem* it = m_list.firstChild(); it != 0; it = it->nextSibling()) {
+	deletedItems.append(static_cast<BreakpointItem*>(it));
     }
 
     // get the new list
-    QList<Breakpoint> brks;
-    brks.setAutoDelete(true);
-    m_debugger.driver()->parseBreakList(output, brks);
-    for (Breakpoint* bp = brks.first(); bp != 0; bp = brks.next()) {
-	insertBreakpoint(bp->id, bp->temporary, bp->enabled, bp->location,
-			 0, -1, bp->hitCount, bp->ignoreCount, bp->condition);
+    for (int i = m_debugger->numBreakpoints()-1; i >= 0; i--) {
+	const Breakpoint* bp = m_debugger->breakpoint(i);
+	// look up this item
+	for (BreakpointItem* oldbp = deletedItems.first(); oldbp != 0;
+	     oldbp = deletedItems.next())
+	{
+	    if (oldbp->id == bp->id) {
+		oldbp->updateFrom(*bp);
+		deletedItems.take();	/* don't delete */
+		goto nextItem;
+	    }
+	}
+	// not in the list; add it
+	new BreakpointItem(&m_list, *bp);
+nextItem:;
     }
 
     // delete all untouched breakpoints
-    for (i = m_brkpts.size()-1; i >= 0; i--) {
-	if (m_brkpts[i]->del) {
-	    WndBreakpoint* bp = m_brkpts[i];
-	    // delete the pointer and the object
-	    for (uint j = i+1; j < m_brkpts.size(); j++) {
-		m_brkpts[j-1] = m_brkpts[j];
-	    }
-	    m_brkpts.resize(m_brkpts.size()-1);
-	    delete bp->listItem;
-	    delete bp;
-	}
-    }
+    deletedItems.setAutoDelete(true);
 }
 
-void BreakpointTable::insertBreakpoint(int num, const QString& fileName, int lineNo)
+BreakpointItem::BreakpointItem(QListView* list, const Breakpoint& bp) :
+	QListViewItem(list),
+	Breakpoint(bp)
 {
-    SIZED_QString(str,fileName.length()+20);
-    str.sprintf("%s:%d", fileName.data(), lineNo+1);
-    insertBreakpoint(num, false, true,	/* keep, enabled */
-		     str, fileName, lineNo);
+    display();
 }
 
-void BreakpointTable::insertBreakpoint(int num, bool temp, bool enabled, QString location,
-				       QString fileName, int lineNo,
-				       int hits, uint ignoreCount, QString condition)
+void BreakpointItem::updateFrom(const Breakpoint& bp)
 {
-    assert(lineNo != 0);		/* line numbers are 1-based */
-    TRACE("insert bp " + QString().setNum(num));
-    int numBreaks = m_brkpts.size();
-    WndBreakpoint* bp = breakpointById(num);
-    if (bp == 0) {
-	// not found, insert a new one
-	bp = new WndBreakpoint;
-	m_brkpts.resize(numBreaks+1);
-	m_brkpts[numBreaks] = bp;
-	bp->id = num;
-	bp->lineNo = -1;
-	bp->listItem = new QListViewItem(&m_list);
-    }
-    bp->temporary = temp;
-    bp->enabled = enabled;
-    bp->location = location;
-    if (!fileName.isEmpty())
-	bp->fileName = fileName;
-    if (lineNo > 0)
-	bp->lineNo = lineNo;
-    bp->hitCount = hits;
-    bp->ignoreCount = ignoreCount;
-    bp->condition = condition;
-    if (bp->conditionInput.isEmpty())
-	bp->conditionInput = condition;
-    bp->del = false;
-    // update list
-    m_list.changeItem(bp);
+    Breakpoint::operator=(bp);		/* assign new values */
+    display();
 }
 
 void BreakpointTable::closeEvent(QCloseEvent* ev)
@@ -181,8 +156,8 @@ void BreakpointTable::addBP()
     // set a breakpoint at the specified text
     QString bpText = m_bpEdit.text();
     bpText = bpText.stripWhiteSpace();
-    if (m_debugger.isReady()) {
-	m_debugger.driver()->executeCmd(DCbreaktext, bpText);
+    if (m_debugger->isReady()) {
+	m_debugger->driver()->executeCmd(DCbreaktext, bpText);
 	// clear text if successfully set
 	m_bpEdit.setText("");
     }
@@ -190,16 +165,16 @@ void BreakpointTable::addBP()
 
 void BreakpointTable::removeBP()
 {
-    WndBreakpoint* bp = breakpointByItem(m_list.currentItem());
+    BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
     if (bp == 0)
 	return;
 
-    m_debugger.driver()->executeCmd(DCdelete, bp->id);
+    m_debugger->driver()->executeCmd(DCdelete, bp->id);
 }
 
 void BreakpointTable::viewBP()
 {
-    WndBreakpoint* bp = breakpointByItem(m_list.currentItem());
+    BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
     if (bp == 0)
 	return;
 
@@ -208,7 +183,7 @@ void BreakpointTable::viewBP()
 
 void BreakpointTable::updateUI()
 {
-    bool enableChkpt = m_debugger.canChangeBreakpoints();
+    bool enableChkpt = m_debugger->canChangeBreakpoints();
     m_btAdd.setEnabled(enableChkpt);
     m_btRemove.setEnabled(enableChkpt);
     m_btConditional.setEnabled(enableChkpt);
@@ -239,7 +214,7 @@ protected:
 
 void BreakpointTable::conditionalBP()
 {
-    WndBreakpoint* bp = breakpointByItem(m_list.currentItem());
+    BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
     if (bp == 0)
 	return;
 
@@ -252,7 +227,7 @@ void BreakpointTable::conditionalBP()
     int id = bp->id;
 
     ConditionalDlg dlg(this);
-    dlg.setCondition(bp->conditionInput);
+    dlg.setCondition(bp->condition);
     dlg.setIgnoreCount(bp->ignoreCount);
 
     if (dlg.exec() != QDialog::Accepted)
@@ -260,257 +235,60 @@ void BreakpointTable::conditionalBP()
 
     QString conditionInput = dlg.condition();
     int ignoreCount = dlg.ignoreCount();
-    updateBreakpointCondition(id, conditionInput.simplifyWhiteSpace(),
-			      ignoreCount);
-}
-
-// this handles the menu entry: toggles breakpoint on and off
-void BreakpointTable::doBreakpoint(QString file, int lineNo, bool temporary)
-{
-    WndBreakpoint* bp = breakpointByFilePos(file, lineNo);
-    if (bp == 0)
-    {
-	// no such breakpoint, so set a new one
-	// strip off directory part of file name
-#if QT_VERSION < 200
-	file.detach();
-#endif
-	int offset = file.findRev("/");
-	if (offset >= 0) {
-	    file.remove(0, offset+1);
-	}
-	m_debugger.driver()->executeCmd(temporary ? DCtbreakline : DCbreakline,
-					file, lineNo);
-    }
-    else
-    {
-	/*
-	 * If the breakpoint is disabled, enable it; if it's enabled,
-	 * delete that breakpoint.
-	 */
-	if (bp->enabled) {
-	    m_debugger.driver()->executeCmd(DCdelete, bp->id);
-	} else {
-	    m_debugger.driver()->executeCmd(DCenable, bp->id);
-	}
-    }
-}
-
-void BreakpointTable::doEnableDisableBreakpoint(const QString& file, int lineNo)
-{
-    WndBreakpoint* bp = breakpointByFilePos(file, lineNo);
-    if (bp == 0)
-	return;
-
-    // toggle enabled/disabled state
-    if (bp->enabled) {
-	m_debugger.driver()->executeCmd(DCdisable, bp->id);
-    } else {
-	m_debugger.driver()->executeCmd(DCenable, bp->id);
-    }
+    updateBreakpointCondition(id, conditionInput, ignoreCount);
 }
 
 void BreakpointTable::updateBreakpointCondition(int id,
 						const QString& condition,
 						int ignoreCount)
 {
-    WndBreakpoint* bp = breakpointById(id);
+    BreakpointItem* bp = itemByBreakId(id);
     if (bp == 0)
 	return;				/* breakpoint no longer exists */
 
     bool changed = false;
 
-    if (bp->conditionInput != condition) {
+    if (bp->condition != condition) {
 	// change condition
-	m_debugger.driver()->executeCmd(DCcondition, condition, bp->id);
-	bp->conditionInput = condition;
+	m_debugger->driver()->executeCmd(DCcondition, condition, bp->id);
+	bp->condition = condition;
 	changed = true;
     }
     if (bp->ignoreCount != ignoreCount) {
 	// change ignore count
-	m_debugger.driver()->executeCmd(DCignore, bp->id, ignoreCount);
+	m_debugger->driver()->executeCmd(DCignore, bp->id, ignoreCount);
 	changed = true;
     }
     if (changed) {
 	// get the changes
-	m_debugger.driver()->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
+	m_debugger->driver()->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
     }
 }
 
 
-
-WndBreakpoint* BreakpointTable::breakpointById(int id)
+BreakpointItem* BreakpointTable::itemByBreakId(int id)
 {
-    for (int i = m_brkpts.size()-1; i >= 0; i--) {
-	if (m_brkpts[i]->id == id) {
-	    return m_brkpts[i];
+    for (QListViewItem* it = m_list.firstChild(); it != 0; it = it->nextSibling()) {
+	BreakpointItem* bp = static_cast<BreakpointItem*>(it);
+	if (bp->id == id) {
+	    return bp;
 	}
     }
     return 0;
 }
 
-WndBreakpoint* BreakpointTable::breakpointByItem(QListViewItem* item)
+
+void BreakpointTable::initListAndIcons()
 {
-    if (item == 0)
-	return 0;
+    m_list.addColumn(i18n("Location"), 300);
+    m_list.addColumn(i18n("Hits"), 30);
+    m_list.addColumn(i18n("Ignore"), 30);
+    m_list.addColumn(i18n("Condition"), 200);
 
-    for (int i = m_brkpts.size()-1; i >= 0; i--) {
-	if (m_brkpts[i]->listItem == item) {
-	    return m_brkpts[i];
-	}
-    }
-    return 0;
-}
-
-WndBreakpoint* BreakpointTable::breakpointByFilePos(QString file, int lineNo)
-{
-    // look for exact file name match
-    int i;
-    for (i = m_brkpts.size()-1; i >= 0; i--) {
-	if (m_brkpts[i]->lineNo == lineNo &&
-	    m_brkpts[i]->fileName == file)
-	{
-	    return m_brkpts[i];
-	}
-    }
-    // not found, so try basename
-    // strip off directory part of file name
-    int offset = file.findRev("/");
-    if (offset < 0) {
-	// that was already the basename, no need to scan the list again
-	return 0;
-    }
-#if QT_VERSION < 200
-    file.detach();
-#endif
-    file.remove(0, offset+1);
-
-    for (i = m_brkpts.size()-1; i >= 0; i--) {
-	if (m_brkpts[i]->lineNo == lineNo &&
-	    m_brkpts[i]->fileName == file)
-	{
-	    return m_brkpts[i];
-	}
-    }
-
-    // not found
-    return 0;
-}
-
-// look if there is at least one temporary breakpoint
-bool BreakpointTable::haveTemporaryBP() const
-{
-    for (int i = m_brkpts.size()-1; i >= 0; i--) {
-	if (m_brkpts[i]->temporary)
-	    return true;
-    }
-    return false;
-}
-
-/*
- * Breakpoints are saved one per group.
- */
-const char BPGroup[] = "Breakpoint %d";
-const char File[] = "File";
-const char Line[] = "Line";
-const char Temporary[] = "Temporary";
-const char Enabled[] = "Enabled";
-const char Condition[] = "Condition";
-
-void BreakpointTable::saveBreakpoints(KSimpleConfig* config)
-{
-    QString groupName;
-    int i;
-    for (i = 0; uint(i) < m_brkpts.size(); i++) {
-	groupName.sprintf(BPGroup, i);
-	config->setGroup(groupName);
-	WndBreakpoint* bp = m_brkpts[i];
-	config->writeEntry(File, bp->fileName);
-	config->writeEntry(Line, bp->lineNo);
-	config->writeEntry(Temporary, bp->temporary);
-	config->writeEntry(Enabled, bp->enabled);
-	if (bp->condition.isEmpty())
-	    config->deleteEntry(Condition, false);
-	else
-	    config->writeEntry(Condition, bp->condition);
-	// we do not save the ignore count
-    }
-    // delete remaining groups
-    // we recognize that a group is present if there is an Enabled entry
-    for (;; i++) {
-	groupName.sprintf(BPGroup, i);
-	config->setGroup(groupName);
-	if (!config->hasKey(Enabled)) {
-	    /* group not present, assume that we've hit them all */
-	    break;
-	}
-	config->deleteGroup(groupName);
-    }
-}
-
-void BreakpointTable::restoreBreakpoints(KSimpleConfig* config)
-{
-    QString groupName;
-    QString fileName;
-    int lineNo;
-    bool enabled, temporary;
-    QString condition;
-    /*
-     * We recognize the end of the list if there is no Enabled entry
-     * present.
-     */
-    for (int i = 0;; i++) {
-	groupName.sprintf(BPGroup, i);
-	config->setGroup(groupName);
-	if (!config->hasKey(Enabled)) {
-	    /* group not present, assume that we've hit them all */
-	    break;
-	}
-	fileName = config->readEntry(File);
-	lineNo = config->readNumEntry(Line, -1);
-	if (lineNo < 0 || fileName.isEmpty())
-	    continue;
-	enabled = config->readBoolEntry(Enabled, true);
-	temporary = config->readBoolEntry(Temporary, false);
-	condition = config->readEntry(Condition);
-	/*
-	 * Add the breakpoint. We assume that we have started a new
-	 * instance of gdb, because we assign the breakpoint ids ourselves,
-	 * starting with 1. Then we use this id to disable the breakpoint,
-	 * if necessary. If this assignment of ids doesn't work, (maybe
-	 * because this isn't a fresh gdb at all), we disable the wrong
-	 * breakpoint! Oh well... for now it works.
-	 */
-	m_debugger.driver()->executeCmd(temporary ? DCtbreakline : DCbreakline,
-					fileName, lineNo);
-	if (!enabled) {
-	    m_debugger.driver()->executeCmd(DCdisable, i+1);
-	}
-	if (!condition.isEmpty()) {
-	    m_debugger.driver()->executeCmd(DCcondition, condition, i+1);
-	}
-
-	SIZED_QString(location, fileName.length()+30);
-	location.sprintf("%s:%d", fileName.data(), lineNo);
-	insertBreakpoint(i+1, temporary, enabled,
-			 location, fileName, lineNo-1, 0, 0, condition);
-    }
-}
-
-
-BreakpointListBox::BreakpointListBox(QWidget* parent, const char* name) :
-	QListView(parent, name)
-{
-    addColumn(i18n("Location"), 300);
-    addColumn(i18n("Hits"), 30);
-    addColumn(i18n("Ignore"), 30);
-    addColumn(i18n("Condition"), 200);
-
-    setMinimumSize(200, 100);
-    /* work around a non-feature of KTabListBox: */
+    m_list.setMinimumSize(200, 100);
     setFocusPolicy(QWidget::StrongFocus);
 
-    setSorting(-1);
+    m_list.setSorting(-1);
 
     // add pixmaps
 #if QT_VERSION < 200
@@ -558,39 +336,37 @@ BreakpointListBox::BreakpointListBox(QWidget* parent, const char* name) :
     }
 }
 
-BreakpointListBox::~BreakpointListBox()
+void BreakpointItem::display()
 {
-}
+    BreakpointTable* lb = static_cast<BreakpointTable*>(listView()->parent());
 
-void BreakpointListBox::changeItem(WndBreakpoint* bp)
-{
-    /* breakpoint icon code; keep order the same as in this class's constructor */
-    int code = bp->enabled ? 1 : 0;
-    if (bp->temporary)
+    /* breakpoint icon code; keep order the same as in BreakpointTable::initListAndIcons */
+    int code = enabled ? 1 : 0;
+    if (temporary)
 	code += 2;
-    if (!bp->condition.isEmpty() || bp->ignoreCount > 0)
+    if (!condition.isEmpty() || ignoreCount > 0)
 	code += 4;
-    bp->listItem->setPixmap(0, m_icons[code]);
+    setPixmap(0, lb->m_icons[code]);
 
     // more breakpoint info
-    bp->listItem->setText(0, bp->location);
+    setText(0, location);
     QString tmp;
-    if (bp->hitCount == 0) {
-	bp->listItem->setText(1, "");
+    if (hitCount == 0) {
+	setText(1, QString());
     } else {
-	tmp.setNum(bp->hitCount);
-	bp->listItem->setText(1, tmp);
+	tmp.setNum(hitCount);
+	setText(1, tmp);
     }
-    if (bp->ignoreCount == 0) {
-	bp->listItem->setText(2, "");
+    if (ignoreCount == 0) {
+	setText(2, QString());
     } else {
-	tmp.setNum(bp->ignoreCount);
-	bp->listItem->setText(2, tmp);
+	tmp.setNum(ignoreCount);
+	setText(2, tmp);
     }
-    if (bp->condition.isEmpty()) {
-	bp->listItem->setText(3, "");
+    if (condition.isEmpty()) {
+	setText(3, QString());
     } else {
-	bp->listItem->setText(3, bp->condition);
+	setText(3, condition);
     }
 }
 

@@ -15,6 +15,7 @@
 #include <ktmainwindow.h>
 #include "mainwndbase.h"
 #include "winstack.h"
+#include "brkpt.h"
 
 
 class DebuggerMainWnd : public KTMainWindow, public DebuggerMainWndBase
@@ -52,6 +53,7 @@ protected:
     QListBox m_btWindow;
     ExprWnd m_localVariables;
     WatchWindow m_watches;
+    BreakpointTable m_bpTable;
 
     // menus
     QPopupMenu m_menuFile;
@@ -82,6 +84,8 @@ public slots:
     void slotAnimationTimeout();
     void slotGlobalOptions();
     void slotDebuggerStarting();
+    void slotToggleBreak(const QString&, int);
+    void slotEnaDisBreak(const QString&, int);
 };
 
 #endif // DBGMAINWND_H
