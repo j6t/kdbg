@@ -33,21 +33,15 @@
 
 int main(int argc, char** argv)
 {
-    static const char* description =
-	i18n("A Debugger");
-
     KAboutData aboutData("kdbg", "KDbg",
 			 VERSION,
-			 description,
+			 I18N_NOOP("A Debugger"),
 			 KAboutData::License_GPL, 
-			 "(c) 1998-2001 Johannes Sixt",
+			 "(c) 1998-2003 Johannes Sixt",
 			 0,		/* any text */
 			 "http://members.nextra.at/johsixt/kdbg.html",
 			 "Johannes.Sixt@telecom.at");
     aboutData.addAuthor("Johannes Sixt", 0, "Johannes.Sixt@telecom.at");
-    aboutData.addCredit("Max Judin",
-			I18N_NOOP("Docking windows"),
-			"novaprint@mtu-net.ru");
     aboutData.addCredit("Keith Isdale",
 			I18N_NOOP("XSLT debugging"),
 			"k_isdale@tpg.com.au");
