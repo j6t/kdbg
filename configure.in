@@ -47,6 +47,24 @@ if test "x$WANT_TRACE_OUTPUT" = "xyes"; then
   AC_DEFINE_UNQUOTED(WANT_TRACE_OUTPUT)
 fi
 
+dnl Check where the communication with gdb should be logged
+AC_MSG_CHECKING([where communication with gdb should be logged])
+dnl Default is ./gdb-transcript until kdbg is released
+AC_ARG_WITH(transcript,
+  [  --with-transcript=file  log communication with gdb [default=./gdb-transcript]],
+  GDB_TRANSCRIPT=$withval, GDB_TRANSCRIPT=yes)
+if test "x$GDB_TRANSCRIPT" = "xyes"; then
+  GDB_TRANSCRIPT="./gdb-transcript"
+fi
+if test "x$GDB_TRANSCRIPT" = "xno"; then
+  GDB_TRANSCRIPT="not logged"
+else
+  dnl add quotes
+  GDB_TRANSCRIPT=\"$GDB_TRANSCRIPT\"
+  AC_DEFINE_UNQUOTED(GDB_TRANSCRIPT, $GDB_TRANSCRIPT)
+fi
+AC_MSG_RESULT($GDB_TRANSCRIPT)
+
 dnl add here all your Makefiles. These are created by configure
 AC_OUTPUT(Makefile \
 	kdbg/Makefile \

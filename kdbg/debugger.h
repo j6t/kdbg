@@ -195,9 +195,11 @@ protected:
     // debugger process
     GdbProcess m_gdb;
     int m_gdbMajor, m_gdbMinor;
-    
+
+#ifdef GDB_TRANSCRIPT
     // log file
     QFile m_logFile;
+#endif
 
     /**
      * Is the window that shows "this" visible?

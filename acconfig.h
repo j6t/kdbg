@@ -31,3 +31,7 @@
 
 /* Define if you want to see voluminous trace output */
 #undef WANT_TRACE_OUTPUT
+
+/* Define to the name of the file that communication with gdb
+   should be logged to; undefine it for no logging */
+#undef GDB_TRANSCRIPT

@@ -70,7 +70,9 @@ KDebugger::KDebugger(const char* name) :
 	m_programConfig(0),
 	m_gdb(),
 	m_gdbMajor(4), m_gdbMinor(16),
-	m_logFile("./gdb-transcript"),
+#ifdef GDB_TRANSCRIPT
+	m_logFile(GDB_TRANSCRIPT),
+#endif
 	m_bpTable(*this),
 	m_menu(this, "menu"),
 	m_toolbar(this, "toolbar"),
@@ -658,8 +660,10 @@ bool KDebugger::startGdb()
 	return false;
     }
 
+#ifdef GDB_TRANSCRIPT
     // open log file
     m_logFile.open(IO_WriteOnly);
+#endif
 
     // change prompt string and synchronize with gdb
     m_state = DSidle;
@@ -678,8 +682,10 @@ void KDebugger::stopGdb()
 
 void KDebugger::gdbExited(KProcess*)
 {
+#ifdef GDB_TRANSCRIPT
     static const char txt[] = "\ngdb exited\n";
     m_logFile.writeBlock(txt,sizeof(txt)-1);
+#endif
 
     // save settings
     if (m_programConfig != 0) {
@@ -967,9 +973,11 @@ void KDebugger::writeCommand()
     const char* str = cmd->m_cmdString;
     m_gdb.writeStdin(const_cast<char*>(str), cmd->m_cmdString.length());
 
+#ifdef GDB_TRANSCRIPT
     // write also to log file
     m_logFile.writeBlock(str, cmd->m_cmdString.length());
     m_logFile.flush();
+#endif
 
     m_state = newState;
 }
@@ -1014,12 +1022,6 @@ void KDebugger::commandRead(KProcess*)
 
 void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
 {
-//    TRACE("in receiveOutput");
-
-    // write to log file
-    m_logFile.writeBlock(buffer, buflen);
-    m_logFile.flush();
-    
     /*
      * The debugger should be running (processing a command) at this point.
      * If it is not, it is still idle because we haven't received the
@@ -1037,6 +1039,12 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
 	m_delayedOutput.enqueue(new QString(buffer, buflen+1));
 	return;
     }
+#ifdef GDB_TRANSCRIPT
+    // write to log file (do not log delayed output - it would appear twice)
+    m_logFile.writeBlock(buffer, buflen);
+    m_logFile.flush();
+#endif
+    
     /*
      * gdb sometimes produces stray output while it's idle. This happens if
      * it receives a signal, most prominently a SIGCONT after a SIGTSTP:
