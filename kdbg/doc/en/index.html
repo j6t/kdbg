@@ -2,7 +2,7 @@
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="GENERATOR" content="Mozilla/4.7 [en] (X11; I; Linux 2.2.13 i586) [Netscape]">
+   <meta name="GENERATOR" content="Mozilla/4.7 [en] (X11; I; Linux 2.2.13-SMP i686) [Netscape]">
    <title>KDbg - User's Manual</title>
 </head>
 <body>
@@ -156,16 +156,28 @@ can set the following:
 the command by which gdb is invoked,</li>
 
 <li>
-the command that opens a terminal for the program's output.</li>
+the command that opens a terminal for the program's output,</li>
+
+<li>
+whether the KDbg shall pop into the foreground when the program stops and
+a timeout when it shall go back again,</li>
+
+<li>
+the tab width.</li>
 </ul>
+
+<h4>
+How to invoke gdb</h4>
 If you want to use a different version of gdb, you can specify it under
 <i>How
 to invoke GDB</i>. The default command is <tt>gdb --fullname --nx</tt>.
 Be sure to also specify these options if you change the gdb executable.
 If you leave them away, KDbg will not work. If you messed up the entry,
 you can clear it to revert to the default setting.
-<p>If you want to use a different terminal program to show the output of
-the program, specify it under <i>Terminal for program output</i>. The default
+<h4>
+How to invoke a terminal emulator</h4>
+If you want to use a different terminal program to show the output of the
+program, specify it under <i>Terminal for program output</i>. The default
 setting is <tt>xterm -name kdbgio -title %T -e sh -c %C</tt>. In this entry,
 <tt>%T</tt>
 will be replaced by a title string, <tt>%C</tt> will be replaced by a Bourne
@@ -173,6 +185,17 @@ shell script that loops infinitely so that the terminal window doesn't
 close. (No, it doesn't use CPU, it calls <tt>sleep 3600</tt> in a loop
 :) An alternative for this setting could be <tt>konsole -nowelcome -name
 kdbgio -caption %T -e sh -c %C</tt>.
+<h4>
+Pop into foreground</h4>
+You can specify whether the KDbg window shall move itself into the foreground
+as soon as the program being debugged stops (at a breakpoint or due to
+a signal). The KDbg window is not activated, however (at least under KWM,
+the KDE window manager). Some users may feel that this behavior is intrusive,
+so this option is off by default.
+<p>If this option is on, KDbg will also retreat itself into the background
+when the program is continued by any command, but it does so only after
+a timeout that can be specified. This avoids that the debugger window flashes
+back and fore each time you click any of the <i>Step</i> commands.
 <h2>
 <a NAME="TipsTricks"></a>Tips and Tricks</h2>
 

@@ -2,7 +2,7 @@
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="GENERATOR" content="Mozilla/4.7 [en] (X11; I; Linux 2.2.13 i586) [Netscape]">
+   <meta name="GENERATOR" content="Mozilla/4.7 [en] (X11; I; Linux 2.2.13-SMP i686) [Netscape]">
    <title>KDbg</title>
 </head>
 <body>
@@ -163,23 +163,49 @@ Optionen einstellen:
 den Befehl, mit dem gdb aufgerufen wird;</li>
 
 <li>
-den Befehl, der das Fenster f&uuml;r die Programmausgabe &ouml;ffnet.</li>
+den Befehl, der das Fenster f&uuml;r die Programmausgabe &ouml;ffnet,</li>
+
+<li>
+ob KDbg in den Vordergrund kommen soll, sobald das Programm stoppt, und
+eine Verz&ouml;gerung, wann er sich wieder zur&uuml;ckzieht,</li>
+
+<li>
+die Tabulatorweite.</li>
 </ul>
+
+<h4>
+Aufruf von gdb</h4>
 Wenn Sie eine alternative Version von gdb verwenden wollen, geben sie diese
 unter <i>Aufruf von GDB</i> an. Die Standardeinstellung ist <tt>gdb -fullname
 -nx</tt>. Achtung: Sie m&uuml;ssen jedenfalls diese beiden Argumente &uuml;bergeben;
 wenn Sie sie weglassen, kann KDbg nicht funktionieren. Wenn Sie das Eingabefeld
 leer lassen, wird die Standardeinstellung verwendet.
-<p>Falls Sie ein anderes Terminal-Programm verwenden wollen, das die Ausgabe
+<h4>
+Aufruf eines Terminal-Emulators</h4>
+Falls Sie ein anderes Terminal-Programm verwenden wollen, das die Ausgabe
 des Programms anzeigt, geben Sie dieses unter <i>Terminal f&uuml;r die
 Programmausgabe</i> an. Die Standardeinstellung ist <tt>xterm -name kdbgio
 -title %T -e sh -c %C</tt>. In diesem Eintrag wird <tt>%T</tt> durch eine
 &Uuml;berschrift und <tt>%C</tt> durch ein Bourne-Shell-Skript ersetzt,
 das in eine Endlosschleife landet, damit sich das Fenster nicht schlie&szlig;t.
 (Keine Sorge, das Skript frisst keine CPU-Zeit, sondern ruft einfach nur
-<tt>sleep 3600</tt> in einer Schleife auf :) Eine alternative f&uuml;r
-diesen Eintrag w&auml;re zm Beispiel <tt>konsole -nowelcome -name kdbgio
--caption %T -e sh -c %C</tt>.
+<tt>sleep
+3600</tt> in einer Schleife auf :) Eine alternative f&uuml;r diesen Eintrag
+w&auml;re zm Beispiel <tt>konsole -nowelcome -name kdbgio -caption %T -e
+sh -c %C</tt>.
+<h4>
+In den Vordergrund</h4>
+Sie k&ouml;nnen angeben, ob das KDbg-Fenster in den Vordergrund gebracht
+werden soll, sobald das kontrollierte Programm anh&auml;lt (bei einem Breakpoint
+oder wegen eines Signals). Das Fenster wird allerdings nicht aktiviert
+(zumindest nicht unter KWM, dem Window Manger von KDE). Manche Benutzer
+werden dieses Verhalten als st&ouml;rend empfinden, weshalb diese Option
+standardm&auml;ssig ausgeschaltet ist.
+<p>Wenn diese Option eingeschaltet ist, zieht sich das KDbg-Fenster auch
+wieder in den Hintergrund zur&uuml;ck, sobald das Programm fortgesetzt
+wird. Allerdings geschieht das erst nach einer Verz&ouml;gerung, die ebenfalls
+angegeben werden kann. Dadurch wird verhindert, dass das Fenster st&auml;ndig
+nach hinten und vorne blinkt, sobald Sie einen Einzelschritt-Befehl absetzen.
 <h2>
 <a NAME="TipsTricks"></a>Tips und Tricks</h2>
 
