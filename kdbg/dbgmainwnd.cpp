@@ -629,7 +629,7 @@ void DebuggerMainWnd::updateLineStatus(int lineNo)
 
 void DebuggerMainWnd::slotGlobalOptions()
 {
-    QTabDialog dlg(0, "global_options", true);
+    QTabDialog dlg(this, "global_options", true);
     QString title = kapp->getCaption();
     title += i18n(": Global options");
     dlg.setCaption(title);
