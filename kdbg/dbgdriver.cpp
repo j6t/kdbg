@@ -456,6 +456,9 @@ DbgAddr::DbgAddr(const QString& aa) :
  */
 void DbgAddr::cleanAddr()
 {
+    if (a.isEmpty())
+	return;
+
     while (a[0] == '0' || a[0] == 'x') {
 	a.remove(0, 1);
     }
@@ -471,7 +474,10 @@ void DbgAddr::operator=(const QString& aa)
 /* Re-attach 0x in front of the address */
 QString DbgAddr::asString() const
 {
-    return "0x" + a;
+    if (a.isEmpty())
+	return QString();
+    else
+	return "0x" + a;
 }
 
 bool operator==(const DbgAddr& a1, const DbgAddr& a2)

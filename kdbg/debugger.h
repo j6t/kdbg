@@ -305,7 +305,7 @@ protected:
 				    const DbgAddr& address);
     void newBreakpoint(const char* output);
     void updateBreakList(const char* output);
-    bool haveTemporaryBP() const;
+    bool stopMayChangeBreakList() const;
     void saveBreakpoints(KSimpleConfig* config);
     void restoreBreakpoints(KSimpleConfig* config);
 

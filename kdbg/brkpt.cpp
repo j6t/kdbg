@@ -39,7 +39,8 @@ BreakpointTable::BreakpointTable(QWidget* parent, const char* name) :
 	m_debugger(0),
 	m_bpEdit(this, "bpedit"),
 	m_list(this, "bptable"),
-	m_btAdd(this, "add"),
+	m_btAddBP(this, "addbp"),
+	m_btAddWP(this, "addwp"),
 	m_btRemove(this, "remove"),
 	m_btEnaDis(this, "enadis"),
 	m_btViewCode(this, "view"),
@@ -59,9 +60,13 @@ BreakpointTable::BreakpointTable(QWidget* parent, const char* name) :
     // need mouse button events
     m_list.viewport()->installEventFilter(this);
 
-    m_btAdd.setText(i18n("&Add"));
-    m_btAdd.setMinimumSize(m_btAdd.sizeHint());
-    connect(&m_btAdd, SIGNAL(clicked()), this, SLOT(addBP()));
+    m_btAddBP.setText(i18n("Add &Breakpoint"));
+    m_btAddBP.setMinimumSize(m_btAddBP.sizeHint());
+    connect(&m_btAddBP, SIGNAL(clicked()), this, SLOT(addBP()));
+
+    m_btAddWP.setText(i18n("Add &Watchpoint"));
+    m_btAddWP.setMinimumSize(m_btAddWP.sizeHint());
+    connect(&m_btAddWP, SIGNAL(clicked()), this, SLOT(addWP()));
 
     m_btRemove.setText(i18n("&Remove"));
     m_btRemove.setMinimumSize(m_btRemove.sizeHint());
@@ -95,7 +100,8 @@ BreakpointTable::BreakpointTable(QWidget* parent, const char* name) :
     m_layout.addLayout(&m_buttons);
     m_listandedit.addWidget(&m_bpEdit);
     m_listandedit.addWidget(&m_list, 10);
-    m_buttons.addWidget(&m_btAdd);
+    m_buttons.addWidget(&m_btAddBP);
+    m_buttons.addWidget(&m_btAddWP);
     m_buttons.addWidget(&m_btRemove);
     m_buttons.addWidget(&m_btEnaDis);
     m_buttons.addWidget(&m_btViewCode);
@@ -168,6 +174,16 @@ void BreakpointTable::addBP()
     }
 }
 
+void BreakpointTable::addWP()
+{
+    // set a watchpoint for the specified expression
+    QString wpExpr = m_bpEdit.text();
+    wpExpr = wpExpr.stripWhiteSpace();
+    if (m_debugger->isReady()) {
+	m_debugger->driver()->executeCmd(DCwatchpoint, wpExpr);
+    }
+}
+
 void BreakpointTable::removeBP()
 {
     BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
@@ -199,7 +215,8 @@ void BreakpointTable::viewBP()
 void BreakpointTable::updateUI()
 {
     bool enableChkpt = m_debugger->canChangeBreakpoints();
-    m_btAdd.setEnabled(enableChkpt);
+    m_btAddBP.setEnabled(enableChkpt);
+    m_btAddWP.setEnabled(enableChkpt);
 
     BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
     m_btViewCode.setEnabled(bp != 0);
@@ -351,32 +368,36 @@ void BreakpointTable::initListAndIcons()
     KIconLoader* loader = kapp->getIconLoader();
     QPixmap brkena = loader->loadIcon("brkena.xpm");
     QPixmap brkdis = loader->loadIcon("brkdis.xpm");
+    QPixmap watchena = loader->loadIcon("watchena.xpm");
+    QPixmap watchdis = loader->loadIcon("watchdis.xpm");
     QPixmap brktmp = loader->loadIcon("brktmp.xpm");
     QPixmap brkcond = loader->loadIcon("brkcond.xpm");
 #else
     QPixmap brkena = BarIcon("brkena.xpm");
     QPixmap brkdis = BarIcon("brkdis.xpm");
+    QPixmap watchena = BarIcon("watchena.xpm");
+    QPixmap watchdis = BarIcon("watchdis.xpm");
     QPixmap brktmp = BarIcon("brktmp.xpm");
     QPixmap brkcond = BarIcon("brkcond.xpm");
 #endif
     /*
-     * There are 8 different pixmaps: The basic enabled or disabled
+     * There are 16 different pixmaps: The basic enabled or disabled
      * breakpoint, plus an optional overlaid brktmp icon plus an optional
-     * overlaid brkcond icon.
+     * overlaid brkcond icon. Then the same sequence for watchpoints.
      */
-    m_icons.setSize(8);
+    m_icons.setSize(16);
     QPixmap canvas(16,16);
 
-    for (int i = 0; i < 8; i++) {
+    for (int i = 0; i < 16; i++) {
 	{
 	    QPainter p(&canvas);
 	    // clear canvas
 	    p.fillRect(0,0, canvas.width(),canvas.height(), cyan);
 	    // basic icon
 	    if (i & 1) {
-		p.drawPixmap(1,1, brkena);
+		p.drawPixmap(1,1, (i & 8) ? watchena : brkena);
 	    } else {
-		p.drawPixmap(1,1, brkdis);
+		p.drawPixmap(1,1, (i & 8) ? watchdis : brkdis);
 	    }
 	    // temporary overlay
 	    if (i & 2) {
@@ -402,6 +423,8 @@ void BreakpointItem::display()
 	code += 2;
     if (!condition.isEmpty() || ignoreCount > 0)
 	code += 4;
+    if (type == watchpoint)
+	code += 8;
     setPixmap(0, lb->m_icons[code]);
 
     // more breakpoint info

@@ -70,6 +70,7 @@ enum DbgCommand {
 	DCtbreakline,			/* line number is zero-based! */
 	DCbreakaddr,
 	DCtbreakaddr,
+	DCwatchpoint,
 	DCdelete,
 	DCenable,
 	DCdisable,
@@ -158,6 +159,9 @@ struct CmdQueueItem
 struct Breakpoint
 {
     int id;				/* gdb's number */
+    enum Type {
+	breakpoint, watchpoint 
+    } type;
     bool temporary;
     bool enabled;
     QString location;

@@ -104,6 +104,7 @@ static GdbCmdInfo cmds[] = {
     { DCtbreakline, "tbreak %s:%d\n", GdbCmdInfo::argStringNum },
     { DCbreakaddr, "break *%s\n", GdbCmdInfo::argString },
     { DCtbreakaddr, "tbreak *%s\n", GdbCmdInfo::argString },
+    { DCwatchpoint, "watch %s\n", GdbCmdInfo::argString },
     { DCdelete, "delete %d\n", GdbCmdInfo::argNum },
     { DCenable, "enable %d\n", GdbCmdInfo::argNum },
     { DCdisable, "disable %d\n", GdbCmdInfo::argNum },
@@ -1486,11 +1487,20 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	// get Num
 	long bpNum = strtol(p, &dummy, 10);	/* don't care about overflows */
 	p = dummy;
-	// skip Type
+	// get Type
 	while (isspace(*p))
 	    p++;
-	while (*p != '\0' && !isspace(*p))	/* "breakpoint" */
-	    p++;
+	Breakpoint::Type bpType;
+	if (strncmp(p, "breakpoint", 10) == 0) {
+	    bpType = Breakpoint::breakpoint;
+	    p += 10;
+	} else if (strncmp(p, "hw watchpoint", 13) == 0) {
+	    bpType = Breakpoint::watchpoint;
+	    p += 13;
+	} else if (strncmp(p, "watchpoint", 10) == 0) {
+	    bpType = Breakpoint::watchpoint;
+	    p += 10;
+	}
 	while (isspace(*p))
 	    p++;
 	if (*p == '\0')
@@ -1512,7 +1522,9 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	if (*p == '\0')
 	    break;
 	// the address, if present
-	if (strncmp(p, "0x", 2) == 0) {
+	if (bpType == Breakpoint::breakpoint &&
+	    strncmp(p, "0x", 2) == 0)
+	{
 	    const char* start = p;
 	    while (*p != '\0' && !isspace(*p))
 		p++;
@@ -1573,6 +1585,7 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	}
 	Breakpoint* bp = new Breakpoint;
 	bp->id = bpNum;
+	bp->type = bpType;
 	bp->temporary = disp == 'd';
 	bp->enabled = enable == 'y';
 	bp->location = location;

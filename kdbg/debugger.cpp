@@ -685,11 +685,13 @@ const char Condition[] = "Condition";
 void KDebugger::saveBreakpoints(KSimpleConfig* config)
 {
     QString groupName;
-    int i;
-    for (i = 0; uint(i) < m_brkpts.size(); i++) {
-	groupName.sprintf(BPGroup, i);
+    int i = 0;
+    for (uint j = 0; j < m_brkpts.size(); j++) {
+	Breakpoint* bp = m_brkpts[j];
+	if (bp->type == Breakpoint::watchpoint)
+	    continue;			/* don't save watchpoints */
+	groupName.sprintf(BPGroup, i++);
 	config->setGroup(groupName);
-	Breakpoint* bp = m_brkpts[i];
 	if (!bp->fileName.isEmpty()) {
 	    config->writeEntry(File, bp->fileName);
 	    config->writeEntry(Line, bp->lineNo);
@@ -911,6 +913,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCtbreakline:
     case DCbreakaddr:
     case DCtbreakaddr:
+    case DCwatchpoint:
 	newBreakpoint(output);
 	// fall through
     case DCdelete:
@@ -973,7 +976,7 @@ void KDebugger::handleRunCommands(const char* output)
      * it would go away now.
      */
     if ((flags & (DebuggerDriver::SFrefreshBreak|DebuggerDriver::SFrefreshSource)) ||
-	haveTemporaryBP())
+	stopMayChangeBreakList())
     {
 	m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
     }
@@ -1771,10 +1774,12 @@ void KDebugger::updateBreakList(const char* output)
 }
 
 // look if there is at least one temporary breakpoint
-bool KDebugger::haveTemporaryBP() const
+// or a watchpoint
+bool KDebugger::stopMayChangeBreakList() const
 {
     for (int i = m_brkpts.size()-1; i >= 0; i--) {
-	if (m_brkpts[i]->temporary)
+	Breakpoint* bp = m_brkpts[i];
+	if (bp->temporary || bp->type == Breakpoint::watchpoint)
 	    return true;
     }
     return false;

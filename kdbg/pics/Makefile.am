@@ -23,6 +23,8 @@ PICTOGRAMS = \
 	regs.xpm \
 	watch.xpm \
 	watchcoded.xpm \
+	watchena.xpm \
+	watchdis.xpm \
 	pointer.xpm
 
 

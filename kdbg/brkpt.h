@@ -30,7 +30,8 @@ protected:
     KDebugger* m_debugger;
     QLineEdit m_bpEdit;
     QListView m_list;
-    QPushButton m_btAdd;
+    QPushButton m_btAddBP;
+    QPushButton m_btAddWP;
     QPushButton m_btRemove;
     QPushButton m_btEnaDis;
     QPushButton m_btViewCode;
@@ -66,6 +67,7 @@ signals:
     void activateFileLine(const QString& file, int lineNo, const DbgAddr& address);
 public slots:
     virtual void addBP();
+    virtual void addWP();
     virtual void removeBP();
     virtual void enadisBP();
     virtual void viewBP();
