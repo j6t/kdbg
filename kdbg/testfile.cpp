@@ -74,10 +74,10 @@ void f(E e[3], char c)
 	emptyVNested evn;
 }
 
-void strtest(const char* s)
+void strtest(const char* t)
 {
-    const char* t = s;
-    cout << t << endl;
+    const char* s = t;
+    cout << s << endl;
 }
 
 

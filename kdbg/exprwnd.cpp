@@ -306,9 +306,6 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues)
 {
     bool isExpanded = display->isExpanded();
 
-    // display the new value
-    updateSingleExpr(display, newValues);
-
     /*
      * If we are updating a pointer without children by a dummy, we don't
      * collapse it, but simply insert the new children. This happens when a
@@ -343,6 +340,11 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues)
 	    collapseSubTree(display, false);
 	}
 
+	// since children changed, it is likely that the type has also changed
+	display->m_type = 0;		/* will re-evaluate the type */
+
+	// display the new value
+	updateSingleExpr(display, newValues);
 	replaceChildren(display, newValues);
 
 	// update the m_varKind
@@ -354,7 +356,10 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues)
 	// (note that the new value might not have a sub-tree at all)
 	return display->m_valueChanged || isExpanded;	/* no visible change if not expanded */
     }
-    
+
+    // display the new value
+    updateSingleExpr(display, newValues);
+
     /*
      * If this is an expanded pointer, record it for being updated.
      */
