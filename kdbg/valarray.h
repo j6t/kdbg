@@ -5,6 +5,14 @@
 
 // an array template class that holds values (not pointers to values)
 
+// need a placement new
+#include "config.h"
+#ifdef HAVE_PLACEMENT_NEW
+#include <new>
+#else
+inline void* operator new(size_t, void* p) { return p; }
+#endif
+
 template<class T>
 class ValArray
 {
@@ -24,9 +32,6 @@ protected:
 
     void expand(const T& newElem, int newSize);
 };
-
-// need a placement-new
-inline void* operator new(size_t, void* p) { return p; }
 
 template<class T>
 ValArray<T>::~ValArray()
