@@ -48,8 +48,8 @@
 #define ID_WINDOW_INDEX_MASK 0xf
 
 // statusbar ids
-#define ID_STATUS_MSG 1
-#define ID_STATUS_BUSY 2
-#define ID_STATUS_ACTIVE 3
-#define ID_STATUS_LINENO 4
+#define ID_STATUS_MSG 191
+#define ID_STATUS_BUSY 192
+#define ID_STATUS_ACTIVE 193
+#define ID_STATUS_LINENO 194
 #endif // COMMANDIDS_H

@@ -77,6 +77,8 @@ KDebugger::KDebugger(const char* name) :
 	m_menu(this, "menu"),
 	m_toolbar(this, "toolbar"),
 	m_statusbar(this, "statusbar"),
+	m_animationTimer(this),
+	m_animationCounter(0),
 	m_mainPanner(this, "main_pane", KNewPanner::Vertical, KNewPanner::Percent, 60),
 	m_leftPanner(&m_mainPanner, "left_pane", KNewPanner::Horizontal, KNewPanner::Percent, 70),
 	m_rightPanner(&m_mainPanner, "right_pane", KNewPanner::Horizontal, KNewPanner::Percent, 50),
@@ -97,7 +99,6 @@ KDebugger::KDebugger(const char* name) :
 	m_watchV(&m_watches, 0),
 	m_watchH(0)
 {
-    m_statusBusy = i18n("busy");
     m_statusActive = i18n("active");
 
     m_gdbOutputAlloc = 4000;
@@ -126,7 +127,7 @@ KDebugger::KDebugger(const char* name) :
 	    SLOT(slotLocalsExpanding(KTreeViewItem*,bool&)));
 
     m_leftPanner.activate(&m_filesWindow, &m_btWindow);
-    connect(&m_btWindow, SIGNAL(selected(int)), SLOT(gotoFrame(int)));
+    connect(&m_btWindow, SIGNAL(highlighted(int)), SLOT(gotoFrame(int)));
     connect(&m_watchVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
 	    SLOT(slotWatchExpanding(KTreeViewItem*,bool&)));
 
@@ -464,6 +465,12 @@ void KDebugger::updateUI()
     UpdateToolbarUI updateToolbar(&m_toolbar, this, SLOT(updateUIItem(UpdateUI*)),
 				  toolIds, sizeof(toolIds)/sizeof(toolIds[0]));
     updateToolbar.iterateToolbar();
+    // special update of animation
+    if (m_state == DSidle) {
+	stopAnimation();
+    } else {
+	startAnimation();
+    }
 }
 
 void KDebugger::updateUIItem(UpdateUI* item)
@@ -506,8 +513,6 @@ void KDebugger::updateUIItem(UpdateUI* item)
     }
     
     // update statusbar
-    m_statusbar.changeItem(m_state == DSidle ? "" : static_cast<const char*>(m_statusBusy),
-			   ID_STATUS_BUSY);
     m_statusbar.changeItem(m_programActive ? static_cast<const char*>(m_statusActive) : "",
 			   ID_STATUS_ACTIVE);
     // line number is updated in slotLineChanged
@@ -609,8 +614,9 @@ void KDebugger::initToolbar()
 			   i18n("Search"));
 
     connect(&m_toolbar, SIGNAL(clicked(int)), SLOT(menuCallback(int)));
+    
+    initAnimation();
 
-    m_statusbar.insertItem(m_statusBusy, ID_STATUS_BUSY);
     m_statusbar.insertItem(m_statusActive, ID_STATUS_ACTIVE);
     m_statusbar.insertItem(i18n("Line 00000"), ID_STATUS_LINENO);
     m_statusbar.insertItem("", ID_STATUS_MSG);	/* message pane */
@@ -619,6 +625,30 @@ void KDebugger::initToolbar()
     i18n("Restart");
     i18n("Executable");
     i18n("Core dump");
+}
+
+void KDebugger::initAnimation()
+{
+    QPixmap pixmap;
+    QString path = kapp->kde_datadir() + "/kfm/pics/";
+
+    pixmap.load(path + "/kde1.xpm");
+    
+    m_toolbar.insertButton(pixmap, ID_STATUS_BUSY);
+    m_toolbar.alignItemRight(ID_STATUS_BUSY, true);
+    
+    // Load animated logo
+    m_animation.setAutoDelete(true);
+    QString n;
+    for (int i = 1; i <= 9; i++) {
+	n.sprintf("/kde%d.xpm", i);
+	QPixmap* p = new QPixmap();
+	p->load(path + n);
+	if (!p->isNull()) {
+	    m_animation.append(p);
+	}
+    }
+    connect(&m_animationTimer, SIGNAL(timeout()), SLOT(slotAnimationTimeout()));
 }
 
 #ifdef WANT_THIS_PANE
@@ -1069,7 +1099,6 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
     if (m_activeCmd == 0 && m_state != DSinterrupted) {
 	// ignore the output
 	TRACE("ignoring stray output: " + QString(buffer, buflen+1));
-	ASSERT(buflen >= PROMPT_LEN && strncmp(buffer, PROMPT, PROMPT_LEN) == 0);
 	return;
     }
     ASSERT(m_state == DSrunning || m_state == DSrunningLow || m_state == DSinterrupted);
@@ -1127,6 +1156,13 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
 	// empty buffer
 	m_gdbOutputLen = 0;
 	*m_gdbOutput = '\0';
+	// also clear delayed output if interrupted
+	if (m_state == DSinterrupted) {
+	    QString* delayed;
+	    while ((delayed = m_delayedOutput.dequeue()) != 0) {
+		delete delayed;
+	    }
+	}
 
 	/*
 	 * We parsed some output successfully. Unless there's more delayed
@@ -1888,7 +1924,7 @@ void KDebugger::dereferencePointer(ExprWnd* wnd, VarTree* exprItem,
     QString queueExpr = "print *(" + expr + ")";
     CmdQueueItem* cmd;
     if (immediate) {
-	cmd = executeCmd(DCprint, queueExpr);
+	cmd = queueCmd(DCprint, queueExpr, QMoverrideMoreEqual);
     } else {
 	cmd = queueCmd(DCprint, queueExpr, QMoverride);
     }
@@ -2202,5 +2238,29 @@ void KDebugger::updateLineStatus(int lineNo)
 	QString strLine;
 	strLine.sprintf(i18n("Line %d"), lineNo + 1);
 	m_statusbar.changeItem(strLine, ID_STATUS_LINENO);
+    }
+}
+
+void KDebugger::slotAnimationTimeout()
+{
+    m_animationCounter++;
+    if (m_animationCounter == m_animation.count())
+	m_animationCounter = 0;
+    m_toolbar.setButtonPixmap(ID_STATUS_BUSY,
+			      *m_animation.at(m_animationCounter));
+}
+
+void KDebugger::startAnimation()
+{
+    if (!m_animationTimer.isActive()) {
+	m_animationTimer.start(50);
+    }
+}
+
+void KDebugger::stopAnimation()
+{
+    if (m_animationTimer.isActive()) {
+	m_animationTimer.stop();
+	m_toolbar.setButtonPixmap(ID_STATUS_BUSY, *m_animation.at(0));
     }
 }

@@ -222,6 +222,7 @@ public slots:
     void slotWatchExpanding(KTreeViewItem*, bool&);
     void slotFileChanged();
     void slotLineChanged();
+    void slotAnimationTimeout();
     /*
      * Unless WANT_THIS_PANE is defined, the following slots are unused.
      * Removing them with #ifdef ... #endif doesn't work because moc
@@ -242,8 +243,11 @@ protected:
     KToolBar m_toolbar;
     KStatusBar m_statusbar;
     // statusbar texts
-    QString m_statusBusy;
     QString m_statusActive;
+    // animated buttons
+    QList<QPixmap> m_animation;
+    QTimer m_animationTimer;
+    uint m_animationCounter;
     
     // view windows
     KNewPanner m_mainPanner;
@@ -279,6 +283,9 @@ protected:
 protected:
     void initMenu();
     void initToolbar();
+    void initAnimation();
+    void startAnimation();
+    void stopAnimation();
 
     friend class BreakpointTable;
 };
