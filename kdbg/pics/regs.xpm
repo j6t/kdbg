@@ -1,0 +1,26 @@
+/* XPM */
+static const char *regs[] = {
+"16 16 6 1",
+"  c Gray0",
+". c #808000",
+"X c Yellow",
+"o c #808080",
+"O c None",
+"+ c Gray100",
+"OOOOOOOOOOOOOOOO",
+"OOOOOOOOOOOOOOOO",
+"OOO........... O",
+"OO.XXXXXXXXXX. O",
+"OO...........O O",
+"OOo++++++++++O O",
+"OOo+OOO+++OO+O O",
+"OOo++++++++++O O",
+"OOo+OOOOOOOO+O O",
+"OOo++++++++++O O",
+"OOo+OOOOOOOO+O O",
+"OOo++++++++++O O",
+"OOo++++++++++O O",
+"OOooooooooooooOO",
+"OOOOOOOOOOOOOOOO",
+"OOOOOOOOOOOOOOOO"
+};
