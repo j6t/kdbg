@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 0.2.3\n"
-"POT-Creation-Date: 1998-09-15 23:22+0200\n"
+"POT-Creation-Date: 1998-11-07 19:26+0100\n"
 "PO-Revision-Date: 1998-05-14 20:00-0500\n"
 "Last-Translator: Vladimir Vuksan <vuksan@veus.hr>\n"
 "Language-Team: Croatian <hr@li.org>\n"
@@ -30,235 +30,246 @@ msgstr "E"
 msgid "Location"
 msgstr "Mjesto"
 
-#: pgmargs.cpp:20
+#: pgmargs.cpp:19
 msgid ": Program arguments"
 msgstr ": Argumenti programa"
 
-#: pgmargs.cpp:25
+#: pgmargs.cpp:24
 #, c-format
 msgid "Run %s with these arguments:"
 msgstr "Pokreni %s sa ovim argumentima:"
 
-#: debugger.cpp:92
+#: procattach.cpp:19
+msgid ": Attach to process"
+msgstr ""
+
+#: procattach.cpp:23
+msgid "Specify the process number to attach to:"
+msgstr ""
+
+#: debugger.cpp:98
 msgid " Add "
 msgstr " Dodaj "
 
-#: debugger.cpp:93
+#: debugger.cpp:99
 msgid " Del "
 msgstr " Obri¹i "
 
-#: debugger.cpp:98
-msgid "busy"
-msgstr "zauzet"
-
-#: debugger.cpp:99
+#: debugger.cpp:104
 msgid "active"
 msgstr "aktivan"
 
-#: debugger.cpp:118
+#: debugger.cpp:123
 msgid "Locals"
 msgstr "Lokalni"
 
-#: debugger.cpp:155
+#: debugger.cpp:164
 msgid "Breakpoints"
 msgstr "Mjesto prekida"
 
-#: debugger.cpp:283
+#: debugger.cpp:292
 msgid "Select the executable to debug"
 msgstr "Izaberite izvr¹ni program za debugiranje"
 
-#: debugger.cpp:316
+#: debugger.cpp:325
 msgid "Select core dump"
 msgstr ""
 
-#: debugger.cpp:518
+#: debugger.cpp:550
 msgid "&Open Source..."
 msgstr "&Otvori izvorni kod..."
 
-#: debugger.cpp:519
+#: debugger.cpp:551
 msgid "&Reload Source"
 msgstr ""
 
-#: debugger.cpp:521
+#: debugger.cpp:553
 msgid "&Executable..."
 msgstr "&Izvr¹ni program..."
 
-#: debugger.cpp:522
+#: debugger.cpp:554
 msgid "&Core dump..."
 msgstr ""
 
-#: debugger.cpp:528
+#: debugger.cpp:560
 msgid "&Find..."
 msgstr ""
 
-#: debugger.cpp:529
+#: debugger.cpp:561
 msgid "Toggle &Toolbar"
 msgstr "Uklj./isklj. &traku sa alatima"
 
-#: debugger.cpp:530
+#: debugger.cpp:562
 msgid "Toggle &Statusbar"
 msgstr "Uklj./isklj. traku sa &statusom"
 
-#: debugger.cpp:533
+#: debugger.cpp:565
 msgid "&Run"
 msgstr "Pok&reni"
 
-#: debugger.cpp:534
+#: debugger.cpp:566
 msgid "Step &into"
 msgstr ""
 
-#: debugger.cpp:535
+#: debugger.cpp:567
 msgid "Step &over"
 msgstr ""
 
-#: debugger.cpp:536
+#: debugger.cpp:568
 msgid "Step o&ut"
 msgstr ""
 
-#: debugger.cpp:537
+#: debugger.cpp:569
 msgid "Run to &cursor"
 msgstr "Izvr¹i do poka&zivaèa"
 
-#: debugger.cpp:539
+#: debugger.cpp:571
 msgid "&Break"
 msgstr "&Prekid"
 
-#: debugger.cpp:540
+#: debugger.cpp:572
 msgid "Re&start"
 msgstr ""
 
-#: debugger.cpp:542
+#: debugger.cpp:573
+msgid "A&ttach..."
+msgstr ""
+
+#: debugger.cpp:575
 msgid "&Arguments..."
 msgstr "&Argumenti..."
 
-#: debugger.cpp:550
+#: debugger.cpp:583
 msgid "Set/Clear &breakpoint"
 msgstr "Postavi/Obri¹i mjesta &prekida"
 
-#: debugger.cpp:551
+#: debugger.cpp:584
 msgid "Set &temporary breakpoint"
 msgstr "Postavi pri&vremena mjesta prekida"
 
-#: debugger.cpp:552
+#: debugger.cpp:585
 msgid "&Enable/Disable breakpoint"
 msgstr "&Uklj./isklj. mjesta prekida"
 
-#: debugger.cpp:553
+#: debugger.cpp:586
 msgid "&List..."
 msgstr "&Lista..."
 
-#: debugger.cpp:558
+#: debugger.cpp:591
 msgid "&More..."
 msgstr "&Jo¹..."
 
-#: debugger.cpp:572
+#: debugger.cpp:605
 msgid "E&xecution"
 msgstr "I&zvr¹avanje"
 
-#: debugger.cpp:573
+#: debugger.cpp:606
 msgid "&Breakpoint"
 msgstr "&Mjesta prekida"
 
-#: debugger.cpp:574
+#: debugger.cpp:607
 msgid "&Window"
 msgstr "&Prozor"
 
-#: debugger.cpp:578
+#: debugger.cpp:611
 msgid ""
 "A Debugger\n"
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "with the help of many others"
 msgstr ""
 
-#: debugger.cpp:590
-msgid "Open a source file"
-msgstr "Otvori datoteku sa izvornim kodom"
-
-#: debugger.cpp:592
-msgid "Reload source file"
-msgstr ""
-
-#: debugger.cpp:595
-msgid "Run/Continue"
-msgstr "Izvr¹i/Nastavi"
-
-#: debugger.cpp:597
-msgid "Step into"
-msgstr ""
-
-#: debugger.cpp:599
-msgid "Step over"
-msgstr ""
-
-#: debugger.cpp:601
-msgid "Step out"
-msgstr ""
-
-#: debugger.cpp:604
-msgid "Breakpoint"
-msgstr "Mjesto prekida"
-
-#: debugger.cpp:607
-msgid "Search"
-msgstr ""
-
-#: debugger.cpp:613
-msgid "Line 00000"
-msgstr ""
-
-#: debugger.cpp:617
-msgid "Restart"
-msgstr ""
-
-#: debugger.cpp:618
+#: debugger.cpp:623
 msgid "Executable"
 msgstr "Izvr¹ni program..."
 
-#: debugger.cpp:619
+#: debugger.cpp:625
+msgid "Open a source file"
+msgstr "Otvori datoteku sa izvornim kodom"
+
+#: debugger.cpp:627
+msgid "Reload source file"
+msgstr ""
+
+#: debugger.cpp:630
+msgid "Run/Continue"
+msgstr "Izvr¹i/Nastavi"
+
+#: debugger.cpp:632
+msgid "Step into"
+msgstr ""
+
+#: debugger.cpp:634
+msgid "Step over"
+msgstr ""
+
+#: debugger.cpp:636
+msgid "Step out"
+msgstr ""
+
+#: debugger.cpp:639
+msgid "Breakpoint"
+msgstr "Mjesto prekida"
+
+#: debugger.cpp:642
+msgid "Search"
+msgstr ""
+
+#: debugger.cpp:649
+msgid "Line 00000"
+msgstr ""
+
+#: debugger.cpp:653
+msgid "Restart"
+msgstr ""
+
+#: debugger.cpp:654
 msgid "Core dump"
 msgstr ""
 
-#: debugger.cpp:756
+#: debugger.cpp:819
 msgid ": Program output"
 msgstr ": Izlaz programa"
 
-#: debugger.cpp:808
+#: debugger.cpp:871
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "`%s' nije datoteka ili ne postoji"
 
-#: debugger.cpp:2176
+#: debugger.cpp:2269
 #, c-format
 msgid "Line %d"
 msgstr ""
 
-#: winstack.cpp:627
+#: winstack.cpp:685
 msgid ": Open Windows"
 msgstr ""
 
-#: winstack.cpp:635
+#: winstack.cpp:693
 msgid "Show"
 msgstr ""
 
-#: winstack.cpp:703
+#: winstack.cpp:761
 msgid ": Search"
 msgstr ""
 
-#: winstack.cpp:709
+#: winstack.cpp:767
 msgid "&Case sensitive"
 msgstr ""
 
-#: winstack.cpp:711
+#: winstack.cpp:769
 msgid "&Forward"
 msgstr ""
 
-#: winstack.cpp:713
+#: winstack.cpp:771
 msgid "&Backward"
 msgstr ""
 
 #: main.cpp:69
 msgid "Cannot start debugger."
 msgstr "Ne mogu pokrenuti debugger."
+
+#~ msgid "busy"
+#~ msgstr "zauzet"
 
 #~ msgid "&Remove"
 #~ msgstr "&Ukloni"
