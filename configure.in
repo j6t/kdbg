@@ -1,0 +1,56 @@
+
+dnl without this order in this file, autoconf will not work!
+dnl the argument is a source file out of your sources. But
+dnl acinclude.m4 makes the job for all programs ;-)
+AC_INIT(acinclude.m4)
+
+dnl without this order in this file, automake will be confused!
+dnl the argument 
+AM_CONFIG_HEADER(config.h)
+
+dnl insert here your program name and version number
+KDE_DO_IT_ALL(kdbg, 0.1.2)
+
+dnl in this space add everything you want to check for
+dnl examples are specific headers, libraries, etc.
+dnl everything to compile and run a KDE program is already checked
+
+dnl Checks for header files.
+AC_LANG_CPLUSPLUS dnl switch to C++
+AC_HEADER_DIRENT dnl check for dirent.h
+AC_HEADER_STDC dnl check for other stdc headers. More traditional ;)
+dnl check for some more header files. You can remove some of
+dnl them, if you want to. But it doesn't hurt
+AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h sys/cdefs.h)
+AC_CHECK_HEADERS(fnmatch.h sysent.h strings.h sys/stat.h)
+
+dnl Checks for libraries.
+AC_CHECK_LIB(socket, socket, [LIBSOCKET="-lsocket -lnsl"]) dnl for Solaris' X11
+AC_SUBST(LIBSOCKET)
+
+dnl Checks for typedefs, structures, and compiler characteristics.
+AC_HEADER_TIME
+
+dnl Checks for library functions.
+AC_CHECK_FUNCS(setpgid putenv socket vsnprintf)
+AC_CHECK_SETENV
+AC_LANG_CPLUSPLUS
+
+dnl Check whether we want much debugging output
+AC_MSG_CHECKING([whether kgdb should generate lots of trace output])
+dnl Default is no trace output
+AC_ARG_ENABLE(lots-a-trace,
+  [  --enable-lots-a-trace   generate lots of trace output [default=no]],
+  WANT_TRACE_OUTPUT=$enableval, WANT_TRACE_OUTPUT=no)
+AC_MSG_RESULT($WANT_TRACE_OUTPUT)
+if test "x$WANT_TRACE_OUTPUT" = "xyes"; then
+  AC_DEFINE_UNQUOTED(WANT_TRACE_OUTPUT)
+fi
+
+dnl add here all your Makefiles. These are created by configure
+AC_OUTPUT(Makefile \
+	kdbg/Makefile \
+	kdbg/doc/Makefile \
+	kdbg/doc/en/Makefile \
+	kdbg/doc/de/Makefile \
+	po/Makefile)

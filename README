@@ -1,0 +1,38 @@
+This is KDbg, a graphical user interface around gdb using
+KDE, the K Desktop Environment.
+
+To install:
+
+	./configure
+	make
+	make install
+
+
+I've heard reports that kdbg sends debugging messages to a message box by
+default. This is annoying.  To send the debugging output to stderr, create
+a file .kde/share/config/kdbgrc with the following contents:
+
+----- cut here
+# KDE Config File
+[KDebug]
+FatalShow=
+ErrorOutput=2
+WarnFilename=kdebug.dbg
+InfoShow=
+FatalFilename=kdebug.dbg
+WarnOutput=2
+InfoOutput=2
+FatalOutput=2
+ErrorFilename=kdebug.dbg
+InfoFilename=kdebug.dbg
+AbortFatal=0
+WarnShow=
+ErrorShow=
+----- cut here
+
+You can change this from within KDbg using Ctrl-Shift-F12, which pops up a huge
+dialog box where you can select where debugging output should go.
+
+Problem reports as well as success stories are welcome!
+
+Johannes.Sixt@telecom.at
