@@ -466,6 +466,7 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 
     // get the bounding rect of the text
     QPainter painter(this);
+    setupPainter(&painter);
     const QString& text = m_texts[row];
     QRect bound =
 	painter.boundingRect(left+2, top, 0,0,

@@ -2,6 +2,9 @@ Version 1.9.6
 
 	"<invalid float value>" in register dumps was not parsed correctly.
 
+	Fixed that variable popup location was computed incorrectly if tab
+	width is not 0.
+
 Version 1.9.5
 
 	Fixed some issues when the items in the environment variable list
