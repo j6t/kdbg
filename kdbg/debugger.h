@@ -245,8 +245,8 @@ protected:
     QString m_debuggerCmd;		/* per-program setting */
     QString m_generalDebuggerCmd;	/* global setting */
     TTYLevel m_ttyLevel;		/* level of terminal emulation */
-    bool startGdb();
-    void stopGdb();
+    bool startDriver();
+    void stopDriver();
     void writeCommand();
     
     QList<VarTree> m_watchEvalExpr;	/* exprs to evaluate for watch windows */
@@ -326,6 +326,7 @@ protected slots:
     void slotDisassemble(const QString&, int);
 public slots:
     void setThread(int);
+    void shutdown();
 
 signals:
     /**

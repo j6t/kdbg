@@ -45,6 +45,7 @@ public:
 				   QueueMode mode);
 
     virtual void terminate();
+    virtual void detachAndTerminate();
     virtual void interruptInferior();
     virtual VarTree* parseQCharArray(const char* output, bool wantErrorValue);
     virtual void parseBackTrace(const char* output, QList<StackFrame>& stack);

@@ -291,6 +291,11 @@ void DebuggerMainWnd::closeEvent(QCloseEvent* e)
 #if QT_VERSION >= 200
     clearWFlags(WDestructiveClose);
 #endif
+
+    if (m_debugger != 0) {
+	m_debugger->shutdown();
+    }
+
     e->accept();
     kapp->quit();
 }
@@ -359,6 +364,9 @@ void DebuggerMainWnd::menuCallback(int item)
 	}
 	break;
     case ID_FILE_QUIT:
+	if (m_debugger != 0) {
+	    m_debugger->shutdown();
+	}
 	kapp->quit();
 	break;
     case ID_VIEW_TOOLBAR:

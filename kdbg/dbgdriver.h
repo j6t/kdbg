@@ -299,6 +299,12 @@ public:
     virtual void terminate() = 0;
 
     /**
+     * Terminates the debugger process, but also detaches any program that
+     * it has been attached to.
+     */
+    virtual void detachAndTerminate() = 0;
+
+    /**
      * Interrupts the debuggee.
      */
     virtual void interruptInferior() = 0;

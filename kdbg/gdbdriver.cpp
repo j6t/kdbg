@@ -543,6 +543,13 @@ void GdbDriver::terminate()
     m_state = DSidle;
 }
 
+void GdbDriver::detachAndTerminate()
+{
+    kill(SIGINT);
+    flushCommands();
+    executeCmdString(DCinitialize, "detach\nquit\n", true);
+}
+
 void GdbDriver::interruptInferior()
 {
     kill(SIGINT);

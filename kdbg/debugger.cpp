@@ -120,20 +120,7 @@ bool KDebugger::debugProgram(const QString& name)
     {
 	QApplication::setOverrideCursor(waitCursor);
 
-	stopGdb();
-	/*
-	 * We MUST wait until the slot gdbExited() has been called. But to
-	 * avoid a deadlock, we wait only for some certain maximum time.
-	 * Should this timeout be reached, the only reasonable thing one
-	 * could do then is exiting kdbg.
-	 */
-	int maxTime = 20;		/* about 20 seconds */
-	while (m_haveExecutable && maxTime > 0) {
-	    kapp->processEvents(1000);
-	    // give gdb time to die (and send a SIGCLD)
-	    ::sleep(1);
-	    --maxTime;
-	}
+	stopDriver();
 
 	QApplication::restoreOverrideCursor();
 
@@ -156,8 +143,8 @@ bool KDebugger::debugProgram(const QString& name)
     }
     // the rest is read in later in the handler of DCexecutable
 
-    if (!startGdb()) {
-	TRACE("startGdb failed");
+    if (!startDriver()) {
+	TRACE("startDriver failed");
 	return false;
     }
 
@@ -181,6 +168,15 @@ bool KDebugger::debugProgram(const QString& name)
     emit updateUI();
 
     return true;
+}
+
+void KDebugger::shutdown()
+{
+    // shut down debugger driver
+    if (m_d->isRunning())
+    {
+	stopDriver();
+    }
 }
 
 void KDebugger::useCoreFile(QString corefile, bool batch)
@@ -418,7 +414,7 @@ bool KDebugger::isIdle() const
 //////////////////////////////////////////////////////////
 // debugger driver
 
-bool KDebugger::startGdb()
+bool KDebugger::startDriver()
 {
     emit debuggerStarting();		/* must set m_inferiorTerminal */
 
@@ -460,10 +456,30 @@ bool KDebugger::startGdb()
     return true;
 }
 
-void KDebugger::stopGdb()
+void KDebugger::stopDriver()
 {
     m_explicitKill = true;
-    m_d->terminate();
+
+    if (m_attachedPid.isEmpty()) {
+	m_d->terminate();
+    } else {
+	m_d->detachAndTerminate();
+    }
+
+    /*
+     * We MUST wait until the slot gdbExited() has been called. But to
+     * avoid a deadlock, we wait only for some certain maximum time. Should
+     * this timeout be reached, the only reasonable thing one could do then
+     * is exiting kdbg.
+     */
+    kapp->processEvents(1000);		/* ideally, this will already shut it down */
+    int maxTime = 20;			/* about 20 seconds */
+    while (m_haveExecutable && maxTime > 0) {
+	// give gdb time to die (and send a SIGCLD)
+	::sleep(1);
+	--maxTime;
+	kapp->processEvents(1000);
+    }
 }
 
 void KDebugger::gdbExited(KProcess*)
