@@ -626,6 +626,7 @@ static bool isErrorExpr(const char* output)
 	strncmp(output, "Attempt to take contents of ", 28) == 0 ||
 	strncmp(output, "Attempt to use a type name as an expression", 43) == 0 ||
 	strncmp(output, "There is no member or method named", 34) == 0 ||
+	strncmp(output, "A parse error in expression", 27) == 0 ||
 	strncmp(output, "No symbol \"", 11) == 0 ||
 	strncmp(output, "Internal error: ", 16) == 0;
 }
