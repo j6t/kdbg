@@ -330,7 +330,7 @@ void RegisterView::doubleClicked( QListViewItem* item )
 #if QT_VERSION >= 200
     RegisterViewItem* it = static_cast<RegisterViewItem*>(item);
     QMessageBox::information(this, "work in progress...",
-			     QString("Prepare for change register value\nregister: %1    current value: %2").arg(it->m_reg).arg(it->m_value));
+			     QString("Prepare for change register value\nregister: %1    current value: %2").arg(it->m_reg.regName).arg(it->m_reg.rawValue));
 #endif
 }
 
