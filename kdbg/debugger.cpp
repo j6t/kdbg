@@ -14,7 +14,6 @@
 #include <qfileinfo.h>
 #include <qlistbox.h>
 #include <kapp.h>
-#include <kfiledialog.h>
 #include <ksimpleconfig.h>
 #include <kconfig.h>
 #include <kwm.h>
@@ -113,51 +112,37 @@ void KDebugger::restoreSettings(KConfig* /*config*/)
 }
 
 
-// helper that gets a file name (it only differs in the caption of the dialog)
-static QString getFileName(const char* caption,
-			   const char* dir = 0, const char* filter = 0,
-			   QWidget* parent = 0, const char* name = 0)
-{
-    QString filename;
-    KFileDialog dlg(dir, filter, parent, name, true);
-
-    dlg.setCaption(caption);
-
-    if (dlg.exec() == QDialog::Accepted)
-	filename = dlg.selectedFile();
-
-    return filename;
-}
-
-
 //////////////////////////////////////////////////////////////////////
 // external interface
 
 bool KDebugger::debugProgram(const QString& name)
 {
-    TRACE(__PRETTY_FUNCTION__);
-    // check for running program
-    if (!m_executable.isEmpty()) {
-	return false;
-    }
+    if (m_haveExecutable)
+    {
+	QApplication::setOverrideCursor(waitCursor);
 
-    // check the file name
-    QFileInfo fi(name);
-    m_lastDirectory = fi.dirPath(true);
+	stopGdb();
+	/*
+	 * We MUST wait until the slot gdbExited() has been called. But to
+	 * avoid a deadlock, we wait only for some certain maximum time.
+	 * Should this timeout be reached, the only reasonable thing one
+	 * could do then is exiting kdbg.
+	 */
+	int maxTime = 20;		/* about 20 seconds */
+	while (m_haveExecutable && maxTime > 0) {
+	    kapp->processEvents(1000);
+	    // give gdb time to die (and send a SIGCLD)
+	    ::sleep(1);
+	    --maxTime;
+	}
 
-    if (!fi.isFile()) {
-	QString msgFmt = i18n("`%s' is not a file or does not exist");
-	SIZED_QString(msg, msgFmt.length() + name.length() + 20);
-	msg.sprintf(msgFmt, name.data());
-#if QT_VERSION < 200
-	KMsgBox::message(parentWidget(), kapp->appName(),
-			 msg,
-			 KMsgBox::STOP,
-			 i18n("OK"));
-#else
-	KMessageBox::sorry(parentWidget(), msg);
-#endif
-	return false;
+	QApplication::restoreOverrideCursor();
+
+	if (m_haveExecutable) {
+	    /* timed out! We can't really do anything useful now */
+	    TRACE("timed out while waiting for gdb to die!");
+	    return false;
+	}
     }
 
     if (!m_d->isRunning()) {
@@ -181,6 +166,7 @@ bool KDebugger::debugProgram(const QString& name)
     }
 
     // create the program settings object
+    QFileInfo fi(name);
     QString pgmConfigFile = fi.dirPath(true);
     if (!pgmConfigFile.isEmpty()) {
 	pgmConfigFile += '/';
@@ -212,59 +198,10 @@ bool KDebugger::debugProgram(const QString& name)
     return true;
 }
 
-
-void KDebugger::fileExecutable()
+void KDebugger::useCoreFile(QString corefile, bool batch)
 {
-    if (!m_d->isIdle())
-	return;
-
-    // open a new executable
-    QString executable = getFileName(i18n("Select the executable to debug"),
-				     m_lastDirectory, 0, parentWidget());
-    if (executable.isEmpty())
-	return;
-
-    if (m_haveExecutable)
-    {
-	QApplication::setOverrideCursor(waitCursor);
-
-	stopGdb();
-	/*
-	 * We MUST wait until the slot gdbExited() has been called. But to
-	 * avoid a deadlock, we wait only for some certain maximum time.
-	 * Should this timeout be reached, the only reasonable thing one
-	 * could do then is exiting kdbg.
-	 */
-	int maxTime = 20;		/* about 20 seconds */
-	while (m_haveExecutable && maxTime > 0) {
-	    kapp->processEvents(1000);
-	    // give gdb time to die (and send a SIGCLD)
-	    ::sleep(1);
-	    --maxTime;
-	}
-
-	QApplication::restoreOverrideCursor();
-
-	if (m_haveExecutable) {
-	    /* timed out! We can't really do anything useful now */
-	    TRACE("timed out while waiting for gdb to die!");
-	    return;
-	}
-    }
-
-    debugProgram(executable);
-}
-
-void KDebugger::fileCoreFile()
-{
-    if (!isReady() || m_programRunning)
-	return;
-
-    // use a core dump
-    QString corefile = getFileName(i18n("Select core dump"),
-				   m_lastDirectory, 0, parentWidget());
-    if (!corefile.isEmpty()) {
-	m_corefile = corefile;
+    m_corefile = corefile;
+    if (!batch) {
 	CmdQueueItem* cmd = loadCoreFile();
 	cmd->m_byUser = true;
     }
@@ -461,6 +398,11 @@ bool KDebugger::isReady() const
     return m_haveExecutable &&
 	/*(m_d->isIdle() || m_state == DSrunningLow)*/
 	m_d->m_hipriCmdQueue.isEmpty();
+}
+
+bool KDebugger::isIdle() const
+{
+    return m_d->isIdle();
 }
 
 

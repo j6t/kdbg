@@ -8,12 +8,17 @@
 #include <klocale.h>			/* i18n */
 #include <kinstance.h>
 #include <kconfig.h>
+#include <kmessagebox.h>
+#else
+#include <kmsgbox.h>
 #endif
 #include <kiconloader.h>
 #include <kstatusbar.h>
 #include <ktoolbar.h>
+#include <kfiledialog.h>
 #include <qpainter.h>
 #include <qtabdialog.h>
+#include <qfileinfo.h>
 #include "mainwndbase.h"
 #include "debugger.h"
 #include "gdbdriver.h"
@@ -148,7 +153,7 @@ void DebuggerMainWndBase::setupDebugger(ExprWnd* localVars,
 void DebuggerMainWndBase::setCoreFile(const QString& corefile)
 {
     assert(m_debugger != 0);
-    m_debugger->setCoreFile(corefile);
+    m_debugger->useCoreFile(corefile, true);
 }
 
 void DebuggerMainWndBase::setRemoteDevice(const QString& remoteDevice)
@@ -202,6 +207,22 @@ bool DebuggerMainWndBase::debugProgram(const QString& executable)
     return m_debugger->debugProgram(executable);
 }
 
+// helper that gets a file name (it only differs in the caption of the dialog)
+static QString getFileName(QString caption,
+			   QString dir, QString filter,
+			   QWidget* parent)
+{
+    QString filename;
+    KFileDialog dlg(dir, filter, parent, 0, true);
+
+    dlg.setCaption(caption);
+
+    if (dlg.exec() == QDialog::Accepted)
+	filename = dlg.selectedFile();
+
+    return filename;
+}
+
 bool DebuggerMainWndBase::handleCommand(int item)
 {
     /* first commands that don't require the debugger */
@@ -217,10 +238,57 @@ bool DebuggerMainWndBase::handleCommand(int item)
 
     switch (item) {
     case ID_FILE_EXECUTABLE:
-	m_debugger->fileExecutable();
+	if (m_debugger->isIdle())
+	{
+	    // open a new executable
+	    QString executable = getFileName(i18n("Select the executable to debug"),
+					     m_lastDirectory, 0, dbgMainWnd());
+	    if (executable.isEmpty())
+		return true;
+
+	    // check the file name
+	    QFileInfo fi(executable);
+	    m_lastDirectory = fi.dirPath(true);
+
+	    if (!fi.isFile()) {
+		QString msgFmt = i18n("`%s' is not a file or does not exist");
+		SIZED_QString(msg, msgFmt.length() + executable.length() + 20);
+#if QT_VERSION < 200
+		msg.sprintf(msgFmt, executable.data());
+		KMsgBox::message(dbgMainWnd(), kapp->appName(),
+				 msg,
+				 KMsgBox::STOP,
+				 i18n("OK"));
+#else
+		msg.sprintf(msgFmt, executable.toLatin1());
+		KMessageBox::sorry(dbgMainWnd(), msg);
+#endif
+		return true;
+	    }
+
+	    if (!m_debugger->debugProgram(executable)) {
+		QString msg = i18n("Could not start the debugger process.\n"
+				   "Please shut down KDbg and resolve the problem.");
+#if QT_VERSION < 200
+		KMsgBox::message(dbgMainWnd(), kapp->appName(),
+				 msg,
+				 KMsgBox::STOP,
+				 i18n("OK"));
+#else
+		KMessageBox::sorry(dbgMainWnd(), msg);
+#endif
+	    }
+	}
 	return true;
     case ID_FILE_COREFILE:
-	m_debugger->fileCoreFile();
+	if (m_debugger->canUseCoreFile())
+	{
+	    QString corefile = getFileName(i18n("Select core dump"),
+					   m_lastDirectory, 0, dbgMainWnd());
+	    if (!corefile.isEmpty()) {
+		m_debugger->useCoreFile(corefile, false);
+	    }
+	}
 	return true;
     case ID_PROGRAM_RUN:
 	m_debugger->programRun();
@@ -256,11 +324,11 @@ bool DebuggerMainWndBase::handleCommand(int item)
 void DebuggerMainWndBase::updateUIItem(UpdateUI* item)
 {
     switch (item->id) {
-//    case ID_FILE_EXECUTABLE:
-//	item->enable(m_state == DSidle);
-//	break;
+    case ID_FILE_EXECUTABLE:
+	item->enable(m_debugger->isIdle());
+	break;
     case ID_FILE_COREFILE:
-	item->enable(m_debugger->canChangeExecutable());
+	item->enable(m_debugger->canUseCoreFile());
 	break;
     case ID_PROGRAM_STEP:
     case ID_PROGRAM_NEXT:

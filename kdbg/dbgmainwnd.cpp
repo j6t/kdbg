@@ -11,8 +11,9 @@
 #endif
 #include <kiconloader.h>
 #include <kstdaccel.h>
-#include <qtabdialog.h>
+#include <kfiledialog.h>
 #include <qlistbox.h>
+#include <qfileinfo.h>
 #include <kwm.h>
 #include "dbgmainwnd.h"
 #include "debugger.h"
@@ -327,6 +328,20 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
 void DebuggerMainWnd::menuCallback(int item)
 {
     switch (item) {
+    case ID_FILE_OPEN:
+	{
+	    QString fileName =
+		KFileDialog::getOpenFileName(m_lastDirectory, QString(), this);
+
+	    if (!fileName.isEmpty())
+	    {
+		QFileInfo fi(fileName);
+		m_lastDirectory = fi.dirPath();
+		m_filesWindow->setExtraDirectory(m_lastDirectory);
+		m_filesWindow->activate(fileName, 0);
+	    }
+	}
+	break;
     case ID_FILE_QUIT:
 	kapp->quit();
 	break;
@@ -389,6 +404,10 @@ void DebuggerMainWnd::menuCallback(int item)
 	// forward all others
 	if (!handleCommand(item))
 	    emit forwardMenuCallback(item);
+	else if (item == ID_FILE_EXECUTABLE) {
+	    // special: this may have changed m_lastDirectory
+	    m_filesWindow->setExtraDirectory(m_lastDirectory);
+	}
     }
     updateUI();
 }
@@ -544,7 +563,8 @@ void DebuggerMainWnd::slotLineChanged()
 void DebuggerMainWnd::slotNewFileLoaded()
 {
     // updates program counter in the new file
-    m_filesWindow->updateLineItems(m_debugger);
+    if (m_debugger != 0)
+	m_filesWindow->updateLineItems(m_debugger);
 }
 
 void DebuggerMainWnd::updateLineStatus(int lineNo)

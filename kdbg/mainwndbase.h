@@ -99,6 +99,8 @@ protected:
     QString m_outputTermKeepScript;
     bool createOutputWindow();
 
+    QString m_lastDirectory;		/* the dir of the most recently opened file */
+
     // the debugger proper
     QString m_debuggerCmdStr;
     KDebugger* m_debugger;

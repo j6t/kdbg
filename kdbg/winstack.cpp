@@ -8,7 +8,6 @@
 #include "commandids.h"
 #include "debugger.h"
 #include "dbgdriver.h"
-#include <kfiledialog.h>
 #include <qtextstream.h>
 #include <qpainter.h>
 #include <qbrush.h>
@@ -525,9 +524,6 @@ void WinStack::menuCallback(int item)
     }
     
     switch (item) {
-    case ID_FILE_OPEN:
-	openFile();
-	break;
     case ID_FILE_RELOAD:
 	if (m_activeWindow != 0) {
 	    TRACE("reloading one file");
@@ -541,20 +537,6 @@ void WinStack::menuCallback(int item)
 	    m_findDlg.show();
 	}
     }
-}
-
-void WinStack::openFile()
-{
-    QString fileName = KFileDialog::getOpenFileName(m_lastOpenDir, QString(), this);
-    TRACE("openFile: " + fileName);
-    if (fileName.isEmpty()) {
-	return;
-    }
-
-    QFileInfo fi(fileName);
-    m_lastOpenDir = fi.dirPath();
-
-    activateFI(fi, 0);
 }
 
 void WinStack::mousePressEvent(QMouseEvent* mouseEvent)
@@ -580,11 +562,7 @@ void WinStack::reloadAllFiles()
 void WinStack::activate(const QString& fileName, int lineNo)
 {
     QFileInfo fi(fileName);
-    activateFI(fi, lineNo);
-}
 
-bool WinStack::activateFI(QFileInfo& fi, int lineNo)
-{
     if (!fi.isFile()) {
 	/*
 	 * We didn't find that file. Now check if it is a relative path and
@@ -592,15 +570,15 @@ bool WinStack::activateFI(QFileInfo& fi, int lineNo)
 	 */
 	TRACE(fi.filePath() + (" not found, looking in " + m_lastOpenDir));
 	if (!fi.isRelative() || m_lastOpenDir.isEmpty()) {
-	    return false;
+	    return;
 	}
 	fi.setFile(m_lastOpenDir + "/" + fi.filePath());
 	if (!fi.isFile()) {
-	    return false;
+	    return;
 	}
     }
     // if this is not an absolute path name, make it one
-    return activatePath(fi.absFilePath(), lineNo);
+    activatePath(fi.absFilePath(), lineNo);
 }
 
 bool WinStack::activatePath(QString pathName, int lineNo)

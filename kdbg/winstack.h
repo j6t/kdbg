@@ -122,6 +122,11 @@ public:
      */
     void setWindowMenu(QPopupMenu* menu);
     void selectWindow(int index);	/* 1-based index, 0 means dialog More... */
+    /**
+     * Slot activate also looks in this directory when the specified file is
+     * a relative path.
+     */
+    void setExtraDirectory(const QString& dir) { m_lastOpenDir = dir; }
     bool activeLine(QString& filename, int& lineNo);
     void maybeTip(const QPoint& p);
 
@@ -154,11 +159,9 @@ public slots:
 
 protected:
     void initMenu();
-    bool activateFI(QFileInfo& fi, int lineNo);
     bool activatePath(QString pathname, int lineNo);
     virtual bool activateWindow(FileWindow* fw, int lineNo = -1);	/* -1 doesnt change line */
     virtual void changeWindowMenu();
-    virtual void openFile();
     virtual void mousePressEvent(QMouseEvent*);
     void setPC(bool set, const QString& fileName, int lineNo, int frameNo);
     QList<FileWindow> m_fileList;

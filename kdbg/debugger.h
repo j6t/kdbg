@@ -43,23 +43,19 @@ public:
     ~KDebugger();
     
     /**
-     * This function starts to debug the specified executable.
-     * @return false if an error occurs, in particular if a program is
-     * currently being debugged
+     * This function starts to debug the specified executable. If a program
+     * is currently being debugged, it is terminated first.
+     *
+     * @return false if an error occurs.
      */
     bool debugProgram(const QString& executable);
 
     /**
-     * Queries the user for an executable file and debugs it. If a program
-     * is currently being debugged, it is terminated first.
+     * Uses the specified core to debug the active program.
+     * @param batch tells whether the core file was given on the
+     * command line.
      */
-    void fileExecutable();
-
-    /**
-     * Queries the user for a core file and uses it to debug the active
-     * program
-     */
-    void fileCoreFile();
+    void useCoreFile(QString corefile, bool batch);
 
     /**
      * Runs the program or continues it if it is stopped at a breakpoint.
@@ -155,7 +151,7 @@ public:
     /**
      * Tells whether the debuggee can be changed.
      */
-    bool canChangeExecutable() { return isReady() && !m_programActive; }
+    bool canUseCoreFile() { return isReady() && !m_programActive; }
 
     /**
      * Add a watch expression.
@@ -187,13 +183,16 @@ public:
      */
     bool isProgramActive() { return m_programActive; }
 
+    /**
+     * Is the debugger driver idle?
+     */
+    bool isIdle() const;
+
     /** The list of breakpoints. */
     int numBreakpoints() const { return m_brkpts.size(); }
     const Breakpoint* breakpoint(int i) const { return m_brkpts[i]; }
 
     const QString& executable() const { return m_executable; }
-
-    void setCoreFile(const QString& corefile) { m_corefile = corefile; }
 
     /**
      * Sets the command to invoke gdb. If cmd is the empty string, the
@@ -255,7 +254,6 @@ protected:
     void saveBreakpoints(KSimpleConfig* config);
     void restoreBreakpoints(KSimpleConfig* config);
 
-    QString m_lastDirectory;		/* the dir of the most recently opened file */
     bool m_haveExecutable;		/* has an executable been specified */
     bool m_programActive;		/* is the program active (possibly halting in a brkpt)? */
     bool m_programRunning;		/* is the program executing (not stopped)? */
