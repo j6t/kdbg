@@ -14,7 +14,6 @@
 #include <qtimer.h>
 #include <ktopwidget.h>
 #include <kprocess.h>
-#include <ktabctl.h>
 #include <knewpanner.h>
 #include "winstack.h"
 #include "exprwnd.h"
@@ -82,9 +81,6 @@ public:
 	DCdelete,
 	DCenable,
 	DCdisable,
-#ifdef WANT_THIS_PANE
-	DCprintthis,
-#endif
 	DCprint,
 	DCprintStruct,
 	DCframe,
@@ -180,7 +176,7 @@ protected:
     void updateAllExprs();
     void updateBreakptTable();
     void updateProgEnvironment(const char* args, const QDict<EnvVar>& newVars);
-    bool parseLocals(QList<VarTree>& newVars);
+    void parseLocals(QList<VarTree>& newVars);
     void handleLocals();
     bool handlePrint(const char* var, ExprWnd* wnd);
     bool handlePrint(CmdQueueItem* cmd);
@@ -242,15 +238,6 @@ public slots:
     void slotAnimationTimeout();
     void slotToggleBreak(const QString&, int);
     void slotEnaDisBreak(const QString&, int);
-    /*
-     * Unless WANT_THIS_PANE is defined, the following slots are unused.
-     * Removing them with #ifdef ... #endif doesn't work because moc
-     * doesn't understand the preprocessor defines. Hence, we leave the
-     * declarations here and only remove the function body with #ifdef ...
-     * #endif.
-     */
-    void slotThisExpanding(KTreeViewItem*, bool&);
-    void slotFrameTabChanged(int);
     
 signals:
     /**
@@ -315,13 +302,7 @@ protected:
     KNewPanner m_rightPanner;
     WinStack m_filesWindow;
     QListBox m_btWindow;
-#ifdef WANT_THIS_PANE
-    KTabCtl m_frameVariables;
-#endif
     ExprWnd m_localVariables;
-#ifdef WANT_THIS_PANE
-    ExprWnd m_this;
-#endif
     
     QWidget m_watches;
     QLineEdit m_watchEdit;

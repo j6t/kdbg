@@ -7,6 +7,7 @@
 #include <kiconloader.h>
 #include <ksimpleconfig.h>
 #include <qkeycode.h>
+#include <qpainter.h>
 #include "debugger.h"			/* #includes brkpt.h */
 #include "brkpt.moc"
 #include <ctype.h>

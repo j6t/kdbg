@@ -86,13 +86,7 @@ KDebugger::KDebugger(const char* name) :
 	m_rightPanner(&m_mainPanner, "right_pane", KNewPanner::Horizontal, KNewPanner::Percent, 50),
 	m_filesWindow(&m_leftPanner, "files", m_bpTable),
 	m_btWindow(&m_leftPanner, "backtrace"),
-#ifdef WANT_THIS_PANE
-	m_frameVariables(&m_rightPanner, "frame_variables"),
-	m_localVariables(&m_frameVariables, "locals"),
-	m_this(&m_frameVariables, "this"),
-#else
 	m_localVariables(&m_rightPanner, "locals"),
-#endif
 	m_watches(&m_rightPanner, "watches"),
 	m_watchEdit(&m_watches, "watch_edit"),
 	m_watchAdd(i18n(" Add "), &m_watches, "watch_add"),
@@ -120,25 +114,12 @@ KDebugger::KDebugger(const char* name) :
 
     setView(&m_mainPanner, true);	/* show frame */
     
-#ifdef WANT_THIS_PANE
-//    m_frameVariables.addTab(new QWidget(&m_frameVariables), i18n("Auto"));
-    m_frameVariables.addTab(&m_localVariables, i18n("Locals"));
-    m_frameVariables.addTab(&m_this, "this");
-    connect(&m_this, SIGNAL(expanding(KTreeViewItem*,bool&)),
-	    SLOT(slotThisExpanding(KTreeViewItem*,bool&)));
-#endif
     connect(&m_localVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
 	    SLOT(slotLocalsExpanding(KTreeViewItem*,bool&)));
 
     m_leftPanner.activate(&m_filesWindow, &m_btWindow);
-
-#ifdef WANT_THIS_PANE
-    // must set minimum size to make panner work
-    m_frameVariables.setMinimumSize(10,10);
-    m_rightPanner.activate(&m_frameVariables, &m_watches);
-#else
     m_rightPanner.activate(&m_localVariables, &m_watches);
-#endif
+
     connect(&m_watchEdit, SIGNAL(returnPressed()), SLOT(slotAddWatch()));
     connect(&m_watchAdd, SIGNAL(clicked()), SLOT(slotAddWatch()));
     connect(&m_watchDelete, SIGNAL(clicked()), SLOT(slotDeleteWatch()));
@@ -788,13 +769,6 @@ bool KDebugger::debugProgram(const QString& name)
     return true;
 }
 
-#ifdef WANT_THIS_PANE
-bool KDebugger::isThisPaneVisible()
-{
-    return m_frameVariables.isTabEnabled("this");
-}
-#endif
-
 
 //////////////////////////////////////////////////////////
 // debugger driver
@@ -830,7 +804,9 @@ bool KDebugger::startGdb()
 
 #ifdef GDB_TRANSCRIPT
     // open log file
-    m_logFile.open(IO_WriteOnly);
+    if (!m_logFile.isOpen()) {
+	m_logFile.open(IO_WriteOnly);
+    }
 #endif
 
     // change prompt string and synchronize with gdb
@@ -1398,11 +1374,6 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	handleBacktrace();
 	updateAllExprs();
 	break;
-#ifdef WANT_THIS_PANE
-    case DCprintthis:
-	handlePrint("this", &m_this);
-	break;
-#endif
     case DCprint:
 	handlePrint(cmd);
 	break;
@@ -1612,11 +1583,7 @@ void KDebugger::handleLocals()
      *  variables.
      */
     QList<VarTree> newVars;
-#ifdef WANT_THIS_PANE
-    bool thisPresent = parseLocals(newVars);
-#else
     parseLocals(newVars);
-#endif
 
     /*
      * Clear any old VarTree item pointers, so that later we don't access
@@ -1664,33 +1631,15 @@ void KDebugger::handleLocals()
     if (repaintNeeded && autoU && m_localVariables.isVisible())
 	m_localVariables.repaint();
     m_localVariables.setAutoUpdate(autoU);
-
-#ifdef WANT_THIS_PANE
-    // update this
-    m_delayedPrintThis = false;
-    if (thisPresent) {
-	if (false/*isThisPaneVisible()*/) {
-	    queueCmd(DCprintthis, "print *this", QMoverride);
-	} else {
-	    // delay "print *this" until the user makes the pane visible
-	    m_delayedPrintThis = true;
-	}
-    } else {
-	VarTree* v = m_this.topLevelExprByName("this");
-	removeExpr(&m_this, v);
-    }
-#endif
 }
 
-bool KDebugger::parseLocals(QList<VarTree>& newVars)
+void KDebugger::parseLocals(QList<VarTree>& newVars)
 {
-    bool thisPresent = false;
-
     // check for possible error conditions
     if (strncmp(m_gdbOutput, "No symbol table", 15) == 0 ||
 	strncmp(m_gdbOutput, "No locals", 9) == 0)
     {
-	return false;
+	return;
     }
     QString origName;			/* used in renaming variables */
     const char* p = m_gdbOutput;
@@ -1722,12 +1671,7 @@ bool KDebugger::parseLocals(QList<VarTree>& newVars)
 	    }
 	}
 	newVars.append(variable);
-	// check for "this"
-	if (origName == "this") {
-	    thisPresent = true;
-	}
     }
-    return thisPresent;
 }
 
 bool KDebugger::handlePrint(CmdQueueItem* cmd)
@@ -2026,11 +1970,6 @@ void KDebugger::evalExpressions()
 	STRUCT(m_watchVariables);
 	TYPE(m_localVariables);
 	TYPE(m_watchVariables);
-#ifdef WANT_THIS_PANE
-	POINTER(m_this);
-	STRUCT(m_this);
-	TYPE(m_this);
-#endif
 #undef POINTER
 #undef STRUCT
 #undef TYPE
@@ -2252,13 +2191,6 @@ void KDebugger::slotLocalsExpanding(KTreeViewItem* item, bool& allow)
     exprExpandingHelper(&m_localVariables, item, allow);
 }
 
-void KDebugger::slotThisExpanding(KTreeViewItem* item, bool& allow)
-{
-#ifdef WANT_THIS_PANE
-    exprExpandingHelper(&m_this, item, allow);
-#endif
-}
-
 void KDebugger::slotWatchExpanding(KTreeViewItem* item, bool& allow)
 {
     exprExpandingHelper(&m_watchVariables, item, allow);
@@ -2325,24 +2257,6 @@ void KDebugger::slotWatchHighlighted(int index)
     VarTree* expr = static_cast<VarTree*>(item);
     QString text = expr->computeExpr();
     m_watchEdit.setText(text);
-}
-
-/*
- * When the user activates that "this" pane, print *this.
- */
-void KDebugger::slotFrameTabChanged(int)
-{
-#ifdef WANT_THIS_PANE
-    if (m_delayedPrintThis && isThisPaneVisible()) {
-	/*
-	 * We do not use a high-priority command to display "this". This is
-	 * just a decision out of the stomach and we can change it if
-	 * necessary. But we put it in front of all other low-priority
-	 * commands.
-	 */
-	queueCmd(DCprintthis, "print *this", QMoverrideMoreEqual);
-    }
-#endif
 }
 
 void KDebugger::slotFileChanged()
