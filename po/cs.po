@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 0.2.5\n"
-"POT-Creation-Date: 1999-01-10 21:35+0100\n"
+"POT-Creation-Date: 1999-03-06 18:41+0100\n"
 "PO-Revision-Date: 1998-11-24 20:21 MET\n"
 "Last-Translator: Martin ©pirk <spirk@kla.pvt.cz>\n"
 "Language-Team: Czech <flidr@kky.zcu.cz>\n"
@@ -13,58 +13,74 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: brkpt.cpp:39
+#: brkpt.cpp:41
 msgid "&Add"
 msgstr "&Pøidat"
 
-#: brkpt.cpp:47
+#: brkpt.cpp:49
 msgid "&View Code"
 msgstr "&Zobrazit kód"
 
-#: brkpt.cpp:51
+#: brkpt.cpp:53
 msgid "&Conditional..."
 msgstr ""
 
-#: brkpt.cpp:618
+#: brkpt.cpp:620
 msgid "E"
 msgstr "E"
 
-#: brkpt.cpp:620
+#: brkpt.cpp:622
 msgid "Location"
 msgstr "Umístìní"
 
-#: brkpt.cpp:621
+#: brkpt.cpp:623
 msgid "Hits"
 msgstr ""
 
-#: brkpt.cpp:622
+#: brkpt.cpp:624
 msgid "Ignore"
 msgstr ""
 
-#: brkpt.cpp:623
+#: brkpt.cpp:625
 msgid "Condition"
 msgstr ""
 
-#: brkpt.cpp:739
+#: brkpt.cpp:789
 msgid ": Conditional breakpoint"
 msgstr ""
 
-#: brkpt.cpp:743
+#: brkpt.cpp:792
 msgid "&Condition:"
 msgstr ""
 
-#: brkpt.cpp:745
+#: brkpt.cpp:794
 msgid "Ignore &next hits:"
 msgstr ""
 
-#: pgmargs.cpp:19
+#: pgmargs.cpp:28
 msgid ": Program arguments"
 msgstr ": argumenty programu"
 
-#: pgmargs.cpp:24
+#: pgmargs.cpp:32
 #, c-format
 msgid "Run %s with these arguments:"
 msgstr "Spustit %s s tìmito argumenty:"
+
+#: pgmargs.cpp:44
+msgid "Environment variables (NAME=value):"
+msgstr ""
+
+#: pgmargs.cpp:53
+msgid "Name"
+msgstr ""
+
+#: pgmargs.cpp:54
+msgid "Value"
+msgstr ""
+
+#: pgmargs.cpp:73
+msgid "&Modify"
+msgstr ""
 
 #: procattach.cpp:19
 msgid ": Attach to process"
@@ -74,135 +90,171 @@ msgstr ": Pøipojit k procesu"
 msgid "Specify the process number to attach to:"
 msgstr "Zadejte èíslo procesu pro pøipojení:"
 
-#: debugger.cpp:98
-msgid " Add "
-msgstr " Pøidat "
-
-#: debugger.cpp:99
-msgid " Del "
-msgstr " Smazat "
-
-#: debugger.cpp:104
-msgid "active"
-msgstr "aktivní"
-
-#: debugger.cpp:123
-msgid "Locals"
-msgstr "Lokální"
-
-#: debugger.cpp:164
+#: debugger.cpp:95
 msgid "Breakpoints"
 msgstr "Zará¾ky"
 
-#: debugger.cpp:302
+#: debugger.cpp:198
+#, c-format
+msgid "`%s' is not a file or does not exist"
+msgstr "`%s' není soubor nebo neexistuje"
+
+#: debugger.cpp:254
 msgid "Select the executable to debug"
 msgstr "Vyberte spustitelný soubor který chcete trasovat"
 
-#: debugger.cpp:335
+#: debugger.cpp:296
 msgid "Select core dump"
 msgstr "Vyberte core dump"
 
-#: debugger.cpp:561
+#: debugger.cpp:520
+msgid ""
+"gdb exited unexpectedly.\n"
+"Restart the session (e.g. with File|Executable)."
+msgstr ""
+
+#: debugger.cpp:599
+msgid ": Program output"
+msgstr ": Výstup programu"
+
+#: dbgmainwnd.cpp:123 winstack.cpp:374 winstack.cpp:384
 msgid "&Open Source..."
 msgstr "&Otevøít zdroj..."
 
-#: debugger.cpp:562
-msgid "&Reload Source"
-msgstr "&Znovu naèíst zdroj"
-
-#: debugger.cpp:564
-msgid "&Executable..."
-msgstr "Spustit&elný soubor..."
-
-#: debugger.cpp:565
-msgid "&Core dump..."
-msgstr "&Core dump..."
-
-#: debugger.cpp:571
-msgid "&Find..."
-msgstr "&Hledat..."
-
-#: debugger.cpp:572
-msgid "Toggle &Toolbar"
-msgstr "Pøepnout panel &nástrojù"
-
-#: debugger.cpp:573
-msgid "Toggle &Statusbar"
-msgstr "Pøepnout &stavový øádek"
-
-#: debugger.cpp:576
-msgid "&Run"
-msgstr "S&pustit"
-
-#: debugger.cpp:577
+#: dbgmainwnd.cpp:139 winstack.cpp:376
 msgid "Step &into"
 msgstr "Krok &do"
 
-#: debugger.cpp:578
+#: dbgmainwnd.cpp:140 winstack.cpp:377
 msgid "Step &over"
 msgstr "Krok &pøes"
 
-#: debugger.cpp:579
+#: dbgmainwnd.cpp:141 winstack.cpp:378
 msgid "Step o&ut"
 msgstr "Krok &ven"
 
-#: debugger.cpp:580
+#: dbgmainwnd.cpp:142 winstack.cpp:379
 msgid "Run to &cursor"
 msgstr "Spustit ke &kurzoru"
 
-#: debugger.cpp:582
-msgid "&Break"
-msgstr "&Pøeru¹ení"
-
-#: debugger.cpp:583
-msgid "Re&start"
-msgstr "Res&tart"
-
-#: debugger.cpp:584
-msgid "A&ttach..."
-msgstr "Pøipojit..."
-
-#: debugger.cpp:586
-msgid "&Arguments..."
-msgstr "&Argumenty..."
-
-#: debugger.cpp:594
+#: dbgmainwnd.cpp:156 winstack.cpp:381
 msgid "Set/Clear &breakpoint"
 msgstr "Nastavit/smazat &zará¾ku"
 
-#: debugger.cpp:595
+#: dbgmainwnd.cpp:126 winstack.cpp:386
+msgid "&Executable..."
+msgstr "Spustit&elný soubor..."
+
+#: dbgmainwnd.cpp:127 winstack.cpp:387
+msgid "&Core dump..."
+msgstr "&Core dump..."
+
+# the following means: "windows that are open"
+#: winstack.cpp:739
+msgid ": Open Windows"
+msgstr ": Otevøít okna"
+
+#: winstack.cpp:747
+msgid "Show"
+msgstr "Zobrazit"
+
+#: winstack.cpp:815
+msgid ": Search"
+msgstr ": Hledat"
+
+#: winstack.cpp:821
+msgid "&Case sensitive"
+msgstr "&Rozli¹ovat velká/malá"
+
+#: winstack.cpp:823
+msgid "&Forward"
+msgstr "&Vpøed"
+
+#: winstack.cpp:825
+msgid "&Backward"
+msgstr "V&zad"
+
+#: dbgmainwnd.cpp:31
+msgid " Add "
+msgstr " Pøidat "
+
+#: dbgmainwnd.cpp:32
+msgid " Del "
+msgstr " Smazat "
+
+#: dbgmainwnd.cpp:42
+msgid "active"
+msgstr "aktivní"
+
+#: dbgmainwnd.cpp:124
+msgid "&Reload Source"
+msgstr "&Znovu naèíst zdroj"
+
+#: dbgmainwnd.cpp:133
+msgid "&Find..."
+msgstr "&Hledat..."
+
+#: dbgmainwnd.cpp:134
+msgid "Toggle &Toolbar"
+msgstr "Pøepnout panel &nástrojù"
+
+#: dbgmainwnd.cpp:135
+msgid "Toggle &Statusbar"
+msgstr "Pøepnout &stavový øádek"
+
+#: dbgmainwnd.cpp:138
+msgid "&Run"
+msgstr "S&pustit"
+
+#: dbgmainwnd.cpp:144
+msgid "&Break"
+msgstr "&Pøeru¹ení"
+
+#: dbgmainwnd.cpp:145
+msgid "Re&start"
+msgstr "Res&tart"
+
+#: dbgmainwnd.cpp:146
+msgid "A&ttach..."
+msgstr "Pøipojit..."
+
+#: dbgmainwnd.cpp:148
+msgid "&Arguments..."
+msgstr "&Argumenty..."
+
+#: dbgmainwnd.cpp:157
 msgid "Set &temporary breakpoint"
 msgstr "Nastavit &doèasnou zará¾ku"
 
-#: debugger.cpp:596
+#: dbgmainwnd.cpp:158
 msgid "&Enable/Disable breakpoint"
 msgstr "Po&volit/zakázat &zará¾ku"
 
-#: debugger.cpp:597
+#: dbgmainwnd.cpp:159
 msgid "&List..."
 msgstr "Sezna&m..."
 
-#: debugger.cpp:602
+#: dbgmainwnd.cpp:164
 msgid "&More..."
 msgstr "&Dal¹í..."
 
-#: debugger.cpp:605
+#: dbgmainwnd.cpp:167
 msgid "&About"
 msgstr ""
 
-#: debugger.cpp:616
+#: dbgmainwnd.cpp:178
 msgid "E&xecution"
 msgstr "Spu¹t&ìní"
 
-#: debugger.cpp:617
+#: dbgmainwnd.cpp:179
 msgid "&Breakpoint"
 msgstr "&Zará¾ka"
 
-#: debugger.cpp:618
+#: dbgmainwnd.cpp:180
 msgid "&Window"
 msgstr "&Okno"
 
-#: debugger.cpp:622
+#: dbgmainwnd.cpp:184
 msgid ""
 "A Debugger\n"
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
@@ -212,103 +264,65 @@ msgstr ""
 "napsal Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "s pomocí mnohých dal¹ích"
 
-#: debugger.cpp:634
+#: dbgmainwnd.cpp:196
 msgid "Executable"
 msgstr "Spustitelný soubor"
 
-#: debugger.cpp:636
+#: dbgmainwnd.cpp:198
 msgid "Open a source file"
 msgstr "Otevøít zdrojový soubor"
 
-#: debugger.cpp:638
+#: dbgmainwnd.cpp:200
 msgid "Reload source file"
 msgstr "Znovu naèíst zdrojový soubor"
 
-#: debugger.cpp:641
+#: dbgmainwnd.cpp:203
 msgid "Run/Continue"
 msgstr "Spustit/pokraèovat"
 
-#: debugger.cpp:643
+#: dbgmainwnd.cpp:205
 msgid "Step into"
 msgstr "Krok do"
 
-#: debugger.cpp:645
+#: dbgmainwnd.cpp:207
 msgid "Step over"
 msgstr "Krok pøes"
 
-#: debugger.cpp:647
+#: dbgmainwnd.cpp:209
 msgid "Step out"
 msgstr "Krok ven"
 
-#: debugger.cpp:650
+#: dbgmainwnd.cpp:212
 msgid "Breakpoint"
 msgstr "Zará¾ka"
 
-#: debugger.cpp:653
+#: dbgmainwnd.cpp:215
 msgid "Search"
 msgstr "Hledat"
 
-#: debugger.cpp:660
+#: dbgmainwnd.cpp:222
 msgid "Line 00000"
 msgstr "Øádek 00000"
 
-#: debugger.cpp:664
+#: dbgmainwnd.cpp:226
 msgid "Restart"
 msgstr "Restart"
 
-#: debugger.cpp:665
+#: dbgmainwnd.cpp:227
 msgid "Core dump"
 msgstr "Core dump"
 
-#: debugger.cpp:770
-#, c-format
-msgid ""
-"gdb exited unexpectedly (status 0x%x)\n"
-"Restart the session (e.g. with File|Executable)."
-msgstr ""
-
-#: debugger.cpp:850
-msgid ": Program output"
-msgstr ": Výstup programu"
-
-#: debugger.cpp:898
-#, c-format
-msgid "`%s' is not a file or does not exist"
-msgstr "`%s' není soubor nebo neexistuje"
-
-#: debugger.cpp:2302
+#: dbgmainwnd.cpp:589
 #, c-format
 msgid "Line %d"
 msgstr "Øádek %d"
 
-# the following means: "windows that are open"
-#: winstack.cpp:685
-msgid ": Open Windows"
-msgstr ": Otevøít okna"
-
-#: winstack.cpp:693
-msgid "Show"
-msgstr "Zobrazit"
-
-#: winstack.cpp:761
-msgid ": Search"
-msgstr ": Hledat"
-
-#: winstack.cpp:767
-msgid "&Case sensitive"
-msgstr "&Rozli¹ovat velká/malá"
-
-#: winstack.cpp:769
-msgid "&Forward"
-msgstr "&Vpøed"
-
-#: winstack.cpp:771
-msgid "&Backward"
-msgstr "V&zad"
-
 #: main.cpp:56
 msgid "Cannot start debugger."
 msgstr "Nelze spustit debuger."
+
+#~ msgid "Locals"
+#~ msgstr "Lokální"
 
 #~ msgid "busy"
 #~ msgstr "zaneprázdnìný"
