@@ -71,6 +71,7 @@ public:
 			       QString& addrFrom, QString& addrTo);
     virtual void parseDisassemble(const char* output, QList<DisassembledCode>& code);
     virtual QString parseMemoryDump(const char* output, QList<MemoryDump>& memdump);
+    virtual QString parseSetVariable(const char* output);
 protected:
     int m_gdbMajor, m_gdbMinor;
     QString m_programWD;		/* just an intermediate storage */

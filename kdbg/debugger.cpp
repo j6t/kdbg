@@ -933,8 +933,6 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     switch (cmd->m_cmd) {
     case DCtargetremote:
 	// the output (if any) is uninteresting
-    case DCsetvariable:
-	// the output is an error message that we should display
     case DCsetargs:
     case DCtty:
 	// there is no output
@@ -1083,6 +1081,9 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	break;
     case DCsetpc:
 	handleSetPC(output);
+	break;
+    case DCsetvariable:
+	handleSetVariable(cmd, output);
 	break;
     }
 }
@@ -2222,12 +2223,36 @@ void KDebugger::editLocalValue(int row)
 
 void KDebugger::slotLocalsValueEdited(int row, const QString& text)
 {
+    if (text.simplifyWhiteSpace().isEmpty())
+	return;			       /* no text entered: ignore request */
+
     TRACE(QString().sprintf("Changing value at row %d to ", row) + text);
 
     // determine the lvalue to edit
     VarTree* expr = static_cast<VarTree*>(m_localVariables.itemAt(row));
     QString lvalue = expr->computeExpr();
-    m_d->executeCmd(DCsetvariable, lvalue, text);
+    CmdQueueItem* cmd = m_d->executeCmd(DCsetvariable, lvalue, text);
+    cmd->m_expr = expr;
+    cmd->m_exprWnd = &m_localVariables;
+}
+
+void KDebugger::handleSetVariable(CmdQueueItem* cmd, const char* output)
+{
+    QString msg = m_d->parseSetVariable(output);
+    if (!msg.isEmpty())
+    {
+	// there was an error; display it in the status bar
+	m_statusMessage = msg;
+	emit updateStatusMessage();
+	return;
+    }
+
+    // get the new value
+    QString expr = cmd->m_expr->computeExpr();
+    CmdQueueItem* printCmd =
+	m_d->queueCmd(DCprint, expr, DebuggerDriver::QMoverrideMoreEqual);
+    printCmd->m_expr = cmd->m_expr;
+    printCmd->m_exprWnd = cmd->m_exprWnd;
 }
 
 

@@ -512,6 +512,13 @@ public:
     virtual QString parseMemoryDump(const char* output, QList<MemoryDump>& memdump) = 0;
 
     /**
+     * Parses the output of the DCsetvariable command. Returns an empty
+     * string if no error was found; otherwise it contains an error
+     * message.
+     */
+    virtual QString parseSetVariable(const char* output) = 0;
+
+    /**
      * Returns a value that the user can edit.
      */
     virtual QString editableValue(VarTree* value);

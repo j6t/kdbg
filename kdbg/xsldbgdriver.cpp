@@ -1439,5 +1439,12 @@ XsldbgDriver::parseMemoryDump(const char */*output*/,
     return i18n("No memory dump available");
 }
 
+QString
+XsldbgDriver::parseSetVariable(const char */*output*/)
+{
+    QString msg;
+    return msg;
+}
+
 
 #include "xsldbgdriver.moc"

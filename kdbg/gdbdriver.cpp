@@ -2334,5 +2334,12 @@ QString GdbDriver::parseMemoryDump(const char* output, QList<MemoryDump>& memdum
     return QString();
 }
 
+QString GdbDriver::parseSetVariable(const char* output)
+{
+    // if there is any output, it is an error message
+    QString msg = output;
+    return msg.stripWhiteSpace();
+}
+
 
 #include "gdbdriver.moc"

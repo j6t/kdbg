@@ -85,6 +85,7 @@ class XsldbgDriver:public DebuggerDriver {
                                   QList < DisassembledCode > &code);
     virtual QString parseMemoryDump(const char *output,
                                     QList < MemoryDump > &memdump);
+    virtual QString parseSetVariable(const char* output);
 
   protected:
     int m_gdbMajor, m_gdbMinor;
