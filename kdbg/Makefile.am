@@ -93,8 +93,6 @@ XPMS = \
 	brkcond.xpm \
 	pcinner.xpm \
 	pcup.xpm \
-	green-bullet.xpm \
-	red-bullet.xpm \
 	search.xpm \
 	pointer.xpm
 
