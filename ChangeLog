@@ -1,3 +1,8 @@
+Version 1.9.3
+
+	Improved editing of values; it is now possible to edit variables also
+	in the watch window.
+
 Version 1.9.2
 
 	The previous security fix only protects against accidents, not attacks,
