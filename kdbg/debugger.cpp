@@ -542,6 +542,9 @@ void KDebugger::initToolbar()
     m_toolbar.insertSeparator();
     m_toolbar.insertButton(loader->loadIcon("brkpt.xpm"),ID_BRKPT_SET, true,
 			   i18n("Breakpoint"));
+    m_toolbar.insertSeparator();
+    m_toolbar.insertButton(loader->loadIcon("search.xpm"),ID_VIEW_FINDDLG, true,
+			   i18n("Search"));
     i18n("Restart");			/* to have a translation right from the beginning */
 
     connect(&m_toolbar, SIGNAL(clicked(int)), SLOT(menuCallback(int)));

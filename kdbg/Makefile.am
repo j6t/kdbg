@@ -91,6 +91,7 @@ XPMS = \
 	pcup.xpm \
 	green-bullet.xpm \
 	red-bullet.xpm \
+	search.xpm \
 	pointer.xpm
 
 # types in libraries that we understand
