@@ -53,7 +53,8 @@ protected:
     QString m_fileName;
     enum LineItem { liPC = 1, liPCup = 2,
 	liBP = 4, liBPdisabled = 8, liBPtemporary = 16,
-	liBPany = liBP|liBPdisabled|liBPtemporary
+	liBPconditional = 32,
+	liBPany = liBP|liBPdisabled|liBPtemporary|liBPconditional
     };
     QArray<uchar> m_lineItems;
     QPixmap m_pcinner;			/* PC at innermost frame */
@@ -61,6 +62,7 @@ protected:
     QPixmap m_brkena;			/* enabled breakpoint */
     QPixmap m_brkdis;			/* disabled breakpoint */
     QPixmap m_brktmp;			/* temporary breakpoint marker */
+    QPixmap m_brkcond;			/* conditional breakpoint marker */
 };
 
 class FindDialog : public QDialog

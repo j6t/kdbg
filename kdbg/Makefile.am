@@ -90,6 +90,7 @@ XPMS = \
 	brkena.xpm \
 	brkdis.xpm \
 	brktmp.xpm \
+	brkcond.xpm \
 	pcinner.xpm \
 	pcup.xpm \
 	green-bullet.xpm \

@@ -41,6 +41,7 @@ FileWindow::FileWindow(const char* fileName, QWidget* parent, const char* name) 
     m_brkena = loader->loadIcon("brkena.xpm");
     m_brkdis = loader->loadIcon("brkdis.xpm");
     m_brktmp = loader->loadIcon("brktmp.xpm");
+    m_brkcond = loader->loadIcon("brkcond.xpm");
 }
 
 FileWindow::~FileWindow()
@@ -162,8 +163,6 @@ void FileWindow::paintCell(QPainter* p, int row, int col)
 	uchar item = m_lineItems[row];
 	if (item == 0)			/* shortcut out */
 	    return;
-//	p->save();
-//	int w = 15;
 	int h = cellHeight(row);
 	if (item & liBP) {
 	    // enabled breakpoint
@@ -183,6 +182,12 @@ void FileWindow::paintCell(QPainter* p, int row, int col)
 	    if (y < 0) y = 0;
 	    p->drawPixmap(0,y,m_brktmp);
 	}
+	if (item & liBPconditional) {
+	    // conditional breakpoint marker
+	    int y = (h - m_brkcond.height())/2;
+	    if (y < 0) y = 0;
+	    p->drawPixmap(0,y,m_brkcond);
+	}
 	if (item & liPC) {
 	    // program counter in innermost frame
 	    int y = (h - m_pcinner.height())/2;
@@ -195,7 +200,6 @@ void FileWindow::paintCell(QPainter* p, int row, int col)
 	    if (y < 0) y = 0;
 	    p->drawPixmap(0,y,m_pcup);
 	}
-//	p->restore();
 	return;
     }
 }
@@ -231,22 +235,17 @@ void FileWindow::updateLineItems(const BreakpointTable& bpt)
 	    int i = bp.lineNo;
 	    if (i < 0 || uint(i) >= m_lineItems.size())
 		continue;
-	    if (bp.enabled) {
-		if (!(m_lineItems[i] & liBP)) {
-		    m_lineItems[i] &= ~liBPany;
-		    m_lineItems[i] |= liBP;
-		    if (bp.temporary)
-			m_lineItems[i] |= liBPtemporary;
-		    updateLineItem(i);
-		}
-	    } else {
-		if (!(m_lineItems[i] & liBPdisabled)) {
-		    m_lineItems[i] &= ~liBPany;
-		    m_lineItems[i] |= liBPdisabled;
-		    if (bp.temporary)
-			m_lineItems[i] |= liBPtemporary;
-		    updateLineItem(i);
-		}
+	    // compute new line item flags for breakpoint
+	    uchar flags = bp.enabled ? liBP : liBPdisabled;
+	    if (bp.temporary)
+		flags |= liBPtemporary;
+	    if (!bp.condition.isEmpty() || bp.ignoreCount != 0)
+		flags |= liBPconditional;
+	    // update if changed
+	    if ((m_lineItems[i] & liBPany) != flags) {
+		m_lineItems[i] &= ~liBPany;
+		m_lineItems[i] |= flags;
+		updateLineItem(i);
 	    }
 	}
     }
