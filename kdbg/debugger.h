@@ -395,6 +395,7 @@ protected:
     KSimpleConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
     void saveProgramSettings();
     void restoreProgramSettings();
+    QString readDebuggerCmd();
 
     // debugger process
     DebuggerDriver* m_d;

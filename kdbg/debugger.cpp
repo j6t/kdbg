@@ -131,7 +131,7 @@ bool KDebugger::debugProgram(const QString& name,
     // get debugger command from per-program settings
     if (m_programConfig != 0) {
 	m_programConfig->setGroup(GeneralGroup);
-	m_debuggerCmd = m_programConfig->readEntry(DebuggerCmdStr);
+	m_debuggerCmd = readDebuggerCmd();
 	// get terminal emulation level
 	m_ttyLevel = TTYLevel(m_programConfig->readNumEntry(TTYLevelEntry, ttyFull));
     }
@@ -744,7 +744,7 @@ void KDebugger::restoreProgramSettings()
      * We ignore file version for now we will use it in the future to
      * distinguish different versions of this configuration file.
      */
-    m_debuggerCmd = m_programConfig->readEntry(DebuggerCmdStr);
+    // m_debuggerCmd has been read in already
     // m_ttyLevel has been read in already
     QString pgmArgs = m_programConfig->readEntry(ProgramArgs);
     QString pgmWd = m_programConfig->readEntry(WorkingDirectory);
@@ -799,6 +799,34 @@ void KDebugger::restoreProgramSettings()
 
     // give others a chance
     emit restoreProgramSpecific(m_programConfig);
+}
+
+QString KDebugger::readDebuggerCmd()
+{
+    QString debuggerCmd = m_programConfig->readEntry(DebuggerCmdStr);
+    if (m_programConfig->isReadOnly())
+    {
+	/*
+	 * The permissions don't allow write access. We do not trust the
+	 * entry DebuggerCmdStr for the following reason: Should the
+	 * debuggee be located in a world-writable directory somebody else
+	 * may have created the program config file where this entry
+	 * contains a malicious command.
+	 */
+	if (!debuggerCmd.isEmpty()) {
+	    QString msg = i18n(
+		"The settings for this program specify "
+		"the following debugger command:\n%1\n"
+		"Shall this command be used?");
+	    if (KMessageBox::warningYesNo(parentWidget(), msg.arg(debuggerCmd))
+		!= KMessageBox::Yes)
+	    {
+		// don't use it
+		debuggerCmd = QString();
+	    }
+	}
+    }
+    return debuggerCmd;
 }
 
 /*
