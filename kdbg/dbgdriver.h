@@ -166,6 +166,10 @@ protected:
 
 public:
     bool isIdle() const { return m_state == DSidle; }
+    /**
+     * Tells whether a high prority command would be executed immediately.
+     */
+    bool canExecuteImmediately() const { return m_hipriCmdQueue.isEmpty(); }
 
 protected:
     char* m_output;			/* normal gdb output */
@@ -197,7 +201,7 @@ public:
 				     bool clearLow = false) = 0;
     virtual CmdQueueItem* executeCmd(DbgCommand, int intArg1, int intArg2,
 				     bool clearLow = false) = 0;
-public:
+
     enum QueueMode {
 	QMnormal,			/* queues the command last */
 	QMoverride,			/* removes an already queued command */
@@ -216,6 +220,22 @@ public:
 				   QueueMode mode) = 0;
     virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg, int intArg,
 				   QueueMode mode) = 0;
+
+    /**
+     * Flushes the command queues.
+     * @param hipriOnly if true, only the high priority queue is flushed.
+     */
+    virtual void flushCommands(bool hipriOnly = false);
+
+    /**
+     * Terminates the debugger process.
+     */
+    virtual void terminate() = 0;
+
+    /**
+     * Interrupts the debuggee.
+     */
+    virtual void interruptInferior() = 0;
 
     /**
      * Parses the output as an array of QChars.
@@ -335,7 +355,6 @@ protected:
     /** Removes all commands from  the high-priority queue. */
     void flushHiPriQueue();
 
-protected:
     QQueue<CmdQueueItem> m_hipriCmdQueue;
     QList<CmdQueueItem> m_lopriCmdQueue;
     /**
@@ -408,10 +427,6 @@ signals:
      * consumed and no more commands are in the queues.
      */
     void enterIdleState();
-
-    // implementation helpers
-protected:
-    friend class KDebugger;
 };
 
 #endif // DBGDRIVER_H

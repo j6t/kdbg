@@ -480,6 +480,19 @@ CmdQueueItem* GdbDriver::queueCmd(DbgCommand cmd, QString strArg, int intArg,
     return queueCmdString(cmd, makeCmdString(cmd, strArg, intArg), mode);
 }
 
+void GdbDriver::terminate()
+{
+    kill(SIGTERM);
+    m_state = DSidle;
+}
+
+void GdbDriver::interruptInferior()
+{
+    kill(SIGINT);
+    // remove accidentally queued commands
+    flushHiPriQueue();
+}
+
 static bool isErrorExpr(const char* output)
 {
     return

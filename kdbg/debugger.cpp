@@ -279,10 +279,10 @@ void KDebugger::programKill()
 {
     if (haveExecutable() && isProgramActive()) {
 	if (m_programRunning) {
-	    m_d->kill(SIGINT);
+	    m_d->interruptInferior();
 	}
 	// this is an emergency command; flush queues
-	m_d->flushHiPriQueue();
+	m_d->flushCommands(true);
 	m_d->executeCmd(DCkill, true);
     }
 }
@@ -310,9 +310,7 @@ bool KDebugger::runUntil(const QString& fileName, int lineNo)
 void KDebugger::programBreak()
 {
     if (m_haveExecutable && m_programRunning) {
-	m_d->kill(SIGINT);
-	// remove accidentally queued commands
-	m_d->flushHiPriQueue();
+	m_d->interruptInferior();
     }
 }
 
@@ -396,8 +394,7 @@ bool KDebugger::canChangeBreakpoints()
 bool KDebugger::isReady() const 
 {
     return m_haveExecutable &&
-	/*(m_d->isIdle() || m_state == DSrunningLow)*/
-	m_d->m_hipriCmdQueue.isEmpty();
+	m_d->canExecuteImmediately();
 }
 
 bool KDebugger::isIdle() const
@@ -441,8 +438,7 @@ bool KDebugger::startGdb()
 void KDebugger::stopGdb()
 {
     m_explicitKill = true;
-    m_d->kill(SIGTERM);
-    m_d->m_state = DebuggerDriver::DSidle;
+    m_d->terminate();
 }
 
 void KDebugger::gdbExited(KProcess*)
@@ -881,8 +877,7 @@ void KDebugger::handleRunCommands(const char* output)
 	// program finished: erase PC
 	emit updatePC(QString(), -1, 0);
 	// dequeue any commands in the queues
-	m_d->flushHiPriQueue();
-	m_d->flushLoPriQueue();
+	m_d->flushCommands();
     }
 
     m_programRunning = false;

@@ -40,6 +40,8 @@ public:
     virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg, int intArg,
 				   QueueMode mode);
 
+    virtual void terminate();
+    virtual void interruptInferior();
     virtual VarTree* parseQCharArray(const char* output, bool wantErrorValue);
     virtual void parseBackTrace(const char* output, QList<StackFrame>& stack);
     virtual bool parseFrameChange(const char* output,

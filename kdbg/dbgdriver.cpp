@@ -219,6 +219,14 @@ void DebuggerDriver::flushHiPriQueue()
     }
 }
 
+void DebuggerDriver::flushCommands(bool hipriOnly)
+{
+    flushHiPriQueue();
+    if (!hipriOnly) {
+	flushLoPriQueue();
+    }
+}
+
 void DebuggerDriver::slotCommandRead(KProcess*)
 {
     TRACE(__PRETTY_FUNCTION__);
