@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.2\n"
-"POT-Creation-Date: 2003-02-16 15:56+0100\n"
-"PO-Revision-Date: 2003-02-16 20:31+0100\n"
+"POT-Creation-Date: 2004-02-20 22:30+0100\n"
+"PO-Revision-Date: 2004-02-20 22:42+0100\n"
 "Last-Translator: Johannes Sixt <johannes.sixt@telecom.at>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -14,69 +14,80 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.6\n"
 
-#: brkpt.cpp:62
+#: brkpt.cpp:61
 msgid "Add &Breakpoint"
 msgstr "&Haltepunkt"
 
-#: brkpt.cpp:66
+#: brkpt.cpp:65
 msgid "Add &Watchpoint"
 msgstr "&Watchpoint"
 
-#: brkpt.cpp:75 brkpt.cpp:227
+#: brkpt.cpp:74 brkpt.cpp:239
 msgid "&Disable"
 msgstr "&Deaktivieren"
 
-#: brkpt.cpp:80 brkpt.cpp:229
+#: brkpt.cpp:79 brkpt.cpp:241
 msgid "&Enable"
 msgstr "&Aktivieren"
 
-#: brkpt.cpp:90
+#: brkpt.cpp:89
 msgid "&View Code"
 msgstr "&Code anzeigen"
 
-#: brkpt.cpp:94
+#: brkpt.cpp:93
 msgid "&Conditional..."
 msgstr "&Bedingt..."
 
-#: brkpt.cpp:348 threadlist.cpp:41
+#: brkpt.cpp:333 threadlist.cpp:41
 msgid "Location"
 msgstr "Ort"
 
-#: brkpt.cpp:349 memwindow.cpp:55
+#: brkpt.cpp:334 memwindow.cpp:55
 msgid "Address"
 msgstr "Adresse"
 
-#: brkpt.cpp:350
+#: brkpt.cpp:335
 msgid "Hits"
 msgstr "Stops"
 
-#: brkpt.cpp:351
+#: brkpt.cpp:336
 msgid "Ignore"
 msgstr "Ignorieren"
 
-#: brkpt.cpp:352
+#: brkpt.cpp:337
 msgid "Condition"
 msgstr "Bedingung"
 
-#: brkpt.cpp:451
+#: brkpt.cpp:460
 msgid ": Conditional breakpoint"
 msgstr ": Bedingten Haltepunkt setzen"
 
-#: brkpt.cpp:454
+#: brkpt.cpp:463
 msgid "&Condition:"
 msgstr "&Bedingung:"
 
-#: brkpt.cpp:456
+#: brkpt.cpp:465
 msgid "Ignore &next hits:"
 msgstr "Ignoriere &nächste Treffer:"
 
-#: debugger.cpp:518
+#: debugger.cpp:632
 msgid ""
 "%1 exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
 "%1 wurde unerwartet beendet\n"
 "Sie müssen die Sitzung neu starten (z.B. mit Datei|Programm)."
+
+#: debugger.cpp:809
+msgid ""
+"The settings for this program specify the following debugger command:\n"
+"%1\n"
+"Shall this command be used?"
+msgstr ""
+"Die Einstellungen für dieses Programm legen folgende Debugger-Anweisung "
+"fest:\n"
+"%1\n"
+"Soll diese Anweisung benutzt werden?"
 
 #: main.cpp:38
 msgid "A Debugger"
@@ -86,35 +97,39 @@ msgstr "Ein Debugger"
 msgid "XSLT debugging"
 msgstr "XSLT debuggen"
 
-#: main.cpp:51
+#: main.cpp:49
+msgid "Register groups and formating"
+msgstr "Registergruppen und -formatierung"
+
+#: main.cpp:54
 msgid "transcript of conversation with the debugger"
 msgstr "Mitschrift der Kommunikation zw. KDbg und gdb"
 
-#: main.cpp:52
+#: main.cpp:55
 msgid "remote debugging via <device>"
 msgstr "entferntes Debuggen über <device>"
 
-#: main.cpp:53
+#: main.cpp:56
 msgid "specify language: C, XSLT"
 msgstr "Programmiersprache: C, XSLT"
 
-#: main.cpp:54
+#: main.cpp:57
 msgid "use language XSLT (deprecated)"
 msgstr "verwende XSLT (überholt, verwende -l stattdessen)"
 
-#: main.cpp:55
+#: main.cpp:58
 msgid "path of executable to debug"
 msgstr "Pfad zum zu debuggenden Programm"
 
-#: main.cpp:56
+#: main.cpp:59
 msgid "a core file to use"
 msgstr "ein zu verwendender Core-Dump"
 
-#: main.cpp:114
+#: main.cpp:117
 msgid "Cannot start debugger."
 msgstr "Kann Debugger nicht ausführen."
 
-#: gdbdriver.cpp:1844 xsldbgdriver.cpp:1309
+#: gdbdriver.cpp:1911 xsldbgdriver.cpp:1346
 msgid "New working directory: "
 msgstr "Neues Arbeitsverzeichnis: "
 
@@ -142,7 +157,7 @@ msgstr "Umgebungsvariablen (NAME=Wert):"
 msgid "Name"
 msgstr "Name"
 
-#: pgmargs.cpp:116 regwnd.cpp:191
+#: pgmargs.cpp:116 regwnd.cpp:428
 msgid "Value"
 msgstr "Wert"
 
@@ -218,232 +233,236 @@ msgstr "&Vorwärts"
 msgid "&Backward"
 msgstr "&Rückwärts"
 
-#: procattach.cpp:21
+#: procattach.cpp:230
 msgid ": Attach to process"
 msgstr ": An Prozess attachen"
 
-#: procattach.cpp:25
+#: procattach.cpp:234
 msgid "Specify the process number to attach to:"
 msgstr "Geben Sie die Prozessnummer ein:"
 
-#: dbgmainwnd.cpp:38
+#: dbgmainwnd.cpp:43
 msgid "Source"
 msgstr "Quellcode"
 
-#: dbgmainwnd.cpp:46
+#: dbgmainwnd.cpp:51
 msgid "Stack"
 msgstr "Stack"
 
-#: dbgmainwnd.cpp:49
+#: dbgmainwnd.cpp:54
 msgid "Locals"
 msgstr "Lokale Variablen"
 
-#: dbgmainwnd.cpp:52
+#: dbgmainwnd.cpp:57
 msgid "Watches"
 msgstr "Ausdrücke"
 
-#: dbgmainwnd.cpp:55
+#: dbgmainwnd.cpp:60
 msgid "Registers"
 msgstr "Register"
 
-#: dbgmainwnd.cpp:58
+#: dbgmainwnd.cpp:63
 msgid "Breakpoints"
 msgstr "Haltepunkte"
 
-#: dbgmainwnd.cpp:61
+#: dbgmainwnd.cpp:66
 msgid "Output"
 msgstr "Ausgabe"
 
-#: dbgmainwnd.cpp:64
+#: dbgmainwnd.cpp:69
 msgid "Threads"
 msgstr "Threads"
 
-#: dbgmainwnd.cpp:67
+#: dbgmainwnd.cpp:72
 msgid "Memory"
 msgstr "Speicher"
 
-#: dbgmainwnd.cpp:186
+#: dbgmainwnd.cpp:192
 msgid "&Open Source..."
 msgstr "Quellcode Ö&ffnen..."
 
-#: dbgmainwnd.cpp:187
+#: dbgmainwnd.cpp:193
 msgid "&Reload Source"
 msgstr "E&rneut laden"
 
-#: dbgmainwnd.cpp:190
+#: dbgmainwnd.cpp:196
 msgid "&Executable..."
 msgstr "&Programm..."
 
-#: dbgmainwnd.cpp:193
+#: dbgmainwnd.cpp:199
 msgid "Recent E&xecutables"
 msgstr "&Zuletzt geöffnete Programme"
 
-#: dbgmainwnd.cpp:196
+#: dbgmainwnd.cpp:202
 msgid "&Core dump..."
 msgstr "&Core dump..."
 
-#: dbgmainwnd.cpp:201
+#: dbgmainwnd.cpp:207
 msgid "This &Program..."
 msgstr "Dieses &Programm"
 
-#: dbgmainwnd.cpp:204
+#: dbgmainwnd.cpp:210
 msgid "&Global Options..."
 msgstr "&Globale Einstellungen..."
 
-#: dbgmainwnd.cpp:211
+#: dbgmainwnd.cpp:218
 msgid "&Find"
 msgstr "&Suche"
 
-#: dbgmainwnd.cpp:214
+#: dbgmainwnd.cpp:221
 msgid "Source &code"
 msgstr "&Quellcode"
 
-#: dbgmainwnd.cpp:216
+#: dbgmainwnd.cpp:223
 msgid "Stac&k"
 msgstr "Stac&k"
 
-#: dbgmainwnd.cpp:217
+#: dbgmainwnd.cpp:224
 msgid "&Locals"
 msgstr "&Lokale Variablen"
 
-#: dbgmainwnd.cpp:218
+#: dbgmainwnd.cpp:225
 msgid "&Watched expressions"
 msgstr "&Ausdrücke"
 
-#: dbgmainwnd.cpp:219
+#: dbgmainwnd.cpp:226
 msgid "&Registers"
 msgstr "&Register"
 
-#: dbgmainwnd.cpp:220
+#: dbgmainwnd.cpp:227
 msgid "&Breakpoints"
 msgstr "&Haltepunkte"
 
-#: dbgmainwnd.cpp:221
+#: dbgmainwnd.cpp:228
 msgid "T&hreads"
 msgstr "&Threads"
 
-#: dbgmainwnd.cpp:222 pgmsettings.cpp:118
+#: dbgmainwnd.cpp:229 pgmsettings.cpp:118
 msgid "&Output"
 msgstr "&Ausgabe"
 
-#: dbgmainwnd.cpp:223
+#: dbgmainwnd.cpp:230
 msgid "&Memory"
 msgstr "&Speicher"
 
-#: dbgmainwnd.cpp:233
+#: dbgmainwnd.cpp:240
 msgid "&Run"
 msgstr "Aus&führen"
 
-#: dbgmainwnd.cpp:236
+#: dbgmainwnd.cpp:243
 msgid "Step &into"
 msgstr "&In Funktion"
 
-#: dbgmainwnd.cpp:240
+#: dbgmainwnd.cpp:247
 msgid "Step &over"
 msgstr "Ü&ber Funktion"
 
-#: dbgmainwnd.cpp:244
+#: dbgmainwnd.cpp:251
 msgid "Step o&ut"
 msgstr "&Aus Funktion"
 
-#: dbgmainwnd.cpp:248
+#: dbgmainwnd.cpp:255
 msgid "Run to &cursor"
 msgstr "&Zum Cursor"
 
-#: dbgmainwnd.cpp:252
+#: dbgmainwnd.cpp:259
 msgid "Step i&nto by instruction"
 msgstr "I&nstruktion - in Funktion"
 
-#: dbgmainwnd.cpp:256
+#: dbgmainwnd.cpp:263
 msgid "Step o&ver by instruction"
 msgstr "In&struktion - über Funktion"
 
-#: dbgmainwnd.cpp:260
+#: dbgmainwnd.cpp:267
 msgid "&Program counter to current line"
 msgstr "&Programmzähler auf aktuelle Zeile"
 
-#: dbgmainwnd.cpp:263
+#: dbgmainwnd.cpp:270
 msgid "&Break"
 msgstr "&Unterbrechen"
 
-#: dbgmainwnd.cpp:266
+#: dbgmainwnd.cpp:273
 msgid "&Kill"
 msgstr "Been&den"
 
-#: dbgmainwnd.cpp:269
+#: dbgmainwnd.cpp:276
 msgid "Re&start"
 msgstr "&Erneut ausführen"
 
-#: dbgmainwnd.cpp:272
+#: dbgmainwnd.cpp:279
 msgid "A&ttach..."
 msgstr "A&ttachen..."
 
-#: dbgmainwnd.cpp:275
+#: dbgmainwnd.cpp:282
 msgid "&Arguments..."
 msgstr "Argu&mente..."
 
-#: dbgmainwnd.cpp:280
+#: dbgmainwnd.cpp:287
 msgid "Set/Clear &breakpoint"
 msgstr "&Setzen/entfernen"
 
-#: dbgmainwnd.cpp:283
+#: dbgmainwnd.cpp:290
 msgid "Set &temporary breakpoint"
 msgstr "&Temporären Haltepunkt setzen"
 
-#: dbgmainwnd.cpp:286
+#: dbgmainwnd.cpp:293
 msgid "&Enable/Disable breakpoint"
 msgstr "&Aktiv/inaktiv"
 
-#: dbgmainwnd.cpp:291
+#: dbgmainwnd.cpp:298
 msgid "Watch Expression"
 msgstr "Ausdruck beobachten"
 
-#: dbgmainwnd.cpp:295
+#: dbgmainwnd.cpp:301
+msgid "Edit Value"
+msgstr "Wert bearbeiten"
+
+#: dbgmainwnd.cpp:305
 msgid "&Window"
 msgstr "&Fenster"
 
-#: dbgmainwnd.cpp:318
+#: dbgmainwnd.cpp:328
 msgid "Line 00000"
 msgstr "Zeile 00000"
 
-#: dbgmainwnd.cpp:322
+#: dbgmainwnd.cpp:332
 msgid "Restart"
 msgstr "Erneut ausführen"
 
-#: dbgmainwnd.cpp:323
+#: dbgmainwnd.cpp:333
 msgid "Core dump"
 msgstr "Core dump"
 
-#: dbgmainwnd.cpp:511
+#: dbgmainwnd.cpp:522
 #, c-format
 msgid "Line %d"
 msgstr "Zeile %d"
 
-#: dbgmainwnd.cpp:583
+#: dbgmainwnd.cpp:594
 msgid "`%1' is not a file or does not exist"
 msgstr "`%1' ist keine Datei oder existiert nicht"
 
-#: dbgmainwnd.cpp:698
+#: dbgmainwnd.cpp:709
 msgid "|All source files\n"
 msgstr "|Alle Quellcodedateien\n"
 
-#: dbgmainwnd.cpp:699
+#: dbgmainwnd.cpp:710
 msgid "|Source files\n"
 msgstr "|Quellcodedateien\n"
 
-#: dbgmainwnd.cpp:700
+#: dbgmainwnd.cpp:711
 msgid "|Header files\n"
 msgstr "|Header-Dateien\n"
 
-#: dbgmainwnd.cpp:701
+#: dbgmainwnd.cpp:712
 msgid "*|All files"
 msgstr "*|Alle Dateien"
 
-#: dbgmainwnd.cpp:797
+#: dbgmainwnd.cpp:841
 msgid "Select the executable to debug"
 msgstr "Ausführbares Programm zum Debuggen wählen"
 
-#: dbgmainwnd.cpp:810
+#: dbgmainwnd.cpp:854
 msgid "Select core dump"
 msgstr "Core dump wählen"
 
@@ -477,29 +496,57 @@ msgstr "Dateifilter für &Quellcodedateien:"
 msgid "File filter for &header files:"
 msgstr "Dateifilter für &Header-Dateien:"
 
-#: regwnd.cpp:190
-msgid "Register"
-msgstr "Register"
+#: regwnd.cpp:75
+msgid "&GDB default"
+msgstr "&GDB-Standard"
 
-#: regwnd.cpp:192
-msgid "Decoded value"
-msgstr "Dekodierter Wert"
-
-#: regwnd.cpp:205 memwindow.cpp:79
+#: regwnd.cpp:76 memwindow.cpp:79
 msgid "&Binary"
 msgstr "&Binär"
 
-#: regwnd.cpp:206 memwindow.cpp:78
+#: regwnd.cpp:77 memwindow.cpp:78
 msgid "&Octal"
 msgstr "&Oktal"
 
-#: regwnd.cpp:207
+#: regwnd.cpp:78
 msgid "&Decimal"
 msgstr "&Dezimal"
 
-#: regwnd.cpp:208 memwindow.cpp:75
+#: regwnd.cpp:79 memwindow.cpp:75
 msgid "He&xadecimal"
 msgstr "He&xadezimal"
+
+#: regwnd.cpp:80
+msgid "Real (&e)"
+msgstr "Reell (&e)"
+
+#: regwnd.cpp:81
+msgid "Real (&f)"
+msgstr "Reell (&f)"
+
+#: regwnd.cpp:82
+msgid "&Real (g)"
+msgstr "&Reell (g)"
+
+#: regwnd.cpp:427
+msgid "Register"
+msgstr "Register"
+
+#: regwnd.cpp:429
+msgid "Decoded value"
+msgstr "Dekodierter Wert"
+
+#: regwnd.cpp:462
+msgid "x86/x87 segment"
+msgstr "x86/x87 Segment"
+
+#: regwnd.cpp:465
+msgid "Flags"
+msgstr "Schalter"
+
+#: regwnd.cpp:468
+msgid "GP and others"
+msgstr "Allgemein u.a."
 
 #: prefdebugger.cpp:20
 msgid "To revert to the default settings, clear the entries."
@@ -600,7 +647,7 @@ msgstr "Thread-ID"
 msgid "&Clear"
 msgstr "&Löschen"
 
-#: xsldbgdriver.cpp:1452
+#: xsldbgdriver.cpp:1455
 msgid "No memory dump available"
 msgstr "Speicherinhalt nicht verfügbar"
 
@@ -648,4 +695,3 @@ msgstr "Speicherinhalt nicht verfügbar"
 
 #~ msgid "Search"
 #~ msgstr "Suche"
-
