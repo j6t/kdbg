@@ -51,6 +51,28 @@
                     </property>
                 </widget>
                 <widget class="QListView">
+                    <column>
+                        <property name="text">
+                            <string>Command</string>
+                        </property>
+                        <property name="clickable">
+                            <bool>true</bool>
+                        </property>
+                        <property name="resizable">
+                            <bool>true</bool>
+                        </property>
+                    </column>
+                    <column>
+                        <property name="text">
+                            <string>PID</string>
+                        </property>
+                        <property name="clickable">
+                            <bool>true</bool>
+                        </property>
+                        <property name="resizable">
+                            <bool>true</bool>
+                        </property>
+                    </column>
                     <property name="name">
                         <cstring>processList</cstring>
                     </property>
@@ -105,7 +127,7 @@
                             </property>
                             <property name="sizePolicy">
                                 <sizepolicy>
-                                    <hsizetype>7</hsizetype>
+                                    <hsizetype>2</hsizetype>
                                     <vsizetype>5</vsizetype>
                                     <horstretch>1</horstretch>
                                     <verstretch>0</verstretch>

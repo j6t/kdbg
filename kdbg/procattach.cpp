@@ -16,11 +16,13 @@
 
 ProcAttachPS::ProcAttachPS(QWidget* parent) :
 	ProcAttachBase(parent),
-	m_firstLine(true)
+	m_pidCol(-1)
 {
     m_ps = new KProcess;
     connect(m_ps, SIGNAL(receivedStdout(KProcess*, char*, int)),
 	    this, SLOT(slotTextReceived(KProcess*, char*, int)));
+
+    processList->setColumnAlignment(1, Qt::AlignRight);
 
     // set the command line
     static const char* const psCommand[] = {
@@ -48,7 +50,7 @@ void ProcAttachPS::runPS()
     // clear the parse state from previous runs
     m_token = "";
     m_line.clear();
-    m_firstLine = true;
+    m_pidCol = -1;
 
     m_ps->start(KProcess::NotifyOnExit, KProcess::Stdout);
 }
@@ -72,7 +74,7 @@ void ProcAttachPS::slotTextReceived(KProcess*, char* buffer, int buflen)
 	    ++buffer;
 	}
 	// blanks: the last column gets the rest of the line, including blanks
-	else if ((m_firstLine || int(m_line.size()) < processList->columns()-1) &&
+	else if ((m_pidCol < 0 || int(m_line.size()) < processList->columns()-1) &&
 		 isspace(*buffer))
 	{
 	    // push a token onto the line
@@ -99,32 +101,52 @@ void ProcAttachPS::slotTextReceived(KProcess*, char* buffer, int buflen)
 
 void ProcAttachPS::pushLine()
 {
-    if (m_line.size() == 0)
+    if (m_line.size() < 2)	// we need the PID and COMMAND columns
 	return;
 
-    if (m_firstLine)
+    if (m_pidCol < 0)
     {
-	m_firstLine = false;
 	// create columns if we don't have them yet
-	if (processList->columns() == 0) {
-	    for (uint i = 0; i < m_line.size(); i++) {
+	bool allocate =	processList->columns() == 2;
+
+	// we assume that the last column is the command
+	m_line.pop_back();
+
+	for (uint i = 0; i < m_line.size(); i++) {
+	    // we don't allocate a PID column,
+	    // but we need to know which column it is
+	    if (m_line[i] == "PID") {
+		m_pidCol = i;
+	    } else if (allocate) {
 		processList->addColumn(m_line[i]);
+		// these columns are normally numbers
+		processList->setColumnAlignment(processList->columns()-1,
+						Qt::AlignRight);
 	    }
 	}
     }
     else
     {
 	// insert a line
-	QListViewItem* item = new QListViewItem(processList, m_line[0]);
-	for (uint i = 1; i < m_line.size(); i++) {
-	    item->setText(i, m_line[i]);
+	// we assume that the last column is the command
+	QListViewItem* item = new QListViewItem(processList, m_line.back());
+	m_line.pop_back();
+	int k = 2;
+	for (uint i = 0; i < m_line.size(); i++)
+	{
+	    // display the pid column's content in the second column
+	    if (int(i) == m_pidCol)
+		item->setText(1, m_line[i]);
+	    else
+		item->setText(k++, m_line[i]);
 	}
     }
 }
 
 void ProcAttachPS::processSelected(QListViewItem* item)
 {
-    pidEdit->setText(item->text(0));
+    pidEdit->setText(item->text(1));
+    processText->setText(item->text(0));
 }
 
 void ProcAttachPS::refresh()

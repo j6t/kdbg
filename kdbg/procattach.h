@@ -44,7 +44,7 @@ protected:
 
     KProcess* m_ps;
     // parse state
-    bool m_firstLine;
+    int m_pidCol;	//!< The PID column in the ps output
     QCString m_token;
     QValueVector<QString> m_line;
 };
