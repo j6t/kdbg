@@ -1,16 +1,17 @@
 ## $Id$
 
 # toolbar icons
-TOOLBAR = \
-	brkpt.xpm \
-	pgmfinish.xpm \
-	pgmnext.xpm \
-	pgmnexti.xpm \
-	pgmrun.xpm \
-	pgmstep.xpm \
-	pgmstepi.xpm \
-	execopen.xpm \
-	search.xpm
+
+kdbgiconsdir = $(kde_datadir)/kdbg/icons
+kdbgicons_ICON = \
+	brkpt \
+	pgmfinish \
+	pgmnext \
+	pgmnexti \
+	pgmrun \
+	pgmstep \
+	pgmstepi \
+	execopen
 
 # line items and other pictograms
 PICTOGRAMS = \
@@ -28,6 +29,8 @@ PICTOGRAMS = \
 	pointer.xpm
 
 
-pics_DATA = $(TOOLBAR) $(PICTOGRAMS)
+pics_DATA = $(PICTOGRAMS)
 picsdir = $(kde_datadir)/kdbg/pics
-KDE_ICON = AUTO
+
+# application icon
+KDE_ICON = kdbg
