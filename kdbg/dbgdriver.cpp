@@ -464,6 +464,7 @@ void DbgAddr::cleanAddr()
 void DbgAddr::operator=(const QString& aa)
 {
     a = aa;
+    fnoffs = QString();
     cleanAddr();
 }
 

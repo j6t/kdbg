@@ -23,11 +23,12 @@ class KDebugger;
 struct DbgAddr
 {
     QString a;
+    QString fnoffs;
     DbgAddr() { }
     DbgAddr(const QString& aa);
-    DbgAddr(const DbgAddr& src) : a(src.a) { }
+    DbgAddr(const DbgAddr& src) : a(src.a), fnoffs(src.fnoffs) { }
     void operator=(const QString& aa);
-    void operator=(const DbgAddr& src) { a = src.a; }
+    void operator=(const DbgAddr& src) { a = src.a; fnoffs = src.fnoffs; }
     QString asString() const;
     bool isEmpty() const { return a.isEmpty(); }
 protected:
@@ -216,6 +217,15 @@ struct DisassembledCode
 {
     DbgAddr address;
     QString code;
+};
+
+/**
+ * Memory contents
+ */
+struct MemoryDump
+{
+    DbgAddr address;
+    QString dump;
 };
 
 /**
@@ -473,9 +483,10 @@ public:
     virtual void parseDisassemble(const char* output, QList<DisassembledCode>& code) = 0;
 
     /**
-     * Parses a memory dump.
+     * Parses a memory dump. Returns an empty string if no error was found;
+     * otherwise it contains an error message.
      */
-    virtual QString parseMemoryDump(const char* output) = 0;
+    virtual QString parseMemoryDump(const char* output, QList<MemoryDump>& memdump) = 0;
 
 protected:
     /** Removes all commands from the low-priority queue. */

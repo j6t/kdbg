@@ -27,7 +27,8 @@ class ThreadInfo;
 class DebuggerDriver;
 class CmdQueueItem;
 class Breakpoint;
-class DisassembledCode;
+struct DisassembledCode;
+struct MemoryDump;
 struct DbgAddr;
 class KProcess;
 
@@ -448,8 +449,10 @@ signals:
 
     /**
      * Indicates that a new memory dump output is ready.
+     * @param msg is an error message or empty
+     * @param memdump is the memory dump
      */
-    void memoryDumpChanged(const QString&);
+    void memoryDumpChanged(const QString&, QList<MemoryDump>&);
 
     /**
      * Gives other objects a chance to save program specific settings.

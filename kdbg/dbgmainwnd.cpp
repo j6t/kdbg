@@ -131,8 +131,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(m_debugger, SIGNAL(registersChanged(QList<RegisterInfo>&)),
 	    m_registers, SLOT(updateRegisters(QList<RegisterInfo>&)));
 
-    connect(m_debugger, SIGNAL(memoryDumpChanged(const QString&)),
-	    m_memoryWindow, SLOT(slotNewMemoryDump(const QString&)));
+    connect(m_debugger, SIGNAL(memoryDumpChanged(const QString&, QList<MemoryDump>&)),
+	    m_memoryWindow, SLOT(slotNewMemoryDump(const QString&, QList<MemoryDump>&)));
     connect(m_debugger, SIGNAL(saveProgramSpecific(KSimpleConfig*)),
 	    m_memoryWindow, SLOT(saveProgramSpecific(KSimpleConfig*)));
     connect(m_debugger, SIGNAL(restoreProgramSpecific(KSimpleConfig*)),
@@ -165,6 +165,16 @@ DebuggerMainWnd::~DebuggerMainWnd()
     m_debugger = 0;
     // must disconnect from dockManager since it keeps emitting signals
     dockManager->disconnect(this);
+
+    delete m_memoryWindow;
+    delete m_threads;
+    delete m_ttyWindow;
+    delete m_bpTable;
+    delete m_registers;
+    delete m_watches;
+    delete m_localVariables;
+    delete m_btWindow;
+    delete m_filesWindow;
 
     delete m_menuWindow;
     delete m_menuBrkpt;

@@ -2053,9 +2053,54 @@ void GdbDriver::parseDisassemble(const char* output, QList<DisassembledCode>& co
     }
 }
 
-QString GdbDriver::parseMemoryDump(const char* output)
+QString GdbDriver::parseMemoryDump(const char* output, QList<MemoryDump>& memdump)
 {
-    return output;
+    if (isErrorExpr(output)) {
+	// error; strip space
+	QString msg = output;
+	return msg.stripWhiteSpace();
+    }
+
+    const char* p = output;		/* save typing */
+    DbgAddr addr;
+    QString dump;
+
+    // the address
+    while (*p != 0) {
+	const char* start = p;
+	while (*p != '\0' && *p != ':' && !isspace(*p))
+	    p++;
+	addr = FROM_LATIN1(start, p-start);
+	if (*p != ':') {
+	    // parse function offset
+	    while (isspace(*p))
+		p++;
+	    start = p;
+	    while (*p != '\0' && !(*p == ':' && isspace(p[1])))
+		p++;
+	    addr.fnoffs = FROM_LATIN1(start, p-start);
+	}
+	if (*p == ':')
+	    p++;
+	// skip space; this may skip a new-line char!
+	while (isspace(*p))
+	    p++;
+	// everything to the end of the line is the memory dump
+	const char* end = strchr(p, '\n');
+	if (end != 0) {
+	    dump = FROM_LATIN1(p, end-p);
+	    p = end+1;
+	} else {
+	    dump = FROM_LATIN1(p, strlen(p));
+	    p += strlen(p);
+	}
+	MemoryDump* md = new MemoryDump;
+	md->address = addr;
+	md->dump = dump;
+	memdump.append(md);
+    }
+    
+    return QString();
 }
 
 

@@ -4,8 +4,9 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include "memwindow.h"
+#include <qheader.h>
 #if QT_VERSION >= 200
-#include <kglobalsettings.h>
+#include <klocale.h>
 #else
 #include <kapp.h>
 #endif
@@ -21,29 +22,22 @@ MemoryWindow::MemoryWindow(QWidget* parent, const char* name) :
 	m_layout(this, 0, 2),
 	m_format(MDTword | MDThex)
 {
-    // use fixed font for contents
-#if QT_VERSION < 200
-    m_memory.setFont(kapp->fixedFont);
-#else
-    m_memory.setFont(KGlobalSettings::fixedFont());
-#endif
-
     QSize minSize = m_expression.sizeHint();
     m_expression.setMinimumSize(minSize);
     m_expression.setInsertionPolicy(QComboBox::NoInsertion);
     m_expression.setMaxCount(15);
 
-    QSize memSize = m_memory.sizeHint();
-    if (memSize.width() < 0 || memSize.height() < 0)	// sizeHint unimplemented?
-	memSize = minSize;
-    m_memory.setMinimumSize(memSize);
+    m_memory.addColumn(i18n("Address"), 80);
+    m_memory.addColumn(i18n("Contents"), 200);
+    m_memory.setSorting(-1);		/* don't sort */
+    m_memory.setAllColumnsShowFocus(true);
+    m_memory.header()->setClickEnabled(false);
 
     // create layout
     m_layout.addWidget(&m_expression, 0);
     m_layout.addWidget(&m_memory, 10);
     m_layout.activate();
 
-    m_memory.setReadOnly(true);
 #if QT_VERSION < 200
     connect(&m_expression, SIGNAL(activated(const char*)),
 	    this, SLOT(slotNewExpression(const char*)));
@@ -70,30 +64,17 @@ MemoryWindow::MemoryWindow(QWidget* parent, const char* name) :
     m_popup.insertItem("&Instructions", MDTinsn);
     connect(&m_popup, SIGNAL(activated(int)), this, SLOT(slotTypeChange(int)));
 
-    m_expression.installEventFilter(this);
-    m_memory.installEventFilter(this);
+    /*
+     * Handle right mouse button. Signal righteButtonClicked cannot be
+     * used, because it works only over items, not over the blank window.
+     */
+    m_memory.viewport()->installEventFilter(this);
 
     m_formatCache.setAutoDelete(true);
 }
 
 MemoryWindow::~MemoryWindow()
 {
-}
-
-void MemoryWindow::paletteChange(const QPalette& oldPal)
-{
-    // font may have changed
-#if QT_VERSION < 200
-    m_memory.setFont(kapp->fixedFont);
-#else
-    m_memory.setFont(KGlobalSettings::fixedFont());
-#endif
-    QWidget::paletteChange(oldPal);
-}
-
-void MemoryWindow::mousePressEvent(QMouseEvent* ev)
-{
-    handlePopup(ev);
 }
 
 #if QT_VERSION < 200
@@ -174,7 +155,7 @@ void MemoryWindow::displayNewExpression(const QString& expr)
 
     // clear memory dump if no dump wanted
     if (expr.isEmpty()) {
-	m_memory.setText(QString());
+	m_memory.clear();
     }
 }
 
@@ -198,15 +179,27 @@ void MemoryWindow::slotTypeChange(int id)
     displayNewExpression(expr);
 }
 
-void MemoryWindow::slotNewMemoryDump(const QString& dump)
+void MemoryWindow::slotNewMemoryDump(const QString& msg, QList<MemoryDump>& memdump)
 {
-    m_memory.setText(dump);
+    m_memory.clear();
+    if (!msg.isEmpty()) {
+	new QListViewItem(&m_memory, QString(), msg);
+	return;
+    }
+
+    QListViewItem* after = 0;
+    MemoryDump* md = memdump.first();
+    for (; md != 0; md = memdump.next()) {
+	QString addr = md->address.asString() + " " + md->address.fnoffs;
+	after = new QListViewItem(&m_memory, after, addr, md->dump);
+    }
 }
 
 static const char MemoryGroup[] = "Memory";
 static const char NumExprs[] = "NumExprs";
 static const char ExpressionFmt[] = "Expression%d";
 static const char FormatFmt[] = "Format%d";
+static const char ColumnWidths[] = "ColumnWidths";
 
 void MemoryWindow::saveProgramSpecific(KSimpleConfig* config)
 {
@@ -226,6 +219,16 @@ void MemoryWindow::saveProgramSpecific(KSimpleConfig* config)
 	unsigned fmt = pFormat != 0  ?  *pFormat  :  MDTword | MDThex;
 	config->writeEntry(fmtEntry, fmt);
     }
+
+    // column widths
+    QStrList widths;
+    QString wStr;
+    for (int i = 0; i < 2; i++) {
+	int w = m_memory.columnWidth(i);
+	wStr.setNum(w);
+	widths.append(wStr);
+    }
+    config->writeEntry(ColumnWidths, widths);
 }
 
 void MemoryWindow::restoreProgramSpecific(KSimpleConfig* config)
@@ -254,6 +257,19 @@ void MemoryWindow::restoreProgramSpecific(KSimpleConfig* config)
 	m_format = *m_formatCache[expr];
 	m_debugger->setMemoryFormat(m_format);
 	displayNewExpression(expr);
+    }
+
+    // column widths
+    QStrList widths;
+    int n = config->readListEntry(ColumnWidths, widths);
+    if (n > 2)
+	n = 2;
+    for (int i = 0; i < n; i++) {
+	QString wStr = widths.at(i);
+	bool ok;
+	int w = wStr.toInt(&ok);
+	if (ok)
+	    m_memory.setColumnWidth(i, w);
     }
 }
 
