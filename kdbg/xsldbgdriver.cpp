@@ -10,6 +10,7 @@
 #include <ctype.h>
 #include <stdlib.h>             /* strtol, atoi */
 #include <string.h>             /* strcpy */
+#include <kmessagebox.h>
 
 #include "assert.h"
 #ifdef HAVE_CONFIG_H
@@ -22,6 +23,7 @@ static VarTree *parseVar(const char *&s);
 static bool parseName(const char *&s, QString & name,
                       VarTree::NameKind & kind);
 static bool parseValue(const char *&s, VarTree * variable);
+static bool isErrorExpr(const char *output);
 
 #define TERM_IO_ALLOWED 1
 
@@ -55,7 +57,7 @@ static XsldbgCmdInfo cmds[] = {
     {DCexamine, "print 'x %s %s'\n", XsldbgCmdInfo::argString2},
     {DCinfoline, "print 'templates %s:%d'\n", XsldbgCmdInfo::argStringNum},
     {DCdisassemble, "print 'disassemble %s %s'\n", XsldbgCmdInfo::argString2},
-    {DCsetargs, "setargs %s\n", XsldbgCmdInfo::argString},
+    {DCsetargs, "data %s\n", XsldbgCmdInfo::argString},
     {DCsetenv, "addparam %s %s\n", XsldbgCmdInfo::argString2},
     {DCunsetenv, "unset env %s\n", XsldbgCmdInfo::argString},
     {DCsetoption, "setoption %s %d\n", XsldbgCmdInfo::argStringNum},
@@ -65,9 +67,9 @@ static XsldbgCmdInfo cmds[] = {
 							 of executing XSLT we show the XSLT file */
     {DCcont, "continue\n", XsldbgCmdInfo::argNone},
     {DCstep, "step\n", XsldbgCmdInfo::argNone},
-    {DCstepi, "print 'DCstepi'\n", XsldbgCmdInfo::argNone},
+    {DCstepi, "step\n", XsldbgCmdInfo::argNone},
     {DCnext, "next\n", XsldbgCmdInfo::argNone},
-    {DCnexti, "print 'nexti'\n", XsldbgCmdInfo::argNone},
+    {DCnexti, "next\n", XsldbgCmdInfo::argNone},
     {DCfinish, "quit\n", XsldbgCmdInfo::argNone},
     {DCuntil, "continue %s:%d\n", XsldbgCmdInfo::argStringNum},
     {DCkill, "quit\n", XsldbgCmdInfo::argNone},
@@ -104,6 +106,7 @@ DebuggerDriver(), m_gdbMajor(2), m_gdbMinor(0)
     m_promptLastChar = ' ';
   
     m_markerRE.setPattern("^Breakpoint at file ");
+    m_haveDataFile = FALSE;
 
 #ifndef NDEBUG
     // check command info array
@@ -208,7 +211,7 @@ void
 XsldbgDriver::slotReceiveOutput(KProcess * process, char *buffer,
                                 int buflen)
 {
-  //TRACE(buffer);
+    //TRACE(buffer);
     if (m_state != DSidle) {
         //    TRACE(buffer);
         DebuggerDriver::slotReceiveOutput(process, buffer, buflen);
@@ -294,9 +297,20 @@ XsldbgDriver::commandFinished(CmdQueueItem * cmd)
         case DCstep:
         case DCnext:
         case DCfinish:{
+	  if (!::isErrorExpr(m_output))
             parseMarker();
+	  else{
+	    // This only shows an error for DCinfolocals 
+	    //  need to update KDebugger::handleRunCommand ? 
+	    KMessageBox::sorry(0L, m_output);
+	  }
 	}
             break;
+
+       case DCinfolinemain:
+	    if (!m_xslFile.isEmpty())
+		emit activateFileLine(m_xslFile, 0, DbgAddr());
+	    break;
 
         default:;
     }
@@ -386,6 +400,9 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg)
     if (cmd == DCcd) {
         // need the working directory when parsing the output
         m_programWD = strArg;
+    } else if (cmd == DCexecutable) {
+        // want to display the XSL file
+	m_xslFile = strArg;
     }
 
     SIZED_QString(cmdString, MAX_FMTLEN + strArg.length());
@@ -646,16 +663,20 @@ isErrorExpr(const char *output)
 {
     int  wordIndex;
     bool result = false;
-#define   ERROR_WORD_COUNT 3
+#define   ERROR_WORD_COUNT 5
     static const char *errorWords[ERROR_WORD_COUNT] = {
       "Error:", 
+      "error:", // libxslt error 
       "Unknown command",  
-      "Warning:"
+      "Warning:",
+      "warning:" // libxslt warning
     };
     static int errorWordLength[ERROR_WORD_COUNT] = {
-      5,  /* Error */
+      6,  /* Error */
+      6,  /* rror */
       15, /* Unknown command*/ 
-      7  /* Warning */
+      8,  /* Warning */
+      8  /* warning */
     };
     
     for (wordIndex = 0; wordIndex < ERROR_WORD_COUNT; wordIndex++){
