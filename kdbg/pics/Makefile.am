@@ -52,13 +52,13 @@ install-data-local:
 	set -x; \
 	d="$(DESTDIR)$(kde_icondir)"; \
 	$(mkinstalldirs) $$d/hicolor/32x32/apps; \
-	$(INSTALL_DATA) hi32-app-kdbg.png $$d/hicolor/32x32/apps/kdbg.png; \
+	$(INSTALL_DATA) $(srcdir)/hi32-app-kdbg.png $$d/hicolor/32x32/apps/kdbg.png; \
 	$(mkinstalldirs) $$d/hicolor/16x16/apps; \
-	$(INSTALL_DATA) hi16-app-kdbg.png $$d/hicolor/16x16/apps/kdbg.png; \
+	$(INSTALL_DATA) $(srcdir)/hi16-app-kdbg.png $$d/hicolor/16x16/apps/kdbg.png; \
 	$(mkinstalldirs) $$d/locolor/32x32/apps; \
-	$(INSTALL_DATA) lo32-app-kdbg.png $$d/locolor/32x32/apps/kdbg.png; \
+	$(INSTALL_DATA) $(srcdir)/lo32-app-kdbg.png $$d/locolor/32x32/apps/kdbg.png; \
 	$(mkinstalldirs) $$d/locolor/16x16/apps; \
-	$(INSTALL_DATA) lo16-app-kdbg.png $$d/locolor/16x16/apps/kdbg.png; \
+	$(INSTALL_DATA) $(srcdir)/lo16-app-kdbg.png $$d/locolor/16x16/apps/kdbg.png; \
 	fi
 
 uninstall-local:
