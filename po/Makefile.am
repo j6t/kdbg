@@ -12,7 +12,7 @@ MAINTAINERCLEANFILES = $(GMOFILES)
 GMSGFMT = @GMSGFMT@
 MSGFMT = @MSGFMT@
 XGETTEXT = @XGETTEXT@
-EXTRA_DIST = $(PACKAGE).pot $(POFILES) $(GMOFILES)
+EXTRA_DIST = $(PACKAGE).pot $(POFILES) $(GMOFILES) kde1-gmo.tar
 
 
 all: all-@USE_NLS@
@@ -23,11 +23,16 @@ SUFFIXES = .po .gmo
 .po.mo:
 	$(MSGFMT) -o $@ $<
 
+if BUILDFORKDE2
 .po.gmo:
 	file=`echo $* | sed 's,.*/,,'`.gmo \
 	&& rm -f $$file && $(GMSGFMT) -o $$file $< 
-
 all-yes: $(GMOFILES)
+else
+all-yes:
+	cd $(srcdir) && tar xf kde1-gmo.tar
+endif
+
 all-no:
 
 install-yes: all
@@ -38,7 +43,7 @@ install-yes: all
 	name=$(PACKAGE).mo \
 	dir=$$destdir/$$lang/LC_MESSAGES; \
 	$(mkinstalldirs) $$dir; \
-	$(INSTALL_DATA) $$cat $$dir/$$name; \
+	$(INSTALL_DATA) $(srcdir)/$$cat $$dir/$$name; \
 	  echo "installing $$cat as $$dir/$$name"; \
 	done
 
