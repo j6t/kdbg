@@ -5,11 +5,17 @@
 
 #undef PACKAGE
 
+/* defines if having libz */
+#undef HAVE_LIBZ
+
 /* defines if having libgif (always 1) */
 #undef HAVE_LIBGIF
 
 /* defines if having libjpeg (always 1) */
 #undef HAVE_LIBJPEG
+
+/* defines if having libpng */
+#undef HAVE_LIBPNG
 
 /* defines which to take for ksize_t */
 #undef ksize_t
@@ -35,3 +41,6 @@
 /* Define to the name of the file that communication with gdb
    should be logged to; undefine it for no logging */
 #undef GDB_TRANSCRIPT
+
+/* Define if placement new works */
+#undef HAVE_PLACEMENT_NEW
