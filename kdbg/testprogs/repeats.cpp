@@ -26,7 +26,12 @@ int main()
     for (int i = 1; i < 29; i++)
 	apf[i] = f;
 
-    QString s[15];
+    QString s[50];
+
+    for (int i = 0; i < 50; i++)
+	s[i].sprintf("String %d", i);
+
+    s[21] = s[48];
 
     exit(0);
 }
