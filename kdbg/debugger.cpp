@@ -155,6 +155,10 @@ KDebugger::KDebugger(const char* name) :
 
     m_filesWindow.setWindowMenu(&m_menuWindow);
     connect(&m_filesWindow.m_findDlg, SIGNAL(closed()), SLOT(updateUI()));
+    connect(&m_filesWindow, SIGNAL(toggleBreak(const QString&, int)),
+	    SLOT(slotToggleBreak(const QString&,int)));
+    connect(&m_filesWindow, SIGNAL(enadisBreak(const QString&, int)),
+	    SLOT(slotEnaDisBreak(const QString&,int)));
 
     m_bpTable.setCaption(i18n("Breakpoints"));
     connect(&m_bpTable, SIGNAL(closed()), SLOT(updateUI()));
@@ -164,7 +168,7 @@ KDebugger::KDebugger(const char* name) :
     // file/line updates
     connect(&m_filesWindow, SIGNAL(fileChanged()), SLOT(slotFileChanged()));
     connect(&m_filesWindow, SIGNAL(lineChanged()), SLOT(slotLineChanged()));
-    
+
     // debugger process
     connect(&m_gdb, SIGNAL(receivedStdout(KProcess*,char*,int)),
 	    SLOT(receiveOutput(KProcess*,char*,int)));
@@ -2272,5 +2276,21 @@ void KDebugger::stopAnimation()
     if (m_animationTimer.isActive()) {
 	m_animationTimer.stop();
 	m_animationInterval = 0;
+    }
+}
+
+void KDebugger::slotToggleBreak(const QString& fileName, int lineNo)
+{
+    // lineNo is zero-based
+    if (isReady()) {
+	m_bpTable.doBreakpoint(fileName, lineNo, false);
+    }
+}
+
+void KDebugger::slotEnaDisBreak(const QString& fileName, int lineNo)
+{
+    // lineNo is zero-based
+    if (isReady()) {
+	m_bpTable.doEnableDisableBreakpoint(fileName, lineNo);
     }
 }

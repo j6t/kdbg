@@ -312,6 +312,30 @@ void FileWindow::find(const char* text, bool caseSensitive, FindDirection dir)
     scrollTo(line);
 }
 
+void FileWindow::mouseReleaseEvent(QMouseEvent* ev)
+{
+    // check if event is in line item column
+    if (findCol(ev->x()) != 0)
+	return;
+
+    // get row
+    int row = findRow(ev->y());
+    if (row < 0)
+	return;
+
+    switch (ev->button()) {
+    case LeftButton:
+	TRACE(QString().sprintf("left-clicked row %d", row));
+	emit clickedLeft(m_fileName, row);
+	break;
+    case MidButton:
+	TRACE(QString().sprintf("mid-clicked row %d", row));
+	emit clickedMid(m_fileName, row);
+	break;
+    default:;
+    }
+}
+
 
 
 WinStack::WinStack(QWidget* parent, const char* name, const BreakpointTable& bpt) :
@@ -438,6 +462,10 @@ bool WinStack::activatePath(QString pathName, int lineNo)
 	fw = new FileWindow(pathName, this, "fileWindow");
 	m_fileList.insert(0, fw);
 	connect(fw, SIGNAL(lineChanged()),SLOT(slotLineChanged()));
+	connect(fw, SIGNAL(clickedLeft(const QString&, int)),
+		SLOT(slotToggleBreak(const QString&,int)));
+	connect(fw, SIGNAL(clickedMid(const QString&, int)),
+		SLOT(slotEnaDisBreak(const QString&,int)));
 
 	changeWindowMenu();
 	
@@ -615,6 +643,17 @@ void WinStack::slotFindBackward()
 	m_activeWindow->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
 			     FileWindow::findBackward);
 }
+
+void WinStack::slotToggleBreak(const QString& fileName, int row)
+{
+    emit toggleBreak(fileName, row);
+}
+
+void WinStack::slotEnaDisBreak(const QString& fileName, int row)
+{
+    emit enadisBreak(fileName, row);
+}
+
 
 class MoreWindowsDialog : public QDialog
 {

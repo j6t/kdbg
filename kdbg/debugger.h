@@ -223,6 +223,8 @@ public slots:
     void slotFileChanged();
     void slotLineChanged();
     void slotAnimationTimeout();
+    void slotToggleBreak(const QString&, int);
+    void slotEnaDisBreak(const QString&, int);
     /*
      * Unless WANT_THIS_PANE is defined, the following slots are unused.
      * Removing them with #ifdef ... #endif doesn't work because moc

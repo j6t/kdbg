@@ -42,7 +42,12 @@ protected:
     virtual int textCol() const;
     virtual int cellWidth(int col);
     virtual void paintCell(QPainter* p, int row, int col);
+    virtual void mouseReleaseEvent(QMouseEvent* ev);
     void updateLineItem(int i);
+
+signals:
+    void clickedLeft(const QString&, int);
+    void clickedMid(const QString&, int);
 
 protected:
     QString m_fileName;
@@ -110,12 +115,16 @@ public:
 signals:
     void fileChanged();
     void lineChanged();
+    void toggleBreak(const QString&, int);
+    void enadisBreak(const QString&, int);
 
 public slots:
     virtual void menuCallback(int item);
     virtual void slotLineChanged();
     virtual void slotFindForward();
     virtual void slotFindBackward();
+    virtual void slotToggleBreak(const QString&,int);
+    virtual void slotEnaDisBreak(const QString&,int);
 
 protected:
     bool activateFI(QFileInfo& fi, int lineNo);
