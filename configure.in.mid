@@ -80,6 +80,35 @@ if eval "test \"`echo `$ac_cv_have_placement_new\" = yes"; then
   AC_DEFINE(HAVE_PLACEMENT_NEW)
 fi
 
+dnl -----------------
+AC_PATH_PROG(PS_COMMAND, ps)
+if test -n "$PS_COMMAND"; then
+  AC_MSG_CHECKING(for suitable ps invocation)
+
+  PS_COMMAND="$PS_COMMAND -eo pid,ppid,uid,vsz,etime,time,args"
+  if $PS_COMMAND > /dev/null 2>&1; then
+    # works in principle; check output
+    set x `$PS_COMMAND | head -1`
+    if test "$*" = "x PID PPID UID VSZ ELAPSED TIME COMMAND"; then
+      : # fine
+    else
+      PS_COMMAND="" # not suitable
+    fi
+  else
+    PS_COMMAND="" # not suitable
+  fi
+
+  if test -n "$PS_COMMAND"; then
+    AC_MSG_RESULT($PS_COMMAND)
+    PS_COMMAND="\"`echo $PS_COMMAND | sed -e 's/ /", "/g'`\""
+    AC_DEFINE_UNQUOTED(PS_COMMAND, $PS_COMMAND)
+  else
+    AC_MSG_RESULT([not suitable])
+  fi
+fi
+AM_CONDITIONAL(HAVE_PS_COMMAND, test -n "$PS_COMMAND")
+
+dnl -----------------
 AC_MSG_CHECKING(for KDE 3)
 
 AC_LANG_CPLUSPLUS

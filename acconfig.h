@@ -41,3 +41,6 @@
 
 /* Define if placement new works */
 #undef HAVE_PLACEMENT_NEW
+
+/* Define how to invoke ps */
+#undef PS_COMMAND

@@ -29,6 +29,9 @@
 #include "procattach.h"
 #include "dbgdriver.h"
 #include "mydebug.h"
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
 
 
 DebuggerMainWnd::DebuggerMainWnd(const char* name) :
@@ -892,8 +895,12 @@ void DebuggerMainWnd::slotExecUntil()
 
 void DebuggerMainWnd::slotExecAttach()
 {
+#ifdef PS_COMMAND
+    ProcAttachPS dlg(this);
+#else
     ProcAttach dlg(this);
     dlg.setText(m_debugger->attachedPid());
+#endif
     if (dlg.exec()) {
 	m_debugger->attachProgram(dlg.text());
     }

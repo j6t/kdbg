@@ -15,8 +15,6 @@
 14. Speed up direct members by reusing values that are already available in
     members.
 
-17. To attach to a process, let the user select it from the list of processes.
-
 19. Improve support of breakpoints in source files having directories in their
     names.
 

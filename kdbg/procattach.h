@@ -6,11 +6,54 @@
 #ifndef ProcAttach_included
 #define ProcAttach_included
 
+#include "procattachbase.h"
+#include <qvaluevector.h>
 #include <qdialog.h>
 #include <qlabel.h>
 #include <qlineedit.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
+
+
+class KProcess;
+
+/*
+ * This is the full-featured version of the dialog. It is used when the
+ * system features a suitable ps command.
+ */
+
+class ProcAttachPS : public ProcAttachBase
+{
+    Q_OBJECT
+public:
+    ProcAttachPS(QWidget* parent);
+    ~ProcAttachPS();
+
+    QString text() const { return pidEdit->text(); }
+
+protected:
+    void runPS();
+    virtual void processSelected(QListViewItem*);
+    virtual void refresh();
+
+protected slots:
+    void slotTextReceived(KProcess* proc, char* buffer, int buflen);
+
+protected:
+    void pushLine();
+
+    KProcess* m_ps;
+    // parse state
+    bool m_firstLine;
+    QCString m_token;
+    QValueVector<QString> m_line;
+};
+
+
+/*
+ * This is an extremely stripped down version of the dialog. It is used
+ * when there is no suitable ps command.
+ */
 
 class ProcAttach : public QDialog
 {

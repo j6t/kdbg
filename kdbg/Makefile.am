@@ -14,6 +14,7 @@ bin_PROGRAMS = 	kdbg
 kdbg_SOURCES = \
 	pgmargs.cpp \
 	procattach.cpp \
+	procattachbase.ui \
 	tableview.cpp \
 	ktreeview.cpp \
 	textvw.cpp \
@@ -38,6 +39,9 @@ kdbg_SOURCES = \
 	dbgmainwnd.cpp \
 	main.cpp
 
+BUILTSOURCES = \
+	procattachbase.cpp
+
 # the library search path
 kdbg_LDFLAGS = \
 	$(all_libraries) $(KDE_RPATH)
@@ -55,6 +59,7 @@ kdbg_LDADD = $(MYKDELIBS)
 noinst_HEADERS = \
 	pgmargs.h \
 	procattach.h \
+	procattachbase.h \
 	tableview.h \
 	textvw.h \
 	valarray.h \

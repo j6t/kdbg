@@ -1,0 +1,232 @@
+<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<class>ProcAttachBase</class>
+<author>Johannes Sixt</author>
+<widget class="QDialog">
+    <property name="name">
+        <cstring>ProcAttachBase</cstring>
+    </property>
+    <property name="geometry">
+        <rect>
+            <x>0</x>
+            <y>0</y>
+            <width>560</width>
+            <height>416</height>
+        </rect>
+    </property>
+    <property name="caption">
+        <string>Attach to Process</string>
+    </property>
+    <property name="sizeGripEnabled">
+        <bool>false</bool>
+    </property>
+    <hbox>
+        <property name="name">
+            <cstring>unnamed</cstring>
+        </property>
+        <widget class="QLayoutWidget">
+            <property name="name">
+                <cstring>layout1</cstring>
+            </property>
+            <vbox>
+                <property name="name">
+                    <cstring>unnamed</cstring>
+                </property>
+                <widget class="QLabel">
+                    <property name="name">
+                        <cstring>textLabel3</cstring>
+                    </property>
+                    <property name="sizePolicy">
+                        <sizepolicy>
+                            <hsizetype>7</hsizetype>
+                            <vsizetype>5</vsizetype>
+                            <horstretch>0</horstretch>
+                            <verstretch>0</verstretch>
+                        </sizepolicy>
+                    </property>
+                    <property name="text">
+                        <string>&amp;Currently running processes:</string>
+                    </property>
+                    <property name="buddy" stdset="0">
+                        <cstring>processList</cstring>
+                    </property>
+                </widget>
+                <widget class="QListView">
+                    <property name="name">
+                        <cstring>processList</cstring>
+                    </property>
+                    <property name="minimumSize">
+                        <size>
+                            <width>300</width>
+                            <height>200</height>
+                        </size>
+                    </property>
+                    <property name="allColumnsShowFocus">
+                        <bool>true</bool>
+                    </property>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout2</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>pidLabel</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Process number:</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>pidEdit</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>pidEdit</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>0</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="maxLength">
+                                <number>20</number>
+                            </property>
+                        </widget>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>processText</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>7</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>1</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+                <widget class="QLayoutWidget">
+                    <property name="name">
+                        <cstring>layout3</cstring>
+                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>buttonRefresh</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>1</hsizetype>
+                                    <vsizetype>0</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Refresh</string>
+                            </property>
+                        </widget>
+                        <spacer>
+                            <property name="name">
+                                <cstring>spacingBtns</cstring>
+                            </property>
+                            <property name="orientation">
+                                <enum>Horizontal</enum>
+                            </property>
+                            <property name="sizeType">
+                                <enum>Expanding</enum>
+                            </property>
+                            <property name="sizeHint">
+                                <size>
+                                    <width>242</width>
+                                    <height>20</height>
+                                </size>
+                            </property>
+                        </spacer>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>buttonOk</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;OK</string>
+                            </property>
+                            <property name="accel">
+                                <string></string>
+                            </property>
+                            <property name="autoDefault">
+                                <bool>true</bool>
+                            </property>
+                            <property name="default">
+                                <bool>true</bool>
+                            </property>
+                        </widget>
+                        <widget class="QPushButton">
+                            <property name="name">
+                                <cstring>buttonCancel</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Cancel</string>
+                            </property>
+                            <property name="accel">
+                                <string></string>
+                            </property>
+                            <property name="autoDefault">
+                                <bool>true</bool>
+                            </property>
+                        </widget>
+                    </hbox>
+                </widget>
+            </vbox>
+        </widget>
+    </hbox>
+</widget>
+<connections>
+    <connection>
+        <sender>buttonOk</sender>
+        <signal>clicked()</signal>
+        <receiver>ProcAttachBase</receiver>
+        <slot>accept()</slot>
+    </connection>
+    <connection>
+        <sender>buttonCancel</sender>
+        <signal>clicked()</signal>
+        <receiver>ProcAttachBase</receiver>
+        <slot>reject()</slot>
+    </connection>
+    <connection>
+        <sender>processList</sender>
+        <signal>clicked(QListViewItem*)</signal>
+        <receiver>ProcAttachBase</receiver>
+        <slot>processSelected(QListViewItem*)</slot>
+    </connection>
+    <connection>
+        <sender>buttonRefresh</sender>
+        <signal>clicked()</signal>
+        <receiver>ProcAttachBase</receiver>
+        <slot>refresh()</slot>
+    </connection>
+</connections>
+<tabstops>
+    <tabstop>processList</tabstop>
+    <tabstop>pidEdit</tabstop>
+    <tabstop>buttonOk</tabstop>
+    <tabstop>buttonCancel</tabstop>
+</tabstops>
+<slots>
+    <slot specifier="pure virtual">processSelected(QListViewItem*)</slot>
+    <slot specifier="pure virtual">refresh()</slot>
+</slots>
+<layoutdefaults spacing="6" margin="10"/>
+</UI>
