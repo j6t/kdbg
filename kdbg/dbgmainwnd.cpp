@@ -134,15 +134,11 @@ void DebuggerMainWnd::initMenu()
 
     m_menuWindow.insertItem(i18n("&More..."), ID_WINDOW_MORE);
   
-    m_menuHelp.insertItem(i18n("&Contents"), ID_HELP_HELP);
-    m_menuHelp.insertItem(i18n("&About"), ID_HELP_ABOUT);
-  
     connect(&m_menuFile, SIGNAL(activated(int)), SLOT(menuCallback(int)));
     connect(&m_menuView, SIGNAL(activated(int)), SLOT(menuCallback(int)));
     connect(&m_menuProgram, SIGNAL(activated(int)), SLOT(menuCallback(int)));
     connect(&m_menuBrkpt, SIGNAL(activated(int)), SLOT(menuCallback(int)));
     connect(&m_menuWindow, SIGNAL(activated(int)), SLOT(menuCallback(int)));
-    connect(&m_menuHelp, SIGNAL(activated(int)), SLOT(menuCallback(int)));
 
     KMenuBar* menu = menuBar();
     menu->insertItem(i18n("&File"), &m_menuFile);

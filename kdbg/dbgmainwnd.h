@@ -48,7 +48,6 @@ protected:
     QPopupMenu m_menuProgram;
     QPopupMenu m_menuBrkpt;
     QPopupMenu m_menuWindow;
-    QPopupMenu m_menuHelp;
 
 protected:
     virtual void closeEvent(QCloseEvent* e);
