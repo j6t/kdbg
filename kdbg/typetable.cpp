@@ -131,6 +131,11 @@ TypeInfo* TypeTable::operator[](const char* type)
     return result;
 }
 
+void TypeTable::registerAlias(const char* type, TypeInfo* info)
+{
+    ASSERT((*this)[type] == 0 || (*this)[type] == info);
+    m_aliasDict.insert(type, info);
+}
 
 TypeInfo::TypeInfo(const QString& displayString)
 {

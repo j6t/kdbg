@@ -56,6 +56,11 @@ public:
     TypeInfo* operator[](const char* type);
 
     /**
+     * Adds a new alias for a type name.
+     */
+    void registerAlias(const char* type, TypeInfo* typeInfo);
+
+    /**
      * Gets a pointer to a TypeInfo that means: "I don't know the type"
      */
     static TypeInfo* unknownType() { return &m_unknownType; }
