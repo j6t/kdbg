@@ -14,6 +14,7 @@
 #include <qbrush.h>
 #include <qfile.h>
 #include <qfileinf.h>
+#include <qlistbox.h>
 #include <kapp.h>
 #include <kiconloader.h>
 #ifdef HAVE_CONFIG_H
@@ -57,6 +58,57 @@ void FileWindow::loadFile()
     
     // allocate line items
     m_lineItems.fill(0, numRows());
+}
+
+void FileWindow::reloadFile()
+{
+    QFile f(m_fileName);
+    if (!f.open(IO_ReadOnly)) {
+	// open failed; leave alone
+	return;
+    }
+
+    bool autoU = autoUpdate();
+    setAutoUpdate(false);
+
+    QTextStream t(&f);
+    QString s;
+    uint lineNo = 0;
+    while (lineNo < m_texts.size() && !t.eof()) {
+	s = t.readLine();
+	replaceLine(lineNo, s);
+	lineNo++;
+    }
+    if (lineNo >= m_texts.size()) {
+	// the new file has more lines than the old one
+	// here lineNo is the number of lines of the old file
+	while (!t.eof()) {
+	    s = t.readLine();
+	    insertLine(s);
+	}
+	// allocate line items
+	m_lineItems.resize(m_texts.size());
+	for (uint i = m_texts.size()-1; i >= lineNo; i--) {
+	    m_lineItems[i] = 0;
+	}
+    } else {
+	// the new file has fewer lines
+	// here lineNo is the number of lines of the new file
+	// remove the excessive lines
+	for (uint i = m_texts.size()-1; i >= lineNo; i--) {
+	    delete[] m_texts[i];
+	}
+	m_texts.resize(lineNo);
+	m_lineItems.resize(lineNo);
+    }
+    f.close();
+
+    setNumRows(m_texts.size());
+
+    setAutoUpdate(autoU);
+    if (autoU && isVisible()) {
+	repaint();
+    }
 }
 
 void FileWindow::scrollTo(int lineNo)
@@ -313,6 +365,12 @@ void WinStack::menuCallback(int item)
     case ID_FILE_OPEN:
 	openFile();
 	break;
+    case ID_FILE_RELOAD:
+	if (m_activeWindow != 0) {
+	    TRACE("reloading one file");
+	    m_activeWindow->reloadFile();
+	}
+	break;
     case ID_VIEW_FINDDLG:
 	if (m_findDlg.isVisible()) {
 	    m_findDlg.done(0);
@@ -331,6 +389,14 @@ void WinStack::openFile()
     }
 
     activate(fileName, 0);
+}
+
+void WinStack::reloadAllFiles()
+{
+    FileWindow* fw;
+    for (fw = m_fileList.first(); fw != 0; fw = m_fileList.next()) {
+	fw->reloadFile();
+    }
 }
 
 bool WinStack::activate(QString fileName, int lineNo)
@@ -453,21 +519,6 @@ void WinStack::changeWindowMenu()
     }
 }
 
-void WinStack::selectWindow(int id)
-{
-    if (id == 0) {
-	TRACE("Window->More... not yet implemented");
-    } else {
-	FileWindow* fw = m_fileList.first();
-	for (int index = (id & ID_WINDOW_INDEX_MASK)-1; index > 0; index--) {
-	    fw = m_fileList.next();
-	}
-	KASSERT(fw != 0, KDEBUG_INFO, 0, "");
-	
-	activateWindow(fw, -1);
-    }
-}
-
 void WinStack::updateLineItems()
 {
     FileWindow* fw = 0;
@@ -533,6 +584,98 @@ void WinStack::slotFindBackward()
     if (m_activeWindow != 0)
 	m_activeWindow->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
 			     FileWindow::findBackward);
+}
+
+class MoreWindowsDialog : public QDialog
+{
+public:
+    MoreWindowsDialog(QWidget* parent);
+    virtual ~MoreWindowsDialog();
+
+    void insertString(const char* text) { m_list.insertItem(text); }
+    void setListIndex(int i) { m_list.setCurrentItem(i); }
+    int listIndex() const { return m_list.currentItem(); }
+
+protected:
+    QListBox m_list;
+    QPushButton m_buttonOK;
+    QPushButton m_buttonCancel;
+    QVBoxLayout m_layout;
+    QHBoxLayout m_buttons;
+};
+
+MoreWindowsDialog::MoreWindowsDialog(QWidget* parent) :
+	QDialog(parent, "morewindows", true),
+	m_list(this, "windows"),
+	m_buttonOK(this, "show"),
+	m_buttonCancel(this, "cancel"),
+	m_layout(this, 8),
+	m_buttons(4)
+{
+    QString title = kapp->getCaption();
+    title += i18n(": Open Windows");
+    setCaption(title);
+
+    m_list.setMinimumSize(250, 100);
+    connect(&m_list, SIGNAL(selected(int)), SLOT(accept()));
+
+    m_buttonOK.setMinimumSize(100, 30);
+    connect(&m_buttonOK, SIGNAL(clicked()), SLOT(accept()));
+    m_buttonOK.setText(i18n("Show"));
+    m_buttonOK.setDefault(true);
+
+    m_buttonCancel.setMinimumSize(100, 30);
+    connect(&m_buttonCancel, SIGNAL(clicked()), SLOT(reject()));
+    m_buttonCancel.setText(i18n("Cancel"));
+
+    m_layout.addWidget(&m_list, 10);
+    m_layout.addLayout(&m_buttons);
+    m_buttons.addStretch(10);
+    m_buttons.addWidget(&m_buttonOK);
+    m_buttons.addSpacing(40);
+    m_buttons.addWidget(&m_buttonCancel);
+    m_buttons.addStretch(10);
+
+    m_layout.activate();
+
+    m_list.setFocus();
+    resize(320, 320);
+}
+
+MoreWindowsDialog::~MoreWindowsDialog()
+{
+}
+
+void WinStack::selectWindow(int id)
+{
+    int index = 0;
+
+    if (id == 0) {
+	// more windows selected: show windows in a list
+	MoreWindowsDialog dlg(0);
+	int i = 0;
+	for (FileWindow* fw = m_fileList.first(); fw != 0; fw = m_fileList.next()) {
+	    dlg.insertString(fw->fileName());
+	    if (m_activeWindow == fw) {
+		index = i;
+	    }
+	    i++;
+	}
+	dlg.setListIndex(index);
+	if (dlg.exec() == QDialog::Rejected)
+	    return;
+	index = dlg.listIndex();
+    } else {
+	index = (id & ID_WINDOW_INDEX_MASK)-1;
+    }
+
+    FileWindow* fw = m_fileList.first();
+    for (; index > 0; index--) {
+	fw = m_fileList.next();
+    }
+    ASSERT(fw != 0);
+	
+    activateWindow(fw, -1);
 }
 
 

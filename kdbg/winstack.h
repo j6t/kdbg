@@ -29,6 +29,7 @@ public:
     ~FileWindow();
     
     void loadFile();
+    void reloadFile();
     void scrollTo(int lineNo);
     const QString& fileName() const { return m_fileName; }
     void updateLineItems(const BreakpointTable& bpt);
@@ -101,6 +102,7 @@ public:
     bool activeLine(QString& filename, int& lineNo);
     void updateLineItems();
     void updatePC(const QString& filename, int lineNo, int frameNo);
+    void reloadAllFiles();
 
     virtual void resizeEvent(QResizeEvent*);
 
