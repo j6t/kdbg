@@ -6,6 +6,8 @@
 #include <qdict.h>
 #include <qstring.h>
 
+class KConfigBase;
+
 /**
  * The maximum number of sub-expressions that may appear in a single struct
  * value.
@@ -51,7 +53,7 @@ public:
     /**
      * Lookup a structure type.
      */
-    TypeInfo* operator[](const char* type) { return m_typeDict[type]; }
+    TypeInfo* operator[](const char* type);
 
     /**
      * Gets a pointer to a TypeInfo that means: "I don't know the type"
@@ -60,7 +62,9 @@ public:
 
 protected:
     void loadOneFile(const char* fileName);
+    void readType(KConfigBase& cf, const char* type);
     QDict<TypeInfo> m_typeDict;
+    QDict<TypeInfo> m_aliasDict;
 
     static TypeInfo m_unknownType;
 };

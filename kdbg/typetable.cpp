@@ -3,6 +3,8 @@
 // Copyright by Johannes Sixt
 // This file is under GPL, the GNU General Public Licence
 
+#include <qdir.h>
+#include <qlist.h>
 #include <kapp.h>
 #include <ksimpleconfig.h>
 #include "typetable.h"
@@ -18,6 +20,8 @@ TypeInfo TypeTable::m_unknownType("");
 TypeTable::TypeTable()
 {
     m_typeDict.setAutoDelete(true);
+    // aliasDict keeps only pointers to items into typeDict
+    m_aliasDict.setAutoDelete(false);
 }
 
 TypeTable::~TypeTable()
@@ -26,60 +30,105 @@ TypeTable::~TypeTable()
 
 void TypeTable::loadTable()
 {
-    QString fileName = KApplication::kde_configdir() + "/kdbgrc";
-    TRACE(fileName);
-    loadOneFile(fileName);
+    QDir dir(KApplication::kde_datadir() + "/kdbg/types");
+    const QStrList* files = dir.entryList("*.kdbgtt");
+    if (files == 0) {
+	TRACE("no type tables found");
+	return;
+    }
+
+    QString fileName;
+    for (QListIterator<char> it(*files); it != 0; ++it) {
+	fileName = dir.filePath(it);
+	loadOneFile(fileName);
+    }
 }
+
+static const char TypeTableGroup[] = "Type Table";
+static const char TypesEntryFmt[] = "Types%d";
+static const char DisplayEntry[] = "Display";
+static const char AliasEntry[] = "Alias";
+static const char ExprEntryFmt[] = "Expr%d";
+
 
 void TypeTable::loadOneFile(const char* fileName)
 {
-    KSimpleConfig cf(fileName, true);
+    TRACE(QString("reading file ") + fileName);
+    KSimpleConfig cf(fileName, true);	/* read-only */
 
     /*
-     * Get the types. Here we assume that the names pointers to the keys
-     * don't change while we iterate over them.
+     * Get the types. We search for entries of kind Types1, Types2, etc.
+     * because a single entry Types could get rather long for large
+     * libraries.
      */
-    KGroupIterator* it = cf.groupIterator();
-    QArray<const char*> typeNames;
-    for (; it->current(); ++(*it)) {
-	if (qstrcmp(it->currentKey(), "<default>") == 0)
-	    continue;
-	int n = typeNames.size();
-	typeNames.resize(n+1);
-	typeNames[n] = it->currentKey();
-    }
-    delete it;
+    QStrList typeNames;
+    QString typesEntry(sizeof(TypesEntryFmt)+20);
+    for (int i = 1; ; i++) {
+	// next bunch of types
+	cf.setGroup(TypeTableGroup);
+	typesEntry.sprintf(TypesEntryFmt, i);
+	if (!cf.hasKey(typesEntry))
+	    break;
+	cf.readListEntry(typesEntry, typeNames, ',');
 
-    // now read them all
-    QString exprEntry;
-    QString expr;
-    for (int i = typeNames.size()-1; i >= 0; i--) {
-	cf.setGroup(typeNames[i]);
-	// the display string
-	expr = cf.readEntry("Display");
-
-	TypeInfo* info = new TypeInfo(expr);
-	if (info->m_numExprs == 0) {
-	    TRACE(QString().sprintf("bogus type %s: no %% in Display: '%s'",
-				    typeNames[i], expr.data()));
-	    delete info;
-	    continue;
+	// now read them
+	QString alias;
+	for (QListIterator<char> it(typeNames); it != 0; ++it) {
+	    cf.setGroup(it);
+	    // check if this is an alias
+	    alias = cf.readEntry(AliasEntry);
+	    if (alias.isEmpty()) {
+		readType(cf, it);
+	    } else {
+		// look up the alias type and insert it
+		TypeInfo* info = m_typeDict[alias];
+		if (info == 0) {
+		    TRACE(QString().sprintf("<%s>: alias %s not found",
+					    it.operator char*(), alias.data()));
+		} else {
+		    m_aliasDict.insert(alias, info);
+		    TRACE(QString().sprintf("<%s>: alias <%s>",
+					    it.operator char*(), alias.data()));
+		}
+	    }
 	}
+    } // for all Types%d
+}
 
-	// Expr1, Expr2, etc...
-	for (int j = 0; j < info->m_numExprs; j++) {
-	    exprEntry.sprintf("Expr%d", j+1);
-	    expr = cf.readEntry(exprEntry);
-	    info->m_exprStrings[j] = expr;
-	}
+void TypeTable::readType(KConfigBase& cf, const char* type)
+{
+    // the display string
+    QString expr = cf.readEntry(DisplayEntry);
 
-	// add the new type
-	m_typeDict.insert(typeNames[i], info);
-	TRACE(QString().sprintf("<%s>: %s%%%s by %s", typeNames[i],
-				info->m_displayString[0].data(),
-				info->m_displayString[1].data(),
-				info->m_exprStrings[0].data()));
+    TypeInfo* info = new TypeInfo(expr);
+    if (info->m_numExprs == 0) {
+	TRACE(QString().sprintf("bogus type %s: no %% in Display: '%s'",
+				type, expr.data()));
+	delete info;
+	return;
     }
+
+    // Expr1, Expr2, etc...
+    QString exprEntry(sizeof(ExprEntryFmt)+20);
+    for (int j = 0; j < info->m_numExprs; j++) {
+	exprEntry.sprintf(ExprEntryFmt, j+1);
+	expr = cf.readEntry(exprEntry);
+	info->m_exprStrings[j] = expr;
+    }
+
+    // add the new type
+    m_typeDict.insert(type, info);
+    TRACE(QString().sprintf("<%s>: %d exprs", type,
+			    info->m_numExprs));
+}
+
+TypeInfo* TypeTable::operator[](const char* type)
+{
+    TypeInfo* result = m_typeDict[type];
+    if (result == 0) {
+	result = m_aliasDict[type];
+    }
+    return result;
 }
 
 
