@@ -14,6 +14,8 @@
 #include <qpushbt.h>
 #include <qlined.h>
 
+class KSimpleConfig;
+
 /*
  * This widget is so closely related to the KDebugger main widget that it
  * in fact is part of it. However, since it's technically easily possible
@@ -37,6 +39,26 @@ struct Breakpoint
     bool del;				/* used when list is parsed */
 };
 
+
+/*
+ * The class BreakpointListBox provides a simpler interface to the
+ * KTabListBox.
+ */
+class BreakpointListBox : public KTabListBox
+{
+public:
+    BreakpointListBox(QWidget* parent, const char* name);
+    ~BreakpointListBox();
+
+    void appendItem(Breakpoint* bp);
+    void changeItem(int id, Breakpoint* bp);
+
+protected:
+    static QString constructListText(Breakpoint* bp);
+    virtual void keyPressEvent(QKeyEvent* e);
+};
+
+
 class BreakpointTable : public QDialog
 {
     Q_OBJECT
@@ -51,11 +73,15 @@ public:
     void doBreakpoint(QString file, int lineNo, bool temporary);
     void doEnableDisableBreakpoint(const QString& file, int lineNo);
     Breakpoint* breakpointByFilePos(QString file, int lineNo);
+    bool haveTemporaryBP() const;
+
+    void saveBreakpoints(KSimpleConfig* config);
+    void restoreBreakpoints(KSimpleConfig* config);
 
 protected:
     KDebugger& m_debugger;
     QLineEdit m_bpEdit;
-    KTabListBox m_list;
+    BreakpointListBox m_list;
     QPushButton m_btAdd;
     QPushButton m_btRemove;
     QPushButton m_btViewCode;
@@ -79,6 +105,7 @@ signals:
 public slots:
     virtual void hide();
     virtual void addBP();
+    virtual void removeBP();
 };
 
 #endif // BRKPT_H

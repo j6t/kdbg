@@ -4,6 +4,9 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include <kapp.h>			/* i18n */
+#include <kiconloader.h>
+#include <ksimpleconfig.h>
+#include <qkeycode.h>
 #include "debugger.h"			/* #includes brkpt.h */
 #include "brkpt.moc"
 #include <ctype.h>
@@ -17,7 +20,7 @@ BreakpointTable::BreakpointTable(KDebugger& deb) :
 	QDialog(0, "breakpoints"),
 	m_debugger(deb),
 	m_bpEdit(this, "bpedit"),
-	m_list(this, "bptable", 1),
+	m_list(this, "bptable"),
 	m_btAdd(this, "add"),
 	m_btRemove(this, "remove"),
 	m_btViewCode(this, "view"),
@@ -29,18 +32,15 @@ BreakpointTable::BreakpointTable(KDebugger& deb) :
     m_bpEdit.setMinimumSize(m_bpEdit.sizeHint());
     connect(&m_bpEdit, SIGNAL(returnPressed()), this, SLOT(addBP()));
 
-    m_list.setColumn(0, i18n("Location"));
-    m_list.setColumnWidth(0, 300);
-    m_list.setMinimumSize(200, 100);
-
-    m_btAdd.setText(i18n("Add"));
+    m_btAdd.setText(i18n("&Add"));
     m_btAdd.setMinimumSize(m_btAdd.sizeHint());
     connect(&m_btAdd, SIGNAL(clicked()), this, SLOT(addBP()));
 
-    m_btRemove.setText(i18n("Remove"));
+    m_btRemove.setText(i18n("&Remove"));
     m_btRemove.setMinimumSize(m_btRemove.sizeHint());
+    connect(&m_btRemove, SIGNAL(clicked()), this, SLOT(removeBP()));
 
-    m_btViewCode.setText(i18n("View Code"));
+    m_btViewCode.setText(i18n("&View Code"));
     m_btViewCode.setMinimumSize(m_btViewCode.sizeHint());
 
     m_btClose.setText(i18n("Close"));
@@ -202,10 +202,10 @@ void BreakpointTable::insertBreakpoint(int num, char disp, char enable, const ch
     bp->del = false;
     if (i < 0) {
 	// add to list
-	m_list.appendItem(location);
+	m_list.appendItem(bp);
     } else {
 	// update list
-	m_list.changeItem(location, i);
+	m_list.changeItem(i, bp);
     }
 }
 
@@ -270,6 +270,18 @@ void BreakpointTable::addBP()
     }
 }
 
+void BreakpointTable::removeBP()
+{
+    int sel = m_list.currentItem();
+    if (sel < 0 || uint(sel) >= m_brkpts.size())
+	return;
+    
+    Breakpoint* bp = m_brkpts[sel];
+    QString cmdString(30);
+    cmdString.sprintf("delete %d", bp->num);
+    m_debugger.enqueueCmd(KDebugger::DCdelete, cmdString);
+}
+
 // this handles the menu entry: toggles breakpoint on and off
 void BreakpointTable::doBreakpoint(QString file, int lineNo, bool temporary)
 {
@@ -322,6 +334,8 @@ void BreakpointTable::doEnableDisableBreakpoint(const QString& file, int lineNo)
     }
 }
 
+
+
 Breakpoint* BreakpointTable::breakpointByFilePos(QString file, int lineNo)
 {
     // look for exact file name match
@@ -353,4 +367,184 @@ Breakpoint* BreakpointTable::breakpointByFilePos(QString file, int lineNo)
 
     // not found
     return 0;
+}
+
+// look if there is at least one temporary breakpoint
+bool BreakpointTable::haveTemporaryBP() const
+{
+    for (int i = m_brkpts.size()-1; i >= 0; i--) {
+	if (m_brkpts[i]->temporary)
+	    return true;
+    }
+    return false;
+}
+
+/*
+ * Breakpoints are saved one per group.
+ */
+const char BPGroup[] = "Breakpoint %d";
+const char File[] = "File";
+const char Line[] = "Line";
+const char Temporary[] = "Temporary";
+const char Enabled[] = "Enabled";
+
+void BreakpointTable::saveBreakpoints(KSimpleConfig* config)
+{
+    QString groupName(30);
+    int i;
+    for (i = 0; uint(i) < m_brkpts.size(); i++) {
+	groupName.sprintf(BPGroup, i);
+	config->setGroup(groupName);
+	Breakpoint* bp = m_brkpts[i];
+	config->writeEntry(File, bp->fileName);
+	config->writeEntry(Line, bp->lineNo);
+	config->writeEntry(Temporary, bp->temporary);
+	config->writeEntry(Enabled, bp->enabled);
+    }
+    // delete remaining groups
+    // we recognize that a group is present if there is an Enabled entry
+    for (;; i++) {
+	groupName.sprintf(BPGroup, i);
+	config->setGroup(groupName);
+	if (!config->hasKey(Enabled)) {
+	    /* group not present, assume that we've hit them all */
+	    break;
+	}
+	config->deleteGroup(groupName);
+    }
+}
+
+void BreakpointTable::restoreBreakpoints(KSimpleConfig* config)
+{
+    QString groupName(30);
+    QString fileName;
+    int lineNo;
+    bool enabled, temporary;
+    /*
+     * We recognize the end of the list if there is no Enabled entry
+     * present.
+     */
+    for (int i = 0;; i++) {
+	groupName.sprintf(BPGroup, i);
+	config->setGroup(groupName);
+	if (!config->hasKey(Enabled)) {
+	    /* group not present, assume that we've hit them all */
+	    break;
+	}
+	fileName = config->readEntry(File);
+	lineNo = config->readNumEntry(Line, -1);
+	if (lineNo < 0 || fileName.isEmpty())
+	    continue;
+	enabled = config->readBoolEntry(Enabled, true);
+	temporary = config->readBoolEntry(Temporary, false);
+	/*
+	 * Add the breakpoint. We assume that we have started a new
+	 * instance of gdb, because we assign the breakpoint ids ourselves,
+	 * starting with 1. Then we use this id to disable the breakpoint,
+	 * if necessary. If this assignment of ids doesn't work, (maybe
+	 * because this isn't a fresh gdb at all), we disable the wrong
+	 * breakpoint! Oh well... for now it works.
+	 */
+	QString cmdString(fileName.length() + 30);
+	cmdString.sprintf("%sbreak %s:%d", temporary ? "t" : "",
+			  fileName.data(), lineNo+1);
+	m_debugger.enqueueCmd(KDebugger::DCbreak, cmdString);
+	if (!enabled) {
+	    cmdString.sprintf("disable %d", i+1);
+	    m_debugger.enqueueCmd(KDebugger::DCdisable, cmdString);
+	}
+
+	cmdString.sprintf("%s:%d", fileName.data(), lineNo);
+	insertBreakpoint(i+1, !temporary, enabled,
+			 cmdString, fileName, lineNo);
+    }
+}
+
+
+BreakpointListBox::BreakpointListBox(QWidget* parent, const char* name) :
+	KTabListBox(parent, name, 2)
+{
+    setColumn(0, i18n("E"),		/* Enabled/disabled */
+	      16, KTabListBox::PixmapColumn);
+    setColumn(1, i18n("Location"), 300);
+
+    setMinimumSize(200, 100);
+    /* work around a non-feature of KTabListBox: */
+    setFocusPolicy(QWidget::StrongFocus);
+
+    setSeparator('\t');
+
+    // add pixmaps
+    KIconLoader* loader = kapp->getIconLoader();
+    dict().insert("E", new QPixmap(loader->loadIcon("green-bullet.xpm")));
+    dict().insert("D", new QPixmap(loader->loadIcon("red-bullet.xpm")));
+}
+
+BreakpointListBox::~BreakpointListBox()
+{
+}
+
+void BreakpointListBox::appendItem(Breakpoint* bp)
+{
+    QString t = constructListText(bp);
+    KTabListBox::appendItem(t);
+}
+
+void BreakpointListBox::changeItem(int id, Breakpoint* bp)
+{
+    QString t = constructListText(bp);
+    KTabListBox::changeItem(t, id);
+}
+
+QString BreakpointListBox::constructListText(Breakpoint* bp)
+{
+    static const char ED[][4] = { "D\t\0", "E\t\0" };
+    return ED[bp->enabled] + bp->location;
+}
+
+/* Grrr! Why doesn't do KTablistBox the keyboard handling? */
+void BreakpointListBox::keyPressEvent(QKeyEvent* e)
+{
+    if (numRows() == 0)
+	return;
+
+//    int newX;
+    switch (e->key()) {
+    case Key_Up:
+	// make previous item current, scroll up if necessary
+	if (currentItem() > 0) {
+	    setCurrentItem(currentItem() - 1);
+	    if (currentItem() < topItem() || currentItem() > lastRowVisible()) {
+		setTopItem(currentItem());
+	    }
+	}
+	break;
+    case Key_Down:
+	// make next item current, scroll down if necessary
+	if (currentItem() < numRows() - 1) {
+	    setCurrentItem(currentItem() + 1);
+	    if (currentItem() > lastRowVisible()) {
+		setTopItem(topItem() + currentItem() - lastRowVisible());
+	    } else if (currentItem() < topItem()) {
+		setTopItem(currentItem());
+	    }
+	}
+	break;
+
+#if 0
+    // scroll left and right by a few pixels
+    case Key_Left:
+	newX = xOffset() - viewWidth()/10;
+	setXOffset(QMAX(newX, 0));
+	break;
+    case Key_Right:
+	newX = xOffset() + viewWidth()/10;
+	setXOffset(QMIN(newX, maxXOffset()));
+	break;
+#endif
+
+    default:
+	QWidget::keyPressEvent(e);
+	break;
+    }
 }
