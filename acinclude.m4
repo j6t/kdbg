@@ -132,12 +132,75 @@ AC_DEFUN(AC_PATH_QT_MOC,
    AC_SUBST(MOC)
 ])
 
+dnl get KDE pathnames from kdelibs
+AC_DEFUN(KDE_GET_KDE_1_X_PATHS,
+[
+
+AC_LANG_SAVE
+AC_LANG_CPLUSPLUS
+ac_cxxflags_safe="$CXXFLAGS"
+ac_ldflags_safe="$LDFLAGS"
+ac_libs_safe="$LIBS"
+
+CXXFLAGS="$CXXFLAGS -I$qt_incdir $all_includes"
+LDFLAGS="-L$qt_libdir $all_libraries"
+LIBS="$LIBS $LIBQT -lkdecore"
+
+cat > conftest.$ac_ext <<EOF
+#include <stdio.h>
+#include "confdefs.h"
+#include <kapp.h>
+
+int main() {
+    printf("kde_htmldir=\\"%s\\"\n", KApplication::kde_htmldir().data());
+    printf("kde_appsdir=\\"%s\\"\n", KApplication::kde_appsdir().data());
+    printf("kde_icondir=\\"%s\\"\n", KApplication::kde_icondir().data());
+    printf("kde_sounddir=\\"%s\\"\n", KApplication::kde_sounddir().data());
+    printf("kde_datadir=\\"%s\\"\n", KApplication::kde_datadir().data());
+    printf("kde_locale=\\"%s\\"\n", KApplication::kde_localedir().data());
+    printf("kde_cgidir=\\"%s\\"\n", KApplication::kde_cgidir().data());
+    printf("kde_confdir=\\"%s\\"\n", KApplication::kde_configdir().data());
+    printf("kde_mimedir=\\"%s\\"\n", KApplication::kde_mimedir().data());
+    printf("kde_toolbardir=\\"%s\\"\n", KApplication::kde_toolbardir().data());
+    printf("kde_wallpaperdir=\\"%s\\"\n",
+        KApplication::kde_wallpaperdir().data());
+    printf("kde_bindir=\\"%s\\"\n", KApplication::kde_bindir().data());
+    printf("kde_partsdir=\\"%s\\"\n", KApplication::kde_partsdir().data());
+    return 0;
+    }
+EOF
+
+if AC_TRY_EVAL(ac_link) && test -s conftest; then
+  eval `KDEDIR= ./conftest 2>&5`
+  KDEDIR= ./conftest 2> /dev/null >&5 # make an echo for config.log
+else
+  AC_MSG_ERROR([your system is not able to compile a small KDE application!
+Check, if you installed the KDE header and library files correctly.])
+fi
+
+rm -f conftest*
+CXXFLAGS="$ac_cxxflags_safe"
+LDFLAGS="$ac_ldflags_safe"
+LIBS="$ac_libs_safe"
+AC_LANG_RESTORE
+])
+
 AC_DEFUN(AC_CREATE_KFSSTND,
 [
 AC_REQUIRE([AC_CHECK_RPATH])
 AC_REQUIRE([AC_CHECK_BOOL])
 AC_MSG_CHECKING([for KDE paths])
 kde_result=""
+
+dnl get paths from kde installed on netbsd
+dnl until now it's only valid for KDE 1.x
+if test "$kde_qtver" = "1"; then
+  case $host in                   dnl this *is* NetBSD specific
+     *-*-netbsd* )
+        KDE_GET_KDE_1_X_PATHS
+     ;;
+  esac
+fi
 
 AC_CACHE_VAL(kde_cv_all_paths,
 [
@@ -615,7 +678,7 @@ AC_ARG_WITH(qt-libraries,
 AC_CACHE_VAL(ac_cv_have_qt,
 [#try to guess Qt locations
 
-qt_incdirs="$QTINC /usr/lib/qt/include /usr/local/qt/include /usr/include/qt /usr/include /usr/lib/qt2/include /usr/X11R6/include/X11/qt $x_includes"
+qt_incdirs="$QTINC /usr/lib/qt/include /usr/local/qt/include /usr/include/qt /usr/include /usr/lib/qt2/include /usr/X11R6/include/X11/qt /usr/X11R6/include/qt $x_includes"
 test -n "$QTDIR" && qt_incdirs="$QTDIR/include $QTDIR $qt_incdirs"
 qt_incdirs="$ac_qt_includes $qt_incdirs"
 AC_FIND_FILE(qmovie.h, $qt_incdirs, qt_incdir)
@@ -1239,6 +1302,7 @@ else
   AC_MSG_ERROR(You need giflib30. Please install the kdesupport package)
 fi
 ])
+
 
 AC_DEFUN(KDE_FIND_JPEG_HELPER,
 [
@@ -2393,9 +2457,16 @@ AC_CACHE_LOAD
 # This can be used to rebuild libtool when needed
 LIBTOOL_DEPS="$ac_aux_dir/ltconfig $ac_aux_dir/ltmain.sh"
 
-# Always use our own libtool.
-LIBTOOL='$(SHELL) $(top_builddir)/libtool'
+# Use our own libtool, if env variable LIBTOOL isn't defined
+AC_MSG_CHECKING(for libtool)
+ac_save_LIBTOOL=${LIBTOOL:=no.LIBTOOL}
+if test -f $ac_save_LIBTOOL; then
+  LIBTOOL="$ac_save_LIBTOOL $1"
+else
+  LIBTOOL='$(SHELL) $(top_builddir)/libtool'
+fi
 AC_SUBST(LIBTOOL)dnl
+AC_MSG_RESULT($LIBTOOL)
 
 # Redirect the config.log output again, so that the ltconfig log is not
 # clobbered by the next message.
