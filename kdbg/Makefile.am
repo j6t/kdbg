@@ -34,6 +34,7 @@ kdbg_SOURCES = \
 	brkpt.cpp \
 	exprwnd.cpp \
 	regwnd.cpp \
+	memwindow.cpp \
 	threadlist.cpp \
 	updateui.cpp \
 	sourcewnd.cpp \
@@ -69,6 +70,7 @@ noinst_HEADERS = \
 	brkpt.h \
 	exprwnd.h \
 	regwnd.h \
+	memwindow.h \
 	threadlist.h \
 	ktreeview.h \
 	updateui.h \
@@ -95,6 +97,7 @@ BUILTSOURCES =	\
 	brkpt.moc \
 	exprwnd.moc \
 	regwnd.moc \
+	memwindow.moc \
 	threadlist.moc \
 	ktreeview.moc \
 	sourcewnd.moc \
@@ -144,6 +147,10 @@ exprwnd.moc: $(srcdir)/exprwnd.h
 $(srcdir)/regwnd.cpp: regwnd.moc
 regwnd.moc: $(srcdir)/regwnd.h
 	$(MOC) $(srcdir)/regwnd.h -o regwnd.moc
+
+$(srcdir)/memwindow.cpp: memwindow.moc
+memwindow.moc: $(srcdir)/memwindow.h
+	$(MOC) $(srcdir)/memwindow.h -o memwindow.moc
 
 $(srcdir)/threadlist.cpp: threadlist.moc
 threadlist.moc: $(srcdir)/threadlist.h

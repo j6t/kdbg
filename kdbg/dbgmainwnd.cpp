@@ -22,6 +22,7 @@
 #include "winstack.h"
 #include "brkpt.h"
 #include "threadlist.h"
+#include "memwindow.h"
 #include "ttywnd.h"
 #include "mydebug.h"
 
@@ -60,6 +61,9 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     DockWidget* dw7 = createDockWidget("Threads", p);
     dw7->setCaption(i18n("Threads"));
     m_threads = new ThreadList(dw7, "threads");
+    DockWidget* dw8 = createDockWidget("Memory", p);
+    dw8->setCaption(i18n("Memory"));
+    m_memoryWindow = new MemoryWindow(dw8, "memory");
 
     m_menuRecentExecutables = new QPopupMenu();
 
@@ -68,6 +72,7 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 
     setupDebugger(m_localVariables, m_watches->watchVariables(), m_btWindow);
     m_bpTable->setDebugger(m_debugger);
+    m_memoryWindow->setDebugger(m_debugger);
 
     connect(m_watches, SIGNAL(addWatch()), SLOT(slotAddWatch()));
     connect(m_watches, SIGNAL(deleteWatch()), m_debugger, SLOT(slotDeleteWatch()));
@@ -190,6 +195,7 @@ void DebuggerMainWnd::initMenu()
     m_menuView->insertItem(i18n("&Breakpoints"), ID_BRKPT_LIST);
     m_menuView->insertItem(i18n("T&hreads"), ID_VIEW_THREADS);
     m_menuView->insertItem(i18n("&Output"), ID_VIEW_OUTPUT);
+    m_menuView->insertItem(i18n("&Memory"), ID_VIEW_MEMORY);
     m_menuView->insertSeparator();
     m_menuView->insertItem(i18n("Toggle &Toolbar"), ID_VIEW_TOOLBAR);
     m_menuView->insertItem(i18n("Toggle &Statusbar"), ID_VIEW_STATUSBAR);
@@ -408,6 +414,9 @@ void DebuggerMainWnd::menuCallback(int item)
 	break;
     case ID_VIEW_THREADS:
 	showhideWindow(m_threads);
+	break;
+    case ID_VIEW_MEMORY:
+	showhideWindow(m_memoryWindow);
 	break;
     case ID_VIEW_OUTPUT:
 	showhideWindow(m_ttyWindow);
