@@ -41,6 +41,8 @@ protected:
     QVBoxLayout m_watchV;
     QHBoxLayout m_watchH;
 
+    virtual bool eventFilter(QObject* ob, QEvent* ev);
+
 signals:
     void addWatch();
     void deleteWatch();

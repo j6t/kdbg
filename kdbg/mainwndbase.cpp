@@ -10,6 +10,7 @@
 #include <kmessagebox.h>
 #else
 #include <kmsgbox.h>
+#include <qkeycode.h>
 #endif
 #include <kiconloader.h>
 #include <kstatusbar.h>
@@ -67,11 +68,33 @@ WatchWindow::WatchWindow(QWidget* parent, const char* name, WFlags f) :
     connect(&m_watchAdd, SIGNAL(clicked()), SIGNAL(addWatch()));
     connect(&m_watchDelete, SIGNAL(clicked()), SIGNAL(deleteWatch()));
     connect(&m_watchVariables, SIGNAL(highlighted(int)), SLOT(slotWatchHighlighted(int)));
+
+    m_watchVariables.installEventFilter(this);
 }
 
 WatchWindow::~WatchWindow()
 {
 }
+
+bool WatchWindow::eventFilter(QObject*, QEvent* ev)
+{
+    if (ev->type() ==
+#if QT_VERSION < 200
+	Event_KeyPress
+#else
+	QEvent::KeyPress
+#endif
+	)
+    {
+	QKeyEvent* kev = static_cast<QKeyEvent*>(ev);
+	if (kev->key() == Key_Delete) {
+	    emit deleteWatch();
+	    return true;
+	}
+    }
+    return false;
+}
+
 
 // place the text of the hightlighted watch expr in the edit field
 void WatchWindow::slotWatchHighlighted(int idx)
