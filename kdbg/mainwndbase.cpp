@@ -25,6 +25,7 @@
 #include "prefdebugger.h"
 #include "updateui.h"
 #include "commandids.h"
+#include "valarray.h"
 #ifdef HAVE_CONFIG
 #include "config.h"
 #endif
@@ -93,10 +94,6 @@ static void splitCmdStr(const QString& cmd, ValArray<QString>& parts)
 
 
 const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
-const char defaultDebuggerCmdStr[] =
-	"gdb"
-	" --fullname"	/* to get standard file names each time the prog stops */
-	" --nx";	/* do not execute initialization files */
 
 
 DebuggerMainWndBase::DebuggerMainWndBase() :
@@ -106,7 +103,6 @@ DebuggerMainWndBase::DebuggerMainWndBase() :
 #ifdef GDB_TRANSCRIPT
 	m_transcriptFile(GDB_TRANSCRIPT),
 #endif
-	m_debuggerCmdStr(defaultDebuggerCmdStr),
 	m_debugger(0)
 {
     m_statusActive = i18n("active");
@@ -146,9 +142,7 @@ void DebuggerMainWndBase::setupDebugger(ExprWnd* localVars,
     QObject::connect(m_debugger, SIGNAL(debuggerStarting()),
 		     parent, SLOT(slotDebuggerStarting()));
 
-    ValArray<QString> cmd;
-    splitCmdStr(m_debuggerCmdStr, cmd);
-    m_debugger->setDebuggerCmd(cmd);
+    m_debugger->setDebuggerCmd(m_debuggerCmdStr);
 }
 
 
@@ -443,7 +437,8 @@ void DebuggerMainWndBase::slotGlobalOptions()
     dlg.setOKButton(i18n("OK"));
 
     PrefDebugger prefDebugger(&dlg);
-    prefDebugger.setDebuggerCmd(m_debuggerCmdStr);
+    prefDebugger.setDebuggerCmd(m_debuggerCmdStr.isEmpty()  ?
+				GdbDriver::defaultGdb()  :  m_debuggerCmdStr);
     prefDebugger.setTerminal(m_outputTermCmdStr);
     
     dlg.addTab(&prefDebugger, "&Debugger");
@@ -609,14 +604,12 @@ void DebuggerMainWndBase::slotDebuggerStarting()
 void DebuggerMainWndBase::setDebuggerCmdStr(const QString& cmd)
 {
     m_debuggerCmdStr = cmd;
-    // revert to default if empty
-    if (m_debuggerCmdStr.isEmpty()) {
-	m_debuggerCmdStr = defaultDebuggerCmdStr;
+    // make empty if it is the default
+    if (m_debuggerCmdStr == GdbDriver::defaultGdb()) {
+	m_debuggerCmdStr = QString();
     }
     if (m_debugger != 0) {
-	ValArray<QString> cmd;
-	splitCmdStr(m_debuggerCmdStr, cmd);
-	m_debugger->setDebuggerCmd(cmd);
+	m_debugger->setDebuggerCmd(m_debuggerCmdStr);
     }
 }
 

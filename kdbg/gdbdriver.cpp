@@ -191,9 +191,22 @@ QString GdbDriver::driverName() const
     return "GDB";
 }
 
-bool GdbDriver::startup()
+QString GdbDriver::defaultGdb()
 {
-    if (!DebuggerDriver::startup())
+    return
+	"gdb"
+	" --fullname"	/* to get standard file names each time the prog stops */
+	" --nx";	/* do not execute initialization files */
+}
+
+QString GdbDriver::defaultInvocation() const
+{
+    return defaultGdb();
+}
+
+bool GdbDriver::startup(QString cmdStr)
+{
+    if (!DebuggerDriver::startup(cmdStr))
 	return false;
 
     static const char gdbInitialize[] =

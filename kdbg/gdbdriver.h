@@ -17,7 +17,9 @@ public:
     ~GdbDriver();
     
     virtual QString driverName() const;
-    virtual bool startup();
+    virtual QString defaultInvocation() const;
+    static QString defaultGdb();
+    virtual bool startup(QString cmdStr);
     virtual void commandFinished(CmdQueueItem* cmd);
     virtual CmdQueueItem* executeCmd(DbgCommand,
 				     bool clearLow = false);

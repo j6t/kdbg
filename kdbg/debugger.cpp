@@ -115,9 +115,12 @@ void KDebugger::restoreSettings(KConfig* /*config*/)
 //////////////////////////////////////////////////////////////////////
 // external interface
 
+const char GeneralGroup[] = "General";
+const char DebuggerCmdStr[] = "DebuggerCmdStr";
+
 bool KDebugger::debugProgram(const QString& name)
 {
-    if (m_haveExecutable)
+    if (m_d->isRunning())
     {
 	QApplication::setOverrideCursor(waitCursor);
 
@@ -138,18 +141,26 @@ bool KDebugger::debugProgram(const QString& name)
 
 	QApplication::restoreOverrideCursor();
 
-	if (m_haveExecutable) {
+	if (m_d->isRunning() || m_haveExecutable) {
 	    /* timed out! We can't really do anything useful now */
 	    TRACE("timed out while waiting for gdb to die!");
 	    return false;
 	}
     }
 
-    if (!m_d->isRunning()) {
-	if (!startGdb()) {
-	    TRACE("startGdb failed");
-	    return false;
-	}
+    // create the program settings object
+    openProgramConfig(name);
+
+    // get debugger command from per-program settings
+    if (m_programConfig != 0) {
+	m_programConfig->setGroup(GeneralGroup);
+	m_debuggerCmd = m_programConfig->readEntry(DebuggerCmdStr);
+    }
+    // the rest is read in later in the handler of DCexecutable
+
+    if (!startGdb()) {
+	TRACE("startGdb failed");
+	return false;
     }
 
     TRACE("before file cmd");
@@ -163,30 +174,6 @@ bool KDebugger::debugProgram(const QString& name)
 	m_d->queueCmd(DCframe, 0, DebuggerDriver::QMnormal);
 	m_programActive = true;
 	m_haveExecutable = true;
-    }
-
-    // create the program settings object
-    QFileInfo fi(name);
-    QString pgmConfigFile = fi.dirPath(true);
-    if (!pgmConfigFile.isEmpty()) {
-	pgmConfigFile += '/';
-    }
-    pgmConfigFile += ".kdbgrc." + fi.fileName();
-    TRACE("program config file = " + pgmConfigFile);
-    // check whether we can write to the file
-    QFile file(pgmConfigFile);
-    bool readonly = true;
-    bool openit = true;
-    if (file.open(IO_ReadWrite)) {	/* don't truncate! */
-	readonly = false;
-	// the file exists now
-    } else if (!file.open(IO_ReadOnly)) {
-	/* file does not exist and cannot be created: don't use it */
-	openit = false;
-    }
-    if (openit) {
-	m_programConfig = new KSimpleConfig(pgmConfigFile, readonly);
-	// it is read in later in the handler of DCexecutable
     }
 
     // create a type table
@@ -410,14 +397,15 @@ bool KDebugger::startGdb()
 {
     emit debuggerStarting();
 
-    // debugger executable
-    m_d->clearArguments();
-    for (int i = 0; i < m_debuggerCmd.size(); i++) {
-	*m_d << m_debuggerCmd[i];
-    }
-
+    /*
+     * If the per-program command string is empty, use the global setting
+     * (which might also be empty, in which case the driver uses its
+     * default).
+     */
+    QString debuggerCmd = m_debuggerCmd.isEmpty()  ?
+	m_generalDebuggerCmd  :  m_debuggerCmd;
     m_explicitKill = false;
-    if (!m_d->startup()) {
+    if (!m_d->startup(debuggerCmd)) {
 	return false;
     }
 
@@ -479,13 +467,40 @@ void KDebugger::gdbExited(KProcess*)
     m_programActive = false;
     m_programRunning = false;
     m_explicitKill = false;
+    m_debuggerCmd = QString();		/* use global setting at next start! */
 
     // stop gear wheel and erase PC
     stopAnimation();
     emit updatePC(QString(), -1, 0);
 }
 
-const char GeneralGroup[] = "General";
+void KDebugger::openProgramConfig(const QString& name)
+{
+    ASSERT(m_programConfig = 0);
+
+    QFileInfo fi(name);
+    QString pgmConfigFile = fi.dirPath(true);
+    if (!pgmConfigFile.isEmpty()) {
+	pgmConfigFile += '/';
+    }
+    pgmConfigFile += ".kdbgrc." + fi.fileName();
+    TRACE("program config file = " + pgmConfigFile);
+    // check whether we can write to the file
+    QFile file(pgmConfigFile);
+    bool readonly = true;
+    bool openit = true;
+    if (file.open(IO_ReadWrite)) {	/* don't truncate! */
+	readonly = false;
+	// the file exists now
+    } else if (!file.open(IO_ReadOnly)) {
+	/* file does not exist and cannot be created: don't use it */
+	openit = false;
+    }
+    if (openit) {
+	m_programConfig = new KSimpleConfig(pgmConfigFile, readonly);
+    }
+}
+
 const char EnvironmentGroup[] = "Environment";
 const char WatchGroup[] = "Watches";
 const char FileVersion[] = "FileVersion";
@@ -502,6 +517,7 @@ void KDebugger::saveProgramSettings()
     m_programConfig->writeEntry(FileVersion, 1);
     m_programConfig->writeEntry(ProgramArgs, m_programArgs);
     m_programConfig->writeEntry(WorkingDirectory, m_programWD);
+    m_programConfig->writeEntry(DebuggerCmdStr, m_debuggerCmd);
 
     // write environment variables
     m_programConfig->deleteGroup(EnvironmentGroup);
@@ -540,6 +556,7 @@ void KDebugger::restoreProgramSettings()
      * We ignore file version for now we will use it in the future to
      * distinguish different versions of this configuration file.
      */
+    m_debuggerCmd = m_programConfig->readEntry(DebuggerCmdStr);
     QString pgmArgs = m_programConfig->readEntry(ProgramArgs);
     QString pgmWd = m_programConfig->readEntry(WorkingDirectory);
 

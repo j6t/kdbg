@@ -8,7 +8,6 @@
 
 #include <qtimer.h>
 #include <qdict.h>
-#include "valarray.h"
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
 
@@ -198,8 +197,8 @@ public:
      * Sets the command to invoke gdb. If cmd is the empty string, the
      * default is substituted.
      */
-    void setDebuggerCmd(const ValArray<QString>& cmd)
-    { m_debuggerCmd = cmd; }
+    void setDebuggerCmd(const QString& cmd)
+    { m_generalDebuggerCmd = cmd; }
 
     /** Sets the terminal that is to be used by the debugger. */
     void setTerminal(const QString& term) { m_inferiorTerminal = term; }
@@ -213,7 +212,8 @@ public:
 
 protected:
     QString m_inferiorTerminal;
-    ValArray<QString> m_debuggerCmd;
+    QString m_debuggerCmd;		/* per-program setting */
+    QString m_generalDebuggerCmd;	/* global setting */
     bool startGdb();
     void stopGdb();
     void writeCommand();
@@ -246,6 +246,7 @@ protected:
     void determineType(ExprWnd* wnd, VarTree* var);
     void removeExpr(ExprWnd* wnd, VarTree* var);
     CmdQueueItem* loadCoreFile();
+    void openProgramConfig(const QString& name);
 
     Breakpoint* breakpointByFilePos(QString file, int lineNo);
     void newBreakpoint(const char* output);

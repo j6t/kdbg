@@ -147,7 +147,12 @@ public:
     virtual ~DebuggerDriver() = 0;
 
     virtual QString driverName() const = 0;
-    virtual bool startup();
+    /**
+     * Returns the default command string to invoke the debugger driver.
+     */
+    virtual QString defaultInvocation() const = 0;
+
+    virtual bool startup(QString cmdStr);
     void dequeueCmdByVar(VarTree* var);
     void setLogFileName(const QString& fname) { m_logFileName = fname; }
 
