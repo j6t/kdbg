@@ -28,6 +28,8 @@ public:
     DebuggerMainWnd(const char* name);
     ~DebuggerMainWnd();
 
+    bool debugProgram(const QString& exe);
+
 protected:
     // session properties
     virtual void saveProperties(KConfig*);

@@ -9,6 +9,7 @@
 #include <qlineedit.h>
 #include <qlayout.h>
 #include <qpushbutton.h>
+#include <qcstring.h>
 #include "exprwnd.h"
 #include "sys/types.h"			/* pid_t */
 
@@ -19,6 +20,7 @@ class UpdateUI;
 class KToolBar;
 class KStatusBar;
 class KProcess;
+class DebuggerDriver;
 
 class WatchWindow : public QWidget
 {
@@ -69,9 +71,10 @@ public:
     void setTranscript(const char* name);
 
     // the following are needed to handle program arguments
-    bool debugProgram(const QString& executable);
+    bool debugProgram(const QString& executable, QWidget* parent);
     void setCoreFile(const QString& corefile);
     void setRemoteDevice(const QString &remoteDevice);
+    void setLanguage(const QCString& lang);
     /** helper around KFileDialog */
     static QString myGetFileName(QString caption,
 				 QString dir, QString filter,
@@ -134,6 +137,9 @@ protected:
 		       ExprWnd* localVars,
 		       ExprWnd* watchVars,
 		       QListBox* backtrace);
+    // which language are we debugging?
+    QCString m_language;
+    static DebuggerDriver* driverFromLang(const QCString& lang);
 
 public:
     /*

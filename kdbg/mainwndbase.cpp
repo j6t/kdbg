@@ -196,6 +196,11 @@ void DebuggerMainWndBase::setTranscript(const char* name)
 	m_debugger->driver()->setLogFileName(m_transcriptFile);
 }
 
+void DebuggerMainWndBase::setLanguage(const QCString& lang)
+{
+    m_language = lang.lower();
+}
+
 const char OutputWindowGroup[] = "OutputWindow";
 const char TermCmdStr[] = "TermCmdStr";
 const char KeepScript[] = "KeepScript";
@@ -262,19 +267,83 @@ void DebuggerMainWndBase::restoreSettings(KConfig* config)
     config->readListEntry(RecentExecutables, m_recentExecList,',');
 }
 
-bool DebuggerMainWndBase::debugProgram(const QString& executable)
+bool DebuggerMainWndBase::debugProgram(const QString& executable, QWidget* parent)
 {
     assert(m_debugger != 0);
 
-    GdbDriver* driver = new GdbDriver;
+    DebuggerDriver* driver = driverFromLang(m_language);
+    if (driver == 0)
+    {
+	// oops
+	QString msg = i18n("Don't know how to debug language `%1'");
+	KMessageBox::sorry(parent, msg.arg(m_language));
+	return false;
+    }
+
     driver->setLogFileName(m_transcriptFile);
 
     bool success = m_debugger->debugProgram(executable, driver);
 
     if (!success)
+    {
 	delete driver;
 
+	QString msg = i18n("Could not start the debugger process.\n"
+			   "Please shut down KDbg and resolve the problem.");
+	KMessageBox::sorry(parent, msg);
+    }
+
     return success;
+}
+
+// derive driver from language
+DebuggerDriver* DebuggerMainWndBase::driverFromLang(const QCString& lang)
+{
+    // lang must be in all lowercase
+    assert(lang == lang.lower());
+
+    // The following table relates languages and debugger drivers
+    static const struct L {
+	const char* shortest;	// abbreviated to this is still unique
+	const char* full;	// full name of language
+	int driver;
+    } langs[] = {
+	{ "c",       "c++",     1 },
+	{ "f",       "fortran", 1 },
+	{ "p",       "python",  3 },
+	{ "x",       "xsl",     2 },
+    };
+    const int N = sizeof(langs)/sizeof(langs[0]);
+
+    // lookup the language name
+    // note that it has been set to lower-case in setLanguage()
+    int driverID = 0;
+    for (int i = 0; i < N; i++)
+    {
+	const L& l = langs[i];
+
+	// shortest must match
+	if (strncmp(l.shortest, lang, strlen(l.shortest)) != 0)
+	    continue;
+
+	// lang must not be longer than the full name, and it must match
+	if (lang.length() <= strlen(l.full) &&
+	    strncmp(l.full, lang, lang.length()) == 0)
+	{
+	    driverID = l.driver;
+	    break;
+	}
+    }
+    DebuggerDriver* driver = 0;
+    switch (driverID) {
+    case 1:
+	driver = new GdbDriver;
+	break;
+    default:
+	// unknown language
+	break;
+    }
+    return driver;
 }
 
 // helper that gets a file name (it only differs in the caption of the dialog)
@@ -687,19 +756,7 @@ bool DebuggerMainWndBase::debugProgramInteractive(const QString& executable,
 	return false;
     }
 
-    if (!debugProgram(executable)) {
-	QString msg = i18n("Could not start the debugger process.\n"
-			   "Please shut down KDbg and resolve the problem.");
-#if QT_VERSION < 200
-	KMsgBox::message(parent, kapp->appName(),
-			 msg,
-			 KMsgBox::STOP,
-			 i18n("OK"));
-#else
-	KMessageBox::sorry(parent, msg);
-#endif
-    }
-    return true;
+    return debugProgram(executable, parent);
 }
 
 

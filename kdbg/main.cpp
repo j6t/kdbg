@@ -66,6 +66,7 @@ int main(int argc, char** argv)
     static KCmdLineOptions options[] = {
 	{ "t <file>", I18N_NOOP("transcript of conversation with the debugger"), 0 },
 	{ "r <device>", I18N_NOOP("remote debugging via <device>"), 0 },
+	{ "l <language>", I18N_NOOP("specify language: C, XSL"), "C"},
 	{ "+[program]", I18N_NOOP("path of executable to debug"), 0 },
 	{ "+[core]", I18N_NOOP("a core file to use"), 0},
 	{ 0, 0, 0 }
@@ -135,6 +136,8 @@ int main(int argc, char** argv)
     QString remote = args->getOption("r");
     if (!remote.isEmpty())
 	debugger.setRemoteDevice(remote);
+
+    debugger.setLanguage(args->getOption("l"));
 #endif
     // check environment variable for transcript file name
     if (transcript == 0) {

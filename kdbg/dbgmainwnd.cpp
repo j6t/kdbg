@@ -695,6 +695,11 @@ TTYWindow* DebuggerMainWnd::ttyWindow()
     return m_ttyWindow;
 }
 
+bool DebuggerMainWnd::debugProgram(const QString& exe)
+{
+    return DebuggerMainWndBase::debugProgram(exe, this);
+}
+
 void DebuggerMainWnd::slotNewStatusMsg()
 {
     DebuggerMainWndBase::slotNewStatusMsg();
