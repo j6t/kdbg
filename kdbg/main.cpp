@@ -39,7 +39,7 @@ int main(int argc, char** argv)
     KGlobal::dirs()->addResourceType("types", "share/apps/kdbg/types");
 #endif
 
-    keys = new KStdAccel(app.getConfig());
+    keys = new KStdAccel();
 
     DebuggerMainWnd debugger("kdbg_main");
 
@@ -89,11 +89,9 @@ int main(int argc, char** argv)
 	    KMessageBox::error(&debugger, i18n("Cannot start debugger."));
 #endif
 	    debugger.setCoreFile("");
-//	    delete keys;
 	}
     }
 
     int rc = app.exec();
-//    delete keys;
     return rc;
 }
