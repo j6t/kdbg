@@ -721,6 +721,11 @@ parseErrorMessage(const char *output,
 }
 
 
+void
+XsldbgDriver::setPrintQStringDataCmd(const char* /*cmd*/)
+{
+}
+
 VarTree *
 XsldbgDriver::parseQCharArray(const char */*output*/, bool /*wantErrorValue*/,
                               bool /*qt3like*/)

@@ -370,6 +370,11 @@ public:
     virtual void interruptInferior() = 0;
 
     /**
+     * Specifies the command that prints the QString data.
+     */
+    virtual void setPrintQStringDataCmd(const char* cmd) = 0;
+
+    /**
      * Parses the output as an array of QChars.
      */
     virtual VarTree* parseQCharArray(const char* output, bool wantErrorValue, bool qt3like) = 0;

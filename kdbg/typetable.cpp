@@ -51,7 +51,8 @@ void TypeTable::loadTypeTables()
 }
 
 
-TypeTable::TypeTable()
+TypeTable::TypeTable() :
+	m_printQStringDataCmd(0)
 {
     m_typeDict.setAutoDelete(true);
     // aliasDict keeps only pointers to items into typeDict
@@ -60,6 +61,7 @@ TypeTable::TypeTable()
 
 TypeTable::~TypeTable()
 {
+    delete[] m_printQStringDataCmd;
 }
 
 
@@ -67,6 +69,7 @@ static const char TypeTableGroup[] = "Type Table";
 static const char LibDisplayName[] = "LibDisplayName";
 static const char ShlibRE[] = "ShlibRE";
 static const char EnableBuiltin[] = "EnableBuiltin";
+static const char PrintQStringCmd[] = "PrintQStringCmd";
 static const char TypesEntryFmt[] = "Types%d";
 static const char DisplayEntry[] = "Display";
 static const char AliasEntry[] = "Alias";
@@ -97,6 +100,13 @@ void TypeTable::loadFromFile(const QString& fileName)
 
     m_shlibNameRE = QRegExp(cf.readEntry(ShlibRE));
     cf.readListEntry(EnableBuiltin, m_enabledBuiltins);
+
+    QString printQString = cf.readEntry(PrintQStringCmd);
+    const char* ascii = printQString.ascii();
+    if (ascii == 0)
+	ascii = "";
+    m_printQStringDataCmd = new char[strlen(ascii)+1];
+    strcpy(m_printQStringDataCmd, ascii);
 
     /*
      * Get the types. We search for entries of kind Types1, Types2, etc.
@@ -218,7 +228,8 @@ TypeInfo::~TypeInfo()
 
 ProgramTypeTable::ProgramTypeTable() :
 	m_parseQt2QStrings(false),
-	m_QCharIsShort(false)
+	m_QCharIsShort(false),
+	m_printQStringDataCmd(0)
 {
     m_types.setAutoDelete(false);	/* paranoia */
     m_aliasDict.setAutoDelete(false);	/* paranoia */
@@ -242,6 +253,9 @@ void ProgramTypeTable::loadTypeTable(TypeTable* table)
     }
     if (!m_QCharIsShort) {
 	m_QCharIsShort = table->isEnabledBuiltin("QCharIsShort");
+    }
+    if (!m_printQStringDataCmd && *table->printQStringDataCmd()) {
+	m_printQStringDataCmd = table->printQStringDataCmd();
     }
 }
 

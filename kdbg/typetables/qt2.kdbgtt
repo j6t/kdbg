@@ -4,6 +4,7 @@ Types2=QObject,QTableView
 LibDisplayName=libqt 2.x
 ShlibRE=libqt\.so\.2$
 EnableBuiltin=QString::Data
+PrintQStringCmd=print ($qstrunicode=($qstrdata=(%s))->unicode)?(*(unsigned short*)$qstrunicode)@(($qstrlen=(unsigned int)($qstrdata->len))>100?100:$qstrlen):1==0\n
 [QString]
 Display={ % }
 Expr1=/QString::Data (%s).d

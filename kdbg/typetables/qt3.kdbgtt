@@ -4,6 +4,7 @@ Types2=QObject
 LibDisplayName=libqt 3.x
 ShlibRE=libqt-mt\.so\.3$
 EnableBuiltin=QString::Data,QCharIsShort
+PrintQStringCmd=print ($qstrunicode=($qstrdata=(%s))->unicode)?(*(unsigned short*)$qstrunicode)@(($qstrlen=(unsigned int)($qstrdata->len))>100?100:$qstrlen):1==0\n
 [QString]
 Display={ % }
 Expr1=/QString::Data (%s).d

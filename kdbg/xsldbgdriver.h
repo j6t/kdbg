@@ -48,6 +48,7 @@ class XsldbgDriver:public DebuggerDriver {
     virtual void detachAndTerminate();
     virtual void interruptInferior();
 
+    virtual void setPrintQStringDataCmd(const char* cmd);
     /**
      * Parses the output as an array of QChars.
      */

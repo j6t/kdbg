@@ -1801,6 +1801,9 @@ void KDebugger::handleSharedLibs(const char* output)
 
     // get type libraries
     m_typeTable->loadLibTypes(m_sharedLibs);
+
+    // hand over the QString data cmd
+    m_d->setPrintQStringDataCmd(m_typeTable->printQStringDataCmd());
 }
 
 CmdQueueItem* KDebugger::loadCoreFile()

@@ -7,6 +7,8 @@ Version 1.9.6
 
 	Updated the manual.
 
+	Implemented printing of Qt4's QStrings.
+
 Version 1.9.5
 
 	Fixed some issues when the items in the environment variable list

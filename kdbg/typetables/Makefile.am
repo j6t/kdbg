@@ -6,6 +6,7 @@ types_DATA = \
 	qt.kdbgtt \
 	qt2.kdbgtt \
 	qt3.kdbgtt \
+	qt4core.kdbgtt \
 	kdecore.kdbgtt \
 	kdecore3.kdbgtt \
 	glib.kdbgtt \

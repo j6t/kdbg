@@ -84,6 +84,11 @@ public:
      * Is the specified builtin feature enabled in this type library?
      */
     bool isEnabledBuiltin(const char* feature);
+
+    /**
+     * Returns the command to print the QString data.
+     */
+    const char* printQStringDataCmd() const { return m_printQStringDataCmd; }
     
 protected:
     /**
@@ -97,6 +102,7 @@ protected:
     QString m_displayName;
     QRegExp m_shlibNameRE;
     QStrList m_enabledBuiltins;
+    char* m_printQStringDataCmd;
 };
 
 
@@ -155,9 +161,15 @@ public:
      */
     bool qCharIsShort() const { return m_QCharIsShort; }
 
+    /**
+     * Returns the command to print the QString data.
+     */
+    const char* printQStringDataCmd() const { return m_printQStringDataCmd; }
+
 protected:
     QDict<TypeInfo> m_types;
     QDict<TypeInfo> m_aliasDict;
     bool m_parseQt2QStrings;
     bool m_QCharIsShort;
+    const char* m_printQStringDataCmd;
 };

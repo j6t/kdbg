@@ -45,6 +45,10 @@ struct GdbCmdInfo {
     } argsNeeded;
 };
 
+#if 0
+// This is  how the QString data print statement generally looks like.
+// It is set by KDebugger via setPrintQStringDataCmd().
+
 static const char printQStringStructFmt[] =
 		// if the string data is junk, fail early
 		"print ($qstrunicode=($qstrdata=(%s))->unicode)?"
@@ -52,18 +56,10 @@ static const char printQStringStructFmt[] =
 		"(*(unsigned short*)$qstrunicode)@"
 		// limit the length
 		"(($qstrlen=(unsigned int)($qstrdata->len))>100?100:$qstrlen)"
-		// if unicode data is 0, check if it is QString::null
-		":($qstrdata==QString::null.d)\n";
-
-// However, gdb can't always find QString::null (I don't know why)
-// which results in an error; we autodetect this situation in
-// parseQt2QStrings and revert to a safe expression.
-// Same as above except for last line:
-static const char printQStringStructNoNullFmt[] =
-		"print ($qstrunicode=($qstrdata=(%s))->unicode)?"
-		"(*(unsigned short*)$qstrunicode)@"
-		"(($qstrlen=(unsigned int)($qstrdata->len))>100?100:$qstrlen)"
+		// if unicode data is 0, report a special value
 		":1==0\n";
+#endif
+static const char printQStringStructFmt[] = "print (0?\"%s\":$kdbgundef)\n";
 
 /*
  * The following array of commands must be sorted by the DC* values,
@@ -188,7 +184,6 @@ GdbDriver::GdbDriver() :
 	}
     }
     assert(strlen(printQStringStructFmt) <= MAX_FMTLEN);
-    assert(strlen(printQStringStructNoNullFmt) <= MAX_FMTLEN);
 #endif
 }
 
@@ -676,6 +671,15 @@ union Qt2QChar {
 };
 #endif
 
+void GdbDriver::setPrintQStringDataCmd(const char* cmd)
+{
+    // don't accept the command if it is empty
+    if (cmd == 0 || *cmd == '\0')
+	return;
+    assert(strlen(cmd) <= MAX_FMTLEN);
+    cmds[DCprintQStringStruct].fmt = cmd;
+}
+
 VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, bool qt3like)
 {
     VarTree* variable = 0;
@@ -687,23 +691,6 @@ VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, boo
     const char* p = output;
     while (isspace(*p))
 	p++;
-
-    // check if this is an error indicating that gdb does not know about QString::null
-    if (cmds[DCprintQStringStruct].fmt == printQStringStructFmt &&
-	(strncmp(p, "Internal error: could not find static variable null", 51) == 0 ||
-	 /*
-	  * At least gdb 5.2.1 reports the following error when it accesses
-	  * QString::null. Checking for it can result in false positives
-	  * (where the error is actually triggered by a real NULL pointer
-	  * in a badly initialized QString variable) but the consequences
-	  * are mild.
-	  */
-	 strncmp(p, "Cannot access memory at address 0x0", 35) == 0))
-    {
-	/* QString::null doesn't work, use an alternate expression */
-	cmds[DCprintQStringStruct].fmt = printQStringStructNoNullFmt;
-	// continue and let parseOffErrorExpr catch the error
-    }
 
     // special case: empty string (0 repetitions)
     if (strncmp(p, "Invalid number 0 of repetitions", 31) == 0)
