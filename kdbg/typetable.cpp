@@ -31,15 +31,30 @@ void TypeTable::loadTypeTables()
     typeTablesInited = true;
 
     QDir dir(KApplication::kde_datadir() + "/kdbg/types");
-    const QStrList* files = dir.entryList("*.kdbgtt");    
+#if QT_VERSION < 200
+    const QStrList* files = dir.entryList("*.kdbgtt");
+	
     if (files == 0) {
 	TRACE("no type tables found");
 	return;
     }
+#else
+    const QStringList files = dir.entryList("*.kdbgtt");
+    
+    if (files.isEmpty()) {
+	TRACE("no type tables found");
+	return;
+    }
+#endif
 
     QString fileName;
+#if QT_VERSION < 200
     for (QListIterator<char> it(*files); it != 0; ++it) {
 	fileName = dir.filePath(it.current());
+#else
+    for (QValueListConstIterator<QString> p = files.begin(); p != files.end(); ++p) {
+	fileName = dir.filePath(*p);
+#endif
 	TypeTable* newTable = new TypeTable;
 	newTable->loadFromFile(fileName);
 	typeTables.append(newTable);

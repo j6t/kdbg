@@ -4,6 +4,9 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include <kapp.h>
+#if QT_VERSION >= 200
+#include <klocale.h>			/* i18n */
+#endif
 #include <kiconloader.h>
 #include <kstdaccel.h>
 #include <qpainter.h>
@@ -530,6 +533,7 @@ void DebuggerMainWnd::initAnimation()
 	QPixmap* pix = new QPixmap(2,2);
 	QPainter p(pix);
 	p.fillRect(0,0,2,2,QBrush(white));
+	m_animation.append(pix);
     }
     
     connect(m_debugger, SIGNAL(animationTimeout()), SLOT(slotAnimationTimeout()));

@@ -5,6 +5,9 @@
 
 #include "pgmargs.h"
 #include <kapp.h>
+#if QT_VERSION >= 200
+#include <klocale.h>			/* i18n */
+#endif
 
 PgmArgs::PgmArgs(QWidget* parent, const char* pgm, QDict<EnvVar>& envVars) :
 	QDialog(parent, "pgmargs", true),

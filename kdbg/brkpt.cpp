@@ -4,6 +4,9 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include <kapp.h>			/* i18n */
+#if QT_VERSION >= 200
+#include <klocale.h>			/* i18n */
+#endif
 #include <kiconloader.h>
 #include <ksimpleconfig.h>
 #include <qkeycode.h>

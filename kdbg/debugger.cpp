@@ -16,7 +16,11 @@
 #include <kfiledialog.h>
 #include <kmsgbox.h>
 #include <ksimpleconfig.h>
+#include <kconfig.h>
 #include <kwm.h>
+#if QT_VERSION >= 200
+#include <klocale.h>			/* i18n */
+#endif
 #include <ctype.h>
 
 #ifndef VERSION				/* #ifndef HAVE_CONFIG_H */

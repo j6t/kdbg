@@ -5,6 +5,9 @@
 
 
 #include <kapp.h>
+#if QT_VERSION >= 200
+#include <klocale.h>			/* i18n */
+#endif
 #include <kmsgbox.h>
 #include <kstdaccel.h>
 #include "dbgmainwnd.h"

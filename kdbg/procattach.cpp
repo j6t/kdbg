@@ -5,6 +5,9 @@
 
 #include "procattach.h"
 #include <kapp.h>
+#if QT_VERSION >= 200
+#include <klocale.h>			/* i18n */
+#endif
 
 ProcAttach::ProcAttach(QWidget* parent) :
 	QDialog(parent, "procattach", true),

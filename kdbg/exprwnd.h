@@ -8,6 +8,7 @@
 
 #include "ktreeview.h"
 #include <qlist.h>
+#include <qstrlist.h>
 
 class ProgramTypeTable;
 class TypeInfo;

@@ -17,6 +17,9 @@
 #include <kapp.h>
 #include <kiconloader.h>
 #include <kstdaccel.h>
+#if QT_VERSION >= 200
+#include <klocale.h>			/* i18n */
+#endif
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
