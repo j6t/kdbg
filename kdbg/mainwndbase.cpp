@@ -18,6 +18,12 @@
 #include "updateui.h"
 #include "commandids.h"
 #include "mydebug.h"
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>			/* mknod(2) */
+#endif
+#ifdef HAVE_FCNTL_H
+#include <fcntl.h>			/* open(2) */
+#endif
 
 
 KStdAccel* keys = 0;
@@ -58,9 +64,32 @@ void WatchWindow::slotWatchHighlighted(int idx)
 }
 
 
+static void splitCmdStr(const QString& cmd, ValArray<QString>& parts)
+{
+    QString str = cmd.simplifyWhiteSpace();
+    int start = 0;
+    int end;
+    while ((end = str.find(' ', start)) >= 0) {
+	parts.append(str.mid(start, end-start));
+	start = end+1;
+    }
+    parts.append(str.mid(start, str.length()-start));
+}
+
+
+const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
+const char defaultDebuggerCmdStr[] =
+	"gdb"
+	" --fullname"	/* to get standard file names each time the prog stops */
+	" --nx";	/* do not execute initialization files */
+
+
 DebuggerMainWndBase::DebuggerMainWndBase(const char* name) :
 	KTMainWindow(name),
 	m_animationCounter(0),
+	m_outputTermCmdStr(defaultTermCmdStr),
+	m_outputTermPID(0),
+	m_debuggerCmdStr(defaultDebuggerCmdStr),
 	m_debugger(0)
 {
     m_statusActive = i18n("active");
@@ -69,6 +98,11 @@ DebuggerMainWndBase::DebuggerMainWndBase(const char* name) :
 DebuggerMainWndBase::~DebuggerMainWndBase()
 {
     delete m_debugger;
+
+    // if the output window is open, close it
+    if (m_outputTermPID != 0) {
+	kill(m_outputTermPID, SIGTERM);
+    }
 }
 
 void DebuggerMainWndBase::setupDebugger(ExprWnd* localVars,
@@ -84,6 +118,11 @@ void DebuggerMainWndBase::setupDebugger(ExprWnd* localVars,
 	    SLOT(updateLineItems()));
     
     connect(m_debugger, SIGNAL(animationTimeout()), SLOT(slotAnimationTimeout()));
+    connect(m_debugger, SIGNAL(debuggerStarting()), SLOT(slotDebuggerStarting()));
+
+    ValArray<QString> cmd;
+    splitCmdStr(m_debuggerCmdStr, cmd);
+    m_debugger->setDebuggerCmd(cmd);
 }
 
 
@@ -100,11 +139,23 @@ void DebuggerMainWndBase::setRemoteDevice(const QString& remoteDevice)
     }
 }
 
+const char OutputWindowGroup[] = "OutputWindow";
+const char TermCmdStr[] = "TermCmdStr";
+const char KeepScript[] = "KeepScript";
+const char DebuggerGroup[] = "Debugger";
+const char DebuggerCmdStr[] = "DebuggerCmdStr";
+
 void DebuggerMainWndBase::saveSettings(KConfig* config)
 {
     if (m_debugger != 0) {
 	m_debugger->saveSettings(config);
     }
+
+    KConfigGroupSaver g(config, OutputWindowGroup);
+    config->writeEntry(TermCmdStr, m_outputTermCmdStr);
+
+    config->setGroup(DebuggerGroup);
+    config->writeEntry(DebuggerCmdStr, m_debuggerCmdStr);
 }
 
 void DebuggerMainWndBase::restoreSettings(KConfig* config)
@@ -112,6 +163,18 @@ void DebuggerMainWndBase::restoreSettings(KConfig* config)
     if (m_debugger != 0) {
 	m_debugger->restoreSettings(config);
     }
+
+    KConfigGroupSaver g(config, OutputWindowGroup);
+    /*
+     * For debugging and emergency purposes, let the config file override
+     * the shell script that is used to keep the output window open. This
+     * string must have EXACTLY 1 %s sequence in it.
+     */
+    setTerminalCmd(config->readEntry(TermCmdStr, defaultTermCmdStr));
+    m_outputTermKeepScript = config->readEntry(KeepScript);
+
+    config->setGroup(DebuggerGroup);
+    setDebuggerCmdStr(config->readEntry(DebuggerCmdStr));
 }
 
 bool DebuggerMainWndBase::debugProgram(const QString& executable)
@@ -298,14 +361,182 @@ void DebuggerMainWndBase::slotGlobalOptions()
     dlg.setOKButton(i18n("OK"));
 
     PrefDebugger prefDebugger(&dlg);
-    prefDebugger.setDebuggerCmd(m_debugger->debuggerCmd());
-    prefDebugger.setTerminal(m_debugger->terminalCmd());
+    prefDebugger.setDebuggerCmd(m_debuggerCmdStr);
+    prefDebugger.setTerminal(m_outputTermCmdStr);
     
     dlg.addTab(&prefDebugger, "&Debugger");
-    if (dlg.exec() == QDialog::Accepted) {
-	m_debugger->setDebuggerCmd(prefDebugger.debuggerCmd());
-	m_debugger->setTerminalCmd(prefDebugger.terminal());
+    if (dlg.exec() == QDialog::Accepted)
+    {
+	setDebuggerCmdStr(prefDebugger.debuggerCmd());
+	setTerminalCmd(prefDebugger.terminal());
     }
 }
+
+const char fifoNameBase[] = "/tmp/kdbgttywin%05d";
+
+/*
+ * We use the scope operator :: in this function, so that we don't
+ * accidentally use the wrong close() function (I've been bitten ;-),
+ * outch!) (We use it for all the libc functions, to be consistent...)
+ */
+bool DebuggerMainWndBase::createOutputWindow()
+{
+    // create a name for a fifo
+    QString fifoName;
+    fifoName.sprintf(fifoNameBase, ::getpid());
+
+    // create a fifo that will pass in the tty name
+    ::unlink(fifoName);			/* remove remnants */
+#ifdef HAVE_MKFIFO
+    if (::mkfifo(fifoName, S_IRUSR|S_IWUSR) < 0) {
+	// failed
+	TRACE("mkfifo " + fifoName + " failed");
+	return false;
+    }
+#else
+    if (::mknod(fifoName, S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
+	// failed
+	TRACE("mknod " + fifoName + " failed");
+	return false;
+    }
+#endif
+
+    int pid = ::fork();
+    if (pid < 0) {
+	// error
+	TRACE("fork failed for fifo " + fifoName);
+	::unlink(fifoName);
+	return false;
+    }
+    if (pid == 0) {
+	// child process
+	/*
+	 * Spawn an xterm that in turn runs a shell script that passes us
+	 * back the terminal name and then only sits and waits.
+	 */
+	static const char shellScriptFmt[] =
+	    "tty>%s;"
+	    "trap \"\" INT QUIT TSTP;"	/* ignore various signals */
+	    "exec<&-;exec>&-;"		/* close stdin and stdout */
+	    "while :;do sleep 3600;done";
+	// let config file override this script
+	const char* fmt = shellScriptFmt;
+	if (m_outputTermKeepScript.length() != 0) {
+	    fmt = m_outputTermKeepScript.data();
+	}
+#if QT_VERSION < 200
+	QString shellScript(strlen(fmt) + fifoName.length());
+#else
+	QString shellScript;
+#endif
+	shellScript.sprintf(fmt, fifoName.data());
+	TRACE("output window script is " + shellScript);
+
+	QString title = kapp->getCaption();
+	title += i18n(": Program output");
+
+	// parse the command line specified in the preferences
+	ValArray<QString> cmdParts;
+	splitCmdStr(m_outputTermCmdStr, cmdParts);
+
+	/*
+	 * Build the argv array. Thereby substitute special sequences:
+	 */
+	struct {
+	    char seq[4];
+	    QString replace;
+	} substitute[] = {
+	    { "%T", title },
+	    { "%C", shellScript }
+	};
+	const char** argv = new const char*[cmdParts.size()+1];
+	argv[cmdParts.size()] = 0;
+
+	for (int i = cmdParts.size()-1; i >= 0; i--) {
+	    QString& str = cmdParts[i];
+	    for (int j = sizeof(substitute)/sizeof(substitute[0])-1; j >= 0; j--) {
+		int pos = str.find(substitute[j].seq);
+		if (pos >= 0) {
+		    str.replace(pos, 2, substitute[j].replace);
+		    break;		/* substitute only one sequence */
+		}
+	    }
+	    argv[i] = str;
+	}
+
+	::execvp(argv[0], const_cast<char* const*>(argv));
+
+	// failed; what can we do?
+	::exit(0);
+    } else {
+	// parent process
+	// read the ttyname from the fifo
+	int f = ::open(fifoName, O_RDONLY);
+	if (f < 0) {
+	    // error
+	    ::unlink(fifoName);
+	    return false;
+	}
+
+	char ttyname[50];
+	int n = ::read(f, ttyname, sizeof(ttyname)-sizeof(char));   /* leave space for '\0' */
+
+	::close(f);
+	::unlink(fifoName);
+
+	if (n < 0) {
+	    // error
+	    return false;
+	}
+
+	// remove whitespace
+	ttyname[n] = '\0';
+	QString tty = ttyname;
+	m_outputTermName = tty.stripWhiteSpace();
+	m_outputTermPID = pid;
+	TRACE(QString().sprintf("tty=%s", m_outputTermName.data()));
+    }
+    return true;
+}
+
+void DebuggerMainWndBase::setTerminalCmd(const QString& cmd)
+{
+    m_outputTermCmdStr = cmd;
+    // revert to default if empty
+    if (m_outputTermCmdStr.isEmpty()) {
+	m_outputTermCmdStr = defaultTermCmdStr;
+    }
+}
+
+void DebuggerMainWndBase::slotDebuggerStarting()
+{
+    if (m_outputTermName.isEmpty()) {
+	// create an output window
+	if (!createOutputWindow()) {
+	    TRACE("createOuputWindow failed");
+	    m_outputTermName = QString();
+	} else {
+	    TRACE("successfully created output window");
+	}
+    }
+    if (m_debugger != 0) {
+	m_debugger->setTerminal(m_outputTermName);
+    }
+}
+
+void DebuggerMainWndBase::setDebuggerCmdStr(const QString& cmd)
+{
+    m_debuggerCmdStr = cmd;
+    // revert to default if empty
+    if (m_debuggerCmdStr.isEmpty()) {
+	m_debuggerCmdStr = defaultDebuggerCmdStr;
+    }
+    if (m_debugger != 0) {
+	ValArray<QString> cmd;
+	splitCmdStr(m_debuggerCmdStr, cmd);
+	m_debugger->setDebuggerCmd(cmd);
+    }
+}
+
 
 #include "mainwndbase.moc"

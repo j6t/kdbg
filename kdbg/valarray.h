@@ -22,6 +22,7 @@ class ValArray
 public:
     ValArray() : m_pData(0), m_size(0), m_space(0) { }
     ~ValArray();
+    void operator=(const ValArray<T>& src);
     const T& operator[](int i) const { return m_pData[i]; }
     T& operator[](int i) { return m_pData[i]; }
     void setSize(int newSize);
@@ -41,6 +42,15 @@ ValArray<T>::~ValArray()
 {
     setSize(0);
     delete[] reinterpret_cast<char*>(m_pData);
+}
+
+template<class T>
+void ValArray<T>::operator=(const ValArray<T>& src)
+{
+    setSize(src.size());
+    for (int i = 0; i < src.size(); i++) {
+	m_pData[i] = src.m_pData[i];
+    }
 }
 
 template<class T>

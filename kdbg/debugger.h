@@ -201,22 +201,11 @@ public:
      * Sets the command to invoke gdb. If cmd is the empty string, the
      * default is substituted.
      */
-    void setDebuggerCmd(const QString& cmd);
+    void setDebuggerCmd(const ValArray<QString>& cmd)
+    { m_debuggerCmd = cmd; }
 
-    /** Retrieves the command to invoke gdb. */
-    QString debuggerCmd() const { return m_debuggerCmdStr; }
-
-    /**
-     * Sets the command to invoke the terminal that displays the program
-     * output. If cmd is the empty string, the default is substituted.
-     */
-    void setTerminalCmd(const QString& cmd);
-
-    /**
-     * Retrieves the command to invoke ther terminal that displays the
-     * program output.
-     */
-    QString terminalCmd() const { return m_outputTermCmdStr; }
+    /** Sets the terminal that is to be used by the debugger. */
+    void setTerminal(const QString& term) { m_inferiorTerminal = term; }
 
     // settings
     void saveSettings(KConfig*);
@@ -258,12 +247,9 @@ public:
 	DCignore
     };
 protected:
-    QString m_outputTermCmdStr;
-    pid_t m_outputTermPID;
-    QString m_outputTermName;
-    QString m_outputTermKeepScript;
-    bool createOutputWindow();
-    QString m_debuggerCmdStr;
+    QString m_inferiorTerminal;
+    QString m_runCmd;
+    ValArray<QString> m_debuggerCmd;
     bool startGdb();
     void stopGdb();
     void writeCommand();
@@ -415,6 +401,12 @@ protected slots:
     void slotDeleteWatch();
     
 signals:
+    /**
+     * This signal is emitted before the debugger is started. The slot is
+     * supposed to set up m_inferiorTerminal.
+     */
+    void debuggerStarting();
+
     /**
      * This signal is emitted whenever a part of the debugger needs to
      * highlight the specfied source code line (e.g. when the program

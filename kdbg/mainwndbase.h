@@ -53,6 +53,16 @@ public:
     DebuggerMainWndBase(const char* name);
     ~DebuggerMainWndBase();
 
+    /**
+     * Sets the command to invoke the terminal that displays the program
+     * output. If cmd is the empty string, the default is substituted.
+     */
+    void setTerminalCmd(const QString& cmd);
+    /**
+     * Sets the command to invoke the debugger.
+     */
+    void setDebuggerCmdStr(const QString& cmd);
+
     // the following are needed to handle program arguments
     bool debugProgram(const QString& executable);
     void setCoreFile(const QString& corefile);
@@ -71,7 +81,15 @@ protected:
     uint m_animationCounter;
     void initAnimation();
 
+    // output window
+    QString m_outputTermCmdStr;
+    pid_t m_outputTermPID;
+    QString m_outputTermName;
+    QString m_outputTermKeepScript;
+    bool createOutputWindow();
+
     // the debugger proper
+    QString m_debuggerCmdStr;
     KDebugger* m_debugger;
     void setupDebugger(ExprWnd* localVars,
 		       ExprWnd* watchVars,
@@ -88,6 +106,7 @@ public slots:
     void slotNewStatusMsg();
     void slotAnimationTimeout();
     void slotGlobalOptions();
+    void slotDebuggerStarting();
 };
 
 #endif // MAINWNDBASE_H
