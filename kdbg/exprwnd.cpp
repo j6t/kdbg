@@ -8,6 +8,7 @@
 #include "typetable.h"
 #include <qstrlist.h>
 #include <qpainter.h>
+#include <qscrollbar.h>
 #include <kapp.h>
 #include <kiconloader.h>		/* icons */
 #ifdef HAVE_CONFIG_H
@@ -685,9 +686,39 @@ void ExprWnd::editValue(int row, const QString& text)
     rowYPos(row, &y);
     int w = cellWidth(1);
     int h = cellHeight(row);
+    QScrollBar* sbV = static_cast<QScrollBar*>(child("table_sbV"));
 
-    QRect rect(x,y, w,h);
+    /*
+     * Make the edit widget at least 5 characters wide (but not wider than
+     * this widget). If less than half of this widget is used to display
+     * the text, scroll this widget so that half of it shows the text (or
+     * less than half of it if the text is shorter).
+     */
+    QFontMetrics metr = m_edit.font();
+    int wMin = metr.width("88888");
+    if (w < wMin)
+	w = wMin;
+    int wThis = width();
+    if (sbV->isVisible())	// subtract width of scrollbar
+	wThis -= sbV->width();
+    if (x >= wThis/2 &&		// less than half the width displays text
+	x+w > wThis)		// not all text is visible
+    {
+	// scroll so that more text is visible
+	int wScroll = QMIN(x-wThis/2, x+w-wThis);
+	sbHor(xOffset()+wScroll);
+	colXPos(1, &x);
+    }
+    else if (x < 0)
+    {
+	// don't let the edit move out at the left
+	x = 0;
+    }
+
+    // make the edit box as wide as the visible column
+    QRect rect(x,y, wThis-x,h);
     m_edit.setText(text);
+    m_edit.selectAll();
 
     m_edit.setGeometry(rect);
     m_edit.m_finished = false;
