@@ -50,9 +50,8 @@ kdbg_SOURCES = \
 kdbg_LDFLAGS = $(all_libraries) $(KDE_RPATH)
 #kdbg_LDFLAGS = -Wl,-static $(all_libraries)
 
-# the libraries to link against. Be aware of the order. First the libraries,
-# that depend on the following ones.
-kdbg_LDADD   = -lkfile -lkfm -lkdeui -lkdecore -lqt -lXext -lX11 $(LIBSOCKET)
+# the libraries to link against.
+kdbg_LDADD   = $(LIB_KFILE)
 
 # this option you can leave out. Just, if you use "make dist", you need it
 noinst_HEADERS = \
@@ -104,7 +103,9 @@ XPMS = \
 # types in libraries that we understand
 TYPES = \
 	qt.kdbgtt \
+	qt2.kdbgtt \
 	kdecore.kdbgtt \
+	kdecore3.kdbgtt \
 	X11.kdbgtt
 
 # if you "make clean", this files get removed. If you want to remove

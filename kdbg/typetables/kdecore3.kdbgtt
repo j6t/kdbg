@@ -1,0 +1,7 @@
+[Type Table]
+Types1=KSimpleConfig
+LibDisplayName=kdecore (KDE post-1.1)
+ShlibRE=libkdecore\.so\.3$
+[KSimpleConfig]
+Display={ global=% }
+Expr1=(*(%s).pData->aGlobalAppFile.shd->data)

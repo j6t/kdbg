@@ -5,6 +5,8 @@
 
 #include <qdict.h>
 #include <qstring.h>
+#include <qregexp.h>
+#include <qstrlist.h>
 
 class KConfigBase;
 
@@ -38,6 +40,21 @@ struct TypeInfo
      * substituted for the percent signs in m_displayString.
      */
     QString m_exprStrings[typeInfoMaxExpr];
+    /**
+     * This is a list of guard expressions. Each contains exactly one %s,
+     * which will be replaced by the parent expression, or is empty. If the
+     * evaluation of the resulting expression returns an error, the
+     * corresponding expression from m_exprStrings is not evaluated. (This
+     * is used to guard function calls.)
+     */
+    QString m_guardStrings[typeInfoMaxExpr];
+    /**
+     * Gets a pointer to a TypeInfo that means: "I don't know the type"
+     */
+    static TypeInfo* unknownType() { return &m_unknownType; }
+
+protected:
+    static TypeInfo m_unknownType;
 };
 
 class TypeTable
@@ -57,10 +74,17 @@ public:
     void copyTypes(QDict<TypeInfo>& dict);
 
     /**
-     * Gets a pointer to a TypeInfo that means: "I don't know the type"
+     * Does the file name match this library?
      */
-    static TypeInfo* unknownType() { return &m_unknownType; }
+    bool matchFileName(const char* fileName) {
+	return m_shlibNameRE.match(fileName) >= 0;
+    }
 
+    /**
+     * Is the specified builtin feature enabled in this type library?
+     */
+    bool isEnabledBuiltin(const char* feature);
+    
 protected:
     /**
      * Loads the structure type information from the configuration files.
@@ -71,9 +95,8 @@ protected:
     QDict<TypeInfo> m_typeDict;
     QDict<TypeInfo> m_aliasDict;
     QString m_displayName;
-    QString m_shlibName;
-
-    static TypeInfo m_unknownType;
+    QRegExp m_shlibNameRE;
+    QStrList m_enabledBuiltins;
 };
 
 
@@ -90,7 +113,7 @@ public:
     /**
      * Load types belonging to the specified libraries.
      */
-    void loadLibTypes(const QArray<char>& libs);
+    void loadLibTypes(const QStrList& libs);
 
     /**
      * Load types belonging to the specified type table
@@ -122,7 +145,13 @@ public:
      */
     void registerAlias(const QString& name, TypeInfo* type);
 
+    /**
+     * Tells whether we use built-in support to understand QStrings.
+     */
+    bool parseQt2QStrings() const { return m_parseQt2QStrings; }
+
 protected:
     QDict<TypeInfo> m_types;
     QDict<TypeInfo> m_aliasDict;
+    bool m_parseQt2QStrings;
 };

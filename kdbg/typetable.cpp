@@ -16,7 +16,7 @@ bool typeTablesInited = false;
 
 
 // the unknown type
-TypeInfo TypeTable::m_unknownType("");
+TypeInfo TypeInfo::m_unknownType("");
 
 
 void TypeTable::initTypeLibraries()
@@ -61,11 +61,13 @@ TypeTable::~TypeTable()
 
 static const char TypeTableGroup[] = "Type Table";
 static const char LibDisplayName[] = "LibDisplayName";
-static const char ShlibName[] = "ShlibName";
+static const char ShlibRE[] = "ShlibRE";
+static const char EnableBuiltin[] = "EnableBuiltin";
 static const char TypesEntryFmt[] = "Types%d";
 static const char DisplayEntry[] = "Display";
 static const char AliasEntry[] = "Alias";
 static const char ExprEntryFmt[] = "Expr%d";
+static const char FunctionGuardEntryFmt[] = "FunctionGuard%d";
 
 
 void TypeTable::loadFromFile(const QString& fileName)
@@ -89,7 +91,8 @@ void TypeTable::loadFromFile(const QString& fileName)
 	}
     }
 
-    m_shlibName = cf.readEntry(ShlibName);
+    m_shlibNameRE = QRegExp(cf.readEntry(ShlibRE));
+    cf.readListEntry(EnableBuiltin, m_enabledBuiltins);
 
     /*
      * Get the types. We search for entries of kind Types1, Types2, etc.
@@ -145,10 +148,15 @@ void TypeTable::readType(KConfigBase& cf, const char* type)
 
     // Expr1, Expr2, etc...
     QString exprEntry;
+    QString funcGuardEntry;
     for (int j = 0; j < info->m_numExprs; j++) {
 	exprEntry.sprintf(ExprEntryFmt, j+1);
 	expr = cf.readEntry(exprEntry);
 	info->m_exprStrings[j] = expr;
+
+	funcGuardEntry.sprintf(FunctionGuardEntryFmt, j+1);
+	expr = cf.readEntry(funcGuardEntry);
+	info->m_guardStrings[j] = expr;
     }
 
     // add the new type
@@ -165,6 +173,17 @@ void TypeTable::copyTypes(QDict<TypeInfo>& dict)
     for (QDictIterator<TypeInfo> it = m_aliasDict; it != 0; ++it) {
 	dict.insert(it.currentKey(), it);
     }
+}
+
+bool TypeTable::isEnabledBuiltin(const char* feature)
+{
+    char* f = m_enabledBuiltins.first();
+    while (f) {
+	if (strcmp(feature, f) == 0)
+	    return true;
+	f = m_enabledBuiltins.next();
+    }
+    return false;
 }
 
 TypeInfo::TypeInfo(const QString& displayString)
@@ -193,15 +212,11 @@ TypeInfo::~TypeInfo()
 }
 
 
-ProgramTypeTable::ProgramTypeTable()
+ProgramTypeTable::ProgramTypeTable() :
+	m_parseQt2QStrings(false)
 {
     m_types.setAutoDelete(false);	/* paranoia */
     m_aliasDict.setAutoDelete(false);	/* paranoia */
-
-    // load all types
-    for (QListIterator<TypeTable> it = typeTables; it; ++it) {
-	loadTypeTable(it);
-    }
 }
 
 ProgramTypeTable::~ProgramTypeTable()
@@ -216,6 +231,10 @@ void ProgramTypeTable::clear()
 void ProgramTypeTable::loadTypeTable(TypeTable* table)
 {
     table->copyTypes(m_types);
+    // check whether to enable builtin QString support
+    if (!m_parseQt2QStrings) {
+	m_parseQt2QStrings = table->isEnabledBuiltin("QString::Data");
+    }
 }
 
 TypeInfo* ProgramTypeTable::lookup(const char* type)
@@ -231,4 +250,43 @@ void ProgramTypeTable::registerAlias(const QString& name, TypeInfo* type)
 {
     ASSERT(lookup(name) == 0 || lookup(name) == type);
     m_aliasDict.insert(name, type);
+}
+
+#if QT_VERSION < 200
+typedef QListIterator<char> QStrListIterator;
+#endif
+
+void ProgramTypeTable::loadLibTypes(const QStrList& libs)
+{
+    QStrListIterator it = libs;
+
+    /*
+     * We use a copy of the list of known libraries, from which we delete
+     * those libs that we already have added. This way we avoid to load a
+     * library twice.
+     */
+    QList<TypeTable> allTables = typeTables;	/* shallow copy! */
+    allTables.setAutoDelete(false);	/* important! */
+
+    for (; it && allTables.count() > 0; ++it)
+    {
+	// look up the library
+    repeatLookup:;
+	for (TypeTable* t = allTables.first(); t != 0; t = allTables.next())
+	{
+	    if (t->matchFileName(it))
+	    {
+		TRACE("adding types for " + QString(it));
+		loadTypeTable(t);
+		// remove the table
+		allTables.remove();
+		/*
+		 * continue the search (due to remove's unpredictable
+		 * behavior of setting the current item we simply go
+		 * through the whole list again)
+		 */
+		goto repeatLookup;
+	    }
+	}
+    }
 }

@@ -62,6 +62,7 @@ KDebugger::KDebugger(QWidget* parent,
 	m_haveExecutable(false),
 	m_programActive(false),
 	m_programRunning(false),
+	m_sharedLibsListed(false),
 	m_typeTable(0),
 	m_programConfig(0),
 	m_gdb(),
@@ -244,6 +245,7 @@ bool KDebugger::debugProgram(const QString& name)
 
 	// create a type table
 	m_typeTable = new ProgramTypeTable;
+	m_sharedLibsListed = false;
     }
 
     emit updateUI();
@@ -499,8 +501,9 @@ bool KDebugger::startGdb()
     // change prompt string and synchronize with gdb
     m_state = DSidle;
     executeCmd(DCinitialize, "set prompt " PROMPT);
-    executeCmd(DCnoconfirm, "set confirm off");
-    executeCmd(DCtty, "tty " + m_outputTermName);
+    executeCmd(DCinitialSet, "set confirm off");
+    executeCmd(DCinitialSet, "set print static-members off");
+    executeCmd(DCinitialSet, "tty " + m_outputTermName);
 
     return true;
 }
@@ -1031,8 +1034,8 @@ void KDebugger::parse(CmdQueueItem* cmd)
     bool parseMarker = false;
     
     switch (cmd->m_cmd) {
-    case DCnoconfirm:
-    case DCtty:
+    case DCinitialSet:
+	// the output (if any) is uninteresting
     case DCsetargs:
 	// there is no output
     case DCsetenv:
@@ -1160,7 +1163,11 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	handleFindType(cmd);
 	break;
     case DCprintStruct:
+    case DCxamineStruct:
 	handlePrintStruct(cmd);
+	break;
+    case DCinfosharedlib:
+	handleSharedLibs();
 	break;
     case DCcondition:
     case DCignore:
@@ -1259,6 +1266,16 @@ void KDebugger::handleRunCommands()
      */
     if (refreshBreaklist || refreshNeeded || m_bpTable.haveTemporaryBP()) {
 	queueCmd(DCinfobreak, "info breakpoints", QMoverride);
+    }
+
+    /*
+     * If we haven't listed the shared libraries yet, do so. We must do
+     * this before we emit any commands that list variables, since the type
+     * libraries depend on the shared libraries.
+     */
+    if (!m_sharedLibsListed) {
+	// must be a high-priority command!
+	executeCmd(DCinfosharedlib, "info sharedlibrary");
     }
 
     // get the backtrace if the program is running or if we have a core file
@@ -1470,38 +1487,34 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd)
     return true;
 }
 
-// parse a printed expression and display it in the window
-bool KDebugger::handlePrint(const char* var, ExprWnd* wnd)
+static bool isErrorExpr(const char* output)
 {
-    VarTree* variable = parseExpr(var);
-    if (variable == 0)
-	return false;
+    return
+	strncmp(output, "Cannot access memory at", 23) == 0 ||
+	strncmp(output, "Attempt to dereference a generic pointer", 40) == 0 ||
+	strncmp(output, "Attempt to take contents of ", 28) == 0 ||
+	strncmp(output, "There is no member or method named", 34) == 0 ||
+	strncmp(output, "No symbol \"", 11) == 0;
+}
 
-    // search the expression in the specified window
-    QStrList vars;
-    wnd->exprList(vars);
-
-    const char* name;
-    for (name = vars.first(); name != 0; name = vars.next()) {
-	// lookup this variable in the list of new variables
-	if (strcmp(var, name) == 0) {
-	    break;			/* found! */
+static bool parseOffErrorExpr(char* output, const char* name,
+			      VarTree*& variable, bool wantErrorValue)
+{
+    if (isErrorExpr(output))
+    {
+	if (wantErrorValue) {
+	    // put the error message as value in the variable
+	    char* endMsg = strchr(output, '\n');
+	    if (endMsg != 0)
+		*endMsg = '\0';
+	    variable = new VarTree(name, VarTree::NKplain);
+	    variable->m_value = output;
+	} else {
+	    variable = 0;
 	}
+	return true;
     }
-    if (name == 0) {
-	// not found: append
-	TRACE(QString().sprintf("append expression: %s", var));
-	wnd->insertExpr(variable);
-    } else {
-	// found: update
-	TRACE(QString().sprintf("update expression: %s", var));
-	wnd->updateExpr(variable);
-	delete variable;
-    }
-    
-    evalExpressions();			/* enqueue dereferenced pointers */
-
-    return true;
+    return false;
 }
 
 VarTree* KDebugger::parseExpr(const char* name, bool wantErrorValue)
@@ -1509,23 +1522,8 @@ VarTree* KDebugger::parseExpr(const char* name, bool wantErrorValue)
     VarTree* variable;
 
     // check for error conditions
-    if (strncmp(m_gdbOutput, "Cannot access memory at", 23) == 0 ||
-	strncmp(m_gdbOutput, "Attempt to dereference a generic pointer", 40) == 0 ||
-	strncmp(m_gdbOutput, "Attempt to take contents of ", 28) == 0 ||
-	strncmp(m_gdbOutput, "There is no member or method named", 34) == 0 ||
-	strncmp(m_gdbOutput, "No symbol \"", 11) == 0)
+    if (!parseOffErrorExpr(m_gdbOutput, name, variable, wantErrorValue))
     {
-	if (wantErrorValue) {
-	    // put the error message as value in the variable
-	    char* endMsg = strchr(m_gdbOutput, '\n');
-	    if (endMsg != 0)
-		*endMsg = '\0';
-	    variable = new VarTree(name, VarTree::NKplain);
-	    variable->m_value = m_gdbOutput;
-	} else {
-	    variable = 0;
-	}
-    } else {
 	// parse the variable
 	const char* p = m_gdbOutput;
 	variable = parseVar(p);
@@ -1536,6 +1534,105 @@ VarTree* KDebugger::parseExpr(const char* name, bool wantErrorValue)
 	variable->setText(name);
 	// get some types
 	variable->inferTypesOfChildren(*m_typeTable);
+    }
+    return variable;
+}
+
+#if QT_VERSION < 200
+struct QChar {
+    // this is the XChar2b on X11
+    uchar row;
+    uchar cell;
+    static QString toQString(QChar* unicode, int len);
+    QChar() : row(0), cell(0) { }
+    QChar(char c) : row(0), cell(c) { }
+    operator char() const { return row ? 0 : cell; }
+};
+
+QString QChar::toQString(QChar* unicode, int len)
+{
+    QString result(len+1);
+    char* data = result.data();
+    data[len] = '\0';
+    while (len >= 0) {
+	data[len] = unicode[len].cell;
+	--len;
+    }
+    return result;
+}
+#endif
+
+VarTree* KDebugger::parseQCharArray(const char* name, int len, bool wantErrorValue)
+{
+    VarTree* variable;
+
+    // check for error conditions
+    if (!parseOffErrorExpr(m_gdbOutput, name, variable, wantErrorValue))
+    {
+	// parse the array
+	const char* p = m_gdbOutput;
+	// provide enough space for escaping all characters plus quotes
+	QChar* unicode = new QChar[2*len+2];
+	int realLen = 0;
+	while (*p != '\0' && len > 0) {
+	    // parse a line
+	    while (*p != '\0' && *p != ':') {	/* search colon ':' */
+		p++;
+	    }
+	    if (*p == '\0')
+		break;
+	    p++;			/* skip colon */
+	    while (*p != '\0' && *p != '\n' && len > 0) {
+		// parse a number
+		char* end;
+		unsigned short value = (unsigned short) strtoul(p, &end, 0);
+		if (end == p) {
+		    len = 0;		/* huh? no valid digits */
+		    break;
+		}
+		// interpret the value as a QChar
+		// TODO: make cross-architecture compatible
+		QChar ch;
+		(unsigned short&)ch = value;
+
+		// escape a few frequently used characters
+		char escapeCode = '\0';
+		switch (char(ch)) {
+		case '\n': escapeCode = 'n'; break;
+		case '\r': escapeCode = 'r'; break;
+		case '\t': escapeCode = 't'; break;
+		case '\b': escapeCode = 'b'; break;
+		case '\"': escapeCode = '\"'; break;
+		case '\\': escapeCode = '\\'; break;
+		case '\0': if (value == 0) { escapeCode = '0'; } break;
+		}
+		++realLen;		/* pre-increment so that there's keep room for a quote */
+		if (escapeCode != '\0') {
+		    unicode[realLen] = '\\';
+		    ++realLen;
+		    ch = escapeCode;
+		}
+		unicode[realLen] = ch;
+		--len;
+		// advance to next value
+		p = end;
+	    }
+	    if (*p == '\n') {
+		p++;
+	    }
+	}
+	TRACE(QString().sprintf("QCharArray: realLen=%d",realLen));
+	// add quotes
+	unicode[0] = '\"';
+	unicode[realLen+1] = '\"';
+	// assign the value
+	variable = new VarTree(name, VarTree::NKplain);
+#if QT_VERSION < 200
+	variable->m_value += QChar::toQString(unicode, realLen+2);
+#else
+	variable->m_value += QString(unicode, realLen+2);
+#endif
+	delete[] unicode;
     }
     return variable;
 }
@@ -1742,11 +1839,9 @@ void KDebugger::evalExpressions()
 
 	ustruct:
 	// paranoia
-	if (exprItem->m_type == 0 || exprItem->m_type == TypeTable::unknownType())
+	if (exprItem->m_type == 0 || exprItem->m_type == TypeInfo::unknownType())
 	    goto repeat;
-	exprItem->m_exprIndex = 0;
-	exprItem->m_partialValue = exprItem->m_type->m_displayString[0];
-	evalStructExpression(exprItem, wnd, false);
+	evalInitialStructExpression(exprItem, wnd, false);
 	return;
 
 	type:
@@ -1830,13 +1925,11 @@ void KDebugger::handleFindType(CmdQueueItem* cmd)
 	}
 	if (info == 0) {
 	    TRACE("unknown type");
-	    cmd->m_expr->m_type = TypeTable::unknownType();
+	    cmd->m_expr->m_type = TypeInfo::unknownType();
 	} else {
 	    cmd->m_expr->m_type = info;
 	    /* since this node has a new type, we get its value immediately */
-	    cmd->m_expr->m_exprIndex = 0;
-	    cmd->m_expr->m_partialValue = info->m_displayString[0];
-	    evalStructExpression(cmd->m_expr, cmd->m_exprWnd, false);
+	    evalInitialStructExpression(cmd->m_expr, cmd->m_exprWnd, false);
 	    return;
 	}
     }
@@ -1850,17 +1943,30 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd)
     ASSERT(var != 0);
     ASSERT(var->m_varKind == VarTree::VKstruct);
 
-    QString partValue;
-    VarTree* partExpr = parseExpr(cmd->m_expr->getText(), false);
-    if (partExpr == 0 ||
+    VarTree* partExpr;
+    if (cmd->m_cmd != DCxamineStruct) {
+	partExpr = parseExpr(cmd->m_expr->getText(), false);
+    } else {
+	partExpr = parseQCharArray(cmd->m_expr->getText(),
+				   cmd->m_expr->m_exprIndexLength, false);
+    }
+    bool errorValue =
+	partExpr == 0 ||
 	/* we only allow simple values at the moment */
-	partExpr->childCount() != 0)
+	partExpr->childCount() != 0;
+
+    QString partValue;
+repeatWithError:
+    if (errorValue)
     {
 	partValue = "???";
     } else {
 	partValue = partExpr->m_value;
     }
     delete partExpr;
+    partExpr = 0;
+
+repeatNoError:
 
     /*
      * Updating a struct value works like this: var->m_partialValue holds
@@ -1868,14 +1974,53 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd)
      * var->m_type->m_displayString[0] earlier). Each time we arrive here,
      * we append the printed result followed by the next
      * var->m_type->m_displayString to var->m_partialValue.
+     * 
+     * If the expression we just evaluated was a guard expression, and it
+     * resulted in an error, we must not evaluate the real expression, but
+     * go on to the next index. (We must still add the ??? to the value).
+     * 
+     * Next, if this was the length expression, we still have not seen the
+     * real expression, but the length of a QString.
      */
     ASSERT(var->m_exprIndex >= 0 && var->m_exprIndex <= typeInfoMaxExpr);
+
+    if (errorValue || (!var->m_exprIndexUseGuard && !var->m_exprIndexIsLength))
+    {
+	// add current partValue (which might be ???)
 #if QT_VERSION < 200
-    var->m_partialValue.detach();
+	var->m_partialValue.detach();
 #endif
-    var->m_partialValue += partValue;
-    var->m_exprIndex++;			/* next part */
-    var->m_partialValue += var->m_type->m_displayString[var->m_exprIndex];
+	var->m_partialValue += partValue;
+	var->m_exprIndex++;		/* next part */
+	var->m_exprIndexUseGuard = true;
+	var->m_partialValue += var->m_type->m_displayString[var->m_exprIndex];
+    }
+    else if (var->m_exprIndexUseGuard)
+    {
+	// this was a guard expression that succeeded
+	// go for the real expression
+	var->m_exprIndexUseGuard = false;
+	var->m_exprIndexIsLength = true;
+    }
+    else
+    {
+	// this was the length expression of a QString
+	// go for the real QString
+	var->m_exprIndexIsLength = false;
+	bool isOk;
+	int length = partValue.toInt(&isOk);
+	if (!isOk || length < 0) {
+	    // not a reasonable string
+	    errorValue = true;
+	    goto repeatWithError;
+	}
+	if (length == 0) {
+	    // do not examine the empty string, just use an empty one
+	    partValue = "\"\"";
+	    goto repeatNoError;
+	}
+	var->m_exprIndexLength = QMIN(100, length);	/* no more than 100 chars */
+    }
 
     /* go for more sub-expressions if needed */
     if (var->m_exprIndex < var->m_type->m_numExprs) {
@@ -1889,19 +2034,72 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd)
     evalExpressions();			/* enqueue dereferenced pointers */
 }
 
+/* queues the first printStruct command for a struct */
+void KDebugger::evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
+{
+    var->m_exprIndex = 0;
+    var->m_exprIndexUseGuard = true;
+    var->m_exprIndexIsLength = false;
+    var->m_partialValue = var->m_type->m_displayString[0];
+    evalStructExpression(var, wnd, immediate);
+}
+
 /* queues a printStruct command; var must have been initialized correctly */
 void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 {
     QString base = var->computeExpr();
-    const QString& exprFmt = var->m_type->m_exprStrings[var->m_exprIndex];
+    QString exprFmt;
+    if (var->m_exprIndexUseGuard) {
+	exprFmt = var->m_type->m_guardStrings[var->m_exprIndex];
+	if (exprFmt.isEmpty()) {
+	    // no guard, omit it and go to expression
+	    var->m_exprIndexUseGuard = false;
+	    var->m_exprIndexIsLength = true;
+	}
+    }
+    if (!var->m_exprIndexUseGuard) {
+	exprFmt = var->m_type->m_exprStrings[var->m_exprIndex];
+    }
+
 #if QT_VERSION < 200
     QString expr(exprFmt.length() + base.length() + 10);
 #else
     QString expr;
 #endif
     expr.sprintf(exprFmt, base.data());
-    TRACE("evalStruct: " + expr);
-    CmdQueueItem* cmd = queueCmd(DCprintStruct, "print " + expr,
+
+    DbgCommand dbgCmd = DCprintStruct;
+    // check if this is a QString::Data
+    if (strncmp(expr, "/QString::Data ", 15) == 0)
+    {
+	if (m_typeTable->parseQt2QStrings())
+	{
+	    expr = expr.mid(15, expr.length());	/* strip off /QString::Data */
+	    if (var->m_exprIndexIsLength) {
+		expr = "print " + expr + ".len";
+	    } else {
+		QString xCmd;
+		xCmd.sprintf("x /%dh ", var->m_exprIndexLength);
+		expr = xCmd + expr + ".unicode";
+		dbgCmd = DCxamineStruct;
+	    }
+	} else {
+	    /*
+	     * This should not happen: the type libraries should be set up
+	     * in a way that this can't happen. If this happens
+	     * nevertheless it means that, eg., kdecore was loaded but qt2
+	     * was not (only qt2 enables the QString feature).
+	     */
+	    // TODO: remove this "print"; queue the next printStruct instead
+	    expr = "print *0";
+	    var->m_exprIndexIsLength = false;
+	}
+    } else {
+	expr = "print " + expr;
+	var->m_exprIndexIsLength = false;
+    }
+    TRACE("evalStruct: " + expr + (var->m_exprIndexUseGuard ? " // guard" : " // real"));
+    CmdQueueItem* cmd = queueCmd(dbgCmd, expr,
 				 immediate  ?  QMoverrideMoreEqual : QMnormal);
 
     // remember which expression this was
@@ -1941,6 +2139,53 @@ void KDebugger::removeExpr(ExprWnd* wnd, VarTree* var)
     }
 
     wnd->removeExpr(var);
+}
+
+void KDebugger::handleSharedLibs()
+{
+    // delete all known libraries
+    m_sharedLibs.clear();
+
+    // parse the table of shared libraries
+    if (strncmp(m_gdbOutput, "No shared libraries loaded", 26) != 0) {
+	const char* str = m_gdbOutput;
+	// strip off head line
+	str = strchr(str, '\n');
+	if (str == 0)
+	    goto doneParse;
+	str++;				/* skip '\n' */
+	QString shlibName;
+	while (str != 0 && *str != '\0') {
+	    // format of a line is
+	    // 0x404c5000  0x40580d90  Yes         /lib/libc.so.5
+	    // 3 blocks of non-space followed by space
+	    for (int i = 0; *str != '\0' && i < 3; i++) {
+		while (*str != '\0' && !isspace(*str)) {   /* non-space */
+		    str++;
+		}
+		while (isspace(*str)) {	/* space */
+		    str++;
+		}
+	    }
+	    if (*str == '\0')
+		goto doneParse;
+	    const char* start = str;
+	    str = strchr(str, '\n');
+	    if (str == 0) {
+		shlibName = start;
+	    } else {
+		shlibName = QString(start, str-start+1);
+		str++;
+	    }
+	    m_sharedLibs.append(shlibName);
+	    TRACE("found shared lib " + shlibName);
+	}
+    }
+doneParse:;
+    m_sharedLibsListed = true;
+
+    // get type libraries
+    m_typeTable->loadLibTypes(m_sharedLibs);
 }
 
 KDebugger::CmdQueueItem* KDebugger::loadCoreFile()

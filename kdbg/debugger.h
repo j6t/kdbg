@@ -198,8 +198,7 @@ public:
     // debugger driver
     enum DbgCommand {
 	DCinitialize,
-	DCnoconfirm,
-	DCtty,
+	DCinitialSet,
 	DCexecutable,
 	DCcorefile,
 	DCattach,
@@ -220,8 +219,10 @@ public:
 	DCdisable,
 	DCprint,
 	DCprintStruct,
+	DCxamineStruct,
 	DCframe,
 	DCfindType,
+	DCinfosharedlib,
 	DCinfobreak,
 	DCcondition,
 	DCignore
@@ -305,19 +306,21 @@ protected:
     CmdQueueItem* m_activeCmd;		/* the cmd we are working on */
     void parse(CmdQueueItem* cmd);
     VarTree* parseExpr(const char* name, bool wantErrorValue = true);
+    VarTree* parseQCharArray(const char* name, int len, bool wantErrorValue);
     void handleRunCommands();
     void updateAllExprs();
     void updateBreakptTable();
     void updateProgEnvironment(const char* args, const QDict<EnvVar>& newVars);
     void parseLocals(QList<VarTree>& newVars);
     void handleLocals();
-    bool handlePrint(const char* var, ExprWnd* wnd);
     bool handlePrint(CmdQueueItem* cmd);
     void handleBacktrace();
     void handleFrameChange();
     void handleFindType(CmdQueueItem* cmd);
     void handlePrintStruct(CmdQueueItem* cmd);
+    void handleSharedLibs();
     void evalExpressions();
+    void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void exprExpandingHelper(ExprWnd* wnd, KTreeViewItem* item, bool& allow);
     void dereferencePointer(ExprWnd* wnd, VarTree* var, bool immediate);
@@ -328,11 +331,13 @@ protected:
     bool m_haveExecutable;		/* has an executable been specified */
     bool m_programActive;		/* is the program active (possibly halting in a brkpt)? */
     bool m_programRunning;		/* is the program executing (not stopped)? */
+    bool m_sharedLibsListed;		/* do we know the shared libraries loaded by the prog? */
     QString m_executable;
     QString m_corefile;
     QString m_attachedPid;		/* user input of attaching to pid */
     QString m_programArgs;
     QDict<EnvVar> m_envVars;		/* environment variables set by user */
+    QStrList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
     KSimpleConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
     void saveProgramSettings();

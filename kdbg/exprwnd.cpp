@@ -22,7 +22,10 @@ VarTree::VarTree(const QString& name, NameKind aKind) :
 	m_nameKind(aKind),
 	m_valueChanged(false),
 	m_type(0),
-	m_exprIndex(0)
+	m_exprIndex(0),
+	m_exprIndexUseGuard(false),
+	m_exprIndexIsLength(false),
+	m_exprIndexLength(0)
 {
 }
 
@@ -165,7 +168,7 @@ void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
 		.stripWhiteSpace();
 	m_type = typeTable.lookup(typeName);
 	if (m_type == 0) {
-	    m_type = TypeTable::unknownType();
+	    m_type = TypeInfo::unknownType();
 	}
     } else if (m_varKind == VKstruct) {
 	// check if this is a base class part
@@ -187,7 +190,7 @@ void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
 	     * If we still don't have a type, the type is really unknown.
 	     */
 	    if (m_type == 0) {
-		m_type = TypeTable::unknownType();
+		m_type = TypeInfo::unknownType();
 	    }
 	} // else
 	    /*
@@ -209,7 +212,7 @@ TypeInfo* VarTree::inferTypeFromBaseClass()
 	       child->m_nameKind == NKtype)
 	{
 	    if (child->m_type != 0 &&
-		child->m_type != TypeTable::unknownType())
+		child->m_type != TypeInfo::unknownType())
 	    {
 		// got a type!
 		return child->m_type;
@@ -412,11 +415,10 @@ void ExprWnd::updateSingleExpr(VarTree* display, VarTree* newValue)
      */
     if (display->m_varKind == VarTree::VKstruct &&
 	display->m_type != 0 &&
-	display->m_type != TypeTable::unknownType())
+	display->m_type != TypeInfo::unknownType())
     {
 	ASSERT(newValue->m_varKind == VarTree::VKstruct);
 	display->m_partialValue = display->m_type->m_displayString[0];
-	display->m_exprIndex = 0;
 	m_updateStruct.append(display);
     }
     else

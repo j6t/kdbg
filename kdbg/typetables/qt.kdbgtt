@@ -1,14 +1,14 @@
 [Type Table]
 Types1=QString,QDir,QFileInfo,QFile
 Types2=QObject,QTableView
-IdentifyingType=
+LibDisplayName=libqt 1.x
+ShlibRE=libqt\.so\.1$
 [QString]
 Display={ % }
 Expr1=(%s).shd->data
 [QObject]
-Display={ name=% #chld=% }
+Display={ name=% }
 Expr1=(%s).objname
-Expr2=(%s).childObjects->numNodes
 [QTableView]
 Alias=QObject
 [QDir]

@@ -1,5 +1,8 @@
 #include <iostream.h>
 #include <qstring.h>
+#include <qfile.h>
+#include <qfileinfo.h>
+#include <qdir.h>
 
 enum E { red, green, blue, yellow };
 struct S { int x, y; S* s; };
@@ -42,6 +45,10 @@ void f(E e[3], char c)
 		x;
 	}
 	g();
+	QDir dir;
+	QFile file;
+	QFileInfo fi;
+	x = red;
 }
 
 void segFault()
@@ -77,7 +84,7 @@ int main(int argc, char* argv[])
 
 	QString s;
 
-	s = "Hi, there!";
+	s = "Hi, there!\r\n\t\"\'\\";
 
 	const QString& strref = s;
 
