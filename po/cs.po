@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.0\n"
 "POT-Creation-Date: 1999-08-22 20:36+0200\n"
-"PO-Revision-Date: 1998-11-24 20:21 MET\n"
+"PO-Revision-Date: 1998-09-27 11:15 MET\n"
 "Last-Translator: Martin ©pirk <spirk@kla.pvt.cz>\n"
 "Language-Team: Czech <flidr@kky.zcu.cz>\n"
 "MIME-Version: 1.0\n"
@@ -23,7 +23,7 @@ msgstr "&Zobrazit kód"
 
 #: brkpt.cpp:56
 msgid "&Conditional..."
-msgstr ""
+msgstr "&Podmínka..."
 
 #: brkpt.cpp:647
 msgid "E"
@@ -39,19 +39,19 @@ msgstr ""
 
 #: brkpt.cpp:651
 msgid "Ignore"
-msgstr ""
+msgstr "Ignorovat"
 
 #: brkpt.cpp:652
 msgid "Condition"
-msgstr ""
+msgstr "Podmínka"
 
 #: brkpt.cpp:816
 msgid ": Conditional breakpoint"
-msgstr ""
+msgstr ": Podmínìná zará¾ka"
 
 #: brkpt.cpp:819
 msgid "&Condition:"
-msgstr ""
+msgstr "&Podmínka:"
 
 #: brkpt.cpp:821
 msgid "Ignore &next hits:"
@@ -68,23 +68,23 @@ msgstr "Spustit %s s tìmito argumenty:"
 
 #: pgmargs.cpp:54
 msgid "Working directory:"
-msgstr ""
+msgstr "Pracovní adresáø:"
 
 #: pgmargs.cpp:64
 msgid "Environment variables (NAME=value):"
-msgstr ""
+msgstr "Promìnné prostøedí (JMENO=hodnota):"
 
 #: pgmargs.cpp:73
 msgid "Name"
-msgstr ""
+msgstr "Jméno"
 
 #: pgmargs.cpp:74
 msgid "Value"
-msgstr ""
+msgstr "Hodnota"
 
 #: pgmargs.cpp:93
 msgid "&Modify"
-msgstr ""
+msgstr "&Upravit"
 
 #: procattach.cpp:22
 msgid ": Attach to process"
@@ -116,6 +116,8 @@ msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
+"gdb se neoèekávanì ukonèilo\n"
+"Obnovit proces ?"
 
 #: debugger.cpp:704
 msgid ": Program output"
@@ -123,7 +125,7 @@ msgstr ": Výstup programu"
 
 #: debugger.cpp:1178
 msgid "New working directory: "
-msgstr ""
+msgstr "Nový pracovní adresáø: "
 
 #: dbgmainwnd.cpp:90 winstack.cpp:386 winstack.cpp:396
 msgid "&Open Source..."
@@ -184,11 +186,11 @@ msgstr "V&zad"
 
 #: prefdebugger.cpp:23
 msgid "To revert to the default settings, clear the entries."
-msgstr ""
+msgstr "Chcete-li pou¾ít defaultní nastavení sma¾te zadané hodnoty."
 
 #: prefdebugger.cpp:27
 msgid "How to invoke &GDB:"
-msgstr ""
+msgstr "Spu¹tìní &GDB:"
 
 #: prefdebugger.cpp:34
 msgid ""
@@ -196,11 +198,13 @@ msgid ""
 "%C will be replaced by a Bourne shell script that\n"
 "keeps the terminal window open."
 msgstr ""
+"%T nahrazuje titulek okna,\n"
+"%C nahazuje shell script, který otevírá okno terminálu."
 
 #: prefdebugger.cpp:40
 #, fuzzy
 msgid "&Terminal for program output:"
-msgstr ": Výstup programu"
+msgstr "&Výstup programu:"
 
 #: mainwndbase.cpp:27
 msgid " Add "
@@ -216,7 +220,7 @@ msgstr "aktivní"
 
 #: mainwndbase.cpp:285
 msgid ": Global options"
-msgstr ""
+msgstr ": Globální nastavení"
 
 #: dbgmainwnd.cpp:91
 msgid "&Reload Source"
@@ -224,7 +228,7 @@ msgstr "&Znovu naèíst zdroj"
 
 #: dbgmainwnd.cpp:96
 msgid "&Global Options..."
-msgstr ""
+msgstr "&Globální nastavení..."
 
 #: dbgmainwnd.cpp:102
 msgid "&Find..."
