@@ -10,6 +10,7 @@
 #include <kiconloader.h>
 #include <kstdaccel.h>
 #include <qtabdialog.h>
+#include <kwm.h>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "prefdebugger.h"
@@ -76,7 +77,6 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(&m_filesWindow, SIGNAL(lineChanged()), SLOT(slotLineChanged()));
 
     restoreSettings(kapp->getConfig());
-    resize(700, 700);
 
     emit updateUI();
     slotFileChanged();
@@ -235,6 +235,7 @@ const char WindowGroup[] = "Windows";
 const char MainPane[] = "MainPane";
 const char LeftPane[] = "LeftPane";
 const char RightPane[] = "RightPane";
+const char MainPosition[] = "MainPosition";
 
 void DebuggerMainWnd::saveSettings(KConfig* config)
 {
@@ -246,6 +247,9 @@ void DebuggerMainWnd::saveSettings(KConfig* config)
     config->writeEntry(MainPane, vsep);
     config->writeEntry(LeftPane, lsep);
     config->writeEntry(RightPane, rsep);
+    // window position
+    const QRect& r = KWM::geometry(winId());
+    config->writeEntry(MainPosition, r);
 
     DebuggerMainWndBase::saveSettings(config);
 }
@@ -260,6 +264,10 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
     m_mainPanner.setSeparatorPos(vsep);
     m_leftPanner.setSeparatorPos(lsep);
     m_rightPanner.setSeparatorPos(rsep);
+    // window position
+    QRect pos(0,0,600,600);
+    pos = config->readRectEntry(MainPosition, &pos);
+    resize(pos.width(), pos.height());	/* only restore size */
 
     DebuggerMainWndBase::restoreSettings(config);
 }
