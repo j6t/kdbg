@@ -7,6 +7,7 @@
 #define REGWND_H
 
 #include <qlistview.h>
+#include <map>
 
 class QPopupMenu;
 class RegisterViewItem;
@@ -26,9 +27,12 @@ protected slots:
 
 private:
     void paletteChange(const QPalette& oldPal);
-    QListViewItem* m_lastItem;
+    void updateGroupVisibility();
+    QListViewItem* findMatchingGroup(const QString& regName);
     QPopupMenu* m_modemenu;
     int m_mode;
+    typedef std::map<QString,RegisterViewItem*> RegMap;
+    RegMap m_registers;
 
 friend class RegisterViewItem;
 };

@@ -1,6 +1,7 @@
+// -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 4 -*-
 // $Id$
 
-// Copyright by Judin Max, Johannes Sixt
+// Copyright by Judin Max, Johannes Sixt, Daniel Kristjansson
 // This file is under GPL, the GNU General Public Licence
 
 #include <qheader.h>
@@ -10,16 +11,36 @@
 #include <qfontdialog.h>
 #include <qmessagebox.h>
 #include <qpopmenu.h>
+#include <qregexp.h>
+#include <qstringlist.h>
 #include <stdlib.h>			/* strtoul */
 #include "regwnd.h"
 #include "dbgdriver.h"
 
 
+class GroupingViewItem : public QListViewItem
+{
+public:
+    GroupingViewItem(RegisterView* parent, 
+                     const QString& name, const QString& pattern) :
+        QListViewItem(parent, name), matcher(pattern)
+    {
+        setExpandable(true);
+        setOpen(true);
+    } 
+    bool matchName(const QString& str) const
+    {
+        return matcher.exactMatch(str);
+    }
+private:
+    QRegExp matcher;
+};
+
 class RegisterViewItem : public QListViewItem
 {
 public:
-    RegisterViewItem(RegisterView* parent, QListViewItem* insertAfter,
-		     QString reg, QString raw, QString cooked);
+    RegisterViewItem(QListViewItem* parent,
+		     const RegisterInfo& regInfo);
     ~RegisterViewItem();
 
     void setValue(QString raw, QString cooked);
@@ -34,15 +55,15 @@ protected:
 };
 
 
-RegisterViewItem::RegisterViewItem(RegisterView* parent, QListViewItem* insertAfter,
-				   QString reg, QString raw, QString cooked) :
-	QListViewItem(parent, insertAfter),
+RegisterViewItem::RegisterViewItem(QListViewItem* parent,
+				   const RegisterInfo& regInfo) :
+	QListViewItem(parent),
+	m_reg(regInfo),
 	m_changes(false),
 	m_found(true)
 {
-    m_reg.regName = reg;
-    setValue(raw, cooked);
-    setText(0, reg);
+    setValue(m_reg.rawValue, m_reg.cookedValue);
+    setText(0, m_reg.regName);
 }
 
 RegisterViewItem::~RegisterViewItem()
@@ -178,7 +199,6 @@ void RegisterViewItem::paintCell(QPainter* p, const QColorGroup& cg,
 
 RegisterView::RegisterView(QWidget* parent, const char* name) :
 	QListView(parent, name),
-	m_lastItem(0),
 	m_mode(16)
 {
     setSorting(-1);
@@ -199,7 +219,7 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
     setAllColumnsShowFocus( true );
     header()->setClickEnabled(false);
 
-    connect(this, SIGNAL(rightButtonClicked(QListViewItem*,const QPoint&,int)),
+    connect(this, SIGNAL(contextMenuRequested(QListViewItem*, const QPoint&, int)),
 	    SLOT(rightButtonClicked(QListViewItem*,const QPoint&,int)));
 
     m_modemenu = new QPopupMenu;
@@ -208,7 +228,20 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
     m_modemenu->insertItem(i18n("&Decimal"),2);
     m_modemenu->insertItem(i18n("He&xadecimal"),3);
     connect(m_modemenu,SIGNAL(activated(int)),SLOT(slotModeChange(int)));
+    
+    new GroupingViewItem(this, "MIPS VU", "^vu.*");
+    new GroupingViewItem(this, "AltiVec", "(^vr.*|^vscr$)");
+    new GroupingViewItem(this, "POWER real", "(^fpr.*|^fpscr$)");
+    new GroupingViewItem(this, "MMX", "^mm.*");
+    new GroupingViewItem(this, "SSE", "(^xmm.*|^mxcsr)");
+    new GroupingViewItem(this, "x87", 
+      "(^st.*|^fctrl$|^fop$|^fooff$|^foseg$|^fioff$|^fiseg$|^ftag$|^fstat$)");
+    new GroupingViewItem(this, i18n("x86 segment"), "(^cs$|^ss$|^ds$|^es$|^fs$|^gs$)");
+    new GroupingViewItem(this, i18n("GP and others"), "^$");
 
+    updateGroupVisibility();
+    setRootIsDecorated(true);
+    
     resize(200,300);
 }
 
@@ -216,62 +249,88 @@ RegisterView::~RegisterView()
 {
 }
 
+QListViewItem* RegisterView::findMatchingGroup(const QString& regName)
+{
+    for (QListViewItem* it = firstChild(); it != 0; it = it->nextSibling())
+    {
+	GroupingViewItem* i = static_cast<GroupingViewItem*>(it);
+	if (i->matchName(regName))
+	    return it;
+    }
+    // not better match found, so return "GP and others"
+    return firstChild();
+}
+
+void RegisterView::updateGroupVisibility()
+{
+    for (QListViewItem* it = firstChild(); it != 0; it = it->nextSibling())
+    {
+	it->setVisible(it->childCount() > 0);
+    }
+}
+
 void RegisterView::updateRegisters(QList<RegisterInfo>& regs)
 {
     setUpdatesEnabled(false);
 
     // mark all items as 'not found'
-    for (QListViewItem* i = firstChild(); i; i = i->nextSibling()) {
-	static_cast<RegisterViewItem*>(i)->m_found = false;
+    for (RegMap::iterator i = m_registers.begin(); i != m_registers.end(); ++i)
+    {
+	i->second->m_found = false;
     }
 
     // parse register values
-    for (RegisterInfo* reg = regs.first(); reg != 0; reg = regs.next())
+    // must iterate last to first, since QListView inserts at the top
+    for (RegisterInfo* reg = regs.last(); reg != 0; reg = regs.prev())
     {
 	// check if this is a new register
-	bool found = false;
-	for (QListViewItem* i = firstChild(); i; i = i->nextSibling()) {
-	    RegisterViewItem* it = static_cast<RegisterViewItem*>(i);
-	    if (it->m_reg.regName == reg->regName) {
-		found = true;
-		it->m_found = true;
-		if (it->m_reg.rawValue != reg->rawValue ||
-		    it->m_reg.cookedValue != reg->cookedValue)
-		{
-		    it->m_changes = true;
-		    it->setValue(reg->rawValue, reg->cookedValue);
+	RegMap::iterator i = m_registers.find(reg->regName);
+
+	if (i != m_registers.end())
+	{
+	    RegisterViewItem* it = i->second;
+	    it->m_found = true;
+	    if (it->m_reg.rawValue != reg->rawValue ||
+		it->m_reg.cookedValue != reg->cookedValue)
+	    {
+		it->m_changes = true;
+		it->setValue(reg->rawValue, reg->cookedValue);
+		repaintItem(it);
+	    } else {
+		/*
+		 * If there was a change last time, but not now, we
+		 * must revert the color.
+		 */
+		if (it->m_changes) {
+		    it->m_changes = false;
 		    repaintItem(it);
-		} else {
-		    /*
-		     * If there was a change last time, but not now, we
-		     * must revert the color.
-		     */
-		    if (it->m_changes) {
-			it->m_changes = false;
-			repaintItem(it);
-		    }
 		}
 	    }
 	}
-	if (!found)
-	    m_lastItem = new RegisterViewItem(this, m_lastItem, reg->regName,
-					      reg->rawValue, reg->cookedValue);
+	else
+	{
+	    QListViewItem* group = findMatchingGroup(reg->regName);
+	    m_registers[reg->regName] =
+		new RegisterViewItem(group, *reg);
+	}
     }
 
     // remove all 'not found' items;
-    QList<QListViewItem> deletedItem;
-    deletedItem.setAutoDelete(true);
-    m_lastItem = 0;
-    for (QListViewItem* i = firstChild(); i; i = i->nextSibling() ){
-	RegisterViewItem* it = static_cast<RegisterViewItem*>(i);
-	if (!it->m_found) {
-	    deletedItem.append(it);
-	} else {
-	    m_lastItem = it;
+    QStringList del;
+    for (RegMap::iterator i = m_registers.begin(); i != m_registers.end(); ++i)
+    {
+	if (!i->second->m_found) {
+	    del.push_back(i->first);
 	}
     }
-    deletedItem.clear();
+    for (QStringList::Iterator i = del.begin(); i != del.end(); ++i)
+    {
+	RegMap::iterator it = m_registers.find(*i);
+	delete it->second;
+	m_registers.erase(it);
+    }
 
+    updateGroupVisibility();
     setUpdatesEnabled(true);
     triggerUpdate();
 }
@@ -293,8 +352,9 @@ void RegisterView::slotModeChange(int code)
 
     m_mode = modes[code];
 
-    for (QListViewItem* i = firstChild(); i; i = i->nextSibling()) {
-	RegisterViewItem* it = static_cast<RegisterViewItem*>(i);
+    for (RegMap::iterator i = m_registers.begin(); i != m_registers.end(); ++i)
+    {
+	RegisterViewItem* it = i->second;
 	it->setValue(it->m_reg.rawValue, it->m_reg.cookedValue);
     }
 }
