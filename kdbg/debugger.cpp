@@ -69,6 +69,7 @@ KDebugger::KDebugger(const char* name) :
 	m_programRunning(false),
 	m_programConfig(0),
 	m_gdb(),
+	m_gdbMajor(4), m_gdbMinor(16),
 	m_logFile("./gdb-transcript"),
 	m_bpTable(*this),
 	m_menu(this, "menu"),
@@ -1130,8 +1131,29 @@ void KDebugger::parse(CmdQueueItem* cmd)
     case DCnoconfirm:
     case DCtty:
 	// there is no output
+	break;
     case DCinitialize:
-	// just ignore the preamble
+	// get version number from preamble
+	{
+	    int len;
+	    QRegExp GDBVersion = "\\nGDB [0-9]+\\.[0-9]+";
+	    int offset = GDBVersion.match(m_gdbOutput, 0, &len);
+	    if (offset >= 0) {
+		char* start = m_gdbOutput + offset + 5;	// skip "\nGDB "
+		char* end;
+		m_gdbMajor = strtol(start, &end, 10);
+		m_gdbMinor = strtol(end + 1, 0, 10);	// skip "."
+		if (start == end) {
+		    // nothing was parsed
+		    m_gdbMajor = 4;
+		    m_gdbMinor = 16;
+		}
+	    } else {
+		// assume some default version (what would make sense?)
+		m_gdbMajor = 4;
+		m_gdbMinor = 16;
+	    }
+	}
 	break;
     case DCexecutable:
 	// there is no output if the command is successful

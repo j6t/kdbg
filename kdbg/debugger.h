@@ -187,6 +187,7 @@ protected:
 
     // debugger process
     GdbProcess m_gdb;
+    int m_gdbMajor, m_gdbMinor;
     
     // log file
     QFile m_logFile;
