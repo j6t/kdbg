@@ -51,7 +51,7 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     m_programArgs.setMinimumSize(s);
     m_programArgs.setMaxLength(10000);
 
-    m_wdLabel.setText(i18n("Working directory"));
+    m_wdLabel.setText(i18n("Working directory:"));
     s = m_wdLabel.sizeHint();
     m_wdLabel.setMinimumSize(s);
     int btnSpace = s.height();
