@@ -9,11 +9,13 @@
 #include <klocale.h>			/* i18n */
 #endif
 
-PgmArgs::PgmArgs(QWidget* parent, const char* pgm, QDict<EnvVar>& envVars) :
+PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
 	QDialog(parent, "pgmargs", true),
 	m_envVars(envVars),
 	m_label(this, "label"),
 	m_programArgs(this, "args"),
+	m_wdLabel(this, "wd_label"),
+	m_wd(this, "wd"),
 	m_envLabel(this, "env_label"),
 	m_envVar(this, "env_var"),
 	m_envList(this, "env_list", 2),
@@ -31,8 +33,13 @@ PgmArgs::PgmArgs(QWidget* parent, const char* pgm, QDict<EnvVar>& envVars) :
     title += i18n(": Program arguments");
     setCaption(title);
 
+    QString fmt = i18n("Run %s with these arguments:");
+#if QT_VERSION < 200
+    QString lab(fmt.length() + pgm.length());
+#else
     QString lab;
-    lab.sprintf(i18n("Run %s with these arguments:"), pgm);
+#endif
+    lab.sprintf(fmt, pgm.data());
     m_label.setText(lab);
     QSize s = m_label.sizeHint();
     /* don't make the label too wide if pgm name is very long */
@@ -40,17 +47,27 @@ PgmArgs::PgmArgs(QWidget* parent, const char* pgm, QDict<EnvVar>& envVars) :
 	s.setWidth(450);
     m_label.setMinimumSize(s);
 
-    m_programArgs.setMinimumSize(330, 24);
+    s = m_programArgs.sizeHint();
+    m_programArgs.setMinimumSize(s);
     m_programArgs.setMaxLength(10000);
-    m_programArgs.setFrame(true);
+
+    m_wdLabel.setText(i18n("Working directory"));
+    s = m_wdLabel.sizeHint();
+    m_wdLabel.setMinimumSize(s);
+    int btnSpace = s.height();
+
+    s = m_wd.sizeHint();
+    m_wd.setMinimumSize(s);
+    m_wd.setMaxLength(10000);
+    btnSpace += s.height();
 
     m_envLabel.setText(i18n("Environment variables (NAME=value):"));
     s = m_envLabel.sizeHint();
     m_envLabel.setMinimumSize(s);
 
-    m_envVar.setMinimumSize(330, 24);
+    s = m_envVar.sizeHint();
+    m_envVar.setMinimumSize(s);
     m_envVar.setMaxLength(10000);
-    m_envVar.setFrame(true);
 
     m_envList.setMinimumSize(330, 40);
     m_envList.setColumn(0, i18n("Name"), 100);
@@ -87,11 +104,14 @@ PgmArgs::PgmArgs(QWidget* parent, const char* pgm, QDict<EnvVar>& envVars) :
     m_layout.addLayout(&m_buttons);
     m_edits.addWidget(&m_label);
     m_edits.addWidget(&m_programArgs);
+    m_edits.addWidget(&m_wdLabel);
+    m_edits.addWidget(&m_wd);
     m_edits.addWidget(&m_envLabel);
     m_edits.addWidget(&m_envVar);
     m_edits.addWidget(&m_envList, 10);
     m_buttons.addWidget(&m_buttonOK);
     m_buttons.addWidget(&m_buttonCancel);
+    m_buttons.addSpacing(btnSpace + 2*m_edits.defaultBorder());
     m_buttons.addWidget(&m_buttonModify);
     m_buttons.addWidget(&m_buttonDelete);
     m_buttons.addStretch(10);

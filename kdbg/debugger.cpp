@@ -442,9 +442,10 @@ void KDebugger::programArgs()
 {
     if (m_haveExecutable) {
 	PgmArgs dlg(parentWidget(), m_executable, m_envVars);
-	dlg.setText(m_programArgs);
+	dlg.setArgs(m_programArgs);
+	dlg.setWd(m_programWD);
 	if (dlg.exec()) {
-	    updateProgEnvironment(dlg.text(), dlg.envVars());
+	    updateProgEnvironment(dlg.args(), dlg.wd(), dlg.envVars());
 	}
     }
 }
@@ -764,6 +765,7 @@ const char GeneralGroup[] = "General";
 const char EnvironmentGroup[] = "Environment";
 const char FileVersion[] = "FileVersion";
 const char ProgramArgs[] = "ProgramArgs";
+const char WorkingDirectory[] = "WorkingDirectory";
 const char Variable[] = "Var%d";
 const char Value[] = "Value%d";
 
@@ -773,6 +775,7 @@ void KDebugger::saveProgramSettings()
     m_programConfig->setGroup(GeneralGroup);
     m_programConfig->writeEntry(FileVersion, 1);
     m_programConfig->writeEntry(ProgramArgs, m_programArgs);
+    m_programConfig->writeEntry(WorkingDirectory, m_programWD);
 
     // write environment variables
     m_programConfig->deleteGroup(EnvironmentGroup);
@@ -800,6 +803,7 @@ void KDebugger::restoreProgramSettings()
      * distinguish different versions of this configuration file.
      */
     QString pgmArgs = m_programConfig->readEntry(ProgramArgs);
+    QString pgmWd = m_programConfig->readEntry(WorkingDirectory);
 
     // read environment variables
     m_programConfig->setGroup(EnvironmentGroup);
@@ -826,7 +830,7 @@ void KDebugger::restoreProgramSettings()
 	pgmVars.insert(name, var);
     }
 
-    updateProgEnvironment(pgmArgs, pgmVars);
+    updateProgEnvironment(pgmArgs, pgmWd, pgmVars);
 
     m_bpTable.restoreBreakpoints(m_programConfig);
 }
@@ -1141,6 +1145,15 @@ void KDebugger::parse(CmdQueueItem* cmd)
     case DCsetenv:
 	/* if value is empty, we see output, but we don't care */
 	break;
+    case DCcd:
+	/* display gdb's message in the status bar */
+	m_statusMessage = QString(m_gdbOutput).stripWhiteSpace();
+	if (m_statusMessage.isEmpty()) {
+	    m_statusMessage =
+		i18n("New working directory: ") + m_programWD;
+	}
+	emit updateStatusMessage();
+	break;
     case DCinitialize:
 	// get version number from preamble
 	{
@@ -1410,11 +1423,18 @@ void KDebugger::updateBreakptTable()
     queueCmd(DCinfobreak, "info breakpoints", QMoverride);
 }
 
-void KDebugger::updateProgEnvironment(const char* args, const QDict<EnvVar>& newVars)
+void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
+				      const QDict<EnvVar>& newVars)
 {
     m_programArgs = args;
     executeCmd(DCsetargs, "set args " + m_programArgs);
     TRACE("new pgm args: " + m_programArgs + "\n");
+
+    m_programWD = wd.stripWhiteSpace();
+    if (!m_programWD.isEmpty()) {
+	executeCmd(DCcd, "cd " + m_programWD);
+	TRACE("new wd: " + m_programWD + "\n");
+    }
 
     QDictIterator<EnvVar> it = newVars;
     EnvVar* val;

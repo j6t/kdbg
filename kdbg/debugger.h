@@ -227,6 +227,7 @@ public:
 	DCinfolocals,
 	DCsetargs,
 	DCsetenv,
+	DCcd,
 	DCbt,
 	DCrun,
 	DCcont,
@@ -333,7 +334,8 @@ protected:
     void handleRunCommands();
     void updateAllExprs();
     void updateBreakptTable();
-    void updateProgEnvironment(const char* args, const QDict<EnvVar>& newVars);
+    void updateProgEnvironment(const QString& args, const QString& wd,
+			       const QDict<EnvVar>& newVars);
     void parseLocals(QList<VarTree>& newVars);
     void handleLocals();
     bool handlePrint(CmdQueueItem* cmd);
@@ -360,6 +362,7 @@ protected:
     QString m_corefile;
     QString m_attachedPid;		/* user input of attaching to pid */
     QString m_programArgs;
+    QString m_programWD;		/* working directory of gdb */
     QDict<EnvVar> m_envVars;		/* environment variables set by user */
     QStrList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
