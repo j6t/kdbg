@@ -38,6 +38,7 @@ kdbg_SOURCES = \
 	exprwnd.cpp \
 	updateui.cpp \
 	winstack.cpp \
+	typetable.cpp \
 	main.cpp
 
 # the library search path
@@ -59,6 +60,7 @@ noinst_HEADERS = \
 	ktreeview.h \
 	updateui.h \
 	winstack.h \
+	typetable.h \
 	commandids.h \
 	mydebug.h
 
@@ -126,8 +128,9 @@ uninstall-local:
 
 
 # compile a testfile
-testfile: testfile.cpp
-	$(CXX) -g -o $@ testfile.cpp
+noinst_PROGRAMS = testfile
+testfile_SOURCES = testfile.cpp
+testfile_LDADD = -lqt -lXext -lX11 $(LIBSOCKET)
 
 # add a dependency for every moc file to be full portable
 # I've added a key binding to emacs for this. 
