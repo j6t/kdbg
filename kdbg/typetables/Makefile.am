@@ -9,6 +9,7 @@ types_DATA = \
 	kdecore3.kdbgtt \
 	glib.kdbgtt \
 	gtk+.kdbgtt \
+	stdc++.kdbgtt \
 	X11.kdbgtt
 
 EXTRA_DIST = $(types_DATA)

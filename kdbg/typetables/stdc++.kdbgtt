@@ -1,0 +1,7 @@
+[Type Table]
+Types1=string
+LibDisplayName=libstdc++
+ShlibRE=libstdc\+\+-libc6\..*\.so\.[0-9]+$
+[string]
+Display={ % }
+Expr1=(%s).dat
