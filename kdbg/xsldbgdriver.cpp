@@ -1386,50 +1386,16 @@ XsldbgDriver::parseProgramStopped(const char *output, QString & message)
     do {
         start++;                /* skip '\n' */
 
-        if (strncmp(start, "Program ", 8) == 0 ||
-            strncmp(start, "ptrace: ", 8) == 0) {
-            /*
-             * When we receive a signal, the program remains active.
-             *
-             * Special: If we "stopped" in a corefile, the string "Program
-             * terminated with signal"... is displayed. (Normally, we see
-             * "Program received signal"... when a signal happens.)
-             */
-            if (strncmp(start, "Program exited", 14) == 0 ||
-                (strncmp(start, "Program terminated", 18) == 0
-                 && !m_haveCoreFile)
-                || strncmp(start, "ptrace: ", 8) == 0) {
-                flags &= ~SFprogramActive;
-            }
-            // set message
-            const char *endOfMessage = strchr(start, '\n');
+        if (strncmp(start, "Finished stylesheet\n\032\032\n", 21) == 0){ 
+            flags &= ~SFprogramActive;
+	    break;
+	}
 
-           if (endOfMessage == 0)
-                endOfMessage = start + strlen(start);
-            message = FROM_LATIN1(start, endOfMessage - start);
-        } else if (strncmp(start, "Breakpoint ", 11) == 0) {
-            /*
-             * We stopped at a (permanent) breakpoint (gdb doesn't tell us
-             * that it stopped at a temporary breakpoint).
-             */
-            flags |= SFrefreshBreak;
-        } else if (strstr(start, "re-reading symbols.") != 0) {
-            flags |= SFrefreshSource;
-        }
         // next line, please
         start = strchr(start, '\n');
     } while (start != 0);
 
-    /*
-     * Gdb only notices when new threads have appeared, but not when a
-     * thread finishes. So we always have to assume that the list of
-     * threads has changed.
-     */
-    flags |= SFrefreshThreads;
-
     return flags;
-
-
 }
 
 void
