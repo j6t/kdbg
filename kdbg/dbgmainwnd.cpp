@@ -12,6 +12,7 @@
 #include <kiconloader.h>
 #include <kstdaccel.h>
 #include <kfiledialog.h>
+#include <kprocess.h>
 #include <qlistbox.h>
 #include <qfileinfo.h>
 #include <kwm.h>
@@ -652,6 +653,21 @@ void DebuggerMainWnd::slotEnaDisBreak(const QString& fileName, int lineNo)
     if (m_debugger != 0) {
 	m_debugger->enableDisableBreakpoint(fileName, lineNo);
     }
+}
+
+bool DebuggerMainWnd::createOutputWindow()
+{
+    bool ok = DebuggerMainWndBase::createOutputWindow();
+    if (ok) {
+	connect(m_outputTermProc, SIGNAL(processExited(KProcess*)),
+		SLOT(slotTermEmuExited()));
+    }
+    return ok;
+}
+
+void DebuggerMainWnd::slotTermEmuExited()
+{
+    shutdownTermWindow();
 }
 
 #include "dbgmainwnd.moc"

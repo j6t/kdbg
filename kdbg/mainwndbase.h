@@ -18,6 +18,7 @@ class UpdateUI;
 class KStdAccel;
 class KToolBar;
 class KStatusBar;
+class KProcess;
 
 extern KStdAccel* keys;
 
@@ -98,10 +99,11 @@ protected:
 
     // output window
     QString m_outputTermCmdStr;
-    pid_t m_outputTermPID;
     QString m_outputTermName;
     QString m_outputTermKeepScript;
-    bool createOutputWindow();
+    KProcess* m_outputTermProc;
+    virtual bool createOutputWindow();
+    void shutdownTermWindow();
 
     QString m_lastDirectory;		/* the dir of the most recently opened file */
 

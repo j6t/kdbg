@@ -58,6 +58,7 @@ protected:
     virtual KToolBar* dbgToolBar();
     virtual KStatusBar* dbgStatusBar();
     virtual QWidget* dbgMainWnd();
+    virtual bool createOutputWindow();
 
     DockWidget* dockParent(QWidget* w);
     bool isDockVisible(QWidget* w);
@@ -83,6 +84,7 @@ public slots:
     void slotDebuggerStarting();
     void slotToggleBreak(const QString&, int);
     void slotEnaDisBreak(const QString&, int);
+    void slotTermEmuExited();
 };
 
 #endif // DBGMAINWND_H

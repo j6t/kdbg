@@ -37,9 +37,8 @@
 #include <fcntl.h>			/* open(2) */
 #endif
 #ifdef HAVE_UNISTD_H
-#include "unistd.h"			/* getpid, unlink, fork etc. */
+#include <unistd.h>			/* getpid, unlink etc. */
 #endif
-#include <signal.h>
 
 
 KStdAccel* keys = 0;
@@ -99,7 +98,6 @@ const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
 DebuggerMainWndBase::DebuggerMainWndBase() :
 	m_animationCounter(0),
 	m_outputTermCmdStr(defaultTermCmdStr),
-	m_outputTermPID(0),
 #ifdef GDB_TRANSCRIPT
 	m_transcriptFile(GDB_TRANSCRIPT),
 #endif
@@ -113,8 +111,10 @@ DebuggerMainWndBase::~DebuggerMainWndBase()
     delete m_debugger;
 
     // if the output window is open, close it
-    if (m_outputTermPID != 0) {
-	::kill(m_outputTermPID, SIGTERM);
+    if (m_outputTermProc != 0) {
+	m_outputTermProc->disconnect();	/* ignore signals */
+	m_outputTermProc->kill();
+	shutdownTermWindow();
     }
 }
 
@@ -483,15 +483,9 @@ bool DebuggerMainWndBase::createOutputWindow()
     }
 #endif
 
-    int pid = ::fork();
-    if (pid < 0) {
-	// error
-	TRACE("fork failed for fifo " + fifoName);
-	::unlink(fifoName);
-	return false;
-    }
-    if (pid == 0) {
-	// child process
+    m_outputTermProc = new KProcess;
+
+    {
 	/*
 	 * Spawn an xterm that in turn runs a shell script that passes us
 	 * back the terminal name and then only sits and waits.
@@ -531,10 +525,8 @@ bool DebuggerMainWndBase::createOutputWindow()
 	    { "%T", title },
 	    { "%C", shellScript }
 	};
-	const char** argv = new const char*[cmdParts.size()+1];
-	argv[cmdParts.size()] = 0;
 
-	for (int i = cmdParts.size()-1; i >= 0; i--) {
+	for (int i = 0; i < cmdParts.size(); i++) {
 	    QString& str = cmdParts[i];
 	    for (int j = sizeof(substitute)/sizeof(substitute[0])-1; j >= 0; j--) {
 		int pos = str.find(substitute[j].seq);
@@ -543,15 +535,13 @@ bool DebuggerMainWndBase::createOutputWindow()
 		    break;		/* substitute only one sequence */
 		}
 	    }
-	    argv[i] = str;
+	    *m_outputTermProc << str;
 	}
 
-	::execvp(argv[0], const_cast<char* const*>(argv));
+    }
 
-	// failed; what can we do?
-	::exit(0);
-    } else {
-	// parent process
+    if (m_outputTermProc->start())
+    {
 	// read the ttyname from the fifo
 	int f = ::open(fifoName, O_RDONLY);
 	if (f < 0) {
@@ -575,10 +565,25 @@ bool DebuggerMainWndBase::createOutputWindow()
 	ttyname[n] = '\0';
 	QString tty = ttyname;
 	m_outputTermName = tty.stripWhiteSpace();
-	m_outputTermPID = pid;
-	TRACE(QString().sprintf("tty=%s", m_outputTermName.data()));
+	TRACE("tty=" + m_outputTermName);
+
+	return true;
     }
-    return true;
+    else
+    {
+	// error, could not start xterm
+	TRACE("fork failed for fifo " + fifoName);
+	::unlink(fifoName);
+	shutdownTermWindow();
+	return false;
+    }
+}
+
+void DebuggerMainWndBase::shutdownTermWindow()
+{
+    delete m_outputTermProc;
+    m_outputTermProc = 0;
+    m_outputTermName = QString();	/* no emulation available */
 }
 
 void DebuggerMainWndBase::setTerminalCmd(const QString& cmd)
@@ -592,7 +597,7 @@ void DebuggerMainWndBase::setTerminalCmd(const QString& cmd)
 
 void DebuggerMainWndBase::slotDebuggerStarting()
 {
-    if (m_outputTermName.isEmpty()) {
+    if (m_outputTermProc == 0) {
 	// create an output window
 	if (!createOutputWindow()) {
 	    TRACE("createOuputWindow failed");
