@@ -404,10 +404,21 @@ bool WinStack::activate(QString fileName, int lineNo)
     return activateFI(fi, lineNo);
 }
 
-bool WinStack::activateFI(const QFileInfo& fi, int lineNo)
+bool WinStack::activateFI(QFileInfo& fi, int lineNo)
 {
     if (!fi.isFile()) {
-	return false;
+	/*
+	 * We didn't find that file. Now check if it is a relative path and
+	 * try m_lastOpenDir as prefix.
+	 */
+	TRACE(fi.filePath() + (" not found, looking in " + m_lastOpenDir));
+	if (!fi.isRelative() || m_lastOpenDir.isEmpty()) {
+	    return false;
+	}
+	fi.setFile(m_lastOpenDir + "/" + fi.filePath());
+	if (!fi.isFile()) {
+	    return false;
+	}
     }
     // if this is not an absolute path name, make it one
     return activatePath(fi.absFilePath(), lineNo);

@@ -118,7 +118,7 @@ public slots:
     virtual void slotFindBackward();
 
 protected:
-    bool activateFI(const QFileInfo& fi, int lineNo);
+    bool activateFI(QFileInfo& fi, int lineNo);
     bool activatePath(QString pathname, int lineNo);
     virtual bool activateWindow(FileWindow* fw, int lineNo = -1);	/* -1 doesnt change line */
     virtual void changeWindowMenu();
