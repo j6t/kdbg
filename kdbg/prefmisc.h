@@ -23,11 +23,16 @@ protected:
 
     QLabel m_backTimeoutLabel;
     QLineEdit m_backTimeout;
+
+    QLabel m_tabWidthLabel;
+    QLineEdit m_tabWidth;
 public:
     bool popIntoForeground() const { return m_popForeground.isChecked(); }
     void setPopIntoForeground(bool pop) { m_popForeground.setChecked(pop); }
     int backTimeout() const;
     void setBackTimeout(int to);
+    int tabWidth() const;
+    void setTabWidth(int tw);
 };
 
 #endif // PREFMISC_H

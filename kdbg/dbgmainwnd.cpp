@@ -95,6 +95,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     // program stopped
     connect(m_debugger, SIGNAL(programStopped()), SLOT(slotProgramStopped()));
     connect(&m_backTimer, SIGNAL(timeout()), SLOT(slotBackTimer()));
+    // tab width
+    connect(this, SIGNAL(setTabWidth(int)), m_filesWindow, SIGNAL(setTabWidth(int)));
 
     // Establish communication when right clicked on file window.
     connect(&m_filesWindow->m_menuFloat, SIGNAL(activated(int)),
@@ -325,6 +327,8 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
     readDockConfig(config);
 
     DebuggerMainWndBase::restoreSettings(config);
+
+    emit setTabWidth(m_tabWidth);
 }
 
 void DebuggerMainWnd::menuCallback(int item)
@@ -647,9 +651,15 @@ void DebuggerMainWnd::slotAnimationTimeout()
     DebuggerMainWndBase::slotAnimationTimeout();
 }
 
-void DebuggerMainWnd::slotGlobalOptions()
+void DebuggerMainWnd::doGlobalOptions()
 {
-    DebuggerMainWndBase::slotGlobalOptions();
+    int oldTabWidth = m_tabWidth;
+
+    DebuggerMainWndBase::doGlobalOptions();
+
+    if (m_tabWidth != oldTabWidth) {
+	emit setTabWidth(m_tabWidth);
+    }
 }
 
 void DebuggerMainWnd::slotDebuggerStarting()

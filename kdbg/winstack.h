@@ -94,6 +94,7 @@ signals:
     void newFileLoaded();
     void initiateValuePopup(const QString&);
     void disassemble(const QString&, int);
+    void setTabWidth(int numChars);
 
 public slots:
     virtual void menuCallback(int item);
@@ -104,6 +105,7 @@ public slots:
     void updatePC(const QString& filename, int lineNo, const DbgAddr& address, int frameNo);
     void reloadAllFiles();
     void updateLineItems(const KDebugger* deb);
+    void slotSetTabWidth(int numChars);
 
     // Right click on file panner when no file is loaded.
     virtual void slotWidgetRightClick(const QPoint &);
@@ -141,6 +143,8 @@ protected:
 
     ValueTip m_valueTip;
     QRect m_tipLocation;		/* where tip should appear */
+
+    int m_tabWidth;			/* number of chars */
 
 public:
     // find dialog

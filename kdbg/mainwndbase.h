@@ -80,6 +80,8 @@ public:
     static QString myGetFileName(QString caption,
 				 QString dir, QString filter,
 				 QWidget* parent);
+    /** invokes the global options dialog */
+    virtual void doGlobalOptions();
 
 protected:
     // settings
@@ -118,6 +120,7 @@ protected:
 
     bool m_popForeground;		/* whether main wnd raises when prog stops */
     int m_backTimeout;			/* when wnd goes back */
+    int m_tabWidth;			/* tab width in characters (can be 0) */
 
     // the debugger proper
     QString m_debuggerCmdStr;
@@ -137,7 +140,6 @@ public:
     void updateLineItems();
     void slotNewStatusMsg();
     void slotAnimationTimeout();
-    void slotGlobalOptions();
     void slotDebuggerStarting();
 };
 

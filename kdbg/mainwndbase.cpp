@@ -107,6 +107,7 @@ DebuggerMainWndBase::DebuggerMainWndBase() :
 #endif
 	m_popForeground(false),
 	m_backTimeout(1000),
+	m_tabWidth(0),
 	m_debugger(0)
 {
     m_statusActive = i18n("active");
@@ -180,6 +181,7 @@ const char DebuggerCmdStr[] = "DebuggerCmdStr";
 const char PreferencesGroup[] = "Preferences";
 const char PopForeground[] = "PopForeground";
 const char BackTimeout[] = "BackTimeout";
+const char TabWidth[] = "TabWidth";
 
 void DebuggerMainWndBase::saveSettings(KConfig* config)
 {
@@ -196,6 +198,7 @@ void DebuggerMainWndBase::saveSettings(KConfig* config)
     config->setGroup(PreferencesGroup);
     config->writeEntry(PopForeground, m_popForeground);
     config->writeEntry(BackTimeout, m_backTimeout);
+    config->writeEntry(TabWidth, m_tabWidth);
 }
 
 void DebuggerMainWndBase::restoreSettings(KConfig* config)
@@ -219,6 +222,7 @@ void DebuggerMainWndBase::restoreSettings(KConfig* config)
     config->setGroup(PreferencesGroup);
     m_popForeground = config->readBoolEntry(PopForeground, false);
     m_backTimeout = config->readNumEntry(BackTimeout, 1000);
+    m_tabWidth = config->readNumEntry(TabWidth, 0);
 }
 
 bool DebuggerMainWndBase::debugProgram(const QString& executable)
@@ -248,7 +252,7 @@ bool DebuggerMainWndBase::handleCommand(int item)
     /* first commands that don't require the debugger */
     switch (item) {
     case ID_FILE_GLOBAL_OPTIONS:
-	slotGlobalOptions();
+	doGlobalOptions();
 	return true;
     }
 
@@ -455,7 +459,7 @@ void DebuggerMainWndBase::slotNewStatusMsg()
     dbgStatusBar()->changeItem(msg, ID_STATUS_MSG);
 }
 
-void DebuggerMainWndBase::slotGlobalOptions()
+void DebuggerMainWndBase::doGlobalOptions()
 {
     QTabDialog dlg(dbgMainWnd(), "global_options", true);
     QString title = kapp->getCaption();
@@ -472,6 +476,7 @@ void DebuggerMainWndBase::slotGlobalOptions()
     PrefMisc prefMisc(&dlg);
     prefMisc.setPopIntoForeground(m_popForeground);
     prefMisc.setBackTimeout(m_backTimeout);
+    prefMisc.setTabWidth(m_tabWidth);
 
     dlg.addTab(&prefDebugger, i18n("&Debugger"));
     dlg.addTab(&prefMisc, i18n("&Miscellaneous"));
@@ -481,6 +486,7 @@ void DebuggerMainWndBase::slotGlobalOptions()
 	setTerminalCmd(prefDebugger.terminal());
 	m_popForeground = prefMisc.popIntoForeground();
 	m_backTimeout = prefMisc.backTimeout();
+	m_tabWidth = prefMisc.tabWidth();
     }
 }
 

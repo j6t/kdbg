@@ -65,6 +65,7 @@ protected:
     virtual QWidget* dbgMainWnd();
     virtual TTYWindow* ttyWindow();
     virtual QString createOutputWindow();
+    virtual void doGlobalOptions();
 
     DockWidget* dockParent(QWidget* w);
     bool isDockVisible(QWidget* w);
@@ -75,6 +76,7 @@ protected:
 
 signals:
     void forwardMenuCallback(int item);
+    void setTabWidth(int tabWidth);
 
 public slots:
     virtual void menuCallback(int item);
@@ -87,7 +89,6 @@ public slots:
     void slotNewFileLoaded();
     void slotNewStatusMsg();
     void slotAnimationTimeout();
-    void slotGlobalOptions();
     void slotDebuggerStarting();
     void slotToggleBreak(const QString&, int, const DbgAddr&, bool);
     void slotEnaDisBreak(const QString&, int, const DbgAddr&);

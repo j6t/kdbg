@@ -26,9 +26,13 @@ protected:
     virtual void activateLine(int row);
     virtual int textCol() const;
     virtual bool updateCellSize(const QString& text);
+    virtual void setupPainter(QPainter* p);
 
 signals:
     void lineChanged();
+
+public slots:
+    void setTabWidth(int numChars);
 
     // event handling
 protected:
@@ -40,8 +44,9 @@ protected:
     void paletteChange(const QPalette& oldPal);
 
     int m_width;
-    int m_height;
-    
+    int m_height;			/* line height */
+    int m_tabWidth;			/* in pixels */
+
     ValArray<QString> m_texts;
     int m_curRow;			/* cursor position */
 };

@@ -29,7 +29,8 @@ WinStack::WinStack(QWidget* parent, const char* name) :
 	m_itemMore(0),
 	m_pcLine(-1),
 	m_valueTip(this),
-	m_tipLocation(1,1,10,10)
+	m_tipLocation(1,1,10,10),
+	m_tabWidth(0)
 {
     // Call menu implementation helper
     initMenu();
@@ -38,6 +39,8 @@ WinStack::WinStack(QWidget* parent, const char* name) :
 	    SIGNAL(clicked()), SLOT(slotFindForward()));
     connect(&m_findDlg.m_buttonBackward,
 	    SIGNAL(clicked()), SLOT(slotFindBackward()));
+
+    connect(this, SIGNAL(setTabWidth(int)), this, SLOT(slotSetTabWidth(int)));
 
     // Check for right click event.
     connect(this, SIGNAL(clickedRight(const QPoint &)),
@@ -203,6 +206,10 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 		SIGNAL(disassemble(const QString&, int)));
 	connect(fw, SIGNAL(expanded(int)), SLOT(slotExpandCollapse(int)));
 	connect(fw, SIGNAL(collapsed(int)), SLOT(slotExpandCollapse(int)));
+
+	// tab width
+	connect(this, SIGNAL(setTabWidth(int)), fw, SLOT(setTabWidth(int)));
+	fw->setTabWidth(m_tabWidth);
 
 	changeWindowMenu();
 	
@@ -442,6 +449,12 @@ void WinStack::slotExpandCollapse(int)
     if (m_pcLine >= 0) {
 	setPC(true, m_pcFile, m_pcLine, DbgAddr(m_pcAddress), m_pcFrame);
     }
+}
+
+
+void WinStack::slotSetTabWidth(int numChars)
+{
+    m_tabWidth = numChars;
 }
 
 

@@ -12,11 +12,14 @@
 #endif
 #include "mydebug.h"
 
+#define DEFAULT_WIDTH 100
+#define DEFAULT_LINEHEIGHT 1
 
 KTextView::KTextView(QWidget* parent, const char* name, WFlags f) :
 	QTableView(parent, name, f),
-	m_width(300),
-	m_height(14),
+	m_width(DEFAULT_WIDTH),
+	m_height(DEFAULT_LINEHEIGHT),
+	m_tabWidth(0),
 	m_curRow(-1)
 {
     setNumCols(1);
@@ -248,4 +251,37 @@ void KTextView::paletteChange(const QPalette& oldPal)
 {
     setBackgroundColor(colorGroup().base());
     QTableView::paletteChange(oldPal);
+
+    // recompute window size
+    m_width = DEFAULT_WIDTH;
+    m_height = DEFAULT_LINEHEIGHT;
+    for (int i = 0; i < m_texts.size(); i++) {
+	updateCellSize(m_texts[i]);
+    }
+    updateTableSize();
+}
+
+void KTextView::setTabWidth(int numChars)
+{
+    QFontMetrics fm = font();
+    int newTabWidth = fm.width('x') * numChars;
+    if (newTabWidth == m_tabWidth)
+	return;
+    m_tabWidth = newTabWidth;
+
+    // recompute window width
+    m_width = DEFAULT_WIDTH;
+    for (int i = 0; i < m_texts.size(); i++) {
+	updateCellSize(m_texts[i]);
+    }
+
+    updateTableSize();
+    if (autoUpdate()) {
+	repaint();
+    }
+}
+
+void KTextView::setupPainter(QPainter* p)
+{
+    p->setTabStops(m_tabWidth);
 }
