@@ -19,7 +19,7 @@ class Dl : public Cl
 public:
 	Dl(int r);
 	virtual int f(int x);
-	int operator()(int r) const;
+	int operator()(const QString& x, int& y) const;
 };
 
 void g()
@@ -64,10 +64,13 @@ int main(int argc, char* argv[])
 
 	s = "Hi, there!";
 
+	const QString& strref = s;
+
 	Cl c1(13);
 	Dl d1(3214);
 	d1.f(17);
-	d1(83);
+	int n = 83;
+	d1(strref, n);
 }
 
 Cl::Cl(int r) :
@@ -98,7 +101,7 @@ int Dl::f(int x)
 	return y+3;
 }
 
-int Dl::operator()(int x) const
+int Dl::operator()(const QString& x, int& y) const
 {
 	cout << "ha! I know!" << endl;
 }
