@@ -65,6 +65,26 @@ else
 fi
 AC_MSG_RESULT($GDB_TRANSCRIPT)
 
+dnl Check whether placement new works
+AC_LANG_CPLUSPLUS
+AC_MSG_CHECKING(whether placement new is available)
+AC_CACHE_VAL(ac_cv_have_placement_new,
+[
+AC_TRY_COMPILE([
+#include <new>
+],
+[
+int ii;
+new(&ii) int;
+],
+ac_cv_have_placement_new=yes,
+ac_cv_have_placement_new=no)
+])
+AC_MSG_RESULT($ac_cv_have_placement_new)
+if eval "test \"`echo `$ac_cv_have_placement_new\" = yes"; then
+  AC_DEFINE(HAVE_PLACEMENT_NEW)
+fi
+
 dnl add here all your Makefiles. These are created by configure
 AC_OUTPUT(Makefile \
 	kdbg/Makefile \
