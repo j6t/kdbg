@@ -71,8 +71,13 @@ public:
     
     virtual void resizeEvent(QResizeEvent*);
 
+signals:
+    void fileChanged();
+    void lineChanged();
+
 public slots:
     virtual void menuCallback(int item);
+    virtual void slotLineChanged();
 
 protected:
     bool activatePath(QString pathname, int lineNo);

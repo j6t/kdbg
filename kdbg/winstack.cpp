@@ -312,6 +312,7 @@ bool WinStack::activatePath(QString pathName, int lineNo)
 	// not found, load it
 	fw = new FileWindow(pathName, this, "fileWindow");
 	m_fileList.insert(0, fw);
+	connect(fw, SIGNAL(lineChanged()),SLOT(slotLineChanged()));
 
 	changeWindowMenu();
 	
@@ -363,6 +364,9 @@ bool WinStack::activateWindow(FileWindow* fw, int lineNo)
 	oldActive->setFocusPolicy(QWidget::NoFocus);
     }
     fw->setFocus();
+
+    emit fileChanged();
+
     return true;
 }
 
@@ -466,4 +470,9 @@ void WinStack::resizeEvent(QResizeEvent*)
     if (m_activeWindow != 0) {
 	m_activeWindow->resize(width(), height());
     }
+}
+
+void WinStack::slotLineChanged()
+{
+    emit lineChanged();
 }
