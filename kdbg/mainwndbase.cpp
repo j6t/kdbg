@@ -6,7 +6,6 @@
 #include <kapp.h>
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
-#include <kinstance.h>
 #include <kconfig.h>
 #include <kmessagebox.h>
 #else
@@ -372,8 +371,7 @@ void DebuggerMainWndBase::initAnimation()
     QPixmap pixmap;
     pixmap.load(path + "/kde1.xpm");
 #else
-    KInstance instance("kdbg");
-    QPixmap pixmap = BarIcon("kde1", &instance);
+    QPixmap pixmap = BarIcon("kde1");
 #endif
 
     KToolBar* toolbar = dbgToolBar();
@@ -390,7 +388,7 @@ void DebuggerMainWndBase::initAnimation()
 	p->load(path + n);
 #else
 	n.sprintf("kde%d", i);
-	QPixmap* p = new QPixmap(BarIcon(n,&instance));
+	QPixmap* p = new QPixmap(BarIcon(n));
 #endif
 	if (!p->isNull()) {
 	    m_animation.append(p);
