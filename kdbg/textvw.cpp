@@ -181,6 +181,22 @@ void KTextView::mousePressEvent(QMouseEvent* ev)
     activateLine(row);
 }
 
+void KTextView::focusInEvent(QFocusEvent*)
+{
+    /*
+     * The base class does a repaint(), which causes flicker. So we do
+     * nothing here.
+     */
+}
+
+void KTextView::focusOutEvent(QFocusEvent*)
+{
+    /*
+     * The base class does a repaint(), which causes flicker. So we do
+     * nothing here.
+     */
+}
+
 void KTextView::activateLine(int row)
 {
     if (row == m_curRow)

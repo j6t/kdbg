@@ -28,6 +28,8 @@ protected:
 protected:
     virtual void keyPressEvent(QKeyEvent* ev);
     virtual void mousePressEvent(QMouseEvent* ev);
+    virtual void focusInEvent(QFocusEvent* ev);
+    virtual void focusOutEvent(QFocusEvent* ev);
 
     void paletteChange(const QPalette& oldPal);
 
