@@ -18,7 +18,11 @@
 #endif
 #ifdef WANT_TRACE_OUTPUT
 # ifndef KDEBUG
-#  define TRACE(x) kDebugInfo("%s", (const char*)(x));
+#  ifdef kDebugArea // "modern" KDE2
+#   define TRACE(x) kDebugInfo("%s", (const char*)(x))
+#  else // KRASH release
+#   define TRACE(x) kdebug(KDEBUG_INFO,0,"%s", (const char*)(x))
+#  endif
 # else  
 #  define TRACE(x) KDEBUG(KDEBUG_INFO,0,(x))
 # endif
