@@ -48,7 +48,7 @@ is translated into (more or less) visible information, such as structured
 variable contents.</p>
 <p>The upshot of all this is that KDbg completely relies on the capabilities
 of the underlying command line debugger, <tt>gdb</tt>. KDbg can do no more
-than <tt>gdb</tt> can. For example, if you have a<tt>gdb</tt> that does
+than <tt>gdb</tt> can. For example, if you have a <tt>gdb</tt> that does
 not supports debugging of threaded programs, KDbg cannot, either (even
 though it offers a threads window).</p>
 <h2>
@@ -114,9 +114,10 @@ of breakpoints in the <a href="breakptlist.html">breakpoints window</a>.
 You can also set a breakpoint by clicking at the left end of the source
 line (using the left mouse button), and you can enable and disable a breakpoint
 by clicking it using the middle mouse button.</p>
-<p><font size="-1">The gearwheel in the toolbar indicates whether gdb is working, in which
-case it rotates. It rotates fast while KDbg wouldn't accept execution commands,
-and it rotates slowly while KDbg retrieves the values of variable.</font></p>
+<p>The animation in the toolbar indicates whether the program
+is running. It stops when the program stopped in a breakpoint or for
+some other reason or when the program exited. This animated button is a shortcut
+for <i>Execution|Break</i>.</p>
 <h2>
 <a name="InfoWindows"></a>KDbg's information windows</h2>
 <p>KDbg displays information and accepts commands in number of different windows.
