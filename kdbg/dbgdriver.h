@@ -9,6 +9,7 @@
 #include <qqueue.h>
 #include <qlist.h>
 #include <qfile.h>
+#include <qregexp.h>
 #include <kprocess.h>
 
 
@@ -280,8 +281,8 @@ public:
 
 protected:
     char* m_output;			/* normal gdb output */
-    int m_outputLen;			/* current accumulated output */
-    int m_outputAlloc;			/* space available in m_gdbOutput */
+    size_t m_outputLen;			/* amount of data so far accumulated in m_output */
+    size_t m_outputAlloc;		/* space available in m_output */
 #if QT_VERSION < 200
     typedef QString DelayedStr;
 #else
@@ -526,8 +527,9 @@ protected:
     virtual int commSetupDoneC();
 
     char m_prompt[10];
-    int m_promptLen;
+    size_t m_promptMinLen;
     char m_promptLastChar;
+    QRegExp m_promptRE;
 
     // log file
     QString m_logFileName;

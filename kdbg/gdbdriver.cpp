@@ -129,7 +129,7 @@ GdbDriver::GdbDriver() :
 	m_gdbMajor(4), m_gdbMinor(16)
 {
     strcpy(m_prompt, PROMPT);
-    m_promptLen = PROMPT_LEN;
+    m_promptMinLen = PROMPT_LEN;
     m_promptLastChar = PROMPT_LAST_CHAR;
 
 #ifndef NDEBUG
