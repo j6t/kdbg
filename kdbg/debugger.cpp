@@ -1815,6 +1815,14 @@ VarTree* KDebugger::parseQCharArray(const char* name, bool wantErrorValue)
 	// continue and let parseOffErrorExpr catch the error
     }
 
+    // special case: empty string (0 repetitions)
+    if (strncmp(p, "Invalid number 0 of repetitions", 31) == 0)
+    {
+	variable = new VarTree(name, VarTree::NKplain);
+	variable->m_value = "\"\"";
+	return variable;
+    }
+
     // check for error conditions
     if (parseOffErrorExpr(p, name, variable, wantErrorValue))
 	return variable;
@@ -1836,84 +1844,94 @@ VarTree* KDebugger::parseQCharArray(const char* name, bool wantErrorValue)
 	// this is the real data
 	p++;				/* skip '{' */
 
-	// parse the array twice: once to get the length, again to create the string
-	char* start = p;
-	int realLen = 0;
+	// parse the array
 	QString result;
-	for (int fill = 0; fill <= 1; fill++) {
-	    p = start;
-	    if (fill) {
+	QString repeatCount;
+	enum { wasNothing, wasChar, wasRepeat } lastThing = wasNothing;
+	/*
+	 * A matrix for separators between the individual "things"
+	 * that are added to the string. The first index is a bool,
+	 * the second index is from the enum above.
+	 */
+	static const char* separator[2][3] = {
+	    { "\"", 0,       ", \"" },	/* normal char is added */
+	    { "'",  "\", '", ", '" }	/* repeated char is added */
+	};
+
+	while (isdigit(*p)) {
+	    // parse a number
+	    char* end;
+	    unsigned short value = (unsigned short) strtoul(p, &end, 0);
+	    if (end == p)
+		goto error;		/* huh? no valid digits */
+	    // skip separator and search for a repeat count
+	    p = end;
+	    while (isspace(*p) || *p == ',')
+		p++;
+	    bool repeats = strncmp(p, "<repeats ", 9) == 0;
+	    if (repeats) {
+		char* start = p;
+		p = strchr(p+9, '>');	/* search end and advance */
+		if (p == 0)
+		    goto error;
+		p++;			/* skip '>' */
 #if QT_VERSION < 200
-		result.resize(realLen+2+1);	/* provide space for quotes */
-		result[realLen+2] = '\0';
+		repeatCount = QString(start, p-start+1);
+#else
+		repeatCount = QString::fromLatin1(start, p-start);
 #endif
-		result[realLen+1] = '\"';
-		result[0] = '\"';
-		realLen = 1;		/* skip quote */
-	    }
-	    while (isdigit(*p)) {
-		// parse a number
-		char* end;
-		unsigned short value = (unsigned short) strtoul(p, &end, 0);
-		if (end == p)
-		    goto error;		/* huh? no valid digits */
-		// skip separator and search for a repeat count
-		p = end;
 		while (isspace(*p) || *p == ',')
 		    p++;
-		int repeats = 1;
-		if (strncmp(p, "<repeats ", 9) == 0) {
-		    p += 9;
-		    repeats = strtol(p, &end, 0);
-		    if (end == p)
-			goto error;	/* no valid digits */
-		    p = end+7;		/* skip " times>" */
-		    while (isspace(*p) || *p == ',')
-			p++;
-		}
-		
-		// interpret the value as a QChar
-		// TODO: make cross-architecture compatible
-		QChar ch;
-		(unsigned short&)ch = value;
-
-		// escape a few frequently used characters
-		char escapeCode = '\0';
-		switch (char(ch)) {
-		case '\n': escapeCode = 'n'; break;
-		case '\r': escapeCode = 'r'; break;
-		case '\t': escapeCode = 't'; break;
-		case '\b': escapeCode = 'b'; break;
-		case '\"': escapeCode = '\"'; break;
-		case '\\': escapeCode = '\\'; break;
-#if QT_VERSION < 200
-		    // since we only deal with ascii values must always escape '\0'
-		case '\0': escapeCode = '0'; break;
-#else
-		case '\0': if (value == 0) { escapeCode = '0'; } break;
-#endif
-		}
-		if (fill) {
-		    while (repeats > 0) {
-			if (escapeCode != '\0') {
-			    result[realLen] = '\\';
-			    ++realLen;
-			    ch = escapeCode;
-			}
-			result[realLen] = ch;
-			++realLen;
-			--repeats;
-		    }
-		} else {
-		    realLen += repeats;
-		    if (escapeCode != '\0')
-			realLen += repeats;
-		}
 	    }
-	    if (*p != '}')
-		goto error;
-	} // while 2 passes
-	TRACE(QString().sprintf("QCharArray: realLen=%d",realLen));
+	    // p is now at the next char (or the end)
+
+	    // interpret the value as a QChar
+	    // TODO: make cross-architecture compatible
+	    QChar ch;
+	    (unsigned short&)ch = value;
+
+	    // escape a few frequently used characters
+	    char escapeCode = '\0';
+	    switch (char(ch)) {
+	    case '\n': escapeCode = 'n'; break;
+	    case '\r': escapeCode = 'r'; break;
+	    case '\t': escapeCode = 't'; break;
+	    case '\b': escapeCode = 'b'; break;
+	    case '\"': escapeCode = '\"'; break;
+	    case '\\': escapeCode = '\\'; break;
+#if QT_VERSION < 200
+		// since we only deal with ascii values must always escape '\0'
+	    case '\0': escapeCode = '0'; break;
+#else
+	    case '\0': if (value == 0) { escapeCode = '0'; } break;
+#endif
+	    }
+
+	    // add separator
+	    result += separator[repeats][lastThing];
+	    // add char
+	    if (escapeCode != '\0') {
+		result += '\\';
+		ch = escapeCode;
+	    }
+	    result += ch;
+
+	    // fixup repeat count and lastThing
+	    if (repeats) {
+		result += "' ";
+		result += repeatCount;
+		lastThing = wasRepeat;
+	    } else {
+		lastThing = wasChar;
+	    }
+	}
+	if (*p != '}')
+	    goto error;
+
+	// closing quote
+	if (lastThing == wasChar)
+	    result += "\"";
+
 	// assign the value
 	variable = new VarTree(name, VarTree::NKplain);
 	variable->m_value = result;
