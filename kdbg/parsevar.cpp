@@ -99,41 +99,39 @@ moreStrings:
     }
     // closing quote
     p++;
+    /*
+     * Strings can consist of several parts, some of which contain repeated
+     * characters.
+     */
+    if (quote == '\'') {
+	// look ahaead for <repeats 123 times>
+	const char* q = p+1;
+	while (isspace(*q))
+	    q++;
+	if (strncmp(q, "<repeats ", 9) == 0) {
+	    p = q+9;
+	    while (*p != '\0' && *p != '>')
+		p++;
+	    if (*p != '\0') {
+		p++;			/* skip the '>' */
+	    }
+	}
+    }
+    // is the string continued?
+    if (*p == ',') {
+	// look ahead for another quote
+	const char* q = p+1;
+	while (isspace(*q))
+	    q++;
+	if (*q == '"' || *q == '\'') {
+	    // yes!
+	    p = q;
+	    goto moreStrings;
+	}
+    }
     /* very long strings are followed by `...' */
     if (*p == '.' && p[1] == '.' && p[2] == '.') {
 	p += 3;
-    }
-    else {
-	/*
-	 * Strings can consist of several parts, some of which contain
-	 * repeated characters.
-	 */
-	if (quote == '\'') {
-	    // look ahaead for <repeats 123 times>
-	    const char* q = p+1;
-	    while (isspace(*q))
-		q++;
-	    if (strncmp(q, "<repeats ", 9) == 0) {
-		p = q+9;
-		while (*p != '\0' && *p != '>')
-		    p++;
-		if (*p != '\0') {
-		    p++;		/* skip the '>' */
-		}
-	    }
-	}
-	// is the string continued?
-	if (*p == ',') {
-	    // look ahead for another quote
-	    const char* q = p+1;
-	    while (isspace(*q))
-		q++;
-	    if (*q == '"' || *q == '\'') {
-		// yes!
-		p = q;
-		goto moreStrings;
-	    }
-	}
     }
 }
 
