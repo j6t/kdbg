@@ -52,6 +52,9 @@ void f(E e[3], char c)
 		x;
 	}
 	g();
+	char buffer[300];
+	memset(buffer, 1, 300);
+	for (int i = 0; i < sizeof(buffer); i +=15) buffer[i] = '\02';
 	QDir dir;
 	QFile file;
 	QFileInfo fi;
