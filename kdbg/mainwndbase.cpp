@@ -331,7 +331,11 @@ void DebuggerMainWndBase::initAnimation()
     if (m_animation.count() == 0) {
 	QPixmap* pix = new QPixmap(2,2);
 	QPainter p(pix);
+#if QT_VERSION < 200
 	p.fillRect(0,0,2,2,QBrush(white));
+#else
+	p.fillRect(0,0,2,2,QBrush(Qt::white));
+#endif
 	m_animation.append(pix);
     }
 }
