@@ -1,24 +1,21 @@
 /* XPM */
-static char * mini_kgdb_xpm[] = {
-/* width height num_colors chars_per_pixel */
+static char*mini[]={
 "14 14 4 1",
-/* colors */
-" 	s None	c None",
-".	c red",
-"X	c dark green",
-"o	c black",
-/* pixels */
-"             .",
-" .          ..",
-"  . XX  XX  . ",
-"  . XX  XX ..o",
-"ooo. XXXX  .o ",
-"   o.oooo .   ",
-"    o.ooo.    ",
-"    oo.o..o   ",
-"ooooooo.oooooo",
-"    oo..ooo   ",
-"     o...o    ",
-"  ooo.oo.oo   ",
-" oo . ooo. o  ",
-"o  .   oo.. oo"};
+"a c #008000",
+"b c #000000",
+". c None",
+"# c #ff0000",
+".............#",
+".#..........##",
+"..#.aa..aa..#.",
+"..#.aa..aa.##b",
+"bbb#.aaaa..#b.",
+"...b#bbbb.#...",
+"....b#bbb#....",
+"....bb#b##b...",
+"bbbbbbb#bbbbbb",
+"....bb##bbb...",
+".....b###b....",
+"..bbb#bb#bb...",
+".bb.#.bbb#.b..",
+"b..#...bb##.bb"};
