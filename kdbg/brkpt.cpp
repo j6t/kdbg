@@ -8,6 +8,7 @@
 #include <ksimpleconfig.h>
 #include <qkeycode.h>
 #include <qpainter.h>
+#include <qlabel.h>
 #include "debugger.h"			/* #includes brkpt.h */
 #include "brkpt.moc"
 #include <ctype.h>

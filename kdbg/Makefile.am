@@ -43,6 +43,7 @@ kdbg_SOURCES = \
 	updateui.cpp \
 	winstack.cpp \
 	typetable.cpp \
+	dbgmainwnd.cpp \
 	main.cpp
 
 # the library search path
@@ -66,6 +67,7 @@ noinst_HEADERS = \
 	updateui.h \
 	winstack.h \
 	typetable.h \
+	dbgmainwnd.h \
 	commandids.h \
 	mydebug.h
 
@@ -77,6 +79,7 @@ BUILTSOURCES =	\
 	exprwnd.moc \
 	ktreeview.moc \
 	winstack.moc \
+	dbgmainwnd.moc \
 	updateui.moc
 
 # toolbar icons and other pixmaps
@@ -184,3 +187,7 @@ brkpt.moc: brkpt.h
 pgmargs.cpp: pgmargs.moc
 pgmargs.moc: pgmargs.h
 	$(MOC) pgmargs.h -o pgmargs.moc
+
+dbgmainwnd.cpp: dbgmainwnd.moc
+dbgmainwnd.moc: dbgmainwnd.h
+	$(MOC) dbgmainwnd.h -o dbgmainwnd.moc

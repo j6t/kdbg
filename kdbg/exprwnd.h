@@ -69,6 +69,8 @@ public:
     VarTree* topLevelExprByName(const char* name);
     /** removes an expression; must be on the topmost level*/
     void removeExpr(VarTree* item);
+    /** retrieves the expression string at the specified line */
+    QString exprStringAt(int index);
     /** clears the list of pointers needing updates */
     void clearPendingUpdates();
     /** returns a pointer to update (or 0) and removes it from the list */

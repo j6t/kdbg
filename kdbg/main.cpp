@@ -7,7 +7,7 @@
 #include <kapp.h>
 #include <kmsgbox.h>
 #include <kstdaccel.h>
-#include "debugger.h"
+#include "dbgmainwnd.h"
 #include "typetable.h"
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 
     keys = new KStdAccel(app.getConfig());
 
-    KDebugger debugger("debugger");
+    DebuggerMainWnd debugger("kdbg_main");
 
     /* yucky! there's only one TypeTable */
     TypeTable typeTable;

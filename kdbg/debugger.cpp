@@ -5,19 +5,17 @@
 
 #include "debugger.h"
 #include "debugger.moc"
-#include "commandids.h"
-#include "updateui.h"
 #include "parsevar.h"
 #include "pgmargs.h"
 #include "procattach.h"
 #include "typetable.h"
+#include "exprwnd.h"
 #include <qregexp.h>
 #include <qfileinf.h>
+#include <qlistbox.h>
 #include <kapp.h>
 #include <kfiledialog.h>
-#include <kiconloader.h>
 #include <kmsgbox.h>
-#include <kstdaccel.h>
 #include <ksimpleconfig.h>
 #include <ctype.h>
 
@@ -40,8 +38,6 @@
 #include "mydebug.h"
 
 
-KStdAccel* keys = 0;
-
 GdbProcess::GdbProcess()
 {
 }
@@ -56,15 +52,18 @@ int GdbProcess::commSetupDoneC()
 }
 
 
-KDebugger::KDebugger(const char* name) :
-	KTopLevelWidget(name),
+KDebugger::KDebugger(QWidget* parent,
+		     ExprWnd* localVars,
+		     ExprWnd* watchVars,
+		     QListBox* backtrace
+		     ) :
+	QObject(parent, "debugger"),
 	m_outputTermPID(0),
 	m_state(DSidle),
 	m_gdbOutput(0),
 	m_gdbOutputLen(0),
 	m_gdbOutputAlloc(0),
 	m_activeCmd(0),
-	m_delayedPrintThis(false),
 	m_haveExecutable(false),
 	m_programActive(false),
 	m_programRunning(false),
@@ -75,103 +74,28 @@ KDebugger::KDebugger(const char* name) :
 	m_logFile(GDB_TRANSCRIPT),
 #endif
 	m_bpTable(*this),
-	m_menu(this, "menu"),
-	m_toolbar(this, "toolbar"),
-	m_statusbar(this, "statusbar"),
+	m_localVariables(*localVars),
+	m_watchVariables(*watchVars),
+	m_btWindow(*backtrace),
 	m_animationTimer(this),
-	m_animationCounter(0),
-	m_animationInterval(0),
-	m_mainPanner(this, "main_pane", KNewPanner::Vertical, KNewPanner::Percent, 60),
-	m_leftPanner(&m_mainPanner, "left_pane", KNewPanner::Horizontal, KNewPanner::Percent, 70),
-	m_rightPanner(&m_mainPanner, "right_pane", KNewPanner::Horizontal, KNewPanner::Percent, 50),
-	m_filesWindow(&m_leftPanner, "files", m_bpTable),
-	m_btWindow(&m_leftPanner, "backtrace"),
-	m_localVariables(&m_rightPanner, "locals"),
-	m_watches(&m_rightPanner, "watches"),
-	m_watchEdit(&m_watches, "watch_edit"),
-	m_watchAdd(i18n(" Add "), &m_watches, "watch_add"),
-	m_watchDelete(i18n(" Del "), &m_watches, "watch_delete"),
-	m_watchVariables(&m_watches, "watch_variables"),
-	m_watchV(&m_watches, 0),
-	m_watchH(0)
+	m_animationInterval(0)
 {
-    m_statusActive = i18n("active");
-
     m_gdbOutputAlloc = 4000;
     m_gdbOutput = new char[m_gdbOutputAlloc];
 
     m_envVars.setAutoDelete(true);
 
-    initMenu();
-    setMenu(&m_menu);
-    
-    initToolbar();
-    addToolBar(&m_toolbar);
-    
-    setStatusBar(&m_statusbar);
-
-    m_mainPanner.activate(&m_leftPanner, &m_rightPanner);
-
-    setView(&m_mainPanner, true);	/* show frame */
-    
     connect(&m_localVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
 	    SLOT(slotLocalsExpanding(KTreeViewItem*,bool&)));
-
-    m_leftPanner.activate(&m_filesWindow, &m_btWindow);
-    m_rightPanner.activate(&m_localVariables, &m_watches);
-
-    connect(&m_watchEdit, SIGNAL(returnPressed()), SLOT(slotAddWatch()));
-    connect(&m_watchAdd, SIGNAL(clicked()), SLOT(slotAddWatch()));
-    connect(&m_watchDelete, SIGNAL(clicked()), SLOT(slotDeleteWatch()));
-    connect(&m_watchVariables, SIGNAL(highlighted(int)), SLOT(slotWatchHighlighted(int)));
     connect(&m_watchVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
 	    SLOT(slotWatchExpanding(KTreeViewItem*,bool&)));
-    
-    // setup the watch window layout
-    m_watchAdd.setMinimumSize(m_watchAdd.sizeHint());
-    m_watchDelete.setMinimumSize(m_watchDelete.sizeHint());
-    m_watchV.addLayout(&m_watchH, 0);
-    m_watchV.addWidget(&m_watchVariables, 10);
-    m_watchH.addWidget(&m_watchEdit, 10);
-    m_watchH.addWidget(&m_watchAdd, 0);
-    m_watchH.addWidget(&m_watchDelete, 0);
-
-    m_filesWindow.setWindowMenu(&m_menuWindow);
-    connect(&m_filesWindow.m_findDlg, SIGNAL(closed()), SLOT(updateUI()));
-    connect(&m_filesWindow, SIGNAL(toggleBreak(const QString&, int)),
-	    SLOT(slotToggleBreak(const QString&,int)));
-    connect(&m_filesWindow, SIGNAL(enadisBreak(const QString&, int)),
-	    SLOT(slotEnaDisBreak(const QString&,int)));
-    connect(this, SIGNAL(activateFileLine(const QString&,int)),
-	    &m_filesWindow, SLOT(activate(const QString&,int)));
-    connect(this, SIGNAL(executableUpdated()),
-	    &m_filesWindow, SLOT(reloadAllFiles()));
-    connect(this, SIGNAL(updatePC(const QString&,int,int)),
-	    &m_filesWindow, SLOT(updatePC(const QString&,int,int)));
-    connect(this, SIGNAL(lineItemsChanged()),
-	    &m_filesWindow, SLOT(updateLineItems()));
-	
-    // Establish communication when right clicked on file window.
-    connect(&m_filesWindow.m_menuFloat, SIGNAL(activated(int)),
-	    SLOT(menuCallback(int)));
-	
-    // Connection when right clicked on file window before any file is
-    // loaded.
-    connect(&m_filesWindow.m_menuFileFloat, SIGNAL(activated(int)),
-	    SLOT(menuCallback(int)));
 
     connect(&m_btWindow, SIGNAL(highlighted(int)), SLOT(gotoFrame(int)));
 
     m_bpTable.setCaption(i18n("Breakpoints"));
-    connect(&m_bpTable, SIGNAL(closed()), SLOT(updateUI()));
+    connect(&m_bpTable, SIGNAL(closed()), SIGNAL(updateUI()));
     connect(&m_bpTable, SIGNAL(activateFileLine(const QString&,int)),
-	    &m_filesWindow, SLOT(activate(const QString&,int)));
-
-    // route unhandled menu items to winstack
-    connect(this, SIGNAL(forwardMenuCallback(int)), &m_filesWindow, SLOT(menuCallback(int)));
-    // file/line updates
-    connect(&m_filesWindow, SIGNAL(fileChanged()), SLOT(slotFileChanged()));
-    connect(&m_filesWindow, SIGNAL(lineChanged()), SLOT(slotLineChanged()));
+	    this, SIGNAL(activateFileLine(const QString&,int)));
 
     // debugger process
     connect(&m_gdb, SIGNAL(receivedStdout(KProcess*,char*,int)),
@@ -179,18 +103,15 @@ KDebugger::KDebugger(const char* name) :
     connect(&m_gdb, SIGNAL(wroteStdin(KProcess*)), SLOT(commandRead(KProcess*)));
     connect(&m_gdb, SIGNAL(processExited(KProcess*)), SLOT(gdbExited(KProcess*)));
 
-    restoreSettings(kapp->getConfig());
-    resize(700, 700);
-
-    emit updateUI();
-    slotFileChanged();
+    // animation
+    connect(&m_animationTimer, SIGNAL(timeout()), SIGNAL(animationTimeout()));
+    // special update of animation
+    connect(this, SIGNAL(updateUI()), SLOT(slotUpdateAnimation()));
 }
 
 KDebugger::~KDebugger()
 {
     TRACE(__PRETTY_FUNCTION__);
-
-    saveSettings(kapp->getConfig());
 
     // if the output window is open, close it
     if (m_outputTermPID != 0) {
@@ -206,29 +127,8 @@ KDebugger::~KDebugger()
 }
 
 
-// instance properties
-void KDebugger::saveProperties(KConfig* config)
-{
-    // session management
-    config->writeEntry("executable", m_executable);
-}
-
-void KDebugger::readProperties(KConfig* config)
-{
-    // session management
-    QString execName = config->readEntry("executable");
-
-    TRACE("readProperties: executable=" + execName);
-    if (!execName.isEmpty()) {
-	debugProgram(execName);
-    }
-}
-
 const char WindowGroup[] = "Windows";
 const char OutputWindowGroup[] = "OutputWindow";
-const char MainPane[] = "MainPane";
-const char LeftPane[] = "LeftPane";
-const char RightPane[] = "RightPane";
 const char BreaklistVisible[] = "BreaklistVisible";
 const char Breaklist[] = "Breaklist";
 const char KeepScript[] = "KeepScript";
@@ -236,13 +136,6 @@ const char KeepScript[] = "KeepScript";
 void KDebugger::saveSettings(KConfig* config)
 {
     KConfigGroupSaver g(config, WindowGroup);
-    // panner positions
-    int vsep = m_mainPanner.separatorPos();
-    int lsep = m_leftPanner.separatorPos();
-    int rsep = m_rightPanner.separatorPos();
-    config->writeEntry(MainPane, vsep);
-    config->writeEntry(LeftPane, lsep);
-    config->writeEntry(RightPane, rsep);
     // breakpoint window
     bool visible = m_bpTable.isVisible();
     const QRect& r = m_bpTable.geometry();
@@ -253,13 +146,6 @@ void KDebugger::saveSettings(KConfig* config)
 void KDebugger::restoreSettings(KConfig* config)
 {
     KConfigGroupSaver g(config, WindowGroup);
-    // panner positions
-    int vsep = config->readNumEntry(MainPane, 60);
-    int lsep = config->readNumEntry(LeftPane, 70);
-    int rsep = config->readNumEntry(RightPane, 50);
-    m_mainPanner.setSeparatorPos(vsep);
-    m_leftPanner.setSeparatorPos(lsep);
-    m_rightPanner.setSeparatorPos(rsep);
     // breakpoint window
     bool visible = config->readBoolEntry(BreaklistVisible, false);
     if (config->hasKey(Breaklist)) {
@@ -294,416 +180,6 @@ static QString getFileName(const char* caption,
     return filename;
 }
 
-// slots
-void KDebugger::menuCallback(int item)
-{
-    switch (item) {
-    case ID_FILE_EXECUTABLE:
-	if (m_state == DSidle)
-	{
-	    // open a new executable
-	    QString executable = getFileName(i18n("Select the executable to debug"),
-					     0, 0, this);
-	    if (!executable.isEmpty()) {
-		if (m_haveExecutable)
-		{
-		    stopGdb();
-		    /*
-		     * We MUST wait until the slot gdbExited() has been
-		     * called. But to avoid a deadlock, we wait only for
-		     * some certain maximum time. Should this timeout be
-		     * reached, the only reasonable thing one could do then
-		     * is exiting kdbg.
-		     */
-		    int maxTime = 20;	/* about 20 seconds */
-		    while (m_haveExecutable && maxTime > 0) {
-			kapp->processEvents(1000);
-			// give gdb time to die (and send a SIGCLD)
-			::sleep(1);
-			--maxTime;
-		    }
-		    if (m_haveExecutable) {
-			/* timed out! We can't really do anything useful now */
-			TRACE("timed out while waiting for gdb to die!");
-			break;
-		    }
-		}
-		debugProgram(executable);
-	    }
-	}
-	break;
-    case ID_FILE_COREFILE:
-	if (isReady() && !m_programRunning) {
-	    // use a core dump
-	    QString corefile = getFileName(i18n("Select core dump"),
-					   0, 0, this);
-	    if (!corefile.isEmpty()) {
-		m_corefile = corefile;
-		CmdQueueItem* cmd = loadCoreFile();
-		cmd->m_byUser = true;
-	    }
-	}
-	break;
-    case ID_FILE_QUIT:
-	kapp->quit();
-	break;
-    case ID_VIEW_TOOLBAR:
-	enableToolBar();
-	break;
-    case ID_VIEW_STATUSBAR:
-	enableStatusBar();
-	break;
-    case ID_PROGRAM_RUN:
-	if (isReady()) {
-	    if (m_programActive) {
-		// gdb command: continue
-		executeCmd(DCcont, "cont", true);
-	    } else {
-		// gdb command: run
-		executeCmd(DCrun, "run", true);
-		m_programActive = true;
-	    }
-	    m_programRunning = true;
-	}
-	break;
-    case ID_PROGRAM_ATTACH:
-	if (isReady()) {
-	    ProcAttach dlg(this);
-	    dlg.setText(m_attachedPid);
-	    if (dlg.exec()) {
-		m_attachedPid = dlg.text();
-		TRACE("Attaching to " + m_attachedPid);
-		executeCmd(DCattach, "attach " + m_attachedPid);
-		m_programActive = true;
-		m_programRunning = true;
-	    }
-	}
-	break;
-    case ID_PROGRAM_RUN_AGAIN:
-	if (isReady() && m_programActive && !m_programRunning) {
-	    executeCmd(DCrun, "run", true);
-	    m_programRunning = true;
-	}
-	break;
-    case ID_PROGRAM_STEP:
-	if (isReady() && m_programActive && !m_programRunning) {
-	    executeCmd(DCstep, "step", true);
-	    m_programRunning = true;
-	}
-	break;
-    case ID_PROGRAM_NEXT:
-	if (isReady() && m_programActive && !m_programRunning) {
-	    executeCmd(DCnext, "next", true);
-	    m_programRunning = true;
-	}
-	break;
-    case ID_PROGRAM_FINISH:
-	if (isReady() && m_programActive && !m_programRunning) {
-	    executeCmd(DCfinish, "finish", true);
-	    m_programRunning = true;
-	}
-	break;
-    case ID_PROGRAM_UNTIL:
-	if (isReady() && m_programActive && !m_programRunning) {
-	    QString file;
-	    int lineNo;
-	    if (m_filesWindow.activeLine(file, lineNo)) {
-		// strip off directory part of file name
-		file.detach();
-		int offset = file.findRev("/");
-		if (offset >= 0) {
-		    file.remove(0, offset+1);
-		}
-		QString cmdString(file.length() + 30);
-		cmdString.sprintf("until %s:%d", file.data(), lineNo+1);
-		executeCmd(DCuntil, cmdString, true);
-		m_programRunning = true;
-	    }
-	}
-	break;
-    case ID_PROGRAM_BREAK:
-	if (m_haveExecutable && m_programRunning) {
-	    m_gdb.kill(SIGINT);
-	}
-	break;
-    case ID_PROGRAM_ARGS:
-	if (m_haveExecutable) {
-	    PgmArgs dlg(this, m_executable, m_envVars);
-	    dlg.setText(m_programArgs);
-	    if (dlg.exec()) {
-		updateProgEnvironment(dlg.text(), dlg.envVars());
-	    }
-	}
-	break;
-    case ID_BRKPT_SET:
-    case ID_BRKPT_TEMP:
-	if (isReady()) {
-	    QString file;
-	    int lineNo;
-	    if (m_filesWindow.activeLine(file, lineNo)) {
-		m_bpTable.doBreakpoint(file, lineNo, item == ID_BRKPT_TEMP);
-	    }
-	}
-	break;
-    case ID_BRKPT_ENABLE:
-	if (isReady()) {
-	    QString file;
-	    int lineNo;
-	    if (m_filesWindow.activeLine(file, lineNo)) {
-		m_bpTable.doEnableDisableBreakpoint(file, lineNo);
-	    }
-	}
-	break;
-    case ID_BRKPT_LIST:
-	if (m_bpTable.isVisible()) {
-	    m_bpTable.hide();
-	} else {
-	    m_bpTable.show();
-	}
-	break;
-    default:
-	// forward all others
-	emit forwardMenuCallback(item);
-    }
-    emit updateUI();
-}
-
-void KDebugger::updateUI()
-{
-    // enumerate all menus
-    {
-	UpdateMenuUI updateMenu(&m_menuFile, this, SLOT(updateUIItem(UpdateUI*)));
-	updateMenu.iterateMenu();
-    }
-    {
-	UpdateMenuUI updateMenu(&m_menuView, this, SLOT(updateUIItem(UpdateUI*)));
-	updateMenu.iterateMenu();
-    }
-    {
-	UpdateMenuUI updateMenu(&m_menuProgram, this, SLOT(updateUIItem(UpdateUI*)));
-	updateMenu.iterateMenu();
-    }
-    {
-	UpdateMenuUI updateMenu(&m_menuBrkpt, this, SLOT(updateUIItem(UpdateUI*)));
-	updateMenu.iterateMenu();
-    }
-
-    // Update winstack float popup items
-    {
-	UpdateMenuUI updateMenu(&m_filesWindow.m_menuFloat, this,
-				SLOT(updateUIItem(UpdateUI*)));
-	updateMenu.iterateMenu();
-    }
-
-    // Update winstack float file popup items
-    {
-	UpdateMenuUI updateMenu(&m_filesWindow.m_menuFileFloat, this,
-				SLOT(updateUIItem(UpdateUI*)));
-	updateMenu.iterateMenu();
-    }
-
-    // toolbar
-    static const int toolIds[] = {
-	ID_PROGRAM_RUN, ID_PROGRAM_STEP, ID_PROGRAM_NEXT, ID_PROGRAM_FINISH,
-	ID_BRKPT_SET
-    };
-    UpdateToolbarUI updateToolbar(&m_toolbar, this, SLOT(updateUIItem(UpdateUI*)),
-				  toolIds, sizeof(toolIds)/sizeof(toolIds[0]));
-    updateToolbar.iterateToolbar();
-    // special update of animation
-    if (m_state == DSidle) {
-	stopAnimation();
-    } else {
-	/*
-	 * Slow animation while program is stopped (i.e. while variables
-	 * are displayed)
-	 */
-	bool slow = isReady() && m_programActive && !m_programRunning;
-	startAnimation(!slow);
-    }
-}
-
-void KDebugger::updateUIItem(UpdateUI* item)
-{
-    switch (item->id) {
-    case ID_VIEW_FINDDLG:
-	item->setCheck(m_filesWindow.m_findDlg.isVisible());
-	break;
-    case ID_FILE_EXECUTABLE:
-	item->enable(m_state == DSidle);
-	break;
-    case ID_FILE_COREFILE:
-	item->enable(isReady() && !m_programRunning);
-	break;
-    case ID_PROGRAM_STEP:
-    case ID_PROGRAM_NEXT:
-    case ID_PROGRAM_FINISH:
-    case ID_PROGRAM_UNTIL:
-    case ID_PROGRAM_RUN_AGAIN:
-	item->enable(isReady() && m_programActive && !m_programRunning);
-	break;
-    case ID_PROGRAM_ATTACH:
-    case ID_PROGRAM_RUN:
-	item->enable(isReady());
-	break;
-    case ID_PROGRAM_BREAK:
-	item->enable(m_haveExecutable && m_programRunning);
-	break;
-    case ID_PROGRAM_ARGS:
-	item->enable(m_haveExecutable);
-    case ID_BRKPT_SET:
-    case ID_BRKPT_TEMP:
-	item->enable(isReady());
-	break;
-    case ID_BRKPT_ENABLE:
-	item->enable(isReady());
-	break;
-    case ID_BRKPT_LIST:
-	item->setCheck(m_bpTable.isVisible());
-	break;
-    }
-    
-    // update statusbar
-    m_statusbar.changeItem(m_programActive ? static_cast<const char*>(m_statusActive) : "",
-			   ID_STATUS_ACTIVE);
-    // line number is updated in slotLineChanged
-}
-
-
-// implementation helpers
-void KDebugger::initMenu()
-{
-    m_menuFile.insertItem(i18n("&Open Source..."), ID_FILE_OPEN);
-    m_menuFile.insertItem(i18n("&Reload Source"), ID_FILE_RELOAD);
-    m_menuFile.insertSeparator();
-    m_menuFile.insertItem(i18n("&Executable..."), ID_FILE_EXECUTABLE);
-    m_menuFile.insertItem(i18n("&Core dump..."), ID_FILE_COREFILE);
-    m_menuFile.insertSeparator();
-    m_menuFile.insertItem(i18n("&Quit"), ID_FILE_QUIT);
-    m_menuFile.setAccel(keys->open(), ID_FILE_OPEN);
-    m_menuFile.setAccel(keys->quit(), ID_FILE_QUIT);
-
-    m_menuView.insertItem(i18n("&Find..."), ID_VIEW_FINDDLG);
-    m_menuView.insertItem(i18n("Toggle &Toolbar"), ID_VIEW_TOOLBAR);
-    m_menuView.insertItem(i18n("Toggle &Statusbar"), ID_VIEW_STATUSBAR);
-    m_menuView.setAccel(keys->find(), ID_VIEW_FINDDLG);
-
-    m_menuProgram.insertItem(i18n("&Run"), ID_PROGRAM_RUN);
-    m_menuProgram.insertItem(i18n("Step &into"), ID_PROGRAM_STEP);
-    m_menuProgram.insertItem(i18n("Step &over"), ID_PROGRAM_NEXT);
-    m_menuProgram.insertItem(i18n("Step o&ut"), ID_PROGRAM_FINISH);
-    m_menuProgram.insertItem(i18n("Run to &cursor"), ID_PROGRAM_UNTIL);
-    m_menuProgram.insertSeparator();
-    m_menuProgram.insertItem(i18n("&Break"), ID_PROGRAM_BREAK);
-    m_menuProgram.insertItem(i18n("Re&start"), ID_PROGRAM_RUN_AGAIN);
-    m_menuProgram.insertItem(i18n("A&ttach..."), ID_PROGRAM_ATTACH);
-    m_menuProgram.insertSeparator();
-    m_menuProgram.insertItem(i18n("&Arguments..."), ID_PROGRAM_ARGS);
-    m_menuProgram.setAccel(Key_F5, ID_PROGRAM_RUN);
-    m_menuProgram.setAccel(Key_F8, ID_PROGRAM_STEP);
-    m_menuProgram.setAccel(Key_F10, ID_PROGRAM_NEXT);
-    m_menuProgram.setAccel(Key_F6, ID_PROGRAM_FINISH);
-    m_menuProgram.setAccel(Key_F7, ID_PROGRAM_UNTIL);
-
-    m_menuBrkpt.setCheckable(true);
-    m_menuBrkpt.insertItem(i18n("Set/Clear &breakpoint"), ID_BRKPT_SET);
-    m_menuBrkpt.insertItem(i18n("Set &temporary breakpoint"), ID_BRKPT_TEMP);
-    m_menuBrkpt.insertItem(i18n("&Enable/Disable breakpoint"), ID_BRKPT_ENABLE);
-    m_menuBrkpt.insertItem(i18n("&List..."), ID_BRKPT_LIST);
-    m_menuBrkpt.setAccel(Key_F9, ID_BRKPT_SET);
-    m_menuBrkpt.setAccel(SHIFT+Key_F9, ID_BRKPT_TEMP);
-    m_menuBrkpt.setAccel(CTRL+Key_F9, ID_BRKPT_ENABLE);
-
-    m_menuWindow.insertItem(i18n("&More..."), ID_WINDOW_MORE);
-  
-    m_menuHelp.insertItem(i18n("&Contents"), ID_HELP_HELP);
-    m_menuHelp.insertItem(i18n("&About"), ID_HELP_ABOUT);
-  
-    connect(&m_menuFile, SIGNAL(activated(int)), SLOT(menuCallback(int)));
-    connect(&m_menuView, SIGNAL(activated(int)), SLOT(menuCallback(int)));
-    connect(&m_menuProgram, SIGNAL(activated(int)), SLOT(menuCallback(int)));
-    connect(&m_menuBrkpt, SIGNAL(activated(int)), SLOT(menuCallback(int)));
-    connect(&m_menuWindow, SIGNAL(activated(int)), SLOT(menuCallback(int)));
-    connect(&m_menuHelp, SIGNAL(activated(int)), SLOT(menuCallback(int)));
-
-    m_menu.insertItem(i18n("&File"), &m_menuFile);
-    m_menu.insertItem(i18n("&View"), &m_menuView);
-    m_menu.insertItem(i18n("E&xecution"), &m_menuProgram);
-    m_menu.insertItem(i18n("&Breakpoint"), &m_menuBrkpt);
-    m_menu.insertItem(i18n("&Window"), &m_menuWindow);
-    m_menu.insertSeparator();
-    
-    QString about = "KDbg " VERSION " - ";
-    about += i18n("A Debugger\n"
-		  "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
-		  "with the help of many others");
-    m_menu.insertItem(i18n("&Help"),
-		      kapp->getHelpMenu(false, about));
-}
-
-void KDebugger::initToolbar()
-{
-    KIconLoader* loader = kapp->getIconLoader();
-
-    m_toolbar.insertButton(loader->loadIcon("execopen.xpm"),ID_FILE_EXECUTABLE, true,
-			   i18n("Executable"));
-    m_toolbar.insertButton(loader->loadIcon("fileopen.xpm"),ID_FILE_OPEN, true,
-			   i18n("Open a source file"));
-    m_toolbar.insertButton(loader->loadIcon("reload.xpm"),ID_FILE_RELOAD, true,
-			   i18n("Reload source file"));
-    m_toolbar.insertSeparator();
-    m_toolbar.insertButton(loader->loadIcon("pgmrun.xpm"),ID_PROGRAM_RUN, true,
-			   i18n("Run/Continue"));
-    m_toolbar.insertButton(loader->loadIcon("pgmstep.xpm"),ID_PROGRAM_STEP, true,
-			   i18n("Step into"));
-    m_toolbar.insertButton(loader->loadIcon("pgmnext.xpm"),ID_PROGRAM_NEXT, true,
-			   i18n("Step over"));
-    m_toolbar.insertButton(loader->loadIcon("pgmfinish.xpm"),ID_PROGRAM_FINISH, true,
-			   i18n("Step out"));
-    m_toolbar.insertSeparator();
-    m_toolbar.insertButton(loader->loadIcon("brkpt.xpm"),ID_BRKPT_SET, true,
-			   i18n("Breakpoint"));
-    m_toolbar.insertSeparator();
-    m_toolbar.insertButton(loader->loadIcon("search.xpm"),ID_VIEW_FINDDLG, true,
-			   i18n("Search"));
-
-    connect(&m_toolbar, SIGNAL(clicked(int)), SLOT(menuCallback(int)));
-    
-    initAnimation();
-
-    m_statusbar.insertItem(m_statusActive, ID_STATUS_ACTIVE);
-    m_statusbar.insertItem(i18n("Line 00000"), ID_STATUS_LINENO);
-    m_statusbar.insertItem("", ID_STATUS_MSG);	/* message pane */
-
-    // reserve some translations
-    i18n("Restart");
-    i18n("Core dump");
-}
-
-void KDebugger::initAnimation()
-{
-    QPixmap pixmap;
-    QString path = kapp->kde_datadir() + "/kfm/pics/";
-
-    pixmap.load(path + "/kde1.xpm");
-    
-    m_toolbar.insertButton(pixmap, ID_STATUS_BUSY);
-    m_toolbar.alignItemRight(ID_STATUS_BUSY, true);
-    
-    // Load animated logo
-    m_animation.setAutoDelete(true);
-    QString n;
-    for (int i = 1; i <= 9; i++) {
-	n.sprintf("/kde%d.xpm", i);
-	QPixmap* p = new QPixmap();
-	p->load(path + n);
-	if (!p->isNull()) {
-	    m_animation.append(p);
-	}
-    }
-    connect(&m_animationTimer, SIGNAL(timeout()), SLOT(slotAnimationTimeout()));
-}
-
 
 //////////////////////////////////////////////////////////////////////
 // external interface
@@ -722,7 +198,7 @@ bool KDebugger::debugProgram(const QString& name)
 	QString msgFmt = i18n("`%s' is not a file or does not exist");
 	QString msg(msgFmt.length() + name.length() + 20);
 	msg.sprintf(msgFmt, name.data());
-	KMsgBox::message(this, kapp->appName(),
+	KMsgBox::message(parentWidget(), kapp->appName(),
 			 msg,
 			 KMsgBox::STOP,
 			 i18n("OK"));
@@ -764,9 +240,207 @@ bool KDebugger::debugProgram(const QString& name)
     }
 
     emit updateUI();
-    slotFileChanged();
 
     return true;
+}
+
+
+void KDebugger::fileExecutable()
+{
+    if (m_state != DSidle)
+	return;
+
+    // open a new executable
+    QString executable = getFileName(i18n("Select the executable to debug"),
+				     0, 0, parentWidget());
+    if (executable.isEmpty())
+	return;
+
+    if (m_haveExecutable)
+    {
+	QApplication::setOverrideCursor(waitCursor);
+
+	stopGdb();
+	/*
+	 * We MUST wait until the slot gdbExited() has been called. But to
+	 * avoid a deadlock, we wait only for some certain maximum time.
+	 * Should this timeout be reached, the only reasonable thing one
+	 * could do then is exiting kdbg.
+	 */
+	int maxTime = 20;		/* about 20 seconds */
+	while (m_haveExecutable && maxTime > 0) {
+	    kapp->processEvents(1000);
+	    // give gdb time to die (and send a SIGCLD)
+	    ::sleep(1);
+	    --maxTime;
+	}
+
+	QApplication::restoreOverrideCursor();
+
+	if (m_haveExecutable) {
+	    /* timed out! We can't really do anything useful now */
+	    TRACE("timed out while waiting for gdb to die!");
+	    return;
+	}
+    }
+
+    debugProgram(executable);
+}
+
+void KDebugger::fileCoreFile()
+{
+    if (!isReady() || m_programRunning)
+	return;
+
+    // use a core dump
+    QString corefile = getFileName(i18n("Select core dump"),
+				   0, 0, parentWidget());
+    if (!corefile.isEmpty()) {
+	m_corefile = corefile;
+	CmdQueueItem* cmd = loadCoreFile();
+	cmd->m_byUser = true;
+    }
+}
+
+void KDebugger::programRun()
+{
+    if (!isReady())
+	return;
+
+    if (m_programActive) {
+	// gdb command: continue
+	executeCmd(DCcont, "cont", true);
+    } else {
+	// gdb command: run
+	executeCmd(DCrun, "run", true);
+	m_programActive = true;
+    }
+    m_programRunning = true;
+}
+
+void KDebugger::programAttach()
+{
+    if (!isReady())
+	return;
+
+    ProcAttach dlg(parentWidget());
+    dlg.setText(m_attachedPid);
+    if (dlg.exec()) {
+	m_attachedPid = dlg.text();
+	TRACE("Attaching to " + m_attachedPid);
+	executeCmd(DCattach, "attach " + m_attachedPid);
+	m_programActive = true;
+	m_programRunning = true;
+    }
+}
+
+void KDebugger::programRunAgain()
+{
+    if (canSingleStep()) {
+	executeCmd(DCrun, "run", true);
+	m_programRunning = true;
+    }
+}
+
+void KDebugger::programStep()
+{
+    if (canSingleStep()) {
+	executeCmd(DCstep, "step", true);
+	m_programRunning = true;
+    }
+}
+
+void KDebugger::programNext()
+{
+    if (canSingleStep()) {
+	executeCmd(DCnext, "next", true);
+	m_programRunning = true;
+    }
+}
+
+void KDebugger::programFinish()
+{
+    if (canSingleStep()) {
+	executeCmd(DCfinish, "finish", true);
+	m_programRunning = true;
+    }
+}
+
+bool KDebugger::runUntil(const QString& fileName, int lineNo)
+{
+    if (isReady() && m_programActive && !m_programRunning) {
+	// strip off directory part of file name
+	QString file = fileName;
+	file.detach();
+	int offset = file.findRev("/");
+	if (offset >= 0) {
+	    file.remove(0, offset+1);
+	}
+	QString cmdString(file.length() + 30);
+	cmdString.sprintf("until %s:%d", file.data(), lineNo+1);
+	executeCmd(DCuntil, cmdString, true);
+	m_programRunning = true;
+	return true;
+    } else {
+	return false;
+    }
+}
+
+void KDebugger::programBreak()
+{
+    if (m_haveExecutable && m_programRunning) {
+	m_gdb.kill(SIGINT);
+    }
+}
+
+void KDebugger::programArgs()
+{
+    if (m_haveExecutable) {
+	PgmArgs dlg(parentWidget(), m_executable, m_envVars);
+	dlg.setText(m_programArgs);
+	if (dlg.exec()) {
+	    updateProgEnvironment(dlg.text(), dlg.envVars());
+	}
+    }
+}
+
+void KDebugger::breakListToggleVisible()
+{
+    if (m_bpTable.isVisible()) {
+	m_bpTable.hide();
+    } else {
+	m_bpTable.show();
+    }
+}
+
+bool KDebugger::setBreakpoint(const QString& fileName, int lineNo, bool temporary)
+{
+    if (isReady()) {
+	m_bpTable.doBreakpoint(fileName, lineNo, temporary);
+	return true;
+    } else {
+	return false;
+    }
+}
+
+bool KDebugger::enableDisableBreakpoint(const QString& fileName, int lineNo)
+{
+    if (isReady()) {
+	m_bpTable.doEnableDisableBreakpoint(fileName, lineNo);
+	return true;
+    } else {
+	return false;
+    }
+}
+
+bool KDebugger::canSingleStep()
+{
+    return isReady() && m_programActive && !m_programRunning;
+}
+
+bool KDebugger::canChangeBreakpoints()
+{
+    return isReady();
 }
 
 
@@ -845,7 +519,7 @@ void KDebugger::gdbExited(KProcess*)
     } else {
 	const char* msg = i18n("gdb exited unexpectedly.\n"
 			       "Restart the session (e.g. with File|Executable).");
-	KMsgBox::message(this, kapp->appName(), msg, KMsgBox::EXCLAMATION);
+	KMsgBox::message(parentWidget(), kapp->appName(), msg, KMsgBox::EXCLAMATION);
     }
 
     // reset state
@@ -1329,9 +1003,11 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	    }
 	} else {
 	    QString msg = "gdb: " + QString(m_gdbOutput);
-	    KMsgBox::message(this, kapp->appName(), msg,
+	    KMsgBox::message(parentWidget(), kapp->appName(), msg,
 			     KMsgBox::STOP, i18n("OK"));
+	    m_executable = "";
 	    m_corefile = "";		/* don't process core file */
+	    m_haveExecutable = false;
 	}
 	break;
     case DCcorefile:
@@ -1345,7 +1021,7 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	} else {
 	    // report error
 	    QString msg = "gdb: " + QString(m_gdbOutput);
-	    KMsgBox::message(this, kapp->appName(), msg,
+	    KMsgBox::message(parentWidget(), kapp->appName(), msg,
 			     KMsgBox::EXCLAMATION, i18n("OK"));
 	    // if core file was loaded from command line, revert to info line main
 	    if (!cmd->m_byUser) {
@@ -1488,7 +1164,8 @@ void KDebugger::handleRunCommands()
 	start = strchr(start, '\n');
     } while (start != 0);
 
-    m_statusbar.changeItem(msg, ID_STATUS_MSG);
+    m_statusMessage = msg;
+    emit updateStatusMessage();
 
     // refresh files if necessary
     if (refreshNeeded) {
@@ -2208,9 +1885,8 @@ void KDebugger::exprExpandingHelper(ExprWnd* wnd, KTreeViewItem* item, bool&)
 }
 
 // add the expression in the edit field to the watch expressions
-void KDebugger::slotAddWatch()
+void KDebugger::addWatch(const QString& t)
 {
-    QString t = m_watchEdit.text();
     QString expr = t.stripWhiteSpace();
     if (expr.isEmpty())
 	return;
@@ -2249,69 +1925,6 @@ void KDebugger::slotDeleteWatch()
     // item is invalid at this point!
 }
 
-// place the text of the hightlighted watch expr in the edit field
-void KDebugger::slotWatchHighlighted(int index)
-{
-    KTreeViewItem* item = m_watchVariables.itemAt(index);
-    if (item == 0) return;		/* paranoia */
-    VarTree* expr = static_cast<VarTree*>(item);
-    QString text = expr->computeExpr();
-    m_watchEdit.setText(text);
-}
-
-void KDebugger::slotFileChanged()
-{
-    // set caption
-    QString caption = kapp->getCaption();
-    if (m_haveExecutable) {
-	// basename part of executable
-	const char* execBase = m_executable.data();
-	int lastSlash = m_executable.findRev('/');
-	if (lastSlash >= 0)
-	    execBase += lastSlash + 1;
-	caption += ": ";
-	caption += execBase;
-    }
-    QString file;
-    int line;
-    bool anyWindows = m_filesWindow.activeLine(file, line);
-    updateLineStatus(anyWindows ? line : -1);
-    if (anyWindows) {
-	caption += " (";
-	caption += file;
-	caption += ")";
-    }
-    setCaption(caption);
-}
-
-void KDebugger::slotLineChanged()
-{
-    QString file;
-    int line;
-    bool anyWindows = m_filesWindow.activeLine(file, line);
-    updateLineStatus(anyWindows ? line : -1);
-}
-
-void KDebugger::updateLineStatus(int lineNo)
-{
-    if (lineNo < 0) {
-	m_statusbar.changeItem("", ID_STATUS_LINENO);
-    } else {
-	QString strLine;
-	strLine.sprintf(i18n("Line %d"), lineNo + 1);
-	m_statusbar.changeItem(strLine, ID_STATUS_LINENO);
-    }
-}
-
-void KDebugger::slotAnimationTimeout()
-{
-    m_animationCounter++;
-    if (m_animationCounter == m_animation.count())
-	m_animationCounter = 0;
-    m_toolbar.setButtonPixmap(ID_STATUS_BUSY,
-			      *m_animation.at(m_animationCounter));
-}
-
 void KDebugger::startAnimation(bool fast)
 {
     int interval = fast ? 50 : 150;
@@ -2344,5 +1957,19 @@ void KDebugger::slotEnaDisBreak(const QString& fileName, int lineNo)
     // lineNo is zero-based
     if (isReady()) {
 	m_bpTable.doEnableDisableBreakpoint(fileName, lineNo);
+    }
+}
+
+void KDebugger::slotUpdateAnimation()
+{
+    if (m_state == DSidle) {
+	stopAnimation();
+    } else {
+	/*
+	 * Slow animation while program is stopped (i.e. while variables
+	 * are displayed)
+	 */
+	bool slow = isReady() && m_programActive && !m_programRunning;
+	startAnimation(!slow);
     }
 }

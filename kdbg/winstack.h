@@ -97,7 +97,7 @@ class WinStack : public QWidget
 {
     Q_OBJECT
 public:
-    WinStack(QWidget* parent, const char* name, const BreakpointTable& bpt);
+    WinStack(QWidget* parent, const char* name);
     virtual ~WinStack();
     
     /**
@@ -118,6 +118,7 @@ signals:
     void toggleBreak(const QString&, int);
     void enadisBreak(const QString&, int);
     void clickedRight(const QPoint&);
+    void newFileLoaded();
 
 public slots:
     virtual void menuCallback(int item);
@@ -127,7 +128,7 @@ public slots:
     virtual void activate(const QString& filename, int lineNo);
     void updatePC(const QString& filename, int lineNo, int frameNo);
     void reloadAllFiles();
-    void updateLineItems();
+    void updateLineItems(const BreakpointTable& bpt);
 
     // Right click on file panner when no file is loaded.
     virtual void slotWidgetRightClick(const QPoint &);
@@ -152,7 +153,6 @@ protected:
     QString m_pcFile;
     int m_pcLine;			/* -1 if no PC */
     int m_pcFrame;
-    const BreakpointTable& m_bpTable;
 
 public:
     // find dialog

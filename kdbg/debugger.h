@@ -7,24 +7,18 @@
 #define DEBUGGER_H
 
 #include <qqueue.h>
-#include <qlistbox.h>
-#include <qlined.h>
-#include <qlayout.h>
-#include <qpushbt.h>
 #include <qtimer.h>
-#include <ktopwidget.h>
+#include <qfile.h>
 #include <kprocess.h>
-#include <knewpanner.h>
-#include "winstack.h"
-#include "exprwnd.h"
 #include "brkpt.h"
 #include "envvar.h"
 
-// forward declarations
-class UpdateUI;
-class KStdAccel;
+class ExprWnd;
+class VarTree;
+class KTreeViewItem;
+class KConfig;
+class QListBox;
 
-extern KStdAccel* keys;
 
 class GdbProcess : public KProcess
 {
@@ -34,11 +28,15 @@ protected:
     virtual int commSetupDoneC();
 };
 
-class KDebugger : public KTopLevelWidget
+class KDebugger : public QObject
 {
     Q_OBJECT
 public:
-    KDebugger(const char* name);
+    KDebugger(QWidget* parent,		/* will be used as the parent for dialogs */
+	      ExprWnd* localVars,
+	      ExprWnd* watchVars,
+	      QListBox* backtrace
+	      );
     ~KDebugger();
     
     /**
@@ -47,12 +45,146 @@ public:
      * currently being debugged
      */
     bool debugProgram(const QString& executable);
+
+    /**
+     * Queries the user for an executable file and debugs it. If a program
+     * is currently being debugged, it is terminated first.
+     */
+    void fileExecutable();
+
+    /**
+     * Queries the user for a core file and uses it to debug the active
+     * program
+     */
+    void fileCoreFile();
+
+    /**
+     * Runs the program or continues it if it is stopped at a breakpoint.
+     */
+    void programRun();
+
+    /**
+     * Attaches to a process and debugs it.
+     */
+    void programAttach();
+
+    /**
+     * Restarts the debuggee.
+     */
+    void programRunAgain();
+
+    /**
+     * Performs a single-step, possibly stepping into a function call.
+     */
+    void programStep();
+
+    /**
+     * Performs a single-step, stepping over a function call.
+     */
+    void programNext();
+
+    /**
+     * Runs the program until it returns from the current function.
+     */
+    void programFinish();
+
+    /**
+     * Interrupts the program if it is currently running.
+     */
+    void programBreak();
+
+    /**
+     * Queries the user for program arguments.
+     */
+    void programArgs();
+
+    /**
+     * Shows the breakpoint list if it isn't currently visible or hides it
+     * if it is.
+     */
+    void breakListToggleVisible();
+
+    /**
+     * Run the debuggee until the specified line in the specified file is
+     * reached.
+     * 
+     * @return false if the command was not executed, e.g. because the
+     * debuggee is running at the moment.
+     */
+    bool runUntil(const QString& fileName, int lineNo);
+
+    /**
+     * Set a breakpoint.
+     * 
+     * @return false if the command was not executed, e.g. because the
+     * debuggee is running at the moment.
+     */
+    bool setBreakpoint(const QString& fileName, int lineNo, bool temporary);
+
+    /**
+     * Enable or disable a breakpoint at the specified location.
+     * 
+     * @return false if the command was not executed, e.g. because the
+     * debuggee is running at the moment.
+     */
+    bool enableDisableBreakpoint(const QString& fileName, int lineNo);
+
+    /**
+     * Tells whether one of the single stepping commands can be invoked
+     * (step, next, finish, until, also run).
+     */
+    bool canSingleStep();
+
+    /**
+     * Tells whether a breakpoints can be set, deleted, enabled, or disabled.
+     */
+    bool canChangeBreakpoints();
+
+    /**
+     * Tells whether the debuggee can be changed.
+     */
+    bool KDebugger::canChangeExecutable() { return isReady() && !m_programActive; }
+
+    /**
+     * Add a watch expression.
+     */
+    void addWatch(const QString& expr);
+
+    /**
+     * Retrieves the current status message.
+     */
+    const QString& statusMessage() const { return m_statusMessage; }
+    /**
+     * Is the debugger ready to receive another high-priority command?
+     */
+    bool isReady() const { return m_haveExecutable &&
+	    /*(m_state == DSidle || m_state == DSrunningLow)*/
+	    m_hipriCmdQueue.isEmpty(); }
+    /**
+     * Is the debuggee running (not just active)?
+     */
+    bool isProgramRunning() { return m_haveExecutable && m_programRunning; }
+
+    /**
+     * Do we have an executable set?
+     */
+    bool haveExecutable() { return m_haveExecutable; }
+
+    /**
+     * Is the debuggee active, i.e. was it started by the debugger?
+     */
+    bool isProgramActive() { return m_programActive; }
+
+    /** Is the breakpoint table visible? */
+    bool isBreakListVisible() { return m_bpTable.isVisible(); }
+
+    /** The table of breakpoints. */
+    BreakpointTable& breakList() { return m_bpTable; }
+
+    const QString& executable() const { return m_executable; }
+
     void setCoreFile(const QString& corefile) { m_corefile = corefile; }
 
-protected:
-    // session properties
-    virtual void saveProperties(KConfig*);
-    virtual void readProperties(KConfig*);
     // settings
     void saveSettings(KConfig*);
     void restoreSettings(KConfig*);
@@ -159,17 +291,11 @@ public:
      * after any high-priority commands.
      */
     CmdQueueItem* queueCmd(DbgCommand cmd, QString cmdString, QueueMode mode);
-    /**
-     * Is the debugger ready to receive another high-priority command?
-     */
-    bool isReady() const { return m_haveExecutable &&
-	    /*(m_state == DSidle || m_state == DSrunningLow)*/
-	    m_hipriCmdQueue.isEmpty(); }
+
 protected:
     QQueue<CmdQueueItem> m_hipriCmdQueue;
     QList<CmdQueueItem> m_lopriCmdQueue;
     CmdQueueItem* m_activeCmd;		/* the cmd we are working on */
-    bool m_delayedPrintThis;		/* whether we delayed "print *this" */
     void parse(CmdQueueItem* cmd);
     VarTree* parseExpr(const char* name, bool wantErrorValue = true);
     void handleRunCommands();
@@ -214,30 +340,19 @@ protected:
     QFile m_logFile;
 #endif
 
-    /**
-     * Is the window that shows "this" visible?
-     */
-    bool isThisPaneVisible();
-    void updateLineStatus(int lineNo);	/* zero-based line number */
+    QString m_statusMessage;
 
-public slots:
-    virtual void menuCallback(int item);
-    virtual void updateUIItem(UpdateUI* item);
+protected slots:
     void receiveOutput(KProcess*, char* buffer, int buflen);
     void commandRead(KProcess*);
     void gdbExited(KProcess*);
-    void updateUI();
     void gotoFrame(int);
-    void slotAddWatch();
-    void slotDeleteWatch();
-    void slotWatchHighlighted(int);
     void slotLocalsExpanding(KTreeViewItem*, bool&);
     void slotWatchExpanding(KTreeViewItem*, bool&);
-    void slotFileChanged();
-    void slotLineChanged();
-    void slotAnimationTimeout();
     void slotToggleBreak(const QString&, int);
     void slotEnaDisBreak(const QString&, int);
+    void slotUpdateAnimation();
+    void slotDeleteWatch();
     
 signals:
     /**
@@ -280,45 +395,33 @@ signals:
      * if you are the editor which changed the executable.)
      */
     void executableUpdated();
-    void forwardMenuCallback(int item);
-    
+
+    /**
+     * This signal is emitted when the animated icon should advance to the
+     * next picture.
+     */
+    void animationTimeout();
+
+    /**
+     * Indicates that a new status message is available.
+     */
+    void updateStatusMessage();
+
+    /**
+     * Indicates that the internal state of the debugger has changed, and
+     * that this will very likely have an impact on the UI.
+     */
+    void updateUI();
+
 protected:
     BreakpointTable m_bpTable;
+    ExprWnd& m_localVariables;
+    ExprWnd& m_watchVariables;
+    QListBox& m_btWindow;
     
-    KMenuBar m_menu;
-    KToolBar m_toolbar;
-    KStatusBar m_statusbar;
-    // statusbar texts
-    QString m_statusActive;
-    // animated buttons
-    QList<QPixmap> m_animation;
+    // animation
     QTimer m_animationTimer;
-    uint m_animationCounter;
     int m_animationInterval;
-    
-    // view windows
-    KNewPanner m_mainPanner;
-    KNewPanner m_leftPanner;
-    KNewPanner m_rightPanner;
-    WinStack m_filesWindow;
-    QListBox m_btWindow;
-    ExprWnd m_localVariables;
-    
-    QWidget m_watches;
-    QLineEdit m_watchEdit;
-    QPushButton m_watchAdd;
-    QPushButton m_watchDelete;
-    ExprWnd m_watchVariables;
-    QVBoxLayout m_watchV;
-    QHBoxLayout m_watchH;
-
-    // menus
-    QPopupMenu m_menuFile;
-    QPopupMenu m_menuView;
-    QPopupMenu m_menuProgram;
-    QPopupMenu m_menuBrkpt;
-    QPopupMenu m_menuWindow;
-    QPopupMenu m_menuHelp;
     
     // implementation helpers
 protected:
@@ -327,6 +430,8 @@ protected:
     void initAnimation();
     void startAnimation(bool fast);
     void stopAnimation();
+
+    QWidget* parentWidget() { return static_cast<QWidget*>(parent()); }
 
     friend class BreakpointTable;
 };

@@ -343,13 +343,12 @@ void FileWindow::mouseReleaseEvent(QMouseEvent* ev)
 
 
 
-WinStack::WinStack(QWidget* parent, const char* name, const BreakpointTable& bpt) :
+WinStack::WinStack(QWidget* parent, const char* name) :
 	QWidget(parent, name),
 	m_activeWindow(0),
 	m_windowMenu(0),
 	m_itemMore(0),
-	m_pcLine(-1),
-	m_bpTable(bpt)
+	m_pcLine(-1)
 {
     // Call menu implementation helper
     initMenu();
@@ -440,7 +439,7 @@ void WinStack::menuCallback(int item)
 
 void WinStack::openFile()
 {
-    QString fileName = KFileDialog::getOpenFileName(m_lastOpenDir);
+    QString fileName = KFileDialog::getOpenFileName(m_lastOpenDir, 0, this);
     TRACE("openFile: " + fileName);
     if (fileName.isEmpty()) {
 	return;
@@ -525,7 +524,7 @@ bool WinStack::activatePath(QString pathName, int lineNo)
 	fw->loadFile();
 	
 	// set PC if there is one
-	updateLineItems();
+	emit newFileLoaded();
 	if (m_pcLine >= 0) {
 	    setPC(true, m_pcFile, m_pcLine, m_pcFrame);
 	}
@@ -597,7 +596,7 @@ void WinStack::changeWindowMenu()
     while ((m_windowMenu->idAt(m_itemMore) & ~ID_WINDOW_INDEX_MASK) == ID_WINDOW_MORE) {
 	m_windowMenu->removeItemAt(m_itemMore);
     }
-    
+
     // insert current windows
     QString text;
     int index = 1;
@@ -614,11 +613,11 @@ void WinStack::changeWindowMenu()
     }
 }
 
-void WinStack::updateLineItems()
+void WinStack::updateLineItems(const BreakpointTable& bpt)
 {
     FileWindow* fw = 0;
     for (fw = m_fileList.first(); fw != 0; fw = m_fileList.next()) {
-	fw->updateLineItems(m_bpTable);
+	fw->updateLineItems(bpt);
     }
 }
 
