@@ -770,9 +770,6 @@ void KDebugger::restoreBreakpoints(KSimpleConfig* config)
 	bp->enabled = config->readBoolEntry(Enabled, true);
 	bp->temporary = config->readBoolEntry(Temporary, false);
 	bp->condition = config->readEntry(Condition);
-	bp->hitCount = 0;
-	bp->ignoreCount = 0;
-	bp->id = 0;
 
 	/*
 	 * Add the breakpoint.
@@ -1776,10 +1773,6 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
     // yes, new
     Breakpoint* bp = new Breakpoint;
     bp->id = id;
-    bp->temporary = false;
-    bp->enabled = true;
-    bp->hitCount = 0;
-    bp->ignoreCount = 0;
     bp->fileName = file;
     bp->lineNo = lineNo;
     bp->address = address;

@@ -182,6 +182,7 @@ struct Breakpoint
     // the following items repeat the location, but in a better usable way
     QString fileName;
     int lineNo;				/* zero-based line number */
+    Breakpoint();
 };
 
 /**

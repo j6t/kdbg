@@ -531,4 +531,13 @@ bool operator>(const DbgAddr& a1, const DbgAddr& a2)
 }
 
 
+Breakpoint::Breakpoint() :
+	id(0),
+	temporary(false),
+	enabled(true),
+	ignoreCount(0),
+	hitCount(0),
+	lineNo(0)
+{ }
+
 #include "dbgdriver.moc"
