@@ -6,15 +6,24 @@
 #include "pgmargs.h"
 #include <kapp.h>
 
-PgmArgs::PgmArgs(QWidget* parent, const char* pgm) :
+PgmArgs::PgmArgs(QWidget* parent, const char* pgm, QDict<EnvVar>& envVars) :
 	QDialog(parent, "pgmargs", true),
+	m_envVars(envVars),
 	m_label(this, "label"),
 	m_programArgs(this, "args"),
+	m_envLabel(this, "env_label"),
+	m_envVar(this, "env_var"),
+	m_envList(this, "env_list", 2),
 	m_buttonOK(this, "ok"),
 	m_buttonCancel(this, "cancel"),
+	m_buttonModify(this, "modify"),
+	m_buttonDelete(this, "delete"),
 	m_layout(this, 8),
-	m_buttons(4)
+	m_edits(8),
+	m_buttons(8)
 {
+    m_envVars.setAutoDelete(false);
+
     QString title = kapp->getCaption();
     title += i18n(": Program arguments");
     setCaption(title);
@@ -32,31 +41,182 @@ PgmArgs::PgmArgs(QWidget* parent, const char* pgm) :
     m_programArgs.setMaxLength(10000);
     m_programArgs.setFrame(true);
 
-    m_buttonOK.setMinimumSize(100, 30);
-    connect(&m_buttonOK, SIGNAL(clicked()), SLOT(accept()));
+    m_envLabel.setText(i18n("Environment variables (NAME=value):"));
+    s = m_envLabel.sizeHint();
+    m_envLabel.setMinimumSize(s);
+
+    m_envVar.setMinimumSize(330, 24);
+    m_envVar.setMaxLength(10000);
+    m_envVar.setFrame(true);
+
+    m_envList.setMinimumSize(330, 40);
+    m_envList.setColumn(0, i18n("Name"), 70);
+    m_envList.setColumn(1, i18n("Value"), 260);
+    /* work around a non-feature of KTabListBox: */
+    m_envList.setFocusPolicy(QWidget::StrongFocus);
+    m_envList.setSeparator('\n');
+    connect(&m_envList, SIGNAL(highlighted(int,int)),
+	    SLOT(envListHighlighted(int,int)));
+    initEnvList();
+
     m_buttonOK.setText(i18n("OK"));
     m_buttonOK.setDefault(true);
+    s = m_buttonOK.sizeHint();
+    m_buttonOK.setMinimumSize(s);
+    connect(&m_buttonOK, SIGNAL(clicked()), SLOT(accept()));
 
-    m_buttonCancel.setMinimumSize(100, 30);
-    connect(&m_buttonCancel, SIGNAL(clicked()), SLOT(reject()));
     m_buttonCancel.setText(i18n("Cancel"));
+    s = m_buttonCancel.sizeHint();
+    m_buttonCancel.setMinimumSize(s);
+    connect(&m_buttonCancel, SIGNAL(clicked()), SLOT(reject()));
 
-    m_layout.addWidget(&m_label);
-    m_layout.addWidget(&m_programArgs);
+    m_buttonModify.setText(i18n("&Modify"));
+    s = m_buttonModify.sizeHint();
+    m_buttonModify.setMinimumSize(s);
+    connect(&m_buttonModify, SIGNAL(clicked()), SLOT(modifyVar()));
+
+    m_buttonDelete.setText(i18n("&Delete"));
+    s = m_buttonDelete.sizeHint();
+    m_buttonDelete.setMinimumSize(s);
+    connect(&m_buttonDelete, SIGNAL(clicked()), SLOT(deleteVar()));
+
+    m_layout.addLayout(&m_edits, 10);
     m_layout.addLayout(&m_buttons);
-    m_layout.addStretch(10);
-    m_buttons.addStretch(10);
+    m_edits.addWidget(&m_label);
+    m_edits.addWidget(&m_programArgs);
+    m_edits.addWidget(&m_envLabel);
+    m_edits.addWidget(&m_envVar);
+    m_edits.addWidget(&m_envList, 10);
     m_buttons.addWidget(&m_buttonOK);
-    m_buttons.addSpacing(40);
     m_buttons.addWidget(&m_buttonCancel);
+    m_buttons.addWidget(&m_buttonModify);
+    m_buttons.addWidget(&m_buttonDelete);
     m_buttons.addStretch(10);
 
     m_layout.activate();
 
     m_programArgs.setFocus();
-    resize(300, 100);
+    resize(300, 300);
 }
 
 PgmArgs::~PgmArgs()
 {
 }
+
+void PgmArgs::modifyVar()
+{
+    QString name, value;
+    parseEnvInput(name, value);
+    if (name.isEmpty())
+	return;
+
+    // lookup the value in the dictionary
+    EnvVar* val = m_envVars[name];
+    if (val != 0) {
+	// see if this is a zombie
+	if (val->status == EnvVar::EVdeleted) {
+	    // resurrect
+	    val->value = value;
+	    val->status = EnvVar::EVdirty;
+	    val->idx = m_envList.count();
+	    m_envList.appendItem(name + "\n" + value);
+	    m_envVars.insert(name, val);
+	} else if (value != val->value) {
+	    // change the value
+	    val->value = value;
+	    val->status = EnvVar::EVdirty;
+	    m_envList.changeItemPart(value, val->idx, 1);
+	}
+    } else {
+	// add the value
+	val = new EnvVar;
+	val->value = value;
+	val->status = EnvVar::EVnew;
+	val->idx = m_envList.count();
+	m_envList.appendItem(name + "\n" + value);
+	m_envVars.insert(name, val);
+    }
+}
+
+void PgmArgs::deleteVar()
+{
+    QString name, value;
+    parseEnvInput(name, value);
+
+    // lookup the value in the dictionary
+    EnvVar* val = m_envVars[name];
+    if (val == 0)
+	return;
+
+    // delete from list
+    int idx = val->idx;
+    m_envList.removeItem(idx);
+    // if this is a new item, delete it completely, otherwise zombie-ize it
+    if (val->status == EnvVar::EVnew) {
+	m_envVars.remove(name);
+	delete val;
+    } else {
+	// mark value deleted
+	val->idx = -1;
+	val->status = EnvVar::EVdeleted;
+	// update the indices of the remaining items
+	QDictIterator<EnvVar> it = m_envVars;
+	while ((val = it) != 0) {
+	    if (val->idx > idx) {
+		--val->idx;
+	    }
+	    ++it;
+	}
+    }
+    // clear the input
+    m_envVar.setText("");
+}
+
+void PgmArgs::parseEnvInput(QString& name, QString& value)
+{
+    // parse input from edit field
+    const char* input = m_envVar.text();
+    const char* equalSign = strchr(input, '=');
+    if (equalSign != 0) {
+	name = QString(input, equalSign-input+1).stripWhiteSpace();
+	value = equalSign+1;
+    } else {
+	name = QString(input).stripWhiteSpace();
+	value = QString();		/* value is empty */
+    }
+}
+
+void PgmArgs::initEnvList()
+{
+    QDictIterator<EnvVar> it = m_envVars;
+    EnvVar* val;
+    int i = 0;
+    QString name;
+    for (; (val = it) != 0; ++it) {
+	val->idx = i++;
+	val->status = EnvVar::EVclean;
+	name = it.currentKey();
+	m_envList.appendItem(name + "\n" + val->value);
+    }
+}
+
+void PgmArgs::envListHighlighted(int idx, int /*col*/)
+{
+    // must get name from list box
+    QString name = m_envList.text(idx, 0);
+    EnvVar* val = m_envVars[name];
+    ASSERT(val != 0);
+    if (val != 0) {
+	m_envVar.setText(name + "=" + val->value);
+    } else {
+	m_envVar.setText(name);
+    }
+}
+
+void PgmArgs::accept()
+{
+    modifyVar();
+    QDialog::accept();
+}
+
+#include "pgmargs.moc"

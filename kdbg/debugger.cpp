@@ -106,6 +106,8 @@ KDebugger::KDebugger(const char* name) :
     m_gdbOutputAlloc = 4000;
     m_gdbOutput = new char[m_gdbOutputAlloc];
 
+    m_envVars.setAutoDelete(true);
+
     initMenu();
     setMenu(&m_menu);
     
@@ -434,12 +436,10 @@ void KDebugger::menuCallback(int item)
 	break;
     case ID_PROGRAM_ARGS:
 	if (m_haveExecutable) {
-	    PgmArgs dlg(this, m_executable);
+	    PgmArgs dlg(this, m_executable, m_envVars);
 	    dlg.setText(m_programArgs);
 	    if (dlg.exec()) {
-		m_programArgs = dlg.text();
-		executeCmd(DCsetargs, "set args " + m_programArgs);
-		TRACE("new pgm args: " + m_programArgs + "\n");
+		updateProgEnvironment(dlg.text(), dlg.envVars());
 	    }
 	}
 	break;
@@ -1288,6 +1288,8 @@ void KDebugger::parse(CmdQueueItem* cmd)
     case DCtty:
     case DCsetargs:
 	// there is no output
+    case DCsetenv:
+	/* if value is empty, we see output, but we don't care */
 	break;
     case DCinitialize:
 	// get version number from preamble
@@ -1544,6 +1546,41 @@ void KDebugger::updateBreakptTable()
 {
     m_bpTable.parseBreakpoint(m_gdbOutput);
     queueCmd(DCinfobreak, "info breakpoints", QMoverride);
+}
+
+void KDebugger::updateProgEnvironment(const char* args, const QDict<EnvVar>& newVars)
+{
+    m_programArgs = args;
+    executeCmd(DCsetargs, "set args " + m_programArgs);
+    TRACE("new pgm args: " + m_programArgs + "\n");
+
+    QDictIterator<EnvVar> it = newVars;
+    EnvVar* val;
+    for (; (val = it) != 0; ++it) {
+	switch (val->status) {
+	case EnvVar::EVnew:
+	    m_envVars.insert(it.currentKey(), val);
+	    // fall thru
+	case EnvVar::EVdirty:
+	    // the value must be in our list
+	    ASSERT(m_envVars[it.currentKey()] == val);
+	    // update value
+	    executeCmd(DCsetenv, QString("set env ") + it.currentKey() + " " + val->value);
+	    break;
+	case EnvVar::EVdeleted:
+	    // must be in our list
+	    ASSERT(m_envVars[it.currentKey()] == val);
+	    // delete value
+	    executeCmd(DCsetenv, QString("unset env ") + it.currentKey());
+	    m_envVars.remove(it.currentKey());
+	    break;
+	default:
+	    ASSERT(false);
+	case EnvVar::EVclean:
+	    // variable not changed
+	    break;
+	}
+    }
 }
 
 void KDebugger::handleLocals()

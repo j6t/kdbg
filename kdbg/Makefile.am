@@ -180,3 +180,7 @@ updateui.moc: updateui.h
 brkpt.cpp: brkpt.moc
 brkpt.moc: brkpt.h
 	$(MOC) brkpt.h -o brkpt.moc
+
+pgmargs.cpp: pgmargs.moc
+pgmargs.moc: pgmargs.h
+	$(MOC) pgmargs.h -o pgmargs.moc

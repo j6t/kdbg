@@ -19,6 +19,7 @@
 #include "winstack.h"
 #include "exprwnd.h"
 #include "brkpt.h"
+#include "envvar.h"
 
 // forward declarations
 class UpdateUI;
@@ -64,6 +65,7 @@ public:
 	DCinfolinemain,
 	DCinfolocals,
 	DCsetargs,
+	DCsetenv,
 	DCbt,
 	DCrun,
 	DCcont,
@@ -172,6 +174,7 @@ protected:
     void handleRunCommands();
     void updateAllExprs();
     void updateBreakptTable();
+    void updateProgEnvironment(const char* args, const QDict<EnvVar>& newVars);
     bool parseLocals(QList<VarTree>& newVars);
     void handleLocals();
     bool handlePrint(const char* var, ExprWnd* wnd);
@@ -195,6 +198,7 @@ protected:
     QString m_corefile;
     QString m_attachedPid;		/* user input of attaching to pid */
     QString m_programArgs;
+    QDict<EnvVar> m_envVars;		/* environment variables set by user */
     KSimpleConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
     void saveProgramSettings();
     void restoreProgramSettings();
