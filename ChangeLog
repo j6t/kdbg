@@ -1,0 +1,244 @@
+Version 1.2.2
+
+	Fixed a special, but common case where removing a breakpoint didn't
+	work but add more on the same line instead (thanks to Ron Lerech).
+
+	Fixed invisible toolbar under KDE 2.1.2 (thanks to Neil Butterworth).
+
+	Fixed compilation for gcc 3.0 (thanks to Ben Burton):
+
+	Fixed make install if srcdir != builddir.
+
+	Changed encoding of German translations (and also Danish, Italian,
+	Norwegian, Romanian, Slovak, Swedish) to UTF-8, which fixes message
+	strings under KDE2 (at least for German - couldn't test the others).
+
+Version 1.2.1
+
+	Working directory can be browsed for.
+
+	Added context menu to move the selected expression from the local
+	variables window to the watch window.
+
+	Fixed crash when environment variables are removed.
+
+	Fixed problems with trailing backslashes in watched expressions.
+
+	Fixed compilation on FreeBSD (openpty).
+
+Version 1.2.0
+
+	Translations for: Hungarian, Japanese, Norwegian (Nynorsk), Serbian,
+	Turkish
+
+	Updated the User's Manual (English, Russian (thanks, Ilmar!), German).
+
+Version 1.1.7beta1
+
+	Improved the program icon; made the installation more KDE2 compliant.
+
+	Enabled mouse wheel scrolling at various places.
+
+Version 1.1.6
+
+	Added memory display.
+
+	Single-stepping by instruction.
+
+	Watchpoints. Finally! (On Linux/i386 works best with gdb 5!)
+
+Version 1.1.5
+
+	Made Delete key work in the watch window.
+
+	Breakpoints can be enabled and disabled in the breakpoint list.
+
+	Detach from debugged program on exit (and when new program is debugged).
+
+	Added a list of recently opened executables (thanks to
+	Thomas Sparr <thomas.sparr@kreatel.se>).
+
+Version 1.1.4
+
+	Fixed endless loop on shutdown.
+
+	Brought in line with KDE 1.91 (KDE 2 beta).
+
+Version 1.1.3
+
+	Debugging of multi-threaded programs. Requires a gdb that supports
+	multi-threaded programs, like gdb 5.
+
+	Debugger window pops into the foreground when the program stops.
+
+	Made tab width a user-settable option.
+
+Version 1.1.2
+
+	Display disassembled code.
+
+Version 1.1.1
+
+	Use the KDE system fixed font for the source code window.
+
+	By default, do not log communication with gdb.
+
+	Added an integrated output window (based on code by Judin Max).
+
+	Program specific settings can be set. In particular: the debugger
+	command (required if you are debugging remote devices), the
+	terminal emulation needed for the program.
+
+Verison 1.1.0
+
+	Use docking windows thanks to Judin Max <novaprint@mtu-net.ru>.
+
+	Added a register dump window. Based on code by Judin Max.
+
+	Implemented "balloons" (tool tips) that show variable values.
+
+	./configure fix for NetBSD thanks to
+	Berndt Josef Wulf <wulf@ping.net.au>.
+
+	There's now a Swedish translation thanks to
+	Örjan Lindbergh <orjan.lindbergh@telia.com>.
+
+Version 1.0.2
+
+	Save and restore watched expressions.
+
+	More adjustments for the KRASH release.
+
+	Show <repeat...> count in QStrings like in normal C strings instead
+	of repeating the characters.
+
+	Use QListView instead of KTabListBox.
+
+Version 1.0.1
+
+	Added a hack to set a remote target. Thanks to
+	Johnny Chan <johnnykc@iprg.nokia.com>.
+
+	Display function arguments. Based on suggestions by Johnny Chan.
+
+	KDE 2 fixes.
+
+	Support builddir != srcdir.
+
+Version 1.0.0
+
+	Brought up-to-date for latest KDE 2.
+
+Version 1.0beta3
+
+	Removal of minor misfeatures.
+
+	Prepared for KDE 2 and Qt 2 (it's a configure option:
+	--with-kde-version=2).
+
+	Added Russian documentation (thanks to
+	Ilmar S. Habibulin <ilmar@ints.ru>) and German documentation.
+
+	There is now a Spanish translation thanks to
+	Manuel Soriano <manu@europa3.com>.
+
+Version 1.0beta2
+
+	Recognize strings with repeated characters: 'x' <repeats 34 times>.
+
+	Fix structs with no (additional) data members and other fixes
+	for gdb 4.18.
+
+	Save window size across sessions.
+
+	There is now an Italian translation thanks to
+	Massimo Morin <mmorin@schedsys.com>.
+
+Version 1.0beta1
+
+	Fixed non-displaying QString (Qt2) with certain gdb 4.17's (at least
+	mine here, of SuSE 6.1, had a problem :-)
+
+	Fixed cases where gdb commands where executed after debuggee has exited.
+
+	Do not execute gdb commands after an interrupt.
+
+	Updated some translations. Still most are incomplete. Please help!
+
+	There is now a Polish translation thanks to
+	Jacek Wojdel <wojdel@kbs.twi.tudelft.nl>.
+
+Version 0.3.1
+
+	The working directory for the program being debugged can be set
+	(Execution|Arguments).
+
+	There's now  a global options dialog in place (File|Global Options).
+	At the moment the debugger program (which must be gdb, but it could be
+	an experimental gdb version, for example) and the terminal for program
+	output can be specified.
+
+	Fixed Makefiles to support make DESTDIR=/tmp/foo install (which is
+	needed by packagers and to create relocatable RPMs).
+
+	There's now a Danish translation thanks to
+	Steen Rabol <rabol@get2net.dk>.
+
+Version 0.3.0
+
+Starting with this version, Qt 1.42 and KDE 1.1 is required.
+
+	Ported to Qt 2.0 and KDE post-1.1! KDbg now runs with both
+	KDE 1.1 (using Qt 1.42) and the latest experimental KDE. You can of
+	course run one version and debug programs written for the other version.
+
+	KDbg can now display Qt 2.0's QString values (which are Unicode
+	strings)!
+
+	Environment variables can be set. Changes become effective the next time
+	the program being debugged is run.
+
+	The breakpoint list has been improved. It disables command buttons at
+	times when it is not possible to change breakpoints. The icons that
+	show the breakpoint status are now the same as those in the source
+	window.
+
+	Popup menus (context menus) for frequently used commands have been added
+	to the source code window (thanks to Tom Nguyen <ttomnguyen@yahoo.com>)
+
+	There's now a Russian translation thanks to
+	Ilmar Habibulin <ilmar@ints.ru>.
+
+	Internal restructuring. These changes are invisible. They just make
+	future extensions less cumbersome.
+
+Version 0.2.5
+
+This is the last version that supports Qt 1.33 and KDE 1.0.
+
+	There's now a Czech translation thanks to
+	Martin Spirk <spirk@kla.pvt.cz>.
+
+	Recognize and report when gdb dies unexpectedly. This happens commonly
+	when writing CORBA programs since gdb obviously has problems in
+	debugging C++ classes with virtual base classes.
+
+	Added conditional breakpoints and ignore counts.
+
+Version 0.2.4
+
+	Added a toolbar button to load the executable. The button to open a
+	source file is still there. I hope it's clear which one does what.
+
+	Attaching to a running process is now possible (Execution|Attach).
+
+	Made more visible when gdb is busy using a gear wheel in the upper right
+	corner of the window like kfm.
+
+	Made the KTreeView widget more flexible by adding a bunch of virtual
+	keywords. (No, this doesn't have any influence on the look and feel of
+	KDbg.) While doing that, I fixed a small repainting bug.
+
+
+ChangeLog starts here.
+See web page at http://members.telecom.at/~johsixt/ for more changes.

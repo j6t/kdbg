@@ -25,9 +25,4 @@ EXTRA_DIST = \
 ####                  END KDEStudio part                  ####
 #2########################################################!@#$
 
-mocs.cpp: stabctl.moc stabbar.moc
-stabctl.moc: $(srcdir)/stabctl.h
-	$(MOC) $(srcdir)/stabctl.h -o stabctl.moc
-
-stabbar.moc: $(srcdir)/stabbar.h
-	$(MOC) $(srcdir)/stabbar.h -o stabbar.moc
+METASOURCES = AUTO

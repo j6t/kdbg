@@ -5,41 +5,41 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
-"POT-Creation-Date: 2000-11-24 21:14+0100\n"
+"POT-Creation-Date: 2001-04-28 22:45+0200\n"
 "PO-Revision-Date: 2000-05-12 20:54+0900\n"
 "Last-Translator: Eri Ishida <>\n"
 "Language-Team: Japanese <Kdeveloper@kde.gr.jp>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=utf8\n"
+"Content-Type: text/plain; charset=utf-8\n"
 "Content-Transfer-Encoding: 8-bit\n"
 "X-Generator: PODB ver.0.2.0\n"
 
-#: pgmargs.cpp:34
+#: pgmargs.cpp:37
 msgid ": Program arguments"
 msgstr "プログラムの引数"
 
-#: pgmargs.cpp:37
+#: pgmargs.cpp:40
 #, c-format
 msgid "Run %s with these arguments:"
 msgstr "これらの引数で %s を実行"
 
-#: pgmargs.cpp:55
+#: pgmargs.cpp:58
 msgid "Working directory:"
 msgstr "作業ディレクトリ:"
 
-#: pgmargs.cpp:65
+#: pgmargs.cpp:73
 msgid "Environment variables (NAME=value):"
 msgstr "環境変数 (NAME=values):"
 
-#: pgmargs.cpp:74
+#: pgmargs.cpp:82
 msgid "Name"
 msgstr "名前"
 
-#: pgmargs.cpp:75 regwnd.cpp:210 regwnd.cpp:218
+#: pgmargs.cpp:83 regwnd.cpp:210 regwnd.cpp:218
 msgid "Value"
 msgstr "値"
 
-#: pgmargs.cpp:91
+#: pgmargs.cpp:99
 msgid "&Modify"
 msgstr "変更(&M)"
 
@@ -59,7 +59,7 @@ msgstr ""
 "gdbの予期せぬ終了\n"
 "セッションを再スタート(例；with File|Executable)"
 
-#: gdbdriver.cpp:1775
+#: gdbdriver.cpp:1799
 msgid "New working directory: "
 msgstr "新しい作業ディレクトリ:"
 
@@ -193,35 +193,35 @@ msgstr ""
 msgid "Thread ID"
 msgstr ""
 
-#: dbgmainwnd.cpp:189 winstack.cpp:58 winstack.cpp:68
+#: dbgmainwnd.cpp:196 winstack.cpp:58 winstack.cpp:68
 msgid "&Open Source..."
 msgstr "ソースを開く(&O)"
 
-#: dbgmainwnd.cpp:223 winstack.cpp:60
+#: dbgmainwnd.cpp:230 winstack.cpp:60
 msgid "Step &into"
 msgstr "ステップ イントゥ(&i)"
 
-#: dbgmainwnd.cpp:224 winstack.cpp:61
+#: dbgmainwnd.cpp:231 winstack.cpp:61
 msgid "Step &over"
 msgstr "ステップ オーバー(&o)"
 
-#: dbgmainwnd.cpp:225 winstack.cpp:62
+#: dbgmainwnd.cpp:232 winstack.cpp:62
 msgid "Step o&ut"
 msgstr "ステップ アウト(&u)"
 
-#: dbgmainwnd.cpp:226 winstack.cpp:63
+#: dbgmainwnd.cpp:233 winstack.cpp:63
 msgid "Run to &cursor"
 msgstr "カーソルまで行く(&c)"
 
-#: dbgmainwnd.cpp:245 winstack.cpp:65
+#: dbgmainwnd.cpp:252 winstack.cpp:65
 msgid "Set/Clear &breakpoint"
 msgstr "ブレークポイントのセット／クリア(&b)"
 
-#: dbgmainwnd.cpp:192 winstack.cpp:70
+#: dbgmainwnd.cpp:199 winstack.cpp:70
 msgid "&Executable..."
 msgstr "実行可能(&E)"
 
-#: dbgmainwnd.cpp:195 winstack.cpp:71
+#: dbgmainwnd.cpp:202 winstack.cpp:71
 msgid "&Core dump..."
 msgstr "コアダンプ(&C)"
 
@@ -249,15 +249,13 @@ msgstr "進む(&F)"
 msgid "&Backward"
 msgstr "戻る(&B)"
 
-#: ttywnd.cpp:155
+#: ttywnd.cpp:158
 msgid "&Clear"
 msgstr ""
 
 #: prefdebugger.cpp:23
 msgid "To revert to the default settings, clear the entries."
-msgstr ""
-"デフォルトの設定を復元するには、エントリーを削除し�"
-"�ください。"
+msgstr "デフォルトの設定を復元するには、エントリーを削除してください。"
 
 #: prefdebugger.cpp:27
 msgid "How to invoke &GDB:"
@@ -325,7 +323,7 @@ msgstr ""
 msgid "&Debugger"
 msgstr ""
 
-#: dbgmainwnd.cpp:214 pgmsettings.cpp:123
+#: dbgmainwnd.cpp:221 pgmsettings.cpp:123
 msgid "&Output"
 msgstr ""
 
@@ -410,201 +408,205 @@ msgstr ""
 msgid "Memory"
 msgstr ""
 
-#: dbgmainwnd.cpp:190
+#: dbgmainwnd.cpp:152
+msgid "Watch Expression"
+msgstr ""
+
+#: dbgmainwnd.cpp:197
 msgid "&Reload Source"
 msgstr "ソースの再読み込み(&R)"
 
-#: dbgmainwnd.cpp:193
+#: dbgmainwnd.cpp:200
 #, fuzzy
 msgid "Recent E&xecutables"
 msgstr "実行可能"
 
-#: dbgmainwnd.cpp:194
+#: dbgmainwnd.cpp:201
 #, fuzzy
 msgid "&Settings..."
 msgstr "検索(&F)"
 
-#: dbgmainwnd.cpp:197
+#: dbgmainwnd.cpp:204
 msgid "&Global Options..."
 msgstr "グローバルオプション(&G)"
 
-#: dbgmainwnd.cpp:205
+#: dbgmainwnd.cpp:212
 msgid "&Find..."
 msgstr "検索(&F)"
 
-#: dbgmainwnd.cpp:207
+#: dbgmainwnd.cpp:214
 msgid "Source &code"
 msgstr ""
 
-#: dbgmainwnd.cpp:208
+#: dbgmainwnd.cpp:215
 msgid "Stac&k"
 msgstr ""
 
-#: dbgmainwnd.cpp:209
+#: dbgmainwnd.cpp:216
 msgid "&Locals"
 msgstr ""
 
-#: dbgmainwnd.cpp:210
+#: dbgmainwnd.cpp:217
 msgid "&Watched expressions"
 msgstr ""
 
-#: dbgmainwnd.cpp:211
+#: dbgmainwnd.cpp:218
 msgid "&Registers"
 msgstr ""
 
-#: dbgmainwnd.cpp:212
+#: dbgmainwnd.cpp:219
 #, fuzzy
 msgid "&Breakpoints"
 msgstr "ブレークポイント"
 
-#: dbgmainwnd.cpp:213
+#: dbgmainwnd.cpp:220
 msgid "T&hreads"
 msgstr ""
 
-#: dbgmainwnd.cpp:215
+#: dbgmainwnd.cpp:222
 msgid "&Memory"
 msgstr ""
 
-#: dbgmainwnd.cpp:217
+#: dbgmainwnd.cpp:224
 msgid "Toggle &Toolbar"
 msgstr "ツールバーをトグル(&T)"
 
-#: dbgmainwnd.cpp:218
+#: dbgmainwnd.cpp:225
 msgid "Toggle &Statusbar"
 msgstr "ステータスバーをトグル(&S)"
 
-#: dbgmainwnd.cpp:222
+#: dbgmainwnd.cpp:229
 msgid "&Run"
 msgstr "実行(&R)"
 
-#: dbgmainwnd.cpp:227
+#: dbgmainwnd.cpp:234
 msgid "Step i&nto by instruction"
 msgstr ""
 
-#: dbgmainwnd.cpp:228
+#: dbgmainwnd.cpp:235
 msgid "Step o&ver by instruction"
 msgstr ""
 
-#: dbgmainwnd.cpp:230
+#: dbgmainwnd.cpp:237
 msgid "&Break"
 msgstr "ブレーク(&B)"
 
-#: dbgmainwnd.cpp:231
+#: dbgmainwnd.cpp:238
 msgid "&Kill"
 msgstr ""
 
-#: dbgmainwnd.cpp:232
+#: dbgmainwnd.cpp:239
 msgid "Re&start"
 msgstr "再スタート(&s)"
 
-#: dbgmainwnd.cpp:233
+#: dbgmainwnd.cpp:240
 msgid "A&ttach..."
 msgstr "接続(&t)"
 
-#: dbgmainwnd.cpp:235
+#: dbgmainwnd.cpp:242
 msgid "&Arguments..."
 msgstr "引数(&A)"
 
-#: dbgmainwnd.cpp:246
+#: dbgmainwnd.cpp:253
 msgid "Set &temporary breakpoint"
 msgstr "仮ブレークポイントをセット(&t)"
 
-#: dbgmainwnd.cpp:247
+#: dbgmainwnd.cpp:254
 msgid "&Enable/Disable breakpoint"
 msgstr "ブレークポイントを有効／無効(&E)"
 
-#: dbgmainwnd.cpp:253
+#: dbgmainwnd.cpp:260
 msgid "&More..."
 msgstr "More(&M)"
 
-#: dbgmainwnd.cpp:264
+#: dbgmainwnd.cpp:271
 msgid "E&xecution"
 msgstr "実行(&x)"
 
-#: dbgmainwnd.cpp:265
+#: dbgmainwnd.cpp:272
 msgid "&Breakpoint"
 msgstr "ブレークポイント(&B)"
 
-#: dbgmainwnd.cpp:266
+#: dbgmainwnd.cpp:273
 msgid "&Window"
 msgstr "ウインドウ(&W)"
 
-#: dbgmainwnd.cpp:280
+#: dbgmainwnd.cpp:287
 msgid "Executable"
 msgstr "実行可能"
 
-#: dbgmainwnd.cpp:282
+#: dbgmainwnd.cpp:289
 msgid "Open a source file"
 msgstr "ソースファイルを開く"
 
-#: dbgmainwnd.cpp:284
+#: dbgmainwnd.cpp:291
 msgid "Reload source file"
 msgstr "ソースファイルを再読み込み"
 
-#: dbgmainwnd.cpp:287
+#: dbgmainwnd.cpp:294
 msgid "Run/Continue"
 msgstr "実行／続ける"
 
-#: dbgmainwnd.cpp:289
+#: dbgmainwnd.cpp:296
 msgid "Step into"
 msgstr "ステップイントゥ"
 
-#: dbgmainwnd.cpp:291
+#: dbgmainwnd.cpp:298
 msgid "Step over"
 msgstr "ステップオーバー"
 
-#: dbgmainwnd.cpp:293
+#: dbgmainwnd.cpp:300
 msgid "Step out"
 msgstr "ステップアウト"
 
-#: dbgmainwnd.cpp:295
+#: dbgmainwnd.cpp:302
 msgid "Step into by instruction"
 msgstr ""
 
-#: dbgmainwnd.cpp:297
+#: dbgmainwnd.cpp:304
 msgid "Step over by instruction"
 msgstr ""
 
-#: dbgmainwnd.cpp:300
+#: dbgmainwnd.cpp:307
 msgid "Breakpoint"
 msgstr "ブレークポイント"
 
-#: dbgmainwnd.cpp:303
+#: dbgmainwnd.cpp:310
 msgid "Search"
 msgstr "検索"
 
-#: dbgmainwnd.cpp:312
+#: dbgmainwnd.cpp:319
 msgid "Line 00000"
 msgstr "00000 行"
 
-#: dbgmainwnd.cpp:316
+#: dbgmainwnd.cpp:323
 msgid "Restart"
 msgstr "再スタート"
 
-#: dbgmainwnd.cpp:317
+#: dbgmainwnd.cpp:324
 msgid "Core dump"
 msgstr "コアダンプ"
 
-#: dbgmainwnd.cpp:655
+#: dbgmainwnd.cpp:662
 #, c-format
 msgid "Line %d"
 msgstr "%d 行"
 
-#: dbgmainwnd.cpp:816
+#: dbgmainwnd.cpp:823
 #, fuzzy
 msgid "|All source files\n"
 msgstr "ソースファイルを再読み込み"
 
-#: dbgmainwnd.cpp:817
+#: dbgmainwnd.cpp:824
 #, fuzzy
 msgid "|Source files\n"
 msgstr "ソースファイルを開く"
 
-#: dbgmainwnd.cpp:818
+#: dbgmainwnd.cpp:825
 msgid "|Header files\n"
 msgstr ""
 
-#: dbgmainwnd.cpp:819
+#: dbgmainwnd.cpp:826
 msgid "*|All files"
 msgstr ""
 

@@ -1,11 +1,4 @@
 
-#ifndef HAVE_BOOL
-#define HAVE_BOOL
-typedef int bool;
-const bool false = 0;
-const bool true = 1;
-#endif
-
 #ifdef QT_VERSION
 # if QT_VERSION < 200
 #  define SIZED_QString(name,size) QString name(size)

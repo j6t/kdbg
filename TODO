@@ -1,0 +1,45 @@
+1. When, during single-stepping, the last displayed line is hit, it is often
+   only partially visible. Move the source window up in this case.
+
+7. Show a list of files for the executable.
+
+9. Use gnuclient to show source code in emacs.
+
+10. Provide formatting options in watch window via mouse, not /FMT.
+
+12. Syntax highlighting.
+
+13. Remember which subtrees have been expanded even when function is left and
+    reentered.
+
+14. Speed up direct members by reusing values that are already available in
+    members.
+
+17. To attach to a process, let the user select it from the list of processes.
+
+18. Show breakpoints in breakpoint list (and try to set them later) even if gdb
+    cannot set them immediately.
+
+19. Improve support of breakpoints in source files having directories in their
+    names.
+
+20. Provide means to change the program counter.
+
+22. Allow to change whether signals are handled or ignored.
+
+23. Deactivate "Recent Executable" when list is empty.
+
+24. Allow to view fewer or more bytes in the memory dump. Beautify the display.
+
+25. Automatic single-stepping by instruction when a source line is disassembled.
+
+26. Let the user hide some members of certain structures (on a per-type basis).
+    The parent indicates whether all members are visible. Provide a context menu
+    to display the hidden entries. Save the settings somewhere.
+
+27. Fix array display: buf[256]:
+      [0]  -1 <repeats 20 times>
+      [1]  100             <-- should be [20] 100
+
+28. Better support for remote debugging and special versions of gdb, e.g.
+    "target pilot localhost:2000".

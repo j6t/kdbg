@@ -1,17 +1,5 @@
 ## $Id$
 
-# this 10 paths are KDE specific. Use them:
-# kde_htmldir       Where your docs should go to. (contains lang subdirs)
-# kde_appsdir       Where your application file (.kdelnk) should go to. 
-# kde_icondir       Where your icon should go to.
-# kde_datadir       Where you install application data. (Use a subdir)
-# kde_locale        Where translation files should go to.(contains lang subdirs)
-# kde_cgidir        Where cgi-bin executables should go to.
-# kde_confdir       Where config files should go to.
-# kde_mimedir       Where mimetypes should go to.
-# kde_toolbardir    Where general toolbar icons should go to.
-# kde_wallpaperdir  Where general wallpapers should go to.
-
 # set the include path for X, qt and KDE
 INCLUDES= $(all_includes) -I$(top_srcdir)/STabCtl -I$(top_srcdir)/DockWidget
 
@@ -87,119 +75,22 @@ noinst_HEADERS = \
 	commandids.h \
 	mydebug.h
 
-# just to make sure, automake makes them
-BUILTSOURCES =	\
-	pgmargs.moc \
-	textvw.moc \
-	debugger.moc \
-	dbgdriver.moc \
-	gdbdriver.moc \
-	brkpt.moc \
-	exprwnd.moc \
-	regwnd.moc \
-	memwindow.moc \
-	threadlist.moc \
-	ktreeview.moc \
-	sourcewnd.moc \
-	winstack.moc \
-	ttywnd.moc \
-	pgmsettings.moc \
-	mainwndbase.moc \
-	dbgmainwnd.moc \
-	updateui.moc
-
+METASOURCES = AUTO
 
 # if you "make clean", this files get removed. If you want to remove
 # them while "make distclean", use DISTCLEANFILES
 CLEANFILES = $(kdbg_METASOURCES)
 
-
-if BUILDFORKDE2
 apps_DATA = kdbg.desktop
-else
-apps_DATA = kdbg.kdelnk
-endif
 appsdir = $(kde_appsdir)/Development
 
 
 # make messages.po. Move this one to ../po/ and "make merge" in po
 # the -x is for skipping messages already translated in kdelibs
-messages:
-	$(XGETTEXT) -C -ki18n -kI18N_NOOP -x $(includedir)/kde.pot $(kdbg_SOURCES) && mv messages.po ../po/kdbg.pot
+messages: rc.cpp
+	LIST=`find . -name \*.h -o -name \*.hh -o -name \*.H -o -name \*.hxx -o -name \*.hpp -o -name \*.cpp -o -name \*.cc -o -name \*.cxx -o -name \*.ecpp -o -name \*.C`; \
+	if test -n "$$LIST"; then \
+	 $(XGETTEXT) $$LIST -o $(podir)/kdbg.pot; \
+	fi
 
-
-EXTRA_DIST = kdbg.kdelnk kdbg.desktop
-
-# add a dependency for every moc file to be full portable
-# I've added a key binding to emacs for this. 
-$(srcdir)/debugger.cpp: debugger.moc
-debugger.moc: $(srcdir)/debugger.h
-	$(MOC) $(srcdir)/debugger.h -o debugger.moc
-
-$(srcdir)/dbgdriver.cpp: dbgdriver.moc
-dbgdriver.moc: $(srcdir)/dbgdriver.h
-	$(MOC) $(srcdir)/dbgdriver.h -o dbgdriver.moc
-
-$(srcdir)/gdbdriver.cpp: gdbdriver.moc
-gdbdriver.moc: $(srcdir)/gdbdriver.h
-	$(MOC) $(srcdir)/gdbdriver.h -o gdbdriver.moc
-
-$(srcdir)/exprwnd.cpp: exprwnd.moc
-exprwnd.moc: $(srcdir)/exprwnd.h
-	$(MOC) $(srcdir)/exprwnd.h -o exprwnd.moc
-
-$(srcdir)/regwnd.cpp: regwnd.moc
-regwnd.moc: $(srcdir)/regwnd.h
-	$(MOC) $(srcdir)/regwnd.h -o regwnd.moc
-
-$(srcdir)/memwindow.cpp: memwindow.moc
-memwindow.moc: $(srcdir)/memwindow.h
-	$(MOC) $(srcdir)/memwindow.h -o memwindow.moc
-
-$(srcdir)/threadlist.cpp: threadlist.moc
-threadlist.moc: $(srcdir)/threadlist.h
-	$(MOC) $(srcdir)/threadlist.h -o threadlist.moc
-
-$(srcdir)/textvw.cpp: textvw.moc
-textvw.moc: $(srcdir)/textvw.h
-	$(MOC) $(srcdir)/textvw.h -o textvw.moc
-
-$(srcdir)/ktreeview.cpp: ktreeview.moc
-ktreeview.moc: $(srcdir)/ktreeview.h
-	$(MOC) $(srcdir)/ktreeview.h -o ktreeview.moc
-
-$(srcdir)/sourcewnd.cpp: sourcewnd.moc
-sourcewnd.moc: $(srcdir)/sourcewnd.h
-	$(MOC) $(srcdir)/sourcewnd.h -o sourcewnd.moc
-
-$(srcdir)/winstack.cpp: winstack.moc
-winstack.moc: $(srcdir)/winstack.h
-	$(MOC) $(srcdir)/winstack.h -o winstack.moc
-
-$(srcdir)/ttywnd.cpp: ttywnd.moc
-ttywnd.moc: $(srcdir)/ttywnd.h
-	$(MOC) $(srcdir)/ttywnd.h -o ttywnd.moc
-
-$(srcdir)/updateui.cpp: updateui.moc
-updateui.moc: $(srcdir)/updateui.h
-	$(MOC) $(srcdir)/updateui.h -o updateui.moc
-
-$(srcdir)/brkpt.cpp: brkpt.moc
-brkpt.moc: $(srcdir)/brkpt.h
-	$(MOC) $(srcdir)/brkpt.h -o brkpt.moc
-
-$(srcdir)/pgmargs.cpp: pgmargs.moc
-pgmargs.moc: $(srcdir)/pgmargs.h
-	$(MOC) $(srcdir)/pgmargs.h -o pgmargs.moc
-
-$(srcdir)/pgmsettings.cpp: pgmsettings.moc
-pgmsettings.moc: $(srcdir)/pgmsettings.h
-	$(MOC) $(srcdir)/pgmsettings.h -o pgmsettings.moc
-
-$(srcdir)/mainwndbase.cpp: mainwndbase.moc
-mainwndbase.moc: $(srcdir)/mainwndbase.h
-	$(MOC) $(srcdir)/mainwndbase.h -o mainwndbase.moc
-
-$(srcdir)/dbgmainwnd.cpp: dbgmainwnd.moc
-dbgmainwnd.moc: $(srcdir)/dbgmainwnd.h
-	$(MOC) $(srcdir)/dbgmainwnd.h -o dbgmainwnd.moc
+EXTRA_DIST = kdbg.desktop

@@ -40,20 +40,4 @@ EXTRA_DIST = \
 ####                  END KDEStudio part                  ####
 #2########################################################!@#$
 
-mocs.cpp: dockmainwindow.moc dockmanager.moc \
-	dockmovemanager.moc docksplitter.moc \
-	knewpanner.moc
-dockmainwindow.moc: $(srcdir)/dockmainwindow.h
-	$(MOC) $(srcdir)/dockmainwindow.h -o dockmainwindow.moc
-
-dockmanager.moc: $(srcdir)/dockmanager.h
-	$(MOC) $(srcdir)/dockmanager.h -o dockmanager.moc
-
-dockmovemanager.moc: $(srcdir)/dockmovemanager.h
-	$(MOC) $(srcdir)/dockmovemanager.h -o dockmovemanager.moc
-
-docksplitter.moc: $(srcdir)/docksplitter.h
-	$(MOC) $(srcdir)/docksplitter.h -o docksplitter.moc
-
-knewpanner.moc: $(srcdir)/knewpanner.h
-	$(MOC) $(srcdir)/knewpanner.h -o knewpanner.moc
+METASOURCES = AUTO

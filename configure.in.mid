@@ -1,37 +1,3 @@
-
-dnl without this order in this file, autoconf will not work!
-dnl the argument is a source file out of your sources. But
-dnl acinclude.m4 makes the job for all programs ;-)
-AC_INIT(acinclude.m4)
-
-dnl without this order in this file, automake will be confused!
-dnl the argument 
-AM_CONFIG_HEADER(config.h)
-
-dnl ask for Qt and KDE version
-AC_ARG_WITH(kde-version,
-  [  --with-kde-version=N    KDE version to configure for: 1 (default) or 2],
-  :, with_kde_version=1)
-if test "x$with_kde_version" = "x1"; then
-  AC_MSG_RESULT("configuring for KDE 1.1.x and Qt 1.4x")
-elif test "x$with_kde_version" = "x2"; then
-  AC_MSG_RESULT("configuring for KDE 2 and Qt 2.x")
-else
-  AC_ERROR([The argument to --with-kde-version must be
-   1    for KDE 1.1.x or
-   2    for KDE 2
-and nothing else!])
-fi
-AM_CONDITIONAL(BUILDFORKDE2, test "x$with_kde_version" = "x2")
-
-dnl insert here your program name and version number
-KDE_USE_QT($with_kde_version)
-KDE_DO_IT_ALL(kdbg, 1.2.2)
-
-dnl in this space add everything you want to check for
-dnl examples are specific headers, libraries, etc.
-dnl everything to compile and run a KDE program is already checked
-
 dnl Checks for header files.
 AC_LANG_C dnl switch to C
 AC_HEADER_DIRENT dnl check for dirent.h
@@ -51,7 +17,6 @@ AC_HEADER_TIME
 
 dnl Checks for library functions.
 AC_CHECK_FUNCS(setpgid putenv socket vsnprintf mkfifo)
-AC_CHECK_SETENV
 
 dnl pseudo tty support in glibc2
 AC_SEARCH_LIBS(openpty, util,
@@ -114,17 +79,3 @@ AC_MSG_RESULT($ac_cv_have_placement_new)
 if eval "test \"`echo `$ac_cv_have_placement_new\" = yes"; then
   AC_DEFINE(HAVE_PLACEMENT_NEW)
 fi
-
-dnl add here all your Makefiles. These are created by configure
-AC_OUTPUT(Makefile \
-	STabCtl/Makefile \
-	DockWidget/Makefile \
-	kdbg/Makefile \
-	kdbg/doc/Makefile \
-	kdbg/doc/de/Makefile \
-	kdbg/doc/en/Makefile \
-	kdbg/doc/ru/Makefile \
-	kdbg/pics/Makefile \
-	kdbg/typetables/Makefile \
-	kdbg/testprogs/Makefile \
-	po/Makefile)

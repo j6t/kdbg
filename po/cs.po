@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.2\n"
-"POT-Creation-Date: 2000-11-24 21:14+0100\n"
+"POT-Creation-Date: 2001-04-28 22:45+0200\n"
 "PO-Revision-Date: 2001-01-09 11:00 MET\n"
 "Last-Translator: Radek Malcic <malcic@atlas.cz>\n"
 "Language-Team: Czech <flidr@kky.zcu.cz>\n"
@@ -13,32 +13,32 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: pgmargs.cpp:34
+#: pgmargs.cpp:37
 msgid ": Program arguments"
 msgstr ": Argumenty programu"
 
-#: pgmargs.cpp:37
+#: pgmargs.cpp:40
 #, c-format
 msgid "Run %s with these arguments:"
 msgstr "Spustit %s s argumenty:"
 
-#: pgmargs.cpp:55
+#: pgmargs.cpp:58
 msgid "Working directory:"
 msgstr "Pracovní adresáø:"
 
-#: pgmargs.cpp:65
+#: pgmargs.cpp:73
 msgid "Environment variables (NAME=value):"
 msgstr "Promìnné prostøedí (Jméno=hodnota):"
 
-#: pgmargs.cpp:74
+#: pgmargs.cpp:82
 msgid "Name"
 msgstr "Jméno"
 
-#: pgmargs.cpp:75 regwnd.cpp:210 regwnd.cpp:218
+#: pgmargs.cpp:83 regwnd.cpp:210 regwnd.cpp:218
 msgid "Value"
 msgstr "Hodnota"
 
-#: pgmargs.cpp:91
+#: pgmargs.cpp:99
 msgid "&Modify"
 msgstr "Z&mìnit"
 
@@ -58,7 +58,7 @@ msgstr ""
 "gdb se neoèekávanì ukonèilo\n"
 "Obnovit proces ?"
 
-#: gdbdriver.cpp:1775
+#: gdbdriver.cpp:1799
 msgid "New working directory: "
 msgstr "Nový pracovní adresáø: "
 
@@ -190,35 +190,35 @@ msgstr "&Instrukce"
 msgid "Thread ID"
 msgstr "ID Vlákna"
 
-#: dbgmainwnd.cpp:189 winstack.cpp:58 winstack.cpp:68
+#: dbgmainwnd.cpp:196 winstack.cpp:58 winstack.cpp:68
 msgid "&Open Source..."
 msgstr "&Otevøít zdroj..."
 
-#: dbgmainwnd.cpp:223 winstack.cpp:60
+#: dbgmainwnd.cpp:230 winstack.cpp:60
 msgid "Step &into"
 msgstr "Krok &do"
 
-#: dbgmainwnd.cpp:224 winstack.cpp:61
+#: dbgmainwnd.cpp:231 winstack.cpp:61
 msgid "Step &over"
 msgstr "Krok &pøes"
 
-#: dbgmainwnd.cpp:225 winstack.cpp:62
+#: dbgmainwnd.cpp:232 winstack.cpp:62
 msgid "Step o&ut"
 msgstr "Krok &ven"
 
-#: dbgmainwnd.cpp:226 winstack.cpp:63
+#: dbgmainwnd.cpp:233 winstack.cpp:63
 msgid "Run to &cursor"
 msgstr "Spustit ke &kurzoru"
 
-#: dbgmainwnd.cpp:245 winstack.cpp:65
+#: dbgmainwnd.cpp:252 winstack.cpp:65
 msgid "Set/Clear &breakpoint"
 msgstr "Nastavit/smazat &zaráµku"
 
-#: dbgmainwnd.cpp:192 winstack.cpp:70
+#: dbgmainwnd.cpp:199 winstack.cpp:70
 msgid "&Executable..."
 msgstr "Spustit&elný soubor..."
 
-#: dbgmainwnd.cpp:195 winstack.cpp:71
+#: dbgmainwnd.cpp:202 winstack.cpp:71
 msgid "&Core dump..."
 msgstr "&Core dump..."
 
@@ -247,7 +247,7 @@ msgstr "&Vpøed"
 msgid "&Backward"
 msgstr "V&zad"
 
-#: ttywnd.cpp:155
+#: ttywnd.cpp:158
 msgid "&Clear"
 msgstr "&Smazat"
 
@@ -321,7 +321,7 @@ msgstr "%s: Nastavení pro %s"
 msgid "&Debugger"
 msgstr ""
 
-#: dbgmainwnd.cpp:214 pgmsettings.cpp:123
+#: dbgmainwnd.cpp:221 pgmsettings.cpp:123
 msgid "&Output"
 msgstr "&Výstup"
 
@@ -406,196 +406,200 @@ msgstr "Vlákna"
 msgid "Memory"
 msgstr "Pamìt"
 
-#: dbgmainwnd.cpp:190
+#: dbgmainwnd.cpp:152
+msgid "Watch Expression"
+msgstr ""
+
+#: dbgmainwnd.cpp:197
 msgid "&Reload Source"
 msgstr "&Znovu naèíst zdroj"
 
-#: dbgmainwnd.cpp:193
+#: dbgmainwnd.cpp:200
 msgid "Recent E&xecutables"
 msgstr "Naposledy spu±tìné soubory"
 
-#: dbgmainwnd.cpp:194
+#: dbgmainwnd.cpp:201
 msgid "&Settings..."
 msgstr "Na&stavení..."
 
-#: dbgmainwnd.cpp:197
+#: dbgmainwnd.cpp:204
 msgid "&Global Options..."
 msgstr "&Globalní nastavení..."
 
-#: dbgmainwnd.cpp:205
+#: dbgmainwnd.cpp:212
 msgid "&Find..."
 msgstr "&Hledat..."
 
-#: dbgmainwnd.cpp:207
+#: dbgmainwnd.cpp:214
 msgid "Source &code"
 msgstr "Zdrojový &kod"
 
-#: dbgmainwnd.cpp:208
+#: dbgmainwnd.cpp:215
 msgid "Stac&k"
 msgstr "Zásobní&k"
 
-#: dbgmainwnd.cpp:209
+#: dbgmainwnd.cpp:216
 msgid "&Locals"
 msgstr "&Lokalní promìnné"
 
-#: dbgmainwnd.cpp:210
+#: dbgmainwnd.cpp:217
 msgid "&Watched expressions"
 msgstr ""
 
-#: dbgmainwnd.cpp:211
+#: dbgmainwnd.cpp:218
 msgid "&Registers"
 msgstr "&Registry"
 
-#: dbgmainwnd.cpp:212
+#: dbgmainwnd.cpp:219
 msgid "&Breakpoints"
 msgstr "&Zaráµky"
 
-#: dbgmainwnd.cpp:213
+#: dbgmainwnd.cpp:220
 msgid "T&hreads"
 msgstr "V&lákna"
 
-#: dbgmainwnd.cpp:215
+#: dbgmainwnd.cpp:222
 msgid "&Memory"
 msgstr "Pa&mì»"
 
-#: dbgmainwnd.cpp:217
+#: dbgmainwnd.cpp:224
 msgid "Toggle &Toolbar"
 msgstr "Pøepnout panel &nástrojù"
 
-#: dbgmainwnd.cpp:218
+#: dbgmainwnd.cpp:225
 msgid "Toggle &Statusbar"
 msgstr "Pøepnout &stavový øádek"
 
-#: dbgmainwnd.cpp:222
+#: dbgmainwnd.cpp:229
 msgid "&Run"
 msgstr "&Spustit"
 
-#: dbgmainwnd.cpp:227
+#: dbgmainwnd.cpp:234
 msgid "Step i&nto by instruction"
 msgstr "Krok do po instrukci"
 
-#: dbgmainwnd.cpp:228
+#: dbgmainwnd.cpp:235
 msgid "Step o&ver by instruction"
 msgstr "Krok pøes po instrukci"
 
-#: dbgmainwnd.cpp:230
+#: dbgmainwnd.cpp:237
 msgid "&Break"
 msgstr "P&øeru±it"
 
-#: dbgmainwnd.cpp:231
+#: dbgmainwnd.cpp:238
 msgid "&Kill"
 msgstr "&Zabít"
 
-#: dbgmainwnd.cpp:232
+#: dbgmainwnd.cpp:239
 msgid "Re&start"
 msgstr "Res&tartovat"
 
-#: dbgmainwnd.cpp:233
+#: dbgmainwnd.cpp:240
 msgid "A&ttach..."
 msgstr "Pøipojit..."
 
-#: dbgmainwnd.cpp:235
+#: dbgmainwnd.cpp:242
 msgid "&Arguments..."
 msgstr "&Argumenty..."
 
-#: dbgmainwnd.cpp:246
+#: dbgmainwnd.cpp:253
 msgid "Set &temporary breakpoint"
 msgstr "Nastavit &doèasnou zaráµku"
 
-#: dbgmainwnd.cpp:247
+#: dbgmainwnd.cpp:254
 msgid "&Enable/Disable breakpoint"
 msgstr "Po&volit/zakázat zaráµku"
 
-#: dbgmainwnd.cpp:253
+#: dbgmainwnd.cpp:260
 msgid "&More..."
 msgstr "&Více..."
 
-#: dbgmainwnd.cpp:264
+#: dbgmainwnd.cpp:271
 msgid "E&xecution"
 msgstr "Spu±t&ìní"
 
-#: dbgmainwnd.cpp:265
+#: dbgmainwnd.cpp:272
 msgid "&Breakpoint"
 msgstr "&Zaráµka"
 
-#: dbgmainwnd.cpp:266
+#: dbgmainwnd.cpp:273
 msgid "&Window"
 msgstr "&Okno"
 
-#: dbgmainwnd.cpp:280
+#: dbgmainwnd.cpp:287
 msgid "Executable"
 msgstr "Spustitelný soubor"
 
-#: dbgmainwnd.cpp:282
+#: dbgmainwnd.cpp:289
 msgid "Open a source file"
 msgstr "Otevøít zdrojový soubor"
 
-#: dbgmainwnd.cpp:284
+#: dbgmainwnd.cpp:291
 msgid "Reload source file"
 msgstr "Znovu naèíst zdrojový soubor"
 
-#: dbgmainwnd.cpp:287
+#: dbgmainwnd.cpp:294
 msgid "Run/Continue"
 msgstr "Spustit/Pokraèovat"
 
-#: dbgmainwnd.cpp:289
+#: dbgmainwnd.cpp:296
 msgid "Step into"
 msgstr "Krok do"
 
-#: dbgmainwnd.cpp:291
+#: dbgmainwnd.cpp:298
 msgid "Step over"
 msgstr "Krok pøes"
 
-#: dbgmainwnd.cpp:293
+#: dbgmainwnd.cpp:300
 msgid "Step out"
 msgstr "Krok ven"
 
-#: dbgmainwnd.cpp:295
+#: dbgmainwnd.cpp:302
 msgid "Step into by instruction"
 msgstr "Krok do po instrukci"
 
-#: dbgmainwnd.cpp:297
+#: dbgmainwnd.cpp:304
 msgid "Step over by instruction"
 msgstr "Krok pøes po instrukci"
 
-#: dbgmainwnd.cpp:300
+#: dbgmainwnd.cpp:307
 msgid "Breakpoint"
 msgstr "Zaráµka"
 
-#: dbgmainwnd.cpp:303
+#: dbgmainwnd.cpp:310
 msgid "Search"
 msgstr "Hledat"
 
-#: dbgmainwnd.cpp:312
+#: dbgmainwnd.cpp:319
 msgid "Line 00000"
 msgstr "Øádek 00000"
 
-#: dbgmainwnd.cpp:316
+#: dbgmainwnd.cpp:323
 msgid "Restart"
 msgstr "Restartovat"
 
-#: dbgmainwnd.cpp:317
+#: dbgmainwnd.cpp:324
 msgid "Core dump"
 msgstr "Core dump"
 
-#: dbgmainwnd.cpp:655
+#: dbgmainwnd.cpp:662
 #, c-format
 msgid "Line %d"
 msgstr "Øádek %d"
 
-#: dbgmainwnd.cpp:816
+#: dbgmainwnd.cpp:823
 msgid "|All source files\n"
 msgstr "|V±echny zdrojové soubory\n"
 
-#: dbgmainwnd.cpp:817
+#: dbgmainwnd.cpp:824
 msgid "|Source files\n"
 msgstr "|Zdrojové soubory\n"
 
-#: dbgmainwnd.cpp:818
+#: dbgmainwnd.cpp:825
 msgid "|Header files\n"
 msgstr "|Hlavièkové soubory\n"
 
-#: dbgmainwnd.cpp:819
+#: dbgmainwnd.cpp:826
 msgid "*|All files"
 msgstr "*|V±echny soubory"
 
