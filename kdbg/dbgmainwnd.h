@@ -76,6 +76,7 @@ protected:
     // to avoid flicker when the status bar is updated,
     // we store the last string that we put there
     QString m_lastActiveStatusText;
+    bool m_animRunning;
 
 signals:
     void setTabWidth(int tabWidth);
@@ -88,7 +89,6 @@ public slots:
     void slotAddWatch();
     void slotNewFileLoaded();
     void slotNewStatusMsg();
-    void slotAnimationTimeout();
     void slotDebuggerStarting();
     void slotToggleBreak(const QString&, int, const DbgAddr&, bool);
     void slotEnaDisBreak(const QString&, int, const DbgAddr&);

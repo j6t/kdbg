@@ -43,9 +43,7 @@ KDebugger::KDebugger(QWidget* parent,
 	m_d(0),
 	m_localVariables(*localVars),
 	m_watchVariables(*watchVars),
-	m_btWindow(*backtrace),
-	m_animationTimer(this),
-	m_animationInterval(0)
+	m_btWindow(*backtrace)
 {
     m_envVars.setAutoDelete(true);
     m_brkpts.setAutoDelete(true);
@@ -60,11 +58,6 @@ KDebugger::KDebugger(QWidget* parent,
 	    SLOT(slotValueEdited(int, const QString&)));
 
     connect(&m_btWindow, SIGNAL(highlighted(int)), SLOT(gotoFrame(int)));
-
-    // animation
-    connect(&m_animationTimer, SIGNAL(timeout()), SIGNAL(animationTimeout()));
-    // special update of animation
-    connect(this, SIGNAL(updateUI()), SLOT(slotUpdateAnimation()));
 
     emit updateUI();
 }
@@ -650,8 +643,7 @@ void KDebugger::gdbExited(KProcess*)
     m_ttyLevel = ttyFull;
     m_brkpts.clear();
 
-    // stop gear wheel and erase PC
-    stopAnimation();
+    // erase PC
     emit updatePC(QString(), -1, DbgAddr(), 0);
 }
 
@@ -1870,39 +1862,6 @@ void KDebugger::slotDeleteWatch()
     }
     removeExpr(&m_watchVariables, item);
     // item is invalid at this point!
-}
-
-void KDebugger::startAnimation(bool fast)
-{
-    int interval = fast ? 50 : 150;
-    if (!m_animationTimer.isActive()) {
-	m_animationTimer.start(interval);
-    } else if (m_animationInterval != interval) {
-	m_animationTimer.changeInterval(interval);
-    }
-    m_animationInterval = interval;
-}
-
-void KDebugger::stopAnimation()
-{
-    if (m_animationTimer.isActive()) {
-	m_animationTimer.stop();
-	m_animationInterval = 0;
-    }
-}
-
-void KDebugger::slotUpdateAnimation()
-{
-    if (isIdle()) {
-	stopAnimation();
-    } else {
-	/*
-	 * Slow animation while program is stopped (i.e. while variables
-	 * are displayed)
-	 */
-	bool slow = isReady() && m_programActive && !m_programRunning;
-	startAnimation(!slow);
-    }
 }
 
 void KDebugger::handleRegisters(const char* output)

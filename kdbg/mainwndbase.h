@@ -100,12 +100,6 @@ protected:
     // statusbar texts
     QString m_statusActive;
 
-    // animated button
-    QList<QPixmap> m_animation;
-    uint m_animationCounter;
-    void initAnimation(KToolBar* toolbar);
-    void nextAnimationFrame(KToolBar* toolbar);
-
     // output window
     QString m_outputTermCmdStr;
     QString m_outputTermKeepScript;

@@ -16,6 +16,7 @@
 #include <kfiledialog.h>
 #include <kprocess.h>
 #include <kkeydialog.h>
+#include <kanimwidget.h>
 #include <qlistbox.h>
 #include <qfileinfo.h>
 #include "dbgmainwnd.h"
@@ -320,7 +321,9 @@ void DebuggerMainWnd::initToolbar()
     toolbar->setBarPos(KToolBar::Top);
     //moveToolBar(toolbar);
     
-    initAnimation(toolbar);
+    toolbar->insertAnimatedWidget(ID_STATUS_BUSY, 0, 0, "pulse", -1);
+    toolbar->alignItemRight(ID_STATUS_BUSY, true);
+    m_animRunning = false;
 
     KStatusBar* statusbar = statusBar();
     statusbar->insertItem(m_statusActive, ID_STATUS_ACTIVE);
@@ -438,6 +441,20 @@ void DebuggerMainWnd::updateUI()
     actionCollection()->action("exec_break")->setEnabled(m_debugger->isProgramRunning());
     actionCollection()->action("exec_arguments")->setEnabled(m_debugger->haveExecutable());
     actionCollection()->action("edit_value")->setEnabled(m_debugger->canSingleStep());
+
+    // animation
+    KAnimWidget* w = toolBar("mainToolBar")->animatedWidget(ID_STATUS_BUSY);
+    if (m_debugger->isIdle()) {
+	if (m_animRunning) {
+	    w->stop();
+	    m_animRunning = false;
+	}
+    } else {
+	if (!m_animRunning) {
+	    w->start();
+	    m_animRunning = true;
+	}
+    }
 
     // update statusbar
     QString newStatus;
@@ -618,11 +635,6 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, QCString lang)
 void DebuggerMainWnd::slotNewStatusMsg()
 {
     newStatusMsg(statusBar());
-}
-
-void DebuggerMainWnd::slotAnimationTimeout()
-{
-    nextAnimationFrame(toolBar("mainToolBar"));
 }
 
 void DebuggerMainWnd::slotFileGlobalSettings()

@@ -7,11 +7,8 @@
 #include <klocale.h>			/* i18n */
 #include <kconfig.h>
 #include <kmessagebox.h>
-#include <kiconloader.h>
 #include <kstatusbar.h>
-#include <ktoolbar.h>
 #include <kfiledialog.h>
-#include <qpainter.h>
 #include <qtabdialog.h>
 #include <qfile.h>
 #include "mainwndbase.h"
@@ -111,7 +108,6 @@ const char defaultHeaderFilter[] = "*.h *.hh *.hpp *.h++";
 
 
 DebuggerMainWndBase::DebuggerMainWndBase() :
-	m_animationCounter(0),
 	m_outputTermCmdStr(defaultTermCmdStr),
 	m_outputTermProc(0),
 	m_ttyLevel(-1),			/* no tty yet */
@@ -155,8 +151,6 @@ void DebuggerMainWndBase::setupDebugger(QWidget* parent,
     QObject::connect(m_debugger, SIGNAL(breakpointsChanged()),
 		     parent, SLOT(updateLineItems()));
     
-    QObject::connect(m_debugger, SIGNAL(animationTimeout()),
-		     parent, SLOT(slotAnimationTimeout()));
     QObject::connect(m_debugger, SIGNAL(debuggerStarting()),
 		     parent, SLOT(slotDebuggerStarting()));
 }
@@ -394,45 +388,6 @@ QString DebuggerMainWndBase::myGetFileName(QString caption,
 	filename = dlg.selectedFile();
 
     return filename;
-}
-
-void DebuggerMainWndBase::initAnimation(KToolBar* toolbar)
-{
-    QPixmap pixmap = BarIcon("kde1");
-    int numPix = 6;
-
-    toolbar->insertButton(pixmap, ID_STATUS_BUSY);
-    toolbar->alignItemRight(ID_STATUS_BUSY, true);
-    
-    // Load animated logo
-    m_animation.setAutoDelete(true);
-    QString n;
-    for (int i = 1; i <= numPix; i++) {
-	n.sprintf("kde%d", i);
-	QPixmap* p = new QPixmap(BarIcon(n));
-	if (!p->isNull()) {
-	    m_animation.append(p);
-	} else {
-	    delete p;
-	}
-    }
-    // safeguard: if we did not find a single icon, add a dummy
-    if (m_animation.count() == 0) {
-	QPixmap* pix = new QPixmap(2,2);
-	QPainter p(pix);
-	p.fillRect(0,0,2,2,QBrush(Qt::white));
-	m_animation.append(pix);
-    }
-}
-
-void DebuggerMainWndBase::nextAnimationFrame(KToolBar* toolbar)
-{
-    assert(m_animation.count() > 0);	/* must have been initialized */
-    m_animationCounter++;
-    if (m_animationCounter == m_animation.count())
-	m_animationCounter = 0;
-    toolbar->setButtonPixmap(ID_STATUS_BUSY,
-			       *m_animation.at(m_animationCounter));
 }
 
 void DebuggerMainWndBase::newStatusMsg(KStatusBar* statusbar)

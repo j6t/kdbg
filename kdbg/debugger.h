@@ -418,7 +418,6 @@ protected slots:
     void gotoFrame(int);
     void slotLocalsExpanding(KTreeViewItem*, bool&);
     void slotWatchExpanding(KTreeViewItem*, bool&);
-    void slotUpdateAnimation();
     void slotDeleteWatch();
     void slotValuePopup(const QString&);
     void slotDisassemble(const QString&, int);
@@ -471,12 +470,6 @@ signals:
      * if you are the editor which changed the executable.)
      */
     void executableUpdated();
-
-    /**
-     * This signal is emitted when the animated icon should advance to the
-     * next picture.
-     */
-    void animationTimeout();
 
     /**
      * Indicates that a new status message is available.
@@ -544,15 +537,8 @@ protected:
     ExprWnd& m_watchVariables;
     QListBox& m_btWindow;
 
-    // animation
-    QTimer m_animationTimer;
-    int m_animationInterval;
-    
     // implementation helpers
 protected:
-    void startAnimation(bool fast);
-    void stopAnimation();
-
     QWidget* parentWidget() { return static_cast<QWidget*>(parent()); }
 
     friend class BreakpointTable;
