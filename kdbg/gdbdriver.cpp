@@ -1103,6 +1103,7 @@ repeat:
 	//  (E *) 0xbffff450
 	//  red
 	//  &parseP (HTMLClueV *, char *)
+	//  Variable "x" is not available.
 
 	const char*p = s;
     
@@ -1192,6 +1193,13 @@ repeat:
 	    }
 	    if (*p == '(') {
 		skipNested(p, '(', ')');
+	    }
+	} else if (strncmp(p, "Variable \"", 10) == 0) {
+	    // Variable "x" is not available.
+	    p += 10;		// skip to "
+	    skipName(p);
+	    if (strncmp(p, "\" is not available.", 19) == 0) {
+		p += 19;
 	    }
 	} else {
 	    // must be an enumeration value
