@@ -105,42 +105,42 @@ EXTRA_DIST = $(apps_DATA)
 
 # add a dependency for every moc file to be full portable
 # I've added a key binding to emacs for this. 
-debugger.cpp: debugger.moc
-debugger.moc: debugger.h
-	$(MOC) debugger.h -o debugger.moc
+$(srcdir)/debugger.cpp: debugger.moc
+debugger.moc: $(srcdir)/debugger.h
+	$(MOC) $(srcdir)/debugger.h -o debugger.moc
 
-exprwnd.cpp: exprwnd.moc
-exprwnd.moc: exprwnd.h
-	$(MOC) exprwnd.h -o exprwnd.moc
+$(srcdir)/exprwnd.cpp: exprwnd.moc
+exprwnd.moc: $(srcdir)/exprwnd.h
+	$(MOC) $(srcdir)/exprwnd.h -o exprwnd.moc
 
-textvw.cpp: textvw.moc
-textvw.moc: textvw.h
-	$(MOC) textvw.h -o textvw.moc
+$(srcdir)/textvw.cpp: textvw.moc
+textvw.moc: $(srcdir)/textvw.h
+	$(MOC) $(srcdir)/textvw.h -o textvw.moc
 
-ktreeview.cpp: ktreeview.moc
-ktreeview.moc: ktreeview.h
-	$(MOC) ktreeview.h -o ktreeview.moc
+$(srcdir)/ktreeview.cpp: ktreeview.moc
+ktreeview.moc: $(srcdir)/ktreeview.h
+	$(MOC) $(srcdir)/ktreeview.h -o ktreeview.moc
 
-winstack.cpp: winstack.moc
-winstack.moc: winstack.h
-	$(MOC) winstack.h -o winstack.moc
+$(srcdir)/winstack.cpp: winstack.moc
+winstack.moc: $(srcdir)/winstack.h
+	$(MOC) $(srcdir)/winstack.h -o winstack.moc
 
-updateui.cpp: updateui.moc
-updateui.moc: updateui.h
-	$(MOC) updateui.h -o updateui.moc
+$(srcdir)/updateui.cpp: updateui.moc
+updateui.moc: $(srcdir)/updateui.h
+	$(MOC) $(srcdir)/updateui.h -o updateui.moc
 
-brkpt.cpp: brkpt.moc
-brkpt.moc: brkpt.h
-	$(MOC) brkpt.h -o brkpt.moc
+$(srcdir)/brkpt.cpp: brkpt.moc
+brkpt.moc: $(srcdir)/brkpt.h
+	$(MOC) $(srcdir)/brkpt.h -o brkpt.moc
 
-pgmargs.cpp: pgmargs.moc
-pgmargs.moc: pgmargs.h
-	$(MOC) pgmargs.h -o pgmargs.moc
+$(srcdir)/pgmargs.cpp: pgmargs.moc
+pgmargs.moc: $(srcdir)/pgmargs.h
+	$(MOC) $(srcdir)/pgmargs.h -o pgmargs.moc
 
-mainwndbase.cpp: mainwndbase.moc
-mainwndbase.moc: mainwndbase.h
-	$(MOC) mainwndbase.h -o mainwndbase.moc
+$(srcdir)/mainwndbase.cpp: mainwndbase.moc
+mainwndbase.moc: $(srcdir)/mainwndbase.h
+	$(MOC) $(srcdir)/mainwndbase.h -o mainwndbase.moc
 
-dbgmainwnd.cpp: dbgmainwnd.moc
-dbgmainwnd.moc: dbgmainwnd.h
-	$(MOC) dbgmainwnd.h -o dbgmainwnd.moc
+$(srcdir)/dbgmainwnd.cpp: dbgmainwnd.moc
+dbgmainwnd.moc: $(srcdir)/dbgmainwnd.h
+	$(MOC) $(srcdir)/dbgmainwnd.h -o dbgmainwnd.moc
