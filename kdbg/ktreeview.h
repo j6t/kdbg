@@ -252,7 +252,8 @@ protected:
     /**
      * paints the item's tree part.
      */
-    virtual void paintTree(QPainter* p, int indent, int cellHeight) const;
+    virtual void paintTree(QPainter* p, int indent, int cellHeight,
+			   const QColorGroup& cg) const;
 
     /**
      * Internal function that counts the number of child items.

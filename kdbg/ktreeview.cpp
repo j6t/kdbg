@@ -271,13 +271,11 @@ void KTreeViewItem::paint(QPainter* p, int indent, const QColorGroup& cg,
     assert(getParent() != 0);		/* can't paint root item */
 
     p->save();
-    p->setPen(cg.text());
-    p->setBackgroundColor(cg.base());
 
     int cellHeight = height(p->fontMetrics());
 
     if (doTree) {
-	paintTree(p, indent, cellHeight);
+	paintTree(p, indent, cellHeight, cg);
     }
 
     /*
@@ -308,6 +306,7 @@ void KTreeViewItem::paintExpandButton(QPainter* p, int indent, int cellHeight,
 
     expandButton.setRect(parentLeaderX - 4, cellCenterY - 4, 9, 9);
     p->setBrush(cg.base());
+    p->setPen(cg.foreground());
     p->drawRect(expandButton);
     if (expanded) {
 	p->drawLine(parentLeaderX - 2, cellCenterY, 
@@ -333,21 +332,28 @@ void KTreeViewItem::paintHighlight(QPainter* p, int indent, const QColorGroup& c
     QRect textRect = textBoundingRect(indent);
     int t,l,b,r;
     textRect.coords(&l, &t, &r, &b);
-    p->fillRect(textRect, fc);		/* draw highlight background */
-    if (hasFocus) {
-	if(style == WindowsStyle) {	/* draw Windows style highlight */
+    QRect outerRect;
+    outerRect.setCoords(l - 2, t - 2, r + 2, b + 2);
+    if (style == WindowsStyle) {	/* Windows style highlight */
+	if (hasFocus) {
+	    p->fillRect(textRect, fc);	/* highlight background */
 	    textRect.setCoords(l - 1, t - 1, r + 1, b + 1);
 	    p->setPen(QPen(yellow, 0, DotLine));
 	    p->setBackgroundColor(fc);
 	    p->setBackgroundMode(OpaqueMode);
 	    p->drawRect(textRect);
-	    textRect.setCoords(l - 2, t - 2, r + 2, b + 2);
 	    p->setPen(fc);
-	    p->drawRect(textRect);
+	    p->drawRect(outerRect);
+	} else {
+	    p->fillRect(outerRect, fc);	/* highlight background */
 	}
-	else {				/* draw Motif style highlight */
-	    textRect.setCoords(l - 2, t - 2, r + 2, b + 2);
-	    p->drawRect(textRect);
+    } else {				/* Motif style highlight */
+	if (hasFocus) {
+	    p->fillRect(textRect, fc);	/* highlight background */
+	    p->setPen(fc);
+	    p->drawRect(outerRect);
+	} else {
+	    p->fillRect(outerRect, fc);	/* highlight background */
 	}
     }
 }
@@ -373,12 +379,15 @@ void KTreeViewItem::paintText(QPainter* p, int indent, int cellHeight,
 }
 
 // paint the tree structure
-void KTreeViewItem::paintTree(QPainter* p, int indent, int cellHeight) const
+void KTreeViewItem::paintTree(QPainter* p, int indent, int cellHeight,
+			      const QColorGroup& cg) const
 {
     int parentLeaderX = indent - (22 / 2);
     int cellCenterY = cellHeight / 2;
     int cellBottomY = cellHeight - 1;
     int itemLeaderX = indent - 3;
+
+    p->setPen(cg.background());
 
     /*
      * If this is not the first item in the tree draw the line up
