@@ -22,6 +22,7 @@ else
    2    for KDE 2
 and nothing else!])
 fi
+AM_CONDITIONAL(BUILDFORKDE2, test "x$with_kde_version" = "x2")
 
 dnl insert here your program name and version number
 KDE_USE_QT($with_kde_version)
