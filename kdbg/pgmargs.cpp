@@ -8,6 +8,7 @@
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
 #endif
+#include "mydebug.h"
 
 PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
 	QDialog(parent, "pgmargs", true),

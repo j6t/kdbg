@@ -160,7 +160,12 @@ void DebuggerMainWnd::initMenu()
 		  "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 		  "with the help of many others");
     menu->insertItem(i18n("&Help"),
-		     kapp->getHelpMenu(false, about));
+#if QT_VERSION < 200
+		     kapp->getHelpMenu(false, about)
+#else
+		     helpMenu(about)
+#endif
+	);
 }
 
 #if QT_VERSION < 200

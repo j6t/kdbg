@@ -8,6 +8,7 @@
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
 #endif
+#include "mydebug.h"
 
 ProcAttach::ProcAttach(QWidget* parent) :
 	QDialog(parent, "procattach", true),

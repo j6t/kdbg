@@ -16,3 +16,9 @@
 #else
 #define TRACE(x) ((void)0)
 #endif
+
+// KDE 2 compatibility; placed here because this file is included everywhere
+#if QT_VERSION >= 200
+#define getCaption caption
+#define getConfig config
+#endif
