@@ -157,10 +157,7 @@ void DebuggerMainWndBase::setupDebugger(QWidget* parent,
 					ExprWnd* watchVars,
 					QListBox* backtrace)
 {
-    GdbDriver* driver = new GdbDriver;
-    driver->setLogFileName(m_transcriptFile);
-
-    m_debugger = new KDebugger(parent, localVars, watchVars, backtrace, driver);
+    m_debugger = new KDebugger(parent, localVars, watchVars, backtrace);
 
     QObject::connect(m_debugger, SIGNAL(updateStatusMessage()),
 		     parent, SLOT(slotNewStatusMsg()));
@@ -195,7 +192,7 @@ void DebuggerMainWndBase::setRemoteDevice(const QString& remoteDevice)
 void DebuggerMainWndBase::setTranscript(const char* name)
 {
     m_transcriptFile = name;
-    if (m_debugger != 0)
+    if (m_debugger != 0 && m_debugger->driver() != 0)
 	m_debugger->driver()->setLogFileName(m_transcriptFile);
 }
 
@@ -268,7 +265,16 @@ void DebuggerMainWndBase::restoreSettings(KConfig* config)
 bool DebuggerMainWndBase::debugProgram(const QString& executable)
 {
     assert(m_debugger != 0);
-    return m_debugger->debugProgram(executable);
+
+    GdbDriver* driver = new GdbDriver;
+    driver->setLogFileName(m_transcriptFile);
+
+    bool success = m_debugger->debugProgram(executable, driver);
+
+    if (!success)
+	delete driver;
+
+    return success;
 }
 
 // helper that gets a file name (it only differs in the caption of the dialog)
@@ -681,7 +687,7 @@ bool DebuggerMainWndBase::debugProgramInteractive(const QString& executable,
 	return false;
     }
 
-    if (!m_debugger->debugProgram(executable)) {
+    if (!debugProgram(executable)) {
 	QString msg = i18n("Could not start the debugger process.\n"
 			   "Please shut down KDbg and resolve the problem.");
 #if QT_VERSION < 200

@@ -40,18 +40,19 @@ public:
     KDebugger(QWidget* parent,		/* will be used as the parent for dialogs */
 	      ExprWnd* localVars,
 	      ExprWnd* watchVars,
-	      QListBox* backtrace,
-	      DebuggerDriver* driver
-	      );
+	      QListBox* backtrace);
     ~KDebugger();
-    
+
     /**
-     * This function starts to debug the specified executable. If a program
-     * is currently being debugged, it is terminated first.
+     * This function starts to debug the specified executable using the
+     * specified driver. If a program is currently being debugged, it is
+     * terminated first. Ownership of driver is taken if and only if
+     * true is returned.
      *
      * @return false if an error occurs.
      */
-    bool debugProgram(const QString& executable);
+    bool debugProgram(const QString& executable,
+		      DebuggerDriver* driver);
 
     /**
      * Uses the specified core to debug the active program.

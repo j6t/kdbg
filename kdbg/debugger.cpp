@@ -33,9 +33,7 @@
 KDebugger::KDebugger(QWidget* parent,
 		     ExprWnd* localVars,
 		     ExprWnd* watchVars,
-		     QListBox* backtrace,
-		     DebuggerDriver* driver
-		     ) :
+		     QListBox* backtrace) :
 	QObject(parent, "debugger"),
 	m_ttyLevel(ttyFull),
 	m_memoryFormat(MDTword | MDThex),
@@ -45,7 +43,7 @@ KDebugger::KDebugger(QWidget* parent,
 	m_sharedLibsListed(false),
 	m_typeTable(0),
 	m_programConfig(0),
-	m_d(driver),
+	m_d(0),
 	m_localVariables(*localVars),
 	m_watchVariables(*watchVars),
 	m_btWindow(*backtrace),
@@ -60,18 +58,6 @@ KDebugger::KDebugger(QWidget* parent,
 	    SLOT(slotWatchExpanding(KTreeViewItem*,bool&)));
 
     connect(&m_btWindow, SIGNAL(highlighted(int)), SLOT(gotoFrame(int)));
-
-    connect(m_d, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
-	    this, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)));
-
-    // debugger process
-    connect(m_d, SIGNAL(processExited(KProcess*)), SLOT(gdbExited(KProcess*)));
-    connect(m_d, SIGNAL(commandReceived(CmdQueueItem*,const char*)),
-	    SLOT(parse(CmdQueueItem*,const char*)));
-    connect(m_d, SIGNAL(wroteStdin(KProcess*)), SIGNAL(updateUI()));
-    connect(m_d, SIGNAL(inferiorRunning()), SLOT(slotInferiorRunning()));
-    connect(m_d, SIGNAL(enterIdleState()), SLOT(backgroundUpdate()));
-    connect(m_d, SIGNAL(enterIdleState()), SIGNAL(updateUI()));
 
     // animation
     connect(&m_animationTimer, SIGNAL(timeout()), SIGNAL(animationTimeout()));
@@ -113,9 +99,10 @@ const char GeneralGroup[] = "General";
 const char DebuggerCmdStr[] = "DebuggerCmdStr";
 const char TTYLevelEntry[] = "TTYLevel";
 
-bool KDebugger::debugProgram(const QString& name)
+bool KDebugger::debugProgram(const QString& name,
+			     DebuggerDriver* driver)
 {
-    if (m_d->isRunning())
+    if (m_d != 0 && m_d->isRunning())
     {
 	QApplication::setOverrideCursor(waitCursor);
 
@@ -128,7 +115,20 @@ bool KDebugger::debugProgram(const QString& name)
 	    TRACE("timed out while waiting for gdb to die!");
 	    return false;
 	}
+	delete m_d;
+	m_d = 0;
     }
+
+    // wire up the driver
+    connect(driver, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
+	    this, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)));
+    connect(driver, SIGNAL(processExited(KProcess*)), SLOT(gdbExited(KProcess*)));
+    connect(driver, SIGNAL(commandReceived(CmdQueueItem*,const char*)),
+	    SLOT(parse(CmdQueueItem*,const char*)));
+    connect(driver, SIGNAL(wroteStdin(KProcess*)), SIGNAL(updateUI()));
+    connect(driver, SIGNAL(inferiorRunning()), SLOT(slotInferiorRunning()));
+    connect(driver, SIGNAL(enterIdleState()), SLOT(backgroundUpdate()));
+    connect(driver, SIGNAL(enterIdleState()), SIGNAL(updateUI()));
 
     // create the program settings object
     openProgramConfig(name);
@@ -141,6 +141,8 @@ bool KDebugger::debugProgram(const QString& name)
 	m_ttyLevel = TTYLevel(m_programConfig->readNumEntry(TTYLevelEntry, ttyFull));
     }
     // the rest is read in later in the handler of DCexecutable
+
+    m_d = driver;
 
     if (!startDriver()) {
 	TRACE("startDriver failed");
@@ -417,12 +419,12 @@ bool KDebugger::canChangeBreakpoints()
 bool KDebugger::isReady() const 
 {
     return m_haveExecutable &&
-	m_d->canExecuteImmediately();
+	m_d != 0 && m_d->canExecuteImmediately();
 }
 
 bool KDebugger::isIdle() const
 {
-    return m_d->isIdle();
+    return m_d == 0 || m_d->isIdle();
 }
 
 
@@ -1688,7 +1690,7 @@ void KDebugger::stopAnimation()
 
 void KDebugger::slotUpdateAnimation()
 {
-    if (m_d->isIdle()) {
+    if (isIdle()) {
 	stopAnimation();
     } else {
 	/*
