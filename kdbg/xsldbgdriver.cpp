@@ -55,8 +55,8 @@ static XsldbgCmdInfo cmds[] = {
     {DCexamine, "print 'x %s %s'\n", XsldbgCmdInfo::argString2},
     {DCinfoline, "print 'templates %s:%d'\n", XsldbgCmdInfo::argStringNum},
     {DCdisassemble, "print 'disassemble %s %s'\n", XsldbgCmdInfo::argString2},
-    {DCsetargs, "data %s\n", XsldbgCmdInfo::argString},
-    {DCsetenv, "%s %s\n", XsldbgCmdInfo::argString2},
+    {DCsetargs, "setargs %s\n", XsldbgCmdInfo::argString},
+    {DCsetenv, "addparam %s %s\n", XsldbgCmdInfo::argString2},
     {DCunsetenv, "unset env %s\n", XsldbgCmdInfo::argString},
     {DCsetoption, "setoption %s %d\n", XsldbgCmdInfo::argStringNum},
     {DCcd, "chdir %s\n", XsldbgCmdInfo::argString},
@@ -65,17 +65,17 @@ static XsldbgCmdInfo cmds[] = {
 							 of executing XSLT we show the XSLT file */
     {DCcont, "continue\n", XsldbgCmdInfo::argNone},
     {DCstep, "step\n", XsldbgCmdInfo::argNone},
-    {DCstepi, "trace\n", XsldbgCmdInfo::argNone},
-    {DCnext, "walk 1\n", XsldbgCmdInfo::argNone},
+    {DCstepi, "print 'DCstepi'\n", XsldbgCmdInfo::argNone},
+    {DCnext, "next\n", XsldbgCmdInfo::argNone},
     {DCnexti, "print 'nexti'\n", XsldbgCmdInfo::argNone},
     {DCfinish, "quit\n", XsldbgCmdInfo::argNone},
     {DCuntil, "continue %s:%d\n", XsldbgCmdInfo::argStringNum},
     {DCkill, "quit\n", XsldbgCmdInfo::argNone},
     {DCbreaktext, "break %s\n", XsldbgCmdInfo::argString},
     {DCbreakline, "break -l %s %d\n", XsldbgCmdInfo::argStringNum},
-    {DCtbreakline, "print 'tbreak -l %s %d'\n", XsldbgCmdInfo::argStringNum},
-    {DCbreakaddr, "print 'break *%s'\n", XsldbgCmdInfo::argString},
-    {DCtbreakaddr, "print 'tbreak *%s'\n", XsldbgCmdInfo::argString},
+    {DCtbreakline, "print `tbreak %s:%d`\n", XsldbgCmdInfo::argStringNum },
+    {DCbreakaddr, "print `break *%s`\n", XsldbgCmdInfo::argString },
+    {DCtbreakaddr, "print `tbreak *%s`\n", XsldbgCmdInfo::argString },
     {DCwatchpoint, "print 'watch %s'\n", XsldbgCmdInfo::argString},
     {DCdelete, "delete %d\n", XsldbgCmdInfo::argNum},
     {DCenable, "enable %d\n", XsldbgCmdInfo::argNum},
@@ -208,7 +208,7 @@ void
 XsldbgDriver::slotReceiveOutput(KProcess * process, char *buffer,
                                 int buflen)
 {
-    // TRACE(buffer);
+  //TRACE(buffer);
     if (m_state != DSidle) {
         //    TRACE(buffer);
         DebuggerDriver::slotReceiveOutput(process, buffer, buflen);
@@ -293,8 +293,9 @@ XsldbgDriver::commandFinished(CmdQueueItem * cmd)
         case DCcont:
         case DCstep:
         case DCnext:
-        case DCfinish:
+        case DCfinish:{
             parseMarker();
+	}
             break;
 
         default:;
@@ -647,9 +648,9 @@ isErrorExpr(const char *output)
     bool result = false;
 #define   ERROR_WORD_COUNT 3
     static const char *errorWords[ERROR_WORD_COUNT] = {
-      "Error", 
+      "Error:", 
       "Unknown command",  
-      "Warning"
+      "Warning:"
     };
     static int errorWordLength[ERROR_WORD_COUNT] = {
       5,  /* Error */
@@ -848,7 +849,8 @@ parseValue(const char *&s, VarTree * variable)
         "Breakpoint at",        /* stepped to next location */
         "Breakpoint in",        /* reached a set breakpoint */
         "Reached ",             /* reached template */
-        "Error",
+        "Error:",
+	 "Warning:",
         "runtime error",
 	 "xmlXPathEval:",
 	0		     				     
@@ -943,9 +945,20 @@ parseFrameInfo(const char *&s, QString & func,
         return;
     }
 
+    /* skip  mode :".*" */
+    while (p && *p != '"')
+      p++;
+    if (p)
+      p++;
+    while (p && *p != '"')
+      p++;   
+    if (p)
+      p++;
+    while (p && *p != '"')
+      p++; 
     /* skip '" in file ' */
     p = p + 10;
-    //    TRACE(p);
+    //   TRACE(p);
     file = "";
     while (!isspace(*p) && (*p != '\0')) {
         file.append(*p);
@@ -1121,7 +1134,7 @@ XsldbgDriver::parseBreakList(const char *output,
 	/* check for ' for template :"'*/
 	if (strncmp(p, " for template :\"", 16) == 0){ 
 	  p = p + 16;
-	  // TRACE("Looking for template name near");
+	  //TRACE("Looking for template name near");
 	  //TRACE(p);
 	  /* get the template name */
 	  while (p && (*p != '\0') && (*p != '\"')){
@@ -1135,6 +1148,17 @@ XsldbgDriver::parseBreakList(const char *output,
 	    TRACE(p);
 	  }
 	}
+
+	//TRACE("Looking for mode near");
+	//TRACE(p);
+	if (strncmp(p, " mode :\"", 8) == 0) {
+	  p = p + 8;
+	  while (p && *p != '\"')
+	    p++;
+	  if (p)
+	    p++;
+	}
+
 	if (strncmp(p, " in file ", 9) != 0){
 	  TRACE("Parse error in breakpoint list");
 	  TRACE(p);
