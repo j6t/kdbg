@@ -9,7 +9,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <kdebug.h>
+#include "mydebug.h"
 
 bool parseName(const char*& s, QString& name, VarTree::NameKind& kind);
 bool parseValue(const char*& s, VarTree* variable);

@@ -1,6 +1,6 @@
 // $Id$
 
-#include_next "kdebug.h"
+#include <kdebug.h>
 #include <assert.h>
 
 #ifdef ASSERT

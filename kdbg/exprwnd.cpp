@@ -13,7 +13,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <kdebug.h>
+#include "mydebug.h"
 
 VarTree::VarTree(const QString& name, NameKind aKind) :
 	KTreeViewItem(name),

@@ -17,7 +17,7 @@
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <kdebug.h>
+#include "mydebug.h"
 
 
 FileWindow::FileWindow(const char* fileName, QWidget* parent, const char* name) :

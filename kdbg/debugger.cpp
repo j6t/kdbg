@@ -31,7 +31,7 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>			/* open(2) */
 #endif
-#include <kdebug.h>
+#include "mydebug.h"
 
 
 KStdAccel* keys = 0;
