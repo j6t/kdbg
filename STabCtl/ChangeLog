@@ -1,0 +1,28 @@
+14 Avg 1999:
+  Create.
+  
+15 Avg 1999:
+  in insertPage method if id is -1 then first id = 0; ( late  be 1 )
+  fixed bug in showPage method ( not work switch tab )
+  
+29 Avg 1999:
+  fixed bug in STabBar::setCurrentTab method ( not work switch tab )
+  scrolling tabbar if current tab is not visible
+  
+07 Sep 1999:
+  add *.studio workspace file
+
+23 Sep 1999:
+  fixed in method STabCtl::removePage and STabCtl::resizeEvent
+  Thanks Thomas Kuhn <t_kuhn@qmx.net>      
+
+25 Sep 1999:
+  NEW - add method STabCtl::setTabTextColor for set color for tab caption
+
+06 Okt 1999:
+  fixed bug where CurrentPage may be disabled.
+  NEW - TabBar may be place RIGHT(vertical) or TOP(horizontal)  
+  change color for draw disabled page header.
+
+08 Okt 1999:
+  FIX - STabCtl::setTabFont working properly ( not finish ;-) );
