@@ -13,7 +13,7 @@
 #include <qregexp.h>
 #include <qfileinf.h>
 #include <kapp.h>
-#include <kfiledialog.h>		/* must come before kapp.h */
+#include <kfiledialog.h>
 #include <kiconloader.h>
 #include <kmsgbox.h>
 #include <kstdaccel.h>
@@ -32,6 +32,9 @@
 #endif
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>			/* open(2) */
+#endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>			/* sleep(3) */
 #endif
 #include "mydebug.h"
 
@@ -275,13 +278,35 @@ void KDebugger::menuCallback(int item)
 	if (m_state == DSidle)
 	{
 	    // open a new executable
-	    // TODO: check for running program
 	    QString executable = getExecFileName(0, 0, this);
 	    if (!executable.isEmpty()) {
+		if (m_haveExecutable)
+		{
+		    stopGdb();
+		    /*
+		     * We MUST wait until the slot gdbExited() has been
+		     * called. But to avoid a deadlock, we wait only for
+		     * some certain maximum time. Should this timeout be
+		     * reached, the only reasonable thing one could do then
+		     * is exiting kdbg.
+		     */
+		    int maxTime = 20;	/* about 20 seconds */
+		    while (m_haveExecutable && maxTime > 0) {
+			kapp->processEvents(1000);
+			// give gdb time to die (and send a SIGCLD)
+			::sleep(1);
+			--maxTime;
+		    }
+		    if (m_haveExecutable) {
+			/* timed out! We can't really do anything useful now */
+			TRACE("timed out while waiting for gdb to die!");
+			break;
+		    }
+		}
 		debugProgram(executable);
 	    }
-	    break;
 	}
+	break;
     case ID_FILE_QUIT:
 	kapp->quit();
 	break;
@@ -586,6 +611,15 @@ bool KDebugger::isThisPaneVisible()
 
 bool KDebugger::startGdb()
 {
+    if (m_outputTermName.isEmpty()) {
+	// create an output window
+	if (!createOutputWindow()) {
+	    TRACE("createOuputWindow failed");
+	    return false;
+	}
+	TRACE("successfully created output window");
+    }
+
     // debugger executable
     m_gdb.clearArguments();
     m_gdb << "gdb";
@@ -606,23 +640,39 @@ bool KDebugger::startGdb()
     m_state = DSidle;
     executeCmd(DCinitialize, "set prompt " PROMPT);
     executeCmd(DCnoconfirm, "set confirm off");
-
-    // create an output window
-    if (!createOutputWindow()) {
-	TRACE("createOuputWindow failed");
-	return false;
-    }
-    TRACE("successfully created output window");
-
     executeCmd(DCtty, "tty " + m_outputTermName);
 
     return true;
+}
+
+void KDebugger::stopGdb()
+{
+    m_gdb.kill(SIGTERM);
+    m_state = DSidle;
 }
 
 void KDebugger::gdbExited(KProcess*)
 {
     static const char txt[] = "\ngdb exited\n";
     m_logFile.writeBlock(txt,sizeof(txt)-1);
+
+    // save settings
+    if (m_programConfig != 0) {
+	saveProgramSettings();
+	m_programConfig->sync();
+	delete m_programConfig;
+	m_programConfig = 0;
+    }
+
+    // reset state
+    m_state = DSidle;
+    m_haveExecutable = false;
+    m_executable = "";
+    m_programActive = false;
+    m_programRunning = false;
+    // empty buffer
+    m_gdbOutputLen = 0;
+    *m_gdbOutput = '\0';
 }
 
 const char fifoNameBase[] = "/tmp/kdbgttywin%05d";

@@ -84,6 +84,7 @@ protected:
     QString m_outputTermName;
     bool createOutputWindow();
     bool startGdb();
+    void stopGdb();
     void writeCommand();
     
     enum DebuggerState {
