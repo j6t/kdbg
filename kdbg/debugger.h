@@ -351,6 +351,7 @@ protected:
     void removeExpr(ExprWnd* wnd, VarTree* var);
     CmdQueueItem* loadCoreFile();
 
+    QString m_lastDirectory;		/* the dir of the most recently opened file */
     bool m_haveExecutable;		/* has an executable been specified */
     bool m_programActive;		/* is the program active (possibly halting in a brkpt)? */
     bool m_programRunning;		/* is the program executing (not stopped)? */

@@ -223,6 +223,8 @@ bool KDebugger::debugProgram(const QString& name)
 
     // check the file name
     QFileInfo fi(name);
+    m_lastDirectory = fi.dirPath(true);
+
     if (!fi.isFile()) {
 	QString msgFmt = i18n("`%s' is not a file or does not exist");
 #if QT_VERSION < 200
@@ -289,7 +291,7 @@ void KDebugger::fileExecutable()
 
     // open a new executable
     QString executable = getFileName(i18n("Select the executable to debug"),
-				     0, 0, parentWidget());
+				     m_lastDirectory, 0, parentWidget());
     if (executable.isEmpty())
 	return;
 
@@ -331,7 +333,7 @@ void KDebugger::fileCoreFile()
 
     // use a core dump
     QString corefile = getFileName(i18n("Select core dump"),
-				   0, 0, parentWidget());
+				   m_lastDirectory, 0, parentWidget());
     if (!corefile.isEmpty()) {
 	m_corefile = corefile;
 	CmdQueueItem* cmd = loadCoreFile();
