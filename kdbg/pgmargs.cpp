@@ -114,7 +114,7 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars,
     m_envList.setMinimumSize(330, 40);
     m_envList.addColumn(i18n("Name"), 100);
     m_envList.addColumn(i18n("Value"), 260);
-    connect(&m_envList, SIGNAL(currentChanged(QListViewItem*)),
+    connect(&m_envList, SIGNAL(selectionChanged(QListViewItem*)),
 	    SLOT(envListCurrentChanged(QListViewItem*)));
     initEnvList();
 
@@ -230,32 +230,36 @@ void PgmArgs::modifyVar()
 	val->item = new QListViewItem(&m_envList, name, value);	// inserts itself
 	m_envVars.insert(name, val);
     }
+    m_envList.setSelected(val->item, true);
+    m_buttonDelete.setEnabled(true);
 }
 
+// delete the selected item
 void PgmArgs::deleteVar()
 {
-    QString name, value;
-    parseEnvInput(name, value);
+    QListViewItem* item = m_envList.selectedItem();
+    if (item == 0)
+	return;
+    QString name = item->text(0);
 
     // lookup the value in the dictionary
     EnvVar* val = m_envVars[name];
-    if (val == 0)
-	return;
-
-    // delete from list
-    QListViewItem* item = val->item;
-    val->item = 0;
-    delete item;
-    // if this is a new item, delete it completely, otherwise zombie-ize it
-    if (val->status == EnvVar::EVnew) {
-	m_envVars.remove(name);
-	delete val;
-    } else {
-	// mark value deleted
-	val->status = EnvVar::EVdeleted;
+    if (val != 0)
+    {
+	// delete from list
+	val->item = 0;
+	// if this is a new item, delete it completely, otherwise zombie-ize it
+	if (val->status == EnvVar::EVnew) {
+	    m_envVars.remove(name);
+	    delete val;
+	} else {
+	    // mark value deleted
+	    val->status = EnvVar::EVdeleted;
+	}
     }
-    // clear the input
-    m_envVar.setText("");
+    delete item;
+    // there is no selected item anymore
+    m_buttonDelete.setEnabled(false);
 }
 
 void PgmArgs::parseEnvInput(QString& name, QString& value)
@@ -282,10 +286,14 @@ void PgmArgs::initEnvList()
 	name = it.currentKey();
 	val->item = new QListViewItem(&m_envList, name, val->value);	// inserts itself
     }
+
+    m_envList.setAllColumnsShowFocus(true);
+    m_buttonDelete.setEnabled(m_envList.selectedItem() != 0);
 }
 
 void PgmArgs::envListCurrentChanged(QListViewItem* item)
 {
+    m_buttonDelete.setEnabled(item != 0);
     if (item == 0)
 	return;
 

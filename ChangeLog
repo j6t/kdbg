@@ -1,3 +1,15 @@
+Version 1.9.5
+
+	Fixed some issues when the items in the environment variable list
+	are selected.
+
+Version 1.9.4
+
+	Updated the build system to the latest auto* tools.
+
+	Worked around the problem that gdb reports "Using host libthread_db"
+	on Fedora Core when it processes the file command.
+
 Version 1.9.3
 
 	Improved editing of values; it is now possible to edit variables also
