@@ -321,12 +321,15 @@ void KDebugger::programRun()
     if (!isReady())
 	return;
 
-    if (m_programActive) {
+    // when program is active, but not a core file, continue
+    // otherwise run the program
+    if (m_programActive && m_corefile.isEmpty()) {
 	// gdb command: continue
 	executeCmd(DCcont, "cont", true);
     } else {
 	// gdb command: run
 	executeCmd(DCrun, m_runCmd, true);
+	m_corefile = QString();
 	m_programActive = true;
     }
     m_programRunning = true;
@@ -352,6 +355,7 @@ void KDebugger::programRunAgain()
 {
     if (canSingleStep()) {
 	executeCmd(DCrun, m_runCmd, true);
+	m_corefile = QString();
 	m_programRunning = true;
     }
 }
@@ -377,6 +381,18 @@ void KDebugger::programFinish()
     if (canSingleStep()) {
 	executeCmd(DCfinish, "finish", true);
 	m_programRunning = true;
+    }
+}
+
+void KDebugger::programKill()
+{
+    if (haveExecutable() && isProgramActive()) {
+	if (m_programRunning) {
+	    m_gdb.kill(SIGINT);
+	}
+	// this is an emergency command; flush queues
+	flushHiPriQueue();
+	executeCmd(DCkill, "kill", true);
     }
 }
 
@@ -1101,7 +1117,9 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	// if command succeeded, gdb emits a line starting with "#0 "
 	if (strstr(m_gdbOutput, "\n#0 ")) {
 	    // loading a core is like stopping at a breakpoint
+	    m_programActive = true;
 	    handleRunCommands();
+	    // do not reset m_corefile
 	} else {
 	    // report error
 	    QString msg = "gdb: " + QString(m_gdbOutput);
@@ -1115,8 +1133,8 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	    if (!cmd->m_byUser) {
 		queueCmd(DCinfolinemain, "info line main", QMnormal);
 	    }
+	    m_corefile = QString();	/* core file not available any more */
 	}
-	m_corefile = "";		/* core file not available any more */
 	break;
     case DCinfolinemain:
 	// ignore the output, marked file info follows
@@ -1162,6 +1180,11 @@ void KDebugger::parse(CmdQueueItem* cmd)
     case DCuntil:
 	handleRunCommands();
 	parseMarker = true;
+	break;
+    case DCkill:
+	m_programRunning = m_programActive = false;
+	// erase PC
+	emit updatePC(QString(), -1, 0);
 	break;
     case DCbreak:
 	updateBreakptTable();
@@ -1240,8 +1263,15 @@ void KDebugger::handleRunCommands()
 
 	if (strncmp(start, "Program ", 8) == 0 ||
 	    strncmp(start, "ptrace: ", 8) == 0) {
+	    /*
+	     * When we receive a signal, the program remains active.
+	     *
+	     * Special: If we "stopped" in a corefile, the string "Program
+	     * terminated with signal"... is displayed. (Normally, we see
+	     * "Program received signal"... when a signal happens.)
+	     */
 	    if (strncmp(start, "Program exited", 14) == 0 ||
-		strncmp(start, "Program terminated", 18) == 0 ||
+		(strncmp(start, "Program terminated", 18) == 0 && m_corefile.isEmpty()) ||
 		strncmp(start, "ptrace: ", 8) == 0)
 	    {
 		m_programActive = false;
@@ -1300,8 +1330,8 @@ void KDebugger::handleRunCommands()
 	executeCmd(DCinfosharedlib, "info sharedlibrary");
     }
 
-    // get the backtrace if the program is running or if we have a core file
-    if (m_programActive || !m_corefile.isEmpty()) {
+    // get the backtrace if the program is running
+    if (m_programActive) {
 	queueCmd(DCbt, "bt", QMoverride);
     } else {
 	// program finished: erase PC

@@ -221,6 +221,10 @@ void DebuggerMainWndBase::menuCallback(int item)
 	if (m_debugger != 0)
 	    m_debugger->programFinish();
 	break;
+    case ID_PROGRAM_KILL:
+	if (m_debugger != 0)
+	    m_debugger->programKill();
+	break;
     case ID_PROGRAM_BREAK:
 	if (m_debugger != 0)
 	    m_debugger->programBreak();
@@ -271,6 +275,9 @@ void DebuggerMainWndBase::updateUIItem(UpdateUI* item)
     case ID_PROGRAM_ATTACH:
     case ID_PROGRAM_RUN:
 	item->enable(m_debugger->isReady());
+	break;
+    case ID_PROGRAM_KILL:
+	item->enable(m_debugger->haveExecutable() && m_debugger->isProgramActive());
 	break;
     case ID_PROGRAM_BREAK:
 	item->enable(m_debugger->isProgramRunning());

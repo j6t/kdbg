@@ -96,6 +96,11 @@ public:
     void programFinish();
 
     /**
+     * Kills the program (removes it from memory).
+     */
+    void programKill();
+
+    /**
      * Interrupts the program if it is currently running.
      */
     void programBreak();
@@ -232,6 +237,7 @@ public:
 	DCnext,
 	DCfinish,
 	DCuntil,
+	DCkill,
 	DCbreak,
 	DCdelete,
 	DCenable,

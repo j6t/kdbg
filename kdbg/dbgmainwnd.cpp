@@ -123,6 +123,7 @@ void DebuggerMainWnd::initMenu()
     m_menuProgram.insertItem(i18n("Run to &cursor"), ID_PROGRAM_UNTIL);
     m_menuProgram.insertSeparator();
     m_menuProgram.insertItem(i18n("&Break"), ID_PROGRAM_BREAK);
+    m_menuProgram.insertItem(i18n("&Kill"), ID_PROGRAM_KILL);
     m_menuProgram.insertItem(i18n("Re&start"), ID_PROGRAM_RUN_AGAIN);
     m_menuProgram.insertItem(i18n("A&ttach..."), ID_PROGRAM_ATTACH);
     m_menuProgram.insertSeparator();
