@@ -635,6 +635,11 @@ void SourceWindow::expandRow(int row)
     bool autoU = autoUpdate();
     setAutoUpdate(false);
 
+    // update line widths
+    for (int i = 0; i < disass.size(); i++) {
+	updateCellSize(disass[i]);
+    }
+
     setNumRows(m_texts.size());
 
     setAutoUpdate(autoU);
