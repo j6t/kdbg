@@ -12,6 +12,7 @@
 #include <kprocess.h>
 #include "brkpt.h"
 #include "envvar.h"
+#include "exprwnd.h"			/* some compilers require this */
 
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -366,6 +367,7 @@ protected:
     QDict<EnvVar> m_envVars;		/* environment variables set by user */
     QStrList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
+    bool m_qstring2nullOk;		/* whether gdb knows about QString::null */
     KSimpleConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
     void saveProgramSettings();
     void restoreProgramSettings();

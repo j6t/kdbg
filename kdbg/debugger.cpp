@@ -77,6 +77,7 @@ KDebugger::KDebugger(QWidget* parent,
 	m_programRunning(false),
 	m_sharedLibsListed(false),
 	m_typeTable(0),
+	m_qstring2nullOk(true),
 	m_programConfig(0),
 	m_gdb(),
 	m_gdbMajor(4), m_gdbMinor(16),
@@ -831,6 +832,9 @@ void KDebugger::restoreProgramSettings()
     }
 
     updateProgEnvironment(pgmArgs, pgmWd, pgmVars);
+
+    // assume that QString::null is ok
+    m_qstring2nullOk = true;
 
     m_bpTable.restoreBreakpoints(m_programConfig);
 }
@@ -1614,7 +1618,8 @@ static bool isErrorExpr(const char* output)
 	strncmp(output, "Attempt to dereference a generic pointer", 40) == 0 ||
 	strncmp(output, "Attempt to take contents of ", 28) == 0 ||
 	strncmp(output, "There is no member or method named", 34) == 0 ||
-	strncmp(output, "No symbol \"", 11) == 0;
+	strncmp(output, "No symbol \"", 11) == 0 ||
+	strncmp(output, "Internal error: ", 16) == 0;
 }
 
 static bool parseOffErrorExpr(char* output, const char* name,
@@ -1693,6 +1698,14 @@ VarTree* KDebugger::parseQCharArray(const char* name, bool wantErrorValue)
     char* p = m_gdbOutput;
     while (isspace(*p))
 	p++;
+
+    // check if this is an error indicating that gdb does not know about QString::null
+    if (m_qstring2nullOk &&
+	strncmp(m_gdbOutput, "Internal error: could not find static variable null", 51))
+    {
+	m_qstring2nullOk = false;
+	// continue and let parseOffErrorExpr catch the error
+    }
 
     // check for error conditions
     if (parseOffErrorExpr(p, name, variable, wantErrorValue))
@@ -2237,9 +2250,13 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 		// print an array of shorts
 		"(*(unsigned short*)$qstrunicode)@"
 		// limit the length and add 1 because length 0 is an error
-		"(($qstrlen=(unsigned int)($qstrdata->len))>100?100:$qstrlen)"
+		"(($qstrlen=(unsigned int)($qstrdata->len))>100?100:$qstrlen)";
 		// if unicode data is 0, check if it is QString::null
-		":($qstrdata==QString::null.d)";
+		// however, gdb can't always find QString::null (I don't know why)
+		// which results in an error; we autodetect this situation in
+		// parseQt2QStrings and revert to a safe expression
+	    expr += m_qstring2nullOk ?
+		":($qstrdata==QString::null.d)" : ":1==0";
 	    dbgCmd = DCprintQStringStruct;
 	} else {
 	    /*
