@@ -47,21 +47,21 @@ MemoryWindow::MemoryWindow(QWidget* parent, const char* name) :
 #endif
 
     // the popup menu
-    m_popup.insertItem("&Bytes", MDTbyte);
-    m_popup.insertItem("&Halfwords (2 Bytes)", MDThalfword);
-    m_popup.insertItem("&Words (4 Bytes)", MDTword);
-    m_popup.insertItem("&Giantwords (8 Bytes)", MDTgiantword);
+    m_popup.insertItem(i18n("B&ytes"), MDTbyte);
+    m_popup.insertItem(i18n("Halfwords (&2 Bytes)"), MDThalfword);
+    m_popup.insertItem(i18n("Words (&4 Bytes)"), MDTword);
+    m_popup.insertItem(i18n("Giantwords (&8 Bytes)"), MDTgiantword);
     m_popup.insertSeparator();
-    m_popup.insertItem("He&xadecimal", MDThex);
-    m_popup.insertItem("Signed &decimal", MDTsigned);
-    m_popup.insertItem("&Unsigned decimal", MDTunsigned);
-    m_popup.insertItem("&Octal", MDToctal);
-    m_popup.insertItem("Bi&nary", MDTbinary);
-    m_popup.insertItem("&Addresses", MDTaddress);
-    m_popup.insertItem("&Character", MDTchar);
-    m_popup.insertItem("&Floatingpoint", MDTfloat);
-    m_popup.insertItem("&Strings", MDTstring);
-    m_popup.insertItem("&Instructions", MDTinsn);
+    m_popup.insertItem(i18n("He&xadecimal"), MDThex);
+    m_popup.insertItem(i18n("Signed &decimal"), MDTsigned);
+    m_popup.insertItem(i18n("&Unsigned decimal"), MDTunsigned);
+    m_popup.insertItem(i18n("&Octal"), MDToctal);
+    m_popup.insertItem(i18n("&Binary"), MDTbinary);
+    m_popup.insertItem(i18n("&Addresses"), MDTaddress);
+    m_popup.insertItem(i18n("&Character"), MDTchar);
+    m_popup.insertItem(i18n("&Floatingpoint"), MDTfloat);
+    m_popup.insertItem(i18n("&Strings"), MDTstring);
+    m_popup.insertItem(i18n("&Instructions"), MDTinsn);
     connect(&m_popup, SIGNAL(activated(int)), this, SLOT(slotTypeChange(int)));
 
     /*
