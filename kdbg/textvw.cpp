@@ -64,6 +64,45 @@ void KTextView::insertLine(const char* text)
     }
 }
 
+/*
+ * TODO: This function doesn't shrink the line length if the longest line
+ * is replaced by a shorter one.
+ */
+void KTextView::replaceLine(int line, const char* text)
+{
+    if (line < 0 || line >= int(m_texts.size()))
+	return;
+
+    int l = strlen(text);
+    m_texts[line] = new char[l+1];
+    strcpy(m_texts[line], text);
+    
+    // update cell width
+    QPainter p(this);
+    setupPainter(&p);
+    QRect r = p.boundingRect(1,1, 2,2, 
+			     AlignLeft | SingleLine | DontClip | ExpandTabs,
+			     m_texts[line], l);
+
+    bool update = false;
+    int w = r.width() + 4;
+    if (w > m_width) {
+	m_width = w;
+	update = true;
+    }
+    int h = r.height() + 2;
+    if (h > m_height) {
+	m_height = h;
+	update = true;
+    }
+    if (update) {
+	updateTableSize();
+	if (autoUpdate()) {
+	    repaint();
+	}
+    }
+}
+
 void KTextView::setCursorPosition(int row, int)
 {
     activateLine(row);

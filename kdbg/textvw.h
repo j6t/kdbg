@@ -15,6 +15,7 @@ public:
     KTextView(QWidget* parent = 0, const char* name = 0, WFlags f = 0);
     ~KTextView();
     void insertLine(const char*);
+    void replaceLine(int line, const char* text);
     virtual void setCursorPosition(int row, int col);
     virtual void cursorPosition(int* row, int* col);
 protected:
