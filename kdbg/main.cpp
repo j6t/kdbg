@@ -53,7 +53,7 @@ int main(int argc, char** argv)
 			 VERSION,
 			 description,
 			 KAboutData::License_GPL, 
-			 "(c) 1998-2000 Johannes Sixt",
+			 "(c) 1998-2001 Johannes Sixt",
 			 0,		/* any text */
 			 "http://members.nextra.at/johsixt/kdbg.html",
 			 "Johannes.Sixt@telecom.at");
