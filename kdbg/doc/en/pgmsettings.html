@@ -3,18 +3,22 @@
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
    <meta name="Author" content="Johannes Sixt">
-   <meta name="GENERATOR" content="Mozilla/4.7 [en] (X11; I; Linux 2.2.13 i586) [Netscape]">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
+   <title>KDbg - User's Manual - Program Settings</title>
 </head>
-<body>
-
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<a href="index.html">Contents</a>
 <h1>
-Program Settings</h1>
-In this dialog, program specific settings can be selected. The settings
-apply only to the currently loaded executable and will be saved across
-sessions.
-<p><b><i>Important note:</i></b> The chosen settings will only apply the
-next time the executable is loaded into KDbg. This means that after pressing
-<i>OK</i> in this dialog, you must reload the executable using <i>File|Executable</i>!!
+The Program Settings Dialog</h1>
+In this dialog, program specific settings can be selected. It is invoked
+by <i>File|Settings</i>. The settings apply only to the currently loaded
+executable and will be saved across sessions.
+<blockquote><b><i>Important note:</i></b> The chosen settings will only
+apply the next time the executable is loaded into KDbg. This means that
+after pressing
+<i>OK</i> in this dialog, you must reload the executable
+using <i>File|Executable</i>!!</blockquote>
+
 <ul>
 <li>
 <a href="#driver">Debugger</a></li>
@@ -26,9 +30,11 @@ next time the executable is loaded into KDbg. This means that after pressing
 <h2>
 <a NAME="driver"></a>Debugger</h2>
 In this section, the debugger to be used for the program can be chosen.
-<p><b>How to invoke GDB</b>
+<h4>
+How to invoke GDB</h4>
+
 <blockquote>Enter the command to invoke gdb. Leave this field empty to
-use the default gdb command as specified in the <a href="index.html#GlobalOptions">global
+use the default gdb command as specified in the <a href="globaloptions.html">global
 options</a>. When you are cross-compiling and remote-debugging, you will
 probably want to use a different gdb suitable for the target platform.
 The default command is <tt>gdb --fullname --nx</tt>. Be sure to also specify
@@ -39,13 +45,18 @@ will not work.</blockquote>
 <a NAME="output"></a>Output</h2>
 In this section, the terminal emulation under which the program will run
 can be selected.
-<p><b>No input and output</b>
+<h4>
+No input and output</h4>
+
 <blockquote>Check this option if your program does not receive input from
 the terminal and you do not want to see the output that the program writes
 to <tt>stdout</tt> and <tt>stderr</tt> (if any). All three standard channels
 (<tt>stdin</tt>, <tt>stdout</tt>, and <tt>stderr</tt>) are effectively
 redirected to <tt>/dev/null</tt>.</blockquote>
-<b>Only output, simple terminal emulation</b>
+
+<h4>
+Only output, simple terminal emulation</h4>
+
 <blockquote>Check this option if your program does not receive input from
 the terminal (<tt>stdin</tt> will be redirected to <tt>/dev/null</tt>),
 and the output that it writes to <tt>stdout</tt> and <tt>stderr</tt> does
@@ -53,13 +64,17 @@ not require sophisticated terminal emulation. The output will be shown
 in the <i>Output</i> window.
 <br><i>Important:</i> The integrated terminal emulator will only interpret
 the line-feed character <tt>\n</tt> (ASCII 10) to break lines. It will
-<i>not</i> handle the carriage-return character <tt>\r</tt> (ASCII 13).
-This is sufficient for displaying plain debugging output that is often
-used by developers of GUI programs.</blockquote>
-<b>Full terminal emulation</b>
+<i>not</i>
+handle the carriage-return character <tt>\r</tt> (ASCII 13). This is sufficient
+for displaying plain debugging output that is often used by developers
+of GUI programs.</blockquote>
+
+<h4>
+Full terminal emulation</h4>
+
 <blockquote>Check this option if your program reads input from <tt>stdin</tt>
 or if the output to <tt>stdout</tt> or <tt>stderr</tt> requires terminal
-emulation. A terminal emulator will be invoked as specified in the <a href="index.html#GlobalOptions">global
+emulation. A terminal emulator will be invoked as specified in the <a href="globaloptions.html">global
 options</a>.</blockquote>
 
 </body>

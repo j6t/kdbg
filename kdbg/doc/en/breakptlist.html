@@ -1,0 +1,75 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - User's Manual - Breakpoint list</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<a href="index.html">Contents</a>
+<h1>
+The Breakpoint List</h1>
+The breakpoint list displays all breakpoints and watchpoints that are set
+and allows you to manipulate them. It can be displayed using <i>View|Breakpoints</i>.
+<h2>
+The list of breakpoints</h2>
+For each breakpoint the following is shown:
+<ul>
+<li>
+the breakpoint location,</li>
+
+<li>
+the hit count,</li>
+
+<li>
+the ignore count if set,</li>
+
+<li>
+the condition if set.</li>
+</ul>
+The icon in front of the entry indicates whether the breakpoint is enabled
+(a red dot) or disabled (a bright red dot), whether the breakpoint is temporary
+(a tiny clock is overlaid) or whether the breakpoint is conditional (a
+tiny question mark is overlaid).
+<p>Watchpoints are indicated by an eye glas icon in front of the line.
+<h2>
+Manipulating breakpoints</h2>
+<a NAME="StopProg"></a>It is important to note that breakpoints and watchpoints
+cannot be manipulated while the program is running. If the program has
+already been started, it must stop first - either by hitting a breakpoint
+that is already set or forcefully by choosing <i>Execution|Break</i>. Note
+that this will not terminate the program, it just interrupts it. You can
+now manipulate the breakpoints; then choose <i>Execution|Continue</i> to
+let the program continue.
+<p>To set a breakpoint on a specific source line, it is easiest to do this
+in the source code window. If you don't know the exact file and line number
+of a function, you can set the breakpoint by typing the function name in
+the edit box above the list and click <i>Add Breakpoint</i>.
+<p>You can disable and enable breakpoints by selecting them in the list
+and clicking <i>Disable</i> or <i>Enable</i>. Or you simply click on the
+breakpoint in the list using the middle mouse button - just like you enable
+and disable breakpoints in the source window.
+<p>You can set a condition on a breakpoint (so that the program is only
+stopped if the condition is true) or set an ignore count (so that the program
+is not stopped the next n times that the breakpoint is hit). To do that,
+press the <i>Conditional</i> button and enter the condition and/or ignore
+count.
+<h2>
+Manipulating watchpoints</h2>
+Watchpoints are a like breakpoints, except that they interrupt the program
+when the value of a memory location changes. As with breakpoints, watchpoints
+cannot be manipulated while the program is running. See <a href="#StopProg">above</a>
+for more information.
+<p>To set a watchpoint, type an expression in the edit box above the list,
+then click <i>Add Watchpoint</i>. The program will stop when the value
+of the expression changes. Note that watchpoints that involve local variables
+can only be set when the program is stopped in a breakpoint (or has been
+interrupted by <i>Execution|Break</i>).
+<p>To remove the watchpoint, select it from the list and click <i>Remove</i>.
+If the expression involves a local variable, the watchpoint will be removed
+automatically when the program leaves the current frame.
+<p>You can set a condition and an ignore count on the watchpoint just like
+on breakpoints by selecting it and clicking <i>Conditional</i>.
+</body>
+</html>

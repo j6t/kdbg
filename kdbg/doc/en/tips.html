@@ -1,0 +1,45 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - User's Manual - Tips and Tricks</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<a href="index.html">Contents</a>
+<h1>
+Tips and Tricks</h1>
+
+<ul>
+<li>
+Always set the environment variable <tt>LD_BIND_NOW=1</tt> on glibc2 systems.
+
+<a href="argspwdenv.html#Environment">See here</a> how to set environment
+variables.</li>
+
+<li>
+You can use breakpoints as bookmarks: Just set a breakpoint and disable
+it. Later, you can quickly come back to that breakpoint by double-clicking
+it in the breakpoint list (or select it and click <i>View Code</i>). Since
+breakpoints are persistent (i.e. KDbg remembers them across invocations
+of a program), you get them back next time you invoke KDbg for that particular
+program.</li>
+
+<li>
+You can change a program variable's value: In the variable watch section
+(in the lower right) type an assignment like this: <tt>var.member=17</tt>
+and click <i>Add</i>. This immediately changes the value of the variable.
+You should delete the expression from the list right away (by selecting
+it in the window below and clicking <i>Del</i>). This is because the watch
+expressions are evaluate each time the program stops, and by this the variable
+would be changed to the specified value again and again!</li>
+
+<li>
+You can display a value in the watch section in different ways by prepending
+gdb's format specifiers in front of the variable to display. E.g. <tt>/x
+var.member</tt> displays the <tt>var.member</tt> in hexadecimal notation.</li>
+</ul>
+
+</body>
+</html>

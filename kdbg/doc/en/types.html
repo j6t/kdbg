@@ -1,109 +1,115 @@
-<HTML>
-<HEAD>
-   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-   <META NAME="GENERATOR" CONTENT="Mozilla/4.05 [en] (X11; I; Linux 2.0.35 i586) [Netscape]">
-   <TITLE>KDbg's type table</TITLE>
-</HEAD>
-<BODY>
-
-<H1>
-KDbg's type table</H1>
-KDbg's type tables are located under <TT>$KDEDIR/share/apps/kdbg/types</TT>.
-The file names end with <TT>.kdbgtt</TT>. Example: The type table for <TT>libqt.a</TT>
-is named <TT>qt.kdbgtt</TT>.
-
-<P>A type table file obeys the regular KDE configuration file syntax. The
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - User's Manual - Type Tables</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<a href="index.html">Contents</a>
+<h1>
+KDbg's Type Table</h1>
+KDbg can display the contents of single members of structured types, so
+that it is not necessary to expand the variable in the <a href="localvars.html">local
+variables window</a> or <a href="watches.html">watched expressions window</a>.
+The information which member variable is displayed is stored in <i>type
+tables</i>. There is generally one type table per shared library.
+<p>KDbg's type tables are located under <tt>$KDEDIR/share/apps/kdbg/types</tt>.
+The file names end with <tt>.kdbgtt</tt>. Example: The type table for <tt>libqt.so</tt>
+is named <tt>qt.kdbgtt</tt>.
+<p>A type table file obeys the regular KDE configuration file syntax. The
 file has the following groups:
-<UL>
-<LI>
-A group <TT>[Type Table]</TT> which lists the types and information how
-the debugger can identify whether the program is linked against the library.</LI>
+<ul>
+<li>
+A group <tt>[Type Table]</tt> which lists the types and information how
+the debugger can identify whether the program is linked against the library.</li>
 
-<LI>
+<li>
 A group for each type which has information about how the value of such
-a type is displayed by KDbg.</LI>
-</UL>
+a type is displayed by KDbg.</li>
+</ul>
 In order to determine which type tables apply to the program being debugged
 KDbg list the shared libraries it is linked to. Then it matches the names
-against the <TT>ShlibRE</TT> entries of all type tables. Those that match
+against the <tt>ShlibRE</tt> entries of all type tables. Those that match
 are used. If a type appears in several type tables, it is unspecified which
 one will be used.
-<H2>
-The <TT>[Type Table]</TT> group</H2>
+<h2>
+The <tt>[Type Table]</tt> group</h2>
 This group contains the following entries:
-<UL>
-<LI>
-<TT>Types1</TT>, <TT>Types2</TT>, etc. These entries name the types. Each
+<ul>
+<li>
+<tt>Types1</tt>, <tt>Types2</tt>, etc. These entries name the types. Each
 of them is a comma-separated list of type names. Each of the entries can
 list any number of types. (The types names can be distributed to several
 lines just so that the lines don't get excessivly long.) No blank space
 is allowed in these lines. The entries must be numbered consecutively (KDbg
 stops reading at the first gap), although an entry may be empty (i.e. contain
 no type at all). Sometimes the order in which the names are listed is important
-(see <TT>Alias</TT> types below).</LI>
+(see <tt>Alias</tt> types below).</li>
 
-<LI>
-<TT>ShlibRE</TT>. KDbg uses this entry to determine if the type table applies
+<li>
+<tt>ShlibRE</tt>. KDbg uses this entry to determine if the type table applies
 to the program being debugged. For this purpose KDbg determines the shared
 libraries to which the program is linked. If any of the libraries matches
 this entry, the type table applies. The regular expression is a Qt-regular
-expression (the metacharacters <TT>.*?[]^$\</TT> are recognized in the
-usual way, but there is no possibility to group characters.)</LI>
+expression (the metacharacters <tt>.*?[]^$\</tt> are recognized in the
+usual way, but there is no possibility to group characters.)</li>
 
-<LI>
-<TT>LibDisplayName</TT>. This entry is used in lists where the available
-type tables are listed to identify this type table.<BR>
-<FONT SIZE=-1>This is not used currently.</FONT></LI>
-</UL>
+<li>
+<tt>LibDisplayName</tt>. This entry is used in lists where the available
+type tables are listed to identify this type table.</li>
 
-<H2>
-The type's group</H2>
-There is one group for each type that is named exactly as the type. <FONT SIZE=-1>At
-the moment C++ template classes are not supported.</FONT> Each group contains
+<br><font size=-1>This is not used currently.</font></ul>
+
+<h2>
+The type's group</h2>
+There is one group for each type that is named exactly as the type. <font size=-1>At
+the moment C++ template classes are not supported.</font> Each group contains
 the following entries:
-<UL>
-<LI>
-<TT>Display</TT> determines how the value of the type is displayed by KDbg.
-The string must contain 1 to 5 percent characters '<TT>%</TT>'. These are
-replaced by the results of the expressions printed by the <TT>Expr</TT><I>x</I>
-entries.</LI>
+<ul>
+<li>
+<tt>Display</tt> determines how the value of the type is displayed by KDbg.
+The string must contain 1 to 5 percent characters '<tt>%</tt>'. These are
+replaced by the results of the expressions printed by the <tt>Expr</tt><i>x</i>
+entries.</li>
 
-<LI>
-One or more of <TT>Expr1</TT>, <TT>Expr2</TT>, etc. Each of them must contain
-<B>exactly one</B> <TT>%s</TT> sequence, which will be replaced by the
-expression whose value is investigate. The so constructed expressions is
-submitted to gdb, and the result substituted back for the corresponding
-percent character in the <TT>Display</TT> string.</LI>
+<li>
+One or more of <tt>Expr1</tt>, <tt>Expr2</tt>, etc. Each of them must contain
+<b>exactly
+one</b> <tt>%s</tt> sequence, which will be replaced by the expression
+whose value is investigate. The so constructed expressions is submitted
+to gdb, and the result substituted back for the corresponding percent character
+in the <tt>Display</tt> string.</li>
 
-<LI>
-<TT>Alias</TT> names an alias type. If this entry is present, the type
+<li>
+<tt>Alias</tt> names an alias type. If this entry is present, the type
 is treated like the specified type. That alias type must appear before
-this type in the <TT>Types</TT><I>x</I> entries in the <TT>Type Table</TT>.</LI>
-</UL>
-<FONT SIZE=-1>Currently the number of expressions per type is limited to
+this type in the <tt>Types</tt><i>x</i> entries in the <tt>Type Table</tt>.</li>
+</ul>
+<font size=-1>Currently the number of expressions per type is limited to
 5. This can easily be changed if it's too restrictive, but I recommend
-not to go to that limit at all - it will slow down the debugging process.</FONT>
-
-<P>KDbg recognizes a special extension that is used to display Qt 2.0's
-unicode strings: If an <TT>Expr</TT><I>x</I> is prepended with <TT>/QString::Data</TT>,
-it is assumed that the result of the expression is a pointer to a <TT>QString::Data</TT>.
-The value displayed is the unicode string that this instance of <TT>QString::Data</TT>
-represents (which can be <TT>QString::null</TT> if it is Qt's well-defined
-null string or <TT>(null)</TT>&nbsp;if the <TT>unicode</TT> member is the
-null pointer). See <TT>qt2.kdbgtt</TT> for examples.
-
-<P>Tip: It is not necessary to define derived types if they ought to be
+not to go to that limit at all - it will slow down the debugging process.</font>
+<p>KDbg recognizes a special extension that is used to display Qt 2.0's
+unicode strings: If an <tt>Expr</tt><i>x</i> is prepended with <tt>/QString::Data</tt>,
+it is assumed that the result of the expression is a pointer to a <tt>QString::Data</tt>.
+The value displayed is the unicode string that this instance of <tt>QString::Data</tt>
+represents (which can be <tt>QString::null</tt> if it is Qt's well-defined
+null string or <tt>(null)</tt> if the <tt>unicode</tt> member is the null
+pointer). See <tt>qt2.kdbgtt</tt> for examples.
+<p>Tip: It is not necessary to define derived types if they ought to be
 treated the same as the base class - KDbg can deduce derived types and
 uses the type specification of the (leftmost) base class. You can use the
-<TT>Alias</TT> entry to quickly specify that a type should be treated like
-a non-leftmost base class for a multiple-inheritance class.
-<H2>
-An example</H2>
-The example shows how <TT>QString</TT> and <TT>QObject</TT> are defined
-in <TT>qt.kdbgtt</TT>. Additionally, <TT>QTableView</TT> is defined as
-an alias of <TT>QObject</TT>. This example applies to Qt 1.x, which is
-located in shared library whose name ends in <TT>libqt.so.1</TT>.
-<PRE>[Type Table]
+<tt>Alias</tt>
+entry to quickly specify that a type should be treated like a non-leftmost
+base class for a multiple-inheritance class.
+<h2>
+An example</h2>
+The example shows how <tt>QString</tt> and <tt>QObject</tt> are defined
+in <tt>qt.kdbgtt</tt>. Additionally, <tt>QTableView</tt> is defined as
+an alias of <tt>QObject</tt>. This example applies to Qt 1.x, which is
+located in shared library whose name ends in <tt>libqt.so.1</tt>.
+<pre>[Type Table]
 Types1=QString
 Types2=QObject,QTableView
 LibDisplayName=libqt 1.x
@@ -116,7 +122,7 @@ Display={ name=% #chld=% }
 Expr1=(%s).objname
 Expr2=(%s).childObjects->numNodes
 [QTableView]
-Alias=QObject</PRE>
-Note that it is safer to wrap the <TT>%s</TT> in parentheses.
-</BODY>
-</HTML>
+Alias=QObject</pre>
+Note that it is safer to wrap the <tt>%s</tt> in parentheses.
+</body>
+</html>

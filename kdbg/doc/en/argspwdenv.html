@@ -1,0 +1,44 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - User's Manual - Arguments, Environment</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<a href="index.html">Contents</a>
+<h1>
+Specifying program arguments, working directory, environment variables</h1>
+Choose <i>Execution|Arguments</i> to open a dialog where you can set program
+arguments, the working directory for your program, and environment variables.
+<h2>
+<a NAME="PgmArgs"></a>Program Arguments</h2>
+In the top edit box enter the arguments that shall be passed on to your
+program. Next time the program is started, the new arguments will be used.
+<h2>
+<a NAME="WorkingDir"></a>Working directory</h2>
+In the edit box below you can specify the working directory for your program.
+Your program will use the new directory only when it is run the next time.
+<p>The working directory also applies to gdb itself! The directory that
+you specify will be passed to gdb immediately, i.e. gdb will work with
+the new setting as soon as you press <i>OK</i>. This can influence whether
+source code files are found.
+<h2>
+<a NAME="Environment"></a>Environment variables</h2>
+In the environment variables section type in an expression of the form
+<tt>VARIABLE=value</tt>
+to set the environment variable <tt>VARIABLE</tt> to the value <tt>value</tt>,
+and click <i>Modify</i>. To remove a variable, select it from the list
+below and click <i>Remove</i>. To change the value, edit the value in the
+edit field and click <i>Modify</i>. If you change the name of the variable
+and click <i>Modify</i>, you add a new variable! The new environment variables
+will be used by your program the next time it is run.
+<p>An important environment variable to set if you are using glibc2 on
+Linux is <tt>LD_BIND_NOW</tt>. It is very important that you set this variable
+to <tt>1</tt> for all your debugging sessions. If it is not set, gdb cannot
+step into and out of system functions that are imported from the shared
+<tt>libc</tt>
+and other libraries.
+</body>
+</html>

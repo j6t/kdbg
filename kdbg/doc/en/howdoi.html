@@ -1,0 +1,79 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - User's Manual - How Do I...?</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<a href="index.html">Contents</a>
+<h1>
+How Do I...?</h1>
+
+<h4>
+... set breakpoints?</h4>
+There's more than one way to set a breakpoint:
+<ul>
+<li>
+You can set it in the source window by clicking on the "active area" at
+the far left of the line.</li>
+
+<li>
+You can set it by selecting the line in the source window and choosing
+an option from the <i>Breakpoint</i> menu.</li>
+
+<li>
+You can set it in the <a href="breakptlist.html">breakpoint list</a>.</li>
+</ul>
+If you can't set breakpoints, maybe the program is currently running. You
+can't set breakpoints while the program is running. Stop it first using
+<i>Execution|Break</i>.
+If you still can't set breakpoints, make sure that you have compiled <i>and
+linked</i> your program with debugging information enabled.
+<h4>
+... display the value of a global variable or an arbitrary expression?</h4>
+Use the Watch window.
+<h4>
+... set watchpoints?</h4>
+Watchpoints are manipulated in the <a href="breakptlist.html">breakpoint
+list</a>.
+<h4>
+... use a core dump?</h4>
+First load the executable using <i>File|Executable</i>, then specify the
+core dump using <i>File|Core dump</i>.
+<h4>
+... debug a program that's caught in an endless loop?</h4>
+Start the program and let it run until it is in the endless loop. Then
+switch to KDbg and choose <i>Execution|Break</i>. You've just caught the
+nasty program <i>in flagranti</i>!
+<h4>
+... achieve that the program passes over a breakpoint a number of times
+before it stops?</h4>
+In the <a href="breakptlist.html">breakpoint list</a> select the breakpoint;
+then click <i>Conditional</i> and specify the number of times to skip the
+breakpoint in the <i>Ignore count</i> field.
+<h4>
+... set environment variables for the executable?</h4>
+Select <i>Execution|Arguments</i> and specify the environment variables
+in the <a href="argspwdenv.html#Environment">program arguments dialog</a>.
+<h4>
+... set a working directory for the executable?</h4>
+Select <i>Execution|Arguments</i> and specify the working directory in
+the <a href="argspwdenv.html#WorkingDir">program arguments dialog</a>.
+<h4>
+... get rid of this terminal window?</h4>
+Select <i>File|Settings</i> and switch to the <a href="pgmsettings.html#output">Output
+</a>tab.
+Select <i>Only output, simple terminal emulation</i> and click
+<i>OK</i>.
+Now restart the program (choose it from the list under <i>File|Recent Executables</i>).
+The program output goes now to the built-in <a href="pgmoutput.html">output
+window</a> and stdin is redirected to <tt>/dev/null</tt>.
+<p>You must do this for every new program that you debug.
+<p><b><i>Important:</i></b> You should not do this if your program expects
+input from the terminal (usually stdin) or if its output requires nifty
+terminal emulation (more than carriage-return and line-feed). The built-in
+output window does not support input and terminal emulation.
+</body>
+</html>
