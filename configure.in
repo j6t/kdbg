@@ -70,5 +70,4 @@ AC_OUTPUT(Makefile \
 	kdbg/Makefile \
 	kdbg/doc/Makefile \
 	kdbg/doc/en/Makefile \
-	kdbg/doc/de/Makefile \
 	po/Makefile)
