@@ -152,7 +152,7 @@ void DebuggerMainWndBase::setupDebugger(QWidget* parent,
     QObject::connect(m_debugger, SIGNAL(updateUI()),
 		     parent, SLOT(updateUI()));
 
-    QObject::connect(m_debugger, SIGNAL(lineItemsChanged()),
+    QObject::connect(m_debugger, SIGNAL(breakpointsChanged()),
 		     parent, SLOT(updateLineItems()));
     
     QObject::connect(m_debugger, SIGNAL(animationTimeout()),

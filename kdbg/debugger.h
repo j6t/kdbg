@@ -399,14 +399,7 @@ signals:
     void activateFileLine(const QString& file, int lineNo, const DbgAddr& address);
 
     /**
-     * This signal is emitted when a line decoration item (those thingies
-     * that indicate breakpoints) must be changed.
-     */
-    void lineItemsChanged();
-
-    /**
-     * This signal is a special case of @ref #lineItemsChanged because it
-     * indicates that only the program counter has changed.
+     * This signal indicates that the program counter has changed.
      *
      * @param filename specifies the filename where the program stopped
      * @param lineNo specifies the line number (zero-based); it can be -1

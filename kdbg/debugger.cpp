@@ -928,7 +928,6 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	// note: this handler must not enqueue a command, since
 	// DCinfobreak is used at various different places.
 	updateBreakList(output);
-	emit lineItemsChanged();
 	break;
     case DCfindType:
 	handleFindType(cmd, output);
