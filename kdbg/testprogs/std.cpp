@@ -5,5 +5,5 @@ int main()
 {
 	std::string s = "abc";
 
-	std::cout << s << endl;
+	std::cout << s << std::endl;
 }

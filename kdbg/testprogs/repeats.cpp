@@ -33,5 +33,5 @@ int main()
 
     s[21] = s[48];
 
-    exit(0);
+    return 0;
 }

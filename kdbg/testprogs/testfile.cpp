@@ -1,4 +1,4 @@
-#include <iostream.h>
+#include <iostream>
 #include <qstring.h>
 #include <qfile.h>
 #include <qfileinfo.h>
@@ -77,7 +77,7 @@ void f(E e[3], char c)
 void strtest(const char* t)
 {
     const char* s = t;
-    cout << s << endl;
+    std::cout << s << std::endl;
 }
 
 
@@ -94,7 +94,7 @@ int main(int argc, char* argv[])
 		} else if (*argv[1] == 'a') {
 			// let debugger attach
 			int junk;
-			cin >> junk;
+			std::cin >> junk;
 		}
 	}
 
@@ -143,7 +143,7 @@ Cl::Cl(int r) :
 	k(r),
 	l(sin(r))
 {
-	cout << l << endl;
+    std::cout << l << std::endl;
 }
 
 Cl::~Cl()
@@ -169,7 +169,7 @@ int Dl::f(int x)
 
 int Dl::operator()(const QString& x, int& y) const
 {
-	cerr << "ha! I know!" << endl;
+	std::cerr << "ha! I know!" << std::endl;
 	return 1;
 }
 
