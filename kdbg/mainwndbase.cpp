@@ -434,23 +434,13 @@ void DebuggerMainWndBase::updateUIItem(UpdateUI* item)
 	item->enable(m_debugger->haveExecutable());
 	break;
     }
-    
-    // update statusbar
-    dbgStatusBar()->changeItem(m_debugger->isProgramActive() ?
-			    static_cast<const char*>(m_statusActive) : "",
-			    ID_STATUS_ACTIVE);
 }
 
-void DebuggerMainWndBase::updateLineItems()
-{
-}
-
-void DebuggerMainWndBase::initAnimation()
+void DebuggerMainWndBase::initAnimation(KToolBar* toolbar)
 {
     QPixmap pixmap = BarIcon("kde1");
     int numPix = 6;
 
-    KToolBar* toolbar = dbgToolBar();
     toolbar->insertButton(pixmap, ID_STATUS_BUSY);
     toolbar->alignItemRight(ID_STATUS_BUSY, true);
     
@@ -475,20 +465,20 @@ void DebuggerMainWndBase::initAnimation()
     }
 }
 
-void DebuggerMainWndBase::slotAnimationTimeout()
+void DebuggerMainWndBase::nextAnimationFrame(KToolBar* toolbar)
 {
     assert(m_animation.count() > 0);	/* must have been initialized */
     m_animationCounter++;
     if (m_animationCounter == m_animation.count())
 	m_animationCounter = 0;
-    dbgToolBar()->setButtonPixmap(ID_STATUS_BUSY,
+    toolbar->setButtonPixmap(ID_STATUS_BUSY,
 			       *m_animation.at(m_animationCounter));
 }
 
-void DebuggerMainWndBase::slotNewStatusMsg()
+void DebuggerMainWndBase::newStatusMsg(KStatusBar* statusbar)
 {
     QString msg = m_debugger->statusMessage();
-    dbgStatusBar()->changeItem(msg, ID_STATUS_MSG);
+    statusbar->changeItem(msg, ID_STATUS_MSG);
 }
 
 void DebuggerMainWndBase::doGlobalOptions(QWidget* parent)

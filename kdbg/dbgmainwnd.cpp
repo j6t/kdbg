@@ -371,7 +371,7 @@ void DebuggerMainWnd::initToolbar()
     toolbar->setBarPos(KToolBar::Top);
     //moveToolBar(toolbar);
     
-    initAnimation();
+    initAnimation(toolbar);
 
     KStatusBar* statusbar = statusBar();
     statusbar->insertItem(m_statusActive, ID_STATUS_ACTIVE);
@@ -664,16 +664,6 @@ bool DebuggerMainWnd::canChangeDockVisibility(QWidget* w)
     return d != 0 && (d->mayBeHide() || d->mayBeShow());
 }
 
-KToolBar* DebuggerMainWnd::dbgToolBar()
-{
-    return toolBar();
-}
-
-KStatusBar* DebuggerMainWnd::dbgStatusBar()
-{
-    return statusBar();
-}
-
 TTYWindow* DebuggerMainWnd::ttyWindow()
 {
     return m_ttyWindow;
@@ -714,12 +704,12 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, QCString lang)
 
 void DebuggerMainWnd::slotNewStatusMsg()
 {
-    DebuggerMainWndBase::slotNewStatusMsg();
+    newStatusMsg(statusBar());
 }
 
 void DebuggerMainWnd::slotAnimationTimeout()
 {
-    DebuggerMainWndBase::slotAnimationTimeout();
+    nextAnimationFrame(toolBar());
 }
 
 void DebuggerMainWnd::slotFileGlobalSettings()

@@ -76,8 +76,6 @@ protected:
 
 protected:
     virtual void closeEvent(QCloseEvent* e);
-    virtual KToolBar* dbgToolBar();
-    virtual KStatusBar* dbgStatusBar();
     virtual TTYWindow* ttyWindow();
     virtual QString createOutputWindow();
 

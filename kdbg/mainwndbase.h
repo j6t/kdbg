@@ -94,11 +94,6 @@ protected:
     virtual void saveSettings(KConfig*);
     virtual void restoreSettings(KConfig*);
 
-    // override must return the toolbar containing the animation and
-    // buttons to update
-    virtual KToolBar* dbgToolBar() = 0;
-    // override must return the statusbar
-    virtual KStatusBar* dbgStatusBar() = 0;
     // override must return the integrated output window
     virtual TTYWindow* ttyWindow() = 0;
 
@@ -108,7 +103,8 @@ protected:
     // animated button
     QList<QPixmap> m_animation;
     uint m_animationCounter;
-    void initAnimation();
+    void initAnimation(KToolBar* toolbar);
+    void nextAnimationFrame(KToolBar* toolbar);
 
     // output window
     QString m_outputTermCmdStr;
@@ -153,9 +149,7 @@ public:
      * class will not be the left-most base class!).
      */
     void updateUIItem(UpdateUI* item);
-    void updateLineItems();
-    void slotNewStatusMsg();
-    void slotAnimationTimeout();
+    void newStatusMsg(KStatusBar* statusbar);
     void slotDebuggerStarting();
 };
 
