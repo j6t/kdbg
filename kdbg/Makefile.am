@@ -121,7 +121,7 @@ appsdir = $(kde_appsdir)/Development
 # make messages.po. Move this one to ../po/ and "make merge" in po
 # the -x is for skipping messages already translated in kdelibs
 messages:
-	$(XGETTEXT) -C -ki18n -x $(includedir)/kde.pot $(kdbg_SOURCES) && mv messages.po ../po/kdbg.pot
+	$(XGETTEXT) -C -ki18n -kI18N_NOOP -x $(includedir)/kde.pot $(kdbg_SOURCES) && mv messages.po ../po/kdbg.pot
 
 
 EXTRA_DIST = $(apps_DATA)
