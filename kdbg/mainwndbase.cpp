@@ -428,8 +428,10 @@ void DebuggerMainWndBase::initAnimation()
     QString path = kapp->kde_datadir() + "/kfm/pics/";
     QPixmap pixmap;
     pixmap.load(path + "/kde1.xpm");
+    int numPix = 9;
 #else
     QPixmap pixmap = BarIcon("kde1");
+    int numPix = 6;
 #endif
 
     KToolBar* toolbar = dbgToolBar();
@@ -439,7 +441,7 @@ void DebuggerMainWndBase::initAnimation()
     // Load animated logo
     m_animation.setAutoDelete(true);
     QString n;
-    for (int i = 1; i <= 9; i++) {
+    for (int i = 1; i <= numPix; i++) {
 #if QT_VERSION < 200
 	n.sprintf("/kde%d.xpm", i);
 	QPixmap* p = new QPixmap();
