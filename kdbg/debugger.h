@@ -190,6 +190,27 @@ public:
 
     void setCoreFile(const QString& corefile) { m_corefile = corefile; }
 
+    /**
+     * Sets the command to invoke gdb. If cmd is the empty string, the
+     * default is substituted.
+     */
+    void setDebuggerCmd(const QString& cmd);
+
+    /** Retrieves the command to invoke gdb. */
+    QString debuggerCmd() const { return m_debuggerCmdStr; }
+
+    /**
+     * Sets the command to invoke the terminal that displays the program
+     * output. If cmd is the empty string, the default is substituted.
+     */
+    void setTerminalCmd(const QString& cmd);
+
+    /**
+     * Retrieves the command to invoke ther terminal that displays the
+     * program output.
+     */
+    QString terminalCmd() const { return m_outputTermCmdStr; }
+
     // settings
     void saveSettings(KConfig*);
     void restoreSettings(KConfig*);
@@ -228,10 +249,12 @@ public:
 	DCignore
     };
 protected:
+    QString m_outputTermCmdStr;
     pid_t m_outputTermPID;
     QString m_outputTermName;
     QString m_outputTermKeepScript;
     bool createOutputWindow();
+    QString m_debuggerCmdStr;
     bool startGdb();
     void stopGdb();
     void writeCommand();

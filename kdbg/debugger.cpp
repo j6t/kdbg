@@ -9,6 +9,7 @@
 #include "procattach.h"
 #include "typetable.h"
 #include "exprwnd.h"
+#include "valarray.h"
 #include <qregexp.h>
 #include <qfileinf.h>
 #include <qlistbox.h>
@@ -51,6 +52,11 @@ int GdbProcess::commSetupDoneC()
     return dup2(STDOUT_FILENO, STDERR_FILENO) != -1;
 }
 
+const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
+const char defaultDebuggerCmdStr[] =
+	"gdb"
+	" -fullname"			/* to get standard file names each time the prog stops */
+	" -nx";				/* do not execute initialization files */
 
 KDebugger::KDebugger(QWidget* parent,
 		     ExprWnd* localVars,
@@ -58,7 +64,9 @@ KDebugger::KDebugger(QWidget* parent,
 		     QListBox* backtrace
 		     ) :
 	QObject(parent, "debugger"),
+	m_outputTermCmdStr(defaultTermCmdStr),
 	m_outputTermPID(0),
+	m_debuggerCmdStr(defaultDebuggerCmdStr),
 	m_state(DSidle),
 	m_gdbOutput(0),
 	m_gdbOutputLen(0),
@@ -85,6 +93,7 @@ KDebugger::KDebugger(QWidget* parent,
     m_gdbOutputAlloc = 4000;
     m_gdbOutput = new char[m_gdbOutputAlloc];
 
+    m_hipriCmdQueue.setAutoDelete(true);
     m_envVars.setAutoDelete(true);
 
     connect(&m_localVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
@@ -133,10 +142,13 @@ KDebugger::~KDebugger()
 }
 
 
+const char DebuggerGroup[] = "Debugger";
 const char WindowGroup[] = "Windows";
 const char OutputWindowGroup[] = "OutputWindow";
+const char DebuggerCmdStr[] = "DebuggerCmdStr";
 const char BreaklistVisible[] = "BreaklistVisible";
 const char Breaklist[] = "Breaklist";
+const char TermCmdStr[] = "TermCmdStr";
 const char KeepScript[] = "KeepScript";
 
 void KDebugger::saveSettings(KConfig* config)
@@ -148,6 +160,12 @@ void KDebugger::saveSettings(KConfig* config)
     const QRect& r = KWM::geometry(m_bpTable.winId());
     config->writeEntry(BreaklistVisible, visible);
     config->writeEntry(Breaklist, r);
+
+    config->setGroup(DebuggerGroup);
+    config->writeEntry(DebuggerCmdStr, m_debuggerCmdStr);
+    
+    config->setGroup(OutputWindowGroup);
+    config->writeEntry(TermCmdStr, m_outputTermCmdStr);
 }
 
 void KDebugger::restoreSettings(KConfig* config)
@@ -161,12 +179,16 @@ void KDebugger::restoreSettings(KConfig* config)
     }
     visible ? m_bpTable.show() : m_bpTable.hide();
 
+    config->setGroup(DebuggerGroup);
+    setDebuggerCmd(config->readEntry(DebuggerCmdStr));
+
     /*
      * For debugging and emergency purposes, let the config file override
      * the shell script that is used to keep the output window open. This
      * string must have EXACTLY 1 %s sequence in it.
      */
     config->setGroup(OutputWindowGroup);
+    setTerminalCmd(config->readEntry(TermCmdStr, defaultTermCmdStr));
     m_outputTermKeepScript = config->readEntry(KeepScript);
 }
 
@@ -464,9 +486,39 @@ bool KDebugger::canChangeBreakpoints()
     return isReady() && !m_programRunning;
 }
 
+void KDebugger::setTerminalCmd(const QString& cmd)
+{
+    m_outputTermCmdStr = cmd;
+    // revert to default if empty
+    if (m_outputTermCmdStr.isEmpty()) {
+	m_outputTermCmdStr = defaultTermCmdStr;
+    }
+}
+
+void KDebugger::setDebuggerCmd(const QString& cmd)
+{
+    m_debuggerCmdStr = cmd;
+    // revert to default if empty
+    if (m_debuggerCmdStr.isEmpty()) {
+	m_debuggerCmdStr = defaultDebuggerCmdStr;
+    }
+}
+
 
 //////////////////////////////////////////////////////////
 // debugger driver
+
+static void splitCmdStr(const QString& cmd, ValArray<QString>& parts)
+{
+    QString str = cmd.simplifyWhiteSpace();
+    int start = 0;
+    int end;
+    while ((end = str.find(' ', start)) >= 0) {
+	parts.append(str.mid(start, end-start));
+	start = end+1;
+    }
+    parts.append(str.mid(start, str.length()-start));
+}
 
 #define PROMPT "(kdbg)"
 #define PROMPT_LEN 6
@@ -483,13 +535,23 @@ bool KDebugger::startGdb()
 	TRACE("successfully created output window");
     }
 
+    // clear command queues
+    delete m_activeCmd;
+    m_activeCmd = 0;
+    m_hipriCmdQueue.clear();
+    bool autodel = m_lopriCmdQueue.autoDelete();
+    m_lopriCmdQueue.setAutoDelete(true);
+    m_lopriCmdQueue.clear();
+    m_lopriCmdQueue.setAutoDelete(autodel);
+
     // debugger executable
+    ValArray<QString> cmdParts;
+    splitCmdStr(m_debuggerCmdStr, cmdParts);
+    
     m_gdb.clearArguments();
-    m_gdb << "gdb";
-    // add options:
-    m_gdb
-	<< "-fullname"			/* to get standard file names each time the prog stops */
-	<< "-nx";			/* do not execute initialization files */
+    for (int i = 0; i < cmdParts.size(); i++) {
+	m_gdb << cmdParts[i];
+    }
 
     m_explicitKill = false;
     if (!m_gdb.start(KProcess::NotifyOnExit,
@@ -624,15 +686,39 @@ bool KDebugger::createOutputWindow()
 	shellScript.sprintf(fmt, fifoName.data());
 	TRACE("output window script is " + shellScript);
 
-	// spawn "xterm -name kdbgio -title "KDbg: Program output" -e sh -c script"
 	QString title = kapp->getCaption();
 	title += i18n(": Program output");
-	::execlp("xterm",
-		 "xterm",
-		 "-name", "kdbgio",
-		 "-title", title.data(),
-		 "-e", "sh", "-c", shellScript.data(),
-		 0);
+
+	// parse the command line specified in the preferences
+	ValArray<QString> cmdParts;
+	splitCmdStr(m_outputTermCmdStr, cmdParts);
+
+	/*
+	 * Build the argv array. Thereby substitute special sequences:
+	 */
+	struct {
+	    char seq[4];
+	    QString replace;
+	} substitute[] = {
+	    { "%T", title },
+	    { "%C", shellScript }
+	};
+	const char** argv = new const char*[cmdParts.size()+1];
+	argv[cmdParts.size()] = 0;
+
+	for (int i = cmdParts.size()-1; i >= 0; i--) {
+	    QString& str = cmdParts[i];
+	    for (int j = sizeof(substitute)/sizeof(substitute[0])-1; j >= 0; j--) {
+		int pos = str.find(substitute[j].seq);
+		if (pos >= 0) {
+		    str.replace(pos, 2, substitute[j].replace);
+		    break;		/* substitute only one sequence */
+		}
+	    }
+	    argv[i] = str;
+	}
+
+	::execvp(argv[0], argv);
 	
 	// failed; what can we do?
 	::exit(0);
