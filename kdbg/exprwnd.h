@@ -37,6 +37,8 @@ public:
     int valueWidth();
     QString computeExpr() const;
     bool isToplevelExpr() const;
+    /** is this element an ancestor of (or equal to) child? */
+    bool isAncestorEq(const VarTree* child) const;
 };
 
 class ExprWnd : public KTreeView
@@ -57,8 +59,10 @@ public:
     void updateSingleExpr(VarTree* display, VarTree* newValues);
     /** updates only the value of the node */
     void updateStructValue(VarTree* display);
-    /** removes an expression from the topmost level*/
-    void removeExpr(const char* name);
+    /** get a top-level expression by name */
+    VarTree* topLevelExprByName(const char* name);
+    /** removes an expression; must be on the topmost level*/
+    void removeExpr(VarTree* item);
     /** clears the list of pointers needing updates */
     void clearPendingUpdates();
     /** returns a pointer to update (or 0) and removes it from the list */
@@ -83,7 +87,7 @@ protected:
     QList<VarTree> m_updateStruct;	/* structs whose nested value needs update */
 
     /** remove items that are in the subTree from the list */
-    static void sweepList(QList<VarTree>& list, KTreeViewItem* subTree);
+    static void sweepList(QList<VarTree>& list, VarTree* subTree);
 
 protected slots:
     void slotExpandOrCollapse(int);

@@ -102,6 +102,15 @@ bool VarTree::isToplevelExpr() const
     return getParent() != 0 && getParent()->getParent() == 0;
 }
 
+bool VarTree::isAncestorEq(const VarTree* child) const
+{
+    const KTreeViewItem* c = child;
+    while (c != 0 && c != this) {
+	c = c->getParent();
+    }
+    return c != 0;
+}
+
 
 ExprWnd::ExprWnd(QWidget* parent, const char* name) :
 	KTreeView(parent, name),
@@ -409,36 +418,38 @@ bool ExprWnd::collectUnknownTypes(KTreeViewItem* item, void* user)
 }
 
 
-void ExprWnd::removeExpr(const char* name)
+VarTree* ExprWnd::topLevelExprByName(const char* name)
 {
     QString p = name;
     KPath path;
     path.push(&p);
-
-    // must remove any pointers scheduled for update from the list
     KTreeViewItem* item = itemAt(path);
+    path.pop();
+
+    return static_cast<VarTree*>(item);
+}
+
+void ExprWnd::removeExpr(VarTree* item)
+{
+    // must remove any pointers scheduled for update from the list
     sweepList(m_updatePtrs, item);
     sweepList(m_updateType, item);
     sweepList(m_updateStruct, item);
 
-    removeItem(path);
-    path.pop();
+    takeItem(item);
+    delete item;
 
     updateValuesWidth();
 }
 
-void ExprWnd::sweepList(QList<VarTree>& list, KTreeViewItem* subTree)
+void ExprWnd::sweepList(QList<VarTree>& list, VarTree* subTree)
 {
     if (subTree == 0)
 	return;
 
-    KTreeViewItem* checkItem = list.first();
+    VarTree* checkItem = list.first();
     while (checkItem != 0) {
-	KTreeViewItem* p = checkItem;
-	while (p != 0 && p != subTree) {
-	    p = p->getParent();
-	}
-	if (p == 0) {
+	if (!subTree->isAncestorEq(checkItem)) {
 	    // checkItem is not an item from subTree
 	    // advance
 	    checkItem = list.next();
