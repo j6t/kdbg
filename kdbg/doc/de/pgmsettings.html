@@ -1,0 +1,83 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="Author" content="Johannes Sixt">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
+   <title>KDbg - Benutzerhandbuch - Programmspezifische Einstellungen</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<a href="index.html">Inhalt</a>
+<h1>
+Programmspezifische Einstellungen</h1>
+In diesem Dialog k&ouml;nnen programmspezifischen Einstellungen getroffen
+werden. Der Dialog wird mittels <i>Datei|Einstellungen</i> aufgerufen.
+Die Einstellungen werden nur auf das geladene Programm angewendet und bleiben
+&uuml;ber Sitzungen hinweg erhalten.
+<blockquote><b><i>Wichtiger Hinweis:</i></b> Die getroffenen Einstellungen
+werden erst wirksam, wenn das Programm das <i>n&auml;chste Mal geladen</i>
+wird. Das bedeutet, dass Sie nach dem Dr&uuml;cken von OK in diesem Dialog
+das Programm erneut laden m&uuml;ssen (mittels <i>Datei|Programm</i>)!!</blockquote>
+
+<ul>
+<li>
+<a href="#driver">Debugger</a></li>
+
+<li>
+<a href="#output">Ausgabe</a></li>
+</ul>
+
+<h2>
+<a NAME="driver"></a>Debugger</h2>
+Hier kann der Debugger gew&auml;hlt werden, der f&uuml;r dieses Programm
+verwendet werden soll.
+<h4>
+Aufruf von GDB</h4>
+
+<blockquote>Geben Sie den Befehl an, mit dem <tt>gdb</tt> aufgerufen werden
+soll. Wenn Sie das Feld leer lassen, wird die <a href="globaloptions.html">globale
+Einstellung</a> &uuml;bernommen. Wenn Sie cross-compilieren oder remote
+debuggen, werden Sie hier einen <tt>gdb</tt>-Befehl angeben, der f&uuml;r
+die Zielplattform geeignet ist. Die Standardeinstellung ist <tt>gdb&nbsp;--fullname&nbsp;--nx</tt>.
+Sie m&uuml;ssen auf jeden Fall auch diese Optionen angeben, andernfalls
+funktioniert KDbg nicht.</blockquote>
+
+<h2>
+<a NAME="output"></a>Ausgabe</h2>
+Hier geben Sie an, unter welcher Terminalemulation das Programm arbeitet.
+<h4>
+Keine Ein- und Ausgabe</h4>
+
+<blockquote>W&auml;hlen Sie diese Option, falls Ihr Programm keine Eingabe
+vom Terminal erwartet und Sie keine Ausgabe sehen wollen, die auf <tt>stdout</tt>
+oder <tt>stderr</tt> geschrieben wird. Alle drei Standardkan&auml;le (<tt>stdin</tt>,
+<tt>stdout</tt>
+und <tt>stderr</tt>) werden praktisch nach <tt>/dev/null</tt> umgeleitet.</blockquote>
+
+<h4>
+Nur Ausgabe, einfache Terminalemulation</h4>
+
+<blockquote>W&auml;hlen Sie diese Option, falls Ihr Programm keine Eingabe
+vom Terminal erwartet (<tt>stdin</tt> wird nach <tt>/dev/null</tt> umgeleitet)
+und die Ausgabe, die auf <tt>stdout</tt> und <tt>stderr</tt> geschrieben
+wird, keine besondere Terminalemulation erfordert. Die Ausgabe wird im
+<a href="pgmoutput.html">Ausgabefenster</a>
+angezeigt.
+<br><i>Wichtig:</i> Die eingebaute Terminalemulation interpretiert nur
+den Zeilenvorschub <tt>\n</tt> (line-feed, ASCII 10) als Zeilenumbruch.
+Das Zeichen f&uuml;r den Wager&uuml;cklauf <tt>\r</tt> (carriage-return,
+ASCII 13) wird <i>nicht</i> behandelt. Das ist ausreichend f&uuml;r Debug-Ausgaben,
+wie sie h&auml;ufig beim Programmierern grafischer Benutzeroberfl&auml;chen
+verwendet wird.</blockquote>
+
+<h4>
+Volle Terminalemulation</h4>
+
+<blockquote>W&auml;hlen Sie diese Option, falls Ihr Programm Eingaben &uuml;ber
+<tt>stdin</tt>
+liest oder falls die Ausgabe auf <tt>stdout</tt> oder <tt>stderr</tt> Terminalemulation
+erfordert. Ein Terminalemulator kann in den <a href="globaloptions.html">globalen
+Einstellungen</a> angegeben werden.</blockquote>
+
+</body>
+</html>

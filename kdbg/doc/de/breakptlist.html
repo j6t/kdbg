@@ -1,0 +1,82 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - Benutzerhandbuch - Haltepunkte</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<a href="index.html">Inhalt</a>
+<h1>
+Die Liste der Haltepunkte</h1>
+Die Liste der Haltepunkte zeigt alle gesetzten Haltepunkte und Watchpoints
+und erm&ouml;glicht, diese zu manipulieren. Die Liste der Haltepunkte k&ouml;nnen
+Sie mit dem Men&uuml;punkt <i>Ansicht|Haltepunkte</i> anzeigen.
+<h2>
+Die &Uuml;bersicht</h2>
+F&uuml;r jeden Haltepunkt wird folgendes angezeigt:
+<ul>
+<li>
+der Ort,</li>
+
+<li>
+die Anzahl der Stopps,</li>
+
+<li>
+die Anzahl der n&auml;chsten zu ignorierenden Stopps (falls gesetzt)</li>
+
+<li>
+die Haltebedingung (falls gesetzt).</li>
+</ul>
+Das Piktogramm links zeigt an, ob der Haltepunkt aktiviert (tiefroter Punkt)
+oder deaktiviert (hellroter Punkt) ist, ob es sich um einen tempor&auml;ren
+Haltepunkt handelt (eine winzige Uhr ist sichtbar) und ob der Haltepunkt
+bedingt ist (ein Fragezeichen ist sichtbar).
+<p>Watchpoints werden durch ein Brillensymbol gekennzeichnet.
+<h2>
+Haltepunkte manipulieren</h2>
+<a NAME="StopProg"></a>Beachten Sie bitte, dass Haltepunkte und Watchpoints
+nicht manipuliert werden k&ouml;nnen solange das zu debuggende Programm
+l&auml;uft. Wenn das Programm bereits gestartet wurde, muss es zuerst angehalten
+werden - entweder indem es auf einen bereits gesetzten Haltepunkt trifft
+oder "gewaltsam" indem Sie <i>Ausf&uuml;hrung|Unterbrechen</i> w&auml;hlen.
+Dadurch wird das Programm nicht beendet, sondern nur unterbrochen. Sie
+k&ouml;nnen die Haltepunkte jetzt ver&auml;ndern. W&auml;hlen Sie danach
+<i>Ausf&uuml;hrung|Ausf&uuml;hren</i>,
+um das Programm fortzusetzen.
+<p>Am einfachsten kann ein Haltepunkt im <a href="sourcecode.html">Quellcode-Fenster</a>
+gesetzt werden. Wenn Sie den genauen Dateinamen und die Zeilennummer einer
+Funktion nicht kennen, k&ouml;nnen Sie den Funktionsnamen im Feld &uuml;ber
+der Liste eingeben und <i>Haltepunkt</i> w&auml;hlen.
+<p>Sie k&ouml;nnen eine Haltepunkt in der Liste ausw&auml;hlen seine Zustand
+mittels <i>Deaktivieren</i> oder <i>Aktivieren</i> &auml;ndern. Oder Sie
+klicken auf den Haltepunkt mit der mittleren Maustaste - genau so, wie
+Sie im Quellcode-Fenster Haltepunkte aktivieren und deaktivieren.
+<p>Sie k&ouml;nnen eine Bedingung setzen (sodass das Programm nur stehen
+bleibt, wenn die Bedingung erf&uuml;llt ist) oder die Anzahl der zu ignorierenden
+Stopps setzen (sodass das Programm die n&auml;chsten n Male nicht stehen
+bleibt, die es &uuml;ber diesen Haltepunkt l&auml;uft). Dazu w&auml;hlen
+sie den Schalter <i>Bedingt</i> und geben die Anzahl der zu ignorierenden
+Treffer und/oder die Bedingung ein.
+<h2>
+Watchpoints manipulieren</h2>
+Watchpoints sind den Haltepunkten &auml;hnlich, nur dass das Programm angehalten
+wird, sobald sich der Inhalt einer Speicherstelle &auml;ndert. Ebenso wie
+Haltepunkte k&ouml;nnen Watchpoints nicht manipuliert werden, solange das
+Programm l&auml;uft. Weitere Hinweise dazu <a href="#StopProg">siehe oben</a>.
+<p>Einen Watchpoint k&ouml;nnen Sie setzen, indem Sie einen Ausdruck im
+Feld &uuml;ber der Liste eingeben und <i>Watchpoint</i> klicken. Das Programm
+wird dann angehalten, sobald sich der Wert des Ausdrucks &auml;ndert. Beachten
+Sie, dass Sie Watchpoints, die eine lokale Variable ben&ouml;tigen, nur
+setzen k&ouml;nnen, wenn das Programm von einem Haltepunkt (oder mittels
+Ausf&uuml;hrung|Unterbrechen) angehalten wurde.
+<p>Zum Entfernen eines Watchpoints w&auml;hlen Sie diesen in der Liste
+aus und klicken <i>Entfernen</i>. Falls der Ausdruck eine lokale Variable
+enth&auml;lt, wird der Watchpoint automatisch entfernt, sobald das Programm
+die aktive Funktion verl&auml;sst.
+<p>Wie mit Haltepunkten k&ouml;nnen Sie eine Bedingung oder eine Anzahl
+zu ignorierender Stopps setzen, indem Sie den Watchpoint ausw&auml;hlen
+und <i>Bedingt</i> klicken.
+</body>
+</html>

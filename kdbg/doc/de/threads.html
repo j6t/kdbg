@@ -1,0 +1,44 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - Benutzerhandbuch - Threads</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<a href="index.html">Inhalt</a>
+<h1>
+Die Programm-Threads</h1>
+Das Fenster mit der Liste der Programm-Threas wird mittels <i>Ansicht|Threads</i>
+aufgerufen. Dieses Fenster listet die aktiven Threads des Programms auf.
+<p><b><i>Wichtig:</i></b> Das Debuggen von Programm-Threads muss von der
+verwendeten <tt>gdb</tt>-Version unterst&uuml;tzt werden - es handelt sich
+hierbei nicht um ein Feature von KDbg. F&uuml;r Linux-Systeme (i386) funktioniert
+<tt>gdb5</tt>
+am besten.
+<p>Der Inhalt des Fensters wird jedesmal erneuert, wenn das Programm vom
+Debugger angehalten wird. (Das heisst, dass <i>nicht</i> der aktuelle Zustand
+des Programms angezeigt wird, w&auml;hrend es l&auml;uft.)
+<p>Die erste Spalte zeigt die Thread-ID an, die zweite Spalte zeigt die
+Stelle, an der der Thread gerade abgearbeitet wird.
+<p>Die Markierung am Zeilenanfang benennt den <i>aktiven</i> Thread:
+<ul>
+<li>
+Das&nbsp; <a href="stack.html">Stack-Fenster</a> zeigt den Call-Stack des
+aktiven Threads.</li>
+
+<li>
+Das <a href="localvars.html">Fenster mit den lokalen Variablen</a> zeigt
+die lokalen Variablen des aktiven Threads.</li>
+
+<li>
+Das <a href="watches.html">Ausdr&uuml;cke-Fenster</a> verwendet zur Evaluierung
+der Ausdr&uuml;cke die lokalen Variablen des aktiven Threads.</li>
+</ul>
+Indem Sie auf einen Thread klicken, wechseln Sie den aktiven Thread und
+die genannten Fenster werden entsprechend auf den aktuellen Stand gebracht.
+Ausserdem schaltet das <a href="sourcecode.html">Quellcode-Fenster</a>
+zu der Programmstelle um, an der der aktive Thread angehalten wurde.
+</body>
+</html>

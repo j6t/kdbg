@@ -1,0 +1,45 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - Benutzerhandbuch - Tipps</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<a href="index.html">Inhalt</a>
+<h2>
+Tipps und Tricks</h2>
+
+<ul>
+<li>
+Setzen Sie immer die Umgebungsvariable <tt>LD_BIND_NOW=1</tt> auf glibc2-Systems.
+Wie Umgebungsvariablen gesetzt werden, wird <a href="argspwdenv.html#Environment">hier
+erkl&auml;rt</a>.</li>
+
+<li>
+Sie k&ouml;nnen Haltepunkte als Lesezeichen verwenden: Setzen Sie einfach
+einen Haltepunkt und deaktivieren Sie diesen. Sp&auml;ter k&ouml;nnen Sie
+rasch an die entsprechende Stelle zur&uuml;ckkehren, indem Sie in der Liste
+der Haltepunkte doppel-klicken (oder&nbsp; <i>Code anzeigen</i> klicken).
+Da sich KDbg alle Haltepunkte &uuml;ber Sitzungen hinaus merkt, werden
+sie sofort wieder gesetzt, sobald sie das entsprechende Programm das n&auml;chste
+Mal debuggen.</li>
+
+<li>
+Auf folgende Weise k&ouml;nnen Sie Programmvariablen &auml;ndern: Im Watch-Bereich
+(rechts unten) geben Sie eine Zuweisung ein, z.B. <tt>var.member=17</tt>
+und Klicken <i>Neu</i>. Die entsprechende Variable wird sofort ge&auml;ndert.
+Sie sollten die Variable nun sofort l&ouml;schen (indem Sie sie ausw&auml;hlen
+und <i>Entf</i> klicken). Das ist notwendig, weil der Ausdruck (d.h die
+Zuweisung) sonst bei jedem Programmstopp ausgewertet wird.</li>
+
+<li>
+Sie k&ouml;nnen Werte im Watch-Bereich in den verschiedenen Formaten anzeigen
+lassen, die gdb versteht. Z.B. zeigt <tt>/x&nbsp;var.member</tt> die Variable
+<tt>var.member</tt>
+in hexadezimaler Notation an.</li>
+</ul>
+
+</body>
+</html>

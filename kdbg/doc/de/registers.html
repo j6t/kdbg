@@ -1,0 +1,37 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - Benutzerhandbuch - Registerinhalt</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<a href="index.html">Inhalt</a>
+<h1>
+Der Registerinhalt</h1>
+Das Fenster zur Anzeige des Registerinhalts wird mittels <i>Ansicht|Register</i>
+angezeigt. Jedesmal, wenn das Programm angehalten wird, zeigt Kdbg hier
+den Inhalt der CPU-Register an.
+<p>Das Fenster ist in 3 Spalten aufgeteilt:
+<ol>
+<li>
+Die Spalte <i>Register</i> zeigt die Namen der Register.</li>
+
+<li>
+Die Spalte <i>Wert</i> zeigt den Inhalt der Register in einer mehr oder
+weniger rohen Form an. Diese rohe Form wird &uuml;blicherweise in Hexadezimaldarstellung
+angezeigt, selbst der Inhalt der Flie&szlig;kommaregister.</li>
+
+<li>
+Die Spalte <i>Dekodierter Wert</i> zeigt den Inhalt der Register in dekotierter
+Form an. Bei den arithmetischen Registern ist das meist eine vorzeichenbehaftete
+Dezimalzahl, bei Flie&szlig;kommaregistern wird die Flie&szlig;kommazahl
+angezeigt, die Flag-Register werden manchmal die gesetzten Flags in Worten
+dargestellt (h&auml;ngt von der verwendeten Version von <tt>gdb</tt> ab).</li>
+</ol>
+Durch Klicken mit der rechten Maustaste k&ouml;nnen Sie ein Kontextmen&uuml;
+aufrufen, &uuml;ber das Sie die Darstellung der Werte in der zweiten Spalte
+w&auml;hlen k&ouml;nnen.
+</body>
+</html>

@@ -1,0 +1,83 @@
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - Benutzerhandbuch - Wie kann ich...?</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
+<a href="index.html">Inhalt</a>
+<h1>
+Wie kann ich...?</h1>
+
+<h4>
+... eine Haltepunkt setzen?</h4>
+Daf&uuml;r gibt's mehrere M&ouml;glichkeiten:
+<ul>
+<li>
+Sie k&ouml;nnen im <a href="sourcecode.html">Quellcode-Fenster</a> in den
+"aktiven Bereich" am linken Ende der Zeile klicken.</li>
+
+<li>
+Sie k&ouml;nnen im Quellcode-Fenster eine Zeile ausw&auml;hlen und dann
+im Men&uuml; <i>Haltepunkt</i> eine Auswahl treffen.</li>
+
+<li>
+Sie k&ouml;nnen einen Haltepunkt in der <a href="breakptlist.html">Liste
+der Haltepunkte</a> setzen.</li>
+</ul>
+Wenn Sie keinen Haltepunkt setzen k&ouml;nnen, k&ouml;nnte es sein, dass
+das Programm gerade l&auml;uft. Sie k&ouml;nnen keine Haltepunkte setzen,
+solange das Programm l&auml;uft. Halten Sie es zuerst mit <i>Ausf&uuml;hrung|Unterbrechen</i>
+an. Falls Sie dann noch immer keine Haltepunkte setzen k&ouml;nnen, versichern
+Sie sich, dass Sie das Programm mit Debug-Information &uuml;bersetzt <i>und
+gebunden</i> haben.
+<h4>
+... den Wert einer globalen Variablen oder eines beliebigen Ausdrucks anzeigen?</h4>
+Benutzen Sie das <a href="watches.html">Ausdr&uuml;cke-Fenster</a>.
+<h4>
+... Watchpoints setzen?</h4>
+Watchpoints k&ouml;nnen &uuml;ber die <a href="breakptlist.html">Liste
+der Haltepunkte</a> bearbeitet werden.
+<h4>
+... einen Core-Dump benutzen?</h4>
+Laden Sie zuerst das Programm mittels <i>Datei|Programm</i>, dann geben
+Sie den Core-Dump mittels <i>Datei|Core dump</i> an.
+<h4>
+... ein Programm debuggen, das sich in eine Endlosschleife verlaufen hat?</h4>
+Starten Sie das Programm und lassen Sie es laufen, bis es in die Endlosschleife
+gelangt. Dann schalten Sie um zu KDbg und w&auml;hlen <i>Ausf&uuml;hrung|Unterbrechen</i>.
+Hiermit haben Sie das Programm <i>in flagranti</i> erwischt!
+<h4>
+... erreichen, dass das Programm einigemale &uuml;ber einen Haltepunkt
+dr&uuml;berl&auml;uft, ohne anzuhalten?</h4>
+In der <a href="breakptlist.html">Liste der Haltepunkte</a> w&auml;hlen
+Sie den Haltepunkt; dann klicken Sie <i>Bedingt</i> und geben die Anzahl
+in <i>Ignoriere n&auml;chste Treffer</i> an.
+<h4>
+... eine Umgebungsvariable f&uuml;r das Programm setzen?</h4>
+W&auml;hlen Sie <i>Ausf&uuml;hrung|Argumente</i> und geben die Umgebungsvariable
+im <a href="argspwdenv.html#Environment">Argumente-Dialog</a> an.
+<h4>
+... ein Arbeitsverzeichnis f&uuml;r das Programm w&auml;hlen?</h4>
+W&auml;hlen Sie <i>Ausf&uuml;hrung|Argumente</i> und geben das Arbeitsverzeichnis
+im <a href="argspwdenv.html#Environment">Argumente-Dialog</a> an.
+<h4>
+... das Terminal-Fenster los werden?</h4>
+W&auml;hlen Sie <i>Datei|Einstellungen</i> und schalten auf das Register
+<a href="pgmsettings.html#output">Ausgabe</a>
+um. W&auml;hlen Sie <i>Nur Ausgabe, einfache Terminalemulation</i> und
+klicken Sie <i>OK</i>. Nun m&uuml;ssen Sie das Programm neu laden (am einfachsten
+w&auml;hlen Sie es aus der Liste unter <i>Datei|Zuletzt ge&ouml;ffnete
+Programme</i>). Die Programmausgaben werden nun in das eingebaute <a href="pgmoutput.html">Ausgabefenster</a>
+geschrieben und stdin ist auf <tt>/dev/null</tt> umgeleitet.
+<p>Sie m&uuml;ssen diese Einstellungen f&uuml;r jedes neue Programm wiederholen,
+das Sie debuggen.
+<p><b><i>Wichtig:</i></b> Sie sollten dies nicht tun, falls Ihr Programm
+Eingaben vom Terminal (normalerweise stdin) erwartet oder falls mehr als
+nur einfache Terminalemultionen ben&ouml;tigt werden (mehr als nur Wagenr&uuml;cklauf
+und Zeilenvorschub). Das eingebaute Ausgabefenster unterst&uuml;tzt keine
+Eingaben oder Terminalemulationen.
+</body>
+</html>
