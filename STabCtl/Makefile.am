@@ -12,8 +12,7 @@ DEFS = -I. -I$(srcdir) -I$(top_srcdir)
 libtab_library_a_SOURCES = \
 		stabbar.cpp\
 		stabctl.cpp \
-		stabbar.moc.cpp \
-		stabctl.moc.cpp
+		mocs.cpp
 
 EXTRA_DIST = \
 		b_left.xpm\
@@ -26,8 +25,9 @@ EXTRA_DIST = \
 ####                  END KDEStudio part                  ####
 #2########################################################!@#$
 
-stabctl.moc.cpp: $(srcdir)/stabctl.h
-	$(MOC) $(srcdir)/stabctl.h -o stabctl.moc.cpp
+mocs.cpp: stabctl.moc stabbar.moc
+stabctl.moc: $(srcdir)/stabctl.h
+	$(MOC) $(srcdir)/stabctl.h -o stabctl.moc
 
-stabbar.moc.cpp: $(srcdir)/stabbar.h
-	$(MOC) $(srcdir)/stabbar.h -o stabbar.moc.cpp
+stabbar.moc: $(srcdir)/stabbar.h
+	$(MOC) $(srcdir)/stabbar.h -o stabbar.moc
