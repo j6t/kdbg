@@ -1,164 +1,184 @@
-<HTML>
-<HEAD>
-   <META HTTP-EQUIV="Content-Type" CONTENT="text/html; charset=iso-8859-1">
-   <META NAME="GENERATOR" CONTENT="Mozilla/4.05 [en] (X11; I; Linux 2.0.35 i586) [Netscape]">
-   <TITLE>KDbg</TITLE>
-</HEAD>
-<BODY>
+<!doctype html public "-//w3c//dtd html 4.0 transitional//en">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
+   <meta name="GENERATOR" content="Mozilla/4.51 [en] (X11; I; Linux 2.2.5 i586) [Netscape]">
+   <title>KDbg</title>
+</head>
+<body>
 
-<H1>
-KDbg</H1>
+<h1>
+KDbg</h1>
 
-<H2>
-Contents</H2>
+<h2>
+Contents</h2>
 
-<UL>
-<LI>
-<A HREF="#Introduction">Introduction</A></LI>
+<ul>
+<li>
+<a href="#Introduction">Introduction</a></li>
 
-<LI>
-<A HREF="#WhatsThis">What's it that I see here?</A></LI>
+<li>
+<a href="#WhatsThis">What's it that I see here?</a></li>
 
-<LI>
-<A HREF="#UsingKDbg">Using KDbg</A></LI>
+<li>
+<a href="#UsingKDbg">Using KDbg</a></li>
 
-<LI>
-<A HREF="#TipsTricks">Tips and Tricks</A></LI>
+<ul>
+<li>
+<a href="#BrkptList">The breakpoint list</a></li>
 
-<LI>
-<A HREF="#KnownProblems">Known problems</A></LI>
+<li>
+<a href="#Environment">Specifying program arguments, working directory,
+environment variables</a></li>
+</ul>
 
-<LI>
-<A HREF="#Author">Author</A></LI>
-</UL>
+<li>
+<a href="#TipsTricks">Tips and Tricks</a></li>
 
-<HR>
-<H2>
-<A NAME="Introduction"></A>Introduction</H2>
-KDbg is a front-end for <TT>gdb</TT>, the GNU debugger.
+<li>
+<a href="#KnownProblems">Known problems</a></li>
 
-<P>At the moment there is not much documentation available.
+<li>
+<a href="#Author">Author</a></li>
+</ul>
 
-<P>For the really brave there's documentation about how <A HREF="types.html">KDbg
-can understand types</A> like <TT>QString</TT>.
-<H2>
-<A NAME="WhatsThis"></A>What's it that I see here?</H2>
+<hr>
+<h2>
+<a NAME="Introduction"></a>Introduction</h2>
+KDbg is a front-end for <tt>gdb</tt>, the GNU debugger.
+<p>At the moment there is not much documentation available.
+<p>For the really brave there's documentation about how <a href="types.html">KDbg
+can understand types</a> like <tt>QString</tt>.
+<h2>
+<a NAME="WhatsThis"></a>What's it that I see here?</h2>
 The main window of KDbg consist of four panes:
-
-<P>The <B>upper left</B> pane shows the source code. Mostly, source code
+<p>The <b>upper left</b> pane shows the source code. Mostly, source code
 windows are opened automatically. To open a souce code window manually
-choose <I>File|Open Source</I> from the menu. You can switch the opened
-source code windows by choosing an open source file from the <I>Window</I>
+choose <i>File|Open Source</i> from the menu. You can switch the opened
+source code windows by choosing an open source file from the <i>Window</i>
 menu.
-
-<P>The <B>lower left</B> pane displays the backtrace (aka stack frames),
+<p>The <b>lower left</b> pane displays the backtrace (aka stack frames),
 i.e. the functions that the program has entered, but not left yet. The
 innermost frame (where the program currently executes) is shown at the
 top. Double-click on a stack frame to inspect the variables of that frame.
-
-<P>The <B>upper right</B> pane displays the local variables. Whenever the
+<p>The <b>upper right</b> pane displays the local variables. Whenever the
 progam stops, KDbg displays the values of the local variables in this pane.
-
-<P>The <B>lower right</B> pane displays expressions of your choice (such
-expression is also called a <I>watch</I>). To add an expression, type it
-into the edit field and press Enter or click <I>Add</I>. To remove an expression,
-click on it (choose the root of the expression) and click <I>Del</I>.
-
-<P>The gearwheel in the toolbar indicates whether gdb is working, in which
+<p>The <b>lower right</b> pane displays expressions of your choice (such
+expression is also called a <i>watch</i>). To add an expression, type it
+into the edit field and press Enter or click <i>Add</i>. To remove an expression,
+click on it (choose the root of the expression) and click <i>Del</i>.
+<p>The gearwheel in the toolbar indicates whether gdb is working, in which
 case it rotates. It rotates fast while KDbg wouldn't accept execution commands,
 and it rotates slowly while KDbg gets the variable values.
-<H2>
-<A NAME="UsingKDbg"></A>Using KDbg</H2>
-To <B>debug a program</B>, choose <I>File|Executable</I> from the menu.
-The program is loaded. An <TT>xterm</TT> window is opened which will show
-the output of the debuggee. If you want to debug a <B>core dump</B>, you
+<h2>
+<a NAME="UsingKDbg"></a>Using KDbg</h2>
+To <b>debug a program</b>, choose <i>File|Executable</i> from the menu.
+The program is loaded. An <tt>xterm</tt> window is opened which will show
+the output of the debuggee. If you want to debug a <b>core dump</b>, you
 must first load the executable that produced the core dump, then choose
-<I>File|Core Dump</I> from the menu. Now KDbg goes to the point in the
-program that caused the core dump.
-
-<P>To run the <B>program with arguments</B>, choose <I>Execution|Arguments</I>
-and type in the arguments. Next time the program is started, the arguments
-will be passed on.
-
-<P>To set <B>environment variabels</B> for the program, choose <I>Execution|Arguments</I>.
-In the environment variables section type in an expression of the form
-<TT>VARIABLE=value</TT> to set the environment variable <TT>VARIABLE</TT>
-to the value <TT>value, and</TT> click <I>Modify</I>. To remove a variable,
-select it from the list below and click <I>Remove</I>. To change the value,
-edit the value in the edit field and click <I>Modify</I>. If you change
-the name of the variable and click <I>Modify</I>, you add a new variable!
-
-<P>In the menu <I>Execution</I> you find the commands that you need to
-<B>run</B> the program, <B>step</B> through code, and to <B>interrupt</B>
-the program (<I>Break</I>) while it is running. The important commands
-(<I>Run</I> and all kinds of <I>Step</I>) are bound to function keys. For
-efficient debugging I strongly recommend that you get used to using them.
-<BR><FONT SIZE=-1>The functions are not configurable, but perhaps you want
-to contribute a bit of code that does it?</FONT>
-
-<P>In the menu <I>Breakpoint</I> you find commands to set, clear, disable,
-and enable permanent and temporary <B>breakpoints</B>. You can display
+<i>File|Core
+Dump</i> from the menu. Now KDbg goes to the point in the program that
+caused the core dump.
+<p>To run the <b>program with arguments</b>, set the <b>working directory</b>,
+or set <b>environment variables</b>, choose <i>Execution|Arguments</i>.
+<a href="#Environment">See below</a> for more details.
+<p>In the menu <i>Execution</i> you find the commands that you need to
+<b>run</b>
+the program, <b>step</b> through code, and to <b>interrupt</b> the program
+(<i>Break</i>) while it is running. The important commands (<i>Run</i>
+and all kinds of <i>Step</i>) are bound to function keys. For efficient
+debugging I strongly recommend that you get used to using them.
+<br><font size=-1>The functions are not configurable, but perhaps you want
+to contribute a bit of code that does it?</font>
+<p>In the menu <i>Breakpoint</i> you find commands to set, clear, disable,
+and enable permanent and temporary <b>breakpoints</b>. You can display
 a list of active breakpoints. You can also set a breakpoint by clicking
 at the left end of the source line (using the left mouse button), and you
 can enable and disable a breakpoint by clicking it using the middle mouse
 button.
-<H3>
-The breakpoint list</H3>
-The breakpoint list can be displayed using <I>Breakpoint|List</I>. For
+<h3>
+<a NAME="BrkptList"></a>The breakpoint list</h3>
+The breakpoint list can be displayed using <i>Breakpoint|List</i>. For
 each breakpoint the following is shown: the breakpoint location, the hit
 count, the ignore count if set, the condition if set. The icon in front
 of the entry indicates whether the breakpoint is enabled (a full red dot)
 or disabled (a hollow circle), whether the breakpoint is temporary (a tiny
 clock is overlaid) or whether the breakpoint is conditional (a tiny question
 mark is overlaid).
-
-<P>You can set a <B>condition</B> on a breakpoint (so that the program
-is only stopped if the condition is true) or set an <B>ignore count</B>
+<p>You can set a <b>condition</b> on a breakpoint (so that the program
+is only stopped if the condition is true) or set an <b>ignore count</b>
 (so that the program is not stopped the next n times that the breakpoint
-is hit). To do that, press the <I>Conditional</I> button and enter the
+is hit). To do that, press the <i>Conditional</i> button and enter the
 condition and/or ignore count.
-<H2>
-<A NAME="TipsTricks"></A>Tips and Tricks</H2>
+<h3>
+<a NAME="Environment"></a>Specifying program arguments, working directory,
+environment variables</h3>
+Choose <i>Execution|Arguments</i> to open a dialog where you can set program
+arguments, the working directory for your program, and environment variables.
+<p>In the top edit box enter the arguments that shall be passed on to your
+program. Next time the program is started, the new arguments will be used.
+<p>In the edit box below you can specify the working directory for your
+program. The new working directory will be passed to gdb immediately, i.e.
+gdb will work with the new setting as soon as you press <i>OK</i>. Your
+program will use the new directory only when it is run the next time.
+<p>In the environment variables section type in an expression of the form
+<tt>VARIABLE=value</tt>
+to set the environment variable <tt>VARIABLE</tt> to the value <tt>value</tt>,
+and click <i>Modify</i>. To remove a variable, select it from the list
+below and click <i>Remove</i>. To change the value, edit the value in the
+edit field and click <i>Modify</i>. If you change the name of the variable
+and click <i>Modify</i>, you add a new variable! The new environment variables
+will be used by your program the next time it is run.
+<p>An important environment variable to set if you are using glibc2 on
+Linux is <tt>LD_BIND_NOW</tt>. It is very important that you set this variable
+to <tt>1</tt> for all your debugging sessions. If it is not set, gdb cannot
+step into and out of system functions that are imported from the shared
+<tt>libc</tt> and other libraries.
+<h2>
+<a NAME="TipsTricks"></a>Tips and Tricks</h2>
 
-<UL>
-<LI>
+<ul>
+<li>
+Always set the environment variable <tt>LD_BIND_NOW=1</tt> on glibc2 systems.
+<a href="#Environment">See above</a>.</li>
+
+<li>
 You can use breakpoints as bookmarks: Just set a breakpoint and disable
 it. Later, you can quickly come back to that breakpoint by double-clicking
-it in the breakpoint list (or select it and click <I>View Code</I>). Since
+it in the breakpoint list (or select it and click <i>View Code</i>). Since
 breakpoints are persistent (i.e. KDbg remembers them across invocations
 of a program), you get them back next time you invoke KDbg for that particular
-program.</LI>
+program.</li>
 
-<LI>
+<li>
 You can change a program variable's value: In the variable watch section
-(in the lower right) type an assignment like this: <TT>var.member=17</TT>
-and click <I>Add</I>. This immediately changes the value of the variable.
+(in the lower right) type an assignment like this: <tt>var.member=17</tt>
+and click <i>Add</i>. This immediately changes the value of the variable.
 You should delete the expression from the list right away (by selecting
-it in the window below and clicking <I>Del</I>). This is because the watch
+it in the window below and clicking <i>Del</i>). This is because the watch
 expressions are evaluate each time the program stops, and by this the variable
-would be changed to the specified value again and again!</LI>
+would be changed to the specified value again and again!</li>
 
-<LI>
+<li>
 You can display a value in the watch section in different way by prepending
-gdb's format specifiers in front of the variable to display. E.g. <TT>/x
-var.member</TT> displays the <TT>var.member</TT> in hexadecimal notation.</LI>
-</UL>
+gdb's format specifiers in front of the variable to display. E.g. <tt>/x
+var.member</tt> displays the <tt>var.member</tt> in hexadecimal notation.</li>
+</ul>
 
-<H2>
-<A NAME="KnownProblems"></A>Known problems</H2>
+<h2>
+<a NAME="KnownProblems"></a>Known problems</h2>
 gdb 4.16 has problems in handling C++ classes with virtual base classes.
 (Such classes commonly occur in CORBA programs.) It dies quite often due
 to a segmentation violation. KDbg reports when gdb exits unexpectedly.
 Unfortunately, you cannot really do anything about it. You have to restart
-gdb by choosing <I>File|Executable</I>, which restarts your debugging session
+gdb by choosing <i>File|Executable</i>, which restarts your debugging session
 :-(.
-
-<P>KDbg's type recognition only works for libraries that are linked dynamically
+<p>KDbg's type recognition only works for libraries that are linked dynamically
 to the program being debugged.
-<H2>
-<A NAME="Author"></A>Author</H2>
-KDbg is written by <A HREF="mailto:Johannes.Sixt@telecom.at">Johannes Sixt</A>
+<h2>
+<a NAME="Author"></a>Author</h2>
+KDbg is written by <a href="mailto:Johannes.Sixt@telecom.at">Johannes Sixt</a>
 with the help of many others.
-<BR>KDbg homepage at <A HREF="http://members.telecom.at/~johsixt/kdbg.html">http://members.telecom.at/~johsixt/kdbg.html</A>.
-</BODY>
-</HTML>
+<br>KDbg homepage at <a href="http://members.telecom.at/~johsixt/kdbg.html">http://members.telecom.at/~johsixt/kdbg.html</a>.
+</body>
+</html>
