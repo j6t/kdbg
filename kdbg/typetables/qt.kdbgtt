@@ -1,0 +1,24 @@
+[Type Table]
+Types1=QString,QDir,QFileInfo,QFile
+Types2=QWidget,QTableView
+IdentifyingType=
+[QString]
+Display={ % }
+Expr1=((%s).shd->data)
+[QWidget]
+Display={ name=% #chld=% #conn=% }
+Expr1=(%s).objname
+Expr2=(%s).childObjects->numNodes
+Expr3=(%s).connections->numItems
+[QTableView]
+Alias=QString
+[QDir]
+Display={ path=% filter=% }
+Expr1=((%s).dPath.shd->data)
+Expr2=((%s).nameFilt.shd->data)
+[QFileInfo]
+Display={ name=% }
+Expr1=((%s).fn.shd->data)
+[QFile]
+Display={ name=% }
+Expr1=((%s).fn.shd->data)

@@ -1,0 +1,6 @@
+[Type Table]
+Types1=KSimpleConfig
+IdentifyingType=KApplication
+[KSimpleConfig]
+Display={ global=% }
+Expr1=(%s).pData->aGlobalAppFile.shd->data
