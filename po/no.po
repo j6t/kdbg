@@ -1,17 +1,18 @@
 # KDbg - Debugger GUI for gdb
 # Copyright (C) 1998 Johannes Sixt
 # Johannes Sixt <Johannes.Sixt@telecom.at>, 1998
+# Hans Petter Bieker <zerium@webindex.no>, 1998.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 0.2.3\n"
+"Project-Id-Version: kdbg 0.2.4\n"
 "POT-Creation-Date: 1998-11-07 19:26+0100\n"
-"PO-Revision-Date: 1998-08-11 20:21+0200\n"
-"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"PO-Revision-Date: 1998-11-14 19:11+0100\n"
+"Last-Translator: Hans Petter Bieker <zerium@webindex.no>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=CHARSET\n"
-"Content-Transfer-Encoding: ENCODING\n"
+"Content-Type: text/plain; charset=ISO_8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 #: brkpt.cpp:38
 msgid "&Add"
@@ -40,11 +41,11 @@ msgstr "Kjør %s med disse argumentene:"
 
 #: procattach.cpp:19
 msgid ": Attach to process"
-msgstr ""
+msgstr ": Knytt til prosess"
 
 #: procattach.cpp:23
 msgid "Specify the process number to attach to:"
-msgstr ""
+msgstr "Oppgi prosessnummeret du vil knytte til:"
 
 #: debugger.cpp:98
 msgid " Add "
@@ -72,7 +73,7 @@ msgstr "Velg programmet du vil avluse"
 
 #: debugger.cpp:325
 msgid "Select core dump"
-msgstr ""
+msgstr "Velg en minnedump"
 
 #: debugger.cpp:550
 msgid "&Open Source..."
@@ -80,7 +81,7 @@ msgstr "&Åpne kildekode..."
 
 #: debugger.cpp:551
 msgid "&Reload Source"
-msgstr ""
+msgstr "L&ast kildekode på nytt"
 
 #: debugger.cpp:553
 msgid "&Executable..."
@@ -88,11 +89,11 @@ msgstr "&Programfil..."
 
 #: debugger.cpp:554
 msgid "&Core dump..."
-msgstr ""
+msgstr "&Minnedump..."
 
 #: debugger.cpp:560
 msgid "&Find..."
-msgstr ""
+msgstr "&Linn..."
 
 #: debugger.cpp:561
 msgid "Toggle &Toolbar"
@@ -128,11 +129,11 @@ msgstr "&Bryt"
 
 #: debugger.cpp:572
 msgid "Re&start"
-msgstr ""
+msgstr "&Omstart"
 
 #: debugger.cpp:573
 msgid "A&ttach..."
-msgstr ""
+msgstr "&Knytt til..."
 
 #: debugger.cpp:575
 msgid "&Arguments..."
@@ -176,10 +177,13 @@ msgid ""
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "with the help of many others"
 msgstr ""
+"En avluser\n"
+"av Johannes Sixt <Johannes.Sixt@telecom.at>\n"
+"med hjelp av mange andre"
 
 #: debugger.cpp:623
 msgid "Executable"
-msgstr "Programfil..."
+msgstr "Programfil"
 
 #: debugger.cpp:625
 msgid "Open a source file"
@@ -187,7 +191,7 @@ msgstr "Åpne en kildekodefil"
 
 #: debugger.cpp:627
 msgid "Reload source file"
-msgstr ""
+msgstr "Åpne kildekode på nytt"
 
 #: debugger.cpp:630
 msgid "Run/Continue"
@@ -211,19 +215,19 @@ msgstr "Brytningspunkt"
 
 #: debugger.cpp:642
 msgid "Search"
-msgstr ""
+msgstr "Søk"
 
 #: debugger.cpp:649
 msgid "Line 00000"
-msgstr ""
+msgstr "Linje 00000"
 
 #: debugger.cpp:653
 msgid "Restart"
-msgstr ""
+msgstr "Omstart"
 
 #: debugger.cpp:654
 msgid "Core dump"
-msgstr ""
+msgstr "Minnedump"
 
 #: debugger.cpp:819
 msgid ": Program output"
@@ -237,31 +241,32 @@ msgstr "%s' er ikke en fil eller eksisterer ikke"
 #: debugger.cpp:2269
 #, c-format
 msgid "Line %d"
-msgstr ""
+msgstr "Linje %d"
 
+# the following means: "windows that are open"
 #: winstack.cpp:685
 msgid ": Open Windows"
-msgstr ""
+msgstr ": Åpne vinduer"
 
 #: winstack.cpp:693
 msgid "Show"
-msgstr ""
+msgstr "Vis"
 
 #: winstack.cpp:761
 msgid ": Search"
-msgstr ""
+msgstr ": Søk"
 
 #: winstack.cpp:767
 msgid "&Case sensitive"
-msgstr ""
+msgstr "&Avhengig av bokstavstørrelse"
 
 #: winstack.cpp:769
 msgid "&Forward"
-msgstr ""
+msgstr "&Forover"
 
 #: winstack.cpp:771
 msgid "&Backward"
-msgstr ""
+msgstr "&Bakover"
 
 #: main.cpp:69
 msgid "Cannot start debugger."
@@ -269,6 +274,3 @@ msgstr "Kan ikke starte avluser."
 
 #~ msgid "busy"
 #~ msgstr "opptatt"
-
-#~ msgid "&Remove"
-#~ msgstr "&Fjern"
