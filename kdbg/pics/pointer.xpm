@@ -1,0 +1,18 @@
+/* XPM */
+static char * pointer_xpm[] = {
+"12 12 3 1",
+" 	s None	c None",
+".	c red",
+"X	c dark red",
+"            ",
+"            ",
+"            ",
+"            ",
+".       ..  ",
+"X.      ... ",
+"XX..........",
+" XXXXXXXXXXX",
+"        ..X ",
+"        XX  ",
+"            ",
+"            "};
