@@ -55,11 +55,11 @@ int main(int argc, char** argv)
 			 KAboutData::License_GPL, 
 			 "(c) 1998-2000 Johannes Sixt",
 			 0,		/* any text */
-			 "http://members.telecom.at/~johsixt/kdbg.html",
+			 "http://members.nextra.at/johsixt/kdbg.html",
 			 "Johannes.Sixt@telecom.at");
     aboutData.addAuthor("Johannes Sixt", 0, "Johannes.Sixt@telecom.at");
-    aboutData.addCredit("Judin Max",
-			i18n("Docking windows"),
+    aboutData.addCredit("Max Judin",
+			I18N_NOOP("Docking windows"),
 			"novaprint@mtu-net.ru");
     KCmdLineArgs::init( argc, argv, &aboutData );
 
