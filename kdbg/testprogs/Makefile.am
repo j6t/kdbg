@@ -6,7 +6,7 @@ INCLUDES= $(all_includes)
 CXXFLAGS = -g
 
 if BUILDTESTPROGS
-PROGS = testfile
+PROGS = testfile locals
 else
 PROGS =
 endif
@@ -16,3 +16,6 @@ noinst_PROGRAMS = $(PROGS)
 testfile_SOURCES = testfile.cpp
 testfile_LDFLAGS = -g $(all_libraries) $(KDE_RPATH)
 testfile_LDADD = -lqt -lXext -lX11 $(LIBSOCKET)
+
+locals_SOURCES = locals.cpp
+testfile_LDFLAGS = -g
