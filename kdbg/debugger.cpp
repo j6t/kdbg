@@ -119,7 +119,7 @@ static QString getFileName(const char* caption,
 			   QWidget* parent = 0, const char* name = 0)
 {
     QString filename;
-    KFileDialog dlg(dir, filter, parent, name, true, false);
+    KFileDialog dlg(dir, filter, parent, name, true);
 
     dlg.setCaption(caption);
 
