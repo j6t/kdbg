@@ -77,7 +77,10 @@ void f(E e[3], char c)
 void strtest(const char* t)
 {
     const char* s = t;
-    std::cout << s << std::endl;
+    const char*& s2 = s;
+    if (t == 0)
+	strtest(s2);
+    std::cout << s2 << std::endl;
 }
 
 

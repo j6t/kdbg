@@ -2335,6 +2335,55 @@ QString GdbDriver::parseMemoryDump(const char* output, QList<MemoryDump>& memdum
     return QString();
 }
 
+QString GdbDriver::editableValue(VarTree* value)
+{
+    const char* s = value->m_value.latin1();
+
+    // if the variable is a pointer value that contains a cast,
+    // remove the cast
+    if (*s == '(') {
+	skipNested(s, '(', ')');
+	// skip space
+	while (isspace(*s))
+	    ++s;
+    }
+
+repeat:
+    const char* start = s;
+
+    if (strncmp(s, "0x", 2) == 0)
+    {
+	s += 2;
+	while (isxdigit(*s))
+	    ++s;
+
+	/*
+	 * What we saw so far might have been a reference. If so, edit the
+	 * referenced value. Otherwise, edit the pointer.
+	 */
+	if (*s == ':') {
+	    // a reference
+	    ++s;
+	    goto repeat;
+	}
+	// a pointer
+	// if it's a pointer to a string, remove the string
+	const char* end = s;
+	while (isspace(*s))
+	    ++s;
+	if (*s == '"') {
+	    // a string
+	    return FROM_LATIN1(start, end-start);
+	} else {
+	    // other pointer
+	    return FROM_LATIN1(start, strlen(start));
+	}
+    }
+
+    // else leave it unchanged (or stripped of the reference preamble)
+    return s;
+}
+
 QString GdbDriver::parseSetVariable(const char* output)
 {
     // if there is any output, it is an error message
