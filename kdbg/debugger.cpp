@@ -1177,7 +1177,7 @@ void KDebugger::handleRunCommands(const char* output)
     }
 
     /* Update threads list */
-    if (flags & DebuggerDriver::SFrefreshThreads) {
+    if (m_programActive && (flags & DebuggerDriver::SFrefreshThreads)) {
 	m_d->queueCmd(DCinfothreads, DebuggerDriver::QMoverride);
     }
 
