@@ -44,6 +44,7 @@ kdbg_SOURCES = \
 	winstack.cpp \
 	typetable.cpp \
 	prefdebugger.cpp \
+	mainwndbase.cpp \
 	dbgmainwnd.cpp \
 	main.cpp
 
@@ -69,6 +70,7 @@ noinst_HEADERS = \
 	winstack.h \
 	typetable.h \
 	prefdebugger.h \
+	mainwndbase.h \
 	dbgmainwnd.h \
 	envvar.h \
 	commandids.h \
@@ -82,6 +84,7 @@ BUILTSOURCES =	\
 	exprwnd.moc \
 	ktreeview.moc \
 	winstack.moc \
+	mainwndbase.moc \
 	dbgmainwnd.moc \
 	updateui.moc
 
@@ -192,6 +195,10 @@ brkpt.moc: brkpt.h
 pgmargs.cpp: pgmargs.moc
 pgmargs.moc: pgmargs.h
 	$(MOC) pgmargs.h -o pgmargs.moc
+
+mainwndbase.cpp: mainwndbase.moc
+mainwndbase.moc: mainwndbase.h
+	$(MOC) mainwndbase.h -o mainwndbase.moc
 
 dbgmainwnd.cpp: dbgmainwnd.moc
 dbgmainwnd.moc: dbgmainwnd.h

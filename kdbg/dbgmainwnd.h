@@ -7,32 +7,17 @@
 #define DBGMAINWND_H
 
 #include <qlistbox.h>
-#include <qlined.h>
-#include <qlayout.h>
-#include <qpushbt.h>
-#include <ktmainwindow.h>
 #include <knewpanner.h>
+#include "mainwndbase.h"
 #include "winstack.h"
-#include "exprwnd.h"
-
-// forward declarations
-class KDebugger;
-class UpdateUI;
-class KStdAccel;
-
-extern KStdAccel* keys;
 
 
-class DebuggerMainWnd : public KTMainWindow
+class DebuggerMainWnd : public DebuggerMainWndBase
 {
     Q_OBJECT
 public:
     DebuggerMainWnd(const char* name);
     ~DebuggerMainWnd();
-
-    // the following are needed to handle program arguments
-    bool debugProgram(const QString& executable);
-    void setCoreFile(const QString& corefile);
 
 protected:
     // session properties
@@ -44,11 +29,9 @@ protected:
 
     // statusbar texts
     void updateLineStatus(int lineNo);	/* zero-based line number */
-    QString m_statusActive;
 
     void initMenu();
     void initToolbar();
-    void initAnimation();
 
     // view windows
     KNewPanner m_mainPanner;
@@ -57,14 +40,7 @@ protected:
     WinStack m_filesWindow;
     QListBox m_btWindow;
     ExprWnd m_localVariables;
-
-    QWidget m_watches;
-    QLineEdit m_watchEdit;
-    QPushButton m_watchAdd;
-    QPushButton m_watchDelete;
-    ExprWnd m_watchVariables;
-    QVBoxLayout m_watchV;
-    QHBoxLayout m_watchH;
+    WatchWindow m_watches;
 
     // menus
     QPopupMenu m_menuFile;
@@ -74,32 +50,18 @@ protected:
     QPopupMenu m_menuWindow;
     QPopupMenu m_menuHelp;
 
-    // animated button
-    QList<QPixmap> m_animation;
-    uint m_animationCounter;
-
-    // the debugger proper
-    KDebugger* m_debugger;
-
 protected:
     virtual void closeEvent(QCloseEvent* e);
-
-signals:
-    void forwardMenuCallback(int item);
 
 public slots:
     virtual void menuCallback(int item);
     virtual void updateUIItem(UpdateUI* item);
-    void newStatusMsg();
+    virtual void updateUI();
+    virtual void updateLineItems();
     void slotFileChanged();
     void slotLineChanged();
-    void slotAnimationTimeout();
-    void updateUI();
-    void updateLineItems();
     void slotAddWatch();
-    void slotWatchHighlighted(int);
     void slotNewFileLoaded();
-    void slotGlobalOptions();
 };
 
 #endif // DBGMAINWND_H

@@ -9,7 +9,6 @@
 #endif
 #include <kiconloader.h>
 #include <kstdaccel.h>
-#include <qpainter.h>
 #include <qtabdialog.h>
 #include "dbgmainwnd.h"
 #include "debugger.h"
@@ -19,36 +18,23 @@
 #include "mydebug.h"
 
 
-KStdAccel* keys = 0;
-
 DebuggerMainWnd::DebuggerMainWnd(const char* name) :
-	KTMainWindow(name),
+	DebuggerMainWndBase(name),
 	m_mainPanner(this, "main_pane", KNewPanner::Vertical, KNewPanner::Percent, 60),
 	m_leftPanner(&m_mainPanner, "left_pane", KNewPanner::Horizontal, KNewPanner::Percent, 70),
 	m_rightPanner(&m_mainPanner, "right_pane", KNewPanner::Horizontal, KNewPanner::Percent, 50),
 	m_filesWindow(&m_leftPanner, "files"),
 	m_btWindow(&m_leftPanner, "backtrace"),
 	m_localVariables(&m_rightPanner, "locals"),
-	m_watches(&m_rightPanner, "watches"),
-	m_watchEdit(&m_watches, "watch_edit"),
-	m_watchAdd(i18n(" Add "), &m_watches, "watch_add"),
-	m_watchDelete(i18n(" Del "), &m_watches, "watch_delete"),
-	m_watchVariables(&m_watches, "watch_variables"),
-	m_watchV(&m_watches, 0),
-	m_watchH(0),
-	m_animationCounter(0),
-	m_debugger(new KDebugger(this,
-				 &m_localVariables,
-				 &m_watchVariables,
-				 &m_btWindow))
+	m_watches(&m_rightPanner, "watches")
+				 
 {
     m_statusActive = i18n("active");
 
     initMenu();
     initToolbar();
-    
-    connect(m_debugger, SIGNAL(updateStatusMessage()), SLOT(newStatusMsg()));
-    connect(m_debugger, SIGNAL(updateUI()), SLOT(updateUI()));
+
+    setupDebugger(&m_localVariables, m_watches.watchVariables(), &m_btWindow);
 
     m_mainPanner.activate(&m_leftPanner, &m_rightPanner);
     setView(&m_mainPanner, true);	/* show frame */
@@ -56,20 +42,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     m_leftPanner.activate(&m_filesWindow, &m_btWindow);
     m_rightPanner.activate(&m_localVariables, &m_watches);
 
-    connect(&m_watchEdit, SIGNAL(returnPressed()), SLOT(slotAddWatch()));
-    connect(&m_watchAdd, SIGNAL(clicked()), SLOT(slotAddWatch()));
-    connect(&m_watchDelete, SIGNAL(clicked()),
-	    m_debugger, SLOT(slotDeleteWatch()));
-    connect(&m_watchVariables, SIGNAL(highlighted(int)), SLOT(slotWatchHighlighted(int)));
-    
-    // setup the watch window layout
-    m_watchAdd.setMinimumSize(m_watchAdd.sizeHint());
-    m_watchDelete.setMinimumSize(m_watchDelete.sizeHint());
-    m_watchV.addLayout(&m_watchH, 0);
-    m_watchV.addWidget(&m_watchVariables, 10);
-    m_watchH.addWidget(&m_watchEdit, 10);
-    m_watchH.addWidget(&m_watchAdd, 0);
-    m_watchH.addWidget(&m_watchDelete, 0);
+    connect(&m_watches, SIGNAL(addWatch()), SLOT(slotAddWatch()));
+    connect(&m_watches, SIGNAL(deleteWatch()), m_debugger, SLOT(slotDeleteWatch()));
 
     m_filesWindow.setWindowMenu(&m_menuWindow);
     connect(&m_filesWindow.m_findDlg, SIGNAL(closed()), SLOT(updateUI()));
@@ -85,8 +59,6 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	    &m_filesWindow, SLOT(reloadAllFiles()));
     connect(m_debugger, SIGNAL(updatePC(const QString&,int,int)),
 	    &m_filesWindow, SLOT(updatePC(const QString&,int,int)));
-    connect(m_debugger, SIGNAL(lineItemsChanged()),
-	    SLOT(updateLineItems()));
 
     // Establish communication when right clicked on file window.
     connect(&m_filesWindow.m_menuFloat, SIGNAL(activated(int)),
@@ -113,8 +85,6 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 DebuggerMainWnd::~DebuggerMainWnd()
 {
     saveSettings(kapp->getConfig());
-
-    delete m_debugger;
 }
 
 void DebuggerMainWnd::initMenu()
@@ -217,7 +187,7 @@ void DebuggerMainWnd::initToolbar()
     toolbar->insertButton(loader->loadIcon("search.xpm"),ID_VIEW_FINDDLG, true,
 			   i18n("Search"));
 
-    connect(toolBar(), SIGNAL(clicked(int)), SLOT(menuCallback(int)));
+    connect(toolbar, SIGNAL(clicked(int)), SLOT(menuCallback(int)));
     
     initAnimation();
 
@@ -240,12 +210,6 @@ void DebuggerMainWnd::closeEvent(QCloseEvent* e)
 {
     e->accept();
     kapp->quit();
-}
-
-
-void DebuggerMainWnd::setCoreFile(const QString& corefile)
-{
-    m_debugger->setCoreFile(corefile);
 }
 
 
@@ -287,9 +251,7 @@ void DebuggerMainWnd::saveSettings(KConfig* config)
     config->writeEntry(LeftPane, lsep);
     config->writeEntry(RightPane, rsep);
 
-    if (m_debugger != 0) {
-	m_debugger->saveSettings(config);
-    }
+    DebuggerMainWndBase::saveSettings(config);
 }
 
 void DebuggerMainWnd::restoreSettings(KConfig* config)
@@ -303,31 +265,12 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
     m_leftPanner.setSeparatorPos(lsep);
     m_rightPanner.setSeparatorPos(rsep);
 
-    if (m_debugger != 0) {
-	m_debugger->restoreSettings(config);
-    }
-}
-
-bool DebuggerMainWnd::debugProgram(const QString& executable)
-{
-    assert(m_debugger != 0);
-    return m_debugger->debugProgram(executable);
+    DebuggerMainWndBase::restoreSettings(config);
 }
 
 void DebuggerMainWnd::menuCallback(int item)
 {
     switch (item) {
-    case ID_FILE_EXECUTABLE:
-	if (m_debugger != 0)
-	    m_debugger->fileExecutable();
-	break;
-    case ID_FILE_COREFILE:
-	if (m_debugger != 0)
-	    m_debugger->fileCoreFile();
-	break;
-    case ID_FILE_GLOBAL_OPTIONS:
-	slotGlobalOptions();
-	break;
     case ID_FILE_QUIT:
 	kapp->quit();
 	break;
@@ -337,30 +280,6 @@ void DebuggerMainWnd::menuCallback(int item)
     case ID_VIEW_STATUSBAR:
 	enableStatusBar();
 	break;
-    case ID_PROGRAM_RUN:
-	if (m_debugger != 0)
-	    m_debugger->programRun();
-	break;
-    case ID_PROGRAM_ATTACH:
-	if (m_debugger != 0)
-	    m_debugger->programAttach();
-	break;
-    case ID_PROGRAM_RUN_AGAIN:
-	if (m_debugger != 0)
-	    m_debugger->programRunAgain();
-	break;
-    case ID_PROGRAM_STEP:
-	if (m_debugger != 0)
-	    m_debugger->programStep();
-	break;
-    case ID_PROGRAM_NEXT:
-	if (m_debugger != 0)
-	    m_debugger->programNext();
-	break;
-    case ID_PROGRAM_FINISH:
-	if (m_debugger != 0)
-	    m_debugger->programFinish();
-	break;
     case ID_PROGRAM_UNTIL:
 	if (m_debugger != 0)
 	{
@@ -369,14 +288,6 @@ void DebuggerMainWnd::menuCallback(int item)
 	    if (m_filesWindow.activeLine(file, lineNo))
 		m_debugger->runUntil(file, lineNo);
 	}
-	break;
-    case ID_PROGRAM_BREAK:
-	if (m_debugger != 0)
-	    m_debugger->programBreak();
-	break;
-    case ID_PROGRAM_ARGS:
-	if (m_debugger != 0)
-	    m_debugger->programArgs();
 	break;
     case ID_BRKPT_SET:
     case ID_BRKPT_TEMP:
@@ -397,15 +308,10 @@ void DebuggerMainWnd::menuCallback(int item)
 		m_debugger->enableDisableBreakpoint(file, lineNo);
 	}
 	break;
-    case ID_BRKPT_LIST:
-	if (m_debugger != 0)
-	    m_debugger->breakListToggleVisible();
-	break;
     default:
 	// forward all others
-	emit forwardMenuCallback(item);
+	DebuggerMainWndBase::menuCallback(item);
     }
-    emit updateUI();
 }
 
 void DebuggerMainWnd::updateUI()
@@ -442,14 +348,7 @@ void DebuggerMainWnd::updateUI()
 	updateMenu.iterateMenu();
     }
 
-    // toolbar
-    static const int toolIds[] = {
-	ID_PROGRAM_RUN, ID_PROGRAM_STEP, ID_PROGRAM_NEXT, ID_PROGRAM_FINISH,
-	ID_BRKPT_SET
-    };
-    UpdateToolbarUI updateToolbar(toolBar(), this, SLOT(updateUIItem(UpdateUI*)),
-				  toolIds, sizeof(toolIds)/sizeof(toolIds[0]));
-    updateToolbar.iterateToolbar();
+    DebuggerMainWndBase::updateUI();
 }
 
 void DebuggerMainWnd::updateUIItem(UpdateUI* item)
@@ -458,28 +357,6 @@ void DebuggerMainWnd::updateUIItem(UpdateUI* item)
     case ID_VIEW_FINDDLG:
 	item->setCheck(m_filesWindow.m_findDlg.isVisible());
 	break;
-//    case ID_FILE_EXECUTABLE:
-//	item->enable(m_state == DSidle);
-//	break;
-    case ID_FILE_COREFILE:
-	item->enable(m_debugger->canChangeExecutable());
-	break;
-    case ID_PROGRAM_STEP:
-    case ID_PROGRAM_NEXT:
-    case ID_PROGRAM_FINISH:
-    case ID_PROGRAM_UNTIL:
-    case ID_PROGRAM_RUN_AGAIN:
-	item->enable(m_debugger->canSingleStep());
-	break;
-    case ID_PROGRAM_ATTACH:
-    case ID_PROGRAM_RUN:
-	item->enable(m_debugger->isReady());
-	break;
-    case ID_PROGRAM_BREAK:
-	item->enable(m_debugger->isProgramRunning());
-	break;
-    case ID_PROGRAM_ARGS:
-	item->enable(m_debugger->haveExecutable());
     case ID_BRKPT_SET:
     case ID_BRKPT_TEMP:
 	item->enable(m_debugger->canChangeBreakpoints());
@@ -487,15 +364,10 @@ void DebuggerMainWnd::updateUIItem(UpdateUI* item)
     case ID_BRKPT_ENABLE:
 	item->enable(m_debugger->canChangeBreakpoints());
 	break;
-    case ID_BRKPT_LIST:
-	item->setCheck(m_debugger->isBreakListVisible());
+    default:
+	DebuggerMainWndBase::updateUIItem(item);
 	break;
     }
-    
-    // update statusbar
-    statusBar()->changeItem(m_debugger->isProgramActive() ?
-			    static_cast<const char*>(m_statusActive) : "",
-			    ID_STATUS_ACTIVE);
     // line number is updated in slotLineChanged
 }
 
@@ -504,76 +376,12 @@ void DebuggerMainWnd::updateLineItems()
     m_filesWindow.updateLineItems(m_debugger->breakList());
 }
 
-void DebuggerMainWnd::initAnimation()
-{
-#if QT_VERSION < 200
-    QString path = kapp->kde_datadir() + "/kfm/pics/";
-    QPixmap pixmap;
-    pixmap.load(path + "/kde1.xpm");
-#else
-    KIconLoader* loader = kapp->getIconLoader();
-    QPixmap pixmap = loader->loadIcon("kde1.xpm");
-#endif
-
-    KToolBar* toolbar = toolBar();
-    toolbar->insertButton(pixmap, ID_STATUS_BUSY);
-    toolbar->alignItemRight(ID_STATUS_BUSY, true);
-    
-    // Load animated logo
-    m_animation.setAutoDelete(true);
-    QString n;
-    for (int i = 1; i <= 9; i++) {
-#if QT_VERSION < 200
-	n.sprintf("/kde%d.xpm", i);
-	QPixmap* p = new QPixmap();
-	p->load(path + n);
-#else
-	n.sprintf("kde%d.xpm", i);
-	QPixmap* p = new QPixmap(loader->loadIcon(n));
-#endif
-	if (!p->isNull()) {
-	    m_animation.append(p);
-	}
-    }
-    // safeguard: if we did not find a single icon, add a dummy
-    if (m_animation.count() == 0) {
-	QPixmap* pix = new QPixmap(2,2);
-	QPainter p(pix);
-	p.fillRect(0,0,2,2,QBrush(white));
-	m_animation.append(pix);
-    }
-    
-    connect(m_debugger, SIGNAL(animationTimeout()), SLOT(slotAnimationTimeout()));
-}
-
-void DebuggerMainWnd::slotAnimationTimeout()
-{
-    m_animationCounter++;
-    if (m_animationCounter == m_animation.count())
-	m_animationCounter = 0;
-    toolBar()->setButtonPixmap(ID_STATUS_BUSY,
-			       *m_animation.at(m_animationCounter));
-}
-
-void DebuggerMainWnd::newStatusMsg()
-{
-    QString msg = m_debugger->statusMessage();
-    statusBar()->changeItem(msg, ID_STATUS_MSG);
-}
-
 void DebuggerMainWnd::slotAddWatch()
 {
     if (m_debugger != 0) {
-	QString t = m_watchEdit.text();
+	QString t = m_watches.watchText();
 	m_debugger->addWatch(t);
     }
-}
-
-// place the text of the hightlighted watch expr in the edit field
-void DebuggerMainWnd::slotWatchHighlighted(int index)
-{
-    QString text = m_watchVariables.exprStringAt(index);
-    m_watchEdit.setText(text);
 }
 
 void DebuggerMainWnd::slotFileChanged()
@@ -624,25 +432,6 @@ void DebuggerMainWnd::updateLineStatus(int lineNo)
 	QString strLine;
 	strLine.sprintf(i18n("Line %d"), lineNo + 1);
 	statusBar()->changeItem(strLine, ID_STATUS_LINENO);
-    }
-}
-
-void DebuggerMainWnd::slotGlobalOptions()
-{
-    QTabDialog dlg(this, "global_options", true);
-    QString title = kapp->getCaption();
-    title += i18n(": Global options");
-    dlg.setCaption(title);
-    dlg.setCancelButton();
-
-    PrefDebugger prefDebugger(&dlg);
-    prefDebugger.setDebuggerCmd(m_debugger->debuggerCmd());
-    prefDebugger.setTerminal(m_debugger->terminalCmd());
-    
-    dlg.addTab(&prefDebugger, "&Debugger");
-    if (dlg.exec() == QDialog::Accepted) {
-	m_debugger->setDebuggerCmd(prefDebugger.debuggerCmd());
-	m_debugger->setTerminalCmd(prefDebugger.terminal());
     }
 }
 
