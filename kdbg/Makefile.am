@@ -16,7 +16,7 @@
 INCLUDES= $(all_includes)
 
 # claim, which subdirectories you want to install
-SUBDIRS = doc pics typetables
+SUBDIRS = doc pics typetables testprogs
 
 ####### This part is very kdbg specific
 # you can add here more. This one gets installed 
@@ -97,12 +97,6 @@ appsdir = $(kde_appsdir)/Development
 messages:
 	$(XGETTEXT) -C -ki18n -x $(includedir)/kde.pot $(kdbg_SOURCES) && mv messages.po ../po/kdbg.pot
 
-
-# compile a testfile
-noinst_PROGRAMS = testfile
-testfile_SOURCES = testfile.cpp
-testfile_LDFLAGS = $(all_libraries) $(KDE_RPATH)
-testfile_LDADD = -lqt -lXext -lX11 $(LIBSOCKET)
 
 EXTRA_DIST = $(apps_DATA)
 
