@@ -1052,22 +1052,23 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
     QDictIterator<EnvVar> it = newVars;
     EnvVar* val;
     for (; (val = it) != 0; ++it) {
+	QString var = it.currentKey();
 	switch (val->status) {
 	case EnvVar::EVnew:
-	    m_envVars.insert(it.currentKey(), val);
+	    m_envVars.insert(var, val);
 	    // fall thru
 	case EnvVar::EVdirty:
 	    // the value must be in our list
-	    ASSERT(m_envVars[it.currentKey()] == val);
+	    ASSERT(m_envVars[var] == val);
 	    // update value
-	    m_d->executeCmd(DCsetenv, it.currentKey(), val->value);
+	    m_d->executeCmd(DCsetenv, var, val->value);
 	    break;
 	case EnvVar::EVdeleted:
 	    // must be in our list
-	    ASSERT(m_envVars[it.currentKey()] == val);
+	    ASSERT(m_envVars[var] == val);
 	    // delete value
-	    m_d->executeCmd(DCsetenv, it.currentKey());
-	    m_envVars.remove(it.currentKey());
+	    m_d->executeCmd(DCunsetenv, var);
+	    m_envVars.remove(var);
 	    break;
 	default:
 	    ASSERT(false);
