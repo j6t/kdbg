@@ -203,11 +203,10 @@ void RegisterViewItem::paintCell(QPainter* p, const QColorGroup& cg,
 }
 
 
-RegisterView::RegisterView(QWidget* parent, DebuggerDriver* driver, const char* name) :
+RegisterView::RegisterView(QWidget* parent, const char* name) :
 	QListView(parent, name),
 	m_lastInsert(0),
-	m_mode(16),
-	m_d(driver)
+	m_mode(16)
 {
     setSorting(-1);
 
@@ -256,16 +255,8 @@ RegisterView::~RegisterView()
 {
 }
 
-void RegisterView::updateRegisters( const char* output )
+void RegisterView::updateRegisters(QList<RegisterInfo>& regs)
 {
-    QList<RegisterInfo> regs;
-    m_d->parseRegisters(output, regs);
-
-    if (regs.count() == 0) {
-	clear();
-	return;
-    }
-
     setUpdatesEnabled(false);
 
     // mark all items as 'not found'
@@ -274,10 +265,8 @@ void RegisterView::updateRegisters( const char* output )
     }
 
     // parse register values
-    while (regs.count() > 0)
+    for (RegisterInfo* reg = regs.first(); reg != 0; reg = regs.next())
     {
-	RegisterInfo* reg = regs.take(0);
-
 	// check if this is a new register
 	bool found = false;
 	for (QListViewItem* i = firstChild(); i; i = i->nextSibling()) {
@@ -306,7 +295,6 @@ void RegisterView::updateRegisters( const char* output )
 	if (!found)
 	    m_lastInsert = new RegisterViewItem(this, reg->regName,
 						reg->rawValue, reg->cookedValue);
-	delete reg;
     }
 
     // remove all 'not found' items;

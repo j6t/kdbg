@@ -9,7 +9,6 @@
 #include "procattach.h"
 #include "typetable.h"
 #include "exprwnd.h"
-#include "regwnd.h"
 #include "valarray.h"
 #include <qregexp.h>
 #include <qfileinfo.h>
@@ -58,9 +57,6 @@ KDebugger::KDebugger(QWidget* parent,
 	m_animationTimer(this),
 	m_animationInterval(0)
 {
-    m_regView = new RegisterView(0, driver);
-    m_regView->show();
-    
     m_envVars.setAutoDelete(true);
     m_parsedLocals.setAutoDelete(true);
 
@@ -1662,8 +1658,13 @@ void KDebugger::slotUpdateAnimation()
 
 void KDebugger::handleRegisters(const char* output)
 {
-    const char* str = output;
-    m_regView->updateRegisters(str);
+    QList<RegisterInfo> regs;
+    m_d->parseRegisters(output, regs);
+
+    emit registersChanged(regs);
+
+    // delete them all
+    regs.setAutoDelete(true);
 }
 
 /*

@@ -16,6 +16,7 @@
 #include "mainwndbase.h"
 #include "winstack.h"
 #include "brkpt.h"
+#include "regwnd.h"
 
 
 class DebuggerMainWnd : public KTMainWindow, public DebuggerMainWndBase
@@ -54,6 +55,7 @@ protected:
     ExprWnd m_localVariables;
     WatchWindow m_watches;
     BreakpointTable m_bpTable;
+    RegisterView m_registers;
 
     // menus
     QPopupMenu m_menuFile;

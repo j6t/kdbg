@@ -36,7 +36,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	m_filesWindow(&m_leftPanner, "files"),
 	m_btWindow(&m_leftPanner, "backtrace"),
 	m_localVariables(&m_rightPanner, "locals"),
-	m_watches(&m_rightPanner, "watches")
+	m_watches(&m_rightPanner, "watches"),
+	m_registers(0)
 {
     initMenu();
     initToolbar();
@@ -91,6 +92,10 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(m_debugger, SIGNAL(updateUI()), &m_bpTable, SLOT(updateUI()));
     connect(m_debugger, SIGNAL(breakpointsChanged()), &m_bpTable, SLOT(updateBreakList()));
 
+    connect(m_debugger, SIGNAL(registersChanged(QList<RegisterInfo>&)),
+	    &m_registers, SLOT(updateRegisters(QList<RegisterInfo>&)));
+    m_registers.show();
+    
     restoreSettings(kapp->getConfig());
 
     updateUI();

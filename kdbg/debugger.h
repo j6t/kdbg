@@ -23,7 +23,7 @@ class KTreeViewItem;
 class KConfig;
 class KSimpleConfig;
 class QListBox;
-class RegisterView;
+class RegisterInfo;
 class DebuggerDriver;
 class CmdQueueItem;
 class Breakpoint;
@@ -361,11 +361,15 @@ signals:
      */
     void breakpointsChanged();
 
+    /**
+     * Indicates that the register values have possibly changed.
+     */
+    void registersChanged(QList<RegisterInfo>&);
+
 protected:
     ExprWnd& m_localVariables;
     ExprWnd& m_watchVariables;
     QListBox& m_btWindow;
-    RegisterView* m_regView;
 
     // animation
     QTimer m_animationTimer;
