@@ -1165,7 +1165,7 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	handleFindType(cmd);
 	break;
     case DCprintStruct:
-    case DCxamineStruct:
+    case DCprintQStringStruct:
 	handlePrintStruct(cmd);
 	break;
     case DCinfosharedlib:
@@ -1564,34 +1564,75 @@ QString QChar::toQString(QChar* unicode, int len)
 }
 #endif
 
-VarTree* KDebugger::parseQCharArray(const char* name, int len, bool wantErrorValue)
+VarTree* KDebugger::parseQCharArray(const char* name, bool wantErrorValue)
 {
-    VarTree* variable;
+    VarTree* variable = 0;
+
+    /*
+     * Parse off white space. gdb sometimes prints white space first if the
+     * printed array leaded to an error.
+     */
+    char* p = m_gdbOutput;
+    while (isspace(*p))
+	p++;
 
     // check for error conditions
-    if (!parseOffErrorExpr(m_gdbOutput, name, variable, wantErrorValue))
+    if (parseOffErrorExpr(p, name, variable, wantErrorValue))
+	return variable;
+
+    // parse the array
+
+    // find '='
+    p = strchr(p, '=');
+    if (p == 0) {
+	goto error;
+    }
+    // skip white space
+    do {
+	p++;
+    } while (isspace(*p));
+
+    if (*p == '{')
     {
-	// parse the array
-	const char* p = m_gdbOutput;
-	// provide enough space for escaping all characters plus quotes
-	QChar* unicode = new QChar[2*len+2];
+	// this is the real data
+	p++;				/* skip '{' */
+
+	// parse the array twice: once to get the length, again to create the string
+	char* start = p;
 	int realLen = 0;
-	while (*p != '\0' && len > 0) {
-	    // parse a line
-	    while (*p != '\0' && *p != ':') {	/* search colon ':' */
-		p++;
+	QString result;
+	for (int fill = 0; fill <= 1; fill++) {
+	    p = start;
+	    if (fill) {
+#if QT_VERSION < 200
+		result.resize(realLen+2+1);	/* provide space for quotes */
+		result[realLen+2] = '\0';
+#endif
+		result[realLen+1] = '\"';
+		result[0] = '\"';
+		realLen = 1;		/* skip quote */
 	    }
-	    if (*p == '\0')
-		break;
-	    p++;			/* skip colon */
-	    while (*p != '\0' && *p != '\n' && len > 0) {
+	    while (isdigit(*p)) {
 		// parse a number
 		char* end;
 		unsigned short value = (unsigned short) strtoul(p, &end, 0);
-		if (end == p) {
-		    len = 0;		/* huh? no valid digits */
-		    break;
+		if (end == p)
+		    goto error;		/* huh? no valid digits */
+		// skip separator and search for a repeat count
+		p = end;
+		while (isspace(*p) || *p == ',')
+		    p++;
+		int repeats = 1;
+		if (strncmp(p, "<repeats ", 9) == 0) {
+		    p += 9;
+		    repeats = strtol(p, &end, 0);
+		    if (end == p)
+			goto error;	/* no valid digits */
+		    p = end+7;		/* skip " times>" */
+		    while (isspace(*p) || *p == ',')
+			p++;
 		}
+		
 		// interpret the value as a QChar
 		// TODO: make cross-architecture compatible
 		QChar ch;
@@ -1606,35 +1647,56 @@ VarTree* KDebugger::parseQCharArray(const char* name, int len, bool wantErrorVal
 		case '\b': escapeCode = 'b'; break;
 		case '\"': escapeCode = '\"'; break;
 		case '\\': escapeCode = '\\'; break;
+#if QT_VERSION < 200
+		    // since we only deal with ascii values must always escape '\0'
+		case '\0': escapeCode = '0'; break;
+#else
 		case '\0': if (value == 0) { escapeCode = '0'; } break;
+#endif
 		}
-		++realLen;		/* pre-increment so that there's keep room for a quote */
-		if (escapeCode != '\0') {
-		    unicode[realLen] = '\\';
-		    ++realLen;
-		    ch = escapeCode;
+		if (fill) {
+		    while (repeats > 0) {
+			if (escapeCode != '\0') {
+			    result[realLen] = '\\';
+			    ++realLen;
+			    ch = escapeCode;
+			}
+			result[realLen] = ch;
+			++realLen;
+			--repeats;
+		    }
+		} else {
+		    realLen += repeats;
+		    if (escapeCode != '\0')
+			realLen += repeats;
 		}
-		unicode[realLen] = ch;
-		--len;
-		// advance to next value
-		p = end;
 	    }
-	    if (*p == '\n') {
-		p++;
-	    }
-	}
+	    if (*p != '}')
+		goto error;
+	} // while 2 passes
 	TRACE(QString().sprintf("QCharArray: realLen=%d",realLen));
-	// add quotes
-	unicode[0] = '\"';
-	unicode[realLen+1] = '\"';
 	// assign the value
 	variable = new VarTree(name, VarTree::NKplain);
-#if QT_VERSION < 200
-	variable->m_value += QChar::toQString(unicode, realLen+2);
-#else
-	variable->m_value += QString(unicode, realLen+2);
-#endif
-	delete[] unicode;
+	variable->m_value = result;
+    }
+    else if (strncmp(p, "true", 4) == 0)
+    {
+	variable = new VarTree(name, VarTree::NKplain);
+	variable->m_value = "QString::null";
+    }
+    else if (strncmp(p, "false", 5) == 0)
+    {
+	variable = new VarTree(name, VarTree::NKplain);
+	variable->m_value = "(null)";
+    }
+    else
+	goto error;
+    return variable;
+
+error:
+    if (wantErrorValue) {
+	variable = new VarTree(name, VarTree::NKplain);
+	variable->m_value = "internal parse error";
     }
     return variable;
 }
@@ -1946,11 +2008,10 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd)
     ASSERT(var->m_varKind == VarTree::VKstruct);
 
     VarTree* partExpr;
-    if (cmd->m_cmd != DCxamineStruct) {
+    if (cmd->m_cmd != DCprintQStringStruct) {
 	partExpr = parseExpr(cmd->m_expr->getText(), false);
     } else {
-	partExpr = parseQCharArray(cmd->m_expr->getText(),
-				   cmd->m_expr->m_exprIndexLength, false);
+	partExpr = parseQCharArray(cmd->m_expr->getText(), false);
     }
     bool errorValue =
 	partExpr == 0 ||
@@ -1958,7 +2019,6 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd)
 	partExpr->childCount() != 0;
 
     QString partValue;
-repeatWithError:
     if (errorValue)
     {
 	partValue = "???";
@@ -1967,8 +2027,6 @@ repeatWithError:
     }
     delete partExpr;
     partExpr = 0;
-
-repeatNoError:
 
     /*
      * Updating a struct value works like this: var->m_partialValue holds
@@ -1986,7 +2044,7 @@ repeatNoError:
      */
     ASSERT(var->m_exprIndex >= 0 && var->m_exprIndex <= typeInfoMaxExpr);
 
-    if (errorValue || (!var->m_exprIndexUseGuard && !var->m_exprIndexIsLength))
+    if (errorValue || !var->m_exprIndexUseGuard)
     {
 	// add current partValue (which might be ???)
 #if QT_VERSION < 200
@@ -1997,31 +2055,11 @@ repeatNoError:
 	var->m_exprIndexUseGuard = true;
 	var->m_partialValue += var->m_type->m_displayString[var->m_exprIndex];
     }
-    else if (var->m_exprIndexUseGuard)
+    else
     {
 	// this was a guard expression that succeeded
 	// go for the real expression
 	var->m_exprIndexUseGuard = false;
-	var->m_exprIndexIsLength = true;
-    }
-    else
-    {
-	// this was the length expression of a QString
-	// go for the real QString
-	var->m_exprIndexIsLength = false;
-	bool isOk;
-	int length = partValue.toInt(&isOk);
-	if (!isOk || length < 0) {
-	    // not a reasonable string
-	    errorValue = true;
-	    goto repeatWithError;
-	}
-	if (length == 0) {
-	    // do not examine the empty string, just use an empty one
-	    partValue = "\"\"";
-	    goto repeatNoError;
-	}
-	var->m_exprIndexLength = QMIN(100, length);	/* no more than 100 chars */
     }
 
     /* go for more sub-expressions if needed */
@@ -2041,7 +2079,6 @@ void KDebugger::evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool imm
 {
     var->m_exprIndex = 0;
     var->m_exprIndexUseGuard = true;
-    var->m_exprIndexIsLength = false;
     var->m_partialValue = var->m_type->m_displayString[0];
     evalStructExpression(var, wnd, immediate);
 }
@@ -2056,7 +2093,6 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 	if (exprFmt.isEmpty()) {
 	    // no guard, omit it and go to expression
 	    var->m_exprIndexUseGuard = false;
-	    var->m_exprIndexIsLength = true;
 	}
     }
     if (!var->m_exprIndexUseGuard) {
@@ -2077,14 +2113,16 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 	if (m_typeTable->parseQt2QStrings())
 	{
 	    expr = expr.mid(15, expr.length());	/* strip off /QString::Data */
-	    if (var->m_exprIndexIsLength) {
-		expr = "print " + expr + ".len";
-	    } else {
-		QString xCmd;
-		xCmd.sprintf("x /%dh ", var->m_exprIndexLength);
-		expr = xCmd + expr + ".unicode";
-		dbgCmd = DCxamineStruct;
-	    }
+	    expr =
+		// if the string data is junk, fail early
+		"print ($qstrunicode=($qstrdata=(" + expr + "))->unicode)?"
+		// print an array of shorts
+		"(*(unsigned short*)$qstrunicode)@"
+		// limit the length and add 1 because length 0 is an error
+		"(($qstrlen=(unsigned int)($qstrdata->len))>100?100:$qstrlen)"
+		// if unicode data is 0, check if it is QString::null
+		":($qstrdata==QString::null.d)";
+	    dbgCmd = DCprintQStringStruct;
 	} else {
 	    /*
 	     * This should not happen: the type libraries should be set up
@@ -2094,11 +2132,9 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 	     */
 	    // TODO: remove this "print"; queue the next printStruct instead
 	    expr = "print *0";
-	    var->m_exprIndexIsLength = false;
 	}
     } else {
 	expr = "print " + expr;
-	var->m_exprIndexIsLength = false;
     }
     TRACE("evalStruct: " + expr + (var->m_exprIndexUseGuard ? " // guard" : " // real"));
     CmdQueueItem* cmd = queueCmd(dbgCmd, expr,

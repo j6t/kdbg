@@ -30,8 +30,6 @@ public:
     TypeInfo* m_type;			/* type of struct */
     int m_exprIndex;			/* used in struct value update */
     bool m_exprIndexUseGuard;		/* ditto; if guard expr should be used */
-    bool m_exprIndexIsLength;		/* ditto; for printing QStrings */
-    int m_exprIndexLength;		/* also for QStrings */
     QString m_partialValue;		/* while struct value update is in progress */
 
     VarTree(const QString& name, NameKind kind);

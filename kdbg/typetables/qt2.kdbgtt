@@ -6,7 +6,7 @@ ShlibRE=libqt\.so\.2$
 EnableBuiltin=QString::Data
 [QString]
 Display={ % }
-Expr1=/QString::Data (*(%s).d)
+Expr1=/QString::Data (%s).d
 [QCString]
 Display={ % }
 Expr1=(%s).shd->data
@@ -17,11 +17,11 @@ Expr1=(%s).objname
 Alias=QObject
 [QDir]
 Display={ path=% filter=% }
-Expr1=/QString::Data (*(%s).dPath.d)
-Expr2=/QString::Data (*(%s).nameFilt.d)
+Expr1=/QString::Data (%s).dPath.d
+Expr2=/QString::Data (%s).nameFilt.d
 [QFileInfo]
 Display={ name=% }
-Expr1=/QString::Data (*(%s).fn.d)
+Expr1=/QString::Data (%s).fn.d
 [QFile]
 Display={ name=% }
-Expr1=/QString::Data (*(%s).fn.d)
+Expr1=/QString::Data (%s).fn.d

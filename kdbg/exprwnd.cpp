@@ -23,9 +23,7 @@ VarTree::VarTree(const QString& name, NameKind aKind) :
 	m_valueChanged(false),
 	m_type(0),
 	m_exprIndex(0),
-	m_exprIndexUseGuard(false),
-	m_exprIndexIsLength(false),
-	m_exprIndexLength(0)
+	m_exprIndexUseGuard(false)
 {
 }
 

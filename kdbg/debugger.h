@@ -219,7 +219,7 @@ public:
 	DCdisable,
 	DCprint,
 	DCprintStruct,
-	DCxamineStruct,
+	DCprintQStringStruct,
 	DCframe,
 	DCfindType,
 	DCinfosharedlib,
@@ -306,7 +306,7 @@ protected:
     CmdQueueItem* m_activeCmd;		/* the cmd we are working on */
     void parse(CmdQueueItem* cmd);
     VarTree* parseExpr(const char* name, bool wantErrorValue = true);
-    VarTree* parseQCharArray(const char* name, int len, bool wantErrorValue);
+    VarTree* parseQCharArray(const char* name, bool wantErrorValue);
     void handleRunCommands();
     void updateAllExprs();
     void updateBreakptTable();
