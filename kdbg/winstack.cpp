@@ -277,7 +277,6 @@ void WinStack::setPC(bool set, const QString& fileName, int lineNo,
 
 void WinStack::resizeEvent(QResizeEvent*)
 {
-    ASSERT(m_activeWindow == 0);
     if (m_activeWindow != 0) {
 	m_activeWindow->resize(width(), height());
     }
