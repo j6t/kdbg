@@ -7,6 +7,13 @@
 enum E { red, green, blue, yellow };
 struct S { int x, y; S* s; };
 
+struct emptyBase { };
+struct emptyDerived : S { };
+struct emptyNested : emptyBase { };
+struct emptyVBase { virtual ~emptyVBase(){} };
+struct emptyVDerived : S { virtual ~emptyVDerived(){} };
+struct emptyVNested : emptyVBase { };
+
 class Cl
 {
 	int k;
@@ -49,7 +56,21 @@ void f(E e[3], char c)
 	QFile file;
 	QFileInfo fi;
 	x = red;
+	emptyBase eb;
+	emptyDerived ed;
+	emptyNested en;
+	int ea[0];
+	emptyVBase evb;
+	emptyVDerived evd;
+	emptyVNested evn;
 }
+
+void strtest(const char* s)
+{
+    const char* t = s;
+    cout << t << endl;
+}
+
 
 void segFault()
 {
@@ -87,6 +108,18 @@ int main(int argc, char* argv[])
 	s = "Hi, there!\r\n\t\"\'\\";
 
 	const QString& strref = s;
+
+	strtest(s);
+	s = "asbcxxxxxxxxxxxxxxxxxxxxxxxxxxx";
+	strtest(s);
+	s += "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiii";
+	strtest(s);
+	s += "rst";
+	strtest(s);
+	s = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
+	strtest(s);
+	s += "rst";
+	strtest(s);
 
 	Cl c1(13);
 	Dl d1(3214);
