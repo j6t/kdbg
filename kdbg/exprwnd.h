@@ -9,7 +9,9 @@
 #include "ktreeview.h"
 #include <qlist.h>
 
-// a variable's value is the tree of sub-variables
+class TypeInfo;
+
+/* a variable's value is the tree of sub-variables */
 
 class VarTree : public KTreeViewItem
 {
@@ -24,6 +26,9 @@ public:
     NameKind m_nameKind;
     QString m_value;
     bool m_valueChanged;
+    TypeInfo* m_type;			/* type of struct */
+    int m_exprIndex;			/* used in struct value update */
+    QString m_partialValue;		/* while struct value update is in progress */
 
     VarTree(const QString& name, NameKind kind);
     virtual ~VarTree();
@@ -48,12 +53,18 @@ public:
     /** updates an existing expression */
     void updateExpr(VarTree* expr);
     void updateExpr(VarTree* display, VarTree* newValues);
+    /** updates the value and repaints it for a single item (not the children) */
+    void updateSingleExpr(VarTree* display, VarTree* newValues);
+    /** updates only the value of the node */
+    void updateStructValue(VarTree* display);
     /** removes an expression from the topmost level*/
     void removeExpr(const char* name);
     /** clears the list of pointers needing updates */
-    void clearUpdatePtrs();
+    void clearPendingUpdates();
     /** returns a pointer to update (or 0) and removes it from the list */
     VarTree* nextUpdatePtr();
+    VarTree* nextUpdateType();
+    VarTree* nextUpdateStruct();
 
 protected:
     bool updateExprRec(VarTree* display, VarTree* newValues);
@@ -62,10 +73,17 @@ protected:
     virtual int cellWidth(int col);
     void updateValuesWidth();
     static bool getMaxValueWidth(KTreeViewItem* item, void* user);
+    void collectUnknownTypes(VarTree* item);
+    static bool collectUnknownTypes(KTreeViewItem* item, void* user);
     int maxValueWidth;
     QPixmap m_pixPointer;
 
     QList<VarTree> m_updatePtrs;	/* dereferenced pointers that need update */
+    QList<VarTree> m_updateType;	/* structs whose type must be determined */
+    QList<VarTree> m_updateStruct;	/* structs whose nested value needs update */
+
+    /** remove items that are in the subTree from the list */
+    static void sweepList(QList<VarTree>& list, KTreeViewItem* subTree);
 
 protected slots:
     void slotExpandOrCollapse(int);

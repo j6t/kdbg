@@ -6,6 +6,7 @@
 #include "exprwnd.h"
 #include "exprwnd.moc"
 #include "parsevar.h"
+#include "typetable.h"
 #include <qstrlist.h>
 #include <qpainter.h>
 #include <kapp.h>
@@ -20,7 +21,9 @@ VarTree::VarTree(const QString& name, NameKind aKind) :
 	m_varKind(VKsimple),
 	m_nameKind(aKind),
 	m_value(100),			/* reserve some space */
-	m_valueChanged(false)
+	m_valueChanged(false),
+	m_type(0),
+	m_exprIndex(0)
 {
 }
 
@@ -33,8 +36,9 @@ void VarTree::paintValue(QPainter* p)
     p->save();
     int cellHeight = height(p->fontMetrics());
     int textX = 2;
-    int textY = cellHeight - ((cellHeight - p->fontMetrics().ascent() - 
-			       p->fontMetrics().leading()) / 2);
+    int textY = (cellHeight - p->fontMetrics().height()) / 2 +
+	p->fontMetrics().ascent();
+
     if (m_valueChanged) {
 	p->setPen(red);
     }
@@ -133,6 +137,8 @@ void ExprWnd::insertExpr(VarTree* expr)
     // append the expression
     insertItem(expr);
 
+    collectUnknownTypes(expr);
+
     updateValuesWidth();
 }
 
@@ -153,6 +159,7 @@ void ExprWnd::updateExpr(VarTree* expr)
 	updateValuesWidth();
 	repaint();
     }
+    collectUnknownTypes(static_cast<VarTree*>(item));
 }
 
 void ExprWnd::updateExpr(VarTree* display, VarTree* newValues)
@@ -162,6 +169,7 @@ void ExprWnd::updateExpr(VarTree* display, VarTree* newValues)
 	updateValuesWidth();
 	repaint();
     }
+    collectUnknownTypes(display);
 }
 
 /*
@@ -170,34 +178,14 @@ void ExprWnd::updateExpr(VarTree* display, VarTree* newValues)
 bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues)
 {
     bool isExpanded = display->isExpanded();
-    /*
-     * If newValues is a VKdummy, we are only interested in its children.
-     */
-    if (newValues->m_varKind != VarTree::VKdummy) {
-	// check whether the value changed
-	bool prevValueChanged = display->m_valueChanged;
-	display->m_valueChanged = false;
-	if (display->m_value != newValues->m_value) {
-	    display->m_value = newValues->m_value;
-	    display->m_valueChanged = true;
-	}
-	/*
-	 * We must repaint the cell if the value changed. If it did not
-	 * change, we still must repaint the cell if the value changed
-	 * previously, because the color of the display must be changed
-	 * (from red to black).
-	 */
-	if (display->m_valueChanged || prevValueChanged) {
-	    int i = itemRow(display);
-	    if (i >= 0) {
-		updateCell(i, 1, true);
-	    }
-	}
-    }
+
+    // display the new value
+    updateSingleExpr(display, newValues);
 
     /*
      * If we are updating a pointer without children by a dummy, we don't
-     * collaps it and simply insert the new children.
+     * collapse it, but simply insert the new children. This happens when a
+     * pointer has just been expanded by the user.
      */
     if (display->m_varKind == VarTree::VKpointer &&
 	display->childCount() == 0 &&
@@ -286,7 +274,83 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues)
     }
 
     // update of children propagates only if this node is expanded
-    return display->m_valueChanged || (isExpanded && childChanged);
+    return display->m_valueChanged || (display->isExpanded() && childChanged);
+}
+
+void ExprWnd::updateSingleExpr(VarTree* display, VarTree* newValue)
+{
+    /*
+     * If newValues is a VKdummy, we are only interested in its children.
+     * No need to update anything here.
+     */
+    if (newValue->m_varKind == VarTree::VKdummy) {
+	return;
+    }
+
+    /*
+     * If this node is a struct and we know its type then don't update its
+     * value now. This is a node for which we know how to find a nested
+     * value. So register the node for an update.
+     */
+    if (display->m_varKind == VarTree::VKstruct &&
+	display->m_type != 0 &&
+	display->m_type != TypeTable::unknownType())
+    {
+	ASSERT(newValue->m_varKind == VarTree::VKstruct);
+	display->m_partialValue = display->m_type->m_displayString[0];
+	display->m_exprIndex = 0;
+	m_updateStruct.append(display);
+    }
+    else
+    {
+	// check whether the value changed
+	bool prevValueChanged = display->m_valueChanged;
+	display->m_valueChanged = false;
+	if (display->m_value != newValue->m_value) {
+	    display->m_value = newValue->m_value;
+	    display->m_valueChanged = true;
+	}
+	/*
+	 * We must repaint the cell if the value changed. If it did not
+	 * change, we still must repaint the cell if the value changed
+	 * previously, because the color of the display must be changed
+	 * (from red to black).
+	 */
+	if (display->m_valueChanged || prevValueChanged) {
+	    int i = itemRow(display);
+	    if (i >= 0) {
+		updateCell(i, 1, true);
+	    }
+	}
+    }
+}
+
+void ExprWnd::updateStructValue(VarTree* display)
+{
+    ASSERT(display->m_varKind == VarTree::VKstruct);
+
+    // check whether the value changed
+    bool prevValueChanged = display->m_valueChanged;
+    display->m_valueChanged = false;
+    if (display->m_value != display->m_partialValue) {
+	display->m_value = display->m_partialValue;
+	display->m_valueChanged = true;
+    }
+    /*
+     * We must repaint the cell if the value changed. If it did not
+     * change, we still must repaint the cell if the value changed
+     * previously, because the color of the display must be changed
+     * (from red to black).
+     */
+    if (display->m_valueChanged || prevValueChanged) {
+	int i = itemRow(display);
+	if (i >= 0) {
+	    updateCell(i, 1, true);
+	}
+    }
+    // reset the value
+    display->m_partialValue = "";
+    display->m_exprIndex = -1;
 }
 
 void ExprWnd::replaceChildren(VarTree* display, VarTree* newValues)
@@ -311,6 +375,40 @@ void ExprWnd::replaceChildren(VarTree* display, VarTree* newValues)
     }
 }
 
+void ExprWnd::collectUnknownTypes(VarTree* var)
+{
+    /*
+     * forEveryItem does not scan the root item itself. So we must do it
+     * ourselves.
+     */
+    ASSERT(var->m_varKind != VarTree::VKpointer || var->m_nameKind != VarTree::NKtype);
+    if (var->m_type == 0 &&
+	var->m_varKind == VarTree::VKstruct &&
+	var->m_nameKind != VarTree::NKtype)
+    {
+	/* this struct node doesn't have a type yet: register it */
+	m_updateType.append(var);
+    }
+
+    forEveryItem(collectUnknownTypes, this, var);
+}
+
+bool ExprWnd::collectUnknownTypes(KTreeViewItem* item, void* user)
+{
+    VarTree* var = static_cast<VarTree*>(item);
+    ExprWnd* tree = static_cast<ExprWnd*>(user);
+    ASSERT(var->m_varKind != VarTree::VKpointer || var->m_nameKind != VarTree::NKtype);
+    if (var->m_type == 0 &&
+	var->m_varKind == VarTree::VKstruct &&
+	var->m_nameKind != VarTree::NKtype)
+    {
+	/* this struct node doesn't have a type yet: register it */
+	tree->m_updateType.append(var);
+    }
+    return false;
+}
+
+
 void ExprWnd::removeExpr(const char* name)
 {
     QString p = name;
@@ -319,36 +417,9 @@ void ExprWnd::removeExpr(const char* name)
 
     // must remove any pointers scheduled for update from the list
     KTreeViewItem* item = itemAt(path);
-    if (item != 0) {
-	KTreeViewItem* checkItem = m_updatePtrs.first();
-	while (checkItem != 0) {
-	    KTreeViewItem* p = checkItem;
-	    while (p != 0 && p != item) {
-		p = p->getParent();
-	    }
-	    if (p == 0) {
-		// checkItem is not a subitem of item
-		// advance
-		checkItem = m_updatePtrs.next();
-	    } else {
-		// checkItem is a subitem of item
-		/* 
-		 * If checkItem is the last item in the list, we need a
-		 * special treatment, because remove()ing it steps the
-		 * current item of the list in the "wrong" direction.
-		 */
-		if (checkItem == m_updatePtrs.getLast()) { // does not set current item
-		    m_updatePtrs.remove();
-		    /* we deleted the last element, so we've finished */
-		    checkItem = 0;
-		} else {
-		    m_updatePtrs.remove();
-		    /* remove() advanced already */
-		    checkItem = m_updatePtrs.current();
-		}
-	    }
-	}
-    }
+    sweepList(m_updatePtrs, item);
+    sweepList(m_updateType, item);
+    sweepList(m_updateStruct, item);
 
     removeItem(path);
     path.pop();
@@ -356,9 +427,46 @@ void ExprWnd::removeExpr(const char* name)
     updateValuesWidth();
 }
 
-void ExprWnd::clearUpdatePtrs()
+void ExprWnd::sweepList(QList<VarTree>& list, KTreeViewItem* subTree)
+{
+    if (subTree == 0)
+	return;
+
+    KTreeViewItem* checkItem = list.first();
+    while (checkItem != 0) {
+	KTreeViewItem* p = checkItem;
+	while (p != 0 && p != subTree) {
+	    p = p->getParent();
+	}
+	if (p == 0) {
+	    // checkItem is not an item from subTree
+	    // advance
+	    checkItem = list.next();
+	} else {
+	    // checkItem is an item from subTree
+	    /* 
+	     * If checkItem is the last item in the list, we need a special
+	     * treatment, because remove()ing it steps the current item of
+	     * the list in the "wrong" direction.
+	     */
+	    if (checkItem == list.getLast()) { // does not set current item
+		list.remove();
+		/* we deleted the last element, so we've finished */
+		checkItem = 0;
+	    } else {
+		list.remove();
+		/* remove() advanced already */
+		checkItem = list.current();
+	    }
+	}
+    }
+}
+
+void ExprWnd::clearPendingUpdates()
 {
     m_updatePtrs.clear();
+    m_updateType.clear();
+    m_updateStruct.clear();
 }
 
 VarTree* ExprWnd::nextUpdatePtr()
@@ -366,6 +474,24 @@ VarTree* ExprWnd::nextUpdatePtr()
     VarTree* ptr = m_updatePtrs.first();
     if (ptr != 0) {
 	m_updatePtrs.remove();
+    }
+    return ptr;
+}
+
+VarTree* ExprWnd::nextUpdateType()
+{
+    VarTree* ptr = m_updateType.first();
+    if (ptr != 0) {
+	m_updateType.remove();
+    }
+    return ptr;
+}
+
+VarTree* ExprWnd::nextUpdateStruct()
+{
+    VarTree* ptr = m_updateStruct.first();
+    if (ptr != 0) {
+	m_updateStruct.remove();
     }
     return ptr;
 }

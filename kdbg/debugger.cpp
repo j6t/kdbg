@@ -9,6 +9,7 @@
 #include "updateui.h"
 #include "parsevar.h"
 #include "pgmargs.h"
+#include "typetable.h"
 #include <qregexp.h>
 #include <qfileinf.h>
 #include <kapp.h>
@@ -1102,6 +1103,12 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	m_bpTable.updateBreakList(m_gdbOutput);
 	m_filesWindow.updateLineItems(m_bpTable);
 	break;
+    case DCfindType:
+	handleFindType(cmd);
+	break;
+    case DCprintStruct:
+	handlePrintStruct(cmd);
+	break;
     }
     /*
      * The -fullname option makes gdb send a special normalized sequence
@@ -1227,7 +1234,7 @@ void KDebugger::handleLocals()
      * Clear any old VarTree item pointers, so that later we don't access
      * dangling pointers.
      */
-    m_localVariables.clearUpdatePtrs();
+    m_localVariables.clearPendingUpdates();
 
     /*
      * Match old variables against new ones.
@@ -1260,7 +1267,7 @@ void KDebugger::handleLocals()
     // update this
     m_delayedPrintThis = false;
     if (thisPresent) {
-	if (isThisPaneVisible()) {
+	if (false/*isThisPaneVisible()*/) {
 	    queueCmd(DCprintthis, "print *this", QMoverride);
 	} else {
 	    // delay "print *this" until the user makes the pane visible
@@ -1568,8 +1575,12 @@ void KDebugger::evalExpressions()
     // evaluate expressions in the following order:
     //   watch expressions
     //   pointers in local variables
-    //   pointers in 'this'
     //   pointers in watch expressions
+    //   types in local variables
+    //   types in watch expressions
+    //   pointers in 'this'
+    //   types in 'this'
+    
     VarTree* exprItem = m_watchEvalExpr.first();
     if (exprItem != 0) {
 	m_watchEvalExpr.remove();
@@ -1580,21 +1591,55 @@ void KDebugger::evalExpressions()
 	cmd->m_expr = exprItem;
 	cmd->m_exprWnd = &m_watchVariables;
     } else {
-	ExprWnd* wnd = &m_localVariables;
-	exprItem = m_localVariables.nextUpdatePtr();
-	if (exprItem == 0) {
-	    wnd = &m_this;
-	    exprItem = m_this.nextUpdatePtr();
-	    if (exprItem == 0) {
-		wnd = &m_watchVariables;
-		exprItem = m_watchVariables.nextUpdatePtr();
-		if (exprItem == 0) {
-		    return;
-		}
-	    }
-	}
+	ExprWnd* wnd;
+	VarTree* exprItem;
+#define POINTER(widget) \
+		wnd = &widget; \
+		exprItem = widget.nextUpdatePtr(); \
+		if (exprItem != 0) goto pointer
+#define STRUCT(widget) \
+		wnd = &widget; \
+		exprItem = widget.nextUpdateStruct(); \
+		if (exprItem != 0) goto ustruct
+#define TYPE(widget) \
+		wnd = &widget; \
+		exprItem = widget.nextUpdateType(); \
+		if (exprItem != 0) goto type
+    repeat:
+	POINTER(m_localVariables);
+	POINTER(m_watchVariables);
+	STRUCT(m_localVariables);
+	STRUCT(m_watchVariables);
+	TYPE(m_localVariables);
+	TYPE(m_watchVariables);
+	POINTER(m_this);
+	STRUCT(m_this);
+	TYPE(m_this);
+	return;
+
+	pointer:
 	// we have an expression to send
 	dereferencePointer(wnd, exprItem, false);
+	return;
+
+	ustruct:
+	// paranoia
+	if (exprItem->m_type == 0 || exprItem->m_type == TypeTable::unknownType())
+	    goto repeat;
+	exprItem->m_exprIndex = 0;
+	exprItem->m_partialValue = exprItem->m_type->m_displayString[0];
+	evalStructExpression(exprItem, wnd, false);
+	return;
+
+	type:
+	/*
+	 * Sometimes a VarTree gets registered twice for a type update. So
+	 * it may happen that it has already been updated. Hence, we ignore
+	 * it here and go on to the next task.
+	 */
+	if (exprItem->m_type != 0)
+	    goto repeat;
+	determineType(wnd, exprItem);
     }
 }
 
@@ -1614,6 +1659,111 @@ void KDebugger::dereferencePointer(ExprWnd* wnd, VarTree* exprItem,
     }
     // remember which expr this was
     cmd->m_expr = exprItem;
+    cmd->m_exprWnd = wnd;
+}
+
+void KDebugger::determineType(ExprWnd* wnd, VarTree* exprItem)
+{
+    ASSERT(exprItem->m_varKind == VarTree::VKstruct);
+
+    QString expr = exprItem->computeExpr();
+    TRACE("get type of: " + expr);
+    QString queueExpr = "whatis " + expr;
+    CmdQueueItem* cmd;
+    cmd = queueCmd(DCfindType, queueExpr, QMoverride);
+
+    // remember which expr this was
+    cmd->m_expr = exprItem;
+    cmd->m_exprWnd = wnd;
+}
+
+void KDebugger::handleFindType(CmdQueueItem* cmd)
+{
+    const char* str = m_gdbOutput;
+    if (strncmp(str, "type = ", 7) == 0) {
+	str += 7;
+
+	/*
+	 * Everything else is the type. We strip off all white-space from
+	 * the type.
+	 */
+	QString type = str;
+	type.replace(QRegExp("\\s+"), "");
+
+	ASSERT(cmd != 0 && cmd->m_expr != 0);
+
+	TypeInfo* info = typeTable()[type];
+	if (info == 0) {
+	    TRACE("unknown type");
+	    info = TypeTable::unknownType();
+	} else {
+	    cmd->m_expr->m_type = info;
+	    /* since this node has a new type, we get its value immediately */
+	    cmd->m_expr->m_exprIndex = 0;
+	    cmd->m_expr->m_partialValue = info->m_displayString[0];
+	    evalStructExpression(cmd->m_expr, cmd->m_exprWnd, false);
+	    return;
+	}
+    }
+
+    evalExpressions();			/* queue more of them */
+}
+
+void KDebugger::handlePrintStruct(CmdQueueItem* cmd)
+{
+    VarTree* var = cmd->m_expr;
+    ASSERT(var != 0);
+    ASSERT(var->m_varKind == VarTree::VKstruct);
+
+    VarTree* partExpr = parseExpr(cmd->m_expr->getText());
+    if (partExpr == 0 ||
+	/* we only allow simple values at the moment */
+	partExpr->childCount() != 0)
+    {
+	// syntax error: reset this struct value
+	var->m_value = "";
+	var->m_exprIndex = -1;
+	delete partExpr;
+    } else {
+	/*
+	 * Updating a struct value works like this: var->m_partialValue
+	 * holds the value that we have gathered so far (it's been
+	 * initialized with var->m_type->m_displayString[0] earlier). Each
+	 * time we arrive here, we append the printed result followed by
+	 * the next var->m_type->m_displayString to var->m_partialValue.
+	 */
+	ASSERT(var->m_exprIndex >= 0 && var->m_exprIndex <= typeInfoMaxExpr);
+	var->m_partialValue.detach();
+	var->m_partialValue += partExpr->m_value;
+	var->m_exprIndex++;		/* next part */
+	var->m_partialValue += var->m_type->m_displayString[var->m_exprIndex];
+
+	/* go for more sub-expressions if needed */
+	if (var->m_exprIndex < var->m_type->m_numExprs) {
+	    /* queue a new print command with quite high priority */
+	    evalStructExpression(var, cmd->m_exprWnd, true);
+	    return;
+	}
+    }
+
+    cmd->m_exprWnd->updateStructValue(var);
+
+    evalExpressions();			/* enqueue dereferenced pointers */
+}
+
+/* queues a printStruct command; var must have been initialized correctly */
+void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
+{
+    QString base = var->computeExpr();
+    const QString& exprFmt = var->m_type->m_exprStrings[var->m_exprIndex];
+    QString expr(exprFmt.length() + base.length() + 10);
+    expr.sprintf(exprFmt, base.data());
+    TRACE("evalStruct: " + expr);
+    CmdQueueItem* cmd = queueCmd(DCprintStruct, "print " + expr,
+				 immediate  ?  QMoverrideMoreEqual : QMnormal);
+
+    // remember which expression this was
+    cmd->m_expr = var;
     cmd->m_exprWnd = wnd;
 }
 

@@ -8,6 +8,7 @@
 #include <kmsgbox.h>
 #include <kstdaccel.h>
 #include "debugger.h"
+#include "typetable.h"
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -37,6 +38,11 @@ int main(int argc, char** argv)
     keys = new KStdAccel(app.getConfig());
 
     KDebugger debugger("debugger");
+
+    /* yucky! there's only one TypeTable */
+    TypeTable typeTable;
+    typeTable.loadTable();
+    theTypeTable = &typeTable;
 
     // session management
     bool restored = false;
