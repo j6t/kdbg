@@ -5,7 +5,7 @@
 
 #include "updateui.h"
 #include "updateui.moc"
-#include <qpopmenu.h>
+#include <qpopupmenu.h>
 #include <ktoolbar.h>
 #ifdef HAVE_CONFIG_H
 #include "config.h"

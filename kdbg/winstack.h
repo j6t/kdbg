@@ -6,14 +6,14 @@
 #ifndef WINSTACK_H
 #define WINSTACK_H
 
-#include <qmlined.h>
+#include <qmultilinedit.h>
 #include <qlist.h>
 #include <qpixmap.h>
 #include <qdialog.h>
-#include <qlined.h>
+#include <qlineedit.h>
 #include <qlayout.h>
-#include <qchkbox.h>
-#include <qpushbt.h>
+#include <qcheckbox.h>
+#include <qpushbutton.h>
 #include <qpopupmenu.h>
 #include "textvw.h"
 

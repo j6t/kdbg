@@ -24,7 +24,7 @@
 
 #include <ktreeview.h>
 #include "ktreeview.moc"
-#include <qapp.h>			/* used for QApplication::closingDown() */
+#include <qapplication.h>		/* used for QApplication::closingDown() */
 #include <qkeycode.h>			/* used for keyboard interface */
 #include <qpainter.h>			/* used to paint items */
 #include <assert.h>

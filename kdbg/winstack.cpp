@@ -8,11 +8,11 @@
 #include "commandids.h"
 #include "brkpt.h"
 #include <kfiledialog.h>
-#include <qtstream.h>
+#include <qtextstream.h>
 #include <qpainter.h>
 #include <qbrush.h>
 #include <qfile.h>
-#include <qfileinf.h>
+#include <qfileinfo.h>
 #include <qlistbox.h>
 #include <kapp.h>
 #include <kiconloader.h>

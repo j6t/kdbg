@@ -11,7 +11,7 @@
 #include "exprwnd.h"
 #include "valarray.h"
 #include <qregexp.h>
-#include <qfileinf.h>
+#include <qfileinfo.h>
 #include <qlistbox.h>
 #include <kapp.h>
 #include <kfiledialog.h>

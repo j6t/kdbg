@@ -28,7 +28,7 @@
 #include <qpixmap.h>			/* used in items */
 #include <qstack.h>			/* used to specify tree paths */
 #include <qstring.h>			/* used in items */
-#include <qtablevw.h>			/* base class for widget */
+#include <qtableview.h>			/* base class for widget */
 
 // use stack of strings to represent path information
 typedef QStack<QString> KPath;

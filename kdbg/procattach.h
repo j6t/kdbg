@@ -8,8 +8,8 @@
 
 #include <qdialog.h>
 #include <qlabel.h>
-#include <qlined.h>
-#include <qpushbt.h>
+#include <qlineedit.h>
+#include <qpushbutton.h>
 #include <qlayout.h>
 
 class ProcAttach : public QDialog

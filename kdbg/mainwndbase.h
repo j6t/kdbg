@@ -6,9 +6,9 @@
 #ifndef MAINWNDBASE_H
 #define MAINWNDBASE_H
 
-#include <qlined.h>
+#include <qlineedit.h>
 #include <qlayout.h>
-#include <qpushbt.h>
+#include <qpushbutton.h>
 #include <ktmainwindow.h>
 #include "exprwnd.h"
 

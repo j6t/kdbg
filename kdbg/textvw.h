@@ -6,7 +6,7 @@
 #ifndef TEXTVW_H
 #define TEXTVW_H
 
-#include <qtablevw.h>
+#include <qtableview.h>
 #include "valarray.h"
 
 class KTextView : public QTableView

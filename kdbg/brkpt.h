@@ -11,8 +11,8 @@
 #include <qdialog.h>
 #include <ktablistbox.h>
 #include <qlayout.h>
-#include <qpushbt.h>
-#include <qlined.h>
+#include <qpushbutton.h>
+#include <qlineedit.h>
 
 class KSimpleConfig;
 
