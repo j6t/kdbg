@@ -275,6 +275,12 @@ void WinStack::menuCallback(int item)
     case ID_FILE_OPEN:
 	openFile();
 	break;
+    case ID_VIEW_FINDDLG:
+	if (m_findDlg.isVisible()) {
+	    m_findDlg.done(0);
+	} else {
+	    m_findDlg.show();
+	}
     }
 }
 
@@ -475,4 +481,95 @@ void WinStack::resizeEvent(QResizeEvent*)
 void WinStack::slotLineChanged()
 {
     emit lineChanged();
+}
+
+void WinStack::slotFindForward()
+{
+}
+
+void WinStack::slotFindBackward()
+{
+}
+
+
+FindDialog::FindDialog() :
+	QDialog(0, "find", false),
+	m_searchText(this, "text"),
+	m_caseCheck(this, "case"),
+	m_buttonForward(this, "forward"),
+	m_buttonBackward(this, "backward"),
+	m_buttonClose(this, "close"),
+	m_layout(this, 8),
+	m_buttons(4)
+{
+    setCaption(QString(kapp->getCaption()) + i18n(": Search"));
+
+    m_searchText.setMinimumSize(330, 24);
+    m_searchText.setMaxLength(10000);
+    m_searchText.setFrame(true);
+
+    m_caseCheck.setText(i18n("&Case sensitive"));
+    m_caseCheck.setChecked(true);
+    m_buttonForward.setText(i18n("&Forward"));
+    m_buttonForward.setDefault(true);
+    m_buttonBackward.setText(i18n("&Backward"));
+    m_buttonClose.setText(i18n("Close"));
+
+    m_caseCheck.setMinimumSize(330, 24);
+
+    // get maximum size of buttons
+    QSize maxSize(80,30);
+    maxSize.expandedTo(m_buttonForward.sizeHint());
+    maxSize.expandedTo(m_buttonBackward.sizeHint());
+    maxSize.expandedTo(m_buttonClose.sizeHint());
+
+    m_buttonForward.setMinimumSize(maxSize);
+    connect(&m_buttonForward, SIGNAL(clicked()), SLOT(slotFindForward()));
+
+    m_buttonBackward.setMinimumSize(maxSize);
+    connect(&m_buttonBackward, SIGNAL(clicked()), SLOT(slotFindBackward()));
+
+    m_buttonClose.setMinimumSize(maxSize);
+    connect(&m_buttonClose, SIGNAL(clicked()), SLOT(reject()));
+
+    m_layout.addWidget(&m_searchText);
+    m_layout.addWidget(&m_caseCheck);
+    m_layout.addLayout(&m_buttons);
+    m_layout.addStretch(10);
+    m_buttons.addWidget(&m_buttonForward);
+    m_buttons.addStretch(10);
+    m_buttons.addWidget(&m_buttonBackward);
+    m_buttons.addStretch(10);
+    m_buttons.addWidget(&m_buttonClose);
+
+    m_layout.activate();
+
+    m_searchText.setFocus();
+    resize( 350, 120 );
+}
+
+FindDialog::~FindDialog()
+{
+}
+
+void FindDialog::slotFindForward()
+{
+    emit findForwardClicked();
+}
+
+void FindDialog::slotFindBackward()
+{
+    emit findBackwardClicked();
+}
+
+void FindDialog::closeEvent(QCloseEvent* ev)
+{
+    QDialog::closeEvent(ev);
+    emit closed();
+}
+
+void FindDialog::done(int result)
+{
+    QDialog::done(result);
+    emit closed();
 }

@@ -9,6 +9,11 @@
 #include <qmlined.h>
 #include <qlist.h>
 #include <qpixmap.h>
+#include <qdialog.h>
+#include <qlined.h>
+#include <qlayout.h>
+#include <qcheckbox.h>
+#include <qpushbt.h>
 #include "textvw.h"
 
 // forward declarations
@@ -49,6 +54,37 @@ protected:
     QPixmap m_brktmp;			/* temporary breakpoint marker */
 };
 
+class FindDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    FindDialog();
+    ~FindDialog();
+
+    bool caseSensitive() const { return m_caseCheck.isChecked(); }
+    const char* searchText() const { return m_searchText.text(); }
+    virtual void done(int result);
+
+signals:
+    void findForwardClicked();
+    void findBackwardClicked();
+    void closed();
+
+public slots:
+    void slotFindForward();
+    void slotFindBackward();
+
+protected:
+    virtual void closeEvent(QCloseEvent* ev);
+    QLineEdit m_searchText;
+    QCheckBox m_caseCheck;
+    QPushButton m_buttonForward;
+    QPushButton m_buttonBackward;
+    QPushButton m_buttonClose;
+    QVBoxLayout m_layout;
+    QHBoxLayout m_buttons;
+};
+
 class WinStack : public QWidget
 {
     Q_OBJECT
@@ -68,7 +104,7 @@ public:
     bool activeLine(QString& filename, int& lineNo);
     void updateLineItems();
     void updatePC(const QString& filename, int lineNo, int frameNo);
-    
+
     virtual void resizeEvent(QResizeEvent*);
 
 signals:
@@ -78,6 +114,8 @@ signals:
 public slots:
     virtual void menuCallback(int item);
     virtual void slotLineChanged();
+    virtual void slotFindForward();
+    virtual void slotFindBackward();
 
 protected:
     bool activatePath(QString pathname, int lineNo);
@@ -96,6 +134,10 @@ protected:
     int m_pcLine;			/* -1 if no PC */
     int m_pcFrame;
     const BreakpointTable& m_bpTable;
+
+public:
+    // find dialog
+    FindDialog m_findDlg;
 };
 
 #endif // WINSTACK_H

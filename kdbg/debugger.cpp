@@ -136,6 +136,7 @@ KDebugger::KDebugger(const char* name) :
     m_watchH.addWidget(&m_watchDelete, 0);
 
     m_filesWindow.setWindowMenu(&m_menuWindow);
+    connect(&m_filesWindow.m_findDlg, SIGNAL(closed()), SLOT(updateUI()));
 
     m_bpTable.setCaption(i18n("Breakpoints"));
     connect(&m_bpTable, SIGNAL(closed()), SLOT(updateUI()));
@@ -416,6 +417,9 @@ void KDebugger::updateUI()
 void KDebugger::updateUIItem(UpdateUI* item)
 {
     switch (item->id) {
+    case ID_VIEW_FINDDLG:
+	item->setCheck(m_filesWindow.m_findDlg.isVisible());
+	break;
     case ID_FILE_EXECUTABLE:
 	item->enable(m_state == DSidle);
 	break;
@@ -465,8 +469,10 @@ void KDebugger::initMenu()
     m_menuFile.setAccel(keys->open(), ID_FILE_OPEN);
     m_menuFile.setAccel(keys->quit(), ID_FILE_QUIT);
 
+    m_menuView.insertItem(i18n("&Find..."), ID_VIEW_FINDDLG);
     m_menuView.insertItem(i18n("Toggle &Toolbar"), ID_VIEW_TOOLBAR);
     m_menuView.insertItem(i18n("Toggle &Statusbar"), ID_VIEW_STATUSBAR);
+    m_menuView.setAccel(keys->find(), ID_VIEW_FINDDLG);
 
     m_menuProgram.insertItem(i18n("&Run"), ID_PROGRAM_RUN);
     m_menuProgram.insertItem(i18n("Step &into"), ID_PROGRAM_STEP);
@@ -652,10 +658,12 @@ bool KDebugger::createOutputWindow()
 
 	// spawn "xterm -name kdbgio -title "KDbg: Program output" -e kdbg"
 	extern QString thisExecName;
+	QString title = kapp->getCaption();
+	title += i18n(": Program output");
 	::execlp("xterm",
 		 "xterm",
 		 "-name", "kdbgio",
-		 "-title", i18n("KDbg: Program output"),
+		 "-title", title.data(),
 		 "-e", thisExecName.data(),
 		 0);
 	
