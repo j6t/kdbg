@@ -330,7 +330,7 @@ protected:
 
     Breakpoint* breakpointByFilePos(QString file, int lineNo,
 				    const DbgAddr& address);
-    void newBreakpoint(const char* output);
+    void newBreakpoint(CmdQueueItem* cmd, const char* output);
     void updateBreakList(const char* output);
     bool stopMayChangeBreakList() const;
     void saveBreakpoints(KSimpleConfig* config);

@@ -124,6 +124,8 @@ enum MemoryDumpType {
     MDTformatmask = 0xf0
 };
 
+struct Breakpoint;
+
 /**
  * Debugger commands are placed in a queue. Only one command at a time is
  * sent down to the debugger. All other commands in the queue are retained
@@ -143,6 +145,8 @@ struct CmdQueueItem
     // remember file position
     QString m_fileName;
     int m_lineNo;
+    // the breakpoint info
+    Breakpoint* m_brkpt;
     // whether command was emitted due to direct user request (only set when relevant)
     bool m_byUser;
 
@@ -153,6 +157,7 @@ struct CmdQueueItem
 	m_expr(0),
 	m_exprWnd(0),
 	m_lineNo(0),
+	m_brkpt(0),
 	m_byUser(false)
     { }
 };
@@ -407,11 +412,12 @@ public:
      * @param output The output of the debugger.
      * @param id Returns the breakpoint id.
      * @param file Returns the file name in which the breakpoint is.
-     * @param lineNo Returns he zero-based line number of the breakpoint.
+     * @param lineNo Returns the zero-based line number of the breakpoint.
+     * @param address Returns the address of the breakpoint.
      * @return False if there was no breakpoint.
      */
     virtual bool parseBreakpoint(const char* output, int& id,
-				 QString& file, int& lineNo) = 0;
+				 QString& file, int& lineNo, QString& address) = 0;
 
     /**
      * Parses the output of the DCinfolocals command.

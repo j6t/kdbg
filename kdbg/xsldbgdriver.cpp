@@ -1252,7 +1252,7 @@ XsldbgDriver::parseThreadList(const char */*output*/,
 
 bool
 XsldbgDriver::parseBreakpoint(const char */*output*/, int &/*id*/,
-                              QString & /*file*/, int &/*lineNo*/)
+                              QString & /*file*/, int &/*lineNo*/, QString&/*address*/)
 {
     TRACE("parseBreakpoint");
     return true;

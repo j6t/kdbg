@@ -1764,7 +1764,7 @@ bool GdbDriver::parseThreadList(const char* output, QList<ThreadInfo>& threads)
 }
 
 bool GdbDriver::parseBreakpoint(const char* output, int& id,
-				QString& file, int& lineNo)
+				QString& file, int& lineNo, QString& address)
 {
     const char* o = output;
     // skip lines of that begin with "(Cannot find"
@@ -1781,14 +1781,23 @@ bool GdbDriver::parseBreakpoint(const char* output, int& id,
     // breakpoint id
     output += 11;			/* skip "Breakpoint " */
     char* p;
-    int num = strtoul(output, &p, 10);
+    id = strtoul(output, &p, 10);
     if (p == o)
 	return false;
+
+    // check for the address
+    if (strncmp(p, " at 0x", 6) == 0) {
+	char* start = p+4;	       /* skip " at ", but not 0x */
+	p += 6;
+	while (isxdigit(*p))
+	    ++p;
+	address = FROM_LATIN1(start, p-start);
+    }
     
     // file name
     char* fileStart = strstr(p, "file ");
     if (fileStart == 0)
-	return false;
+	return !address.isEmpty();     /* parse error only if there's no address */
     fileStart += 5;
     
     // line number
@@ -1799,7 +1808,6 @@ bool GdbDriver::parseBreakpoint(const char* output, int& id,
     if (numStart == p)
 	return false;
 
-    id = num;
     file = fileName;
     lineNo = line-1;			/* zero-based! */
     return true;

@@ -56,7 +56,7 @@ public:
     virtual bool parseBreakList(const char* output, QList<Breakpoint>& brks);
     virtual bool parseThreadList(const char* output, QList<ThreadInfo>& threads);
     virtual bool parseBreakpoint(const char* output, int& id,
-				 QString& file, int& lineNo);
+				 QString& file, int& lineNo, QString& address);
     virtual void parseLocals(const char* output, QList<VarTree>& newVars);
     virtual bool parsePrintExpr(const char* output, bool wantErrorValue,
 				VarTree*& var);
