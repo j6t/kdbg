@@ -112,6 +112,8 @@ fi
 
 dnl add here all your Makefiles. These are created by configure
 AC_OUTPUT(Makefile \
+	STabCtl/Makefile \
+	DockWidget/Makefile \
 	kdbg/Makefile \
 	kdbg/doc/Makefile \
 	kdbg/doc/de/Makefile \
