@@ -591,7 +591,9 @@ void KDebugger::gdbExited(KProcess*)
 {
 #ifdef GDB_TRANSCRIPT
     static const char txt[] = "\ngdb exited\n";
-    m_logFile.writeBlock(txt,sizeof(txt)-1);
+    if (m_logFile.isOpen()) {
+	m_logFile.writeBlock(txt,sizeof(txt)-1);
+    }
 #endif
 
     /*
@@ -949,8 +951,10 @@ void KDebugger::writeCommand()
 
 #ifdef GDB_TRANSCRIPT
     // write also to log file
-    m_logFile.writeBlock(str, cmd->m_cmdString.length());
-    m_logFile.flush();
+    if (m_logFile.isOpen()) {
+	m_logFile.writeBlock(str, cmd->m_cmdString.length());
+	m_logFile.flush();
+    }
 #endif
 
     m_state = newState;
@@ -1015,8 +1019,10 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
     }
 #ifdef GDB_TRANSCRIPT
     // write to log file (do not log delayed output - it would appear twice)
-    m_logFile.writeBlock(buffer, buflen);
-    m_logFile.flush();
+    if (m_logFile.isOpen()) {
+	m_logFile.writeBlock(buffer, buflen);
+	m_logFile.flush();
+    }
 #endif
     
     /*
