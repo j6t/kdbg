@@ -47,9 +47,6 @@ public:
 public:
     ChooseDriver m_chooseDriver;
     OutputSettings m_output;
-
-protected slots:
-    void slotHelp();
 };
 
 #endif

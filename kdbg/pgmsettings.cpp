@@ -110,25 +110,9 @@ ProgramSettings::ProgramSettings(QWidget* parent, QString exeName, bool modal) :
 
     setCancelButton(i18n("Cancel"));
     setOKButton(i18n("OK"));
-    setDefaultButton(i18n("&Help"));
-
-    connect(this, SIGNAL(defaultButtonPressed()), SLOT(slotHelp()));
 
     addTab(&m_chooseDriver, i18n("&Debugger"));
     addTab(&m_output, i18n("&Output"));
-}
-
-void ProgramSettings::slotHelp()
-{
-    QString section;
-
-    // find active page and jump to its section
-    QWidget* curWidget = currentPage();
-    if (curWidget != 0) {
-	section = curWidget->name();
-    }
-    TRACE("invoking help: pgmsettings.html section #" + section);
-    kapp->invokeHTMLHelp("kdbg/pgmsettings.html", section);
 }
 
 #include "pgmsettings.moc"
