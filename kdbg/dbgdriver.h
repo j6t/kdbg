@@ -47,6 +47,7 @@ enum DbgCommand {
 	DCinfolinemain,
 	DCinfolocals,
 	DCinforegisters,
+	DCexamine,
 	DCinfoline,
 	DCdisassemble,
 	DCsetargs,
@@ -86,6 +87,32 @@ enum RunDevNull {
     RDNstdin = 0x1,			/* redirect stdin to /dev/null */
     RDNstdout = 0x2,			/* redirect stdout to /dev/null */
     RDNstderr = 0x4			/* redirect stderr to /dev/null */
+};
+
+/**
+ * How the memory dump is formated. The lowest 4 bits define the size of
+ * the entities. The higher bits define how these are formatted. Note that
+ * not all combinations make sense.
+ */
+enum MemoryDumpType {
+    // sizes
+    MDTbyte = 0x1,
+    MDThalfword = 0x2,
+    MDTword = 0x3,
+    MDTgiantword = 0x4,
+    MDTsizemask = 0xf,
+    // formats
+    MDThex = 0x10,
+    MDTsigned = 0x20,
+    MDTunsigned = 0x30,
+    MDToctal = 0x40,
+    MDTbinary = 0x50,
+    MDTaddress = 0x60,
+    MDTchar = 0x70,
+    MDTfloat = 0x80,
+    MDTstring = 0x90,
+    MDTinsn = 0xa0,
+    MDTformatmask = 0xf0
 };
 
 /**
@@ -444,6 +471,11 @@ public:
      * Parses the ouput of the DCdisassemble command.
      */
     virtual void parseDisassemble(const char* output, QList<DisassembledCode>& code) = 0;
+
+    /**
+     * Parses a memory dump.
+     */
+    virtual QString parseMemoryDump(const char* output) = 0;
 
 protected:
     /** Removes all commands from the low-priority queue. */

@@ -82,6 +82,7 @@ static GdbCmdInfo cmds[] = {
     { DCinfolinemain, "info line main\n", GdbCmdInfo::argNone },
     { DCinfolocals, "kdbg__alllocals\n", GdbCmdInfo::argNone },
     { DCinforegisters, "info all-registers\n", GdbCmdInfo::argNone},
+    { DCexamine, "x %s %s\n", GdbCmdInfo::argString2 },
     { DCinfoline, "info line %s:%d\n", GdbCmdInfo::argStringNum },
     { DCdisassemble, "disassemble %s %s\n", GdbCmdInfo::argString2 },
     { DCsetargs, "set args %s\n", GdbCmdInfo::argString },
@@ -389,6 +390,7 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == GdbCmdInfo::argStringNum ||
 	   cmds[cmd].argsNeeded == GdbCmdInfo::argNumString ||
+	   cmd == DCexamine ||
 	   cmd == DCtty);
 
     SIZED_QString(cmdString, MAX_FMTLEN+30+strArg.length());
@@ -419,6 +421,28 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
 	m_redirect = runRedir[intArg & 7];
 
 	return makeCmdString(DCtty, strArg);   /* note: no problem if strArg empty */
+    }
+
+    if (cmd == DCexamine) {
+	// make a format specifier from the intArg
+	static const char size[16] = {
+	    '\0', 'b', 'h', 'w', 'g'
+	};
+	static const char format[16] = {
+	    '\0', 'x', 'd', 'u', 'o', 't',
+	    'a',  'c', 'f', 's', 'i'
+	};
+	assert(MDTsizemask == 0xf);	/* lowest 4 bits */
+	assert(MDTformatmask == 0xf0);	/* next 4 bits */
+	int count = 16;			/* number of entities to print */
+	char sizeSpec = size[intArg & MDTsizemask];
+	char formatSpec = format[(intArg & MDTformatmask) >> 4];
+	assert(sizeSpec != '\0');
+	assert(formatSpec != '\0');
+	QString spec;
+	spec.sprintf("/%d%c%c", count, sizeSpec, formatSpec);
+
+	return makeCmdString(DCexamine, spec, strArg);
     }
 
     if (cmds[cmd].argsNeeded == GdbCmdInfo::argStringNum)
@@ -2010,6 +2034,11 @@ void GdbDriver::parseDisassemble(const char* output, QList<DisassembledCode>& co
 	c->code = FROM_LATIN1(start, p-start);
 	code.append(c);
     }
+}
+
+QString GdbDriver::parseMemoryDump(const char* output)
+{
+    return output;
 }
 
 

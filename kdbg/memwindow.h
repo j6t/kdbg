@@ -31,6 +31,9 @@ protected:
     QLineEdit m_expression;
     QMultiLineEdit m_memory;
     QVBoxLayout m_layout;
+
+    unsigned m_format;
+
     QPopupMenu m_popup;
 
     virtual void paletteChange(const QPalette& oldPal);
@@ -42,6 +45,7 @@ protected:
 public slots:
     void slotNewExpression();
     void slotTypeChange(int id);
+    void slotNewMemoryDump(const QString&);
 };
 
 #endif // MEMWINDOW_H

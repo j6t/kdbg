@@ -131,6 +131,9 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(m_debugger, SIGNAL(registersChanged(QList<RegisterInfo>&)),
 	    m_registers, SLOT(updateRegisters(QList<RegisterInfo>&)));
 
+    connect(m_debugger, SIGNAL(memoryDumpChanged(const QString&)),
+	    m_memoryWindow, SLOT(slotNewMemoryDump(const QString&)));
+
     // thread window
     connect(m_debugger, SIGNAL(threadsChanged(QList<ThreadInfo>&)),
 	    m_threads, SLOT(updateThreads(QList<ThreadInfo>&)));

@@ -236,6 +236,18 @@ public:
     /** Returns the pid that the debugger is currently attached to. */
     const QString& attachedPid() const { return m_attachedPid; }
 
+    /**
+     * The memory at that the expression evaluates to is watched. Can be
+     * empty. Triggers a redisplay even if the expression did not change.
+     */
+    void setMemoryExpression(const QString& memexpr);
+
+    /**
+     * Sets how the watched memory location is displayed.
+     * Call setMemoryExpression() to force a redisplay.
+     */
+    void setMemoryFormat(unsigned format) { m_memoryFormat = format; }
+
     // settings
     void saveSettings(KConfig*);
     void restoreSettings(KConfig*);
@@ -251,6 +263,8 @@ protected:
     
     QList<VarTree> m_watchEvalExpr;	/* exprs to evaluate for watch windows */
     QArray<Breakpoint*> m_brkpts;
+    QString m_memoryExpression;		/* memory location to watch */
+    unsigned m_memoryFormat;		/* how that output should look */
 
 protected slots:
     void parse(CmdQueueItem* cmd, const char* output);
@@ -269,6 +283,7 @@ protected:
     void handlePrintStruct(CmdQueueItem* cmd, const char* output);
     void handleSharedLibs(const char* output);
     void handleRegisters(const char* output);
+    void handleMemoryDump(const char* output);
     void handleInfoLine(CmdQueueItem* cmd, const char* output);
     void handleDisassemble(CmdQueueItem* cmd, const char* output);
     void handleThreadList(const char* output);
@@ -279,6 +294,7 @@ protected:
     void dereferencePointer(ExprWnd* wnd, VarTree* var, bool immediate);
     void determineType(ExprWnd* wnd, VarTree* var);
     void removeExpr(ExprWnd* wnd, VarTree* var);
+    void queueMemoryDump(bool immediate);
     CmdQueueItem* loadCoreFile();
     void openProgramConfig(const QString& name);
 
@@ -429,6 +445,11 @@ signals:
      * step instruction.
      */
     void programStopped();
+
+    /**
+     * Indicates that a new memory dump output is ready.
+     */
+    void memoryDumpChanged(const QString&);
 
 protected:
     ExprWnd& m_localVariables;

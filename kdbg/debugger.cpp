@@ -38,6 +38,7 @@ KDebugger::KDebugger(QWidget* parent,
 		     ) :
 	QObject(parent, "debugger"),
 	m_ttyLevel(ttyFull),
+	m_memoryFormat(MDTword | MDThex),
 	m_haveExecutable(false),
 	m_programActive(false),
 	m_programRunning(false),
@@ -862,6 +863,9 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCinforegisters:
 	handleRegisters(output);
 	break;
+    case DCexamine:
+	handleMemoryDump(output);
+	break;
     case DCinfoline:
 	handleInfoLine(cmd, output);
 	break;
@@ -1010,6 +1014,11 @@ void KDebugger::updateAllExprs()
 
     // retrieve registers
     m_d->queueCmd(DCinforegisters, DebuggerDriver::QMoverride);
+
+    // get new memory dump
+    if (!m_memoryExpression.isEmpty()) {
+	queueMemoryDump(false);
+    }
 
     // update watch expressions
     KTreeViewItem* item = m_watchVariables.itemAt(0);
@@ -1881,6 +1890,32 @@ void KDebugger::handleThreadList(const char* output)
 void KDebugger::setThread(int id)
 {
     m_d->queueCmd(DCthread, id, DebuggerDriver::QMoverrideMoreEqual);
+}
+
+void KDebugger::setMemoryExpression(const QString& memexpr)
+{
+    m_memoryExpression = memexpr;
+
+    // queue the new expression
+    if (!m_memoryExpression.isEmpty() &&
+	isProgramActive() &&
+	!isProgramRunning())
+    {
+	queueMemoryDump(true);
+    }
+}
+
+void KDebugger::queueMemoryDump(bool immediate)
+{
+    m_d->queueCmd(DCexamine, m_memoryExpression, m_memoryFormat,
+		  immediate ? DebuggerDriver::QMoverrideMoreEqual :
+			      DebuggerDriver::QMoverride);
+}
+
+void KDebugger::handleMemoryDump(const char* output)
+{
+    QString dump = m_d->parseMemoryDump(output);
+    emit memoryDumpChanged(dump);
 }
 
 
