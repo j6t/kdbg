@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.0\n"
-"POT-Creation-Date: 1999-08-22 20:36+0200\n"
+"POT-Creation-Date: 2000-02-19 18:47+0100\n"
 "PO-Revision-Date: 1998-08-06 16:10+MET\n"
 "Last-Translator: Ilmar Habibulin <ilmar@ints.ru>\n"
 "Language-Team: ru@li.org\n"
@@ -13,72 +13,28 @@ msgstr ""
 "Content-Type: text/plain; charset=koi8-r\n"
 "Content-Transfer-Encoding: 8-bit\n"
 
-#: brkpt.cpp:44
-msgid "&Add"
-msgstr "&Добавить"
-
-#: brkpt.cpp:52
-msgid "&View Code"
-msgstr "&Посмотреть код"
-
-#: brkpt.cpp:56
-msgid "&Conditional..."
-msgstr "&Условный..."
-
-#: brkpt.cpp:647
-msgid "E"
-msgstr "E"
-
-#: brkpt.cpp:649
-msgid "Location"
-msgstr "Расположение"
-
-#: brkpt.cpp:650
-msgid "Hits"
-msgstr "Попадания"
-
-#: brkpt.cpp:651
-msgid "Ignore"
-msgstr "Игнорировать"
-
-#: brkpt.cpp:652
-msgid "Condition"
-msgstr "Условие"
-
-#: brkpt.cpp:816
-msgid ": Conditional breakpoint"
-msgstr ": Условная точка останова"
-
-#: brkpt.cpp:819
-msgid "&Condition:"
-msgstr "&Условие:"
-
-#: brkpt.cpp:821
-msgid "Ignore &next hits:"
-msgstr "Игнорировать &следующее попадание:"
-
-#: pgmargs.cpp:33
+#: pgmargs.cpp:34
 msgid ": Program arguments"
 msgstr ": Аргументы программы"
 
-#: pgmargs.cpp:36
+#: pgmargs.cpp:37
 #, c-format
 msgid "Run %s with these arguments:"
 msgstr "Запустить %s со следующими аргументами:"
 
-#: pgmargs.cpp:54
+#: pgmargs.cpp:55
 msgid "Working directory:"
 msgstr "Рабочая директория:"
 
-#: pgmargs.cpp:64
+#: pgmargs.cpp:65
 msgid "Environment variables (NAME=value):"
 msgstr "Переменные окружения (ИМЯ=значение):"
 
-#: pgmargs.cpp:73
+#: pgmargs.cpp:74
 msgid "Name"
 msgstr "Имя"
 
-#: pgmargs.cpp:74
+#: pgmargs.cpp:75 regwnd.cpp:215 regwnd.cpp:223
 msgid "Value"
 msgstr "Значение"
 
@@ -86,32 +42,28 @@ msgstr "Значение"
 msgid "&Modify"
 msgstr "Изменит&ь"
 
-#: procattach.cpp:22
+#: procattach.cpp:23
 msgid ": Attach to process"
 msgstr ": Подсоединиться к процессу"
 
-#: procattach.cpp:26
+#: procattach.cpp:27
 msgid "Specify the process number to attach to:"
 msgstr "Укажите номер порцесса: к которому будем подсоединяться:"
 
-#: debugger.cpp:107
-msgid "Breakpoints"
-msgstr "Точки останова"
-
-#: debugger.cpp:230
+#: debugger.cpp:149
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "`%s' не файл или не существует"
 
-#: debugger.cpp:294
+#: debugger.cpp:222
 msgid "Select the executable to debug"
 msgstr "Выберите исполняемый модуль для отладки"
 
-#: debugger.cpp:336
+#: debugger.cpp:264
 msgid "Select core dump"
 msgstr "Выберите сохраненный образ памяти процесса"
 
-#: debugger.cpp:622
+#: debugger.cpp:529
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
@@ -119,67 +71,138 @@ msgstr ""
 "gdb неожиданно завершился\n"
 "Перезапустите сессию (например, через Файл|Исполняемый модуль."
 
-#: debugger.cpp:704
-msgid ": Program output"
-msgstr ": Вывод программы"
-
-#: debugger.cpp:1178
+#: gdbdriver.cpp:1519
 msgid "New working directory: "
 msgstr "Новая рабочая директория: "
 
-#: dbgmainwnd.cpp:90 winstack.cpp:386 winstack.cpp:396
+#: brkpt.cpp:57
+msgid "&Add"
+msgstr "&Добавить"
+
+#: brkpt.cpp:65
+msgid "&View Code"
+msgstr "&Посмотреть код"
+
+#: brkpt.cpp:69
+msgid "&Conditional..."
+msgstr "&Условный..."
+
+#: brkpt.cpp:266
+msgid "Location"
+msgstr "Расположение"
+
+#: brkpt.cpp:267
+msgid "Hits"
+msgstr "Попадания"
+
+#: brkpt.cpp:268
+msgid "Ignore"
+msgstr "Игнорировать"
+
+#: brkpt.cpp:269
+msgid "Condition"
+msgstr "Условие"
+
+#: brkpt.cpp:370
+msgid ": Conditional breakpoint"
+msgstr ": Условная точка останова"
+
+#: brkpt.cpp:373
+msgid "&Condition:"
+msgstr "&Условие:"
+
+#: brkpt.cpp:375
+msgid "Ignore &next hits:"
+msgstr "Игнорировать &следующее попадание:"
+
+#: regwnd.cpp:214 regwnd.cpp:222
+#, fuzzy
+msgid "Register"
+msgstr "Перезапустить"
+
+#: regwnd.cpp:216 regwnd.cpp:224
+msgid "Decoded value"
+msgstr ""
+
+#: regwnd.cpp:240
+msgid "Binary"
+msgstr ""
+
+#: regwnd.cpp:241
+msgid "Octal"
+msgstr ""
+
+#: regwnd.cpp:242
+msgid "Decimal"
+msgstr ""
+
+#: regwnd.cpp:243
+msgid "Hexadecimal"
+msgstr ""
+
+#: regwnd.cpp:248
+#, fuzzy
+msgid "Font..."
+msgstr "Искать..."
+
+#: regwnd.cpp:249
+#, fuzzy
+msgid "View mode"
+msgstr "&Посмотреть код"
+
+#: dbgmainwnd.cpp:139 winstack.cpp:475 winstack.cpp:485
 msgid "&Open Source..."
 msgstr "&Открыть исходный текст..."
 
-#: dbgmainwnd.cpp:108 winstack.cpp:388
+#: dbgmainwnd.cpp:169 winstack.cpp:477
 msgid "Step &into"
 msgstr "Шаг &внутрь"
 
-#: dbgmainwnd.cpp:109 winstack.cpp:389
+#: dbgmainwnd.cpp:170 winstack.cpp:478
 msgid "Step &over"
 msgstr "Шаг &через"
 
-#: dbgmainwnd.cpp:110 winstack.cpp:390
+#: dbgmainwnd.cpp:171 winstack.cpp:479
 msgid "Step o&ut"
 msgstr "Шаг &изнутри"
 
-#: dbgmainwnd.cpp:111 winstack.cpp:391
+#: dbgmainwnd.cpp:172 winstack.cpp:480
 msgid "Run to &cursor"
 msgstr "Исполнять до &курсора"
 
-#: dbgmainwnd.cpp:125 winstack.cpp:393
+#: dbgmainwnd.cpp:187 winstack.cpp:482
 msgid "Set/Clear &breakpoint"
 msgstr "Установить/Снять &точку останова"
 
-#: dbgmainwnd.cpp:93 winstack.cpp:398
+#: dbgmainwnd.cpp:142 winstack.cpp:487
 msgid "&Executable..."
 msgstr "&Исполняемый модуль..."
 
-#: dbgmainwnd.cpp:94 winstack.cpp:399
+#: dbgmainwnd.cpp:143 winstack.cpp:488
 msgid "&Core dump..."
 msgstr "&Образ памяти..."
 
-#: winstack.cpp:753
+#: winstack.cpp:880
 msgid ": Open Windows"
 msgstr ": Открыть(тые?) Окна"
 
-#: winstack.cpp:761
+#: winstack.cpp:888
 msgid "Show"
 msgstr "Показать"
 
-#: winstack.cpp:829
+#: winstack.cpp:956
 msgid ": Search"
 msgstr ": Поиск"
 
-#: winstack.cpp:835
+#: winstack.cpp:962
 msgid "&Case sensitive"
 msgstr "&Учитывать регистр"
 
-#: winstack.cpp:837
+#: winstack.cpp:964
 msgid "&Forward"
 msgstr "&Переадресация"
 
-#: winstack.cpp:839
+#: winstack.cpp:966
 msgid "&Backward"
 msgstr "&Назад"
 
@@ -206,91 +229,151 @@ msgstr ""
 msgid "&Terminal for program output:"
 msgstr ": Вывод программы"
 
-#: mainwndbase.cpp:27
+#: mainwndbase.cpp:44
 msgid " Add "
 msgstr " Добавить "
 
-#: mainwndbase.cpp:28
+#: mainwndbase.cpp:45
 msgid " Del "
 msgstr " Удалить "
 
-#: mainwndbase.cpp:65
+#: mainwndbase.cpp:104
 msgid "active"
 msgstr "активный"
 
-#: mainwndbase.cpp:285
+#: mainwndbase.cpp:363
 msgid ": Global options"
 msgstr ": Глобальные параметры"
 
-#: dbgmainwnd.cpp:91
+#: mainwndbase.cpp:441
+msgid ": Program output"
+msgstr ": Вывод программы"
+
+#: dbgmainwnd.cpp:36
+#, fuzzy
+msgid "Source"
+msgstr "&Перезагрузить исходный текст"
+
+#: dbgmainwnd.cpp:41
+msgid "Stack"
+msgstr ""
+
+#: dbgmainwnd.cpp:44
+msgid "Locals"
+msgstr ""
+
+#: dbgmainwnd.cpp:47
+msgid "Watches"
+msgstr ""
+
+#: dbgmainwnd.cpp:50
+#, fuzzy
+msgid "Registers"
+msgstr "Перезапустить"
+
+#: dbgmainwnd.cpp:53
+msgid "Breakpoints"
+msgstr "Точки останова"
+
+#: dbgmainwnd.cpp:140
 msgid "&Reload Source"
 msgstr "&Перезагрузить исходный текст"
 
-#: dbgmainwnd.cpp:96
+#: dbgmainwnd.cpp:145
 msgid "&Global Options..."
 msgstr "Глобальные &Параметры..."
 
-#: dbgmainwnd.cpp:102
+#: dbgmainwnd.cpp:153
 msgid "&Find..."
 msgstr "Искать..."
 
-#: dbgmainwnd.cpp:103
+#: dbgmainwnd.cpp:155
+msgid "Source &code"
+msgstr ""
+
+#: dbgmainwnd.cpp:156
+msgid "Stac&k"
+msgstr ""
+
+#: dbgmainwnd.cpp:157
+msgid "&Locals"
+msgstr ""
+
+#: dbgmainwnd.cpp:158
+msgid "&Watched expressions"
+msgstr ""
+
+#: dbgmainwnd.cpp:159
+#, fuzzy
+msgid "&Registers"
+msgstr "Перезапустить"
+
+#: dbgmainwnd.cpp:160
+#, fuzzy
+msgid "&Breakpoints"
+msgstr "Точки останова"
+
+#: dbgmainwnd.cpp:161
+msgid "T&hreads"
+msgstr ""
+
+#: dbgmainwnd.cpp:163
 msgid "Toggle &Toolbar"
 msgstr "Вкл/Выкл панель &инструментов"
 
-#: dbgmainwnd.cpp:104
+#: dbgmainwnd.cpp:164
 msgid "Toggle &Statusbar"
 msgstr "Вкл/Выкл панель &состояния"
 
-#: dbgmainwnd.cpp:107
+#: dbgmainwnd.cpp:168
 msgid "&Run"
 msgstr "Запустить"
 
-#: dbgmainwnd.cpp:113
+#: dbgmainwnd.cpp:174
 msgid "&Break"
 msgstr "&Останов"
 
-#: dbgmainwnd.cpp:114
+#: dbgmainwnd.cpp:175
+msgid "&Kill"
+msgstr ""
+
+#: dbgmainwnd.cpp:176
 msgid "Re&start"
 msgstr "Пере&запуск"
 
-#: dbgmainwnd.cpp:115
+#: dbgmainwnd.cpp:177
 msgid "A&ttach..."
 msgstr "Под&соединение..."
 
-#: dbgmainwnd.cpp:117
+#: dbgmainwnd.cpp:179
 msgid "&Arguments..."
 msgstr "&Аргументы..."
 
-#: dbgmainwnd.cpp:126
+#: dbgmainwnd.cpp:188
 msgid "Set &temporary breakpoint"
 msgstr "Установить &временную точку останова"
 
-#: dbgmainwnd.cpp:127
+#: dbgmainwnd.cpp:189
 msgid "&Enable/Disable breakpoint"
 msgstr "&Вкл/Выкл точку останова"
 
-#: dbgmainwnd.cpp:128
-msgid "&List..."
-msgstr "Список..."
-
-#: dbgmainwnd.cpp:133
+#: dbgmainwnd.cpp:195
 msgid "&More..."
 msgstr "&Дальше..."
 
-#: dbgmainwnd.cpp:144
+#: dbgmainwnd.cpp:206
 msgid "E&xecution"
 msgstr "&Исполнение"
 
-#: dbgmainwnd.cpp:145
+#: dbgmainwnd.cpp:207
 msgid "&Breakpoint"
 msgstr "&Точки останова"
 
-#: dbgmainwnd.cpp:146
+#: dbgmainwnd.cpp:208
 msgid "&Window"
 msgstr "Окно"
 
-#: dbgmainwnd.cpp:150
+#: dbgmainwnd.cpp:212
 msgid ""
 "A Debugger\n"
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
@@ -300,62 +383,68 @@ msgstr ""
 "Автор Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "и много-много еще кого"
 
-#: dbgmainwnd.cpp:163
+#: dbgmainwnd.cpp:235
 msgid "Executable"
 msgstr "Исполняемый модуль"
 
-#: dbgmainwnd.cpp:165
+#: dbgmainwnd.cpp:237
 msgid "Open a source file"
 msgstr "Открыть файл исходных текстов"
 
-#: dbgmainwnd.cpp:167
+#: dbgmainwnd.cpp:239
 msgid "Reload source file"
 msgstr "Перезагрузить файл исходных текстов"
 
-#: dbgmainwnd.cpp:170
+#: dbgmainwnd.cpp:242
 msgid "Run/Continue"
 msgstr "Запустить/Продолжить"
 
-#: dbgmainwnd.cpp:172
+#: dbgmainwnd.cpp:244
 msgid "Step into"
 msgstr "Шаг внутрь"
 
-#: dbgmainwnd.cpp:174
+#: dbgmainwnd.cpp:246
 msgid "Step over"
 msgstr "Шаг через"
 
-#: dbgmainwnd.cpp:176
+#: dbgmainwnd.cpp:248
 msgid "Step out"
 msgstr "Шаг изнутри"
 
-#: dbgmainwnd.cpp:179
+#: dbgmainwnd.cpp:251
 msgid "Breakpoint"
 msgstr "Точка останова"
 
-#: dbgmainwnd.cpp:182
+#: dbgmainwnd.cpp:254
 msgid "Search"
 msgstr "Поиск"
 
-#: dbgmainwnd.cpp:190
+#: dbgmainwnd.cpp:262
 msgid "Line 00000"
 msgstr "Строка 00000"
 
-#: dbgmainwnd.cpp:194
+#: dbgmainwnd.cpp:266
 msgid "Restart"
 msgstr "Перезапустить"
 
-#: dbgmainwnd.cpp:195
+#: dbgmainwnd.cpp:267
 msgid "Core dump"
 msgstr "Образ памяти процесса"
 
-#: dbgmainwnd.cpp:435
+#: dbgmainwnd.cpp:556
 #, c-format
 msgid "Line %d"
 msgstr "Строка %d"
 
-#: main.cpp:57
+#: main.cpp:85 main.cpp:89
 msgid "Cannot start debugger."
 msgstr "Невозможно запустить отладчик."
+
+#~ msgid "&List..."
+#~ msgstr "Список..."
+
+#~ msgid "E"
+#~ msgstr "E"
 
 #~ msgid "&About"
 #~ msgstr "&О программе"

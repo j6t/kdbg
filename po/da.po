@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.0\n"
-"POT-Creation-Date: 1999-08-22 20:36+0200\n"
+"POT-Creation-Date: 2000-02-19 18:47+0100\n"
 "PO-Revision-Date: 1999-04-09 20:32+1\n"
 "Last-Translator: Steen Rabol <rabol@get2net.dk>\n"
 "Language-Team: da <LL@li.org>\n"
@@ -13,72 +13,28 @@ msgstr ""
 "Content-Type: text/plain; charset=ISO_8859-1\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: brkpt.cpp:44
-msgid "&Add"
-msgstr "&Tilføj"
-
-#: brkpt.cpp:52
-msgid "&View Code"
-msgstr "&Vis kode"
-
-#: brkpt.cpp:56
-msgid "&Conditional..."
-msgstr "&Betingelser..."
-
-#: brkpt.cpp:647
-msgid "E"
-msgstr ""
-
-#: brkpt.cpp:649
-msgid "Location"
-msgstr "Lokation"
-
-#: brkpt.cpp:650
-msgid "Hits"
-msgstr ""
-
-#: brkpt.cpp:651
-msgid "Ignore"
-msgstr "Ignorer"
-
-#: brkpt.cpp:652
-msgid "Condition"
-msgstr "Betingelse"
-
-#: brkpt.cpp:816
-msgid ": Conditional breakpoint"
-msgstr ": Betingelses breakpoint"
-
-#: brkpt.cpp:819
-msgid "&Condition:"
-msgstr "&Betingelse:"
-
-#: brkpt.cpp:821
-msgid "Ignore &next hits:"
-msgstr "Ignorer og gå til &næste"
-
-#: pgmargs.cpp:33
+#: pgmargs.cpp:34
 msgid ": Program arguments"
 msgstr ": Program argumenter"
 
-#: pgmargs.cpp:36
+#: pgmargs.cpp:37
 #, c-format
 msgid "Run %s with these arguments:"
 msgstr "Udfør %s med disse parametre"
 
-#: pgmargs.cpp:54
+#: pgmargs.cpp:55
 msgid "Working directory:"
 msgstr ""
 
-#: pgmargs.cpp:64
+#: pgmargs.cpp:65
 msgid "Environment variables (NAME=value):"
 msgstr "Enviroment variable(NAVN=værdi)"
 
-#: pgmargs.cpp:73
+#: pgmargs.cpp:74
 msgid "Name"
 msgstr "Navn"
 
-#: pgmargs.cpp:74
+#: pgmargs.cpp:75 regwnd.cpp:215 regwnd.cpp:223
 msgid "Value"
 msgstr "Værdi"
 
@@ -86,32 +42,28 @@ msgstr "Værdi"
 msgid "&Modify"
 msgstr "&Ændre"
 
-#: procattach.cpp:22
+#: procattach.cpp:23
 msgid ": Attach to process"
 msgstr ": Hæft til proces"
 
-#: procattach.cpp:26
+#: procattach.cpp:27
 msgid "Specify the process number to attach to:"
 msgstr "Specificer det proces nummer der skal hæftes til:"
 
-#: debugger.cpp:107
-msgid "Breakpoints"
-msgstr ""
-
-#: debugger.cpp:230
+#: debugger.cpp:149
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "'%s' er ikke en fil eller findes ikke"
 
-#: debugger.cpp:294
+#: debugger.cpp:222
 msgid "Select the executable to debug"
 msgstr "Vælg program der skal debugges"
 
-#: debugger.cpp:336
+#: debugger.cpp:264
 msgid "Select core dump"
 msgstr "Vælg core dump"
 
-#: debugger.cpp:622
+#: debugger.cpp:529
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
@@ -119,67 +71,137 @@ msgstr ""
 "gdb afsluttede uventet.\n"
 "Genstart sesionen (eks. med fil|Applikation)."
 
-#: debugger.cpp:704
-msgid ": Program output"
-msgstr ""
-
-#: debugger.cpp:1178
+#: gdbdriver.cpp:1519
 msgid "New working directory: "
 msgstr ""
 
-#: dbgmainwnd.cpp:90 winstack.cpp:386 winstack.cpp:396
+#: brkpt.cpp:57
+msgid "&Add"
+msgstr "&Tilføj"
+
+#: brkpt.cpp:65
+msgid "&View Code"
+msgstr "&Vis kode"
+
+#: brkpt.cpp:69
+msgid "&Conditional..."
+msgstr "&Betingelser..."
+
+#: brkpt.cpp:266
+msgid "Location"
+msgstr "Lokation"
+
+#: brkpt.cpp:267
+msgid "Hits"
+msgstr ""
+
+#: brkpt.cpp:268
+msgid "Ignore"
+msgstr "Ignorer"
+
+#: brkpt.cpp:269
+msgid "Condition"
+msgstr "Betingelse"
+
+#: brkpt.cpp:370
+msgid ": Conditional breakpoint"
+msgstr ": Betingelses breakpoint"
+
+#: brkpt.cpp:373
+msgid "&Condition:"
+msgstr "&Betingelse:"
+
+#: brkpt.cpp:375
+msgid "Ignore &next hits:"
+msgstr "Ignorer og gå til &næste"
+
+#: regwnd.cpp:214 regwnd.cpp:222
+#, fuzzy
+msgid "Register"
+msgstr "Genstart"
+
+#: regwnd.cpp:216 regwnd.cpp:224
+msgid "Decoded value"
+msgstr ""
+
+#: regwnd.cpp:240
+msgid "Binary"
+msgstr ""
+
+#: regwnd.cpp:241
+msgid "Octal"
+msgstr ""
+
+#: regwnd.cpp:242
+msgid "Decimal"
+msgstr ""
+
+#: regwnd.cpp:243
+msgid "Hexadecimal"
+msgstr ""
+
+#: regwnd.cpp:248
+msgid "Font..."
+msgstr ""
+
+#: regwnd.cpp:249
+#, fuzzy
+msgid "View mode"
+msgstr "&Vis kode"
+
+#: dbgmainwnd.cpp:139 winstack.cpp:475 winstack.cpp:485
 msgid "&Open Source..."
 msgstr "&Åben kilde kode..."
 
-#: dbgmainwnd.cpp:108 winstack.cpp:388
+#: dbgmainwnd.cpp:169 winstack.cpp:477
 msgid "Step &into"
 msgstr "Gå &ind i"
 
-#: dbgmainwnd.cpp:109 winstack.cpp:389
+#: dbgmainwnd.cpp:170 winstack.cpp:478
 msgid "Step &over"
 msgstr "Spring &over"
 
-#: dbgmainwnd.cpp:110 winstack.cpp:390
+#: dbgmainwnd.cpp:171 winstack.cpp:479
 msgid "Step o&ut"
 msgstr "Hop &ud"
 
-#: dbgmainwnd.cpp:111 winstack.cpp:391
+#: dbgmainwnd.cpp:172 winstack.cpp:480
 msgid "Run to &cursor"
 msgstr "Udfør til markør"
 
-#: dbgmainwnd.cpp:125 winstack.cpp:393
+#: dbgmainwnd.cpp:187 winstack.cpp:482
 msgid "Set/Clear &breakpoint"
 msgstr "Sæt/fjern &breakpoint"
 
-#: dbgmainwnd.cpp:93 winstack.cpp:398
+#: dbgmainwnd.cpp:142 winstack.cpp:487
 msgid "&Executable..."
 msgstr "&Applikation..."
 
-#: dbgmainwnd.cpp:94 winstack.cpp:399
+#: dbgmainwnd.cpp:143 winstack.cpp:488
 msgid "&Core dump..."
 msgstr ""
 
-#: winstack.cpp:753
+#: winstack.cpp:880
 msgid ": Open Windows"
 msgstr ": Åben vindue"
 
-#: winstack.cpp:761
+#: winstack.cpp:888
 msgid "Show"
 msgstr "Vis"
 
-#: winstack.cpp:829
+#: winstack.cpp:956
 msgid ": Search"
 msgstr ": Søg"
 
-#: winstack.cpp:835
+#: winstack.cpp:962
 msgid "&Case sensitive"
 msgstr "&Forskel på store og små bogstaver"
 
-#: winstack.cpp:837
+#: winstack.cpp:964
 msgid "&Forward"
 msgstr "&Fremad"
 
-#: winstack.cpp:839
+#: winstack.cpp:966
 msgid "&Backward"
 msgstr "&Baglæns"
 
@@ -202,91 +224,151 @@ msgstr ""
 msgid "&Terminal for program output:"
 msgstr ""
 
-#: mainwndbase.cpp:27
+#: mainwndbase.cpp:44
 msgid " Add "
 msgstr " Tilføj "
 
-#: mainwndbase.cpp:28
+#: mainwndbase.cpp:45
 msgid " Del "
 msgstr " Slet "
 
-#: mainwndbase.cpp:65
+#: mainwndbase.cpp:104
 msgid "active"
 msgstr "aktiv"
 
-#: mainwndbase.cpp:285
+#: mainwndbase.cpp:363
 msgid ": Global options"
 msgstr ""
 
-#: dbgmainwnd.cpp:91
+#: mainwndbase.cpp:441
+msgid ": Program output"
+msgstr ""
+
+#: dbgmainwnd.cpp:36
+#, fuzzy
+msgid "Source"
+msgstr "&Genlæs kilde kode"
+
+#: dbgmainwnd.cpp:41
+msgid "Stack"
+msgstr ""
+
+#: dbgmainwnd.cpp:44
+msgid "Locals"
+msgstr ""
+
+#: dbgmainwnd.cpp:47
+msgid "Watches"
+msgstr ""
+
+#: dbgmainwnd.cpp:50
+#, fuzzy
+msgid "Registers"
+msgstr "Genstart"
+
+#: dbgmainwnd.cpp:53
+msgid "Breakpoints"
+msgstr ""
+
+#: dbgmainwnd.cpp:140
 msgid "&Reload Source"
 msgstr "&Genlæs kilde kode"
 
-#: dbgmainwnd.cpp:96
+#: dbgmainwnd.cpp:145
 msgid "&Global Options..."
 msgstr ""
 
-#: dbgmainwnd.cpp:102
+#: dbgmainwnd.cpp:153
 msgid "&Find..."
 msgstr ""
 
-#: dbgmainwnd.cpp:103
+#: dbgmainwnd.cpp:155
+msgid "Source &code"
+msgstr ""
+
+#: dbgmainwnd.cpp:156
+msgid "Stac&k"
+msgstr ""
+
+#: dbgmainwnd.cpp:157
+msgid "&Locals"
+msgstr ""
+
+#: dbgmainwnd.cpp:158
+msgid "&Watched expressions"
+msgstr ""
+
+#: dbgmainwnd.cpp:159
+#, fuzzy
+msgid "&Registers"
+msgstr "Genstart"
+
+#: dbgmainwnd.cpp:160
+#, fuzzy
+msgid "&Breakpoints"
+msgstr "Sæt/fjern &breakpoint"
+
+#: dbgmainwnd.cpp:161
+msgid "T&hreads"
+msgstr ""
+
+#: dbgmainwnd.cpp:163
 msgid "Toggle &Toolbar"
 msgstr "Vis/gem &toolbar"
 
-#: dbgmainwnd.cpp:104
+#: dbgmainwnd.cpp:164
 msgid "Toggle &Statusbar"
 msgstr "Vis/gem &statusbar"
 
-#: dbgmainwnd.cpp:107
+#: dbgmainwnd.cpp:168
 msgid "&Run"
 msgstr "&Udfør"
 
-#: dbgmainwnd.cpp:113
+#: dbgmainwnd.cpp:174
 msgid "&Break"
 msgstr ""
 
-#: dbgmainwnd.cpp:114
+#: dbgmainwnd.cpp:175
+msgid "&Kill"
+msgstr ""
+
+#: dbgmainwnd.cpp:176
 msgid "Re&start"
 msgstr "Gen&start"
 
-#: dbgmainwnd.cpp:115
+#: dbgmainwnd.cpp:177
 msgid "A&ttach..."
 msgstr "&Vedhæft..."
 
-#: dbgmainwnd.cpp:117
+#: dbgmainwnd.cpp:179
 msgid "&Arguments..."
 msgstr "&Argumenter..."
 
-#: dbgmainwnd.cpp:126
+#: dbgmainwnd.cpp:188
 msgid "Set &temporary breakpoint"
 msgstr "Sæt midlertidigt breakpoint"
 
-#: dbgmainwnd.cpp:127
+#: dbgmainwnd.cpp:189
 msgid "&Enable/Disable breakpoint"
 msgstr "&Aktiver/Deaktiver breakpoint"
 
-#: dbgmainwnd.cpp:128
-msgid "&List..."
-msgstr ""
-
-#: dbgmainwnd.cpp:133
+#: dbgmainwnd.cpp:195
 msgid "&More..."
 msgstr "&Mere..."
 
-#: dbgmainwnd.cpp:144
+#: dbgmainwnd.cpp:206
 msgid "E&xecution"
 msgstr "&Udførelse"
 
-#: dbgmainwnd.cpp:145
+#: dbgmainwnd.cpp:207
 msgid "&Breakpoint"
 msgstr ""
 
-#: dbgmainwnd.cpp:146
+#: dbgmainwnd.cpp:208
 msgid "&Window"
 msgstr "&Vindue"
 
-#: dbgmainwnd.cpp:150
+#: dbgmainwnd.cpp:212
 msgid ""
 "A Debugger\n"
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
@@ -296,60 +378,60 @@ msgstr ""
 "af Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "med hjælp fra mange andre"
 
-#: dbgmainwnd.cpp:163
+#: dbgmainwnd.cpp:235
 msgid "Executable"
 msgstr "Applikation"
 
-#: dbgmainwnd.cpp:165
+#: dbgmainwnd.cpp:237
 msgid "Open a source file"
 msgstr "Åben en kilde kode fil"
 
-#: dbgmainwnd.cpp:167
+#: dbgmainwnd.cpp:239
 msgid "Reload source file"
 msgstr "Genlæs kilde kode"
 
-#: dbgmainwnd.cpp:170
+#: dbgmainwnd.cpp:242
 msgid "Run/Continue"
 msgstr "Udfør/fortsæt"
 
-#: dbgmainwnd.cpp:172
+#: dbgmainwnd.cpp:244
 msgid "Step into"
 msgstr "Hop ind i"
 
-#: dbgmainwnd.cpp:174
+#: dbgmainwnd.cpp:246
 msgid "Step over"
 msgstr "Spring over"
 
-#: dbgmainwnd.cpp:176
+#: dbgmainwnd.cpp:248
 msgid "Step out"
 msgstr "Hop ud"
 
-#: dbgmainwnd.cpp:179
+#: dbgmainwnd.cpp:251
 msgid "Breakpoint"
 msgstr ""
 
-#: dbgmainwnd.cpp:182
+#: dbgmainwnd.cpp:254
 msgid "Search"
 msgstr "Søg"
 
-#: dbgmainwnd.cpp:190
+#: dbgmainwnd.cpp:262
 msgid "Line 00000"
 msgstr "Linie 00000"
 
-#: dbgmainwnd.cpp:194
+#: dbgmainwnd.cpp:266
 msgid "Restart"
 msgstr "Genstart"
 
-#: dbgmainwnd.cpp:195
+#: dbgmainwnd.cpp:267
 msgid "Core dump"
 msgstr ""
 
-#: dbgmainwnd.cpp:435
+#: dbgmainwnd.cpp:556
 #, c-format
 msgid "Line %d"
 msgstr "Linie %d"
 
-#: main.cpp:57
+#: main.cpp:85 main.cpp:89
 msgid "Cannot start debugger."
 msgstr "Kan ikke starte debugger"
 

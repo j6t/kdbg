@@ -1,180 +1,182 @@
 # KDbg - Debugger GUI for gdb
-# Copyright (C) 1998,1999 Johannes Sixt
-# Johannes Sixt <Johannes.Sixt@telecom.at>, 1999
+# Copyright (C) 1998,1999,2000 Johannes Sixt
+# Johannes Sixt <Johannes.Sixt@telecom.at>, 2000
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 1.0\n"
+"Project-Id-Version: kdbg 1.0.3\n"
 "POT-Creation-Date: 2000-02-19 18:47+0100\n"
-"PO-Revision-Date: 2000-02-15 21:50+0100\n"
-"Last-Translator: Johannes Sixt <Johannes.Sixt@telecom.at>\n"
-"Language-Team: none\n"
+"PO-Revision-Date: 1999-12-31 23:00+0100\n"
+"Last-Translator: Örjan Lindbergh <orjan.lindbergh@telia.com>\n"
+"Language-Team: (None)\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=ISO8859-1\n"
-"Content-Transfer-Encoding: 8-bit\n"
+"Content-Type: text/plain; charset=ISO_8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 #: pgmargs.cpp:34
 msgid ": Program arguments"
-msgstr ": Programmargumente"
+msgstr "Program argument"
 
 #: pgmargs.cpp:37
 #, c-format
 msgid "Run %s with these arguments:"
-msgstr "%s mit folgenden Argumenten ausführen:"
+msgstr "Kör %s med dessa argument:"
 
 #: pgmargs.cpp:55
 msgid "Working directory:"
-msgstr "Arbeitsverzeichnis:"
+msgstr "Arbets katalog:"
 
 #: pgmargs.cpp:65
 msgid "Environment variables (NAME=value):"
-msgstr "Umgebungsvariablen (NAME=Wert)"
+msgstr "Miljö variabel  (Namn=värde):"
 
 #: pgmargs.cpp:74
 msgid "Name"
-msgstr "Name"
+msgstr "Namn"
 
 #: pgmargs.cpp:75 regwnd.cpp:215 regwnd.cpp:223
 msgid "Value"
-msgstr "Wert"
+msgstr "Värde"
 
 #: pgmargs.cpp:93
 msgid "&Modify"
-msgstr "Ä&ndern"
+msgstr "&Ändra"
 
 #: procattach.cpp:23
 msgid ": Attach to process"
-msgstr ": An Prozess attachen"
+msgstr "Lägg till processen"
 
 #: procattach.cpp:27
 msgid "Specify the process number to attach to:"
-msgstr "Geben Sie die Prozessnummer ein:"
+msgstr "Specifiera processnumret att lägga till"
 
 #: debugger.cpp:149
 #, c-format
 msgid "`%s' is not a file or does not exist"
-msgstr "`%s' ist keine Datei oder existiert nicht"
+msgstr "`%s' är inte någon fil eller så finns den inte"
 
 #: debugger.cpp:222
 msgid "Select the executable to debug"
-msgstr "Ausführbares Programm zum Debuggen wählen"
+msgstr "Välj exefil för avlusning"
 
 #: debugger.cpp:264
 msgid "Select core dump"
-msgstr "Core dump wählen"
+msgstr "Välj core dump"
 
 #: debugger.cpp:529
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
-"gdb wurde unerwartet beendet\n"
-"Sie müssen die Sitzung neu starten (z.B. mit Datei|Programm)."
+"gdb avslutades oväntat.\n"
+"Starta om programmet (e.g. med Fil|exefil)."
 
 #: gdbdriver.cpp:1519
 msgid "New working directory: "
-msgstr "Neues Arbeitsverzeichnis: "
+msgstr "Ny arbets katalog:"
 
 #: brkpt.cpp:57
 msgid "&Add"
-msgstr "&Hinzufügen"
+msgstr "&Lägg till"
 
 #: brkpt.cpp:65
 msgid "&View Code"
-msgstr "&Code anzeigen"
+msgstr "&Visa kod"
 
 #: brkpt.cpp:69
 msgid "&Conditional..."
-msgstr "&Bedingt..."
+msgstr "Beroende..."
 
 #: brkpt.cpp:266
 msgid "Location"
-msgstr "Ort"
+msgstr "Plats"
 
 #: brkpt.cpp:267
 msgid "Hits"
-msgstr "Stops"
+msgstr "Träffar"
 
 #: brkpt.cpp:268
 msgid "Ignore"
-msgstr "Ignorieren"
+msgstr "Ingorera"
 
 #: brkpt.cpp:269
 msgid "Condition"
-msgstr "Bedingung"
+msgstr "Vilkor"
 
 #: brkpt.cpp:370
 msgid ": Conditional breakpoint"
-msgstr ": Bedingten Haltepunkt setzen"
+msgstr "Beroende brytpunkt"
 
 #: brkpt.cpp:373
 msgid "&Condition:"
-msgstr "&Bedingung:"
+msgstr "&Villkor"
 
 #: brkpt.cpp:375
 msgid "Ignore &next hits:"
-msgstr "Ignoriere &nächste Treffer:"
+msgstr "Ignorera &nästa träff:"
 
 #: regwnd.cpp:214 regwnd.cpp:222
 #, fuzzy
 msgid "Register"
-msgstr "Erneut ausführen"
+msgstr "Starta om"
 
 #: regwnd.cpp:216 regwnd.cpp:224
 msgid "Decoded value"
-msgstr "Dekodierter Wert"
+msgstr ""
 
 #: regwnd.cpp:240
 msgid "Binary"
-msgstr "Binär"
+msgstr ""
 
 #: regwnd.cpp:241
 msgid "Octal"
-msgstr "Oktal"
+msgstr ""
 
 #: regwnd.cpp:242
 msgid "Decimal"
-msgstr "Dezimal"
+msgstr ""
 
 #: regwnd.cpp:243
 msgid "Hexadecimal"
-msgstr "Hexadezimal"
+msgstr ""
 
 #: regwnd.cpp:248
+#, fuzzy
 msgid "Font..."
-msgstr "Schriftart..."
+msgstr "&Sök..."
 
 #: regwnd.cpp:249
+#, fuzzy
 msgid "View mode"
-msgstr "Anzeigemodus"
+msgstr "&Visa kod"
 
 #: dbgmainwnd.cpp:139 winstack.cpp:475 winstack.cpp:485
 msgid "&Open Source..."
-msgstr "Quellcode Ö&ffnen..."
+msgstr "&Öpnna källa..."
 
 #: dbgmainwnd.cpp:169 winstack.cpp:477
 msgid "Step &into"
-msgstr "&In Funktion"
+msgstr "Stega &in"
 
 #: dbgmainwnd.cpp:170 winstack.cpp:478
 msgid "Step &over"
-msgstr "Ü&ber Funktion"
+msgstr "Stega &över"
 
 #: dbgmainwnd.cpp:171 winstack.cpp:479
 msgid "Step o&ut"
-msgstr "&Aus Funktion"
+msgstr "stega u&t"
 
 #: dbgmainwnd.cpp:172 winstack.cpp:480
 msgid "Run to &cursor"
-msgstr "&Zum Cursor"
+msgstr "Kör till &markör"
 
 #: dbgmainwnd.cpp:187 winstack.cpp:482
 msgid "Set/Clear &breakpoint"
-msgstr "&Setzen/entfernen"
+msgstr "Sätt/rensa &brytpunkt"
 
 #: dbgmainwnd.cpp:142 winstack.cpp:487
 msgid "&Executable..."
-msgstr "&Programm..."
+msgstr "Körbar..."
 
 #: dbgmainwnd.cpp:143 winstack.cpp:488
 msgid "&Core dump..."
@@ -182,35 +184,35 @@ msgstr "&Core dump..."
 
 #: winstack.cpp:880
 msgid ": Open Windows"
-msgstr ": Geöffnete Quellcodedateien"
+msgstr "Öpnna fönster"
 
 #: winstack.cpp:888
 msgid "Show"
-msgstr "Anzeigen"
+msgstr "Visa"
 
 #: winstack.cpp:956
 msgid ": Search"
-msgstr ": Suche"
+msgstr ": Sök"
 
 #: winstack.cpp:962
 msgid "&Case sensitive"
-msgstr "&Groß-/Kleinschreibung"
+msgstr "&Gör skillnad på små och stora bokstäver"
 
 #: winstack.cpp:964
 msgid "&Forward"
-msgstr "&Vorwärts"
+msgstr "&Framåt"
 
 #: winstack.cpp:966
 msgid "&Backward"
-msgstr "&Rückwärts"
+msgstr "&Bakåt"
 
 #: prefdebugger.cpp:23
 msgid "To revert to the default settings, clear the entries."
-msgstr "Standardeinstellungen werden verwendet, wenn die Einträge leer sind."
+msgstr "För att sätta på dom ordinarie inställningarna, ta bort texten"
 
 #: prefdebugger.cpp:27
 msgid "How to invoke &GDB:"
-msgstr "Aufruf von &GDB:"
+msgstr "Hur man anropar &GDB:"
 
 #: prefdebugger.cpp:34
 msgid ""
@@ -218,21 +220,21 @@ msgid ""
 "%C will be replaced by a Bourne shell script that\n"
 "keeps the terminal window open."
 msgstr ""
-"%T wird durch eine Überschrift ersetzt,\n"
-"%C wird durch eine Bourne-Shell-Skript ersetzt, das\n"
-"das Terminal-Fenster offen hält."
+"%T kommer att bytas mot en text\n"
+"%C kommer att bytas mot ett Bourne skript som\n"
+"behåller terminalfönstret öppet."
 
 #: prefdebugger.cpp:40
 msgid "&Terminal for program output:"
-msgstr "&Terminal für die Programmausgabe"
+msgstr "&Terminal för programutskrift:"
 
 #: mainwndbase.cpp:44
 msgid " Add "
-msgstr " Neu "
+msgstr "Lägg till"
 
 #: mainwndbase.cpp:45
 msgid " Del "
-msgstr " Entf "
+msgstr " Ta bort "
 
 #: mainwndbase.cpp:104
 msgid "active"
@@ -240,131 +242,135 @@ msgstr "aktiv"
 
 #: mainwndbase.cpp:363
 msgid ": Global options"
-msgstr ": Globale Einstellungen"
+msgstr ": Allmänna inställningar"
 
 #: mainwndbase.cpp:441
 msgid ": Program output"
-msgstr ": Programmausgabe"
+msgstr ": Programutskrift"
 
 #: dbgmainwnd.cpp:36
+#, fuzzy
 msgid "Source"
-msgstr "Quellcode"
+msgstr "&Ladda om källa"
 
 #: dbgmainwnd.cpp:41
 msgid "Stack"
-msgstr "Stack"
+msgstr ""
 
 #: dbgmainwnd.cpp:44
 msgid "Locals"
-msgstr "Lokale Variablen"
+msgstr ""
 
 #: dbgmainwnd.cpp:47
 msgid "Watches"
-msgstr "Ausdrücke"
+msgstr ""
 
 #: dbgmainwnd.cpp:50
+#, fuzzy
 msgid "Registers"
-msgstr "Register"
+msgstr "Starta om"
 
 #: dbgmainwnd.cpp:53
 msgid "Breakpoints"
-msgstr "Haltepunkte"
+msgstr "Brytpunkt"
 
 #: dbgmainwnd.cpp:140
 msgid "&Reload Source"
-msgstr "E&rneut laden"
+msgstr "&Ladda om källa"
 
 #: dbgmainwnd.cpp:145
 msgid "&Global Options..."
-msgstr "&Globale Einstellungen..."
+msgstr "&Allmänna inställningar..."
 
 #: dbgmainwnd.cpp:153
 msgid "&Find..."
-msgstr "S&uchen..."
+msgstr "&Sök..."
 
 #: dbgmainwnd.cpp:155
 msgid "Source &code"
-msgstr "&Quellcode"
+msgstr ""
 
 #: dbgmainwnd.cpp:156
 msgid "Stac&k"
-msgstr "Stac&k"
+msgstr ""
 
 #: dbgmainwnd.cpp:157
 msgid "&Locals"
-msgstr "&Lokale Variablen"
+msgstr ""
 
 #: dbgmainwnd.cpp:158
 msgid "&Watched expressions"
-msgstr "&Ausdrücke"
+msgstr ""
 
 #: dbgmainwnd.cpp:159
+#, fuzzy
 msgid "&Registers"
-msgstr "&Register"
+msgstr "Starta om"
 
 #: dbgmainwnd.cpp:160
+#, fuzzy
 msgid "&Breakpoints"
-msgstr "&Haltepunkte"
+msgstr "Brytpunkt"
 
 #: dbgmainwnd.cpp:161
 msgid "T&hreads"
-msgstr "&Threads"
+msgstr ""
 
 #: dbgmainwnd.cpp:163
 msgid "Toggle &Toolbar"
-msgstr "&Werkzeugleiste ein-/ausblenden"
+msgstr "Sätt på &verktygsraden"
 
 #: dbgmainwnd.cpp:164
 msgid "Toggle &Statusbar"
-msgstr "&Statusleiste ein-/ausblenden"
+msgstr "Sätt på &statusraden"
 
 #: dbgmainwnd.cpp:168
 msgid "&Run"
-msgstr "Aus&führen"
+msgstr "&Kör"
 
 #: dbgmainwnd.cpp:174
 msgid "&Break"
-msgstr "&Unterbrechen"
+msgstr "&Bryt"
 
 #: dbgmainwnd.cpp:175
 msgid "&Kill"
-msgstr "Been&den"
+msgstr "&Stoppa"
 
 #: dbgmainwnd.cpp:176
 msgid "Re&start"
-msgstr "&Erneut ausführen"
+msgstr "St&arta om"
 
 #: dbgmainwnd.cpp:177
 msgid "A&ttach..."
-msgstr "A&ttachen..."
+msgstr "L&ägg till..."
 
 #: dbgmainwnd.cpp:179
 msgid "&Arguments..."
-msgstr "Argu&mente..."
+msgstr "&Argument..."
 
 #: dbgmainwnd.cpp:188
 msgid "Set &temporary breakpoint"
-msgstr "&Temporären Haltepunkt setzen"
+msgstr "Sätt &temoprär brytpunkt"
 
 #: dbgmainwnd.cpp:189
 msgid "&Enable/Disable breakpoint"
-msgstr "&Aktiv/inaktiv"
+msgstr "&Sätt på/ stäng av brytpunkt"
 
 #: dbgmainwnd.cpp:195
 msgid "&More..."
-msgstr "&Weitere..."
+msgstr "&Mer..."
 
 #: dbgmainwnd.cpp:206
 msgid "E&xecution"
-msgstr "A&usführung"
+msgstr "K&ör"
 
 #: dbgmainwnd.cpp:207
 msgid "&Breakpoint"
-msgstr "Halte&punkt"
+msgstr "&Brytpunkt"
 
 #: dbgmainwnd.cpp:208
 msgid "&Window"
-msgstr "&Fenster"
+msgstr "&Fönster"
 
 #: dbgmainwnd.cpp:212
 msgid ""
@@ -372,53 +378,53 @@ msgid ""
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "with the help of many others"
 msgstr ""
-"Ein Debugger\n"
-"von Johannes Sixt <Johannes.Sixt@telecom.at>\n"
-"und vielen weiteren Helfern"
+"En avlusare\n"
+"av Johannes Sixt <Johannes.Sixt@telecom.at>\n"
+"med hjälp av många andra"
 
 #: dbgmainwnd.cpp:235
 msgid "Executable"
-msgstr "Programm"
+msgstr "Körbar"
 
 #: dbgmainwnd.cpp:237
 msgid "Open a source file"
-msgstr "Quelldatei öffnen"
+msgstr "Öppna en källfil"
 
 #: dbgmainwnd.cpp:239
 msgid "Reload source file"
-msgstr "Erneut laden"
+msgstr "Ladda om källfilen"
 
 #: dbgmainwnd.cpp:242
 msgid "Run/Continue"
-msgstr "Ausführen/Fortsetzen"
+msgstr "Kör/fortsätt"
 
 #: dbgmainwnd.cpp:244
 msgid "Step into"
-msgstr "In Funktion"
+msgstr "Stig in i"
 
 #: dbgmainwnd.cpp:246
 msgid "Step over"
-msgstr "Über Funktion"
+msgstr "Stega över"
 
 #: dbgmainwnd.cpp:248
 msgid "Step out"
-msgstr "Aus Funktion"
+msgstr "Stega ut"
 
 #: dbgmainwnd.cpp:251
 msgid "Breakpoint"
-msgstr "Haltepunkt"
+msgstr "Brytpunkt"
 
 #: dbgmainwnd.cpp:254
 msgid "Search"
-msgstr "Suche"
+msgstr "Sök"
 
 #: dbgmainwnd.cpp:262
 msgid "Line 00000"
-msgstr "Zeile 00000"
+msgstr "Rad 00000"
 
 #: dbgmainwnd.cpp:266
 msgid "Restart"
-msgstr "Erneut ausführen"
+msgstr "Starta om"
 
 #: dbgmainwnd.cpp:267
 msgid "Core dump"
@@ -427,35 +433,11 @@ msgstr "Core dump"
 #: dbgmainwnd.cpp:556
 #, c-format
 msgid "Line %d"
-msgstr "Zeile %d"
+msgstr "Rad %d"
 
 #: main.cpp:85 main.cpp:89
 msgid "Cannot start debugger."
-msgstr "Kann Debugger nicht ausführen."
+msgstr "Kan inte starta avlusaren."
 
 #~ msgid "&List..."
-#~ msgstr "&Liste..."
-
-#~ msgid "E"
-#~ msgstr "A"
-
-#~ msgid "&Remove"
-#~ msgstr "&Entfernen"
-
-#~ msgid "Close"
-#~ msgstr "Schließen"
-
-#~ msgid "OK"
-#~ msgstr "OK"
-
-#~ msgid "Cancel"
-#~ msgstr "Abbrechen"
-
-#~ msgid "&Quit"
-#~ msgstr "&Beenden"
-
-#~ msgid "&View"
-#~ msgstr "&Ansicht"
-
-#~ msgid "&Help"
-#~ msgstr "&Hilfe"
+#~ msgstr "&Visa brytpunkter"
