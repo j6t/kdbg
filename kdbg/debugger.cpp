@@ -813,6 +813,12 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCinforegisters:
 	handleRegisters(output);
 	break;
+    case DCinfoline:
+	handleInfoLine(cmd, output);
+	break;
+    case DCdisassemble:
+	handleDisassemble(cmd, output);
+	break;
     case DCframe:
 	handleFrameChange(output);
 	updateAllExprs();
@@ -1765,6 +1771,35 @@ void KDebugger::slotValuePopup(const QString& expr)
 	}
     }
     emit valuePopup(tip);
+}
+
+void KDebugger::slotDisassemble(const QString& fileName, int lineNo)
+{
+    CmdQueueItem* cmd = m_d->queueCmd(DCinfoline, fileName, lineNo,
+				      DebuggerDriver::QMoverrideMoreEqual);
+    cmd->m_fileName = fileName;
+    cmd->m_lineNo = lineNo;
+}
+
+void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
+{
+    QString addrFrom, addrTo;
+    if (m_d->parseInfoLine(output, addrFrom, addrTo)) {
+	// got the address range, now get the real code
+	CmdQueueItem* c = m_d->queueCmd(DCdisassemble, addrFrom, addrTo,
+					DebuggerDriver::QMoverrideMoreEqual);
+	c->m_fileName = cmd->m_fileName;
+	c->m_lineNo = cmd->m_lineNo;
+    } else {
+	// no code
+	emit disassembled(cmd->m_fileName, cmd->m_lineNo, QString());
+    }
+}
+
+void KDebugger::handleDisassemble(CmdQueueItem* cmd, const char* output)
+{
+    QString code = m_d->parseDisassemble(output);
+    emit disassembled(cmd->m_fileName, cmd->m_lineNo, code);
 }
 
 

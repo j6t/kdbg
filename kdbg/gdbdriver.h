@@ -41,6 +41,8 @@ public:
 				   QueueMode mode);
     virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg, int intArg,
 				   QueueMode mode);
+    virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg1, QString strArg2,
+				   QueueMode mode);
 
     virtual void terminate();
     virtual void interruptInferior();
@@ -61,6 +63,9 @@ public:
     virtual void parseSharedLibs(const char* output, QStrList& shlibs);
     virtual bool parseFindType(const char* output, QString& type);
     virtual void parseRegisters(const char* output, QList<RegisterInfo>& regs);
+    virtual bool parseInfoLine(const char* output,
+			       QString& addrFrom, QString& addrTo);
+    virtual QString parseDisassemble(const char* output);
 protected:
     int m_gdbMajor, m_gdbMinor;
     QString m_programWD;		/* just an intermediate storage */

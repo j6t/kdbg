@@ -82,6 +82,8 @@ static GdbCmdInfo cmds[] = {
     { DCinfolinemain, "info line main\n", GdbCmdInfo::argNone },
     { DCinfolocals, "kdbg__alllocals\n", GdbCmdInfo::argNone },
     { DCinforegisters, "info all-registers\n", GdbCmdInfo::argNone},
+    { DCinfoline, "info line %s:%d\n", GdbCmdInfo::argStringNum },
+    { DCdisassemble, "disassemble %s %s\n", GdbCmdInfo::argString2 },
     { DCsetargs, "set args %s\n", GdbCmdInfo::argString },
     { DCsetenv, "set env %s %s\n", GdbCmdInfo::argString2 },
     { DCunsetenv, "unset env %s\n", GdbCmdInfo::argString },
@@ -218,6 +220,7 @@ bool GdbDriver::startup(QString cmdStr)
 	"set editing off\n"
 	"set confirm off\n"
 	"set print static-members off\n"
+	"set print asm-demangle on\n"
 	/*
 	 * Write a short macro that prints all locals: local variables and
 	 * function arguments.
@@ -412,8 +415,18 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
     if (cmds[cmd].argsNeeded == GdbCmdInfo::argStringNum)
     {
 	// line numbers are zero-based
-	if (cmd == DCuntil || cmd == DCbreakline || cmd == DCtbreakline)
+	if (cmd == DCuntil || cmd == DCbreakline ||
+	    cmd == DCtbreakline || cmd == DCinfoline)
+	{
 	    intArg++;
+	}
+	if (cmd == DCinfoline)
+	{
+	    // must split off file name part
+	    int slash = strArg.findRev('/');
+	    if (slash >= 0)
+		strArg = strArg.right(strArg.length()-slash-1);
+	}
 	cmdString.sprintf(cmds[cmd].fmt, LATIN1(strArg), intArg);
     }
     else
@@ -507,6 +520,12 @@ CmdQueueItem* GdbDriver::queueCmd(DbgCommand cmd, QString strArg, int intArg,
 				  QueueMode mode)
 {
     return queueCmdString(cmd, makeCmdString(cmd, strArg, intArg), mode);
+}
+
+CmdQueueItem* GdbDriver::queueCmd(DbgCommand cmd, QString strArg1, QString strArg2,
+				  QueueMode mode)
+{
+    return queueCmdString(cmd, makeCmdString(cmd, strArg1, strArg2), mode);
 }
 
 void GdbDriver::terminate()
@@ -1769,6 +1788,86 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 
 	regs.append(reg);
     }
+}
+
+bool GdbDriver::parseInfoLine(const char* output, QString& addrFrom, QString& addrTo)
+{
+    const char* start = strstr(output, "starts at address ");
+    if (start == 0)
+	return false;
+
+    start += 18;
+    const char* p = start;
+    while (*p != '\0' && !isspace(*p))
+	p++;
+    addrFrom = FROM_LATIN1(start, p-start);
+
+    start = strstr(p, "and ends at ");
+    if (start == 0)
+	return false;
+
+    start += 12;
+    p = start;
+    while (*p != '\0' && !isspace(*p))
+	p++;
+    addrTo = FROM_LATIN1(start, p-start);
+
+    return true;
+}
+
+QString GdbDriver::parseDisassemble(const char* output)
+{
+    if (strncmp(output, "Dump of assembler", 17) != 0) {
+	// error message?
+	return output;
+    }
+
+    // remove first line
+    const char* p = strchr(output, '\n');
+    if (p == 0)
+	return QString();		/* not a regular output */
+
+    p++;
+
+    // remove last line
+    const char* end = strstr(output, "\nEnd of assembler");
+    if (end == 0)
+	end = p + strlen(p);
+
+    QString code;
+
+    // remove function offsets from the lines
+    while (p != end)
+    {
+	const char* start = p;
+	// address
+	while (p != end && !isspace(*p))
+	    p++;
+	code += FROM_LATIN1(start, p-start);
+	code += ' ';
+
+	// function name (enclosed in '<>', followed by ':')
+	while (p != end && *p != '<')
+	    p++;
+	if (*p == '<')
+	    skipNested(p, '<', '>');
+	if (*p == ':')
+	    p++;
+
+	// space until code
+	while (p != end && isspace(*p))
+	    p++;
+
+	// code until end of line
+	start = p;
+	while (p != end && *p != '\n')
+	    p++;
+	if (p != end)			/* include '\n' */
+	    p++;
+	code += FROM_LATIN1(start, p-start);
+    }
+
+    return code;
 }
 
 

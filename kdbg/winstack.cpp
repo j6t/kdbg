@@ -174,6 +174,10 @@ bool WinStack::activatePath(QString pathName, int lineNo)
 	connect(fw, SIGNAL(clickedRight(const QPoint &)),
 		SLOT(slotFileWindowRightClick(const QPoint &)));
 
+	// disassemble code
+	connect(fw, SIGNAL(disassemble(const QString&, int)),
+		SIGNAL(disassemble(const QString&, int)));
+
 	changeWindowMenu();
 	
 	// slurp the file in
@@ -374,6 +378,38 @@ void WinStack::maybeTip(const QPoint& p)
 void WinStack::slotShowValueTip(const QString& tipText)
 {
     m_valueTip.tip(m_tipLocation, tipText);
+}
+
+void WinStack::slotDisassembled(const QString& fileName, int lineNo,
+				const QString& disass)
+{
+    // lookup the file
+    SourceWindow* fw;
+    for (fw = m_fileList.first(); fw != 0; fw = m_fileList.next()) {
+	if (fw->fileNameMatches(fileName)) {
+	    break;
+	}
+    }
+    if (fw == 0) {
+	// not found: ignore
+	return;
+    }
+
+    // break up the code in pieces
+    ValArray<QString> disassLines;
+    int start = 0;
+    int p;
+    while ((p = disass.find('\n', start)) >= 0) {
+	QString l = disass.mid(start, p-start);
+	start = p+1;
+	disassLines.append(l);
+    }
+    QString l = disass.right(disass.length()-start);
+    if (!l.isEmpty())
+	disassLines.append(l);
+
+    // if there is no code, short-circuit out
+    fw->disassembled(lineNo, disassLines);
 }
 
 

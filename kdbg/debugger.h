@@ -262,6 +262,8 @@ protected:
     void handlePrintStruct(CmdQueueItem* cmd, const char* output);
     void handleSharedLibs(const char* output);
     void handleRegisters(const char* output);
+    void handleInfoLine(CmdQueueItem* cmd, const char* output);
+    void handleDisassemble(CmdQueueItem* cmd, const char* output);
     void evalExpressions();
     void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
@@ -312,7 +314,8 @@ protected slots:
     void slotUpdateAnimation();
     void slotDeleteWatch();
     void slotValuePopup(const QString&);
-    
+    void slotDisassemble(const QString&, int);
+
 signals:
     /**
      * This signal is emitted before the debugger is started. The slot is
@@ -392,6 +395,12 @@ signals:
      * Indicates that the value for a value popup is ready.
      */
     void valuePopup(const QString&);
+
+    /**
+     * Provides the disassembled code of the location given by file and
+     * line number (zero-based).
+     */
+    void disassembled(const QString& file, int line, const QString& disass);
 
 protected:
     ExprWnd& m_localVariables;

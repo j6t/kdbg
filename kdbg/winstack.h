@@ -89,6 +89,7 @@ signals:
     void clickedRight(const QPoint&);
     void newFileLoaded();
     void initiateValuePopup(const QString&);
+    void disassemble(const QString&, int);
 
 public slots:
     virtual void menuCallback(int item);
@@ -105,6 +106,10 @@ public slots:
 
     // Displays the value tip at m_tipLocation
     void slotShowValueTip(const QString& tipText);
+
+    // Shows the disassembled code at the location given by file and lineNo
+    void slotDisassembled(const QString& fileName, int lineNo,
+			  const QString& disass);
 
 protected:
     void initMenu();

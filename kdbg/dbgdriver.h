@@ -27,6 +27,8 @@ enum DbgCommand {
 	DCinfolinemain,
 	DCinfolocals,
 	DCinforegisters,
+	DCinfoline,
+	DCdisassemble,
 	DCsetargs,
 	DCsetenv,
 	DCunsetenv,
@@ -78,6 +80,9 @@ struct CmdQueueItem
     // remember which expression when printing an expression
     VarTree* m_expr;
     ExprWnd* m_exprWnd;
+    // remember file position
+    QString m_fileName;
+    int m_lineNo;
     // whether command was emitted due to direct user request (only set when relevant)
     bool m_byUser;
 
@@ -87,6 +92,7 @@ struct CmdQueueItem
 	m_committed(false),
 	m_expr(0),
 	m_exprWnd(0),
+	m_lineNo(0),
 	m_byUser(false)
     { }
 };
@@ -225,6 +231,8 @@ public:
 				   QueueMode mode) = 0;
     virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg, int intArg,
 				   QueueMode mode) = 0;
+    virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg1, QString strArg2,
+				   QueueMode mode) = 0;
 
     /**
      * Flushes the command queues.
@@ -353,6 +361,18 @@ public:
      * Parses the output of the DCinforegisters command.
      */
     virtual void parseRegisters(const char* output, QList<RegisterInfo>& regs) = 0;
+
+    /**
+     * Parses the output of the DCinfoline command. Returns false if the
+     * two addresses could not be found.
+     */
+    virtual bool parseInfoLine(const char* output,
+			       QString& addrFrom, QString& addrTo) = 0;
+
+    /**
+     * Parses the ouput of the DCdisassemble command.
+     */
+    virtual QString parseDisassemble(const char* output) = 0;
 
 protected:
     /** Removes all commands from the low-priority queue. */
