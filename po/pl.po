@@ -1,0 +1,355 @@
+# KDbg Polish translation file.
+# Main translation work:
+#       Jacek Wojdel <wojdel@kbs.twi.tudelft.nl>
+msgid ""
+msgstr ""
+"Project-Id-Version: kdbg 1.0\n"
+"POT-Creation-Date: 1999-08-22 20:36+0200\n"
+"PO-Revision-Date: 1999-07-07 22:13+0200\n"
+"Last-Translator: Jacek Wojdel <wojdel@kbs.twi.tudelft.nl>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=iso-8859-2\n"
+"Content-Transfer-Encoding: iso-8859-2\n"
+
+#: brkpt.cpp:44
+msgid "&Add"
+msgstr "Dod&j"
+
+#: brkpt.cpp:52
+msgid "&View Code"
+msgstr "&Poka¿ kod"
+
+#: brkpt.cpp:56
+msgid "&Conditional..."
+msgstr "&Warunkowy..."
+
+#: brkpt.cpp:647
+msgid "E"
+msgstr "E"
+
+#: brkpt.cpp:649
+msgid "Location"
+msgstr "Lokacja"
+
+#: brkpt.cpp:650
+msgid "Hits"
+msgstr "Trafienia"
+
+#: brkpt.cpp:651
+msgid "Ignore"
+msgstr ""
+
+#: brkpt.cpp:652
+msgid "Condition"
+msgstr "Warunek"
+
+#: brkpt.cpp:816
+msgid ": Conditional breakpoint"
+msgstr ": Warunkowy punkt zatrzymania"
+
+#: brkpt.cpp:819
+msgid "&Condition:"
+msgstr "&Warunek:"
+
+#: brkpt.cpp:821
+msgid "Ignore &next hits:"
+msgstr "Ignoruj &nastêpne trafienia:"
+
+#: pgmargs.cpp:33
+msgid ": Program arguments"
+msgstr ": Argumenty programu"
+
+#: pgmargs.cpp:36
+#, c-format
+msgid "Run %s with these arguments:"
+msgstr "Uruchom %s z tymi argumentami:"
+
+#: pgmargs.cpp:54
+msgid "Working directory:"
+msgstr "Katalog roboczy:"
+
+#: pgmargs.cpp:64
+msgid "Environment variables (NAME=value):"
+msgstr "Zmienne ¶rodowiskowe (NAZWA=warto¶æ):"
+
+#: pgmargs.cpp:73
+msgid "Name"
+msgstr ""
+
+#: pgmargs.cpp:74
+msgid "Value"
+msgstr "Warto¶æ"
+
+#: pgmargs.cpp:93
+msgid "&Modify"
+msgstr "&Modyfikuj"
+
+#: procattach.cpp:22
+msgid ": Attach to process"
+msgstr ": Pod³±cz do procesu"
+
+#: procattach.cpp:26
+msgid "Specify the process number to attach to:"
+msgstr "Podaj numer procesu do pod³±czenia siê:"
+
+#: debugger.cpp:107
+msgid "Breakpoints"
+msgstr "Punkty zatrzymania"
+
+#: debugger.cpp:230
+#, c-format
+msgid "`%s' is not a file or does not exist"
+msgstr "%s' nie jest plikiem lub nie istnieje"
+
+#: debugger.cpp:294
+msgid "Select the executable to debug"
+msgstr "Wybierz plik wykonywalny do debugowania"
+
+#: debugger.cpp:336
+msgid "Select core dump"
+msgstr "Wybierz zrzut rdzenia"
+
+#: debugger.cpp:622
+msgid ""
+"gdb exited unexpectedly.\n"
+"Restart the session (e.g. with File|Executable)."
+msgstr ""
+"gdb niespodziewanie zakoñczy³ pracê.\n"
+"Uruchom sesjê ponownie (np. u¿ywaj±c Plik|Plik wykonywalny)."
+
+#: debugger.cpp:704
+msgid ": Program output"
+msgstr ": Wyniki dzia³ania programu"
+
+#: debugger.cpp:1178
+msgid "New working directory: "
+msgstr "Nowy katalog roboczy: "
+
+#: dbgmainwnd.cpp:90 winstack.cpp:386 winstack.cpp:396
+msgid "&Open Source..."
+msgstr "&Otwórz ¼ród³a..."
+
+#: dbgmainwnd.cpp:108 winstack.cpp:388
+msgid "Step &into"
+msgstr "Wejd¼ &w"
+
+#: dbgmainwnd.cpp:109 winstack.cpp:389
+msgid "Step &over"
+msgstr "Przejd¼ &przez"
+
+#: dbgmainwnd.cpp:110 winstack.cpp:390
+msgid "Step o&ut"
+msgstr "Wyjd¼ &z"
+
+#: dbgmainwnd.cpp:111 winstack.cpp:391
+msgid "Run to &cursor"
+msgstr "Uruchom do &kursora"
+
+#: dbgmainwnd.cpp:125 winstack.cpp:393
+msgid "Set/Clear &breakpoint"
+msgstr "Ustaw/usuñ punkt &zatrzymania"
+
+#: dbgmainwnd.cpp:93 winstack.cpp:398
+msgid "&Executable..."
+msgstr "Plik &wykonywalny..."
+
+#: dbgmainwnd.cpp:94 winstack.cpp:399
+msgid "&Core dump..."
+msgstr "&Zrzut rdzenia..."
+
+#: winstack.cpp:753
+msgid ": Open Windows"
+msgstr ": Otwarte okna"
+
+#: winstack.cpp:761
+msgid "Show"
+msgstr "Poka¿"
+
+#: winstack.cpp:829
+msgid ": Search"
+msgstr ": Wyszukaj"
+
+#: winstack.cpp:835
+msgid "&Case sensitive"
+msgstr "&Rozró¿niaj wielkie/ma³e"
+
+#: winstack.cpp:837
+msgid "&Forward"
+msgstr "&Do przodu"
+
+#: winstack.cpp:839
+msgid "&Backward"
+msgstr "&Wstecz"
+
+#: prefdebugger.cpp:23
+msgid "To revert to the default settings, clear the entries."
+msgstr "Wyczy¶æ pola by przywróciæ domy¶lne ustawienia."
+
+#: prefdebugger.cpp:27
+msgid "How to invoke &GDB:"
+msgstr "Jak uruchomiæ &GDB:"
+
+#: prefdebugger.cpp:34
+msgid ""
+"%T will be replaced with a title string,\n"
+"%C will be replaced by a Bourne shell script that\n"
+"keeps the terminal window open."
+msgstr ""
+"%T zostanie zast±pione tekstem tytu³owym,\n"
+"%C zostanie zast±pione przez skrypt w Bourne shell,\n"
+"który spowoduje pozostawienie otwartego okna terminala."
+
+#: prefdebugger.cpp:40
+msgid "&Terminal for program output:"
+msgstr "&Terminal dla wyników programu:"
+
+#: mainwndbase.cpp:27
+msgid " Add "
+msgstr " Dodaj "
+
+#: mainwndbase.cpp:28
+msgid " Del "
+msgstr " Usuñ "
+
+#: mainwndbase.cpp:65
+msgid "active"
+msgstr "aktywny"
+
+#: mainwndbase.cpp:285
+msgid ": Global options"
+msgstr ": Ogólne opcje"
+
+#: dbgmainwnd.cpp:91
+msgid "&Reload Source"
+msgstr "P&rze³aduj ¼ród³a..."
+
+#: dbgmainwnd.cpp:96
+msgid "&Global Options..."
+msgstr "Opcje o&gólne..."
+
+#: dbgmainwnd.cpp:102
+msgid "&Find..."
+msgstr "&Wyszukaj..."
+
+#: dbgmainwnd.cpp:103
+msgid "Toggle &Toolbar"
+msgstr "Pasek &narzêdzi"
+
+#: dbgmainwnd.cpp:104
+msgid "Toggle &Statusbar"
+msgstr "Pasek &stanu"
+
+#: dbgmainwnd.cpp:107
+msgid "&Run"
+msgstr "U&ruchom"
+
+#: dbgmainwnd.cpp:113
+msgid "&Break"
+msgstr "&Zatrzymaj"
+
+#: dbgmainwnd.cpp:114
+msgid "Re&start"
+msgstr "Re&startuj"
+
+#: dbgmainwnd.cpp:115
+msgid "A&ttach..."
+msgstr "&Pod³±cz..."
+
+#: dbgmainwnd.cpp:117
+msgid "&Arguments..."
+msgstr "&Argumenty..."
+
+#: dbgmainwnd.cpp:126
+msgid "Set &temporary breakpoint"
+msgstr "Us&taw chwilowy punkt zatrzymania"
+
+#: dbgmainwnd.cpp:127
+msgid "&Enable/Disable breakpoint"
+msgstr "&W³±cz/wy³±cz punkt zatrzymania"
+
+#: dbgmainwnd.cpp:128
+msgid "&List..."
+msgstr "&Lista..."
+
+#: dbgmainwnd.cpp:133
+msgid "&More..."
+msgstr "&Wiêcej..."
+
+#: dbgmainwnd.cpp:144
+msgid "E&xecution"
+msgstr "&Wykonywanie"
+
+#: dbgmainwnd.cpp:145
+msgid "&Breakpoint"
+msgstr "Punkt &zatrzymania"
+
+#: dbgmainwnd.cpp:146
+msgid "&Window"
+msgstr "&Okno"
+
+#: dbgmainwnd.cpp:150
+msgid ""
+"A Debugger\n"
+"by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
+"with the help of many others"
+msgstr ""
+"Debuger\n"
+"Autorstwa Johannesa Sixta <Johannes.Sixt@telecom.at>\n"
+"przy wspó³udziale wielu innych"
+
+#: dbgmainwnd.cpp:163
+msgid "Executable"
+msgstr "Plik wykonywalny"
+
+#: dbgmainwnd.cpp:165
+msgid "Open a source file"
+msgstr "Otwórz plik ¼ród³owy"
+
+#: dbgmainwnd.cpp:167
+msgid "Reload source file"
+msgstr "Prze³aduj plik ¼ród³owy"
+
+#: dbgmainwnd.cpp:170
+msgid "Run/Continue"
+msgstr "Uruchom/kontynuuj"
+
+#: dbgmainwnd.cpp:172
+msgid "Step into"
+msgstr "Wejd¼ w"
+
+#: dbgmainwnd.cpp:174
+msgid "Step over"
+msgstr "Przejd¼ przez"
+
+#: dbgmainwnd.cpp:176
+msgid "Step out"
+msgstr "Wyjd¼ z"
+
+#: dbgmainwnd.cpp:179
+msgid "Breakpoint"
+msgstr "Punkt zatrzymania"
+
+#: dbgmainwnd.cpp:182
+msgid "Search"
+msgstr "Wyszukaj"
+
+#: dbgmainwnd.cpp:190
+msgid "Line 00000"
+msgstr "Linia 00000"
+
+#: dbgmainwnd.cpp:194
+msgid "Restart"
+msgstr "Restartuj"
+
+#: dbgmainwnd.cpp:195
+msgid "Core dump"
+msgstr "Zrzut rdzenia"
+
+#: dbgmainwnd.cpp:435
+#, c-format
+msgid "Line %d"
+msgstr "Linia %d"
+
+#: main.cpp:57
+msgid "Cannot start debugger."
+msgstr "Nie uda³o siê uruchomiæ debugera."
