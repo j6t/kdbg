@@ -356,7 +356,6 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues)
 	    newValues->m_varKind != VarTree::VKdummy)
 	{
 	    m_updatePtrs.append(display);
-	    display->setPixmap(m_pixPointer);
 	}
 	/*
 	 * If the visible sub-tree has children, but newValues doesn't, we
@@ -486,6 +485,11 @@ void ExprWnd::collectUnknownTypes(VarTree* var)
 	m_updateType.append(var);
     }
 
+    // add pointer pixmap to pointers
+    if (var->m_varKind == VarTree::VKpointer) {
+	var->setPixmap(m_pixPointer);
+    }
+
     forEveryItem(collectUnknownTypes, this, var);
 }
 
@@ -500,6 +504,10 @@ bool ExprWnd::collectUnknownTypes(KTreeViewItem* item, void* user)
     {
 	/* this struct node doesn't have a type yet: register it */
 	tree->m_updateType.append(var);
+    }
+    // add pointer pixmap to pointers
+    if (var->m_varKind == VarTree::VKpointer) {
+	var->setPixmap(tree->m_pixPointer);
     }
     return false;
 }
