@@ -463,6 +463,8 @@ void KDebugger::updateUIItem(UpdateUI* item)
 void KDebugger::initMenu()
 {
     m_menuFile.insertItem(i18n("&Open Source..."), ID_FILE_OPEN);
+    m_menuFile.insertItem(i18n("&Reload Source"), ID_FILE_RELOAD);
+    m_menuFile.insertSeparator();
     m_menuFile.insertItem(i18n("&Executable..."), ID_FILE_EXECUTABLE);
     m_menuFile.insertSeparator();
     m_menuFile.insertItem(i18n("&Quit"), ID_FILE_QUIT);
@@ -530,6 +532,8 @@ void KDebugger::initToolbar()
 
     m_toolbar.insertButton(loader->loadIcon("fileopen.xpm"),ID_FILE_OPEN, true,
 			   i18n("Open a source file"));
+    m_toolbar.insertButton(loader->loadIcon("reload.xpm"),ID_FILE_RELOAD, true,
+			   i18n("Reload source file"));
     m_toolbar.insertSeparator();
     m_toolbar.insertButton(loader->loadIcon("pgmrun.xpm"),ID_PROGRAM_RUN, true,
 			   i18n("Run/Continue"));
@@ -1177,6 +1181,7 @@ void KDebugger::handleRunCommands()
     
     // go through the output, line by line, checking what we have
     char* start = m_gdbOutput - 1;
+    bool refreshNeeded = false;
     QString msg;
     do {
 	start++;			/* skip '\n' */
@@ -1195,6 +1200,8 @@ void KDebugger::handleRunCommands()
 	    } else {
 		msg = QString(start, endOfMessage-start);
 	    }
+	} else if (strstr(start, "re-reading symbols.") != 0) {
+	    refreshNeeded = true;
 	}
 
 	// next line, please
@@ -1203,12 +1210,18 @@ void KDebugger::handleRunCommands()
 
     m_statusbar.changeItem(msg, ID_STATUS_MSG);
 
+    // refresh files if necessary
+    if (refreshNeeded) {
+	TRACE("re-reading files");
+	m_filesWindow.reloadAllFiles();
+    }
+
     /*
      * If we have any temporary breakpoints, we must update the breakpoint
      * list since this stop may be due to on of them, which would now go
      * away.
      */
-    if (m_bpTable.haveTemporaryBP()) {
+    if (refreshNeeded || m_bpTable.haveTemporaryBP()) {
 	queueCmd(DCinfobreak, "info breakpoints", QMoverride);
     }
 
