@@ -1,12 +1,12 @@
 # KDbg - Debugger GUI for gdb
-# Copyright (C) 1998 Johannes Sixt
-# Johannes Sixt <Johannes.Sixt@telecom.at>, 1998
+# Copyright (C) 1998,1999 Johannes Sixt
+# Johannes Sixt <Johannes.Sixt@telecom.at>, 1999
 # Hans Petter Bieker <zerium@webindex.no>, 1998.
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 0.3.0\n"
-"POT-Creation-Date: 1999-07-23 22:09+0200\n"
+"Project-Id-Version: kdbg 1.0\n"
+"POT-Creation-Date: 1999-08-22 20:36+0200\n"
 "PO-Revision-Date: 1998-11-14 19:11+0100\n"
 "Last-Translator: Hans Petter Bieker <zerium@webindex.no>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -112,49 +112,49 @@ msgstr "Velg programmet du vil avluse"
 msgid "Select core dump"
 msgstr "Velg en minnedump"
 
-#: debugger.cpp:620
+#: debugger.cpp:622
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
 
-#: debugger.cpp:702
+#: debugger.cpp:704
 msgid ": Program output"
 msgstr ": Programutmating"
 
-#: debugger.cpp:1163
+#: debugger.cpp:1178
 msgid "New working directory: "
 msgstr ""
 
-#: dbgmainwnd.cpp:92 winstack.cpp:386 winstack.cpp:396
+#: dbgmainwnd.cpp:90 winstack.cpp:386 winstack.cpp:396
 msgid "&Open Source..."
 msgstr "&Åpne kildekode..."
 
-#: dbgmainwnd.cpp:110 winstack.cpp:388
+#: dbgmainwnd.cpp:108 winstack.cpp:388
 msgid "Step &into"
 msgstr "Hopp &inn i"
 
-#: dbgmainwnd.cpp:111 winstack.cpp:389
+#: dbgmainwnd.cpp:109 winstack.cpp:389
 msgid "Step &over"
 msgstr "Hopp &over"
 
-#: dbgmainwnd.cpp:112 winstack.cpp:390
+#: dbgmainwnd.cpp:110 winstack.cpp:390
 msgid "Step o&ut"
 msgstr "Hopp &ut"
 
-#: dbgmainwnd.cpp:113 winstack.cpp:391
+#: dbgmainwnd.cpp:111 winstack.cpp:391
 msgid "Run to &cursor"
 msgstr "Kjør til &markør"
 
-#: dbgmainwnd.cpp:127 winstack.cpp:393
+#: dbgmainwnd.cpp:125 winstack.cpp:393
 msgid "Set/Clear &breakpoint"
 msgstr "Sett/nullstill &brytningspunkter"
 
-#: dbgmainwnd.cpp:95 winstack.cpp:398
+#: dbgmainwnd.cpp:93 winstack.cpp:398
 msgid "&Executable..."
 msgstr "&Programfil..."
 
-#: dbgmainwnd.cpp:96 winstack.cpp:399
+#: dbgmainwnd.cpp:94 winstack.cpp:399
 msgid "&Core dump..."
 msgstr "&Minnedump..."
 
@@ -210,7 +210,7 @@ msgstr " Legg til "
 msgid " Del "
 msgstr " Slett "
 
-#: dbgmainwnd.cpp:32 mainwndbase.cpp:65
+#: mainwndbase.cpp:65
 msgid "active"
 msgstr "aktiv"
 
@@ -218,79 +218,75 @@ msgstr "aktiv"
 msgid ": Global options"
 msgstr ""
 
-#: dbgmainwnd.cpp:93
+#: dbgmainwnd.cpp:91
 msgid "&Reload Source"
 msgstr "L&ast kildekode på nytt"
 
-#: dbgmainwnd.cpp:98
+#: dbgmainwnd.cpp:96
 msgid "&Global Options..."
 msgstr ""
 
-#: dbgmainwnd.cpp:104
+#: dbgmainwnd.cpp:102
 msgid "&Find..."
 msgstr "&Finn..."
 
-#: dbgmainwnd.cpp:105
+#: dbgmainwnd.cpp:103
 msgid "Toggle &Toolbar"
 msgstr "Vis/skjul &verktøylinje"
 
-#: dbgmainwnd.cpp:106
+#: dbgmainwnd.cpp:104
 msgid "Toggle &Statusbar"
 msgstr "Vis/skjul &statuslinje"
 
-#: dbgmainwnd.cpp:109
+#: dbgmainwnd.cpp:107
 msgid "&Run"
 msgstr "&Kjør"
 
-#: dbgmainwnd.cpp:115
+#: dbgmainwnd.cpp:113
 msgid "&Break"
 msgstr "&Bryt"
 
-#: dbgmainwnd.cpp:116
+#: dbgmainwnd.cpp:114
 msgid "Re&start"
 msgstr "&Omstart"
 
-#: dbgmainwnd.cpp:117
+#: dbgmainwnd.cpp:115
 msgid "A&ttach..."
 msgstr "&Knytt til..."
 
-#: dbgmainwnd.cpp:119
+#: dbgmainwnd.cpp:117
 msgid "&Arguments..."
 msgstr "&Argumenter..."
 
-#: dbgmainwnd.cpp:128
+#: dbgmainwnd.cpp:126
 msgid "Set &temporary breakpoint"
 msgstr "Se&tt midlertidig brytningspunkt"
 
-#: dbgmainwnd.cpp:129
+#: dbgmainwnd.cpp:127
 msgid "&Enable/Disable breakpoint"
 msgstr "&Skru av/på brytningspunkter"
 
-#: dbgmainwnd.cpp:130
+#: dbgmainwnd.cpp:128
 msgid "&List..."
 msgstr "&List..."
 
-#: dbgmainwnd.cpp:135
+#: dbgmainwnd.cpp:133
 msgid "&More..."
 msgstr "&Mer..."
 
-#: dbgmainwnd.cpp:138
-msgid "&About"
-msgstr "&Om"
-
-#: dbgmainwnd.cpp:150
+#: dbgmainwnd.cpp:144
 msgid "E&xecution"
 msgstr "&Programfil"
 
-#: dbgmainwnd.cpp:151
+#: dbgmainwnd.cpp:145
 msgid "&Breakpoint"
 msgstr "&Brytningpunkter"
 
-#: dbgmainwnd.cpp:152
+#: dbgmainwnd.cpp:146
 msgid "&Window"
 msgstr "&Vindu"
 
-#: dbgmainwnd.cpp:156
+#: dbgmainwnd.cpp:150
 msgid ""
 "A Debugger\n"
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
@@ -300,55 +296,55 @@ msgstr ""
 "av Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "med hjelp av mange andre"
 
-#: dbgmainwnd.cpp:169
+#: dbgmainwnd.cpp:163
 msgid "Executable"
 msgstr "Programfil"
 
-#: dbgmainwnd.cpp:171
+#: dbgmainwnd.cpp:165
 msgid "Open a source file"
 msgstr "Åpne en kildekodefil"
 
-#: dbgmainwnd.cpp:173
+#: dbgmainwnd.cpp:167
 msgid "Reload source file"
 msgstr "Åpne kildekode på nytt"
 
-#: dbgmainwnd.cpp:176
+#: dbgmainwnd.cpp:170
 msgid "Run/Continue"
 msgstr "Kjør/fortsett"
 
-#: dbgmainwnd.cpp:178
+#: dbgmainwnd.cpp:172
 msgid "Step into"
 msgstr "Hopp inn i"
 
-#: dbgmainwnd.cpp:180
+#: dbgmainwnd.cpp:174
 msgid "Step over"
 msgstr "Hopp over"
 
-#: dbgmainwnd.cpp:182
+#: dbgmainwnd.cpp:176
 msgid "Step out"
 msgstr "Hopp ut"
 
-#: dbgmainwnd.cpp:185
+#: dbgmainwnd.cpp:179
 msgid "Breakpoint"
 msgstr "Brytningspunkt"
 
-#: dbgmainwnd.cpp:188
+#: dbgmainwnd.cpp:182
 msgid "Search"
 msgstr "Søk"
 
-#: dbgmainwnd.cpp:196
+#: dbgmainwnd.cpp:190
 msgid "Line 00000"
 msgstr "Linje 00000"
 
-#: dbgmainwnd.cpp:200
+#: dbgmainwnd.cpp:194
 msgid "Restart"
 msgstr "Omstart"
 
-#: dbgmainwnd.cpp:201
+#: dbgmainwnd.cpp:195
 msgid "Core dump"
 msgstr "Minnedump"
 
-#: dbgmainwnd.cpp:433
+#: dbgmainwnd.cpp:435
 #, c-format
 msgid "Line %d"
 msgstr "Linje %d"
@@ -356,3 +352,6 @@ msgstr "Linje %d"
 #: main.cpp:57
 msgid "Cannot start debugger."
 msgstr "Kan ikke starte avluser."
+
+#~ msgid "&About"
+#~ msgstr "&Om"

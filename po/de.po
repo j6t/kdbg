@@ -1,11 +1,11 @@
 # KDbg - Debugger GUI for gdb
-# Copyright (C) 1998 Johannes Sixt
-# Johannes Sixt <Johannes.Sixt@telecom.at>, 1998
+# Copyright (C) 1998,1999 Johannes Sixt
+# Johannes Sixt <Johannes.Sixt@telecom.at>, 1999
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 0.3.1\n"
-"POT-Creation-Date: 1999-07-23 22:09+0200\n"
+"Project-Id-Version: kdbg 1.0\n"
+"POT-Creation-Date: 1999-08-22 20:36+0200\n"
 "PO-Revision-Date: 1999-05-30 17:30+0200\n"
 "Last-Translator: Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "Language-Team: none\n"
@@ -111,7 +111,7 @@ msgstr "Ausführbares Programm zum Debuggen wählen"
 msgid "Select core dump"
 msgstr "Core dump wählen"
 
-#: debugger.cpp:620
+#: debugger.cpp:622
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
@@ -119,43 +119,43 @@ msgstr ""
 "gdb wurde unerwartet beendet\n"
 "Sie müssen die Sitzung neu starten (z.B. mit Datei|Programm)."
 
-#: debugger.cpp:702
+#: debugger.cpp:704
 msgid ": Program output"
 msgstr ": Programmausgabe"
 
-#: debugger.cpp:1163
+#: debugger.cpp:1178
 msgid "New working directory: "
 msgstr "Neues Arbeitsverzeichnis: "
 
-#: dbgmainwnd.cpp:92 winstack.cpp:386 winstack.cpp:396
+#: dbgmainwnd.cpp:90 winstack.cpp:386 winstack.cpp:396
 msgid "&Open Source..."
 msgstr "Quellcode Ö&ffnen..."
 
-#: dbgmainwnd.cpp:110 winstack.cpp:388
+#: dbgmainwnd.cpp:108 winstack.cpp:388
 msgid "Step &into"
 msgstr "&In Funktion"
 
-#: dbgmainwnd.cpp:111 winstack.cpp:389
+#: dbgmainwnd.cpp:109 winstack.cpp:389
 msgid "Step &over"
 msgstr "Ü&ber Funktion"
 
-#: dbgmainwnd.cpp:112 winstack.cpp:390
+#: dbgmainwnd.cpp:110 winstack.cpp:390
 msgid "Step o&ut"
 msgstr "&Aus Funktion"
 
-#: dbgmainwnd.cpp:113 winstack.cpp:391
+#: dbgmainwnd.cpp:111 winstack.cpp:391
 msgid "Run to &cursor"
 msgstr "&Zum Cursor"
 
-#: dbgmainwnd.cpp:127 winstack.cpp:393
+#: dbgmainwnd.cpp:125 winstack.cpp:393
 msgid "Set/Clear &breakpoint"
 msgstr "&Setzen/entfernen"
 
-#: dbgmainwnd.cpp:95 winstack.cpp:398
+#: dbgmainwnd.cpp:93 winstack.cpp:398
 msgid "&Executable..."
 msgstr "&Programm..."
 
-#: dbgmainwnd.cpp:96 winstack.cpp:399
+#: dbgmainwnd.cpp:94 winstack.cpp:399
 msgid "&Core dump..."
 msgstr "&Core dump..."
 
@@ -213,7 +213,7 @@ msgstr " Neu "
 msgid " Del "
 msgstr " Entf "
 
-#: dbgmainwnd.cpp:32 mainwndbase.cpp:65
+#: mainwndbase.cpp:65
 msgid "active"
 msgstr "aktiv"
 
@@ -221,79 +221,75 @@ msgstr "aktiv"
 msgid ": Global options"
 msgstr ": Globale Einstellungen"
 
-#: dbgmainwnd.cpp:93
+#: dbgmainwnd.cpp:91
 msgid "&Reload Source"
 msgstr "E&rneut laden"
 
-#: dbgmainwnd.cpp:98
+#: dbgmainwnd.cpp:96
 msgid "&Global Options..."
 msgstr "&Globale Einstellungen..."
 
-#: dbgmainwnd.cpp:104
+#: dbgmainwnd.cpp:102
 msgid "&Find..."
 msgstr "S&uchen..."
 
-#: dbgmainwnd.cpp:105
+#: dbgmainwnd.cpp:103
 msgid "Toggle &Toolbar"
 msgstr "&Werkzeugleiste ein-/ausblenden"
 
-#: dbgmainwnd.cpp:106
+#: dbgmainwnd.cpp:104
 msgid "Toggle &Statusbar"
 msgstr "&Statusleiste ein-/ausblenden"
 
-#: dbgmainwnd.cpp:109
+#: dbgmainwnd.cpp:107
 msgid "&Run"
 msgstr "Aus&führen"
 
-#: dbgmainwnd.cpp:115
+#: dbgmainwnd.cpp:113
 msgid "&Break"
 msgstr "&Unterbrechen"
 
-#: dbgmainwnd.cpp:116
+#: dbgmainwnd.cpp:114
 msgid "Re&start"
 msgstr "&Erneut ausführen"
 
-#: dbgmainwnd.cpp:117
+#: dbgmainwnd.cpp:115
 msgid "A&ttach..."
 msgstr "A&ttachen..."
 
-#: dbgmainwnd.cpp:119
+#: dbgmainwnd.cpp:117
 msgid "&Arguments..."
 msgstr "Argu&mente..."
 
-#: dbgmainwnd.cpp:128
+#: dbgmainwnd.cpp:126
 msgid "Set &temporary breakpoint"
 msgstr "&Temporären Haltepunkt setzen"
 
-#: dbgmainwnd.cpp:129
+#: dbgmainwnd.cpp:127
 msgid "&Enable/Disable breakpoint"
 msgstr "&Aktiv/inaktiv"
 
-#: dbgmainwnd.cpp:130
+#: dbgmainwnd.cpp:128
 msgid "&List..."
 msgstr "&Liste..."
 
-#: dbgmainwnd.cpp:135
+#: dbgmainwnd.cpp:133
 msgid "&More..."
 msgstr "&Weitere..."
 
-#: dbgmainwnd.cpp:138
-msgid "&About"
-msgstr "&Info..."
-
-#: dbgmainwnd.cpp:150
+#: dbgmainwnd.cpp:144
 msgid "E&xecution"
 msgstr "A&usführung"
 
-#: dbgmainwnd.cpp:151
+#: dbgmainwnd.cpp:145
 msgid "&Breakpoint"
 msgstr "Halte&punkt"
 
-#: dbgmainwnd.cpp:152
+#: dbgmainwnd.cpp:146
 msgid "&Window"
 msgstr "&Fenster"
 
-#: dbgmainwnd.cpp:156
+#: dbgmainwnd.cpp:150
 msgid ""
 "A Debugger\n"
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
@@ -303,55 +299,55 @@ msgstr ""
 "von Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "und vielen weiteren Helfern"
 
-#: dbgmainwnd.cpp:169
+#: dbgmainwnd.cpp:163
 msgid "Executable"
 msgstr "Programm"
 
-#: dbgmainwnd.cpp:171
+#: dbgmainwnd.cpp:165
 msgid "Open a source file"
 msgstr "Quelldatei öffnen"
 
-#: dbgmainwnd.cpp:173
+#: dbgmainwnd.cpp:167
 msgid "Reload source file"
 msgstr "Erneut laden"
 
-#: dbgmainwnd.cpp:176
+#: dbgmainwnd.cpp:170
 msgid "Run/Continue"
 msgstr "Ausführen/Fortsetzen"
 
-#: dbgmainwnd.cpp:178
+#: dbgmainwnd.cpp:172
 msgid "Step into"
 msgstr "In Funktion"
 
-#: dbgmainwnd.cpp:180
+#: dbgmainwnd.cpp:174
 msgid "Step over"
 msgstr "Über Funktion"
 
-#: dbgmainwnd.cpp:182
+#: dbgmainwnd.cpp:176
 msgid "Step out"
 msgstr "Aus Funktion"
 
-#: dbgmainwnd.cpp:185
+#: dbgmainwnd.cpp:179
 msgid "Breakpoint"
 msgstr "Haltepunkt"
 
-#: dbgmainwnd.cpp:188
+#: dbgmainwnd.cpp:182
 msgid "Search"
 msgstr "Suche"
 
-#: dbgmainwnd.cpp:196
+#: dbgmainwnd.cpp:190
 msgid "Line 00000"
 msgstr "Zeile 00000"
 
-#: dbgmainwnd.cpp:200
+#: dbgmainwnd.cpp:194
 msgid "Restart"
 msgstr "Erneut ausführen"
 
-#: dbgmainwnd.cpp:201
+#: dbgmainwnd.cpp:195
 msgid "Core dump"
 msgstr "Core dump"
 
-#: dbgmainwnd.cpp:433
+#: dbgmainwnd.cpp:435
 #, c-format
 msgid "Line %d"
 msgstr "Zeile %d"

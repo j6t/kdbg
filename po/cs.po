@@ -1,11 +1,11 @@
 # KDbg - Debugger GUI for gdb
-# Copyright (C) 1998 Johannes Sixt
-# Johannes Sixt <Johannes.Sixt@telecom.at>, 1998
+# Copyright (C) 1998,1999 Johannes Sixt
+# Johannes Sixt <Johannes.Sixt@telecom.at>, 1999
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 0.3.0\n"
-"POT-Creation-Date: 1999-07-23 22:09+0200\n"
+"Project-Id-Version: kdbg 1.0\n"
+"POT-Creation-Date: 1999-08-22 20:36+0200\n"
 "PO-Revision-Date: 1998-11-24 20:21 MET\n"
 "Last-Translator: Martin ©pirk <spirk@kla.pvt.cz>\n"
 "Language-Team: Czech <flidr@kky.zcu.cz>\n"
@@ -111,49 +111,49 @@ msgstr "Vyberte spustitelný soubor který chcete trasovat"
 msgid "Select core dump"
 msgstr "Vyberte core dump"
 
-#: debugger.cpp:620
+#: debugger.cpp:622
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
 
-#: debugger.cpp:702
+#: debugger.cpp:704
 msgid ": Program output"
 msgstr ": Výstup programu"
 
-#: debugger.cpp:1163
+#: debugger.cpp:1178
 msgid "New working directory: "
 msgstr ""
 
-#: dbgmainwnd.cpp:92 winstack.cpp:386 winstack.cpp:396
+#: dbgmainwnd.cpp:90 winstack.cpp:386 winstack.cpp:396
 msgid "&Open Source..."
 msgstr "&Otevøít zdroj..."
 
-#: dbgmainwnd.cpp:110 winstack.cpp:388
+#: dbgmainwnd.cpp:108 winstack.cpp:388
 msgid "Step &into"
 msgstr "Krok &do"
 
-#: dbgmainwnd.cpp:111 winstack.cpp:389
+#: dbgmainwnd.cpp:109 winstack.cpp:389
 msgid "Step &over"
 msgstr "Krok &pøes"
 
-#: dbgmainwnd.cpp:112 winstack.cpp:390
+#: dbgmainwnd.cpp:110 winstack.cpp:390
 msgid "Step o&ut"
 msgstr "Krok &ven"
 
-#: dbgmainwnd.cpp:113 winstack.cpp:391
+#: dbgmainwnd.cpp:111 winstack.cpp:391
 msgid "Run to &cursor"
 msgstr "Spustit ke &kurzoru"
 
-#: dbgmainwnd.cpp:127 winstack.cpp:393
+#: dbgmainwnd.cpp:125 winstack.cpp:393
 msgid "Set/Clear &breakpoint"
 msgstr "Nastavit/smazat &zará¾ku"
 
-#: dbgmainwnd.cpp:95 winstack.cpp:398
+#: dbgmainwnd.cpp:93 winstack.cpp:398
 msgid "&Executable..."
 msgstr "Spustit&elný soubor..."
 
-#: dbgmainwnd.cpp:96 winstack.cpp:399
+#: dbgmainwnd.cpp:94 winstack.cpp:399
 msgid "&Core dump..."
 msgstr "&Core dump..."
 
@@ -210,7 +210,7 @@ msgstr " Pøidat "
 msgid " Del "
 msgstr " Smazat "
 
-#: dbgmainwnd.cpp:32 mainwndbase.cpp:65
+#: mainwndbase.cpp:65
 msgid "active"
 msgstr "aktivní"
 
@@ -218,79 +218,75 @@ msgstr "aktivní"
 msgid ": Global options"
 msgstr ""
 
-#: dbgmainwnd.cpp:93
+#: dbgmainwnd.cpp:91
 msgid "&Reload Source"
 msgstr "&Znovu naèíst zdroj"
 
-#: dbgmainwnd.cpp:98
+#: dbgmainwnd.cpp:96
 msgid "&Global Options..."
 msgstr ""
 
-#: dbgmainwnd.cpp:104
+#: dbgmainwnd.cpp:102
 msgid "&Find..."
 msgstr "&Hledat..."
 
-#: dbgmainwnd.cpp:105
+#: dbgmainwnd.cpp:103
 msgid "Toggle &Toolbar"
 msgstr "Pøepnout panel &nástrojù"
 
-#: dbgmainwnd.cpp:106
+#: dbgmainwnd.cpp:104
 msgid "Toggle &Statusbar"
 msgstr "Pøepnout &stavový øádek"
 
-#: dbgmainwnd.cpp:109
+#: dbgmainwnd.cpp:107
 msgid "&Run"
 msgstr "S&pustit"
 
-#: dbgmainwnd.cpp:115
+#: dbgmainwnd.cpp:113
 msgid "&Break"
 msgstr "&Pøeru¹ení"
 
-#: dbgmainwnd.cpp:116
+#: dbgmainwnd.cpp:114
 msgid "Re&start"
 msgstr "Res&tart"
 
-#: dbgmainwnd.cpp:117
+#: dbgmainwnd.cpp:115
 msgid "A&ttach..."
 msgstr "Pøipojit..."
 
-#: dbgmainwnd.cpp:119
+#: dbgmainwnd.cpp:117
 msgid "&Arguments..."
 msgstr "&Argumenty..."
 
-#: dbgmainwnd.cpp:128
+#: dbgmainwnd.cpp:126
 msgid "Set &temporary breakpoint"
 msgstr "Nastavit &doèasnou zará¾ku"
 
-#: dbgmainwnd.cpp:129
+#: dbgmainwnd.cpp:127
 msgid "&Enable/Disable breakpoint"
 msgstr "Po&volit/zakázat &zará¾ku"
 
-#: dbgmainwnd.cpp:130
+#: dbgmainwnd.cpp:128
 msgid "&List..."
 msgstr "Sezna&m..."
 
-#: dbgmainwnd.cpp:135
+#: dbgmainwnd.cpp:133
 msgid "&More..."
 msgstr "&Dal¹í..."
 
-#: dbgmainwnd.cpp:138
-msgid "&About"
-msgstr ""
-
-#: dbgmainwnd.cpp:150
+#: dbgmainwnd.cpp:144
 msgid "E&xecution"
 msgstr "Spu¹t&ìní"
 
-#: dbgmainwnd.cpp:151
+#: dbgmainwnd.cpp:145
 msgid "&Breakpoint"
 msgstr "&Zará¾ka"
 
-#: dbgmainwnd.cpp:152
+#: dbgmainwnd.cpp:146
 msgid "&Window"
 msgstr "&Okno"
 
-#: dbgmainwnd.cpp:156
+#: dbgmainwnd.cpp:150
 msgid ""
 "A Debugger\n"
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
@@ -300,55 +296,55 @@ msgstr ""
 "napsal Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "s pomocí mnohých dal¹ích"
 
-#: dbgmainwnd.cpp:169
+#: dbgmainwnd.cpp:163
 msgid "Executable"
 msgstr "Spustitelný soubor"
 
-#: dbgmainwnd.cpp:171
+#: dbgmainwnd.cpp:165
 msgid "Open a source file"
 msgstr "Otevøít zdrojový soubor"
 
-#: dbgmainwnd.cpp:173
+#: dbgmainwnd.cpp:167
 msgid "Reload source file"
 msgstr "Znovu naèíst zdrojový soubor"
 
-#: dbgmainwnd.cpp:176
+#: dbgmainwnd.cpp:170
 msgid "Run/Continue"
 msgstr "Spustit/pokraèovat"
 
-#: dbgmainwnd.cpp:178
+#: dbgmainwnd.cpp:172
 msgid "Step into"
 msgstr "Krok do"
 
-#: dbgmainwnd.cpp:180
+#: dbgmainwnd.cpp:174
 msgid "Step over"
 msgstr "Krok pøes"
 
-#: dbgmainwnd.cpp:182
+#: dbgmainwnd.cpp:176
 msgid "Step out"
 msgstr "Krok ven"
 
-#: dbgmainwnd.cpp:185
+#: dbgmainwnd.cpp:179
 msgid "Breakpoint"
 msgstr "Zará¾ka"
 
-#: dbgmainwnd.cpp:188
+#: dbgmainwnd.cpp:182
 msgid "Search"
 msgstr "Hledat"
 
-#: dbgmainwnd.cpp:196
+#: dbgmainwnd.cpp:190
 msgid "Line 00000"
 msgstr "Øádek 00000"
 
-#: dbgmainwnd.cpp:200
+#: dbgmainwnd.cpp:194
 msgid "Restart"
 msgstr "Restart"
 
-#: dbgmainwnd.cpp:201
+#: dbgmainwnd.cpp:195
 msgid "Core dump"
 msgstr "Core dump"
 
-#: dbgmainwnd.cpp:433
+#: dbgmainwnd.cpp:435
 #, c-format
 msgid "Line %d"
 msgstr "Øádek %d"

@@ -1,0 +1,491 @@
+# Translation Table for KDbg into Italian
+# 
+# Tabella di traduzione per KDbg dall'inglese all'italiano
+#
+#
+# Copyright (C) 1999 Free Software Foundation, Inc.
+# Massimo Morin <mmorin@schedsys.com, mmorin@110.net>, 1999.
+# Walter  Tasin <tasin@e-technik.fh-muenchen.de>, 1999.
+#
+# Queste regole vengono da Kdevelop it.po
+#
+# Regole Base
+#
+# Bisogna fissarsi delle regole da cui partire, per cui parto da
+# queste; se qualcuno me ne può suggerire di altre e/o di
+# migliori....
+#
+# o  Uso sempre la seconda persona singolare in forma IMPERATIVA
+#    PRESENTE (fai, premi etc..) quando mi riferisco all'utente
+# o  Uso la prima persona singolare indicativa quando riferito al
+#    programma (compilo.... controllo....)
+# o  Parole che riferiscono a programmi all'interno di frasi le
+#    racchiudo in `' cosicchè non siano troppo ambigui
+# o  Cerco di evitare il più possibile ripetizioni di aggettivi
+#    possessivi quali "tuo, nostro..." per cui "your project" diventa "il
+#    progetto"
+# o  Gli avverbi come "here" e simili non hanno molto senso in
+#    italiano (sono proprio brutti ed ovvii) per cui se sono ripetitivi
+#    e inutili come "Add comments here" diviene "Aggiungi commenti" li
+#    tolgo 
+# o  Le parole inglesi sono ammesse in italiano ma non hanno plurale,
+#    per cui "file" diventa "il file" e "files" diventa "i file"
+# o  Non sono sicuro ma alcune parole inglesi si sono italianizzate,
+#    per cui "to click" è diventato "clickare" e "to debug"
+#    "debuggare"... vedo di usare "the comon sense (tm)"
+# o  Le abbreviazioni le tengo uguali (CV, RFV) anche perchè
+#    molte volte non so come interpretarle....
+#
+#    (WAT) spiegazione (CV = class view - struttura di classe,
+#                       RFV = real file view - presentazione di tutti i file,
+#                       LFV=logical fileview - presentazione dei file collegati
+#                       col progetto)
+#
+# # o  Uso ' come apostrofo e ` come accento (non ho i caratteri a, e i
+# #    accentati per ora :( )
+# #
+# o  (WAT) Sempre usare la vocale e con ` per è (o con ´ per ó, o con ` per ò,
+#          u con ` per ù, ecc. ...)
+#          ... c'è un programma che cambierà poi queste combinazioni
+#              nelle vocali accentate
+#          ' <= usa questo tipo di accento come apostrofo
+#
+# Traduzioni mancate
+#
+# Secondo me alcune parole inglesi hanno più significato per i
+# programmatori nella loro forma originale che non in una "possibile"
+# traduzione. Qui di seguito indico le parole non tradotte.
+#
+# -  file
+# -  directory
+# -  bug	detesto la parola "baco", anche perchè diciamo
+# 		debuggare e non debacare :)  
+# -  editor     what the heck we are talking with programmers not with
+# 		secretaries! 
+# -  ChangeLog	non mi viene niente di meglio
+# -  DistClean	è una opzione standard del make
+# -  window manager
+# -  warning 	sembra più bello di avvisi (quando non è attenzione!)
+# -  widget
+# -  syntax highlighting 
+# -  bookmark 	segnalibro non mi piace
+# -  clipboard 	è più bello di avagnetta
+# -  wizard	decisamente meglio che mago o stregone 8-)
+# -  stop	(vedi sotto)
+# -  breakpoint	meglio di "punto di interruzione"
+# -  database
+# -  logo
+# -  private protected public   sono keyword 
+# -  team       non esiste un analogo in italiano
+# -  target     quando si riferisce a regola del makefile
+# -  symbol table
+# -  shared library librerie condivise?? È più bello inalterato
+# -  touch 	quando si tratta del programma (touch)
+# -  job 	quando si tratta di job=task
+# -  cast 	promozione nei casi che ha senso, sennò invariato (eppoi si dice cast anche in italiano)
+# -  prototype  quando parliamo di prototype di funzione
+# -  signed/unsigned quando si tratta di modificatori
+# -  fixed point and floating point   non ha senso tradurre
+# -  old-style
+# -  C-style
+# -  breakpoint
+# -  process-id
+#
+# Ambiguità
+#
+# Queste sono parole che traduco in parte ma non sono la "miglior traduzione
+# possibile" ma mi pare che il senso sia vicino (almeno nelle
+# intenzioni.... consigli???) 
+#
+# -  source	lo traduco in `sorgente', solo se non è chiaro dal
+#    		contesto altrimenti lascio inalterato
+# -  project	qualche volta ha più senso parlare di `project file'
+#    		che `file del progetto' 
+# -  report	in alcuni casi lo traduco in rapporto in altri lo
+# 		lascio inalterato (come Bug report)
+# -  tree	qualche volta `albero' va bene ma altre volte
+# 		preferisco `struttura'
+# -  dialog	qualche volta lo traduco in "finestra di dialogo" o
+#		semplicemente "finestra" ma in casi come "dialog
+#		editor" lo lascio inalterato 
+# -  history page 	la lascio come "history page" perché non so come
+# 		tradurla nel modo più sensato
+# -  view     	è vista o visualizzazione o visore???? Mah!!! Cerco
+# 		di esser consistente..... In linea di massima se è ...-View
+#		come in Output-View la traduco come Vista (Vista-Output)
+# -  All of Fame	che è l'Aula Magna??? Ahò facciamo meno i ganzi per
+# 		favore ;)
+# -  Make	se è il programma lo lascio inalterato, altrimenti lo
+# 		traduco in "Crea"
+# -  Build	preferirei lasciarlo in inglese ma penso che
+# 		"costruire" vada bene lo stesso
+# -  Clean	"elimina" mi pare più appropriato che "pulisci"
+# -  Access 	traduco con Accedi ma potrebbe essere anche "Entra" o
+# 		"Procedi" 
+# -  Severity 	=> severità ma non mi piace meglio gravità
+# -  Application 	"applicazione" ma certe volte lo lascio
+# 		inalterato come in "Application Wizard"
+# -  fail 	"fallire" ma non mi piace
+# -  stop	alcune volte rimane inalterato come semplicemente
+# 		"Stop" ma altre lo traduco con interrompi.
+# - togglebutton selettore o bottone di selezione
+# - machine   	lo traduco con sistema perchè mi pare più bello di macchina
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: Kdbg\n"
+"POT-Creation-Date: 1999-08-22 20:36+0200\n"
+"PO-Revision-Date: 1999-08-09 12:00+5\n"
+"Last-Translator: Massimo Morin <mmorin@schedsys.com>\n"
+"Language-Team: Italiano <it@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: ENCODING\n"
+
+#: brkpt.cpp:44
+msgid "&Add"
+msgstr "&Aggiungi"
+
+#: brkpt.cpp:52
+msgid "&View Code"
+msgstr "&Mostra Codice"
+
+#: brkpt.cpp:56
+msgid "&Conditional..."
+msgstr "&Condizione..."
+
+#: brkpt.cpp:647
+msgid "E"
+msgstr "A"
+
+#: brkpt.cpp:649
+msgid "Location"
+msgstr "Posizione"
+
+# Penso si riferisca a breakpoint, per cui sono i "passaggi" di esecuzione dell'istruzione
+#: brkpt.cpp:650
+msgid "Hits"
+msgstr "Passaggi"
+
+#: brkpt.cpp:651
+msgid "Ignore"
+msgstr "Ignora"
+
+#: brkpt.cpp:652
+msgid "Condition"
+msgstr "Condizione"
+
+# (WAT) comm: titolo della finestra di dialogo, mentre mettere le impostazioni
+#                    meglio cominciare con una lettera maiuscola
+#: brkpt.cpp:816
+msgid ": Conditional breakpoint"
+msgstr ": Breakpoint condizionato"
+
+#: brkpt.cpp:819
+msgid "&Condition:"
+msgstr "&Condizione:"
+
+#: brkpt.cpp:821
+msgid "Ignore &next hits:"
+msgstr "Ignora il &prossimo passaggio:"
+
+#: pgmargs.cpp:33
+msgid ": Program arguments"
+msgstr ": Argomenti del programma"
+
+#: pgmargs.cpp:36
+#, c-format
+msgid "Run %s with these arguments:"
+msgstr "Esegui %s con questi argomenti:"
+
+#: pgmargs.cpp:54
+msgid "Working directory:"
+msgstr "Directory di lavoro"
+
+#: pgmargs.cpp:64
+msgid "Environment variables (NAME=value):"
+msgstr "Variabili di ambiente (NAME=valore):"
+
+#: pgmargs.cpp:73
+msgid "Name"
+msgstr "Nome"
+
+#: pgmargs.cpp:74
+msgid "Value"
+msgstr "Valore"
+
+#: pgmargs.cpp:93
+msgid "&Modify"
+msgstr "&Modifica"
+
+#: procattach.cpp:22
+msgid ": Attach to process"
+msgstr ": Connessione al processo"
+
+#: procattach.cpp:26
+msgid "Specify the process number to attach to:"
+msgstr "Specifica il process-id al quale connettersi:"
+
+#: debugger.cpp:107
+msgid "Breakpoints"
+msgstr "Breakpoint"
+
+#: debugger.cpp:230
+#, c-format
+msgid "`%s' is not a file or does not exist"
+msgstr "`%s' non è un file oppure non esiste"
+
+#: debugger.cpp:294
+msgid "Select the executable to debug"
+msgstr "Seleziona l'eseguibile da debuggare"
+
+#: debugger.cpp:336
+msgid "Select core dump"
+msgstr "Seleziona il core dump"
+
+#: debugger.cpp:622
+msgid ""
+"gdb exited unexpectedly.\n"
+"Restart the session (e.g. with File|Executable)."
+msgstr ""
+"gdb è terminato inaspettatamente.\n"
+"Riapri la sessione (ad esempio con File|Esegui)."
+
+#: debugger.cpp:704
+msgid ": Program output"
+msgstr ": Output del programma"
+
+# (WAT) corr: directory
+#: debugger.cpp:1178
+msgid "New working directory: "
+msgstr "Nuova directory di lavoro: "
+
+#: dbgmainwnd.cpp:90 winstack.cpp:386 winstack.cpp:396
+msgid "&Open Source..."
+msgstr "&Apri Sorgente..."
+
+#: dbgmainwnd.cpp:108 winstack.cpp:388
+msgid "Step &into"
+msgstr "Entra nella &funzione"
+
+#: dbgmainwnd.cpp:109 winstack.cpp:389
+msgid "Step &over"
+msgstr "&Salta la funzione"
+
+#: dbgmainwnd.cpp:110 winstack.cpp:390
+msgid "Step o&ut"
+msgstr "&Esci dalla funzione"
+
+#: dbgmainwnd.cpp:111 winstack.cpp:391
+msgid "Run to &cursor"
+msgstr "Esegui fino al &cursore"
+
+#: dbgmainwnd.cpp:125 winstack.cpp:393
+msgid "Set/Clear &breakpoint"
+msgstr "Imposta/Elimina &breakpoint"
+
+#: dbgmainwnd.cpp:93 winstack.cpp:398
+msgid "&Executable..."
+msgstr "&Eseguibile"
+
+#: dbgmainwnd.cpp:94 winstack.cpp:399
+msgid "&Core dump..."
+msgstr "&Core dump..."
+
+#: winstack.cpp:753
+msgid ": Open Windows"
+msgstr ": Apri finestre"
+
+#: winstack.cpp:761
+msgid "Show"
+msgstr "Mostra"
+
+#: winstack.cpp:829
+msgid ": Search"
+msgstr ": Cerca"
+
+#: winstack.cpp:835
+msgid "&Case sensitive"
+msgstr "&Maiuscole/Minuscole"
+
+#: winstack.cpp:837
+msgid "&Forward"
+msgstr "&Avanti"
+
+#: winstack.cpp:839
+msgid "&Backward"
+msgstr "&Indietro"
+
+#: prefdebugger.cpp:23
+msgid "To revert to the default settings, clear the entries."
+msgstr "Per rimettere i valori di default, cancella le impostazioni"
+
+#: prefdebugger.cpp:27
+msgid "How to invoke &GDB:"
+msgstr "Come eseguire &GDB:"
+
+#: prefdebugger.cpp:34
+msgid ""
+"%T will be replaced with a title string,\n"
+"%C will be replaced by a Bourne shell script that\n"
+"keeps the terminal window open."
+msgstr ""
+"%T verrà sostituita con il titolo,\n"
+"%C verrà sostituito da uno script Bourne shell\n"
+"che terrà la finestra del terminale aperta."
+
+#: prefdebugger.cpp:40
+msgid "&Terminal for program output:"
+msgstr "&Terminale per l'output del programma:"
+
+#: mainwndbase.cpp:27
+msgid " Add "
+msgstr " Aggiungi "
+
+#: mainwndbase.cpp:28
+msgid " Del "
+msgstr " Elimina "
+
+#: mainwndbase.cpp:65
+msgid "active"
+msgstr "attiva"
+
+#: mainwndbase.cpp:285
+msgid ": Global options"
+msgstr ": Impostazioni globali"
+
+#: dbgmainwnd.cpp:91
+msgid "&Reload Source"
+msgstr "&Ricarica Sorgente"
+
+#: dbgmainwnd.cpp:96
+msgid "&Global Options..."
+msgstr "&Impostazioni Globali..."
+
+#: dbgmainwnd.cpp:102
+msgid "&Find..."
+msgstr "&Trova..."
+
+#: dbgmainwnd.cpp:103
+msgid "Toggle &Toolbar"
+msgstr "Attiva/Disattiva &Toolbar"
+
+#: dbgmainwnd.cpp:104
+msgid "Toggle &Statusbar"
+msgstr "Attiva/Disattiva &Barra di Stato"
+
+#: dbgmainwnd.cpp:107
+msgid "&Run"
+msgstr "&Esegui"
+
+#: dbgmainwnd.cpp:113
+msgid "&Break"
+msgstr "&Interrompi"
+
+#: dbgmainwnd.cpp:114
+msgid "Re&start"
+msgstr "&Riparti"
+
+#: dbgmainwnd.cpp:115
+msgid "A&ttach..."
+msgstr "Co&nnetti..."
+
+#: dbgmainwnd.cpp:117
+msgid "&Arguments..."
+msgstr "&Argomenti..."
+
+# (WAT) corr: mancanza del hotkey
+#: dbgmainwnd.cpp:126
+msgid "Set &temporary breakpoint"
+msgstr "Imposta breakpoint &temporaneo"
+
+#: dbgmainwnd.cpp:127
+msgid "&Enable/Disable breakpoint"
+msgstr "&Abilita/Disabilita breakpoint"
+
+#: dbgmainwnd.cpp:128
+msgid "&List..."
+msgstr "&Lista..."
+
+#: dbgmainwnd.cpp:133
+msgid "&More..."
+msgstr "&Altri..."
+
+#: dbgmainwnd.cpp:144
+msgid "E&xecution"
+msgstr "E&secuzione"
+
+#: dbgmainwnd.cpp:145
+msgid "&Breakpoint"
+msgstr "&Breakpoint"
+
+#: dbgmainwnd.cpp:146
+msgid "&Window"
+msgstr "&Finestra"
+
+#: dbgmainwnd.cpp:150
+msgid ""
+"A Debugger\n"
+"by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
+"with the help of many others"
+msgstr ""
+"Un Debugger\n"
+"creato da Johannes Sixt <Johannes.Sixt@telecom.at>\n"
+"con l'aiuto di molti altri"
+
+#: dbgmainwnd.cpp:163
+msgid "Executable"
+msgstr "Eseguibile"
+
+#: dbgmainwnd.cpp:165
+msgid "Open a source file"
+msgstr "Apri file sorgente"
+
+#: dbgmainwnd.cpp:167
+msgid "Reload source file"
+msgstr "Ricarica file sorgente"
+
+#: dbgmainwnd.cpp:170
+msgid "Run/Continue"
+msgstr "Esegui/Continua"
+
+#: dbgmainwnd.cpp:172
+msgid "Step into"
+msgstr "Entra nella funzione"
+
+#: dbgmainwnd.cpp:174
+msgid "Step over"
+msgstr "Salta la funzione"
+
+#: dbgmainwnd.cpp:176
+msgid "Step out"
+msgstr "Esci dalla funzione"
+
+#: dbgmainwnd.cpp:179
+msgid "Breakpoint"
+msgstr "Breakpoint"
+
+#: dbgmainwnd.cpp:182
+msgid "Search"
+msgstr "Cerca"
+
+#: dbgmainwnd.cpp:190
+msgid "Line 00000"
+msgstr "Linea 00000"
+
+#: dbgmainwnd.cpp:194
+msgid "Restart"
+msgstr "Riparti"
+
+#: dbgmainwnd.cpp:195
+msgid "Core dump"
+msgstr "Core dump"
+
+#: dbgmainwnd.cpp:435
+#, c-format
+msgid "Line %d"
+msgstr "Linea %d"
+
+#: main.cpp:57
+msgid "Cannot start debugger."
+msgstr "Non riesco ad eseguire il debugger"

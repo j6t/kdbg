@@ -1,11 +1,11 @@
 # KDbg - Debugger GUI for gdb
-# Copyright (C) 1998 Johannes Sixt
-# Johannes Sixt <Johannes.Sixt@telecom.at>, 1998
+# Copyright (C) 1998,1999 Johannes Sixt
+# Johannes Sixt <Johannes.Sixt@telecom.at>, 1999
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 0.3.0\n"
-"POT-Creation-Date: 1999-07-23 22:09+0200\n"
+"Project-Id-Version: kdbg 1.0\n"
+"POT-Creation-Date: 1999-08-22 20:36+0200\n"
 "PO-Revision-Date: 1998-08-11 20:15+0200\n"
 "Last-Translator: Wang Jian <lark@linux.ustc.edu.cn>\n"
 "Language-Team: zh_CN ( gb2312 )\n"
@@ -111,49 +111,49 @@ msgstr "选中要调试的执行文件"
 msgid "Select core dump"
 msgstr ""
 
-#: debugger.cpp:620
+#: debugger.cpp:622
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
 
-#: debugger.cpp:702
+#: debugger.cpp:704
 msgid ": Program output"
 msgstr ": 程序输出"
 
-#: debugger.cpp:1163
+#: debugger.cpp:1178
 msgid "New working directory: "
 msgstr ""
 
-#: dbgmainwnd.cpp:92 winstack.cpp:386 winstack.cpp:396
+#: dbgmainwnd.cpp:90 winstack.cpp:386 winstack.cpp:396
 msgid "&Open Source..."
 msgstr "打开源文件[&O]..."
 
-#: dbgmainwnd.cpp:110 winstack.cpp:388
+#: dbgmainwnd.cpp:108 winstack.cpp:388
 msgid "Step &into"
 msgstr "单步进入函数[&I]"
 
-#: dbgmainwnd.cpp:111 winstack.cpp:389
+#: dbgmainwnd.cpp:109 winstack.cpp:389
 msgid "Step &over"
 msgstr "单步跳过函数[&O]"
 
-#: dbgmainwnd.cpp:112 winstack.cpp:390
+#: dbgmainwnd.cpp:110 winstack.cpp:390
 msgid "Step o&ut"
 msgstr "单步跳出函数[&U]"
 
-#: dbgmainwnd.cpp:113 winstack.cpp:391
+#: dbgmainwnd.cpp:111 winstack.cpp:391
 msgid "Run to &cursor"
 msgstr "运行到光标处[&C]"
 
-#: dbgmainwnd.cpp:127 winstack.cpp:393
+#: dbgmainwnd.cpp:125 winstack.cpp:393
 msgid "Set/Clear &breakpoint"
 msgstr "设定/清除断点"
 
-#: dbgmainwnd.cpp:95 winstack.cpp:398
+#: dbgmainwnd.cpp:93 winstack.cpp:398
 msgid "&Executable..."
 msgstr "可执行文件[&E]..."
 
-#: dbgmainwnd.cpp:96 winstack.cpp:399
+#: dbgmainwnd.cpp:94 winstack.cpp:399
 msgid "&Core dump..."
 msgstr ""
 
@@ -209,7 +209,7 @@ msgstr " 添加 "
 msgid " Del "
 msgstr " 删除 "
 
-#: dbgmainwnd.cpp:32 mainwndbase.cpp:65
+#: mainwndbase.cpp:65
 msgid "active"
 msgstr "活动"
 
@@ -217,134 +217,130 @@ msgstr "活动"
 msgid ": Global options"
 msgstr ""
 
-#: dbgmainwnd.cpp:93
+#: dbgmainwnd.cpp:91
 msgid "&Reload Source"
 msgstr ""
 
-#: dbgmainwnd.cpp:98
+#: dbgmainwnd.cpp:96
 msgid "&Global Options..."
 msgstr ""
 
-#: dbgmainwnd.cpp:104
+#: dbgmainwnd.cpp:102
 msgid "&Find..."
 msgstr ""
 
-#: dbgmainwnd.cpp:105
+#: dbgmainwnd.cpp:103
 msgid "Toggle &Toolbar"
 msgstr "(不)显示工具条[&T]"
 
-#: dbgmainwnd.cpp:106
+#: dbgmainwnd.cpp:104
 msgid "Toggle &Statusbar"
 msgstr "(不)显示状态条[&S]"
 
-#: dbgmainwnd.cpp:109
+#: dbgmainwnd.cpp:107
 msgid "&Run"
 msgstr "运行[&R]"
 
-#: dbgmainwnd.cpp:115
+#: dbgmainwnd.cpp:113
 msgid "&Break"
 msgstr "中断[&B]"
 
-#: dbgmainwnd.cpp:116
+#: dbgmainwnd.cpp:114
 msgid "Re&start"
 msgstr ""
 
-#: dbgmainwnd.cpp:117
+#: dbgmainwnd.cpp:115
 msgid "A&ttach..."
 msgstr ""
 
-#: dbgmainwnd.cpp:119
+#: dbgmainwnd.cpp:117
 msgid "&Arguments..."
 msgstr "参数[&A]..."
 
-#: dbgmainwnd.cpp:128
+#: dbgmainwnd.cpp:126
 msgid "Set &temporary breakpoint"
 msgstr "设置临时断点[&T]"
 
-#: dbgmainwnd.cpp:129
+#: dbgmainwnd.cpp:127
 msgid "&Enable/Disable breakpoint"
 msgstr "允许/不允许断点[&E]"
 
-#: dbgmainwnd.cpp:130
+#: dbgmainwnd.cpp:128
 msgid "&List..."
 msgstr "列表[&L]..."
 
-#: dbgmainwnd.cpp:135
+#: dbgmainwnd.cpp:133
 msgid "&More..."
 msgstr "更多[&M]..."
 
-#: dbgmainwnd.cpp:138
-msgid "&About"
-msgstr ""
-
-#: dbgmainwnd.cpp:150
+#: dbgmainwnd.cpp:144
 msgid "E&xecution"
 msgstr "执行[&X]"
 
-#: dbgmainwnd.cpp:151
+#: dbgmainwnd.cpp:145
 msgid "&Breakpoint"
 msgstr "断点[&B]"
 
-#: dbgmainwnd.cpp:152
+#: dbgmainwnd.cpp:146
 msgid "&Window"
 msgstr "窗口[&W]"
 
-#: dbgmainwnd.cpp:156
+#: dbgmainwnd.cpp:150
 msgid ""
 "A Debugger\n"
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "with the help of many others"
 msgstr ""
 
-#: dbgmainwnd.cpp:169
+#: dbgmainwnd.cpp:163
 msgid "Executable"
 msgstr "可执行文件"
 
-#: dbgmainwnd.cpp:171
+#: dbgmainwnd.cpp:165
 msgid "Open a source file"
 msgstr "打开源文件"
 
-#: dbgmainwnd.cpp:173
+#: dbgmainwnd.cpp:167
 msgid "Reload source file"
 msgstr ""
 
-#: dbgmainwnd.cpp:176
+#: dbgmainwnd.cpp:170
 msgid "Run/Continue"
 msgstr "运行/继续"
 
-#: dbgmainwnd.cpp:178
+#: dbgmainwnd.cpp:172
 msgid "Step into"
 msgstr "单步进入函数"
 
-#: dbgmainwnd.cpp:180
+#: dbgmainwnd.cpp:174
 msgid "Step over"
 msgstr "单步不进入函数"
 
-#: dbgmainwnd.cpp:182
+#: dbgmainwnd.cpp:176
 msgid "Step out"
 msgstr "单步跳出函数"
 
-#: dbgmainwnd.cpp:185
+#: dbgmainwnd.cpp:179
 msgid "Breakpoint"
 msgstr "断点"
 
-#: dbgmainwnd.cpp:188
+#: dbgmainwnd.cpp:182
 msgid "Search"
 msgstr ""
 
-#: dbgmainwnd.cpp:196
+#: dbgmainwnd.cpp:190
 msgid "Line 00000"
 msgstr ""
 
-#: dbgmainwnd.cpp:200
+#: dbgmainwnd.cpp:194
 msgid "Restart"
 msgstr ""
 
-#: dbgmainwnd.cpp:201
+#: dbgmainwnd.cpp:195
 msgid "Core dump"
 msgstr ""
 
-#: dbgmainwnd.cpp:433
+#: dbgmainwnd.cpp:435
 #, c-format
 msgid "Line %d"
 msgstr ""
