@@ -24,12 +24,16 @@ public:
 	virtual int f(int x);
 };
 
+typedef void (*PtrFunc)(E*, char);
+
 class Dl : public Cl
 {
 public:
 	Dl(int r);
 	virtual int f(int x);
 	int operator()(const QString& x, int& y) const;
+	operator const char*() { return 0; }
+	operator PtrFunc*();
 };
 
 void g()
@@ -129,6 +133,7 @@ int main(int argc, char* argv[])
 	d1.f(17);
 	int n = 83;
 	d1(strref, n);
+	PtrFunc* ppf = d1;
 }
 
 Cl::Cl(int r) :
@@ -163,4 +168,9 @@ int Dl::operator()(const QString& x, int& y) const
 {
 	cout << "ha! I know!" << endl;
 	return 1;
+}
+
+Dl::operator PtrFunc*()
+{
+    return 0;
 }
