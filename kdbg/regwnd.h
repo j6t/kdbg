@@ -25,6 +25,7 @@ protected slots:
     void updateRegisters(QList<RegisterInfo>&);
 
 private:
+    void paletteChange(const QPalette& oldPal);
     QListViewItem* m_lastItem;
     QPopupMenu* m_modemenu;
     int m_mode;

@@ -182,6 +182,7 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
 	m_mode(16)
 {
     setSorting(-1);
+    setFont(KGlobalSettings::fixedFont());
 
     QPixmap iconRegs = BarIcon("regs.xpm");
     QPixmap iconWatchcoded = BarIcon("watchcoded.xpm");
@@ -296,6 +297,12 @@ void RegisterView::slotModeChange(int code)
 	RegisterViewItem* it = static_cast<RegisterViewItem*>(i);
 	it->setValue(it->m_reg.rawValue, it->m_reg.cookedValue);
     }
+}
+
+void RegisterView::paletteChange(const QPalette& oldPal)
+{
+    setFont(KGlobalSettings::fixedFont());
+    QListView::paletteChange(oldPal);
 }
 
 #include "regwnd.moc"
