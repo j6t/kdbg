@@ -52,9 +52,11 @@ public:
     virtual void paintCell(QPainter* p, int row, int col) = 0;
     virtual void setupPainter(QPainter* p);
 
+protected:
     // overrides
     virtual void resizeEvent(QResizeEvent* ev);
     virtual void paintEvent(QPaintEvent* ev);
+    virtual void wheelEvent(QWheelEvent* ev);
 
 public slots:
     void sbVer(int value);

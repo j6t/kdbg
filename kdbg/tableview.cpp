@@ -4,6 +4,8 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include "tableview.h"
+
+#include <qapplication.h>
 #include <qpainter.h>
 #include <qscrollbar.h>
 
@@ -293,6 +295,23 @@ void TableView::paintEvent(QPaintEvent* /*ev*/)
 	}
 	row++;
 	y += cellHeight(0/*row*/);
+    }
+}
+
+void TableView::wheelEvent(QWheelEvent* ev)
+{
+#if QT_VERSION >= 300
+    if (ev->orientation() == Horizontal && m_sbH != 0)
+    {
+	QApplication::sendEvent(m_sbH, ev);
+    }
+    else
+#endif
+    {
+	if (m_sbV != 0)
+	{
+	    QApplication::sendEvent(m_sbV, ev);
+	}
     }
 }
 
