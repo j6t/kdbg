@@ -9,7 +9,7 @@ dnl the argument
 AM_CONFIG_HEADER(config.h)
 
 dnl insert here your program name and version number
-KDE_DO_IT_ALL(kdbg, 0.2.6)
+KDE_DO_IT_ALL(kdbg, 0.3.0)
 
 dnl in this space add everything you want to check for
 dnl examples are specific headers, libraries, etc.
