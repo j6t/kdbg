@@ -76,15 +76,15 @@ KDebugger::KDebugger(const char* name) :
 	m_this(&m_frameVariables, "this"),
 	m_watches(&m_rightPanner, "watches"),
 	m_watchEdit(&m_watches, "watch_edit"),
-	m_watchAdd("Add", &m_watches, "watch_add"),
-	m_watchDelete("Del", &m_watches, "watch_delete"),
+	m_watchAdd(i18n(" Add "), &m_watches, "watch_add"),
+	m_watchDelete(i18n(" Del "), &m_watches, "watch_delete"),
 	m_watchVariables(&m_watches, "watch_variables"),
 	m_watchV(&m_watches, 0),
 	m_watchH(0),
 	m_bpTable(*this)
 {
-    m_statusBusy = klocale->translate("busy");
-    m_statusActive = klocale->translate("active");
+    m_statusBusy = i18n("busy");
+    m_statusActive = i18n("active");
 
     m_gdbOutputAlloc = 4000;
     m_gdbOutput = new char[m_gdbOutputAlloc];
@@ -101,8 +101,8 @@ KDebugger::KDebugger(const char* name) :
 
     setView(&m_mainPanner, true);	/* show frame */
     
-//    m_frameVariables.addTab(new QWidget(&m_frameVariables), klocale->translate("Auto"));
-    m_frameVariables.addTab(&m_localVariables, klocale->translate("Locals"));
+//    m_frameVariables.addTab(new QWidget(&m_frameVariables), i18n("Auto"));
+    m_frameVariables.addTab(&m_localVariables, i18n("Locals"));
     m_frameVariables.addTab(&m_this, "this");
     connect(&m_localVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
 	    SLOT(slotLocalsExpanding(KTreeViewItem*,bool&)));
@@ -133,7 +133,7 @@ KDebugger::KDebugger(const char* name) :
 
     m_filesWindow.setWindowMenu(&m_menuWindow);
 
-    m_bpTable.setCaption(klocale->translate("Breakpoints"));
+    m_bpTable.setCaption(i18n("Breakpoints"));
     connect(&m_bpTable, SIGNAL(closed()), SLOT(updateUI()));
 
     // route unhandled menu items to winstack
@@ -188,7 +188,7 @@ static QString getExecFileName(const char* dir = 0, const char* filter = 0,
     QString filename;
     KFileDialog dlg(dir, filter, parent, name, true, false);
 
-    dlg.setCaption(klocale->translate("Select the executable to debug"));
+    dlg.setCaption(i18n("Select the executable to debug"));
 
     if (dlg.exec() == QDialog::Accepted)
 	filename = dlg.selectedFile();
@@ -395,25 +395,25 @@ void KDebugger::updateUIItem(UpdateUI* item)
 // implementation helpers
 void KDebugger::initMenu()
 {
-    m_menuFile.insertItem(klocale->translate("&Open Source..."), ID_FILE_OPEN);
-    m_menuFile.insertItem(klocale->translate("&Executable..."), ID_FILE_EXECUTABLE);
+    m_menuFile.insertItem(i18n("&Open Source..."), ID_FILE_OPEN);
+    m_menuFile.insertItem(i18n("&Executable..."), ID_FILE_EXECUTABLE);
     m_menuFile.insertSeparator();
-    m_menuFile.insertItem(klocale->translate("&Quit"), ID_FILE_QUIT);
+    m_menuFile.insertItem(i18n("&Quit"), ID_FILE_QUIT);
     m_menuFile.setAccel(keys->open(), ID_FILE_OPEN);
     m_menuFile.setAccel(keys->quit(), ID_FILE_QUIT);
 
-    m_menuView.insertItem(klocale->translate("Toggle &Toolbar"), ID_VIEW_TOOLBAR);
-    m_menuView.insertItem(klocale->translate("Toggle &Statusbar"), ID_VIEW_STATUSBAR);
+    m_menuView.insertItem(i18n("Toggle &Toolbar"), ID_VIEW_TOOLBAR);
+    m_menuView.insertItem(i18n("Toggle &Statusbar"), ID_VIEW_STATUSBAR);
 
-    m_menuProgram.insertItem(klocale->translate("&Run"), ID_PROGRAM_RUN);
-    m_menuProgram.insertItem(klocale->translate("Step &into"), ID_PROGRAM_STEP);
-    m_menuProgram.insertItem(klocale->translate("Step &over"), ID_PROGRAM_NEXT);
-    m_menuProgram.insertItem(klocale->translate("Step o&ut"), ID_PROGRAM_FINISH);
-    m_menuProgram.insertItem(klocale->translate("Run to &cursor"), ID_PROGRAM_UNTIL);
+    m_menuProgram.insertItem(i18n("&Run"), ID_PROGRAM_RUN);
+    m_menuProgram.insertItem(i18n("Step &into"), ID_PROGRAM_STEP);
+    m_menuProgram.insertItem(i18n("Step &over"), ID_PROGRAM_NEXT);
+    m_menuProgram.insertItem(i18n("Step o&ut"), ID_PROGRAM_FINISH);
+    m_menuProgram.insertItem(i18n("Run to &cursor"), ID_PROGRAM_UNTIL);
     m_menuProgram.insertSeparator();
-    m_menuProgram.insertItem(klocale->translate("&Break"), ID_PROGRAM_BREAK);
+    m_menuProgram.insertItem(i18n("&Break"), ID_PROGRAM_BREAK);
     m_menuProgram.insertSeparator();
-    m_menuProgram.insertItem(klocale->translate("&Arguments..."), ID_PROGRAM_ARGS);
+    m_menuProgram.insertItem(i18n("&Arguments..."), ID_PROGRAM_ARGS);
     m_menuProgram.setAccel(Key_F5, ID_PROGRAM_RUN);
     m_menuProgram.setAccel(Key_F8, ID_PROGRAM_STEP);
     m_menuProgram.setAccel(Key_F10, ID_PROGRAM_NEXT);
@@ -421,17 +421,17 @@ void KDebugger::initMenu()
     m_menuProgram.setAccel(Key_F7, ID_PROGRAM_UNTIL);
 
     m_menuBrkpt.setCheckable(true);
-    m_menuBrkpt.insertItem(klocale->translate("Set &breakpoint"), ID_BRKPT_SET);
-    m_menuBrkpt.insertItem(klocale->translate("Set &temporary breakpoint"), ID_BRKPT_TEMP);
-    m_menuBrkpt.insertItem(klocale->translate("&Clear breakpoint"), ID_BRKPT_CLEAR);
-    m_menuBrkpt.insertItem(klocale->translate("&List..."), ID_BRKPT_LIST);
+    m_menuBrkpt.insertItem(i18n("Set &breakpoint"), ID_BRKPT_SET);
+    m_menuBrkpt.insertItem(i18n("Set &temporary breakpoint"), ID_BRKPT_TEMP);
+    m_menuBrkpt.insertItem(i18n("&Clear breakpoint"), ID_BRKPT_CLEAR);
+    m_menuBrkpt.insertItem(i18n("&List..."), ID_BRKPT_LIST);
     m_menuBrkpt.setAccel(Key_F9, ID_BRKPT_SET);
     m_menuBrkpt.setAccel(SHIFT+Key_F9, ID_BRKPT_TEMP);
 
-    m_menuWindow.insertItem(klocale->translate("&More..."), ID_WINDOW_MORE);
+    m_menuWindow.insertItem(i18n("&More..."), ID_WINDOW_MORE);
   
-    m_menuHelp.insertItem(klocale->translate("&Contents"), ID_HELP_HELP);
-    m_menuHelp.insertItem(klocale->translate("&About"), ID_HELP_ABOUT);
+    m_menuHelp.insertItem(i18n("&Contents"), ID_HELP_HELP);
+    m_menuHelp.insertItem(i18n("&About"), ID_HELP_ABOUT);
   
     connect(&m_menuFile, SIGNAL(activated(int)), SLOT(menuCallback(int)));
     connect(&m_menuView, SIGNAL(activated(int)), SLOT(menuCallback(int)));
@@ -440,16 +440,16 @@ void KDebugger::initMenu()
     connect(&m_menuWindow, SIGNAL(activated(int)), SLOT(menuCallback(int)));
     connect(&m_menuHelp, SIGNAL(activated(int)), SLOT(menuCallback(int)));
 
-    m_menu.insertItem(klocale->translate("&File"), &m_menuFile);
-    m_menu.insertItem(klocale->translate("&View"), &m_menuView);
-    m_menu.insertItem(klocale->translate("E&xecution"), &m_menuProgram);
-    m_menu.insertItem(klocale->translate("&Breakpoint"), &m_menuBrkpt);
-    m_menu.insertItem(klocale->translate("&Window"), &m_menuWindow);
+    m_menu.insertItem(i18n("&File"), &m_menuFile);
+    m_menu.insertItem(i18n("&View"), &m_menuView);
+    m_menu.insertItem(i18n("E&xecution"), &m_menuProgram);
+    m_menu.insertItem(i18n("&Breakpoint"), &m_menuBrkpt);
+    m_menu.insertItem(i18n("&Window"), &m_menuWindow);
     m_menu.insertSeparator();
     static const char about[] =
 	"KDbg " VERSION " - A Debugger\n"
 	"by Johannes Sixt <Johannes.Sixt@telecom.at>";
-    m_menu.insertItem(klocale->translate("&Help"),
+    m_menu.insertItem(i18n("&Help"),
 		      kapp->getHelpMenu(false, about));
 }
 
@@ -458,19 +458,19 @@ void KDebugger::initToolbar()
     KIconLoader* loader = kapp->getIconLoader();
 
     m_toolbar.insertButton(loader->loadIcon("fileopen.xpm"),ID_FILE_OPEN, true,
-			   klocale->translate("Open a source file"));
+			   i18n("Open a source file"));
     m_toolbar.insertSeparator();
     m_toolbar.insertButton(loader->loadIcon("pgmrun.xpm"),ID_PROGRAM_RUN, true,
-			   klocale->translate("Run/Continue"));
+			   i18n("Run/Continue"));
     m_toolbar.insertButton(loader->loadIcon("pgmstep.xpm"),ID_PROGRAM_STEP, true,
-			   klocale->translate("Step into"));
+			   i18n("Step into"));
     m_toolbar.insertButton(loader->loadIcon("pgmnext.xpm"),ID_PROGRAM_NEXT, true,
-			   klocale->translate("Step over"));
+			   i18n("Step over"));
     m_toolbar.insertButton(loader->loadIcon("pgmfinish.xpm"),ID_PROGRAM_FINISH, true,
-			   klocale->translate("Step out"));
+			   i18n("Step out"));
     m_toolbar.insertSeparator();
     m_toolbar.insertButton(loader->loadIcon("brkpt.xpm"),ID_BRKPT_SET, true,
-			   klocale->translate("Breakpoint"));
+			   i18n("Breakpoint"));
 
     connect(&m_toolbar, SIGNAL(clicked(int)), SLOT(menuCallback(int)));
 
@@ -575,7 +575,7 @@ bool KDebugger::createOutputWindow()
 	::execlp("xterm",
 		 "xterm",
 		 "-name", "kdbgio",
-		 "-title", "KDbg: Program output",
+		 "-title", i18n("KDbg: Program output"),
 		 "-e", thisExecName.data(),
 		 0);
 	
@@ -623,13 +623,13 @@ bool KDebugger::debugProgram(const QString& name)
     // check the file name
     QFileInfo fi(name);
     if (!fi.isFile()) {
-	QString msgFmt = klocale->translate("`%s' is not a file or does not exist");
+	QString msgFmt = i18n("`%s' is not a file or does not exist");
 	QString msg(msgFmt.length() + name.length() + 20);
 	msg.sprintf(msgFmt, name.data());
 	KMsgBox::message(this, kapp->appName(),
 			 msg,
 			 KMsgBox::STOP,
-			 klocale->translate("OK"));
+			 i18n("OK"));
 	return false;
     }
 
@@ -873,7 +873,7 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	} else {
 	    QString msg = "gdb: " + QString(m_gdbOutput);
 	    KMsgBox::message(this, kapp->appName(), msg,
-			     KMsgBox::STOP, klocale->translate("OK"));
+			     KMsgBox::STOP, i18n("OK"));
 	}
 	break;
     case DCinfolinemain:

@@ -56,9 +56,9 @@ int main(int argc, char** argv)
 	    // failed
 	    TRACE("cannot start debugger");
 	    KMsgBox::message(&debugger, kapp->appName(),
-			     klocale->translate("Cannot start debugger.\nExiting..."),
+			     i18n("Cannot start debugger.\nExiting..."),
 			     KMsgBox::STOP,
-			     klocale->translate("OK"));
+			     i18n("OK"));
 //	    delete keys;
 	    return 1;
 	}

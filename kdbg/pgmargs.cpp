@@ -16,11 +16,11 @@ PgmArgs::PgmArgs(QWidget* parent, const char* pgm) :
 	m_layout(this, 8),
 	m_buttons(4)
 {
-    setCaption(klocale->translate("KDbg: Program arguments"));
+    setCaption(i18n("KDbg: Program arguments"));
 
     m_label.setMinimumSize(330, 24);
     QString lab;
-    lab.sprintf(klocale->translate("Run %s with these arguments:"), pgm);
+    lab.sprintf(i18n("Run %s with these arguments:"), pgm);
     m_label.setText(lab);
     m_label.setAlignment( 33 );
     m_label.setMargin( -1 );
@@ -32,14 +32,14 @@ PgmArgs::PgmArgs(QWidget* parent, const char* pgm) :
 
     m_buttonOK.setMinimumSize(100, 30);
     connect(&m_buttonOK, SIGNAL(clicked()), SLOT(accept()));
-    m_buttonOK.setText(klocale->translate("OK"));
+    m_buttonOK.setText(i18n("OK"));
 //    m_buttonOK.setAutoRepeat( false );
 //    m_buttonOK.setAutoResize( false );
     m_buttonOK.setDefault(true);
 
     m_buttonCancel.setMinimumSize(100, 30);
     connect(&m_buttonCancel, SIGNAL(clicked()), SLOT(reject()));
-    m_buttonCancel.setText(klocale->translate("Cancel"));
+    m_buttonCancel.setText(i18n("Cancel"));
 //    m_buttonCancel.setAutoRepeat( false );
 //    m_buttonCancel.setAutoResize( false );
 

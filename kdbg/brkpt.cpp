@@ -3,7 +3,7 @@
 // Copyright by Johannes Sixt
 // This file is under GPL, the GNU General Public Licence
 
-#include <kapp.h>			/* klocale */
+#include <kapp.h>			/* i18n */
 #include "debugger.h"			/* #includes brkpt.h */
 #include "brkpt.moc"
 #include <ctype.h>
@@ -29,21 +29,21 @@ BreakpointTable::BreakpointTable(KDebugger& deb) :
     m_bpEdit.setMinimumSize(m_bpEdit.sizeHint());
     connect(&m_bpEdit, SIGNAL(returnPressed()), this, SLOT(addBP()));
 
-    m_list.setColumn(0, klocale->translate("Location"));
+    m_list.setColumn(0, i18n("Location"));
     m_list.setColumnWidth(0, 300);
     m_list.setMinimumSize(200, 100);
 
-    m_btAdd.setText(klocale->translate("Add"));
+    m_btAdd.setText(i18n("Add"));
     m_btAdd.setMinimumSize(m_btAdd.sizeHint());
     connect(&m_btAdd, SIGNAL(clicked()), this, SLOT(addBP()));
 
-    m_btRemove.setText(klocale->translate("Remove"));
+    m_btRemove.setText(i18n("Remove"));
     m_btRemove.setMinimumSize(m_btRemove.sizeHint());
 
-    m_btViewCode.setText(klocale->translate("View Code"));
+    m_btViewCode.setText(i18n("View Code"));
     m_btViewCode.setMinimumSize(m_btViewCode.sizeHint());
 
-    m_btClose.setText(klocale->translate("Close"));
+    m_btClose.setText(i18n("Close"));
     m_btClose.setMinimumSize(m_btClose.sizeHint());
     connect(&m_btClose, SIGNAL(clicked()), this, SLOT(hide()));
 
