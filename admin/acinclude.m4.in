@@ -655,8 +655,6 @@ can't find it itself, we stop here assuming that make wouldn't find
 them either.])
 fi
 
-])
-
 AC_LANG_RESTORE
 ])
 
@@ -3159,7 +3157,6 @@ AC_MSG_RESULT($kde_cv_libgpp_includes)
 if test "$kde_cv_libgpp_includes" != "no"; then
   all_includes="-I$kde_cv_libgpp_includes $all_includes $USER_INCLUDES"
 fi
-])
 ])
 
 
