@@ -6,7 +6,7 @@ INCLUDES= $(all_includes)
 CXXFLAGS = -g
 
 if BUILDTESTPROGS
-PROGS = testfile locals maths
+PROGS = testfile locals maths std
 else
 PROGS =
 endif
@@ -22,3 +22,6 @@ locals_LDFLAGS = -g
 
 maths_SOURCES = maths.cpp
 maths_LDFLAGS = -g
+
+std_SOURCES = std.cpp
+std_LDFLAGS = -g
