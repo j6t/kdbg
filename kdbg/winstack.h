@@ -8,6 +8,7 @@
 
 #include <qmlined.h>
 #include <qlist.h>
+#include <qpixmap.h>
 #include "textvw.h"
 
 // forward declarations
@@ -40,6 +41,10 @@ protected:
 	liBP = 4, liBPdisabled = 8, liBPany = liBP|liBPdisabled
     };
     QArray<uchar> m_lineItems;
+    QPixmap m_pcinner;			/* PC at innermost frame */
+    QPixmap m_pcup;			/* PC at frame up the stack */
+    QPixmap m_brkena;			/* enabled breakpoint */
+    QPixmap m_brkdis;			/* disabled breakpoint */
 };
 
 class WinStack : public QWidget

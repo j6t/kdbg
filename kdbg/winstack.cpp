@@ -14,6 +14,8 @@
 #include <qbrush.h>
 #include <qfile.h>
 #include <qfileinf.h>
+#include <kapp.h>
+#include <kiconloader.h>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -26,6 +28,13 @@ FileWindow::FileWindow(const char* fileName, QWidget* parent, const char* name) 
 {
     setNumCols(2);
     setFont(QFont("courier"));
+
+    // load pixmaps
+    KIconLoader* loader = kapp->getIconLoader();
+    m_pcinner = loader->loadIcon("pcinner.xpm");
+    m_pcup = loader->loadIcon("pcup.xpm");
+    m_brkena = loader->loadIcon("brkena.xpm");
+    m_brkdis = loader->loadIcon("brkdis.xpm");
 }
 
 FileWindow::~FileWindow()
@@ -96,42 +105,34 @@ void FileWindow::paintCell(QPainter* p, int row, int col)
 	uchar item = m_lineItems[row];
 	if (item == 0)			/* shortcut out */
 	    return;
-	p->save();
-	int w = 15;
+//	p->save();
+//	int w = 15;
 	int h = cellHeight(row);
 	if (item & liBP) {
 	    // enabled breakpoint
-	    p->setBrush(QBrush(red));
-	    int d = QMIN(w, h) - 2;
-	    if (d < 2) d = 2;
-	    p->drawEllipse(1,1, d,d);
+	    int y = (h - m_brkena.height())/2;
+	    if (y < 0) y = 0;
+	    p->drawPixmap(0,y,m_brkena);
 	}
 	if (item & liBPdisabled) {
 	    // disabled breakpoint
-	    p->setPen(QPen(red));
-	    int d = QMIN(w, h) - 2;
-	    if (d < 2) d = 2;
-	    p->drawEllipse(1,1, d,d);
+	    int y = (h - m_brkdis.height())/2;
+	    if (y < 0) y = 0;
+	    p->drawPixmap(0,y,m_brkdis);
 	}
-	if (item & (liPC | liPCup)) {
-	    int d = h/2;
-	    QPointArray points(3);
-	    points[0] = QPoint(w-2, d);
-	    points[1] = QPoint(w-12, d-3);
-	    points[2] = QPoint(w-12, d+3);
-	    if (item & liPC) {
-		// program counter in innermost frame
-		p->setPen(QPen(darkGreen));
-		p->setBrush(QBrush(darkGreen));
-		p->drawPolygon(points);
-	    }
-	    if (item & liPCup) {
-		// program counter somewhere up the stack
-		p->setPen(QPen(darkGreen));
-		p->drawPolyline(points);
-	    }
+	if (item & liPC) {
+	    // program counter in innermost frame
+	    int y = (h - m_pcinner.height())/2;
+	    if (y < 0) y = 0;
+	    p->drawPixmap(0,y,m_pcinner);
 	}
-	p->restore();
+	if (item & liPCup) {
+	    // program counter somewhere up the stack
+	    int y = (h - m_pcup.height())/2;
+	    if (y < 0) y = 0;
+	    p->drawPixmap(0,y,m_pcup);
+	}
+//	p->restore();
 	return;
     }
 }
