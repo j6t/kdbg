@@ -1,3 +1,7 @@
+Version 1.9.1
+
+	Fixed security flaw regarding the program specific debugger command.
+
 Version 1.9.0
 
 	Program arguments that are file names can be browsed for.
@@ -11,6 +15,10 @@ Version 1.9.0
 	"Orphaned breakpoints", i.e. breakpoints that gdb cannot set
 	immediately, can be set. This helps debug shared libraries and
 	dynamically loaded modules.
+
+Version 1.2.8
+
+	Fixed security flaw regarding the program specific debugger command.
 
 Version 1.2.7
 
