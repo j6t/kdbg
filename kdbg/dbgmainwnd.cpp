@@ -92,6 +92,9 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	    m_debugger, SLOT(slotDisassemble(const QString&, int)));
     connect(m_debugger, SIGNAL(disassembled(const QString&,int,const QList<DisassembledCode>&)),
 	    m_filesWindow, SLOT(slotDisassembled(const QString&,int,const QList<DisassembledCode>&)));
+    // program stopped
+    connect(m_debugger, SIGNAL(programStopped()), SLOT(slotProgramStopped()));
+    connect(&m_backTimer, SIGNAL(timeout()), SLOT(slotBackTimer()));
 
     // Establish communication when right clicked on file window.
     connect(&m_filesWindow->m_menuFloat, SIGNAL(activated(int)),
@@ -390,6 +393,18 @@ void DebuggerMainWnd::menuCallback(int item)
 	else if (item == ID_FILE_EXECUTABLE) {
 	    // special: this may have changed m_lastDirectory
 	    m_filesWindow->setExtraDirectory(m_lastDirectory);
+	} else {
+	    // start timer to move window into background
+	    switch (item) {
+	    case ID_PROGRAM_STEP:
+	    case ID_PROGRAM_NEXT:
+	    case ID_PROGRAM_FINISH:
+	    case ID_PROGRAM_UNTIL:
+	    case ID_PROGRAM_RUN:
+		if (m_popForeground)
+		    intoBackground();
+		break;
+	    }
 	}
     }
     updateUI();
@@ -673,6 +688,25 @@ QString DebuggerMainWnd::createOutputWindow()
 void DebuggerMainWnd::slotTermEmuExited()
 {
     shutdownTermWindow();
+}
+
+void DebuggerMainWnd::slotProgramStopped()
+{
+    // when the program stopped, move the window to the foreground
+    if (m_popForeground) {
+	::XRaiseWindow(x11Display(), winId());
+    }
+    m_backTimer.stop();
+}
+
+void DebuggerMainWnd::intoBackground()
+{
+    m_backTimer.start(m_backTimeout, true);	/* single-shot */
+}
+
+void DebuggerMainWnd::slotBackTimer()
+{
+    ::XLowerWindow(x11Display(), winId());
 }
 
 #include "dbgmainwnd.moc"

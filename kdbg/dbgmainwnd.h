@@ -55,6 +55,8 @@ protected:
     QPopupMenu* m_menuBrkpt;
     QPopupMenu* m_menuWindow;
 
+    QTimer m_backTimer;
+
 protected:
     virtual void closeEvent(QCloseEvent* e);
     virtual KToolBar* dbgToolBar();
@@ -68,6 +70,7 @@ protected:
     bool canChangeDockVisibility(QWidget* w);
     void showhideWindow(QWidget* w);
     void dockUpdateHelper(UpdateUI* item, QWidget* w);
+    void intoBackground();
 
 signals:
     void forwardMenuCallback(int item);
@@ -88,6 +91,8 @@ public slots:
     void slotToggleBreak(const QString&, int, const DbgAddr&, bool);
     void slotEnaDisBreak(const QString&, int, const DbgAddr&);
     void slotTermEmuExited();
+    void slotProgramStopped();
+    void slotBackTimer();
 };
 
 #endif // DBGMAINWND_H

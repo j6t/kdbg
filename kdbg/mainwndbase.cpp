@@ -22,6 +22,7 @@
 #include "debugger.h"
 #include "gdbdriver.h"
 #include "prefdebugger.h"
+#include "prefmisc.h"
 #include "procattach.h"
 #include "ttywnd.h"
 #include "updateui.h"
@@ -104,6 +105,8 @@ DebuggerMainWndBase::DebuggerMainWndBase() :
 #ifdef GDB_TRANSCRIPT
 	m_transcriptFile(GDB_TRANSCRIPT),
 #endif
+	m_popForeground(false),
+	m_backTimeout(1000),
 	m_debugger(0)
 {
     m_statusActive = i18n("active");
@@ -174,6 +177,9 @@ const char TermCmdStr[] = "TermCmdStr";
 const char KeepScript[] = "KeepScript";
 const char DebuggerGroup[] = "Debugger";
 const char DebuggerCmdStr[] = "DebuggerCmdStr";
+const char PreferencesGroup[] = "Preferences";
+const char PopForeground[] = "PopForeground";
+const char BackTimeout[] = "BackTimeout";
 
 void DebuggerMainWndBase::saveSettings(KConfig* config)
 {
@@ -186,6 +192,10 @@ void DebuggerMainWndBase::saveSettings(KConfig* config)
 
     config->setGroup(DebuggerGroup);
     config->writeEntry(DebuggerCmdStr, m_debuggerCmdStr);
+
+    config->setGroup(PreferencesGroup);
+    config->writeEntry(PopForeground, m_popForeground);
+    config->writeEntry(BackTimeout, m_backTimeout);
 }
 
 void DebuggerMainWndBase::restoreSettings(KConfig* config)
@@ -205,6 +215,10 @@ void DebuggerMainWndBase::restoreSettings(KConfig* config)
 
     config->setGroup(DebuggerGroup);
     setDebuggerCmdStr(config->readEntry(DebuggerCmdStr));
+
+    config->setGroup(PreferencesGroup);
+    m_popForeground = config->readBoolEntry(PopForeground, false);
+    m_backTimeout = config->readNumEntry(BackTimeout, 1000);
 }
 
 bool DebuggerMainWndBase::debugProgram(const QString& executable)
@@ -454,12 +468,19 @@ void DebuggerMainWndBase::slotGlobalOptions()
     prefDebugger.setDebuggerCmd(m_debuggerCmdStr.isEmpty()  ?
 				GdbDriver::defaultGdb()  :  m_debuggerCmdStr);
     prefDebugger.setTerminal(m_outputTermCmdStr);
-    
-    dlg.addTab(&prefDebugger, "&Debugger");
+
+    PrefMisc prefMisc(&dlg);
+    prefMisc.setPopIntoForeground(m_popForeground);
+    prefMisc.setBackTimeout(m_backTimeout);
+
+    dlg.addTab(&prefDebugger, i18n("&Debugger"));
+    dlg.addTab(&prefMisc, i18n("&Miscellaneous"));
     if (dlg.exec() == QDialog::Accepted)
     {
 	setDebuggerCmdStr(prefDebugger.debuggerCmd());
 	setTerminalCmd(prefDebugger.terminal());
+	m_popForeground = prefMisc.popIntoForeground();
+	m_backTimeout = prefMisc.backTimeout();
     }
 }
 

@@ -116,6 +116,9 @@ protected:
 
     QString m_transcriptFile;		/* where gdb dialog is logged */
 
+    bool m_popForeground;		/* whether main wnd raises when prog stops */
+    int m_backTimeout;			/* when wnd goes back */
+
     // the debugger proper
     QString m_debuggerCmdStr;
     KDebugger* m_debugger;

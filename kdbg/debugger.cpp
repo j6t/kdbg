@@ -968,6 +968,7 @@ void KDebugger::handleRunCommands(const char* output)
     }
 
     m_programRunning = false;
+    emit programStopped();
 }
 
 void KDebugger::slotInferiorRunning()

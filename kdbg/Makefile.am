@@ -40,6 +40,7 @@ kdbg_SOURCES = \
 	ttywnd.cpp \
 	typetable.cpp \
 	prefdebugger.cpp \
+	prefmisc.cpp \
 	pgmsettings.cpp \
 	mainwndbase.cpp \
 	dbgmainwnd.cpp \
@@ -74,6 +75,7 @@ noinst_HEADERS = \
 	ttywnd.h \
 	typetable.h \
 	prefdebugger.h \
+	prefmisc.h \
 	pgmsettings.h \
 	mainwndbase.h \
 	dbgmainwnd.h \

@@ -413,6 +413,13 @@ signals:
      */
     void disassembled(const QString& file, int line, const QList<DisassembledCode>& code);
 
+    /**
+     * Indicates that the program has stopped for any reason: by a
+     * breakpoint, by a signal that the debugger driver caught, by a single
+     * step instruction.
+     */
+    void programStopped();
+
 protected:
     ExprWnd& m_localVariables;
     ExprWnd& m_watchVariables;
