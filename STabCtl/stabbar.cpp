@@ -86,7 +86,12 @@ void BarPainter::drawBuffer()
   QPainter paint;
   paint.begin(buffer);
   paint.setBrushOrigin(0,0);
-  paint.fillRect( 0, 0, W, H, QBrush( colorGroup().brush( QColorGroup::Background ) ));
+#if QT_VERSION >= 200
+  QBrush bgBrush = colorGroup().brush(QColorGroup::Background);
+#else
+  QBrush bgBrush(colorGroup().background());
+#endif
+  paint.fillRect( 0, 0, W, H, bgBrush);
 
   int x = 2;
   int curTab  = ((STabBar*)parent())->_currentTab;
@@ -167,7 +172,7 @@ void BarPainter::drawBuffer()
 
     // fixed picture for leftTab
     if ( leftTab == (int)k + 1 ){
-      paint.fillRect( x1 + width - 2, 0, 2, H - 1, QBrush( colorGroup().brush( QColorGroup::Background ) ));
+      paint.fillRect( x1 + width - 2, 0, 2, H - 1, bgBrush);
     }
 
     // paint broken left
@@ -175,7 +180,7 @@ void BarPainter::drawBuffer()
     {
       int yy = y1;
       int xx = x1 - 2;
-      paint.fillRect( x1, 0, 1, H - 1, QBrush( colorGroup().brush( QColorGroup::Background ) ));
+      paint.fillRect( x1, 0, 1, H - 1, bgBrush);
       paint.setPen( c1 );
       do {
           paint.drawPoint( xx + 2, yy );
@@ -210,16 +215,16 @@ void BarPainter::drawBuffer()
     paint.moveTo( curx + curWidth - 1, 0 );
     paint.lineTo( curx + curWidth - 1, H-1 );
 
-    paint.fillRect( curx + 1, 1, 2, H - 1, QBrush( colorGroup().brush( QColorGroup::Background ) ));
-    paint.fillRect( curx + curWidth - 4, 1, 3, H - 1, QBrush( colorGroup().brush( QColorGroup::Background ) ));
-    paint.fillRect( curx + 1, 1, curWidth - 3, 2, QBrush( colorGroup().brush( QColorGroup::Background ) ));
+    paint.fillRect( curx + 1, 1, 2, H - 1, bgBrush);
+    paint.fillRect( curx + curWidth - 4, 1, 3, H - 1, bgBrush);
+    paint.fillRect( curx + 1, 1, curWidth - 3, 2, bgBrush);
   }
 
   if ( curTabNum == leftTab && curTabNum != 0 )
   {
     int yy = 0;
     int xx = curx;
-    paint.fillRect( curx, 0, 1, H - 1, QBrush( colorGroup().brush( QColorGroup::Background ) ));
+    paint.fillRect( curx, 0, 1, H - 1, bgBrush);
     paint.setPen( c1 );
     do {
         paint.drawPoint( xx + 2, yy );
@@ -241,8 +246,8 @@ void BarPainter::drawBuffer()
   {
     int yy = broken == curTabNum ? 0:2;
     int xx = W;
-    paint.fillRect( xx - 2, 0, 2, H - 1, QBrush( colorGroup().brush( QColorGroup::Background ) ) );
-    paint.fillRect( xx - 5, yy + 1, 5, H - 2 - yy, QBrush( colorGroup().brush( QColorGroup::Background ) ) );
+    paint.fillRect( xx - 2, 0, 2, H - 1, bgBrush );
+    paint.fillRect( xx - 5, yy + 1, 5, H - 2 - yy, bgBrush );
     paint.setPen( c2 );
     do {
         paint.drawPoint( xx - 2, yy );
@@ -409,10 +414,16 @@ void STabBar::paintEvent(QPaintEvent *)
 
   if ( curWidth == 0 ) curx = 0; // no tab selected
 
+#if QT_VERSION >= 200
+  QBrush bgBrush = colorGroup().brush(QColorGroup::Background);
+#else
+  QBrush bgBrush(colorGroup().background());
+#endif
+
   // paint button line
   switch ( tabPos ){
     case TAB_TOP:
-      paint.fillRect( 0, height()-1, width(), 1, QBrush( colorGroup().brush( QColorGroup::Background ) ));
+      paint.fillRect( 0, height()-1, width(), 1, bgBrush);
       paint.setPen( white );
       paint.moveTo( 0, height()-1 );
       paint.lineTo( curx, height()-1 );
@@ -420,7 +431,7 @@ void STabBar::paintEvent(QPaintEvent *)
       paint.lineTo( width() - 1, height()-1 );
       break;
     case TAB_RIGHT:
-      paint.fillRect( width() - 1, 0, 1, height(), QBrush( colorGroup().brush( QColorGroup::Background ) ));
+      paint.fillRect( width() - 1, 0, 1, height(), bgBrush);
       curx = height() - curx;
       paint.setPen( colorGroup().dark() );
       paint.drawPoint( width() - 1, height()-1 );
@@ -769,6 +780,6 @@ const QColor& STabBar::textColor( int id )
   if ( data != 0L ){
     return data->textColor;
   }
-  return Qt::black;
+  return black;
 }
 

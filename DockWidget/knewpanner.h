@@ -30,6 +30,8 @@
 #include <qframe.h>
 #include <qlabel.h>
 
+#define KNewPanner DockWidget_KNewPanner
+
 /**
  * KNewPanner is a simple widget for managing two children which
  * are seperated by a draggable divider. The user can resize both

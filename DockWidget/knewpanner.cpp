@@ -202,13 +202,19 @@ int KNewPanner::checkValue(int pos)
     return pos;
 }
 
+#if QT_VERSION >= 200
+#define EV(a,b) a
+#else
+#define EV(a,b) b
+#endif
+
 bool KNewPanner::eventFilter(QObject *, QEvent *e)
 {
     QMouseEvent *mev;
     bool handled= false;
 
     switch (e->type()) {
-    case QEvent::MouseMove:
+    case EV(QEvent::MouseMove,Event_MouseMove):
 	mev= (QMouseEvent *)e;
 	child0->setUpdatesEnabled(false);
 	child1->setUpdatesEnabled(false);
@@ -224,7 +230,7 @@ bool KNewPanner::eventFilter(QObject *, QEvent *e)
 	}
 	handled= true;
 	break;
-    case QEvent::MouseButtonRelease:
+    case EV(QEvent::MouseButtonRelease,Event_MouseButtonRelease):
 	mev= (QMouseEvent *)e;
 
 	child0->setUpdatesEnabled(true);

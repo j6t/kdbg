@@ -8,16 +8,20 @@ noinst_LIBRARIES = libdock_library.a
 
 
 INCLUDES = $(all_includes)\
-		-I$(top_srcdir)/STabCtl/tab_library
-CXXFLAGS = -g -O2 -Wall 
-DEFS = -I. -I$(srcdir) -I$(top_srcdir)
-libdock_library_a_METASOURCES = AUTO
+		-I$(top_srcdir)/STabCtl
+
 libdock_library_a_SOURCES = \
 		dockmainwindow.cpp\
 		dockmanager.cpp\
 		dockmovemanager.cpp\
 		docksplitter.cpp\
-		knewpanner.cpp
+		knewpanner.cpp \
+		dockmainwindow.moc.cpp \
+		dockmanager.moc.cpp \
+		dockmovemanager.moc.cpp \
+		docksplitter.moc.cpp \
+		knewpanner.moc.cpp
+
 EXTRA_DIST = \
 		close.xpm\
 		dock_close_bottom.xpm\
@@ -39,3 +43,18 @@ EXTRA_DIST = \
 ##############################################################
 ####                  END KDEStudio part                  ####
 #2########################################################!@#$
+
+dockmainwindow.moc.cpp: $(srcdir)/dockmainwindow.h
+	$(MOC) $(srcdir)/dockmainwindow.h -o dockmainwindow.moc.cpp
+
+dockmanager.moc.cpp: $(srcdir)/dockmanager.h
+	$(MOC) $(srcdir)/dockmanager.h -o dockmanager.moc.cpp
+
+dockmovemanager.moc.cpp: $(srcdir)/dockmovemanager.h
+	$(MOC) $(srcdir)/dockmovemanager.h -o dockmovemanager.moc.cpp
+
+docksplitter.moc.cpp: $(srcdir)/docksplitter.h
+	$(MOC) $(srcdir)/docksplitter.h -o docksplitter.moc.cpp
+
+knewpanner.moc.cpp: $(srcdir)/knewpanner.h
+	$(MOC) $(srcdir)/knewpanner.h -o knewpanner.moc.cpp

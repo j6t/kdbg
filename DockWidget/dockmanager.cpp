@@ -5,24 +5,25 @@
     email                : novaprint@mtu-net.ru
  ***************************************************************************/
 
-#define DOCK_CONFIG_VERSION "0.0.2"
+#define DOCK_CONFIG_VERSION "0.0.4"
 
 #include <kconfig.h>
 #include <qpopupmenu.h>
 #include <qapplication.h>
 #include <kapp.h>
+#if QT_VERSION < 200
+#include <qkeycode.h>
+#endif
 
 #include <qobjcoll.h>
 #include <qframe.h>
 #include <qpainter.h>
-#include <kwm.h>
 #include <ktmainwindow.h>
 
 #include "dockmainwindow.h"
 #include "dockmanager.h"
 #include "docksplitter.h"
 #include "dockmovemanager.h"
-#include "stabctl.h"
 
 #include "close.xpm"
 #include "notclose.xpm"
@@ -39,7 +40,12 @@ SDockButton::~SDockButton()
 
 void SDockButton::drawButton( QPainter* p )
 {
-  p->fillRect( 0,0, width(), height(), QBrush(colorGroup().brush(QColorGroup::Background)) );
+#if QT_VERSION >= 200
+  QBrush bgBrush = colorGroup().brush(QColorGroup::Background);
+#else
+  QBrush bgBrush(colorGroup().background());
+#endif
+  p->fillRect( 0,0, width(), height(), bgBrush );
   p->drawPixmap( (width() - pixmap()->width()) / 2, (height() - pixmap()->height()) / 2, *pixmap() );
   if ( moveMouse && !isDown() ){
     p->setPen( white );
@@ -77,11 +83,12 @@ void SDockButton::leaveEvent( QEvent * )
 
 /*************************************************************************/
 
-DockWidget::DockWidget( DockManager* dockManager, const char* name, const QPixmap &pixmap ) : QWidget( 0L, name )
+DockWidget::DockWidget( DockManager* dockManager, const char* name, const QPixmap &pixmap, QWidget* parent )
+: QWidget( parent, name )
 {
-  Parent = (QWidget*)dockManager->parent();
+  setCaption( name );
 
-  eDocking = DockTop|DockLeft|DockRight|DockBottom|DockCenter;
+  eDocking = DockTop|DockLeft|DockRight|DockBottom|DockCenter|DockDesktop;
   sDocking = DockTop|DockLeft|DockRight|DockBottom|DockCenter;
 
   isGroup = false;
@@ -101,16 +108,20 @@ DockWidget::DockWidget( DockManager* dockManager, const char* name, const QPixma
   stayButton->setToggleButton( true );
   stayButton->setPixmap(not_close_xpm);
 
+  closeButton->resize( 9, 9 );
+  closeButton->hide();
+
+  stayButton->resize( 9, 9 );
+  stayButton->hide();
 
   QPoint p = QPoint(0,0);
   widget = 0L;
-  setMouseTracking( true );
   dockCaptionHeight = 10;
 
   drawBuffer = 0L;
   pix = new QPixmap(pixmap);
 
-  recreateToDesktop( p );
+  applyToWidget( parent, p );
 }
 
 DockWidget::~DockWidget()
@@ -123,88 +134,118 @@ DockWidget::~DockWidget()
   manager->childDock->remove( this );
 }
 
-void DockWidget::recreateToDesktop( QPoint p )
+void DockWidget::setEnableDocking( int pos )
 {
-  reparent(0, 0, p, false);
-  XSetTransientForHint( qt_xdisplay(), winId(), Parent->topLevelWidget()->winId());
-  QApplication::syncX();
-  KWM::setDecoration(winId(), KWM::tinyDecoration);
-  setMouseTracking( true );
-  dockCaptionHeight = 15;
-  buttonY = 2;
-  closeButton->setGeometry( 0, 2 , 11, 11 );
-  closeButton->show();
-
-  stayButton->setGeometry( 0, 2 , 11, 11 );
-  stayButton->show();
+  eDocking = pos;
+  updateCaptionButton();
 }
 
-void DockWidget::recreateTo( QWidget* s )
+void DockWidget::updateCaptionButton()
 {
-  reparent( s, 0, QPoint(0,0), false );
-  QApplication::syncX();
-
-  buttonY = 0;
-  if ( s->inherits("KTMainWindow") || isGroup ){
-    dockCaptionHeight = 0;
-    closeButton->setGeometry( 0, 0 , 9, 9 );
-    closeButton->hide();
-
-    stayButton->setGeometry( 0, 0 , 9, 9 );
-    stayButton->hide();
+  if ( parent() ){
+    if ( (parent() == manager->main) || isGroup || (eDocking == DockNone) ){
+      dockCaptionHeight = 0;
+      closeButton->hide();
+      stayButton->hide();
+    } else {
+      dockCaptionHeight = 10;
+      closeButton->show();
+      stayButton->show();
+    }
   } else {
     dockCaptionHeight = 10;
-    closeButton->setGeometry( 0, 0 , 9, 9 );
-    closeButton->show();
-
-    stayButton->setGeometry( 0, 0 , 9, 9 );
-    stayButton->show();
+    closeButton->hide();
+    stayButton->hide();
   }
+  repaint(false);
+}
+
+void DockWidget::applyToWidget( QWidget* s, const QPoint& p )
+{
+  if ( parent() != s ){
+    hide();
+#if QT_VERSION >= 200
+    reparent(s, 0, QPoint(0,0), false);
+#else
+    recreate(s, 0, QPoint(0,0), false);
+#endif
+    QApplication::syncX();
+  }
+
+  setMouseTracking( true );
+
+  if ( s && s->inherits("DockMainWindow") ){
+    ((DockMainWindow*)s)->setDockView( this );
+  }
+
+#if QT_VERSION >= 200	// does not work with KDE 1
+  if ( s == manager->main )
+      setGeometry( QRect(QPoint(0,0), manager->main->geometry().size()) );
+#endif
+
+  if ( !s ){
+    XSetTransientForHint( qt_xdisplay(), winId(), manager->main->topLevelWidget()->winId());
+    move(p);
+  } else {
+    if ( !s->inherits("DockSplitter") && !s->inherits("DockTabCtl") )
+      eDocking = DockNone;
+  }
+
+  updateCaptionButton();
 }
 
 void DockWidget::show()
 {
-  if ( manager->parent() == 0L ){
-    QWidget::show();
-    return;
-  }
-
-  if ( parent() == 0L ){
-    if ( !(manager->showTopLevelDock()) || !((DockMainWindow*)manager->parent())->isVisible() )
-    return;
-  }
-  QWidget::show();
+  if ( parent() || manager->main->isVisible() )
+    if ( !parent() ){
+     emit manager->setDockDefaultPos( this );
+     emit setDockDefaultPos();
+     if ( parent() ){
+        makeDockVisible();
+      } else {
+        stayButton->setOn( false );
+        QWidget::show();
+      }
+    } else {
+     QWidget::show();
+    }
 }
+
+#if QT_VERSION >= 200
+#define EV(a,b) a
+#else
+#define EV(a,b) b
+#endif
 
 bool DockWidget::event( QEvent *event )
 {
   switch ( event->type() )
   {
-    case QEvent::ChildInserted:
-      if ( ((QChildEvent*)event)->child()->isA("SDockButton") ) break;
-      if ( widget == 0L ){
+    case EV(QEvent::ChildInserted,Event_ChildInserted):
+      if ( ((QChildEvent*)event)->child()->inherits("SDockButton") ) break;
         widget = (QWidget*)((QChildEvent*)event)->child();
         widget->setGeometry( crect() );
-      }
-      else debug("DockWidget: Only one child may be on this widget");
       break;
-    case QEvent::ChildRemoved:
+    case EV(QEvent::ChildRemoved,Event_ChildRemoved):
       if ( widget == ((QChildEvent*)event)->child() ) widget = 0L;
       break;
-    case QEvent::Resize:
-      closeButton->move( width() - closeButton->width() - 1, buttonY );
-      stayButton ->move( closeButton->x() - stayButton->width() - 1, buttonY );
-      if ( widget != 0L ){
+    case EV(QEvent::Resize,Event_Resize):
+      closeButton->move( width() - closeButton->width() - 1, 0 );
+      stayButton->move( closeButton->x() - stayButton->width() - 1, 0 );
+      if ( widget ){
         widget->setGeometry( crect() );
       }
-      if ( drawBuffer != 0L ) delete drawBuffer;
+      if ( drawBuffer ) delete drawBuffer;
       drawBuffer = new QPixmap( width(), height() );
       break;
-    case QEvent::Paint:
+    case EV(QEvent::Paint,Event_Paint):
       paintCaption();
       break;
-    case QEvent::Show:
-      if ( widget != 0L ) widget->show();
+    case EV(QEvent::Show,Event_Show):
+      if ( widget ) widget->show();
+      break;
+    case EV(QEvent::Hide,Event_Hide):
+      if ( widget ) widget->hide();
       break;
     default:
       break;
@@ -220,178 +261,197 @@ QRect DockWidget::crect()
 void DockWidget::paintCaption()
 {
   if ( dockCaptionHeight == 0 ) return;
-  QPainter p(this);
-  if ( parent() == 0L ){
-    QPainter paint;
-    paint.begin( drawBuffer );
-    drawBuffer->fill( QColor(0,0,128) );
 
-    paint.setPen( black );
-    paint.drawLine( 0, 0, width()-1, 0 );
-    paint.drawLine( 0 , dockCaptionHeight-1, 0, 0 );
+  QPainter paint;
+  int delta = ( parent() ) ? 24:0;
 
-    paint.setPen( white );
-    paint.drawLine( 0, dockCaptionHeight-1, width()-1, dockCaptionHeight-1 );
-    paint.drawLine( width()-1 , 0, width()-1, dockCaptionHeight-1 );
+#if QT_VERSION >= 200
+  QBrush bgBrush = colorGroup().brush(QColorGroup::Background);
+#else
+  QBrush bgBrush(colorGroup().background());
+#endif
 
-    paint.setFont( *(manager->titleFont) );
-    paint.drawText( 3, 0, width() - closeButton->width()-7, dockCaptionHeight, AlignLeft|AlignVCenter, name() );
+  paint.begin( drawBuffer );
+  paint.fillRect( drawBuffer->rect(), bgBrush );
 
-    paint.fillRect( width() - 28, 0, 28, height(), QBrush(colorGroup().brush(QColorGroup::Background)) );
+  paint.setPen( white );
+  paint.drawLine( 1, 3, 1, 2 );
+  paint.drawLine( 1, 2, width()-delta, 2 );
 
-    bitBlt( this,0,0,drawBuffer,0,0,width(),dockCaptionHeight );
-    paint.end();
-  } else {
-    QPainter paint;
-    paint.begin( drawBuffer );
-    paint.fillRect( drawBuffer->rect(), QBrush(colorGroup().brush(QColorGroup::Background)) );
+  paint.setPen( colorGroup().mid() );
+  paint.drawLine( 1, 4, width()-delta, 4 );
+  paint.drawLine( width()-delta, 4, width()-delta, 3 );
 
-    int delta = 24;
+  paint.setPen( white );
+  paint.drawLine( 1, 6, 1, 5 );
+  paint.drawLine( 1, 5, width()-delta, 5 );
 
-    paint.setPen( white );
-    paint.drawLine( 1, 3, 1, 2 );
-    paint.drawLine( 1, 2, width()-delta, 2 );
+  paint.setPen( colorGroup().mid() );
+  paint.drawLine( 1, 7, width()-delta, 7 );
+  paint.drawLine( width()-delta, 7, width()-delta, 6 );
 
-    paint.setPen( colorGroup().mid() );
-    paint.drawLine( 1, 4, width()-delta, 4 );
-    paint.drawLine( width()-delta, 4, width()-delta, 3 );
-
-    paint.setPen( white );
-    paint.drawLine( 1, 6, 1, 5 );
-    paint.drawLine( 1, 5, width()-delta, 5 );
-
-    paint.setPen( colorGroup().mid() );
-    paint.drawLine( 1, 7, width()-delta, 7 );
-    paint.drawLine( width()-delta, 7, width()-delta, 6 );
-
-    bitBlt( this,0,0,drawBuffer,0,0,width(),dockCaptionHeight );
-    paint.end();
-  }
+  bitBlt( this,0,0,drawBuffer,0,0,width(),dockCaptionHeight );
+  paint.end();
 }
 
-void DockWidget::manualDock( DockWidget* target, DockPosition dockPos, QPoint pos,  int spliPos )
+DockWidget* DockWidget::manualDock( DockWidget* target, DockPosition dockPos, int spliPos, QPoint pos, bool check )
 {
-  unDock();
-  if ( target != 0L ){
+  bool succes = true; // tested flag
 
-    QWidget* parentDock = target->parentWidget();
-    if ( parentDock != 0L )
-      if ( parentDock->isA("STabCtl") ){
-        recreateTo( parentDock );
-        ((STabCtl*)parentDock)->insertPage( this, name() );
-        ((STabCtl*)parentDock)->setPixmap( this, *pix );
-        setDockTabName( (STabCtl*)parentDock );
-
-        emit manager->change();
-        return;
-      }
-
-    DockWidget* newDock = new DockWidget( manager, "tempName", QPixmap("") );
-
-    if ( dockPos == DockCenter ){
-      newDock->isTabGroup = true;
-      newDock->eDocking = (int)DockNone;
-    } else {
-      newDock->isGroup = true;
-      newDock->eDocking = DockTop|DockLeft|DockRight|DockBottom;
-    }
-
-    if ( parentDock == 0L ){
-      newDock->move( target->frameGeometry().topLeft() );
-      newDock->resize( target->geometry().size() );
-      if ( target->isVisibleToTLW() ) newDock->show();
-    } else {
-      newDock->recreateTo( parentDock );
-    }
-
-
-    if ( dockPos == DockCenter )
-    {
-      STabCtl* tab = new STabCtl( newDock, "_dock_tab");
-      newDock->widget = tab;
-      connect( tab, SIGNAL(tabShowPopup(int,QPoint)), manager, SLOT(slotTabShowPopup(int,QPoint)));
-      target->recreateTo( tab );
-      recreateTo( tab );
-
-      tab->insertPage( target, target->name() );
-      tab->setPixmap( target, *(target->pix) );
-
-      tab->insertPage( this, name() );
-      tab->setPixmap( this, *pix );
-
-      setDockTabName( tab );
-      tab->show();
-    } else {
-      DockSplitter* panner = 0L;
-      if ( dockPos == DockTop  || dockPos == DockBottom ) panner = new DockSplitter( newDock, "DockPaner", DockSplitter::Horizontal, KNewPanner::Percent, spliPos );
-      if ( dockPos == DockLeft || dockPos == DockRight  ) panner = new DockSplitter( newDock, "DockPaner", DockSplitter::Vertical , KNewPanner::Percent, spliPos );
-      newDock->widget = panner;
-      panner->setFocusPolicy( NoFocus );
-      target->recreateTo( panner );
-      recreateTo( panner );
-      if ( dockPos == DockRight || dockPos == DockBottom ) panner->activate( target, this );
-      if ( dockPos == DockTop   || dockPos == DockLeft   ) panner->activate( this, target );
-      target->show();
-      show();
-      panner->show();
-    }
-
-    if ( parentDock != 0L ){
-      if ( parentDock->isA("DockSplitter") ){
-        DockSplitter* sp = (DockSplitter*)parentDock;
-        sp->deactivate();
-        if ( sp->getFirst() == target )
-          sp->activate( newDock, 0L );
-        else
-          sp->activate( 0L, newDock );
-      }
-      if ( parentDock->inherits("KTMainWindow") ){
-        ((DockMainWindow*)parentDock)->setDockView( newDock );
-      }
-    }
-    newDock->show();
-    emit target->docking( this, dockPos );
-    emit manager->replaceDock( target, newDock );
-  } else {
-      move( pos );
-      show();
+  // check allowed this dock submit this operations
+  if ( !(eDocking & (int)dockPos) ){
+      succes = false;
   }
-  // for set DockWidget::widget
-//  qApp->processEvents();
+
+  // check allowed target submit this operations
+  if ( target && !(target->sDocking & (int)dockPos) ){
+      succes = false;
+  }
+
+  if ( !succes ){
+    // try to make another manualDock
+    DockWidget* dock_result = 0L;
+    if ( target && !check ){
+      int another_spliPos = 100 - spliPos;
+      DockPosition another__dockPos = DockNone;
+      switch ( dockPos ){
+        case DockLeft  : another__dockPos = DockRight ; break;
+        case DockRight : another__dockPos = DockLeft  ; break;
+        case DockTop   : another__dockPos = DockBottom; break;
+        case DockBottom: another__dockPos = DockTop   ; break;
+        default: break;
+      }
+      dock_result = target->manualDock( this, another__dockPos, another_spliPos, pos, true );
+    }
+    return dock_result;
+  }
+  // end check block
+
+  unDock();
+
+  if ( !target ){
+    move( pos );
+    show();
+    emit manager->change();
+    return this;
+  }
+
+  QWidget* parentDock = target->parentWidget();
+
+  if ( parentDock && parentDock->inherits("DockTabCtl") ){
+    // add to existing TabGroup
+    applyToWidget( parentDock );
+    ((DockTabCtl*)parentDock)->insertPage( this, caption() );
+    ((DockTabCtl*)parentDock)->setPixmap( this, *pix );
+    setDockTabName( (DockTabCtl*)parentDock );
+
+    emit manager->change();
+    return (DockWidget*)parentDock->parent();
+  }
+
+  DockWidget* newDock = new DockWidget( manager, "tempName", QPixmap(""), parentDock );
+
+  if ( dockPos == DockCenter ){
+    newDock->isTabGroup = true;
+  } else {
+    newDock->isGroup = true;
+  }
+  newDock->eDocking = (target->eDocking & eDocking) & (~(int)DockCenter);
+
+  newDock->applyToWidget( parentDock );
+
+  if ( !parentDock ){
+    newDock->move( target->frameGeometry().topLeft() );
+    newDock->resize( target->geometry().size() );
+    if ( target->isVisibleToTLW() ) newDock->show();
+  }
+
+
+  if ( dockPos == DockCenter )
+  {
+    DockTabCtl* tab = manager->createTabCtrl( newDock, "_dock_tab");
+    newDock->widget = tab;
+#ifdef DOCK_ORIGINAL
+    connect( tab, SIGNAL(tabShowPopup(int,QPoint)), manager, SLOT(slotTabShowPopup(int,QPoint)));
+#endif
+    target->applyToWidget( tab );
+    applyToWidget( tab );
+
+    tab->insertPage( target, target->caption() );
+    tab->setPixmap( target, *(target->pix) );
+
+    tab->insertPage( this, caption() );
+    tab->setPixmap( this, *pix );
+
+    setDockTabName( tab );
+    tab->show();
+  } else {
+    DockSplitter* panner = 0L;
+    if ( dockPos == DockTop  || dockPos == DockBottom ) panner = manager->createDockSplitter( newDock, "DockPaner", DockSplitter::Horizontal, KNewPanner::Percent, spliPos );
+    if ( dockPos == DockLeft || dockPos == DockRight  ) panner = manager->createDockSplitter( newDock, "DockPaner", DockSplitter::Vertical , KNewPanner::Percent, spliPos );
+    newDock->widget = panner;
+    panner->setFocusPolicy( NoFocus );
+    target->applyToWidget( panner );
+    applyToWidget( panner );
+    if ( dockPos == DockRight || dockPos == DockBottom ) panner->activate( target, this );
+    if ( dockPos == DockTop   || dockPos == DockLeft   ) panner->activate( this, target );
+    target->show();
+    show();
+    panner->show();
+  }
+
+  if ( parentDock ){
+    if ( parentDock->inherits("DockSplitter") ){
+      DockSplitter* sp = (DockSplitter*)parentDock;
+      sp->deactivate();
+      if ( sp->getFirst() == target )
+        sp->activate( newDock, 0L );
+      else
+        sp->activate( 0L, newDock );
+    }
+  }
+
+  newDock->show();
+  emit target->docking( this, dockPos );
+  emit manager->replaceDock( target, newDock );
   emit manager->change();
+
+  return newDock;
 }
 
 void DockWidget::unDock()
 {
   QWidget* parentW = parentWidget();
-  if ( parentW == 0L )  return; // Trivial move around desktop
 
+  if ( !parentW || parentW == manager->main || eDocking == DockNone )
+    return;
+
+  manager->blockSignals(true);
   manager->undockProcess = true;
 
   bool isV = parentW->isVisibleToTLW();
-  if ( parentW->isA("STabCtl") ){
-    ((STabCtl*)parentW)->removePage( this );
-    recreateToDesktop(QPoint(0,0));
-    if ( ((STabCtl*)parentW)->pageCount() == 1 ){
+  if ( parentW->inherits("DockTabCtl") ){
+    ((DockTabCtl*)parentW)->removePage( this );
+    applyToWidget( 0L );
+    if ( ((DockTabCtl*)parentW)->pageCount() == 1 ){
 
       /* last subdock widget in the tab control*/
-      DockWidget* lastTab = (DockWidget*)((STabCtl*)parentW)->getFirstPage();
-      ((STabCtl*)parentW)->removePage( lastTab );
-      lastTab->recreateToDesktop(QPoint(0,0));
+      DockWidget* lastTab = (DockWidget*)((DockTabCtl*)parentW)->getFirstPage();
+      ((DockTabCtl*)parentW)->removePage( lastTab );
+      lastTab->applyToWidget( 0L );
       lastTab->move( parentW->mapToGlobal(parentW->frameGeometry().topLeft()) );
 
-      /* STabCtl always have a parent is DockWidget*/
+      /* DockTabCtl always have a parent is DockWidget*/
       DockWidget* parentOfTab = (DockWidget*)parentW->parent();
-      delete parentW; // STabCtl
+      delete parentW; // DockTabCtl
 
-      /* may be DockSplitter on null (desktop) or DockMainWindow*/
       QWidget* parentOfDockWidget = parentOfTab->parentWidget();
       if ( parentOfDockWidget == 0L ){
           if ( isV ) lastTab->show();
       } else {
-        if ( parentOfDockWidget->isA("DockSplitter") ){
+        if ( parentOfDockWidget->inherits("DockSplitter") ){
           DockSplitter* split = (DockSplitter*)parentOfDockWidget;
-          lastTab->recreateTo( split );
+          lastTab->applyToWidget( split );
           split->deactivate();
           if ( split->getFirst() == parentOfTab ){
             split->activate( lastTab );
@@ -407,78 +467,61 @@ void DockWidget::unDock()
               emit ((DockWidget*)split->getAnother(parentOfTab))->docking( parentOfTab, DockBottom );
           }
           split->show();
-        }
-        if ( parentOfDockWidget->inherits("KTMainWindow") ){
-          lastTab->recreateTo( parentOfDockWidget );
-          ((DockMainWindow*)parentOfDockWidget)->setDockView( lastTab );
+        } else {
+          lastTab->applyToWidget( parentOfDockWidget );
         }
         lastTab->show();
       }
+      manager->blockSignals(false);
       emit manager->replaceDock( parentOfTab, lastTab );
+      manager->blockSignals(true);
       delete parentOfTab;
 
     } else {
-      setDockTabName( (STabCtl*)parentW );
+      setDockTabName( (DockTabCtl*)parentW );
     }
-    // for set DockWidget::widget
-//    qApp->processEvents();
-
-    emit manager->change();
-    manager->undockProcess = false;
-    return;
-  }
-
-  if ( parentW->inherits("KTMainWindow") ){
-    recreateToDesktop(QPoint(0,0));
-    move(1,1);
-    manager->undockProcess = false;
-    return;
-  }
-
-  DockSplitter* parentSplitterOfDockWidget = (DockSplitter*)parentW;
-
-  recreateToDesktop(QPoint(0,0));
-  move(1,1);
-
-  DockWidget* secondWidget = (DockWidget*)parentSplitterOfDockWidget->getAnother( this );
-  DockWidget* group        = (DockWidget*)parentSplitterOfDockWidget->parentWidget();
-
-  if ( group->parentWidget() == 0L ){
-    secondWidget->recreateToDesktop( QPoint(0,0) );
-    secondWidget->setGeometry( group->frameGeometry().x(),
-                             group->frameGeometry().y(),
-                             group->geometry().size().width(),
-                             group->geometry().size().height() );
   } else {
-    QWidget* obj = group->parentWidget();
-    secondWidget->recreateTo( obj );
-    if ( obj->inherits("KTMainWindow") ){
-      ((DockMainWindow*)obj)->setDockView( secondWidget );
-    } else {
-      secondWidget->recreateTo( obj );
-      DockSplitter* parentOfGroup = (DockSplitter*)obj;
-      parentOfGroup->deactivate();
+/*********************************************************************************************/
+    if ( parentW->inherits("DockSplitter") ){
+      DockSplitter* parentSplitterOfDockWidget = (DockSplitter*)parentW;
 
-      if ( parentOfGroup->getFirst() == group )
-        parentOfGroup->activate( secondWidget );
-      else
-        parentOfGroup->activate( 0L, secondWidget );
+      applyToWidget( 0L );
+      DockWidget* secondWidget = (DockWidget*)parentSplitterOfDockWidget->getAnother( this );
+      DockWidget* group        = (DockWidget*)parentSplitterOfDockWidget->parentWidget();
+      group->hide();
+
+      if ( !group->parentWidget() ){
+        secondWidget->applyToWidget( 0L, group->frameGeometry().topLeft() );
+        secondWidget->resize( group->width(), group->height() );
+      } else {
+        QWidget* obj = group->parentWidget();
+        secondWidget->applyToWidget( obj );
+        if ( obj->inherits("DockSplitter") ){
+          DockSplitter* parentOfGroup = (DockSplitter*)obj;
+          parentOfGroup->deactivate();
+
+          if ( parentOfGroup->getFirst() == group )
+            parentOfGroup->activate( secondWidget );
+          else
+            parentOfGroup->activate( 0L, secondWidget );
+        }
+      }
+      delete parentSplitterOfDockWidget;
+      manager->blockSignals(false);
+      emit manager->replaceDock( group, secondWidget );
+      manager->blockSignals(true);
+      delete group;
+
+      if ( isV ) secondWidget->show();
     }
+/*********************************************************************************************/
   }
-  delete parentSplitterOfDockWidget;
-  emit manager->replaceDock( group, secondWidget );
-  delete group;
-
-  if ( isV ) secondWidget->show();
-
-  // for set DockWidget::widget
-//  qApp->processEvents();
-
+  manager->blockSignals(false);
   emit manager->change();
   manager->undockProcess = false;
 }
 
-void DockWidget::setKTMainWindow( KTMainWindow* mw )
+void DockWidget::setWidget( QWidget* mw )
 {
   mw->recreate(this, 0, QPoint(0,0), false);
   QApplication::syncX();
@@ -487,63 +530,71 @@ void DockWidget::setKTMainWindow( KTMainWindow* mw )
 void DockWidget::slotCloseButtonClick()
 {
   if ( stayButton->isOn() ) return;
-  unDock();
-  if ( parent() == 0L ) hide();
+  if ( parent() ) unDock(); else hide();
+  emit manager->change();
 }
 
-void DockWidget::setDockTabName( STabCtl* tab )
+void DockWidget::setDockTabName( DockTabCtl* tab )
 {
   QString listOfName;
-  for ( QWidget* w = tab->getFirstPage(); w != 0L; w = tab->getNextPage( w ) ){
+  QString listOfCaption;
+  for ( QWidget* w = tab->getFirstPage(); w; w = tab->getNextPage( w ) ){
+    listOfCaption.append( w->caption() ).append(",");
+  }
+  listOfCaption.remove( listOfCaption.length()-1, 1 );
+
+  for ( QWidget* w = tab->getFirstPage(); w; w = tab->getNextPage( w ) ){
     listOfName.append( w->name() ).append(",");
   }
   listOfName.remove( listOfName.length()-1, 1 );
 
-  tab->parent()->setName( listOfName );
+  tab->parentWidget()->setName( listOfName );
+  tab->parentWidget()->setCaption( listOfCaption );
+
   tab->parentWidget()->repaint( false ); // DockWidget->repaint
-  if ( tab->parentWidget()->parent() != 0L )
-    if ( tab->parentWidget()->parent()->isA("DockSplitter") ) ( (DockSplitter*)(tab->parentWidget()->parent()) )->updateName();
+  if ( tab->parentWidget()->parent() )
+    if ( tab->parentWidget()->parent()->inherits("DockSplitter") )
+      ((DockSplitter*)(tab->parentWidget()->parent()))->updateName();
 }
 /**************************************************************************************/
 
-DockManager::DockManager( DockMainWindow* mainWindow, const char* name )
-:QObject( mainWindow, name )
+DockManager::DockManager( QWidget* mainWindow , const char* name )
+:QObject( 0, name )
 {
-  setShowTopLevelDock( true );
+  main = mainWindow;
+  main->installEventFilter( this );
+
   undockProcess = false;
 
+#ifdef DOCK_ORIGINAL
   menuData = new QList<menuDockData>;
   menuData->setAutoDelete( true );
-  configMenuData = new QStrList();
   menuData->setAutoDelete( true );
 
   menu = new QPopupMenu();
-  configMenu = new QPopupMenu();
 
   connect( menu, SIGNAL(aboutToShow()), SLOT(slotMenuPopup()) );
   connect( menu, SIGNAL(activated(int)), SLOT(slotMenuActivated(int)) );
-  connect( configMenu, SIGNAL(activated(int)), SLOT(slotConfigMenuActivated(int)) );
+#endif
 
-  childDock = new QObjectList();
+  childDock = new QList<DockWidget>();
   childDock->setAutoDelete( false );
   mg = 0L;
-  titleFont = new QFont("helvetica", 12, QFont::Bold);
   draging = false;
+  dropCancel = false;
 }
 
 DockManager::~DockManager()
 {
+#ifdef DOCK_ORIGINAL
   delete menuData;
-  delete configMenuData;
   delete menu;
-  delete configMenu;
-  delete titleFont;
+#endif
 
-
-  QObjectListIt it( *childDock );
+  QListIterator<DockWidget> it( *childDock );
   DockWidget * obj;
 
-  while ( (obj=(DockWidget*)it.current()) != 0 ) {
+  while ( (obj=it.current()) ) {
     delete obj;
   }
   delete childDock;
@@ -551,67 +602,108 @@ DockManager::~DockManager()
 
 void DockManager::activate()
 {
-  QObjectListIt it( *childDock );
+  QListIterator<DockWidget> it( *childDock );
   DockWidget * obj;
-  QList<DockWidget> showList;
 
-  while ( (obj=(DockWidget*)it.current()) != 0 ) {
+  while ( (obj=it.current()) ) {
     ++it;
-    if ( obj->parent() != 0L && !obj->parent()->isA("STabCtl") ){
+    if ( obj->widget ) obj->widget->show();
+    if ( obj->parent() && !obj->parent()->inherits("DockTabCtl") ){
         obj->show();
-        if ( obj->widget != 0L ) obj->widget->show();
     }
-    if ( obj->parent() == 0L ){
-      showList.append( obj );
-      if ( obj->widget != 0L ) obj->widget->show();
+    if ( !obj->parent() ){
+      obj->show();
     }
   }
-
-  ( (QWidget*)parent() )->show();
-  for ( obj = showList.first(); obj != 0L; obj = showList.next() )
-    obj->show();
-
-  writeConfig( "default" );
-  writeConfig( "lastsavedconfig" );
+  if ( !main->inherits("QDialog") ) main->show();
 }
 
 bool DockManager::eventFilter( QObject *obj, QEvent *event )
 {
-  if ( obj->isA("DockWidget") ){
+  if ( obj == main && event->type() == EV(QEvent::Resize,Event_Resize) && main->children() ){
+    QWidget* fc = (QWidget*)main->children()->getFirst();
+    if ( fc )
+      fc->setGeometry( QRect(QPoint(0,0), main->geometry().size()) );
+  }
+
+  if ( obj->inherits("DockWidget") ){
     DockWidget* ww;
+    DockWidget* curdw = (DockWidget*)obj;
     switch ( event->type() )
     {
-      case QEvent::MouseButtonRelease:
-        if ( draging ){
+#if QT_VERSION >= 200
+      case QEvent::CaptionChange:
+        curdw->repaint( false );
+        if ( curdw->parentWidget() ){
+          if ( curdw->parentWidget()->inherits("DockSplitter") ){
+            ((DockSplitter*)(curdw->parentWidget()))->updateName();
+          }
+          if ( curdw->parentWidget()->inherits("DockTabCtl") ){
+            curdw->setDockTabName( ((DockTabCtl*)(curdw->parentWidget())) );
+            ((DockTabCtl*)(curdw->parentWidget()))->setPageCaption( curdw, curdw->caption() );
+          }
+        }
+        break;
+#endif
+      case EV(QEvent::MouseButtonRelease,Event_MouseButtonRelease):
+        if ( draging && !dropCancel ){
           draging = false;
           drop();
         }
+        dropCancel = false;
         break;
-      case QEvent::MouseMove:
+      case EV(QEvent::MouseMove,Event_MouseMove):
         if ( draging ) {
           ww = findDockWidgetAt( QCursor::pos() );
           DockWidget* oldMoveWidget = currentMoveWidget;
-          if ( currentMoveWidget != 0L && ww == currentMoveWidget ) { //move
+          if ( currentMoveWidget  && ww == currentMoveWidget ) { //move
             dragMove( currentMoveWidget, currentMoveWidget->mapFromGlobal( QCursor::pos() ) );
             break;
           }
 
-          if ( oldMoveWidget != 0L && ww != currentMoveWidget ) { //leave
-            currentMoveWidget = ww;
-            curPos = DockNone;
-            mg->resize( storeW, storeH );
-            mg->moveContinue();
+          if ( !ww && (curdw->eDocking & (int)DockDesktop) == 0 ){
+              currentMoveWidget = ww;
+              curPos = DockDesktop;
+              mg->movePause();
+          } else {
+            if ( oldMoveWidget && ww != currentMoveWidget ) { //leave
+              currentMoveWidget = ww;
+              curPos = DockDesktop;
+              mg->resize( storeW, storeH );
+              mg->moveContinue();
+            }
           }
-          if ( oldMoveWidget != ww && ww != 0L ) { //enter ww
+
+          if ( oldMoveWidget != ww && ww ) { //enter ww
             currentMoveWidget = ww;
-            curPos = DockNone;
+            curPos = DockDesktop;
             storeW = mg->width();
             storeH = mg->height();
             mg->movePause();
           }
         } else {
-          if ( ((QMouseEvent*)event)->state() == LeftButton ) startDrag( (DockWidget*)obj );
+          if ( (((QMouseEvent*)event)->state() == LeftButton) &&  !dropCancel ){
+            if ( curdw->eDocking != (int)DockNone ){
+              dropCancel = false;
+              curdw->setFocus();
+              qApp->processOneEvent();
+              startDrag( curdw );
+            }
+          }
         }
+        break;
+      case 6/*QEvent::KeyPress*/:
+        if ( ((QKeyEvent*)event)->key() == EV(Qt::Key_Escape,Key_Escape) ){
+          if ( draging ){
+            dropCancel = true;
+            draging = false;
+            drop();
+          }
+        }
+        break;
+      case EV(QEvent::Hide,Event_Hide):
+      case EV(QEvent::Show,Event_Show):
+        emit change();
         break;
       default:
         break;
@@ -625,30 +717,31 @@ DockWidget* DockManager::findDockWidgetAt( const QPoint& pos )
   if (currentDragWidget->eDocking == (int)DockNone ) return 0L;
 
   QWidget* p = QApplication::widgetAt( pos );
-  if ( p == 0L ) return 0L;
+  if ( !p ) return 0L;
   QWidget* w = 0L;
   findChildDockWidget( w, p, p->mapFromParent(pos) );
-  if ( w == 0L ){
-    if ( !p->isA("DockWidget") ) return 0L;
+  if ( !w ){
+    if ( !p->inherits("DockWidget") ) return 0L;
     w = p;
   }
-  if ( qt_find_obj_child( w, "DockSplitter", "DockPaner" ) != 0L ) return 0L;
-  if ( qt_find_obj_child( w, "STabCtl", "_dock_tab" ) != 0L ) return 0L;
+  if ( qt_find_obj_child( w, "DockSplitter", "DockPaner" ) ) return 0L;
+  if ( qt_find_obj_child( w, "DockTabCtl", "_dock_tab" ) ) return 0L;
   if ( childDockWidgetList->find(w) != -1 ) return 0L;
+  if ( w->parent() && currentDragWidget->isGroup && w->parent()->inherits("DockTabCtl") ) return 0L;
 
   DockWidget* www = (DockWidget*)w;
   if ( www->sDocking == (int)DockNone ) return 0L;
 
-  DockPosition curPos = DockNone;
+  DockPosition curPos = DockDesktop;
   QPoint cpos  = www->mapFromGlobal( pos );
   QRect r = www->crect();
 
   int ww = r.width() / 3;
   int hh = r.height() / 3;
 
-  if ( cpos.y() <= hh ){
+	if ( cpos.y() <= hh ){
     curPos = DockTop;
-  } else
+	} else
     if ( cpos.y() >= 2*hh ){
       curPos = DockBottom;
     } else
@@ -676,7 +769,7 @@ void DockManager::findChildDockWidget( QWidget*& ww, const QWidget* p, const QPo
       if ( it.current()->isWidgetType() ) {
         w = (QWidget*)it.current();
         if ( w->isVisible() && w->geometry().contains(pos) ) {
-          if ( w->isA("DockWidget") ) ww = w;
+          if ( w->inherits("DockWidget") ) ww = w;
           findChildDockWidget( ww, w, w->mapFromParent(pos) );
           return;
         }
@@ -697,7 +790,7 @@ void DockManager::findChildDockWidget( const QWidget* p, WidgetList*& list )
       if ( it.current()->isWidgetType() ) {
         w = (QWidget*)it.current();
         if ( w->isVisible() ) {
-          if ( w->isA("DockWidget") ) list->append( w );
+          if ( w->inherits("DockWidget") ) list->append( w );
           findChildDockWidget( w, list );
         }
       }
@@ -711,14 +804,14 @@ void DockManager::startDrag( DockWidget* w )
 {
   if ( w->stayButton->isOn() ) return;
   currentMoveWidget = 0L;
-  currentDragWidget = w;
+	currentDragWidget = w;
   childDockWidgetList = new WidgetList();
   childDockWidgetList->append( w );
   findChildDockWidget( w, childDockWidgetList );
 
-  if ( mg != 0L ) delete mg;
+	if ( mg ) delete mg;
   mg = new DockMoveManager( w );
-  curPos = DockNone;
+  curPos = DockDesktop;
   draging = true;
   mg->doMove( true, true, false);
 }
@@ -729,8 +822,8 @@ void DockManager::dragMove( DockWidget* dw, QPoint pos )
 	QPoint p = dw->mapToGlobal( r.topLeft() );
   DockPosition oldPos = curPos;
 
-  if ( dw->parent() != 0L )
-    if ( dw->parent()->isA("STabCtl") ){
+  if ( dw->parent() )
+    if ( dw->parent()->inherits("DockTabCtl") ){
       curPos = DockCenter;
     	if ( oldPos != curPos ) mg->setGeometry( p.x()+2, p.y()+2, r.width()-4, r.height()-4 );
       return;
@@ -770,34 +863,43 @@ void DockManager::drop()
 {
   mg->stop();
   delete childDockWidgetList;
-  if ( currentMoveWidget == 0L && currentDragWidget->parent() == 0L )
+  if ( dropCancel ) return;
+  if ( !currentMoveWidget && ((currentDragWidget->eDocking & (int)DockDesktop) == 0) ) return;
+
+  if ( !currentMoveWidget && !currentDragWidget->parent() )
     currentDragWidget->move( mg->x(), mg->y() );
   else
-    currentDragWidget->manualDock( currentMoveWidget, curPos , QPoint(mg->x(), mg->y()) );
+    currentDragWidget->manualDock( currentMoveWidget, curPos , 50, QPoint(mg->x(), mg->y()) );
 }
 
-void DockManager::writeConfig( const char* confName )
+void DockManager::writeConfig( KConfig* c, QString group )
 {
 debug("BEGIN Write Config");
-  KConfig* c = kapp->config();
-  c->setGroup( QString(name())+"_config_"+confName );
+#if QT_VERSION >= 200
+  if ( !c ) c = kapp->config();
+#else
+  if ( !c ) c = kapp->getConfig();
+#endif
+  if ( group.isEmpty() ) group = "dock_setting_default";
+
+  c->setGroup( group );
   c->writeEntry( "Version", DOCK_CONFIG_VERSION );
 
 	QStrList nameList;
 	QStrList findList;
-  QObjectListIt it( *childDock );
+  QListIterator<DockWidget> it( *childDock );
   DockWidget * obj;
 
 	// collect DockWidget's name
 	QStrList nList;
-  while ( (obj=(DockWidget*)it.current()) != 0 ) {
+  while ( (obj=it.current()) ) {
 	  ++it;
     debug("  +Add subdock %s", obj->name());
 		nList.append( obj->name() );
   }
 
 	nList.first();
-  while ( nList.current() != 0L ){
+  while ( nList.current() ){
     debug("  -Try to save %s", nList.current());
 		obj = getDockWidgetFromName( nList.current() );
     QString cname = obj->name();
@@ -807,12 +909,9 @@ debug("BEGIN Write Config");
       if ( findList.find( obj->firstName ) != -1 && findList.find( obj->lastName ) != -1 ){
 
         c->writeEntry( cname+":type", "GROUP");
-        if ( obj->parent() == 0L ){
+        if ( !obj->parent() ){
           c->writeEntry( cname+":parent", "___null___");
-          c->writeEntry( cname+":x", obj->frameGeometry().x());
-          c->writeEntry( cname+":y", obj->frameGeometry().y());
-          c->writeEntry( cname+":width", obj->width());
-          c->writeEntry( cname+":height", obj->height());
+          c->writeEntry( cname+":geometry", QRect(obj->frameGeometry().topLeft(), obj->size()) );
           c->writeEntry( cname+":visible", obj->isVisible());
         } else {
           c->writeEntry( cname+":parent", "yes");
@@ -835,28 +934,25 @@ debug("BEGIN Write Config");
         if ( findList.find( obj->lastName ) == -1 )
           debug("  ? Not found %s", obj->lastName);
         nList.next();
-        if ( nList.current() == 0L ) nList.first();
+        if ( !nList.current() ) nList.first();
       }
     } else {
 /*************************************************************************************************/
       if ( obj->isTabGroup){
         c->writeEntry( cname+":type", "TAB_GROUP");
-        if ( obj->parent() == 0L ){
+        if ( !obj->parent() ){
           c->writeEntry( cname+":parent", "___null___");
-          c->writeEntry( cname+":x", obj->frameGeometry().x());
-          c->writeEntry( cname+":y", obj->frameGeometry().y());
-          c->writeEntry( cname+":width", obj->width());
-          c->writeEntry( cname+":height", obj->height());
+          c->writeEntry( cname+":geometry", QRect(obj->frameGeometry().topLeft(), obj->size()) );
           c->writeEntry( cname+":visible", obj->isVisible());
         } else {
           c->writeEntry( cname+":parent", "yes");
         }
         QStrList list;
-        for ( QWidget* w = ((STabCtl*)obj->widget)->getFirstPage(); w != 0L; w = ((STabCtl*)obj->widget)->getNextPage( w ) ){
+        for ( QWidget* w = ((DockTabCtl*)obj->widget)->getFirstPage(); w; w = ((DockTabCtl*)obj->widget)->getNextPage( w ) ){
           list.append( w->name() );
         }
         c->writeEntry( cname+":tabNames", list );
-        c->writeEntry( cname+":curTab", ((STabCtl*)obj->widget)->visiblePageId() );
+        c->writeEntry( cname+":curTab", ((DockTabCtl*)obj->widget)->visiblePageId() );
 
         nameList.append( obj->name() );
         findList.append( obj->name() ); // not realy need !!!
@@ -865,15 +961,12 @@ debug("BEGIN Write Config");
         nList.first();
       } else {
 /*************************************************************************************************/
-        if ( obj->parent() == 0L ){
-          c->writeEntry( cname+":type", "DOCK");
-          c->writeEntry( cname+":x", obj->frameGeometry().x());
-          c->writeEntry( cname+":y", obj->frameGeometry().y());
-          c->writeEntry( cname+":width", obj->width());
-          c->writeEntry( cname+":height", obj->height());
+        if ( !obj->parent() ){
+          c->writeEntry( cname+":type", "NULL_DOCK");
+          c->writeEntry( cname+":geometry", QRect(obj->frameGeometry().topLeft(), obj->size()) );
           c->writeEntry( cname+":visible", obj->isVisible());
         } else {
-          c->writeEntry( cname+":type", "NULL_DOCK");
+          c->writeEntry( cname+":type", "DOCK");
         }
         nameList.append( cname );
         debug("  Save %s", nList.current());
@@ -885,136 +978,168 @@ debug("BEGIN Write Config");
   }
   c->writeEntry( "NameList", nameList );
 
-  DockMainWindow* m = (DockMainWindow*)parent();
-  c->writeEntry( "Main:Geometry", KWM::geometry( m->winId() ) );
-  c->writeEntry( "Main:visible", m->isVisible());
+  c->writeEntry( "Main:Geometry", QRect(main->frameGeometry().topLeft(), main->size()) );
+  c->writeEntry( "Main:visible", main->isVisible()); // curently nou use
 
-  // for DockMainWindow->setDockView() in reafConfig()
-  c->writeEntry( "Main:view", m->getMainViewDockWidget()->name() );
+  if ( main->inherits("DockMainWindow") ){
+    DockMainWindow* dmain = (DockMainWindow*)main;
+    // for DockMainWindow->setDockView() in reafConfig()
+    c->writeEntry( "Main:view", dmain->getMainViewDockWidget() ? dmain->getMainViewDockWidget()->name():"" );
+#ifdef DOCK_ORIGINAL
+    c->writeEntry( "Main:dock", dmain->getMainDockWidget()     ? dmain->getMainDockWidget()->name()    :"" );
+#endif
+  }
 
   c->sync();
   debug("END Write Config");
 }
 
-void DockManager::readConfig( const char* confName )
+void DockManager::readConfig( KConfig* c, QString group )
 {
-  KConfig* c = kapp->config();
-  c->setGroup( QString(name())+"_config_"+confName );
+#if QT_VERSION >= 200
+  if ( !c ) c = kapp->config();
+#else
+  if ( !c ) c = kapp->getConfig();
+#endif
+  if ( group.isEmpty() ) group = "dock_setting_default";
+
+  c->setGroup( group );
   QStrList nameList;
   c->readListEntry( "NameList", nameList );
   QString ver = c->readEntry( "Version", "0.0.1" );
-  if ( nameList.count() < 1 || ver != DOCK_CONFIG_VERSION ){
+  nameList.first();
+  if ( !nameList.current() || ver != DOCK_CONFIG_VERSION ){
     activate();
     return;
   }
 
-  setShowTopLevelDock( false );
-  QList<DockWidget> showTopLevelDock;
   autoCreateDock = new QObjectList();
   autoCreateDock->setAutoDelete( true );
 
-  QObjectListIt it( *childDock );
+  main->hide();
+
+  QListIterator<DockWidget> it( *childDock );
   DockWidget * obj;
-  while ( (obj=(DockWidget*)it.current()) != 0 ) {
+
+  while ( (obj=it.current()) ) {
     ++it;
     if ( !obj->isGroup && !obj->isTabGroup )
     {
-      obj->unDock();
+      if ( obj->parent() ) obj->unDock(); else obj->hide();
     }
   }
 
   nameList.first();
-  while ( nameList.current() != 0L ){
+  while ( nameList.current() ){
     QString oname = nameList.current();
-
     QString type = c->readEntry( oname + ":type" );
+    obj = 0L;
+
     if ( type == "GROUP" ){
       DockWidget* first = getDockWidgetFromName( c->readEntry( oname + ":first_name" ) );
       DockWidget* last  = getDockWidgetFromName( c->readEntry( oname + ":last_name"  ) );
 
       int p = c->readNumEntry( oname + ":orientation" );
-      if ( first != 0L && last != 0L ){
-        first->manualDock( last, ( p == 0 ) ? DockLeft : DockTop );
-//        qApp->processEvents(); /* need to process InsertChildEvent to set member 'widget' */
-        obj = getDockWidgetFromName( oname );
-        ((DockSplitter*)obj->widget)->setSeparatorPos( c->readNumEntry( oname + ":sepPos" ) );
+      if ( first  && last ){
+        obj = first->manualDock( last, ( p == 0 ) ? DockLeft : DockTop );
+        if (obj){
+          obj->setName( oname );
+          ((DockSplitter*)obj->widget)->setSeparatorPos( c->readNumEntry( oname + ":sepPos" ) );
+        }
       }
     }
 
     if ( type == "TAB_GROUP" ){
       QStrList list;
+      DockWidget* tabDockGroup = 0L;
       c->readListEntry( oname+":tabNames", list );
       DockWidget* d1 = getDockWidgetFromName( list.first() );
       list.next();
       DockWidget* d2 = getDockWidgetFromName( list.current() );
-      d2->manualDock( d1, DockCenter );
-      STabCtl* tab = (STabCtl*)d1->parent();
-      list.next();
-      while ( list.current() != 0L ){
-        DockWidget* tabDock = getDockWidgetFromName( list.current() );
-        tabDock->manualDock( d1, DockCenter );
+      tabDockGroup = d2->manualDock( d1, DockCenter );
+      if ( tabDockGroup ){
+        DockTabCtl* tab = (DockTabCtl*)tabDockGroup->widget;
         list.next();
+        while ( list.current() && tabDockGroup ){
+          DockWidget* tabDock = getDockWidgetFromName( list.current() );
+          tabDockGroup = tabDock->manualDock( d1, DockCenter );
+          list.next();
+        }
+        if ( tabDockGroup ){
+          tabDockGroup->setName( oname );
+          tab->setVisiblePage( c->readNumEntry( oname+":curTab" ) );
+        }
       }
-      tab->setVisiblePage( c->readNumEntry( oname+":curTab" ) );
     }
 
-    if ( type == "DOCK" || c->readEntry( oname + ":parent") == "___null___" ){
-      int x = c->readNumEntry( oname + ":x" );
-      int y = c->readNumEntry( oname + ":y" );
-      int w = c->readNumEntry( oname + ":width" );
-      int h = c->readNumEntry( oname + ":height" );
+    if ( type == "NULL_DOCK" || c->readEntry( oname + ":parent") == "___null___" ){
+      QRect r = c->readRectEntry( oname + ":geometry" );
       obj = getDockWidgetFromName( oname );
-      obj->unDock();
-      obj->setGeometry(x,y,w,h);
+      obj->setGeometry(r);
+
       if ( c->readBoolEntry( oname + ":visible" ) ){
-        showTopLevelDock.append( obj );
-        obj->setGeometry(x,y,w,h);
-      } else obj->hide();
+        obj->QWidget::show();
+      }
     }
-    obj = getDockWidgetFromName( oname );
-    obj->stayButton->setOn( c->readBoolEntry( oname+":stayButton", false ) );
+
+    if ( type == "DOCK"  ){
+      obj = getDockWidgetFromName( oname );
+    }
+
+    if ( obj ) obj->stayButton->setOn( c->readBoolEntry( oname+":stayButton", false ) );
 
     nameList.next();
 	}
 
-  DockMainWindow* m = (DockMainWindow*)parent();
-
-  QString mv = c->readEntry( "Main:view" );
-  if ( !mv.isEmpty()  && getDockWidgetFromName( mv ) != 0L ){
-    DockWidget* mvd  = getDockWidgetFromName( mv );
-    mvd->recreateTo( m );
-    mvd->show();
-    m->setDockView( mvd );
-  }
-
   // delete all autocreate dock
   delete autoCreateDock;
+  autoCreateDock = 0L;
 
-  m->show();
+  if ( main->inherits("DockMainWindow") ){
+    DockMainWindow* dmain = (DockMainWindow*)main;
+
+    QString mv = c->readEntry( "Main:view" );
+    if ( !mv.isEmpty() && getDockWidgetFromName( mv ) ){
+      DockWidget* mvd  = getDockWidgetFromName( mv );
+      mvd->applyToWidget( dmain );
+      mvd->show();
+      dmain->setDockView( mvd );
+    }
+#ifdef DOCK_ORIGINAL
+    QString md = c->readEntry( "Main:dock" );
+    if ( !md.isEmpty() && getDockWidgetFromName( md ) ){
+      DockWidget* mvd  = getDockWidgetFromName( md );
+      dmain->setMainDockWidget( mvd );
+    }
+#endif
+  }
+
   QRect mr = c->readRectEntry("Main:Geometry");
-  KWM::setGeometry( m->winId(), mr );
-  setShowTopLevelDock( true );
-
-  for ( obj = showTopLevelDock.first(); obj != 0L; obj = showTopLevelDock.next() )
-    obj->show();
+  main->setGeometry(mr);
+  if ( !main->inherits("QDialog") ) main->show();
 }
 
 DockWidget* DockManager::getDockWidgetFromName( const char* dockName )
 {
-  QObjectListIt it( *childDock );
+  QListIterator<DockWidget> it( *childDock );
   DockWidget * obj;
-  while ( (obj=(DockWidget*)it.current()) != 0 ) {
+  while ( (obj=it.current()) ) {
     ++it;
 		if ( QString(obj->name()) == QString(dockName) ) return obj;
   }
-  DockWidget* autoCreate = new DockWidget( this, dockName, QPixmap("") );
-  autoCreateDock->append( autoCreate );
+
+  DockWidget* autoCreate = 0L;
+  if ( autoCreateDock ){
+    autoCreate = new DockWidget( this, dockName, QPixmap("") );
+    autoCreateDock->append( autoCreate );
+  }
 	return autoCreate;
 }
 
+#ifdef DOCK_ORIGINAL
 void DockManager::slotTabShowPopup( int id, QPoint pos )
 {
-  curTabDockWidget = (DockWidget*)((STabCtl*)sender())->page(id);
+  curTabDockWidget = (DockWidget*)((DockTabCtl*)sender())->page(id);
   QPopupMenu menu;
   menu.insertItem( "Undock", this, SLOT(slotUndockTab()) );
   menu.insertItem( "Hide", this, SLOT(slotHideTab()) );
@@ -1023,7 +1148,7 @@ void DockManager::slotTabShowPopup( int id, QPoint pos )
 
 void DockManager::slotUndockTab()
 {
-  curTabDockWidget->manualDock( 0L, DockNone, curTabDockWidget->mapToGlobal(curTabDockWidget->frameGeometry().topLeft()));
+  curTabDockWidget->manualDock( 0L, DockDesktop, 50, curTabDockWidget->mapToGlobal(curTabDockWidget->frameGeometry().topLeft()));
   curTabDockWidget->show();
 }
 
@@ -1034,69 +1159,58 @@ void DockManager::slotHideTab()
 
 void DockManager::slotMenuPopup()
 {
-  configMenu->clear();
   menu->clear();
   menuData->clear();
 
-  QWidget* w_main = (QWidget*)parent();
-  if ( w_main->isVisible() ){
+  if ( main->isVisible() ){
     menu->insertItem( "Hide toplevel window", 0 );
-    menuData->append( new menuDockData( w_main, true ) );
+    menuData->append( new menuDockData( main, true ) );
   } else {
     menu->insertItem( "Show toplevel window", 0 );
-    menuData->append( new menuDockData( w_main, false ) );
+    menuData->append( new menuDockData( main, false ) );
   }
   menu->insertSeparator();
 
-  QObjectListIt it( *childDock );
+  QListIterator<DockWidget> it( *childDock );
   DockWidget * obj;
   int numerator = 1;
-  while ( (obj=(DockWidget*)it.current()) != 0 ) {
+  while ( (obj=it.current()) ) {
 	  ++it;
-    if ( !obj->isGroup && !obj->isTabGroup && (obj->parent() != obj->Parent) )
+    if ( obj->mayBeHide() )
     {
-      if ( isDockVisible( obj ) )
-      {
-        menu->insertItem( *obj->pix, QString("Hide ") + obj->name(), numerator++ );
-        menuData->append( new menuDockData( obj, true ) );
-      }
-      else
-      {
-    	menu->insertItem( *obj->pix, QString("Show ") + obj->name(), numerator++ );
-        menuData->append( new menuDockData( obj, false ) );
-      }
+      menu->insertItem( *obj->pix, QString("Hide ") + obj->caption(), numerator++ );
+      menuData->append( new menuDockData( obj, true ) );
+    }
+
+    if ( obj->mayBeShow() )
+    {
+      menu->insertItem( *obj->pix, QString("Show ") + obj->caption(), numerator++ );
+      menuData->append( new menuDockData( obj, false ) );
     }
   }
-  menu->insertSeparator();
+}
+#endif // DOCK_ORIGINAL
 
-  configMenuData->clear();
-
-  configMenu->insertItem( "Restore default configuration", 0 );
-  configMenuData->append( "default" );
-
-  configMenu->insertSeparator();
-//  configMenu->insertItem( "Save As ..." );
-//  configMenu->insertSeparator();
-//  configMenu->insertItem( "Set default configuration" );
-
-
-  menu->insertItem( "Config", configMenu );
+bool DockWidget::mayBeHide()
+{
+  bool f = (parent() != manager->main);
+  return ( !isGroup && !isTabGroup && f && isVisible() && ( eDocking != (int)DockNone ) );
 }
 
+bool DockWidget::mayBeShow()
+{
+  bool f = (parent() != manager->main);
+  return ( !isGroup && !isTabGroup && f && !isVisible() );
+}
+
+#ifdef DOCK_ORIGINAL
 void DockManager::slotMenuActivated( int id )
 {
   menuDockData* data = menuData->at( id );
 
   QWidget * obj = data->dock;
-  if ( obj->isA("DockWidget") ){
-    if ( data->hide ){
-      ((DockWidget*)data->dock)->slotCloseButtonClick();
-    } else {
-      if ( parent() == 0L )
-        makeDockVisible((DockWidget*)data->dock);
-      else
-        ((DockMainWindow*)parent())->makeDockVisible((DockWidget*)data->dock);
-    }
+  if ( obj->inherits("DockWidget") ){
+    ((DockWidget*)(data->dock))->changeHideShowState();
   } else {
     if ( data->hide ){
       obj->hide();
@@ -1105,43 +1219,60 @@ void DockManager::slotMenuActivated( int id )
     }
   }
 }
+#endif // DOCK_ORIGINAL
 
-void DockManager::slotConfigMenuActivated( int id )
+void DockWidget::changeHideShowState()
 {
-  readConfig( configMenuData->at(id) );
-}
+  if ( mayBeHide() ){
+    slotCloseButtonClick();
+    return;
+  }
 
-void DockManager::makeDockVisible( DockWidget* dock )
-{
-  if ( dock == 0L || !((QWidget*)parent())->isVisible() || isDockVisible(dock) ) return;
-
-  if ( dock->parent() != 0L && dock->parent()->isA("STabCtl") ){
-    if ( dock->parentWidget()->isVisibleToTLW() ){
-      ((STabCtl*)dock->parent())->setVisiblePage( dock );
+  if ( mayBeShow() ){
+    if ( manager->main->inherits("DockMainWindow") ){
+      ((DockMainWindow*)manager->main)->makeDockVisible(this);
     } else {
-      dock->stayButton->setOn( false );
-      dock->slotCloseButtonClick();
-      dock->show();
+      makeDockVisible();
     }
-  } else {
-    dock->show();
   }
 }
 
-bool DockManager::isDockVisible( DockWidget* dock )
+void DockWidget::makeDockVisible()
 {
-  return dock->isVisibleToTLW();
+  if ( isVisible() ) return;
+
+  if ( parent() && parent()->inherits("DockTabCtl") ){
+      ((DockTabCtl*)parent())->setVisiblePage( this );
+  }
+  QWidget* p = parentWidget();
+  while ( p ){
+    if ( !p->isVisible() ) p->show();
+    p = p->parentWidget();
+  }
+  show();
 }
 
 DockWidget* DockManager::findWidgetParentDock( QWidget* w )
 {
-  QObjectListIt it( *childDock );
+  QListIterator<DockWidget> it( *childDock );
   DockWidget * dock;
   DockWidget * found = 0L;
 
-  while ( (dock=(DockWidget*)it.current()) != 0 ) {
+  while ( (dock=it.current()) ) {
 	  ++it;
     if ( dock->widget == w ){ found  = dock; break; }
   }
   return found;
+}
+
+DockTabCtl* DockManager::createTabCtrl( QWidget *parent, const char *name )
+{
+    return new DockTabCtl( parent, name );
+}
+
+DockSplitter* DockManager::createDockSplitter(QWidget *parent, const char *name,
+					      KNewPanner::Orientation orient,
+					      KNewPanner::Units units, int pos)
+{
+    return new DockSplitter(parent, name, orient, units, pos);
 }

@@ -18,8 +18,10 @@
 #include "dock_close_top.xpm"
 
 DockMainWindow::DockMainWindow( const char *name )
-:KTMainWindow( name )
+:KTMainWindow( name ),
+  dockManager(0)
 {
+#ifdef DOCK_ORIGINAL
   DockB.dock = 0L;
   DockB.pos  = DockBottom;
 
@@ -32,63 +34,83 @@ DockMainWindow::DockMainWindow( const char *name )
   DockL.dock = 0L;
   DockL.pos  = DockLeft;
 
-  configName = "lastsavedconfig";
-  dockManager = new DockManager( this, QString(name)+"_DockManager");
-  mainDockWidget = new DockWidget( dockManager, "MainWindowDockWidget", QPixmap("") );
-  mainDockWidget->recreateTo( this );
-  setView( mainDockWidget );
-  
-  toolbar = new KToolBar( this );
-  toolbar->insertButton( QPixmap(dock_close_top), 1, true, "Close top dock" );
-  toolbar->insertButton( QPixmap(dock_close_left), 2, true, "Close left dock" );
-  toolbar->insertButton( QPixmap(dock_close_right), 3, true, "Close right dock" );
-  toolbar->insertButton( QPixmap(dock_close_bottom), 4, true, "Close bottom dock" );
-
-  toolbar->setToggle(1);
-  toolbar->setToggle(2);
-  toolbar->setToggle(3);
-  toolbar->setToggle(4);
-
-  toolbar->setButton( 1, true );
-  toolbar->setButton( 2, true );
-  toolbar->setButton( 3, true );
-  toolbar->setButton( 4, true );
-
-  toolbar->setFullWidth( false );
-  connect( dockManager, SIGNAL(change()), SLOT(slotDockChange()) );
-  connect( dockManager, SIGNAL(replaceDock(DockWidget*,DockWidget*)), SLOT(slotReplaceDock(DockWidget*,DockWidget*)) );
-  connect( toolbar, SIGNAL(toggled(int)), SLOT(slotToggled(int)) );
+  toolbar = 0L;
+  mainDockWidget = 0L;
+#endif
+  viewDock = 0L;
 }
 
 DockMainWindow::~DockMainWindow()
 {
-    dockManager->disconnect();
-    delete dockManager;
 }
+
+void DockMainWindow::setDockManager( DockManager* manager )
+{
+  dockManager = manager;
+#ifdef DOCK_ORIGINAL
+  connect( dockManager, SIGNAL(change()), SLOT(slotDockChange()) );
+  connect( dockManager, SIGNAL(replaceDock(DockWidget*,DockWidget*)), SLOT(slotReplaceDock(DockWidget*,DockWidget*)) );
+#endif
+}
+
+#ifdef DOCK_ORIGINAL
+void DockMainWindow::setMainDockWidget( DockWidget* mdw )
+{
+  if ( mainDockWidget == mdw ) return;
+  mainDockWidget = mdw;
+  if ( mainDockWidget ){
+    if ( !toolbar ){
+      toolbar = new KToolBar( this );
+      toolbar->insertButton( QPixmap(dock_close_top), 1, true, "Close top dock" );
+      toolbar->insertButton( QPixmap(dock_close_left), 2, true, "Close left dock" );
+      toolbar->insertButton( QPixmap(dock_close_right), 3, true, "Close right dock" );
+      toolbar->insertButton( QPixmap(dock_close_bottom), 4, true, "Close bottom dock" );
+
+      toolbar->setToggle(1);
+      toolbar->setToggle(2);
+      toolbar->setToggle(3);
+      toolbar->setToggle(4);
+
+      toolbar->setButton( 1, true );
+      toolbar->setButton( 2, true );
+      toolbar->setButton( 3, true );
+      toolbar->setButton( 4, true );
+
+      toolbar->setFullWidth( false );
+      toolbar->show();
+      connect( toolbar, SIGNAL(toggled(int)), SLOT(slotToggled(int)) );
+      addToolBar( toolbar );
+    }
+  } else {
+    delete toolbar;
+    toolbar = 0L;
+    updateRects();
+  }
+  slotDockChange();
+}
+#endif // DOCK_ORIGINAL
 
 void DockMainWindow::setView( QWidget *view )
 {
   if ( view->isA("DockWidget") ){
+    if ( view->parent() != this ) ((DockWidget*)view)->applyToWidget( this );
     KTMainWindow::setView(view);
     viewDock = (DockWidget*)view;
   } else {
-    view->recreate( mainDockWidget, 0, QPoint(0,0) );
-    QApplication::syncX();
+    KTMainWindow::setView(view);
   }
 }
 
-DockWidget* DockMainWindow::createDockWidget( const char* name, const QPixmap &pixmap )
+DockWidget* DockMainWindow::createDockWidget( const char* name, const QPixmap &pixmap, QWidget* parent )
 {
-  return new DockWidget( dockManager, name, pixmap );
+  return new DockWidget( dockManager, name, pixmap, parent );
 }
 
-void DockMainWindow::dockIn( DockWidget* w, DockPosition pos )
-{
-  w->manualDock( mainDockWidget, pos );
-}
-
+#ifdef DOCK_ORIGINAL
 void DockMainWindow::slotDockChange()
 {
+  if ( !mainDockWidget ) return;
+
   DockWidget* DL = 0L;
   DockWidget* DR = 0L;
   DockWidget* DT = 0L;
@@ -104,7 +126,7 @@ void DockMainWindow::slotDockChange()
 
   DockWidget* base = mainDockWidget;
 
-  while ( base != 0L && base->parent()!= 0L && base->parent()->isA("DockSplitter") )
+  while ( base != 0L && base->parent()!= 0L && base->parent()->inherits("DockSplitter") )
   {
     DockSplitter* s = (DockSplitter*)base->parent();
     int o = ((DockWidget*)s->parent())->splitterOrientation;
@@ -156,11 +178,6 @@ void DockMainWindow::slotDockChange()
   /**********************/
 }
 
-void DockMainWindow::insertMainWindowDockToolBar()
-{
-  addToolBar( toolbar );
-}
-
 void DockMainWindow::slotToggled( int id )
 {
   switch ( id ){
@@ -186,7 +203,7 @@ void DockMainWindow::toolBarManager( bool toggled, dockPosData &data )
   if ( data.dock == 0L || data.dropDock == 0L ) return;
 
   if ( toggled ){
-    data.dock->manualDock( data.dropDock, data.pos, QPoint(0,0),  data.sepPos );
+    data.dock->manualDock( data.dropDock, data.pos, data.sepPos );
   } else {
     data.sepPos = ((DockSplitter*)data.dock->parent())->separatorPos();
     data.dock->unDock();
@@ -205,49 +222,54 @@ void DockMainWindow::slotReplaceDock( DockWidget* oldDock, DockWidget* newDock )
   DockR.dropDock = DockR.dropDock == oldDock ? newDock:DockR.dropDock;
   DockL.dropDock = DockL.dropDock == oldDock ? newDock:DockL.dropDock;
 }
+#endif // DOCK_ORIGINAL
 
 void DockMainWindow::makeDockVisible( DockWidget* dock )
 {
-  if ( dock == 0L ) return;
+  if ( !dock ) return;
 
-  toolbar->blockSignals( true );
+#ifdef DOCK_ORIGINAL
+  if ( toolbar ){
+    toolbar->blockSignals( true );
 
-  QWidget* testWidget = dock;
-  bool found = false;
+    QWidget* testWidget = dock;
+    bool found = false;
 
-  while ( testWidget != 0L ){
-    if ( testWidget->isA("DockWidget") ){
-      DockWidget* test = (DockWidget*)testWidget;
-      if ( !toolbar->isButtonOn(1) && DockT.dock == test ){
-        toolbar->toggleButton(1);
-        toolBarManager( true, DockT );
-        found = true;
+    while ( testWidget != 0L ){
+      if ( testWidget->isA("DockWidget") ){
+        DockWidget* test = (DockWidget*)testWidget;
+        if ( !toolbar->isButtonOn(1) && DockT.dock == test ){
+          toolbar->toggleButton(1);
+          toolBarManager( true, DockT );
+          found = true;
+        }
+        if ( !toolbar->isButtonOn(2) && DockL.dock == test ){
+          toolbar->toggleButton(2);
+          toolBarManager( true, DockL );
+          found = true;
+        }
+        if ( !toolbar->isButtonOn(3) && DockR.dock == test ){
+          toolbar->toggleButton(3);
+          toolBarManager( true, DockR );
+          found = true;
+        }
+        if ( !toolbar->isButtonOn(4) && DockB.dock == test ){
+          toolbar->toggleButton(4);
+          toolBarManager( true, DockB );
+          found = true;
+        }
       }
-      if ( !toolbar->isButtonOn(2) && DockL.dock == test ){
-        toolbar->toggleButton(2);
-        toolBarManager( true, DockL );
-        found = true;
-      }
-      if ( !toolbar->isButtonOn(3) && DockR.dock == test ){
-        toolbar->toggleButton(3);
-        toolBarManager( true, DockR );
-        found = true;
-      }
-      if ( !toolbar->isButtonOn(4) && DockB.dock == test ){
-        toolbar->toggleButton(4);
-        toolBarManager( true, DockB );
-        found = true;
-      }
+      testWidget = testWidget->parentWidget();
     }
-    testWidget = testWidget->parentWidget();
+
+    dock->makeDockVisible();
+
+    toolbar->blockSignals( false );
+  } else
+#endif // DOCK_ORIGINAL
+  {
+    dock->makeDockVisible();
   }
-
-  if ( found && dock->parent() != 0L && dock->parent()->isA("STabCtl") )
-      ((STabCtl*)dock->parent())->setVisiblePage( dock );
-  else
-    dockManager->makeDockVisible( dock );
-
-  toolbar->blockSignals( false );
 }
 
 void DockMainWindow::makeWidgetDockVisible( QWidget* widget )
@@ -255,54 +277,68 @@ void DockMainWindow::makeWidgetDockVisible( QWidget* widget )
   makeDockVisible( dockManager->findWidgetParentDock(widget) );
 }
 
-void DockMainWindow::writeDockConfig()
+void DockMainWindow::writeDockConfig( KConfig* c, QString group )
 {
-  toolbar->blockSignals( true );
+#ifdef DOCK_ORIGINAL
+  if ( toolbar ){
+    toolbar->blockSignals( true );
 
-  if ( !toolbar->isButtonOn(1) ){
-    toolbar->toggleButton(1);
-    toolBarManager( true, DockT );
-  }
-  if ( !toolbar->isButtonOn(2) ){
-    toolbar->toggleButton(2);
-    toolBarManager( true, DockL );
-  }
-  if ( !toolbar->isButtonOn(3) ){
-    toolbar->toggleButton(3);
-    toolBarManager( true, DockR );
-  }
-  if ( !toolbar->isButtonOn(4) ){
-    toolbar->toggleButton(4);
-    toolBarManager( true, DockB );
-  }
-  dockManager->writeConfig( configName );
+    if ( !toolbar->isButtonOn(1) ){
+      toolbar->toggleButton(1);
+      toolBarManager( true, DockT );
+    }
+    if ( !toolbar->isButtonOn(2) ){
+      toolbar->toggleButton(2);
+      toolBarManager( true, DockL );
+    }
+    if ( !toolbar->isButtonOn(3) ){
+      toolbar->toggleButton(3);
+      toolBarManager( true, DockR );
+    }
+    if ( !toolbar->isButtonOn(4) ){
+      toolbar->toggleButton(4);
+      toolBarManager( true, DockB );
+    }
+    dockManager->writeConfig( c, group );
 
-  toolbar->blockSignals( false );
+    toolbar->blockSignals( false );
+  } else
+#endif // DOCK_ORIGINAL
+  {
+    dockManager->writeConfig( c, group );
+  }
 }
 
-void DockMainWindow::readDockConfig()
+void DockMainWindow::readDockConfig( KConfig* c, QString group )
 {
-  toolbar->blockSignals( true );
+#ifdef DOCK_ORIGINAL
+  if ( toolbar ){
+    toolbar->blockSignals( true );
 
-  if ( !toolbar->isButtonOn(1) ){
-    toolbar->toggleButton(1);
-    toolBarManager( true, DockT );
-  }
-  if ( !toolbar->isButtonOn(2) ){
-    toolbar->toggleButton(2);
-    toolBarManager( true, DockL );
-  }
-  if ( !toolbar->isButtonOn(3) ){
-    toolbar->toggleButton(3);
-    toolBarManager( true, DockR );
-  }
-  if ( !toolbar->isButtonOn(4) ){
-    toolbar->toggleButton(4);
-    toolBarManager( true, DockB );
-  }
-  dockManager->readConfig( configName );
+    if ( !toolbar->isButtonOn(1) ){
+      toolbar->toggleButton(1);
+      toolBarManager( true, DockT );
+    }
+    if ( !toolbar->isButtonOn(2) ){
+      toolbar->toggleButton(2);
+      toolBarManager( true, DockL );
+    }
+    if ( !toolbar->isButtonOn(3) ){
+      toolbar->toggleButton(3);
+      toolBarManager( true, DockR );
+    }
+    if ( !toolbar->isButtonOn(4) ){
+      toolbar->toggleButton(4);
+      toolBarManager( true, DockB );
+    }
+    dockManager->readConfig( c, group );
 
-  toolbar->blockSignals( false );
+    toolbar->blockSignals( false );
+  } else
+#endif // DOCK_ORIGINAL
+  {
+    dockManager->readConfig( c, group );
+  }
 }
 
 void DockMainWindow::setDockView( QWidget* widget )

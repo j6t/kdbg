@@ -15,7 +15,9 @@
 
 class QPopupMenu;
 class KToolBar;
+class KConfig;
 
+#ifdef DOCK_ORIGINAL
 struct dockPosData
 {
   DockWidget* dock;
@@ -23,6 +25,7 @@ struct dockPosData
   DockPosition pos;
   int sepPos;
 };
+#endif
 
 class DockMainWindow : public KTMainWindow
 {Q_OBJECT
@@ -30,46 +33,54 @@ public:
   DockMainWindow( const char *name = 0L );
   ~DockMainWindow();
 
+  void setDockManager( DockManager* manager );
+  DockManager* manager(){ return dockManager; }
+
   void setView( QWidget* );
   DockWidget* getMainViewDockWidget(){ return viewDock; }
 
-  void setDockCaptionFont( const QFont &f ){ dockManager->titleFont = new QFont(f);}
-  void dockIn( DockWidget* w, DockPosition pos );
-  DockWidget* createDockWidget( const char* name, const QPixmap &pixmap );
+#ifdef DOCK_ORIGINAL
+  void setMainDockWidget( DockWidget* );
+  DockWidget* getMainDockWidget(){ return mainDockWidget; }
+#endif
 
-  void writeDockConfig();
-  void readDockConfig();
+  DockWidget* createDockWidget( const char* name, const QPixmap &pixmap, QWidget* parent = 0L );
+
+  void writeDockConfig( KConfig* c = 0L, QString group = QString() );
+  void readDockConfig ( KConfig* c = 0L, QString group = QString() );
 
   void activateDock(){ dockManager->activate(); }
 
-  void setDockSite( int pos ){ mainDockWidget->sDocking = pos/* % DockCenter*/;}
-  int dockSite(){ return mainDockWidget->sDocking; }
+#ifdef DOCK_ORIGINAL
   QPopupMenu* dockMenu(){ return dockManager->dockMenu(); }
+#endif
 
   void makeDockVisible( DockWidget* dock );
   void makeWidgetDockVisible( QWidget* widget );
 
-  void insertMainWindowDockToolBar();
   void setDockView( QWidget* );
-  
-private slots:
-  void slotDockChange();
-  void slotToggled( int );
-  void slotReplaceDock( DockWidget* oldDock, DockWidget* newDock );
 
-private:
+#ifdef DOCK_ORIGINAL
+protected slots:
+//  void slotDockChange();
+//  void slotToggled( int );
+//  void slotReplaceDock( DockWidget* oldDock, DockWidget* newDock );
+
+protected:
   void toolBarManager( bool toggled, dockPosData &data );
 
   DockWidget* mainDockWidget;
+#endif
   DockManager* dockManager;
-  QString configName;
 
+#ifdef DOCK_ORIGINAL
   dockPosData DockL;
   dockPosData DockR;
   dockPosData DockT;
   dockPosData DockB;
 
   KToolBar* toolbar;
+#endif
   DockWidget* viewDock;
 };
 
