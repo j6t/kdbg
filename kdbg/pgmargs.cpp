@@ -16,7 +16,9 @@ PgmArgs::PgmArgs(QWidget* parent, const char* pgm) :
 	m_layout(this, 8),
 	m_buttons(4)
 {
-    setCaption(i18n("KDbg: Program arguments"));
+    QString title = kapp->getCaption();
+    title += i18n(": Program arguments");
+    setCaption(title);
 
     m_label.setMinimumSize(330, 24);
     QString lab;
@@ -27,21 +29,16 @@ PgmArgs::PgmArgs(QWidget* parent, const char* pgm) :
 
     m_programArgs.setMinimumSize(330, 24);
     m_programArgs.setMaxLength(10000);
-//    m_programArgs.setEchoMode(QLineEdit::Normal);
     m_programArgs.setFrame(true);
 
     m_buttonOK.setMinimumSize(100, 30);
     connect(&m_buttonOK, SIGNAL(clicked()), SLOT(accept()));
     m_buttonOK.setText(i18n("OK"));
-//    m_buttonOK.setAutoRepeat( false );
-//    m_buttonOK.setAutoResize( false );
     m_buttonOK.setDefault(true);
 
     m_buttonCancel.setMinimumSize(100, 30);
     connect(&m_buttonCancel, SIGNAL(clicked()), SLOT(reject()));
     m_buttonCancel.setText(i18n("Cancel"));
-//    m_buttonCancel.setAutoRepeat( false );
-//    m_buttonCancel.setAutoResize( false );
 
     m_layout.addWidget(&m_label);
     m_layout.addWidget(&m_programArgs);
@@ -62,17 +59,3 @@ PgmArgs::PgmArgs(QWidget* parent, const char* pgm) :
 PgmArgs::~PgmArgs()
 {
 }
-
-#if 0
-void PgmArgs::resizeEvent(QResizeEvent* /*ev*/)
-{
-    int newWidth = width() - 20;	/* 10 + 10 margin */
-    int h;
-    // resize edit field
-    h = m_programArgs.height();
-    m_programArgs.resize(newWidth, h);
-    // resize label
-    h = m_label.height();
-    m_label.resize(newWidth, h);
-}
-#endif
