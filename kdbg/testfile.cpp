@@ -44,12 +44,16 @@ void f(E e[3], char c)
 	g();
 }
 
+void segFault()
+{
+	*(char*)0 = 's';
+}
+
 int main(int argc, char* argv[])
 {
 	if (argc > 1) {
-		if (*argv[1] = 's') {
-			// seg fault
-			*(char*)0 = 's';
+		if (*argv[1] == 's') {
+			segFault();
 		}
 	}
 
