@@ -540,6 +540,26 @@ void WinStack::updatePC(const QString& fileName, int lineNo, int frameNo)
     }
 }
 
+/*
+ * Two file names (possibly full paths) match if the last parts - the file
+ * names - match.
+ */
+static bool fileNamesMatch(const QString& f1, const QString& f2)
+{
+    // check for null file names first
+    if (f1.isNull() || f2.isNull()) {
+	return f1.isNull() && f2.isNull();
+    }
+
+    /*
+     * Get file names.  Note: Either there is a slash, then skip it, or
+     * there is no slash, then -1 + 1 = 0!
+     */
+    int s1 = f1.findRev('/') + 1;
+    int s2 = f2.findRev('/') + 1;
+    return strcmp(f1.data() + s1, f2.data() + s2) == 0;
+}
+
 void WinStack::setPC(bool set, const QString& fileName, int lineNo, int frameNo)
 {
     TRACE(QString(fileName.length()+60).sprintf("%s PC: %s:%d#%d", set ? "set" : "clear",
@@ -547,12 +567,7 @@ void WinStack::setPC(bool set, const QString& fileName, int lineNo, int frameNo)
     // find file
     FileWindow* fw = 0;
     for (fw = m_fileList.first(); fw != 0; fw = m_fileList.next()) {
-	// get the simple name for this file
-	const QString& name = fw->fileName();
-	// either there is a slash, then skip it, or there is no slash,
-	// then -1 + 1 = 0!
-	int slash = name.findRev('/') + 1;
-	if (name.data() + slash == fileName) {
+	if (fileNamesMatch(fw->fileName(), fileName)) {
 	    fw->setPC(set, lineNo, frameNo);
 	    break;
 	}
