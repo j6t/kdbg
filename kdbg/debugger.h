@@ -6,11 +6,8 @@
 #ifndef DEBUGGER_H
 #define DEBUGGER_H
 
-#include <qqueue.h>
 #include <qtimer.h>
-#include <qfile.h>
 #include <qdict.h>
-#include <kprocess.h>
 #include "brkpt.h"
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
@@ -26,15 +23,10 @@ class KTreeViewItem;
 class KConfig;
 class QListBox;
 class RegisterView;
+class DebuggerDriver;
+class CmdQueueItem;
+class KProcess;
 
-
-class GdbProcess : public KProcess
-{
-public:
-    GdbProcess();
-protected:
-    virtual int commSetupDoneC();
-};
 
 class KDebugger : public QObject
 {
@@ -43,7 +35,8 @@ public:
     KDebugger(QWidget* parent,		/* will be used as the parent for dialogs */
 	      ExprWnd* localVars,
 	      ExprWnd* watchVars,
-	      QListBox* backtrace
+	      QListBox* backtrace,
+	      DebuggerDriver* driver
 	      );
     ~KDebugger();
     
@@ -133,7 +126,10 @@ public:
 
     /**
      * Set a breakpoint.
-     * 
+     *
+     * @param fileName The source file in which to set the breakpoint.
+     * @param lineNo The zero-based line number.
+     * @param temporary Specifies whether this is a temporary breakpoint
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.
      */
@@ -142,6 +138,8 @@ public:
     /**
      * Enable or disable a breakpoint at the specified location.
      * 
+     * @param fileName The source file in which the breakpoint is.
+     * @param lineNo The zero-based line number.
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.
      */
@@ -172,12 +170,12 @@ public:
      * Retrieves the current status message.
      */
     const QString& statusMessage() const { return m_statusMessage; }
+
     /**
      * Is the debugger ready to receive another high-priority command?
      */
-    bool isReady() const { return m_haveExecutable &&
-	    /*(m_state == DSidle || m_state == DSrunningLow)*/
-	    m_hipriCmdQueue.isEmpty(); }
+    bool isReady() const;
+
     /**
      * Is the debuggee running (not just active)?
      */
@@ -213,150 +211,41 @@ public:
     /** Sets the terminal that is to be used by the debugger. */
     void setTerminal(const QString& term) { m_inferiorTerminal = term; }
 
+    /** Returns the debugger driver. */
+    DebuggerDriver* driver() { return m_d; }
+
     // settings
     void saveSettings(KConfig*);
     void restoreSettings(KConfig*);
 
-public:
-    // debugger driver
-    enum DbgCommand {
-	DCinitialize,
-	DCinitialSet,
-	DCexecutable,
-	DCcorefile,
-	DCattach,
-	DCinfolinemain,
-	DCinfolocals,
-	DCinfoargs,
-	DCinforegisters,
-	DCsetargs,
-	DCsetenv,
-	DCcd,
-	DCbt,
-	DCrun,
-	DCcont,
-	DCstep,
-	DCnext,
-	DCfinish,
-	DCuntil,
-	DCkill,
-	DCbreak,
-	DCdelete,
-	DCenable,
-	DCdisable,
-	DCprint,
-	DCprintStruct,
-	DCprintQStringStruct,
-	DCframe,
-	DCfindType,
-	DCinfosharedlib,
-	DCinfobreak,
-	DCcondition,
-	DCignore
-    };
 protected:
     QString m_inferiorTerminal;
-    QString m_runCmd;
     ValArray<QString> m_debuggerCmd;
     bool startGdb();
     void stopGdb();
     void writeCommand();
     
-    enum DebuggerState {
-	DSidle,				/* gdb waits for input */
-	DSinterrupted,			/* a command was interrupted */
-	DSrunningLow,			/* gdb is running a low-priority command */
-	DSrunning,			/* gdb waits for program */
-	DScommandSent,			/* command has been sent, we wait for wroteStdin signal */
-	DScommandSentLow		/* low-prioritycommand has been sent */
-    };
-    DebuggerState m_state;
-    char* m_gdbOutput;			/* normal gdb output */
-    int m_gdbOutputLen;			/* current accumulated output */
-    int m_gdbOutputAlloc;		/* space available in m_gdbOutput */
-#if QT_VERSION < 200
-    typedef QString DelayedStr;
-#else
-    typedef QCString DelayedStr;
-#endif
-    QQueue<DelayedStr> m_delayedOutput;	/* output colleced while we have receivedOutput */
-					/* but before signal wroteStdin arrived */
     QList<VarTree> m_watchEvalExpr;	/* exprs to evaluate for watch windows */
     QList<VarTree> m_parsedLocals;	/* local variables that have just been parsed */
 
-public:
-    /**
-     * Gdb commands are placed in a queue. Only one command at a time is
-     * sent down to gdb. All other commands in the queue are retained until
-     * the sent command has been processed by gdb. Gdb tells us that it's
-     * done with the command by sending the prompt. The output of gdb is
-     * parsed at that time. Then, if more commands are in the queue, the
-     * next one is sent to gdb.
-     * 
-     * The active command is kept separately from other pending commands.
-     */
-    struct CmdQueueItem
-    {
-	DbgCommand m_cmd;
-	QString m_cmdString;
-	bool m_committed;		/* just a debugging aid */
-	// remember which expression when printing an expression
-	VarTree* m_expr;
-	ExprWnd* m_exprWnd;
-	// whether command was emitted due to direct user request (only set when relevant)
-	bool m_byUser;
-
-	CmdQueueItem(DbgCommand cmd, const QString& str) :
-		m_cmd(cmd),
-		m_cmdString(str),
-		m_committed(false),
-		m_expr(0),
-		m_exprWnd(0),
-		m_byUser(false)
-	{ }
-    };
-    /**
-     * Enqueues a high-priority command. High-priority commands are
-     * executed before any low-priority commands. No user interaction is
-     * possible as long as there is a high-priority command in the queue.
-     */
-    CmdQueueItem* executeCmd(DbgCommand cmd, QString cmdString, bool clearLow = false);
-    enum QueueMode {
-	QMnormal,			/* queues the command last */
-	QMoverride,			/* removes an already queued command */
-	QMoverrideMoreEqual		/* ditto, also puts the command first in the queue */
-    };
-    /**
-     * Enqueues a low-priority command. Low-priority commands are executed
-     * after any high-priority commands.
-     */
-    CmdQueueItem* queueCmd(DbgCommand cmd, QString cmdString, QueueMode mode);
-    /** Removes all commands from the low-priority queue. */
-    void flushLoPriQueue();
-    /** Removes all commands from  the high-priority queue. */
-    void flushHiPriQueue();
-
+protected slots:
+    void parse(CmdQueueItem* cmd, const char* output);
 protected:
-    QQueue<CmdQueueItem> m_hipriCmdQueue;
-    QList<CmdQueueItem> m_lopriCmdQueue;
-    CmdQueueItem* m_activeCmd;		/* the cmd we are working on */
-    void parse(CmdQueueItem* cmd);
-    VarTree* parseExpr(const char* name, bool wantErrorValue = true);
-    VarTree* parseQCharArray(const char* name, bool wantErrorValue);
-    void handleRunCommands();
+    VarTree* parseExpr(const char* output, bool wantErrorValue);
+    void handleRunCommands(const char* output);
     void updateAllExprs();
-    void updateBreakptTable();
+    void updateBreakptTable(const char* output);
     void updateProgEnvironment(const QString& args, const QString& wd,
 			       const QDict<EnvVar>& newVars);
-    void parseLocals(QList<VarTree>& newVars);
-    void handleLocals();
-    bool handlePrint(CmdQueueItem* cmd);
-    void handleBacktrace();
-    void handleFrameChange();
-    void handleFindType(CmdQueueItem* cmd);
-    void handlePrintStruct(CmdQueueItem* cmd);
-    void handleSharedLibs();
-    void handleRegisters();
+    void parseLocals(const char* output, QList<VarTree>& newVars);
+    void handleLocals(const char* output);
+    bool handlePrint(CmdQueueItem* cmd, const char* output);
+    void handleBacktrace(const char* output);
+    void handleFrameChange(const char* output);
+    void handleFindType(CmdQueueItem* cmd, const char* output);
+    void handlePrintStruct(CmdQueueItem* cmd, const char* output);
+    void handleSharedLibs(const char* output);
+    void handleRegisters(const char* output);
     void evalExpressions();
     void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
@@ -376,31 +265,25 @@ protected:
     QString m_attachedPid;		/* user input of attaching to pid */
     QString m_programArgs;
     QString m_remoteDevice;
+    unsigned m_runRedirect;
     QString m_programWD;		/* working directory of gdb */
     QDict<EnvVar> m_envVars;		/* environment variables set by user */
     QStrList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
-    bool m_qstring2nullOk;		/* whether gdb knows about QString::null */
     KSimpleConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
     void saveProgramSettings();
     void restoreProgramSettings();
 
     // debugger process
-    GdbProcess m_gdb;
-    int m_gdbMajor, m_gdbMinor;
+    DebuggerDriver* m_d;
     bool m_explicitKill;		/* whether we are killing gdb ourselves */
-
-#ifdef GDB_TRANSCRIPT
-    // log file
-    QFile m_logFile;
-#endif
 
     QString m_statusMessage;
 
 protected slots:
-    void receiveOutput(KProcess*, char* buffer, int buflen);
-    void commandRead(KProcess*);
     void gdbExited(KProcess*);
+    void slotInferiorRunning();
+    void backgroundUpdate();
     void gotoFrame(int);
     void slotLocalsExpanding(KTreeViewItem*, bool&);
     void slotWatchExpanding(KTreeViewItem*, bool&);
@@ -487,9 +370,6 @@ protected:
     
     // implementation helpers
 protected:
-    void initMenu();
-    void initToolbar();
-    void initAnimation();
     void startAnimation(bool fast);
     void stopAnimation();
 

@@ -4,7 +4,7 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include "debugger.h"
-#include "parsevar.h"
+#include "dbgdriver.h"
 #include "pgmargs.h"
 #include "procattach.h"
 #include "typetable.h"
@@ -37,42 +37,21 @@
 #include "mydebug.h"
 
 
-GdbProcess::GdbProcess()
-{
-}
-
-int GdbProcess::commSetupDoneC()
-{
-    if (!KProcess::commSetupDoneC())
-	return 0;
-
-    close(STDERR_FILENO);
-    return dup2(STDOUT_FILENO, STDERR_FILENO) != -1;
-}
-
 KDebugger::KDebugger(QWidget* parent,
 		     ExprWnd* localVars,
 		     ExprWnd* watchVars,
-		     QListBox* backtrace
+		     QListBox* backtrace,
+		     DebuggerDriver* driver
 		     ) :
 	QObject(parent, "debugger"),
-	m_state(DSidle),
-	m_gdbOutput(0),
-	m_gdbOutputLen(0),
-	m_gdbOutputAlloc(0),
-	m_activeCmd(0),
 	m_haveExecutable(false),
 	m_programActive(false),
 	m_programRunning(false),
 	m_sharedLibsListed(false),
+	m_runRedirect(0),
 	m_typeTable(0),
-	m_qstring2nullOk(true),
 	m_programConfig(0),
-	m_gdb(),
-	m_gdbMajor(4), m_gdbMinor(16),
-#ifdef GDB_TRANSCRIPT
-	m_logFile(GDB_TRANSCRIPT),
-#endif
+	m_d(driver),
 	m_bpTable(*this),
 	m_localVariables(*localVars),
 	m_watchVariables(*watchVars),
@@ -83,10 +62,6 @@ KDebugger::KDebugger(QWidget* parent,
     m_regView = new RegisterView(0);
     m_regView->show();
     
-    m_gdbOutputAlloc = 4000;
-    m_gdbOutput = new char[m_gdbOutputAlloc];
-
-    m_hipriCmdQueue.setAutoDelete(true);
     m_envVars.setAutoDelete(true);
     m_parsedLocals.setAutoDelete(true);
 
@@ -101,13 +76,20 @@ KDebugger::KDebugger(QWidget* parent,
     connect(&m_bpTable, SIGNAL(closed()), SIGNAL(updateUI()));
     connect(&m_bpTable, SIGNAL(activateFileLine(const QString&,int)),
 	    this, SIGNAL(activateFileLine(const QString&,int)));
+    connect(m_d, SIGNAL(activateFileLine(const QString&,int)),
+	    this, SIGNAL(activateFileLine(const QString&,int)));
     connect(this, SIGNAL(updateUI()), &m_bpTable, SLOT(updateUI()));
 
     // debugger process
-    connect(&m_gdb, SIGNAL(receivedStdout(KProcess*,char*,int)),
-	    SLOT(receiveOutput(KProcess*,char*,int)));
-    connect(&m_gdb, SIGNAL(wroteStdin(KProcess*)), SLOT(commandRead(KProcess*)));
-    connect(&m_gdb, SIGNAL(processExited(KProcess*)), SLOT(gdbExited(KProcess*)));
+    connect(m_d, SIGNAL(processExited(KProcess*)), SLOT(gdbExited(KProcess*)));
+    connect(m_d, SIGNAL(commandReceived(CmdQueueItem*,const char*)),
+	    SLOT(parse(CmdQueueItem*,const char*)));
+    // we shouldn't do this, it's very unsafe (different arg lists):
+    connect(m_d, SIGNAL(receivedStdout(KProcess*,char*,int)),
+	    SIGNAL(updateUI()));
+    connect(m_d, SIGNAL(wroteStdin(KProcess*)), SIGNAL(updateUI()));
+    connect(m_d, SIGNAL(inferiorRunning()), SLOT(slotInferiorRunning()));
+    connect(m_d, SIGNAL(enterIdleState()), SLOT(backgroundUpdate()));
 
     // animation
     connect(&m_animationTimer, SIGNAL(timeout()), SIGNAL(animationTimeout()));
@@ -127,7 +109,6 @@ KDebugger::~KDebugger()
 	delete m_programConfig;
     }
     delete m_typeTable;
-    delete[] m_gdbOutput;
 }
 
 
@@ -206,7 +187,7 @@ bool KDebugger::debugProgram(const QString& name)
 	return false;
     }
 
-    if (!m_gdb.isRunning()) {
+    if (!m_d->isRunning()) {
 	if (!startGdb()) {
 	    TRACE("startGdb failed");
 	    return false;
@@ -214,16 +195,16 @@ bool KDebugger::debugProgram(const QString& name)
     }
 
     TRACE("before file cmd");
-    executeCmd(DCexecutable, "file \"" + name + "\"");
+    m_d->executeCmd(DCexecutable, name);
     m_executable = name;
 
     // set remote target
     if (!m_remoteDevice.isEmpty()) {
-	 executeCmd(DCbt, "target remote " + m_remoteDevice);
-	 queueCmd(DCbt, "bt", QMoverride);
-	 queueCmd(DCframe, "frame 0", QMnormal);
-	 m_programActive = true;
-	 m_haveExecutable = true;
+	m_d->executeCmd(DCtargetremote, m_remoteDevice);
+	m_d->queueCmd(DCbt, DebuggerDriver::QMoverride);
+	m_d->queueCmd(DCframe, 0, DebuggerDriver::QMnormal);
+	m_programActive = true;
+	m_haveExecutable = true;
     }
 
     // create the program settings object
@@ -261,7 +242,7 @@ bool KDebugger::debugProgram(const QString& name)
 
 void KDebugger::fileExecutable()
 {
-    if (m_state != DSidle)
+    if (!m_d->isIdle())
 	return;
 
     // open a new executable
@@ -325,10 +306,10 @@ void KDebugger::programRun()
     // otherwise run the program
     if (m_programActive && m_corefile.isEmpty()) {
 	// gdb command: continue
-	executeCmd(DCcont, "cont", true);
+	m_d->executeCmd(DCcont, true);
     } else {
 	// gdb command: run
-	executeCmd(DCrun, m_runCmd, true);
+	m_d->executeCmd(DCrun, m_runRedirect, true);
 	m_corefile = QString();
 	m_programActive = true;
     }
@@ -345,7 +326,7 @@ void KDebugger::programAttach()
     if (dlg.exec()) {
 	m_attachedPid = dlg.text();
 	TRACE("Attaching to " + m_attachedPid);
-	executeCmd(DCattach, "attach " + m_attachedPid);
+	m_d->executeCmd(DCattach, m_attachedPid);
 	m_programActive = true;
 	m_programRunning = true;
     }
@@ -354,7 +335,7 @@ void KDebugger::programAttach()
 void KDebugger::programRunAgain()
 {
     if (canSingleStep()) {
-	executeCmd(DCrun, m_runCmd, true);
+	m_d->executeCmd(DCrun, m_runRedirect, true);
 	m_corefile = QString();
 	m_programRunning = true;
     }
@@ -363,7 +344,7 @@ void KDebugger::programRunAgain()
 void KDebugger::programStep()
 {
     if (canSingleStep()) {
-	executeCmd(DCstep, "step", true);
+	m_d->executeCmd(DCstep, true);
 	m_programRunning = true;
     }
 }
@@ -371,7 +352,7 @@ void KDebugger::programStep()
 void KDebugger::programNext()
 {
     if (canSingleStep()) {
-	executeCmd(DCnext, "next", true);
+	m_d->executeCmd(DCnext, true);
 	m_programRunning = true;
     }
 }
@@ -379,7 +360,7 @@ void KDebugger::programNext()
 void KDebugger::programFinish()
 {
     if (canSingleStep()) {
-	executeCmd(DCfinish, "finish", true);
+	m_d->executeCmd(DCfinish, true);
 	m_programRunning = true;
     }
 }
@@ -388,11 +369,11 @@ void KDebugger::programKill()
 {
     if (haveExecutable() && isProgramActive()) {
 	if (m_programRunning) {
-	    m_gdb.kill(SIGINT);
+	    m_d->kill(SIGINT);
 	}
 	// this is an emergency command; flush queues
-	flushHiPriQueue();
-	executeCmd(DCkill, "kill", true);
+	m_d->flushHiPriQueue();
+	m_d->executeCmd(DCkill, true);
     }
 }
 
@@ -408,9 +389,7 @@ bool KDebugger::runUntil(const QString& fileName, int lineNo)
 	if (offset >= 0) {
 	    file.remove(0, offset+1);
 	}
-	SIZED_QString(cmdString, file.length() + 30);
-	cmdString.sprintf("until %s:%d", file.data(), lineNo+1);
-	executeCmd(DCuntil, cmdString, true);
+	m_d->executeCmd(DCuntil, file, lineNo, true);
 	m_programRunning = true;
 	return true;
     } else {
@@ -421,9 +400,9 @@ bool KDebugger::runUntil(const QString& fileName, int lineNo)
 void KDebugger::programBreak()
 {
     if (m_haveExecutable && m_programRunning) {
-	m_gdb.kill(SIGINT);
+	m_d->kill(SIGINT);
 	// remove accidentally queued commands
-	flushHiPriQueue();
+	m_d->flushHiPriQueue();
     }
 }
 
@@ -478,66 +457,41 @@ bool KDebugger::canChangeBreakpoints()
     return isReady() && !m_programRunning;
 }
 
+bool KDebugger::isReady() const 
+{
+    return m_haveExecutable &&
+	/*(m_d->isIdle() || m_state == DSrunningLow)*/
+	m_d->m_hipriCmdQueue.isEmpty();
+}
+
 
 //////////////////////////////////////////////////////////
 // debugger driver
-
-#define PROMPT "(kdbg)"
-#define PROMPT_LEN 6
-#define PROMPT_LAST_CHAR ')'		/* needed when searching for prompt string */
 
 bool KDebugger::startGdb()
 {
     emit debuggerStarting();
 
-    // clear command queues
-    delete m_activeCmd;
-    m_activeCmd = 0;
-    m_hipriCmdQueue.clear();
-    bool autodel = m_lopriCmdQueue.autoDelete();
-    m_lopriCmdQueue.setAutoDelete(true);
-    m_lopriCmdQueue.clear();
-    m_lopriCmdQueue.setAutoDelete(autodel);
-
     // debugger executable
-    m_gdb.clearArguments();
+    m_d->clearArguments();
     for (int i = 0; i < m_debuggerCmd.size(); i++) {
-	m_gdb << m_debuggerCmd[i];
+	*m_d << m_debuggerCmd[i];
     }
 
     m_explicitKill = false;
-    if (!m_gdb.start(KProcess::NotifyOnExit,
-		     KProcess::Communication(KProcess::Stdin|KProcess::Stdout))) {
+    if (!m_d->startup()) {
 	return false;
     }
 
-#ifdef GDB_TRANSCRIPT
-    // open log file
-    if (!m_logFile.isOpen()) {
-	m_logFile.open(IO_WriteOnly);
-    }
-#endif
-
-    // change prompt string and synchronize with gdb
-    m_state = DSidle;
-    executeCmd(DCinitialize, "set prompt " PROMPT);
-    /*
-     * Work around buggy gdbs that do command line editing even if they are
-     * not on a tty. The readline library echos every command back in this
-     * case, which is confusing for us.
-     */
-    executeCmd(DCinitialSet, "set editing off");
-    executeCmd(DCinitialSet, "set confirm off");
-    executeCmd(DCinitialSet, "set print static-members off");
     /*
      * If we have an output terminal, we use it. Otherwise we will run the
      * program with input and output redirected to /dev/null.
      */
-    m_runCmd = "run";
+    m_runRedirect = 0;
     if (!m_inferiorTerminal.isEmpty()) {
-	executeCmd(DCinitialSet, "tty " + m_inferiorTerminal);
+	m_d->executeCmd(DCtty, m_inferiorTerminal);
     } else {
-	m_runCmd += " >/dev/null 2>&1 </dev/null";
+	m_runRedirect = RDNstdin|RDNstdout|RDNstderr;
     }
 
     return true;
@@ -546,19 +500,12 @@ bool KDebugger::startGdb()
 void KDebugger::stopGdb()
 {
     m_explicitKill = true;
-    m_gdb.kill(SIGTERM);
-    m_state = DSidle;
+    m_d->kill(SIGTERM);
+    m_d->m_state = DebuggerDriver::DSidle;
 }
 
 void KDebugger::gdbExited(KProcess*)
 {
-#ifdef GDB_TRANSCRIPT
-    static const char txt[] = "\ngdb exited\n";
-    if (m_logFile.isOpen()) {
-	m_logFile.writeBlock(txt,sizeof(txt)-1);
-    }
-#endif
-
     /*
      * Save settings, but only if gdb has already processed "info line
      * main", otherwise we would save an empty config file, because it
@@ -590,15 +537,11 @@ void KDebugger::gdbExited(KProcess*)
     }
 
     // reset state
-    m_state = DSidle;
     m_haveExecutable = false;
     m_executable = "";
     m_programActive = false;
     m_programRunning = false;
     m_explicitKill = false;
-    // empty buffer
-    m_gdbOutputLen = 0;
-    *m_gdbOutput = '\0';
 
     // stop gear wheel and erase PC
     stopAnimation();
@@ -690,9 +633,6 @@ void KDebugger::restoreProgramSettings()
 
     updateProgEnvironment(pgmArgs, pgmWd, pgmVars);
 
-    // assume that QString::null is ok
-    m_qstring2nullOk = true;
-
     m_bpTable.restoreBreakpoints(m_programConfig);
 
     // watch expressions
@@ -714,372 +654,33 @@ void KDebugger::restoreProgramSettings()
 }
 
 
-KDebugger::CmdQueueItem* KDebugger::executeCmd(KDebugger::DbgCommand cmd,
-					       QString cmdString, bool clearLow)
-{
-    // place a new command into the high-priority queue
-    CmdQueueItem* cmdItem = new CmdQueueItem(cmd, cmdString + "\n");
-    m_hipriCmdQueue.enqueue(cmdItem);
-
-    if (clearLow) {
-	if (m_state == DSrunningLow) {
-	    // take the liberty to interrupt the running command
-	    m_state = DSinterrupted;
-	    m_gdb.kill(SIGINT);
-	    ASSERT(m_activeCmd != 0);
-	    TRACE(QString().sprintf("interrupted the command %d",
-		  (m_activeCmd ? m_activeCmd->m_cmd : -1)));
-	    delete m_activeCmd;
-	    m_activeCmd = 0;
-	}
-	flushLoPriQueue();
-    }
-    // if gdb is idle, send it the command
-    if (m_state == DSidle) {
-	ASSERT(m_activeCmd == 0);
-	writeCommand();
-    }
-
-    return cmdItem;
-}
-
-KDebugger::CmdQueueItem* KDebugger::queueCmd(KDebugger::DbgCommand cmd,
-					     QString cmdString, QueueMode mode)
-{
-    // place a new command into the low-priority queue
-#if QT_VERSION < 200
-    cmdString.detach();
-#endif
-    cmdString += "\n";
-
-    CmdQueueItem* cmdItem = 0;
-    switch (mode) {
-    case QMoverrideMoreEqual:
-    case QMoverride:
-	// check whether gdb is currently processing this command
-	if (m_activeCmd != 0 &&
-	    m_activeCmd->m_cmd == cmd && m_activeCmd->m_cmdString == cmdString)
-	{
-	    return m_activeCmd;
-	}
-	// check whether there is already the same command in the queue
-	for (cmdItem = m_lopriCmdQueue.first(); cmdItem != 0; cmdItem = m_lopriCmdQueue.next()) {
-	    if (cmdItem->m_cmd == cmd && cmdItem->m_cmdString == cmdString)
-		break;
-	}
-	if (cmdItem != 0) {
-	    // found one
-	    if (mode == QMoverrideMoreEqual) {
-		// All commands are equal, but some are more equal than others...
-		// put this command in front of all others
-		m_lopriCmdQueue.take();
-		m_lopriCmdQueue.insert(0, cmdItem);
-	    }
-	    break;
-	} // else none found, so add it
-	// drop through
-    case QMnormal:
-	cmdItem = new CmdQueueItem(cmd, cmdString);
-	m_lopriCmdQueue.append(cmdItem);
-    }
-
-    // if gdb is idle, send it the command
-    if (m_state == DSidle) {
-	ASSERT(m_activeCmd == 0);
-	writeCommand();
-    }
-
-    return cmdItem;
-}
-
-// dequeue a pending command, make it the active one and send it to gdb
-void KDebugger::writeCommand()
-{
-//    ASSERT(m_activeCmd == 0);
-    assert(m_activeCmd == 0);
-
-    // first check the high-priority queue - only if it is empty
-    // use a low-priority command.
-    CmdQueueItem* cmd = m_hipriCmdQueue.dequeue();
-    DebuggerState newState = DScommandSent;
-    if (cmd == 0) {
-	cmd = m_lopriCmdQueue.first();
-	m_lopriCmdQueue.removeFirst();
-	newState = DScommandSentLow;
-    }
-    if (cmd == 0) {
-	// nothing to do
-	m_state = DSidle;		/* is necessary if command was interrupted earlier */
-	return;
-    }
-
-    m_activeCmd = cmd;
-    TRACE("in writeCommand: " + cmd->m_cmdString);
-
-    const char* str = cmd->m_cmdString;
-    m_gdb.writeStdin(const_cast<char*>(str), cmd->m_cmdString.length());
-
-#ifdef GDB_TRANSCRIPT
-    // write also to log file
-    if (m_logFile.isOpen()) {
-	m_logFile.writeBlock(str, cmd->m_cmdString.length());
-	m_logFile.flush();
-    }
-#endif
-
-    m_state = newState;
-}
-
-void KDebugger::flushLoPriQueue()
-{
-    while (!m_lopriCmdQueue.isEmpty()) {
-	delete m_lopriCmdQueue.take(0);
-    }
-}
-
-void KDebugger::flushHiPriQueue()
-{
-    CmdQueueItem* cmd;
-    while ((cmd = m_hipriCmdQueue.dequeue()) != 0) {
-	delete cmd;
-    }
-}
-
-void KDebugger::commandRead(KProcess*)
-{
-    TRACE(__PRETTY_FUNCTION__);
-
-    // there must be an active command which is not yet commited
-    ASSERT(m_state == DScommandSent || m_state == DScommandSentLow);
-    ASSERT(m_activeCmd != 0);
-    ASSERT(!m_activeCmd->m_committed);
-
-    // commit the command
-    m_activeCmd->m_committed = true;
-
-    // now the debugger is officially working on the command
-    m_state = m_state == DScommandSent ? DSrunning : DSrunningLow;
-
-    // set the flag that reflects whether the program is really running
-    switch (m_activeCmd->m_cmd) {
-    case DCrun:	case DCcont: case DCnext: case DCstep: case DCfinish: case DCuntil:
-	m_programRunning = true;
-	break;
-    default:
-	break;
-    }
-
-    // re-receive delayed output
-    if (m_delayedOutput.current() != 0) {
-	DelayedStr* delayed;
-	while ((delayed = m_delayedOutput.dequeue()) != 0) {
-	    const char* str = delayed->data();
-	    receiveOutput(0, const_cast<char*>(str), delayed->length());
-	    delete delayed;
-	}
-	// updateUI() has been emitted
-    } else {
-	emit updateUI();
-    }
-}
-
-void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
-{
-    /*
-     * The debugger should be running (processing a command) at this point.
-     * If it is not, it is still idle because we haven't received the
-     * wroteStdin signal yet, in which case there must be an active command
-     * which is not commited.
-     */
-    if (m_state == DScommandSent || m_state == DScommandSentLow) {
-	ASSERT(m_activeCmd != 0);
-	ASSERT(!m_activeCmd->m_committed);
-	/*
-	 * We received output before we got signal wroteStdin. Collect this
-	 * output, it will be re-sent by commandRead when it gets the
-	 * acknowledgment for the uncommitted command.
-	 */
-	m_delayedOutput.enqueue(new DelayedStr(buffer, buflen+1));
-	return;
-    }
-#ifdef GDB_TRANSCRIPT
-    // write to log file (do not log delayed output - it would appear twice)
-    if (m_logFile.isOpen()) {
-	m_logFile.writeBlock(buffer, buflen);
-	m_logFile.flush();
-    }
-#endif
-    
-    /*
-     * gdb sometimes produces stray output while it's idle. This happens if
-     * it receives a signal, most prominently a SIGCONT after a SIGTSTP:
-     * The user haltet kdbg with Ctrl-Z, then continues it with "fg", which
-     * also continues gdb, which repeats the prompt!
-     */
-    if (m_activeCmd == 0 && m_state != DSinterrupted) {
-	// ignore the output
-	TRACE("ignoring stray output: " + DelayedStr(buffer, buflen+1));
-	return;
-    }
-    ASSERT(m_state == DSrunning || m_state == DSrunningLow || m_state == DSinterrupted);
-    ASSERT(m_activeCmd != 0 || m_state == DSinterrupted);
-
-    // collect output until next prompt string is found
-    
-    // accumulate it
-    if (m_gdbOutputLen + buflen >= m_gdbOutputAlloc) {
-	/*
-	 * Must enlarge m_gdbOutput: double it. Note: That particular
-	 * sequence of commandes here ensures exception safety.
-	 */
-	int newSize = m_gdbOutputAlloc * 2;
-	char* newBuf = new char[newSize];
-	memcpy(newBuf, m_gdbOutput, m_gdbOutputLen);
-	delete[] m_gdbOutput;
-	m_gdbOutput = newBuf;
-	m_gdbOutputAlloc = newSize;
-    }
-    memcpy(m_gdbOutput+m_gdbOutputLen, buffer, buflen);
-    m_gdbOutputLen += buflen;
-    m_gdbOutput[m_gdbOutputLen] = '\0';
-
-    /*
-     * If there's a prompt string in the collected output, it must be at
-     * the very end.
-     * 
-     * Note: It could nevertheless happen that a character sequence that is
-     * equal to the prompt string appears at the end of the output,
-     * although it is very, very unlikely (namely as part of a string that
-     * lingered in gdb's output buffer due to some timing/heavy load
-     * conditions for a very long time such that that buffer overflowed
-     * exactly at the end of the prompt string look-a-like).
-     */
-    if (m_gdbOutput[m_gdbOutputLen-1] == PROMPT_LAST_CHAR &&
-	m_gdbOutputLen >= PROMPT_LEN &&
-	strncmp(m_gdbOutput+m_gdbOutputLen-PROMPT_LEN, PROMPT, PROMPT_LEN) == 0)
-    {
-	// found prompt!
-
-	// terminate output before the prompt
-	m_gdbOutput[m_gdbOutputLen-PROMPT_LEN] = '\0';
-
-	/*
-	 * We've got output for the active command. But if it was
-	 * interrupted, ignore it.
-	 */
-	if (m_state != DSinterrupted) {
-	    /*
-	     * m_state shouldn't be DSidle while we are parsing the output
-	     * so that all commands produced by parse() go into the queue
-	     * instead of being written to gdb immediately.
-	     */
-	    ASSERT(m_state != DSidle);
-	    CmdQueueItem* cmd = m_activeCmd;
-	    m_activeCmd = 0;
-	    parse(cmd);
-	    delete cmd;
-	}
-
-	// empty buffer
-	m_gdbOutputLen = 0;
-	*m_gdbOutput = '\0';
-	// also clear delayed output if interrupted
-	if (m_state == DSinterrupted) {
-	    DelayedStr* delayed;
-	    while ((delayed = m_delayedOutput.dequeue()) != 0) {
-		delete delayed;
-	    }
-	}
-
-	/*
-	 * We parsed some output successfully. Unless there's more delayed
-	 * output, the debugger must be idle now, so send down the next
-	 * command.
-	 */
-	if (m_delayedOutput.current() == 0) {
-	    if (m_hipriCmdQueue.isEmpty() && m_lopriCmdQueue.isEmpty()) {
-		// no pending commands
-		m_state = DSidle;
-		/*
-		 * If there are still expressions that need to be updated,
-		 * then do so.
-		 */
-		if (m_programActive)
-		    evalExpressions();
-	    } else {
-		writeCommand();
-	    }
-	}
-	emit updateUI();
-    }
-}
-
-static QRegExp MarkerRE(":[0-9]+:[0-9]+:beg");
-
-// parse len characters from m_gdbOutput
-void KDebugger::parse(CmdQueueItem* cmd)
+// parse output of command cmd
+void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 {
     ASSERT(cmd != 0);			/* queue mustn't be empty */
 
-    TRACE(QString(__PRETTY_FUNCTION__) + " parsing " + m_gdbOutput);
+    TRACE(QString(__PRETTY_FUNCTION__) + " parsing " + output);
 
-    // command string must be committed
-    if (!cmd->m_committed) {
-	// not commited!
-	TRACE("calling KDebugger::parse with uncommited command:\n\t" +
-	      cmd->m_cmdString);
-	return;
-    }
-
-    bool parseMarker = false;
-    
     switch (cmd->m_cmd) {
     case DCinitialSet:
+    case DCtargetremote:
 	// the output (if any) is uninteresting
     case DCsetargs:
+    case DCtty:
 	// there is no output
     case DCsetenv:
+    case DCunsetenv:
 	/* if value is empty, we see output, but we don't care */
 	break;
     case DCcd:
 	/* display gdb's message in the status bar */
-	m_statusMessage = QString(m_gdbOutput).stripWhiteSpace();
-	if (m_statusMessage.isEmpty()) {
-	    m_statusMessage =
-		i18n("New working directory: ") + m_programWD;
-	}
+	m_d->parseChangeWD(output, m_statusMessage);
 	emit updateStatusMessage();
 	break;
     case DCinitialize:
-	// get version number from preamble
-	{
-	    int len;
-	    QRegExp GDBVersion("\\nGDB [0-9]+\\.[0-9]+");
-	    int offset = GDBVersion.match(m_gdbOutput, 0, &len);
-	    if (offset >= 0) {
-		char* start = m_gdbOutput + offset + 5;	// skip "\nGDB "
-		char* end;
-		m_gdbMajor = strtol(start, &end, 10);
-		m_gdbMinor = strtol(end + 1, 0, 10);	// skip "."
-		if (start == end) {
-		    // nothing was parsed
-		    m_gdbMajor = 4;
-		    m_gdbMinor = 16;
-		}
-	    } else {
-		// assume some default version (what would make sense?)
-		m_gdbMajor = 4;
-		m_gdbMinor = 16;
-	    }
-	}
 	break;
     case DCexecutable:
-	/*
-	 * The command is successful if there is no output or the single
-	 * message (no debugging symbols found)...
-	 */
-	if (m_gdbOutput[0] == '\0' ||
-	    strcmp(m_gdbOutput, "(no debugging symbols found)...") == 0)
+	if (m_d->parseChangeExecutable(output, m_statusMessage))
 	{
 	    // success; restore breakpoints etc.
 	    if (m_programConfig != 0) {
@@ -1088,13 +689,15 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	    // load file containing main() or core file
 	    if (m_corefile.isEmpty()) {
 		if (m_remoteDevice.isEmpty())
-		    queueCmd(DCinfolinemain, "info line main", QMnormal);
+		    m_d->queueCmd(DCinfolinemain, DebuggerDriver::QMnormal);
 	    } else {
 		// load core file
 		loadCoreFile();
 	    }
+	    if (!m_statusMessage.isEmpty())
+		emit updateStatusMessage();
 	} else {
-	    QString msg = "gdb: " + QString(m_gdbOutput);
+	    QString msg = "gdb: " + m_statusMessage;
 #if QT_VERSION < 200
 	    KMsgBox::message(parentWidget(), kapp->appName(), msg,
 			     KMsgBox::STOP, i18n("OK"));
@@ -1109,16 +712,14 @@ void KDebugger::parse(CmdQueueItem* cmd)
     case DCcorefile:
 	// in any event we have an executable at this point
 	m_haveExecutable = true;
-	parseMarker = true;
-	// if command succeeded, gdb emits a line starting with "#0 "
-	if (strstr(m_gdbOutput, "\n#0 ")) {
+	if (m_d->parseCoreFile(output)) {
 	    // loading a core is like stopping at a breakpoint
 	    m_programActive = true;
-	    handleRunCommands();
+	    handleRunCommands(output);
 	    // do not reset m_corefile
 	} else {
 	    // report error
-	    QString msg = "gdb: " + QString(m_gdbOutput);
+	    QString msg = m_d->driverName() + ": " + QString(output);
 #if QT_VERSION < 200
 	    KMsgBox::message(parentWidget(), kapp->appName(), msg,
 			     KMsgBox::EXCLAMATION, i18n("OK"));
@@ -1127,48 +728,46 @@ void KDebugger::parse(CmdQueueItem* cmd)
 #endif
 	    // if core file was loaded from command line, revert to info line main
 	    if (!cmd->m_byUser) {
-		queueCmd(DCinfolinemain, "info line main", QMnormal);
+		m_d->queueCmd(DCinfolinemain, DebuggerDriver::QMnormal);
 	    }
 	    m_corefile = QString();	/* core file not available any more */
 	}
 	break;
     case DCinfolinemain:
 	// ignore the output, marked file info follows
-	parseMarker = true;
 	m_haveExecutable = true;
 	break;
     case DCinfolocals:
 	// parse local variables
-	if (m_gdbOutput[0] != '\0') {
-	    handleLocals();
+	if (output[0] != '\0') {
+	    handleLocals(output);
 	}
 	break;
     case DCinfoargs:
 	// parse arguments
-	if (m_gdbOutput[0] != '\0') {
+	if (output[0] != '\0') {
 	    /*
 	     * m_parsedLocals collects arguments and local variables.
 	     * Arguments are retrieved first, so we clear the list here.
 	     */
 	    m_parsedLocals.clear();
 
-	    parseLocals(m_parsedLocals);
+	    parseLocals(output, m_parsedLocals);
 	}
 	break;
     case DCinforegisters:
-	handleRegisters();
+	handleRegisters(output);
 	break;
     case DCframe:
-	handleFrameChange();
-	parseMarker = true;
+	handleFrameChange(output);
 	updateAllExprs();
 	break;
     case DCbt:
-	handleBacktrace();
+	handleBacktrace(output);
 	updateAllExprs();
 	break;
     case DCprint:
-	handlePrint(cmd);
+	handlePrint(cmd, output);
 	break;
     case DCattach:
     case DCrun:
@@ -1177,131 +776,64 @@ void KDebugger::parse(CmdQueueItem* cmd)
     case DCnext:
     case DCfinish:
     case DCuntil:
-	handleRunCommands();
-	parseMarker = true;
+	handleRunCommands(output);
 	break;
     case DCkill:
 	m_programRunning = m_programActive = false;
 	// erase PC
 	emit updatePC(QString(), -1, 0);
 	break;
-    case DCbreak:
-	updateBreakptTable();
+    case DCbreaktext:
+    case DCbreakline:
+    case DCtbreakline:
+	updateBreakptTable(output);
 	break;
     case DCdelete:
     case DCenable:
     case DCdisable:
-	queueCmd(DCinfobreak, "info breakpoints", QMoverride);
+	m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
 	break;
     case DCinfobreak:
 	// note: this handler must not enqueue a command, since
 	// DCinfobreak is used at various different places.
-	m_bpTable.updateBreakList(m_gdbOutput);
+	m_bpTable.updateBreakList(output);
 	emit lineItemsChanged();
 	break;
     case DCfindType:
-	handleFindType(cmd);
+	handleFindType(cmd, output);
 	break;
     case DCprintStruct:
     case DCprintQStringStruct:
-	handlePrintStruct(cmd);
+	handlePrintStruct(cmd, output);
 	break;
     case DCinfosharedlib:
-	handleSharedLibs();
+	handleSharedLibs(output);
 	break;
     case DCcondition:
     case DCignore:
 	// we are not interested in the output
 	break;
     }
-    /*
-     * The -fullname option makes gdb send a special normalized sequence
-     * print each time the program stops and at some other points. The
-     * sequence has the form "\032\032filename:lineno:???:beg:address".
-     */
-    if (parseMarker) {
-	char* startMarker = strstr(m_gdbOutput, "\032\032");
-	if (startMarker != 0) {
-	    // extract the marker
-	    startMarker += 2;
-	    TRACE(QString("found marker: ") + startMarker);
-	    char* endMarker = strchr(startMarker, '\n');
-	    if (endMarker != 0) {
-		*endMarker = '\0';
-
-		// extract filename and line number
-		int lineNoStart = MarkerRE.match(startMarker);
-		if (lineNoStart >= 0) {
-		    int lineNo = atoi(startMarker + lineNoStart+1);
-
-		    // now show the window
-		    startMarker[lineNoStart] = '\0';   /* split off file name */
-		    emit activateFileLine(startMarker, lineNo-1);
-		}
-	    }
-	}
-    }
 }
 
-void KDebugger::handleRunCommands()
+void KDebugger::backgroundUpdate()
 {
-    // optionally: "program changed, rereading symbols",
-    // followed by:
-    // "Program exited normally"
-    // "Program terminated with wignal SIGSEGV"
-    // "Program received signal SIGINT" or other signal
-    // "Breakpoint..."
-    
-    // go through the output, line by line, checking what we have
-    char* start = m_gdbOutput - 1;
-    bool refreshNeeded = false;
-    bool refreshBreaklist = false;
-    QString msg;
-    do {
-	start++;			/* skip '\n' */
+    /*
+     * If there are still expressions that need to be updated, then do so.
+     */
+    if (m_programActive)
+	evalExpressions();
+}
 
-	if (strncmp(start, "Program ", 8) == 0 ||
-	    strncmp(start, "ptrace: ", 8) == 0) {
-	    /*
-	     * When we receive a signal, the program remains active.
-	     *
-	     * Special: If we "stopped" in a corefile, the string "Program
-	     * terminated with signal"... is displayed. (Normally, we see
-	     * "Program received signal"... when a signal happens.)
-	     */
-	    if (strncmp(start, "Program exited", 14) == 0 ||
-		(strncmp(start, "Program terminated", 18) == 0 && m_corefile.isEmpty()) ||
-		strncmp(start, "ptrace: ", 8) == 0)
-	    {
-		m_programActive = false;
-	    }
-
-	    // set message
-	    char* endOfMessage = strchr(start, '\n');
-	    if (endOfMessage == 0) {
-		msg = start;
-	    } else {
-		msg = FROM_LATIN1(start, endOfMessage-start);
-	    }
-	} else if (strncmp(start, "Breakpoint ", 11) == 0) {
-	    /*
-	     * We stopped at a (permanent) breakpoint (gdb doesn't tell us
-	     * that it stopped at a temporary breakpoint).
-	     */
-	    refreshBreaklist = true;
-	} else if (strstr(start, "re-reading symbols.") != 0) {
-	    refreshNeeded = true;
-	}
-
-	// next line, please
-	start = strchr(start, '\n');
-    } while (start != 0);
-
-    m_statusMessage = msg;
+void KDebugger::handleRunCommands(const char* output)
+{
+    uint flags = m_d->parseProgramStopped(output, m_statusMessage);
     emit updateStatusMessage();
 
+    m_programActive = flags & DebuggerDriver::SFprogramActive;
+
     // refresh files if necessary
-    if (refreshNeeded) {
+    if (flags & DebuggerDriver::SFrefreshSource) {
 	TRACE("re-reading files");
 	emit executableUpdated();
     }
@@ -1311,8 +843,10 @@ void KDebugger::handleRunCommands()
      * because the hit count changes. Also, if the breakpoint was temporary
      * it would go away now.
      */
-    if (refreshBreaklist || refreshNeeded || m_bpTable.haveTemporaryBP()) {
-	queueCmd(DCinfobreak, "info breakpoints", QMoverride);
+    if ((flags & (DebuggerDriver::SFrefreshBreak|DebuggerDriver::SFrefreshSource)) ||
+	m_bpTable.haveTemporaryBP())
+    {
+	m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
     }
 
     /*
@@ -1322,21 +856,26 @@ void KDebugger::handleRunCommands()
      */
     if (!m_sharedLibsListed) {
 	// must be a high-priority command!
-	executeCmd(DCinfosharedlib, "info sharedlibrary");
+	m_d->executeCmd(DCinfosharedlib);
     }
 
     // get the backtrace if the program is running
     if (m_programActive) {
-	queueCmd(DCbt, "bt", QMoverride);
+	m_d->queueCmd(DCbt, DebuggerDriver::QMoverride);
     } else {
 	// program finished: erase PC
 	emit updatePC(QString(), -1, 0);
 	// dequeue any commands in the queues
-	flushHiPriQueue();
-	flushLoPriQueue();
+	m_d->flushHiPriQueue();
+	m_d->flushLoPriQueue();
     }
 
     m_programRunning = false;
+}
+
+void KDebugger::slotInferiorRunning()
+{
+    m_programRunning = true;
 }
 
 void KDebugger::updateAllExprs()
@@ -1346,13 +885,13 @@ void KDebugger::updateAllExprs()
 
     // retrieve parameters
     // we must be sure that this command is executed before info locals!
-    queueCmd(DCinfoargs, "info args", QMoverrideMoreEqual);
+    m_d->queueCmd(DCinfoargs, DebuggerDriver::QMoverrideMoreEqual);
 
     // retrieve local variables
-    queueCmd(DCinfolocals, "info locals", QMoverride);
+    m_d->queueCmd(DCinfolocals, DebuggerDriver::QMoverride);
 
     // retrieve registers
-    queueCmd(DCinforegisters, "info all-registers", QMoverride);
+    m_d->queueCmd(DCinforegisters, DebuggerDriver::QMoverride);
 
     // update watch expressions
     KTreeViewItem* item = m_watchVariables.itemAt(0);
@@ -1361,22 +900,27 @@ void KDebugger::updateAllExprs()
     }
 }
 
-void KDebugger::updateBreakptTable()
+void KDebugger::updateBreakptTable(const char* output)
 {
-    m_bpTable.parseBreakpoint(m_gdbOutput);
-    queueCmd(DCinfobreak, "info breakpoints", QMoverride);
+    int id;
+    QString file;
+    int lineNo;
+    if (m_d->parseBreakpoint(output, id, file, lineNo)) {
+	m_bpTable.insertBreakpoint(id, file, lineNo);
+    }
+    m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
 }
 
 void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
 				      const QDict<EnvVar>& newVars)
 {
     m_programArgs = args;
-    executeCmd(DCsetargs, "set args " + m_programArgs);
+    m_d->executeCmd(DCsetargs, m_programArgs);
     TRACE("new pgm args: " + m_programArgs + "\n");
 
     m_programWD = wd.stripWhiteSpace();
     if (!m_programWD.isEmpty()) {
-	executeCmd(DCcd, "cd " + m_programWD);
+	m_d->executeCmd(DCcd, m_programWD);
 	TRACE("new wd: " + m_programWD + "\n");
     }
 
@@ -1391,13 +935,13 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
 	    // the value must be in our list
 	    ASSERT(m_envVars[it.currentKey()] == val);
 	    // update value
-	    executeCmd(DCsetenv, QString("set env ") + it.currentKey() + " " + val->value);
+	    m_d->executeCmd(DCsetenv, it.currentKey(), val->value);
 	    break;
 	case EnvVar::EVdeleted:
 	    // must be in our list
 	    ASSERT(m_envVars[it.currentKey()] == val);
 	    // delete value
-	    executeCmd(DCsetenv, QString("unset env ") + it.currentKey());
+	    m_d->executeCmd(DCsetenv, it.currentKey());
 	    m_envVars.remove(it.currentKey());
 	    break;
 	default:
@@ -1409,18 +953,17 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
     }
 }
 
-void KDebugger::handleLocals()
+void KDebugger::handleLocals(const char* output)
 {
     // retrieve old list of local variables
     QStrList oldVars;
     m_localVariables.exprList(oldVars);
 
     /*
-     *  Parse local variables: that is a white-space separate list of
-     *  variables.
+     *  Get local variables.
      */
     QList<VarTree> newVars;
-    parseLocals(newVars);
+    parseLocals(output, newVars);
 
     /*
      * Merge previously parsed local variables into newVars, but eliminate
@@ -1497,21 +1040,15 @@ void KDebugger::handleLocals()
 	m_localVariables.repaint();
 }
 
-void KDebugger::parseLocals(QList<VarTree>& newVars)
+void KDebugger::parseLocals(const char* output, QList<VarTree>& newVars)
 {
-    // check for possible error conditions
-    if (strncmp(m_gdbOutput, "No symbol table", 15) == 0 ||
-	strncmp(m_gdbOutput, "No locals", 9) == 0)
-    {
-	return;
-    }
+    QList<VarTree> vars;
+    m_d->parseLocals(output, vars);
+
     QString origName;			/* used in renaming variables */
-    const char* p = m_gdbOutput;
-    while (*p != '\0') {
-	VarTree* variable = parseVar(p);
-	if (variable == 0) {
-	    break;
-	}
+    while (vars.count() > 0)
+    {
+	VarTree* variable = vars.take(0);
 	// get some types
 	variable->inferTypesOfChildren(*m_typeTable);
 	/*
@@ -1529,8 +1066,7 @@ void KDebugger::parseLocals(QList<VarTree>& newVars)
 	    if (variable->getText() == v->getText()) {
 		// we found a duplicate, change name
 		block++;
-		SIZED_QString(newName, origName.length()+20);
-		newName.sprintf("%s (%d)", origName.data(), block);
+		QString newName = origName + " (" + QString().setNum(block) + ")";
 		variable->setText(newName);
 	    }
 	}
@@ -1538,13 +1074,16 @@ void KDebugger::parseLocals(QList<VarTree>& newVars)
     }
 }
 
-bool KDebugger::handlePrint(CmdQueueItem* cmd)
+bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
 {
     ASSERT(cmd->m_expr != 0);
 
-    VarTree* variable = parseExpr(cmd->m_expr->getText());
+    VarTree* variable = parseExpr(output, true);
     if (variable == 0)
 	return false;
+
+    // set expression "name"
+    variable->setText(cmd->m_expr->getText());
 
     if (cmd->m_expr->m_varKind == VarTree::VKpointer) {
 	/*
@@ -1574,385 +1113,50 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd)
     return true;
 }
 
-static bool isErrorExpr(const char* output)
-{
-    return
-	strncmp(output, "Cannot access memory at", 23) == 0 ||
-	strncmp(output, "Attempt to dereference a generic pointer", 40) == 0 ||
-	strncmp(output, "Attempt to take contents of ", 28) == 0 ||
-	strncmp(output, "Attempt to use a type name as an expression", 43) == 0 ||
-	strncmp(output, "There is no member or method named", 34) == 0 ||
-	strncmp(output, "No symbol \"", 11) == 0 ||
-	strncmp(output, "Internal error: ", 16) == 0;
-}
-
-static bool parseOffErrorExpr(char* output, const char* name,
-			      VarTree*& variable, bool wantErrorValue)
-{
-    if (isErrorExpr(output))
-    {
-	if (wantErrorValue) {
-	    // put the error message as value in the variable
-	    char* endMsg = strchr(output, '\n');
-	    if (endMsg != 0)
-		*endMsg = '\0';
-	    variable = new VarTree(name, VarTree::NKplain);
-	    variable->m_value = output;
-	} else {
-	    variable = 0;
-	}
-	return true;
-    }
-    return false;
-}
-
-VarTree* KDebugger::parseExpr(const char* name, bool wantErrorValue)
+VarTree* KDebugger::parseExpr(const char* output, bool wantErrorValue)
 {
     VarTree* variable;
 
     // check for error conditions
-    if (!parseOffErrorExpr(m_gdbOutput, name, variable, wantErrorValue))
+    bool goodValue = m_d->parsePrintExpr(output, wantErrorValue, variable);
+
+    if (variable != 0 && goodValue)
     {
-	// parse the variable
-	const char* p = m_gdbOutput;
-	variable = parseVar(p);
-	if (variable == 0) {
-	    return 0;
-	}
-	// set name
-	variable->setText(name);
 	// get some types
 	variable->inferTypesOfChildren(*m_typeTable);
     }
     return variable;
 }
 
-#if QT_VERSION < 200
-struct QChar {
-    // this is the XChar2b on X11
-    uchar row;
-    uchar cell;
-    static QString toQString(QChar* unicode, int len);
-    QChar() : row(0), cell(0) { }
-    QChar(char c) : row(0), cell(c) { }
-    operator char() const { return row ? 0 : cell; }
-};
-
-QString QChar::toQString(QChar* unicode, int len)
-{
-    QString result(len+1);
-    char* data = result.data();
-    data[len] = '\0';
-    while (len >= 0) {
-	data[len] = unicode[len].cell;
-	--len;
-    }
-    return result;
-}
-#endif
-
-VarTree* KDebugger::parseQCharArray(const char* name, bool wantErrorValue)
-{
-    VarTree* variable = 0;
-
-    /*
-     * Parse off white space. gdb sometimes prints white space first if the
-     * printed array leaded to an error.
-     */
-    char* p = m_gdbOutput;
-    while (isspace(*p))
-	p++;
-
-    // check if this is an error indicating that gdb does not know about QString::null
-    if (m_qstring2nullOk &&
-	strncmp(p, "Internal error: could not find static variable null", 51) == 0)
-    {
-	m_qstring2nullOk = false;
-	// continue and let parseOffErrorExpr catch the error
-    }
-
-    // special case: empty string (0 repetitions)
-    if (strncmp(p, "Invalid number 0 of repetitions", 31) == 0)
-    {
-	variable = new VarTree(name, VarTree::NKplain);
-	variable->m_value = "\"\"";
-	return variable;
-    }
-
-    // check for error conditions
-    if (parseOffErrorExpr(p, name, variable, wantErrorValue))
-	return variable;
-
-    // parse the array
-
-    // find '='
-    p = strchr(p, '=');
-    if (p == 0) {
-	goto error;
-    }
-    // skip white space
-    do {
-	p++;
-    } while (isspace(*p));
-
-    if (*p == '{')
-    {
-	// this is the real data
-	p++;				/* skip '{' */
-
-	// parse the array
-	QString result;
-	QString repeatCount;
-	enum { wasNothing, wasChar, wasRepeat } lastThing = wasNothing;
-	/*
-	 * A matrix for separators between the individual "things"
-	 * that are added to the string. The first index is a bool,
-	 * the second index is from the enum above.
-	 */
-	static const char* separator[2][3] = {
-	    { "\"", 0,       ", \"" },	/* normal char is added */
-	    { "'",  "\", '", ", '" }	/* repeated char is added */
-	};
-
-	while (isdigit(*p)) {
-	    // parse a number
-	    char* end;
-	    unsigned short value = (unsigned short) strtoul(p, &end, 0);
-	    if (end == p)
-		goto error;		/* huh? no valid digits */
-	    // skip separator and search for a repeat count
-	    p = end;
-	    while (isspace(*p) || *p == ',')
-		p++;
-	    bool repeats = strncmp(p, "<repeats ", 9) == 0;
-	    if (repeats) {
-		char* start = p;
-		p = strchr(p+9, '>');	/* search end and advance */
-		if (p == 0)
-		    goto error;
-		p++;			/* skip '>' */
-		repeatCount = FROM_LATIN1(start, p-start);
-		while (isspace(*p) || *p == ',')
-		    p++;
-	    }
-	    // p is now at the next char (or the end)
-
-	    // interpret the value as a QChar
-	    // TODO: make cross-architecture compatible
-	    QChar ch;
-	    (unsigned short&)ch = value;
-
-	    // escape a few frequently used characters
-	    char escapeCode = '\0';
-	    switch (char(ch)) {
-	    case '\n': escapeCode = 'n'; break;
-	    case '\r': escapeCode = 'r'; break;
-	    case '\t': escapeCode = 't'; break;
-	    case '\b': escapeCode = 'b'; break;
-	    case '\"': escapeCode = '\"'; break;
-	    case '\\': escapeCode = '\\'; break;
-#if QT_VERSION < 200
-		// since we only deal with ascii values must always escape '\0'
-	    case '\0': escapeCode = '0'; break;
-#else
-	    case '\0': if (value == 0) { escapeCode = '0'; } break;
-#endif
-	    }
-
-	    // add separator
-	    result += separator[repeats][lastThing];
-	    // add char
-	    if (escapeCode != '\0') {
-		result += '\\';
-		ch = escapeCode;
-	    }
-	    result += ch;
-
-	    // fixup repeat count and lastThing
-	    if (repeats) {
-		result += "' ";
-		result += repeatCount;
-		lastThing = wasRepeat;
-	    } else {
-		lastThing = wasChar;
-	    }
-	}
-	if (*p != '}')
-	    goto error;
-
-	// closing quote
-	if (lastThing == wasChar)
-	    result += "\"";
-
-	// assign the value
-	variable = new VarTree(name, VarTree::NKplain);
-	variable->m_value = result;
-    }
-    else if (strncmp(p, "true", 4) == 0)
-    {
-	variable = new VarTree(name, VarTree::NKplain);
-	variable->m_value = "QString::null";
-    }
-    else if (strncmp(p, "false", 5) == 0)
-    {
-	variable = new VarTree(name, VarTree::NKplain);
-	variable->m_value = "(null)";
-    }
-    else
-	goto error;
-    return variable;
-
-error:
-    if (wantErrorValue) {
-	variable = new VarTree(name, VarTree::NKplain);
-	variable->m_value = "internal parse error";
-    }
-    return variable;
-}
-
-#if QT_VERSION < 200
-#define ISSPACE(c) isspace((c))
-#else
-// c is a QChar
-#define ISSPACE(c) (c).isSpace()
-#endif
-
-bool parseFrame(const char*& s, int& frameNo, QString& func, QString& file, int& lineNo)
-{
-    // Example:
-    //  #1  0x8048881 in Dl::Dl (this=0xbffff418, r=3214) at testfile.cpp:72
-
-    // must start with a hash mark followed by number
-    if (s[0] != '#' || !isdigit(s[1]))
-	return false;
-
-    const char* p = s;
-    p++;				/* skip the hash mark */
-    // frame number
-    frameNo = atoi(p);
-    while (isdigit(*p))
-	p++;
-    // space
-    while (isspace(*p))
-	p++;
-    // next may be a hexadecimal address
-    if (*p == '0') {
-	p++;
-	if (*p == 'x')
-	    p++;
-	while (isxdigit(*p))
-	    p++;
-	if (strncmp(p, " in ", 4) == 0)
-	    p += 4;
-    }
-    const char* start = p;
-    // search opening parenthesis
-    while (*p != '\0' && *p != '(')
-	p++;
-    if (*p == '\0') {
-	func = start;
-	file = "";
-	lineNo = 0;
-	s = p;
-	return true;
-    }
-    /*
-     * Skip parameters. But notice that for complicated conversion
-     * functions (eg. "operator int(**)()()", ie. convert to pointer to
-     * pointer to function) as well as operator()(...) we have to skip
-     * additional pairs of parentheses.
-     */
-    do {
-	skipNestedWithString(p, '(', ')');
-	while (isspace(*p))
-	    p++;
-    } while (*p == '(');
-
-    // check for file position
-    if (strncmp(p, "at ", 3) == 0) {
-	p += 3;
-	const char* fileStart = p;
-	// go for the end of the line
-	while (*p != '\0' && *p != '\n')
-	    p++;
-	// search back for colon
-	const char* colon = p;
-	do {
-	    --colon;
-	} while (*colon != ':');
-	file = FROM_LATIN1(fileStart, colon-fileStart);
-	lineNo = atoi(colon+1);
-	// skip new-line
-	if (*p != '\0')
-	    p++;
-    } else {
-	// check for "from shared lib"
-	if (strncmp(p, "from ", 5) == 0) {
-	    p += 5;
-	    // go for the end of the line
-	    while (*p != '\0' && *p != '\n')
-		p++;
-	    // skip new-line
-	    if (*p != '\0')
-		p++;
-	}
-	file = "";
-	lineNo = 0;
-    }
-    // construct the function name (including file info)
-    if (*p == '\0') {
-	func = start;
-    } else {
-	func = FROM_LATIN1(start, p-start-1);	/* don't include \n */
-    }
-    s = p;
-
-    // replace \n (and whitespace around it) in func by a blank
-    ASSERT(!ISSPACE(func[0]));		/* there must be non-white before first \n */
-    int nl = 0;
-    while ((nl = func.find('\n', nl)) >= 0) {
-	// search back to the beginning of the whitespace
-	int startWhite = nl;
-	do {
-	    --startWhite;
-	} while (ISSPACE(func[startWhite]));
-	startWhite++;
-	// search forward to the end of the whitespace
-	do {
-	    nl++;
-	} while (ISSPACE(func[nl]));
-	// replace
-	func.replace(startWhite, nl-startWhite, " ");
-	/* continue searching for more \n's at this place: */
-	nl = startWhite+1;
-    }
-    return true;
-}
-
-#undef ISSPACE
-
 // parse the output of bt
-void KDebugger::handleBacktrace()
+void KDebugger::handleBacktrace(const char* output)
 {
-    const char* s = m_gdbOutput;
-
-    QString func, file;
-    int lineNo, frameNo;
-
     // reduce flicker
     m_btWindow.setAutoUpdate(false);
 
     m_btWindow.clear();
-    if (parseFrame(s, frameNo, func, file, lineNo)) {
-	// first frame must set PC
-	TRACE("frame " + func + " (" + file + QString().sprintf(":%d)",lineNo));
-	m_btWindow.insertItem(func);
-	emit updatePC(file, lineNo-1, frameNo);
 
-	while (parseFrame(s, frameNo, func, file, lineNo)) {
-	    TRACE("frame " + func + " (" + file + QString().sprintf(":%d)",lineNo));
+    QList<StackFrame> stack;
+    m_d->parseBackTrace(output, stack);
+
+    if (stack.count() > 0) {
+	StackFrame* frm = stack.take(0);
+	// first frame must set PC
+	// note: frm->lineNo is zero-based
+	emit updatePC(frm->fileName, frm->lineNo, frm->frameNo);
+
+	do {
+	    QString func;
+	    if (frm->var != 0)
+		func = frm->var->getText();
+	    else
+		func = frm->fileName + ":" + QString().setNum(frm->lineNo+1);
 	    m_btWindow.insertItem(func);
+	    TRACE("frame " + func + " (" + frm->fileName + ":" +
+		  QString().setNum(frm->lineNo+1) + ")");
+	    delete frm;
 	}
+	while ((frm = stack.take()) != 0);
     }
 
     m_btWindow.setAutoUpdate(true);
@@ -1961,19 +1165,17 @@ void KDebugger::handleBacktrace()
 
 void KDebugger::gotoFrame(int frame)
 {
-    executeCmd(DCframe, QString().sprintf("frame %d", frame));
+    m_d->executeCmd(DCframe, frame);
 }
 
-void KDebugger::handleFrameChange()
+void KDebugger::handleFrameChange(const char* output)
 {
-    QString func;
     QString fileName;
     int frameNo;
     int lineNo;
-    const char* s = m_gdbOutput;
-    if (parseFrame(s, frameNo, func, fileName, lineNo)) {
-	/* lineNo can be 0 here if we can't find a file name */
-	emit updatePC(fileName, lineNo-1, frameNo);
+    if (m_d->parseFrameChange(output, frameNo, fileName, lineNo)) {
+	/* lineNo can be negative here if we can't find a file name */
+	emit updatePC(fileName, lineNo, frameNo);
     } else {
 	emit updatePC(fileName, -1, frameNo);
     }
@@ -1995,7 +1197,7 @@ void KDebugger::evalExpressions()
 	m_watchEvalExpr.remove();
 	QString expr = exprItem->computeExpr();
 	TRACE("watch expr: " + expr);
-	CmdQueueItem* cmd = queueCmd(DCprint, "print " + expr, QMoverride);
+	CmdQueueItem* cmd = m_d->queueCmd(DCprint, expr, DebuggerDriver::QMoverride);
 	// remember which expr this was
 	cmd->m_expr = exprItem;
 	cmd->m_exprWnd = &m_watchVariables;
@@ -2057,12 +1259,12 @@ void KDebugger::dereferencePointer(ExprWnd* wnd, VarTree* exprItem,
 
     QString expr = exprItem->computeExpr();
     TRACE("dereferencing pointer: " + expr);
-    QString queueExpr = "print *(" + expr + ")";
+    QString queueExpr = "*(" + expr + ")";
     CmdQueueItem* cmd;
     if (immediate) {
-	cmd = queueCmd(DCprint, queueExpr, QMoverrideMoreEqual);
+	cmd = m_d->queueCmd(DCprint, queueExpr, DebuggerDriver::QMoverrideMoreEqual);
     } else {
-	cmd = queueCmd(DCprint, queueExpr, QMoverride);
+	cmd = m_d->queueCmd(DCprint, queueExpr, DebuggerDriver::QMoverride);
     }
     // remember which expr this was
     cmd->m_expr = exprItem;
@@ -2075,28 +1277,19 @@ void KDebugger::determineType(ExprWnd* wnd, VarTree* exprItem)
 
     QString expr = exprItem->computeExpr();
     TRACE("get type of: " + expr);
-    QString queueExpr = "whatis " + expr;
     CmdQueueItem* cmd;
-    cmd = queueCmd(DCfindType, queueExpr, QMoverride);
+    cmd = m_d->queueCmd(DCfindType, expr, DebuggerDriver::QMoverride);
 
     // remember which expr this was
     cmd->m_expr = exprItem;
     cmd->m_exprWnd = wnd;
 }
 
-void KDebugger::handleFindType(CmdQueueItem* cmd)
+void KDebugger::handleFindType(CmdQueueItem* cmd, const char* output)
 {
-    const char* str = m_gdbOutput;
-    if (strncmp(str, "type = ", 7) == 0) {
-	str += 7;
-
-	/*
-	 * Everything else is the type. We strip off all white-space from
-	 * the type.
-	 */
-	QString type = str;
-	type.replace(QRegExp("\\s+"), "");
-
+    QString type;
+    if (m_d->parseFindType(output, type))
+    {
 	ASSERT(cmd != 0 && cmd->m_expr != 0);
 
 	TypeInfo* info = m_typeTable->lookup(type);
@@ -2131,7 +1324,7 @@ void KDebugger::handleFindType(CmdQueueItem* cmd)
     evalExpressions();			/* queue more of them */
 }
 
-void KDebugger::handlePrintStruct(CmdQueueItem* cmd)
+void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
 {
     VarTree* var = cmd->m_expr;
     ASSERT(var != 0);
@@ -2139,9 +1332,9 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd)
 
     VarTree* partExpr;
     if (cmd->m_cmd != DCprintQStringStruct) {
-	partExpr = parseExpr(cmd->m_expr->getText(), false);
+	partExpr = parseExpr(output, false);
     } else {
-	partExpr = parseQCharArray(cmd->m_expr->getText(), false);
+	partExpr = m_d->parseQCharArray(output, false);
     }
     bool errorValue =
 	partExpr == 0 ||
@@ -2239,19 +1432,6 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 	if (m_typeTable->parseQt2QStrings())
 	{
 	    expr = expr.mid(15, expr.length());	/* strip off /QString::Data */
-	    expr =
-		// if the string data is junk, fail early
-		"print ($qstrunicode=($qstrdata=(" + expr + "))->unicode)?"
-		// print an array of shorts
-		"(*(unsigned short*)$qstrunicode)@"
-		// limit the length and add 1 because length 0 is an error
-		"(($qstrlen=(unsigned int)($qstrdata->len))>100?100:$qstrlen)";
-		// if unicode data is 0, check if it is QString::null
-		// however, gdb can't always find QString::null (I don't know why)
-		// which results in an error; we autodetect this situation in
-		// parseQt2QStrings and revert to a safe expression
-	    expr += m_qstring2nullOk ?
-		":($qstrdata==QString::null.d)" : ":1==0";
 	    dbgCmd = DCprintQStringStruct;
 	} else {
 	    /*
@@ -2261,14 +1441,15 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 	     * was not (only qt2 enables the QString feature).
 	     */
 	    // TODO: remove this "print"; queue the next printStruct instead
-	    expr = "print *0";
+	    expr = "*0";
 	}
     } else {
-	expr = "print " + expr;
+	expr = expr;
     }
     TRACE("evalStruct: " + expr + (var->m_exprIndexUseGuard ? " // guard" : " // real"));
-    CmdQueueItem* cmd = queueCmd(dbgCmd, expr,
-				 immediate  ?  QMoverrideMoreEqual : QMnormal);
+    CmdQueueItem* cmd = m_d->queueCmd(dbgCmd, expr,
+				      immediate  ?  DebuggerDriver::QMoverrideMoreEqual
+				      : DebuggerDriver::QMnormal);
 
     // remember which expression this was
     cmd->m_expr = var;
@@ -2282,87 +1463,27 @@ void KDebugger::removeExpr(ExprWnd* wnd, VarTree* var)
 	return;
 
     // must remove any references to var from command queues
-
-    /*
-     * Check the low-priority queue: We start at the back end, but skip the
-     * last element for now. The reason is that if we delete an element the
-     * current element is stepped to the next one - except if it's on the
-     * last: then it's stepped to the previous element. By checking the
-     * last element separately we avoid that special case.
-     */
-    CmdQueueItem* cmd = m_lopriCmdQueue.last();
-    while ((cmd = m_lopriCmdQueue.prev()) != 0) {
-	if (cmd->m_expr != 0 && var->isAncestorEq(cmd->m_expr)) {
-	    // this is indeed a critical command; delete it
-	    TRACE("removing critical lopri-cmd: " + cmd->m_cmdString);
-	    m_lopriCmdQueue.remove();	/* steps to next element */
-	}
-    }
-    cmd = m_lopriCmdQueue.last();
-    if (cmd != 0) {
-	if (cmd->m_expr != 0 && var->isAncestorEq(cmd->m_expr)) {
-	    TRACE("removing critical lopri-cmd: " + cmd->m_cmdString);
-	    m_lopriCmdQueue.remove();	/* steps to next element */
-	}
-    }
+    m_d->dequeueCmdByVar(var);
 
     wnd->removeExpr(var);
 }
 
-void KDebugger::handleSharedLibs()
+void KDebugger::handleSharedLibs(const char* output)
 {
     // delete all known libraries
     m_sharedLibs.clear();
 
     // parse the table of shared libraries
-    if (strncmp(m_gdbOutput, "No shared libraries loaded", 26) != 0) {
-	const char* str = m_gdbOutput;
-	// strip off head line
-	str = strchr(str, '\n');
-	if (str == 0)
-	    goto doneParse;
-	str++;				/* skip '\n' */
-	QString shlibName;
-	while (str != 0 && *str != '\0') {
-	    // format of a line is
-	    // 0x404c5000  0x40580d90  Yes         /lib/libc.so.5
-	    // 3 blocks of non-space followed by space
-	    for (int i = 0; *str != '\0' && i < 3; i++) {
-		while (*str != '\0' && !isspace(*str)) {   /* non-space */
-		    str++;
-		}
-		while (isspace(*str)) {	/* space */
-		    str++;
-		}
-	    }
-	    if (*str == '\0')
-		goto doneParse;
-	    const char* start = str;
-	    str = strchr(str, '\n');
-	    if (str == 0) {
-		shlibName = start;
-	    } else {
-		shlibName = FROM_LATIN1(start, str-start);
-		str++;
-	    }
-	    m_sharedLibs.append(shlibName);
-	    TRACE("found shared lib " + shlibName);
-	}
-    }
-doneParse:;
+    m_d->parseSharedLibs(output, m_sharedLibs);
     m_sharedLibsListed = true;
 
     // get type libraries
     m_typeTable->loadLibTypes(m_sharedLibs);
 }
 
-KDebugger::CmdQueueItem* KDebugger::loadCoreFile()
+CmdQueueItem* KDebugger::loadCoreFile()
 {
-    if (m_gdbMajor > 4 || (m_gdbMajor == 4 && m_gdbMinor >= 16)) {
-	return queueCmd(DCcorefile, "target core " + m_corefile, QMoverride);
-    } else {
-	return queueCmd(DCcorefile, "core-file " + m_corefile, QMoverride);
-    }
+    return m_d->queueCmd(DCcorefile, m_corefile, DebuggerDriver::QMoverride);
 }
 
 void KDebugger::slotLocalsExpanding(KTreeViewItem* item, bool& allow)
@@ -2396,7 +1517,7 @@ void KDebugger::addWatch(const QString& t)
     // if we are boring ourselves, send down the command
     if (m_programActive) {
 	m_watchEvalExpr.append(exprItem);
-	if (m_state == DSidle) {
+	if (m_d->isIdle()) {
 	    evalExpressions();
 	}
     }
@@ -2407,7 +1528,7 @@ void KDebugger::slotDeleteWatch()
 {
     // delete only allowed while debugger is idle; or else we might delete
     // the very expression the debugger is currently working on...
-    if (m_state != DSidle)
+    if (!m_d->isIdle())
 	return;
 
     int index = m_watchVariables.currentItem();
@@ -2463,7 +1584,7 @@ void KDebugger::slotEnaDisBreak(const QString& fileName, int lineNo)
 
 void KDebugger::slotUpdateAnimation()
 {
-    if (m_state == DSidle) {
+    if (m_d->isIdle()) {
 	stopAnimation();
     } else {
 	/*
@@ -2475,9 +1596,9 @@ void KDebugger::slotUpdateAnimation()
     }
 }
 
-void KDebugger::handleRegisters()
+void KDebugger::handleRegisters(const char* output)
 {
-    const char* str = m_gdbOutput;
+    const char* str = output;
     m_regView->updateRegisters(str);
 }
 

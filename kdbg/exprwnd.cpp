@@ -5,7 +5,6 @@
 
 #include "exprwnd.h"
 #include "exprwnd.moc"
-#include "parsevar.h"
 #include "typetable.h"
 #include <qstrlist.h>
 #include <qpainter.h>
@@ -146,6 +145,9 @@ void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
 
     // if this is a pointer, get the type from the value (less the pointer)
     if (m_varKind == VKpointer) {
+#ifndef I_know_a_way_to_do_this_cleanly
+	return;
+#else
 	const char* p = m_value.data();
 	const char* start = p;
 	// the type of the pointer shows up in the value (sometimes)
@@ -168,6 +170,7 @@ void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
 	if (m_type == 0) {
 	    m_type = TypeInfo::unknownType();
 	}
+#endif
     } else if (m_varKind == VKstruct) {
 	// check if this is a base class part
 	if (m_nameKind == NKtype) {

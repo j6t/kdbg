@@ -27,28 +27,22 @@ class KSimpleConfig;
  */
 class KDebugger;
 
-struct Breakpoint
+// todo: a forward should be sufficient
+struct WndBreakpoint;
+#include "dbgdriver.h"
+struct WndBreakpoint : Breakpoint
 {
-    int id;				/* gdb's number */
-    bool temporary;
-    bool enabled;
-    QString location;
     QString conditionInput;		/* condition as input by the user */
-    QString condition;			/* condition as printed by gdb */
-    uint ignoreCount;			/* ignore next that may hits */
-    int hitCount;			/* as reported by gdb */
-    // the following items repeat the location, but in a better usable way
-    QString fileName;
-    int lineNo;				/* zero-based line number */
 
     bool del;				/* used when list is parsed */
     QListViewItem* listItem;		/* the corresponding table item */
 };
 
 
+
 /*
- * The class BreakpointListBox provides a simpler interface to the
- * KTabListBox.
+ * The class BreakpointListBox provides a customized interface to the
+ * QListView.
  */
 class BreakpointListBox : public QListView
 {
@@ -56,7 +50,7 @@ public:
     BreakpointListBox(QWidget* parent, const char* name);
     ~BreakpointListBox();
 
-    void changeItem(Breakpoint* bp);
+    void changeItem(WndBreakpoint* bp);
 
 protected:
     ValArray<QPixmap> m_icons;
@@ -70,13 +64,13 @@ public:
     BreakpointTable(KDebugger& deb);
     ~BreakpointTable();
 
+    void insertBreakpoint(int num, const QString& fileName, int lineNo);
     void updateBreakList(const char* output);
-    void parseBreakpoint(const char* output);
     int numBreakpoints() const { return m_brkpts.size(); }
-    const Breakpoint& breakpoint(int i) const { return *m_brkpts[i]; }
+    const WndBreakpoint* breakpoint(int i) const { return m_brkpts[i]; }
     void doBreakpoint(QString file, int lineNo, bool temporary);
     void doEnableDisableBreakpoint(const QString& file, int lineNo);
-    Breakpoint* breakpointByFilePos(QString file, int lineNo);
+    WndBreakpoint* breakpointByFilePos(QString file, int lineNo);
     bool haveTemporaryBP() const;
 
     void saveBreakpoints(KSimpleConfig* config);
@@ -96,18 +90,16 @@ protected:
     QVBoxLayout m_buttons;
 
     // table of breakpoints; must correspond to items in list box
-    QArray<Breakpoint*> m_brkpts;
+    QArray<WndBreakpoint*> m_brkpts;
 
-    void parseBreakList(const char* output);
-    void insertBreakpoint(int num, char disp, char enable, const char* location,
-			  const char* fileName = 0, int lineNo = -1,
+    void insertBreakpoint(int num, bool temp, bool enabled, QString location,
+			  QString fileName = 0, int lineNo = -1,
 			  int hits = 0, uint ignoreCount = 0,
 			  QString condition = QString());
-    void insertBreakpoint(int num, const QString& fileName, int lineNo);
-    Breakpoint* breakpointById(int id);
-    Breakpoint* breakpointByItem(QListViewItem* item);
+    WndBreakpoint* breakpointById(int id);
+    WndBreakpoint* breakpointByItem(QListViewItem* item);
     void updateBreakpointCondition(int id, const QString& condition,
-				   uint ignoreCount);
+				   int ignoreCount);
 
     void closeEvent(QCloseEvent*);
     

@@ -24,13 +24,14 @@ bin_PROGRAMS = 	kdbg
 
 # Which sources should be compiled for kdbg.
 kdbg_SOURCES = \
-	brkpt.cpp \
 	pgmargs.cpp \
 	procattach.cpp \
 	ktreeview.cpp \
-	parsevar.cpp \
 	textvw.cpp \
 	debugger.cpp \
+	dbgdriver.cpp \
+	gdbdriver.cpp \
+	brkpt.cpp \
 	exprwnd.cpp \
 	regwnd.cpp \
 	updateui.cpp \
@@ -49,13 +50,14 @@ kdbg_LDADD   = $(LIB_KFILE)
 
 # this option you can leave out. Just, if you use "make dist", you need it
 noinst_HEADERS = \
-	brkpt.h \
 	pgmargs.h \
 	procattach.h \
-	parsevar.h \
 	textvw.h \
 	valarray.h \
 	debugger.h \
+	dbgdriver.h \
+	gdbdriver.h \
+	brkpt.h \
 	exprwnd.h \
 	regwnd.h \
 	ktreeview.h \
@@ -74,6 +76,9 @@ BUILTSOURCES =	\
 	pgmargs.moc \
 	textvw.moc \
 	debugger.moc \
+	dbgdriver.moc \
+	gdbdriver.moc \
+	brkpt.moc \
 	exprwnd.moc \
 	regwnd.moc \
 	ktreeview.moc \
@@ -105,6 +110,14 @@ EXTRA_DIST = $(apps_DATA)
 $(srcdir)/debugger.cpp: debugger.moc
 debugger.moc: $(srcdir)/debugger.h
 	$(MOC) $(srcdir)/debugger.h -o debugger.moc
+
+$(srcdir)/dbgdriver.cpp: dbgdriver.moc
+dbgdriver.moc: $(srcdir)/dbgdriver.h
+	$(MOC) $(srcdir)/dbgdriver.h -o dbgdriver.moc
+
+$(srcdir)/gdbdriver.cpp: gdbdriver.moc
+gdbdriver.moc: $(srcdir)/gdbdriver.h
+	$(MOC) $(srcdir)/gdbdriver.h -o gdbdriver.moc
 
 $(srcdir)/exprwnd.cpp: exprwnd.moc
 exprwnd.moc: $(srcdir)/exprwnd.h

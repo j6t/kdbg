@@ -6,7 +6,7 @@
 #include "winstack.h"
 #include "winstack.moc"
 #include "commandids.h"
-#include "brkpt.h"
+#include "brkpt.h"	// todo: this should be "debugger.h" finally!
 #include <kfiledialog.h>
 #include <qtextstream.h>
 #include <qpainter.h>
@@ -227,8 +227,8 @@ void FileWindow::updateLineItems(const BreakpointTable& bpt)
 	    TRACE(QString().sprintf("checking for bp at %d", i));
 	    int j;
 	    for (j = bpt.numBreakpoints()-1; j >= 0; j--) {
-		const Breakpoint& bp = bpt.breakpoint(j);
-		if (bp.lineNo == i && fileNamesMatch(bp.fileName, fileName())) {
+		const Breakpoint* bp = bpt.breakpoint(j);
+		if (bp->lineNo == i && fileNamesMatch(bp->fileName, fileName())) {
 		    // yes it exists; mode is changed below
 		    break;
 		}
@@ -243,17 +243,17 @@ void FileWindow::updateLineItems(const BreakpointTable& bpt)
 
     // add new breakpoints
     for (int j = bpt.numBreakpoints()-1; j >= 0; j--) {
-	const Breakpoint& bp = bpt.breakpoint(j);
-	if (fileNamesMatch(bp.fileName, fileName())) {
-	    TRACE(QString().sprintf("updating %s:%d", bp.fileName.data(), bp.lineNo));
-	    int i = bp.lineNo;
+	const Breakpoint* bp = bpt.breakpoint(j);
+	if (fileNamesMatch(bp->fileName, fileName())) {
+	    TRACE(QString().sprintf("updating %s:%d", bp->fileName.data(), bp->lineNo));
+	    int i = bp->lineNo;
 	    if (i < 0 || uint(i) >= m_lineItems.size())
 		continue;
 	    // compute new line item flags for breakpoint
-	    uchar flags = bp.enabled ? liBP : liBPdisabled;
-	    if (bp.temporary)
+	    uchar flags = bp->enabled ? liBP : liBPdisabled;
+	    if (bp->temporary)
 		flags |= liBPtemporary;
-	    if (!bp.condition.isEmpty() || bp.ignoreCount != 0)
+	    if (!bp->condition.isEmpty() || bp->ignoreCount != 0)
 		flags |= liBPconditional;
 	    // update if changed
 	    if ((m_lineItems[i] & liBPany) != flags) {

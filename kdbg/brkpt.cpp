@@ -14,12 +14,12 @@
 #include <qlabel.h>
 #include <qbitmap.h>
 #include "debugger.h"			/* #includes brkpt.h */
+#include "dbgdriver.h"
 #include "brkpt.moc"
 #include <ctype.h>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
-#include <stdlib.h>			/* strtol */
 #include "mydebug.h"
 
 
@@ -99,12 +99,18 @@ void BreakpointTable::updateBreakList(const char* output)
     }
 
     // get the new list
-    parseBreakList(output);
+    QList<Breakpoint> brks;
+    brks.setAutoDelete(true);
+    m_debugger.driver()->parseBreakList(output, brks);
+    for (Breakpoint* bp = brks.first(); bp != 0; bp = brks.next()) {
+	insertBreakpoint(bp->id, bp->temporary, bp->enabled, bp->location,
+			 0, -1, bp->hitCount, bp->ignoreCount, bp->condition);
+    }
 
     // delete all untouched breakpoints
     for (i = m_brkpts.size()-1; i >= 0; i--) {
 	if (m_brkpts[i]->del) {
-	    Breakpoint* bp = m_brkpts[i];
+	    WndBreakpoint* bp = m_brkpts[i];
 	    // delete the pointer and the object
 	    for (uint j = i+1; j < m_brkpts.size(); j++) {
 		m_brkpts[j-1] = m_brkpts[j];
@@ -116,127 +122,38 @@ void BreakpointTable::updateBreakList(const char* output)
     }
 }
 
-void BreakpointTable::parseBreakList(const char* output)
-{
-    // skip first line, which is the headline
-    const char* p = strchr(output, '\n');
-    if (p == 0)
-	return;
-    p++;
-    if (*p == '\0')
-	return;
-    // split up a line
-    QString location;
-    int hits = 0;
-    uint ignoreCount = 0;
-    QString condition;
-    char* end;
-    while (*p != '\0') {
-	// get Num
-	long bpNum = strtol(p, &end, 10);	/* don't care about overflows */
-	p = end;
-	// skip Type
-	while (isspace(*p))
-	    p++;
-	while (*p != '\0' && !isspace(*p))	/* "breakpoint" */
-	    p++;
-	while (isspace(*p))
-	    p++;
-	if (*p == '\0')
-	    break;
-	// get Disp
-	char disp = *p++;
-	while (*p != '\0' && !isspace(*p))	/* "keep" or "del" */
-	    p++;
-	while (isspace(*p))
-	    p++;
-	if (*p == '\0')
-	    break;
-	// get Enb
-	char enable = *p++;
-	while (*p != '\0' && !isspace(*p))	/* "y" or "n" */
-	    p++;
-	while (isspace(*p))
-	    p++;
-	if (*p == '\0')
-	    break;
-	// remainder is location, hit and ignore count, condition
-	hits = 0;
-	ignoreCount = 0;
-	condition = "";
-	end = strchr(p, '\n');
-	if (end == 0) {
-	    location = p;
-	    p += location.length();
-	} else {
-	    location = FROM_LATIN1(p, end-p).stripWhiteSpace();
-	    p = end+1;			/* skip over \n */
-	    // may be continued in next line
-	    QString continuation;
-	    while (isspace(*p)) {	/* p points to beginning of line */
-		end = strchr(p, '\n');
-		if (end == 0) {
-		    continuation = QString(p).stripWhiteSpace();
-		    p += strlen(p);
-		} else {
-		    continuation = FROM_LATIN1(p, end-p).stripWhiteSpace();
-		    p = end+1;		/* skip '\n' */
-		}
-		if (strncmp(continuation, "breakpoint already hit", 22) == 0) {
-		    // extract the hit count
-		    hits = strtol(continuation.data()+22, &end, 10);
-		    TRACE(QString().sprintf("hit count %d", hits));
-		} else if (strncmp(continuation, "stop only if ", 13) == 0) {
-		    // extract condition
-		    condition = continuation.data()+13;
-		    TRACE("condition: "+condition);
-		} else if (strncmp(continuation, "ignore next ", 12) == 0) {
-		    // extract ignore count
-		    ignoreCount = strtol(continuation.data()+12, &end, 10);
-		    TRACE(QString().sprintf("ignore count %d", ignoreCount));
-		} else {
-		    // indeed a continuation
-		    location += " " + continuation;
-		}
-	    }
-	}
-	insertBreakpoint(bpNum, disp, enable, location, 0, -1,
-			 hits, ignoreCount, condition);
-    }
-}
-
 void BreakpointTable::insertBreakpoint(int num, const QString& fileName, int lineNo)
 {
     SIZED_QString(str,fileName.length()+20);
-    str.sprintf("%s:%d", fileName.data(), lineNo);
-    insertBreakpoint(num, 'k', 'y',	/* keep, enabled */
+    str.sprintf("%s:%d", fileName.data(), lineNo+1);
+    insertBreakpoint(num, false, true,	/* keep, enabled */
 		     str, fileName, lineNo);
 }
 
-void BreakpointTable::insertBreakpoint(int num, char disp, char enable, const char* location,
-				       const char* fileName, int lineNo,
+void BreakpointTable::insertBreakpoint(int num, bool temp, bool enabled, QString location,
+				       QString fileName, int lineNo,
 				       int hits, uint ignoreCount, QString condition)
 {
     assert(lineNo != 0);		/* line numbers are 1-based */
     TRACE("insert bp " + QString().setNum(num));
     int numBreaks = m_brkpts.size();
-    Breakpoint* bp = breakpointById(num);
+    WndBreakpoint* bp = breakpointById(num);
     if (bp == 0) {
 	// not found, insert a new one
-	bp = new Breakpoint;
+	bp = new WndBreakpoint;
 	m_brkpts.resize(numBreaks+1);
 	m_brkpts[numBreaks] = bp;
 	bp->id = num;
 	bp->lineNo = -1;
 	bp->listItem = new QListViewItem(&m_list);
     }
-    bp->temporary = disp == 'd';	/* "del" */
-    bp->enabled = enable == 'y';
+    bp->temporary = temp;
+    bp->enabled = enabled;
     bp->location = location;
-    if (fileName != 0)
+    if (!fileName.isEmpty())
 	bp->fileName = fileName;
     if (lineNo > 0)
-	bp->lineNo = lineNo-1;
+	bp->lineNo = lineNo;
     bp->hitCount = hits;
     bp->ignoreCount = ignoreCount;
     bp->condition = condition;
@@ -245,44 +162,6 @@ void BreakpointTable::insertBreakpoint(int num, char disp, char enable, const ch
     bp->del = false;
     // update list
     m_list.changeItem(bp);
-}
-
-void BreakpointTable::parseBreakpoint(const char* output)
-{
-    const char* o = output;
-    // skip lines of that begin with "(Cannot find"
-    while (strncmp(o, "(Cannot find", 12) == 0) {
-	o = strchr(o, '\n');
-	if (o == 0)
-	    return;
-	o++;				/* skip newline */
-    }
-
-    if (strncmp(o, "Breakpoint ", 11) != 0)
-	return;
-    
-    // breakpoint id
-    output += 11;			/* skip "Breakpoint " */
-    char* p;
-    int num = strtoul(output, &p, 10);
-    if (p == o)
-	return;
-    
-    // file name
-    char* fileStart = strstr(p, "file ");
-    if (fileStart == 0)
-	return;
-    fileStart += 5;
-    
-    // line number
-    char* numStart = strstr(fileStart, ", line ");
-    QString fileName = FROM_LATIN1(fileStart, numStart-fileStart);
-    numStart += 7;
-    int lineNo = strtoul(numStart, &p, 10);
-    if (numStart == p)
-	return;
-    
-    insertBreakpoint(num, fileName, lineNo);
 }
 
 void BreakpointTable::closeEvent(QCloseEvent* ev)
@@ -303,7 +182,7 @@ void BreakpointTable::addBP()
     QString bpText = m_bpEdit.text();
     bpText = bpText.stripWhiteSpace();
     if (m_debugger.isReady()) {
-	m_debugger.executeCmd(KDebugger::DCbreak, "break " + bpText);
+	m_debugger.driver()->executeCmd(DCbreaktext, bpText);
 	// clear text if successfully set
 	m_bpEdit.setText("");
     }
@@ -311,18 +190,16 @@ void BreakpointTable::addBP()
 
 void BreakpointTable::removeBP()
 {
-    Breakpoint* bp = breakpointByItem(m_list.currentItem());
+    WndBreakpoint* bp = breakpointByItem(m_list.currentItem());
     if (bp == 0)
 	return;
 
-    QString cmdString;
-    cmdString.sprintf("delete %d", bp->id);
-    m_debugger.executeCmd(KDebugger::DCdelete, cmdString);
+    m_debugger.driver()->executeCmd(DCdelete, bp->id);
 }
 
 void BreakpointTable::viewBP()
 {
-    Breakpoint* bp = breakpointByItem(m_list.currentItem());
+    WndBreakpoint* bp = breakpointByItem(m_list.currentItem());
     if (bp == 0)
 	return;
 
@@ -362,7 +239,7 @@ protected:
 
 void BreakpointTable::conditionalBP()
 {
-    Breakpoint* bp = breakpointByItem(m_list.currentItem());
+    WndBreakpoint* bp = breakpointByItem(m_list.currentItem());
     if (bp == 0)
 	return;
 
@@ -390,7 +267,7 @@ void BreakpointTable::conditionalBP()
 // this handles the menu entry: toggles breakpoint on and off
 void BreakpointTable::doBreakpoint(QString file, int lineNo, bool temporary)
 {
-    Breakpoint* bp = breakpointByFilePos(file, lineNo);
+    WndBreakpoint* bp = breakpointByFilePos(file, lineNo);
     if (bp == 0)
     {
 	// no such breakpoint, so set a new one
@@ -402,10 +279,8 @@ void BreakpointTable::doBreakpoint(QString file, int lineNo, bool temporary)
 	if (offset >= 0) {
 	    file.remove(0, offset+1);
 	}
-	SIZED_QString(cmdString,file.length() + 30);
-	cmdString.sprintf("%sbreak %s:%d", temporary ? "t" : "",
-			  file.data(), lineNo+1);
-	m_debugger.executeCmd(KDebugger::DCbreak, cmdString);
+	m_debugger.driver()->executeCmd(temporary ? DCtbreakline : DCbreakline,
+					file, lineNo);
     }
     else
     {
@@ -413,65 +288,58 @@ void BreakpointTable::doBreakpoint(QString file, int lineNo, bool temporary)
 	 * If the breakpoint is disabled, enable it; if it's enabled,
 	 * delete that breakpoint.
 	 */
-	QString cmdString;
 	if (bp->enabled) {
-	    cmdString.sprintf("delete %d", bp->id);
-	    m_debugger.executeCmd(KDebugger::DCdelete, cmdString);
+	    m_debugger.driver()->executeCmd(DCdelete, bp->id);
 	} else {
-	    cmdString.sprintf("enable %d", bp->id);
-	    m_debugger.executeCmd(KDebugger::DCenable, cmdString);
+	    m_debugger.driver()->executeCmd(DCenable, bp->id);
 	}
     }
 }
 
 void BreakpointTable::doEnableDisableBreakpoint(const QString& file, int lineNo)
 {
-    Breakpoint* bp = breakpointByFilePos(file, lineNo);
+    WndBreakpoint* bp = breakpointByFilePos(file, lineNo);
     if (bp == 0)
 	return;
 
     // toggle enabled/disabled state
-    QString cmdString;
     if (bp->enabled) {
-	cmdString.sprintf("disable %d", bp->id);
-	m_debugger.executeCmd(KDebugger::DCdisable, cmdString);
+	m_debugger.driver()->executeCmd(DCdisable, bp->id);
     } else {
-	cmdString.sprintf("enable %d", bp->id);
-	m_debugger.executeCmd(KDebugger::DCenable, cmdString);
+	m_debugger.driver()->executeCmd(DCenable, bp->id);
     }
 }
 
 void BreakpointTable::updateBreakpointCondition(int id,
 						const QString& condition,
-						uint ignoreCount)
+						int ignoreCount)
 {
-    Breakpoint* bp = breakpointById(id);
+    WndBreakpoint* bp = breakpointById(id);
     if (bp == 0)
 	return;				/* breakpoint no longer exists */
 
-    QString cmdString;
+    bool changed = false;
 
     if (bp->conditionInput != condition) {
 	// change condition
-	cmdString.sprintf("condition %d ", bp->id);
-	m_debugger.executeCmd(KDebugger::DCcondition, cmdString + condition);
+	m_debugger.driver()->executeCmd(DCcondition, condition, bp->id);
 	bp->conditionInput = condition;
+	changed = true;
     }
     if (bp->ignoreCount != ignoreCount) {
 	// change ignore count
-	cmdString.sprintf("ignore %d %u", bp->id, ignoreCount);
-	m_debugger.executeCmd(KDebugger::DCignore, cmdString);
+	m_debugger.driver()->executeCmd(DCignore, bp->id, ignoreCount);
+	changed = true;
     }
-    if (!cmdString.isEmpty()) {
+    if (changed) {
 	// get the changes
-	m_debugger.queueCmd(KDebugger::DCinfobreak,
-			    "info breakpoints", KDebugger::QMoverride);
+	m_debugger.driver()->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
     }
 }
 
 
 
-Breakpoint* BreakpointTable::breakpointById(int id)
+WndBreakpoint* BreakpointTable::breakpointById(int id)
 {
     for (int i = m_brkpts.size()-1; i >= 0; i--) {
 	if (m_brkpts[i]->id == id) {
@@ -481,7 +349,7 @@ Breakpoint* BreakpointTable::breakpointById(int id)
     return 0;
 }
 
-Breakpoint* BreakpointTable::breakpointByItem(QListViewItem* item)
+WndBreakpoint* BreakpointTable::breakpointByItem(QListViewItem* item)
 {
     if (item == 0)
 	return 0;
@@ -494,7 +362,7 @@ Breakpoint* BreakpointTable::breakpointByItem(QListViewItem* item)
     return 0;
 }
 
-Breakpoint* BreakpointTable::breakpointByFilePos(QString file, int lineNo)
+WndBreakpoint* BreakpointTable::breakpointByFilePos(QString file, int lineNo)
 {
     // look for exact file name match
     int i;
@@ -556,7 +424,7 @@ void BreakpointTable::saveBreakpoints(KSimpleConfig* config)
     for (i = 0; uint(i) < m_brkpts.size(); i++) {
 	groupName.sprintf(BPGroup, i);
 	config->setGroup(groupName);
-	Breakpoint* bp = m_brkpts[i];
+	WndBreakpoint* bp = m_brkpts[i];
 	config->writeEntry(File, bp->fileName);
 	config->writeEntry(Line, bp->lineNo);
 	config->writeEntry(Temporary, bp->temporary);
@@ -613,22 +481,19 @@ void BreakpointTable::restoreBreakpoints(KSimpleConfig* config)
 	 * because this isn't a fresh gdb at all), we disable the wrong
 	 * breakpoint! Oh well... for now it works.
 	 */
-	SIZED_QString(cmdString, fileName.length() + 30);
-	cmdString.sprintf("%sbreak %s:%d", temporary ? "t" : "",
-			  fileName.data(), lineNo+1);
-	m_debugger.executeCmd(KDebugger::DCbreak, cmdString);
+	m_debugger.driver()->executeCmd(temporary ? DCtbreakline : DCbreakline,
+					fileName, lineNo);
 	if (!enabled) {
-	    cmdString.sprintf("disable %d", i+1);
-	    m_debugger.executeCmd(KDebugger::DCdisable, cmdString);
+	    m_debugger.driver()->executeCmd(DCdisable, i+1);
 	}
 	if (!condition.isEmpty()) {
-	    cmdString.sprintf("condition %d ", i+1);
-	    m_debugger.executeCmd(KDebugger::DCcondition, cmdString+condition);
+	    m_debugger.driver()->executeCmd(DCcondition, condition, i+1);
 	}
 
-	cmdString.sprintf("%s:%d", fileName.data(), lineNo);
-	insertBreakpoint(i+1, !temporary, enabled,
-			 cmdString, fileName, lineNo, 0, 0, condition);
+	SIZED_QString(location, fileName.length()+30);
+	location.sprintf("%s:%d", fileName.data(), lineNo);
+	insertBreakpoint(i+1, temporary, enabled,
+			 location, fileName, lineNo-1, 0, 0, condition);
     }
 }
 
@@ -697,7 +562,7 @@ BreakpointListBox::~BreakpointListBox()
 {
 }
 
-void BreakpointListBox::changeItem(Breakpoint* bp)
+void BreakpointListBox::changeItem(WndBreakpoint* bp)
 {
     /* breakpoint icon code; keep order the same as in this class's constructor */
     int code = bp->enabled ? 1 : 0;

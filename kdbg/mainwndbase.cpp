@@ -15,9 +15,13 @@
 #include <qtabdialog.h>
 #include "mainwndbase.h"
 #include "debugger.h"
+#include "gdbdriver.h"
 #include "prefdebugger.h"
 #include "updateui.h"
 #include "commandids.h"
+#ifdef HAVE_CONFIG
+#include "config.h"
+#endif
 #include "mydebug.h"
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>			/* mknod(2) */
@@ -25,6 +29,10 @@
 #ifdef HAVE_FCNTL_H
 #include <fcntl.h>			/* open(2) */
 #endif
+#ifdef HAVE_UNISTD_H
+#include "unistd.h"			/* getpid, unlink, fork etc. */
+#endif
+#include <signal.h>
 
 
 KStdAccel* keys = 0;
@@ -102,7 +110,7 @@ DebuggerMainWndBase::~DebuggerMainWndBase()
 
     // if the output window is open, close it
     if (m_outputTermPID != 0) {
-	kill(m_outputTermPID, SIGTERM);
+	::kill(m_outputTermPID, SIGTERM);
     }
 }
 
@@ -110,7 +118,11 @@ void DebuggerMainWndBase::setupDebugger(ExprWnd* localVars,
 					ExprWnd* watchVars,
 					QListBox* backtrace)
 {
-    m_debugger = new KDebugger(this, localVars, watchVars, backtrace);
+    GdbDriver* driver = new GdbDriver;
+#ifdef GDB_TRANSCRIPT
+    driver->setLogFileName(GDB_TRANSCRIPT);
+#endif
+    m_debugger = new KDebugger(this, localVars, watchVars, backtrace, driver);
 
     connect(m_debugger, SIGNAL(updateStatusMessage()), SLOT(slotNewStatusMsg()));
     connect(m_debugger, SIGNAL(updateUI()), SLOT(updateUI()));
