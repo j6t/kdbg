@@ -16,6 +16,7 @@
 #include <kfiledialog.h>
 #include <kmsgbox.h>
 #include <ksimpleconfig.h>
+#include <kwm.h>
 #include <ctype.h>
 
 #ifndef VERSION				/* #ifndef HAVE_CONFIG_H */
@@ -139,7 +140,8 @@ void KDebugger::saveSettings(KConfig* config)
     KConfigGroupSaver g(config, WindowGroup);
     // breakpoint window
     bool visible = m_bpTable.isVisible();
-    const QRect& r = m_bpTable.geometry();
+    // ask window manager for position
+    const QRect& r = KWM::geometry(m_bpTable.winId());
     config->writeEntry(BreaklistVisible, visible);
     config->writeEntry(Breaklist, r);
 }
