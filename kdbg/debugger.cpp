@@ -637,8 +637,11 @@ bool KDebugger::createOutputWindow()
 }
 
 const char GeneralGroup[] = "General";
+const char EnvironmentGroup[] = "Environment";
 const char FileVersion[] = "FileVersion";
 const char ProgramArgs[] = "ProgramArgs";
+const char Variable[] = "Var%d";
+const char Value[] = "Value%d";
 
 void KDebugger::saveProgramSettings()
 {
@@ -646,6 +649,20 @@ void KDebugger::saveProgramSettings()
     m_programConfig->setGroup(GeneralGroup);
     m_programConfig->writeEntry(FileVersion, 1);
     m_programConfig->writeEntry(ProgramArgs, m_programArgs);
+
+    // write environment variables
+    m_programConfig->deleteGroup(EnvironmentGroup);
+    m_programConfig->setGroup(EnvironmentGroup);
+    QDictIterator<EnvVar> it = m_envVars;
+    EnvVar* var;
+    QString varName;
+    QString varValue;
+    for (int i = 0; (var = it) != 0; ++it, ++i) {
+	varName.sprintf(Variable, i);
+	varValue.sprintf(Value, i);
+	m_programConfig->writeEntry(varName, it.currentKey());
+	m_programConfig->writeEntry(varValue, var->value);
+    }
 
     m_bpTable.saveBreakpoints(m_programConfig);
 }
@@ -658,8 +675,34 @@ void KDebugger::restoreProgramSettings()
      * We ignore file version for now we will use it in the future to
      * distinguish different versions of this configuration file.
      */
-    m_programArgs = m_programConfig->readEntry(ProgramArgs);
-    executeCmd(DCsetargs, "set args " + m_programArgs);
+    QString pgmArgs = m_programConfig->readEntry(ProgramArgs);
+
+    // read environment variables
+    m_programConfig->setGroup(EnvironmentGroup);
+    m_envVars.clear();
+    QDict<EnvVar> pgmVars;
+    EnvVar* var;
+    QString varName;
+    QString varValue;
+    for (int i = 0;; ++i) {
+	varName.sprintf(Variable, i);
+	varValue.sprintf(Value, i);
+	if (!m_programConfig->hasKey(varName)) {
+	    /* entry not present, assume that we've hit them all */
+	    break;
+	}
+	QString name = m_programConfig->readEntry(varName);
+	if (name.isEmpty()) {
+	    // skip empty names
+	    continue;
+	}
+	var = new EnvVar;
+	var->value = m_programConfig->readEntry(varValue);
+	var->status = EnvVar::EVnew;
+	pgmVars.insert(name, var);
+    }
+
+    updateProgEnvironment(pgmArgs, pgmVars);
 
     m_bpTable.restoreBreakpoints(m_programConfig);
 }
