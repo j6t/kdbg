@@ -12,7 +12,8 @@
 #include <kstddirs.h>
 #include <kcmdlineargs.h> 
 #include <kaboutdata.h>
-#include <khelpmenu.h> 
+#include <khelpmenu.h>
+#include <kpopupmenu.h>
 #else // QT_VERSION < 200
 #include <kmsgbox.h>
 #endif

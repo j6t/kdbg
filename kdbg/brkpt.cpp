@@ -31,6 +31,7 @@ public:
     BreakpointItem(QListView* list, const Breakpoint& bp);
     void updateFrom(const Breakpoint& bp);
     void display();			/* sets icon and visible texts */
+    bool enabled() const { return Breakpoint::enabled; }
 };
 
 
@@ -199,7 +200,7 @@ void BreakpointTable::enadisBP()
     if (bp == 0)
 	return;
 
-    DbgCommand cmd = bp->enabled ? DCdisable : DCenable;
+    DbgCommand cmd = bp->enabled() ? DCdisable : DCenable;
     m_debugger->driver()->executeCmd(cmd, bp->id);
 }
 
@@ -224,7 +225,7 @@ void BreakpointTable::updateUI()
     if (bp == 0) {
 	enableChkpt = false;
     } else {
-	if (bp->enabled) {
+	if (bp->enabled()) {
 	    m_btEnaDis.setText(i18n("&Disable"));
 	} else {
 	    m_btEnaDis.setText(i18n("&Enable"));
@@ -252,7 +253,7 @@ bool BreakpointTable::eventFilter(QObject* ob, QEvent* ev)
 		static_cast<BreakpointItem*>(m_list.itemAt(mev->pos()));
 	    if (bp != 0 && m_debugger->canChangeBreakpoints())
 	    {
-		DbgCommand cmd = bp->enabled ? DCdisable : DCenable;
+		DbgCommand cmd = bp->enabled() ? DCdisable : DCenable;
 		m_debugger->driver()->executeCmd(cmd, bp->id);
 	    }
 	    return true;
@@ -417,7 +418,7 @@ void BreakpointItem::display()
     BreakpointTable* lb = static_cast<BreakpointTable*>(listView()->parent());
 
     /* breakpoint icon code; keep order the same as in BreakpointTable::initListAndIcons */
-    int code = enabled ? 1 : 0;
+    int code = enabled() ? 1 : 0;
     if (temporary)
 	code += 2;
     if (!condition.isEmpty() || ignoreCount > 0)

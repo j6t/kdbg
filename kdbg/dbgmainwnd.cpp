@@ -8,6 +8,7 @@
 #include <klocale.h>			/* i18n */
 #include <kmenubar.h>
 #include <kconfig.h>
+#include <kstatusbar.h>
 #endif
 #include <kiconloader.h>
 #include <kstdaccel.h>

@@ -1,3 +1,7 @@
+Version 1.2.4
+
+	Now compiles for KDE 3 (Beta1).
+
 Version 1.2.3
 
 	Fixed invisible toolbar under KDE 2.x (really, this time, I promise).

@@ -304,8 +304,7 @@ protected:
      * paints the highlighted text
      */
     virtual void paintHighlight(QPainter* p, int indent,
-			const QColorGroup& cg, bool hasFocus,
-			GUIStyle style) const;
+			const QColorGroup& cg, bool hasFocus) const;
 
     /**
      * paints the item's text

@@ -15,7 +15,7 @@ noinst_PROGRAMS = $(PROGS)
 
 testfile_SOURCES = testfile.cpp
 testfile_LDFLAGS = -g $(all_libraries) $(KDE_RPATH)
-testfile_LDADD = -lqt -lXext -lX11 $(LIBSOCKET)
+testfile_LDADD = $(LIB_QT)
 
 locals_SOURCES = locals.cpp
 locals_LDFLAGS = -g

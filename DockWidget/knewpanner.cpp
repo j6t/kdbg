@@ -21,6 +21,7 @@
 
 
 #include "knewpanner.h"
+#include <qcursor.h>
 #include <stdio.h>
 
 KNewPanner::KNewPanner(QWidget *parent, const char *name, Orientation orient, Units units, int pos)

@@ -18,7 +18,7 @@
 #include <qobjcoll.h>
 #include <qframe.h>
 #include <qpainter.h>
-#include <ktmainwindow.h>
+#include <qcursor.h>
 
 #include "dockmainwindow.h"
 #include "dockmanager.h"
@@ -661,14 +661,14 @@ bool DockManager::eventFilter( QObject *obj, QEvent *event )
             break;
           }
 
-          if ( !ww && (curdw->eDocking & (int)DockDesktop) == 0 ){
+	  if ( !ww && (curdw->eDocking & DockWidget::DockDesktop) == 0 ){
               currentMoveWidget = ww;
-              curPos = DockDesktop;
+              curPos = DockWidget::DockDesktop;
               mg->movePause();
           } else {
             if ( oldMoveWidget && ww != currentMoveWidget ) { //leave
               currentMoveWidget = ww;
-              curPos = DockDesktop;
+	      curPos = DockWidget::DockDesktop;
               mg->resize( storeW, storeH );
               mg->moveContinue();
             }
@@ -676,14 +676,14 @@ bool DockManager::eventFilter( QObject *obj, QEvent *event )
 
           if ( oldMoveWidget != ww && ww ) { //enter ww
             currentMoveWidget = ww;
-            curPos = DockDesktop;
+	    curPos = DockWidget::DockDesktop;
             storeW = mg->width();
             storeH = mg->height();
             mg->movePause();
           }
         } else {
           if ( (((QMouseEvent*)event)->state() == LeftButton) &&  !dropCancel ){
-            if ( curdw->eDocking != (int)DockNone ){
+	    if ( curdw->eDocking != DockWidget::DockNone ){
               dropCancel = false;
               curdw->setFocus();
               qApp->processOneEvent();
@@ -714,7 +714,7 @@ bool DockManager::eventFilter( QObject *obj, QEvent *event )
 
 DockWidget* DockManager::findDockWidgetAt( const QPoint& pos )
 {
-  if (currentDragWidget->eDocking == (int)DockNone ) return 0L;
+  if (currentDragWidget->eDocking == DockWidget::DockNone ) return 0L;
 
   QWidget* p = QApplication::widgetAt( pos );
   if ( !p ) return 0L;
@@ -730,9 +730,9 @@ DockWidget* DockManager::findDockWidgetAt( const QPoint& pos )
   if ( w->parent() && currentDragWidget->isGroup && w->parent()->inherits("DockTabCtl") ) return 0L;
 
   DockWidget* www = (DockWidget*)w;
-  if ( www->sDocking == (int)DockNone ) return 0L;
+  if ( www->sDocking == DockWidget::DockNone ) return 0L;
 
-  DockPosition curPos = DockDesktop;
+  DockWidget::DockPosition curPos = DockWidget::DockDesktop;
   QPoint cpos  = www->mapFromGlobal( pos );
   QRect r = www->crect();
 
@@ -740,18 +740,18 @@ DockWidget* DockManager::findDockWidgetAt( const QPoint& pos )
   int hh = r.height() / 3;
 
 	if ( cpos.y() <= hh ){
-    curPos = DockTop;
+    curPos = DockWidget::DockTop;
 	} else
     if ( cpos.y() >= 2*hh ){
-      curPos = DockBottom;
+	curPos = DockWidget::DockBottom;
     } else
       if ( cpos.x() <= ww ){
-        curPos = DockLeft;
+	  curPos = DockWidget::DockLeft;
       } else
         if ( cpos.x() >= 2*ww ){
-          curPos = DockRight;
+	    curPos = DockWidget::DockRight;
         } else
-            curPos = DockCenter;
+	    curPos = DockWidget::DockCenter;
 
   if ( !(www->sDocking & (int)curPos) ) return 0L;
   if ( !(currentDragWidget->eDocking & (int)curPos) ) return 0L;
@@ -811,7 +811,7 @@ void DockManager::startDrag( DockWidget* w )
 
 	if ( mg ) delete mg;
   mg = new DockMoveManager( w );
-  curPos = DockDesktop;
+  curPos = DockWidget::DockDesktop;
   draging = true;
   mg->doMove( true, true, false);
 }
@@ -820,11 +820,11 @@ void DockManager::dragMove( DockWidget* dw, QPoint pos )
 {
   QRect r = dw->crect();
 	QPoint p = dw->mapToGlobal( r.topLeft() );
-  DockPosition oldPos = curPos;
+  DockWidget::DockPosition oldPos = curPos;
 
   if ( dw->parent() )
     if ( dw->parent()->inherits("DockTabCtl") ){
-      curPos = DockCenter;
+      curPos = DockWidget::DockCenter;
     	if ( oldPos != curPos ) mg->setGeometry( p.x()+2, p.y()+2, r.width()-4, r.height()-4 );
       return;
     }
@@ -833,25 +833,25 @@ void DockManager::dragMove( DockWidget* dw, QPoint pos )
   int h = r.height() / 3;
 
 	if ( pos.y() <= h ){
-    curPos = DockTop;
+    curPos = DockWidget::DockTop;
     w = r.width();
 	} else
     if ( pos.y() >= 2*h ){
-      curPos = DockBottom;
+      curPos = DockWidget::DockBottom;
       p.setY( p.y() + 2*h );
       w = r.width();
     } else
       if ( pos.x() <= w ){
-        curPos = DockLeft;
+	curPos = DockWidget::DockLeft;
         h = r.height();
       } else
         if ( pos.x() >= 2*w ){
-          curPos = DockRight;
+	  curPos = DockWidget::DockRight;
           p.setX( p.x() + 2*w );
           h = r.height();
         } else
           {
-            curPos = DockCenter;
+	    curPos = DockWidget::DockCenter;
             p.setX( p.x() + w );
             p.setY( p.y() + h );
           }
@@ -864,7 +864,7 @@ void DockManager::drop()
   mg->stop();
   delete childDockWidgetList;
   if ( dropCancel ) return;
-  if ( !currentMoveWidget && ((currentDragWidget->eDocking & (int)DockDesktop) == 0) ) return;
+  if ( !currentMoveWidget && ((currentDragWidget->eDocking & DockWidget::DockDesktop) == 0) ) return;
 
   if ( !currentMoveWidget && !currentDragWidget->parent() )
     currentDragWidget->move( mg->x(), mg->y() );
@@ -1041,7 +1041,7 @@ void DockManager::readConfig( KConfig* c, QString group )
 
       int p = c->readNumEntry( oname + ":orientation" );
       if ( first  && last ){
-        obj = first->manualDock( last, ( p == 0 ) ? DockLeft : DockTop );
+	obj = first->manualDock( last, ( p == 0 ) ? DockWidget::DockLeft : DockWidget::DockTop );
         if (obj){
           obj->setName( oname );
           ((DockSplitter*)obj->widget)->setSeparatorPos( c->readNumEntry( oname + ":sepPos" ) );
@@ -1056,13 +1056,13 @@ void DockManager::readConfig( KConfig* c, QString group )
       DockWidget* d1 = getDockWidgetFromName( list.first() );
       list.next();
       DockWidget* d2 = getDockWidgetFromName( list.current() );
-      tabDockGroup = d2->manualDock( d1, DockCenter );
+      tabDockGroup = d2->manualDock( d1, DockWidget::DockCenter );
       if ( tabDockGroup ){
         DockTabCtl* tab = (DockTabCtl*)tabDockGroup->widget;
         list.next();
         while ( list.current() && tabDockGroup ){
           DockWidget* tabDock = getDockWidgetFromName( list.current() );
-          tabDockGroup = tabDock->manualDock( d1, DockCenter );
+	  tabDockGroup = tabDock->manualDock( d1, DockWidget::DockCenter );
           list.next();
         }
         if ( tabDockGroup ){

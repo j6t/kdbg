@@ -30,7 +30,6 @@
 class QObjectList;
 class DockSplitter;
 class DockMoveManager;
-class KTMainWindow;
 class QPopupMenu;
 class KConfig;
 
@@ -42,17 +41,6 @@ public:
   DockTabCtl( QWidget *parent = 0, const char *name = 0 )
   :STabCtl( parent, name ){};
   ~DockTabCtl(){};
-};
-
-enum DockPosition
-{
-  DockNone   = 0,
-  DockTop    = 0x0001,
-  DockLeft   = 0x0002,
-  DockRight  = 0x0004,
-  DockBottom = 0x0008,
-  DockCenter = 0x0010,
-  DockDesktop= 0x0020
 };
 
 class SDockButton : public QPushButton
@@ -78,6 +66,17 @@ friend class DockMainWindow;
 public:
   DockWidget( DockManager* dockManager, const char* name, const QPixmap &pixmap, QWidget* parent = 0L );
   virtual ~DockWidget();
+
+    enum DockPosition
+    {
+	DockNone   = 0,
+	DockTop    = 0x0001,
+	DockLeft   = 0x0002,
+	DockRight  = 0x0004,
+	DockBottom = 0x0008,
+	DockCenter = 0x0010,
+	DockDesktop= 0x0020
+    };
 
   /* if target is null  - dock move to desktop at position pos;
      check - only for internal uses;
@@ -223,7 +222,7 @@ private:
   DockWidget* currentDragWidget;
   DockWidget* currentMoveWidget; // widget where mouse moving
   WidgetList* childDockWidgetList;
-  DockPosition curPos;
+  DockWidget::DockPosition curPos;
   QList<DockWidget>* childDock;
   QObjectList* autoCreateDock;
   int storeW;

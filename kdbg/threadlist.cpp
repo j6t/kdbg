@@ -12,6 +12,7 @@
 #endif
 #include <kiconloader.h>
 #include <qbitmap.h>
+#include <qpainter.h>
 
 
 class ThreadEntry : public QListViewItem, public ThreadInfo
