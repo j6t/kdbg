@@ -18,6 +18,7 @@
 
 // forward declarations
 class QPopupMenu;
+class QFileInfo;
 class BreakpointTable;
 
 //class FileWindow : public QMultiLineEdit
@@ -117,6 +118,7 @@ public slots:
     virtual void slotFindBackward();
 
 protected:
+    bool activateFI(const QFileInfo& fi, int lineNo);
     bool activatePath(QString pathname, int lineNo);
     virtual bool activateWindow(FileWindow* fw, int lineNo = -1);	/* -1 doesnt change line */
     virtual void changeWindowMenu();
@@ -124,6 +126,7 @@ protected:
     void setPC(bool set, const QString& fileName, int lineNo, int frameNo);
     QList<FileWindow> m_fileList;
     FileWindow* m_activeWindow;
+    QString m_lastOpenDir;		/* where user opened last file */
     QPopupMenu* m_windowMenu;
     int m_itemMore;
     QString m_textMore;

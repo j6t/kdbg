@@ -378,13 +378,16 @@ void WinStack::menuCallback(int item)
 
 void WinStack::openFile()
 {
-    QString fileName = KFileDialog::getOpenFileName();
+    QString fileName = KFileDialog::getOpenFileName(m_lastOpenDir);
     TRACE("openFile: " + fileName);
     if (fileName.isEmpty()) {
 	return;
     }
 
-    activate(fileName, 0);
+    QFileInfo fi(fileName);
+    m_lastOpenDir = fi.dirPath();
+
+    activateFI(fi, 0);
 }
 
 void WinStack::reloadAllFiles()
@@ -397,11 +400,16 @@ void WinStack::reloadAllFiles()
 
 bool WinStack::activate(QString fileName, int lineNo)
 {
-    // if this is not an absolute path name, make it one
     QFileInfo fi(fileName);
+    return activateFI(fi, lineNo);
+}
+
+bool WinStack::activateFI(const QFileInfo& fi, int lineNo)
+{
     if (!fi.isFile()) {
 	return false;
     }
+    // if this is not an absolute path name, make it one
     return activatePath(fi.absFilePath(), lineNo);
 }
 
