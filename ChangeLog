@@ -6,7 +6,12 @@ Version 1.9.0
 
 Version 1.2.5
 
-	Now compiles for KDE 3 (Beta2).
+	Now compiles for KDE 3.
+
+	Fixed make install for builddir != srcdir.
+
+	Fixed status bar flicker. This gives a nice speed-up by a factor of 4
+	when the contents of an array of 50 QStrings are displayed!
 
 Version 1.2.4
 
