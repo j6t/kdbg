@@ -511,13 +511,14 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
     return false;
 }
 
-void SourceWindow::paletteChange(const QPalette&)
+void SourceWindow::paletteChange(const QPalette& oldPal)
 {
 #if QT_VERSION < 200
     setFont(kapp->fixedFont);
 #else
     setFont(KGlobal::fixedFont());
 #endif
+    KTextView::paletteChange(oldPal);
 }
 
 /*
