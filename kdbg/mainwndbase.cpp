@@ -287,7 +287,8 @@ void DebuggerMainWndBase::slotGlobalOptions()
     QString title = kapp->getCaption();
     title += i18n(": Global options");
     dlg.setCaption(title);
-    dlg.setCancelButton();
+    dlg.setCancelButton(i18n("Cancel"));
+    dlg.setOKButton(i18n("OK"));
 
     PrefDebugger prefDebugger(&dlg);
     prefDebugger.setDebuggerCmd(m_debugger->debuggerCmd());
