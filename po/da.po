@@ -1,0 +1,322 @@
+# KDbg - Debugger GUI for gdb
+# Copyright (C) 1998,1999 Johannes Sixt
+# Johannes Sixt <Johannes.Sixt@telecom.at>, 1999
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kdbg 0.3.1\n"
+"POT-Creation-Date: 1999-04-05 11:18+0200\n"
+"PO-Revision-Date: 1999-04-09 20:32+1\n"
+"Last-Translator: Steen Rabol <rabol@get2net.dk>\n"
+"Language-Team: da <LL@li.org>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=ISO_8859-1\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: brkpt.cpp:41
+msgid "&Add"
+msgstr "&Tilføj"
+
+#: brkpt.cpp:49
+msgid "&View Code"
+msgstr "&Vis kode"
+
+#: brkpt.cpp:53
+msgid "&Conditional..."
+msgstr "&Betingelser..."
+
+#: brkpt.cpp:644
+msgid "E"
+msgstr ""
+
+#: brkpt.cpp:646
+msgid "Location"
+msgstr "Lokation"
+
+#: brkpt.cpp:647
+msgid "Hits"
+msgstr ""
+
+#: brkpt.cpp:648
+msgid "Ignore"
+msgstr "Ignorer"
+
+#: brkpt.cpp:649
+msgid "Condition"
+msgstr "Betingelse"
+
+#: brkpt.cpp:813
+msgid ": Conditional breakpoint"
+msgstr ": Betingelses breakpoint"
+
+#: brkpt.cpp:816
+msgid "&Condition:"
+msgstr "&Betingelse:"
+
+#: brkpt.cpp:818
+msgid "Ignore &next hits:"
+msgstr "Ignorer og gå til &næste"
+
+#: pgmargs.cpp:28
+msgid ": Program arguments"
+msgstr ": Program argumenter"
+
+#: pgmargs.cpp:32
+#, c-format
+msgid "Run %s with these arguments:"
+msgstr "Udfør %s med disse parametre"
+
+#: pgmargs.cpp:44
+msgid "Environment variables (NAME=value):"
+msgstr "Enviroment variable(NAVN=værdi)"
+
+#: pgmargs.cpp:53
+msgid "Name"
+msgstr "Navn"
+
+#: pgmargs.cpp:54
+msgid "Value"
+msgstr "Værdi"
+
+#: pgmargs.cpp:73
+msgid "&Modify"
+msgstr "&Ændre"
+
+#: procattach.cpp:19
+msgid ": Attach to process"
+msgstr ": Hæft til proces"
+
+#: procattach.cpp:23
+msgid "Specify the process number to attach to:"
+msgstr "Specificer det proces nummer der skal hæftes til:"
+
+#: debugger.cpp:92
+msgid "Breakpoints"
+msgstr ""
+
+#: debugger.cpp:199
+#, c-format
+msgid "`%s' is not a file or does not exist"
+msgstr "'%s' er ikke en fil eller findes ikke"
+
+#: debugger.cpp:263
+msgid "Select the executable to debug"
+msgstr "Vælg progrem der skal debugges"
+
+#: debugger.cpp:305
+msgid "Select core dump"
+msgstr "Vælg core dump"
+
+#: debugger.cpp:540
+msgid ""
+"gdb exited unexpectedly.\n"
+"Restart the session (e.g. with File|Executable)."
+msgstr ""
+"gdb afsluttede uventet.\n"
+"Genstart sesionen (eks. med fil|Eksekverbar)."
+
+#: debugger.cpp:623
+msgid ": Program output"
+msgstr ""
+
+#: dbgmainwnd.cpp:116 winstack.cpp:380 winstack.cpp:390
+msgid "&Open Source..."
+msgstr "&Åben kilde kode..."
+
+#: dbgmainwnd.cpp:132 winstack.cpp:382
+msgid "Step &into"
+msgstr "Gå &ind i"
+
+#: dbgmainwnd.cpp:133 winstack.cpp:383
+msgid "Step &over"
+msgstr "Spring &over"
+
+#: dbgmainwnd.cpp:134 winstack.cpp:384
+msgid "Step o&ut"
+msgstr "Hop &ud"
+
+#: dbgmainwnd.cpp:135 winstack.cpp:385
+msgid "Run to &cursor"
+msgstr "Udfør til markør"
+
+#: dbgmainwnd.cpp:149 winstack.cpp:387
+msgid "Set/Clear &breakpoint"
+msgstr "Sæt/fjern &breakpoint"
+
+#: dbgmainwnd.cpp:119 winstack.cpp:392
+msgid "&Executable..."
+msgstr "&Eksekverbar..."
+
+#: dbgmainwnd.cpp:120 winstack.cpp:393
+msgid "&Core dump..."
+msgstr ""
+
+#: winstack.cpp:745
+msgid ": Open Windows"
+msgstr ": Åben vindue"
+
+#: winstack.cpp:753
+msgid "Show"
+msgstr "Vis"
+
+#: winstack.cpp:821
+msgid ": Search"
+msgstr ": Søg"
+
+#: winstack.cpp:827
+msgid "&Case sensitive"
+msgstr "&Forskel på store og små bogstaver"
+
+#: winstack.cpp:829
+msgid "&Forward"
+msgstr "&Fremad"
+
+#: winstack.cpp:831
+msgid "&Backward"
+msgstr "&Baglæns"
+
+#: dbgmainwnd.cpp:28
+msgid " Add "
+msgstr " Tilføj "
+
+#: dbgmainwnd.cpp:29
+msgid " Del "
+msgstr " Slet "
+
+#: dbgmainwnd.cpp:39
+msgid "active"
+msgstr "aktiv"
+
+#: dbgmainwnd.cpp:117
+msgid "&Reload Source"
+msgstr "&Genlæs kilde kode"
+
+#: dbgmainwnd.cpp:126
+msgid "&Find..."
+msgstr ""
+
+#: dbgmainwnd.cpp:127
+msgid "Toggle &Toolbar"
+msgstr "Vis/gem &toolbar"
+
+#: dbgmainwnd.cpp:128
+msgid "Toggle &Statusbar"
+msgstr "Vis/gem &statusbar"
+
+#: dbgmainwnd.cpp:131
+msgid "&Run"
+msgstr "&Udfør"
+
+#: dbgmainwnd.cpp:137
+msgid "&Break"
+msgstr ""
+
+#: dbgmainwnd.cpp:138
+msgid "Re&start"
+msgstr "Gen&start"
+
+#: dbgmainwnd.cpp:139
+msgid "A&ttach..."
+msgstr "&Vedhæft..."
+
+#: dbgmainwnd.cpp:141
+msgid "&Arguments..."
+msgstr "&Argumenter..."
+
+#: dbgmainwnd.cpp:150
+msgid "Set &temporary breakpoint"
+msgstr "Sæt midlertidigt breakpoint"
+
+#: dbgmainwnd.cpp:151
+msgid "&Enable/Disable breakpoint"
+msgstr "&Aktiver/Deaktiver breakpoint"
+
+#: dbgmainwnd.cpp:152
+msgid "&List..."
+msgstr ""
+
+#: dbgmainwnd.cpp:157
+msgid "&More..."
+msgstr "&Mere..."
+
+#: dbgmainwnd.cpp:160
+msgid "&About"
+msgstr "&Om"
+
+#: dbgmainwnd.cpp:172
+msgid "E&xecution"
+msgstr "&Udførelse"
+
+#: dbgmainwnd.cpp:173
+msgid "&Breakpoint"
+msgstr ""
+
+#: dbgmainwnd.cpp:174
+msgid "&Window"
+msgstr "&Vindue"
+
+#: dbgmainwnd.cpp:178
+msgid ""
+"A Debugger\n"
+"by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
+"with the help of many others"
+msgstr "En Debugger\n"
+"af Johannes Sixt <Johannes.Sixt@telecom.at>\n"
+"med hjælp fra mange andre"
+
+#: dbgmainwnd.cpp:191
+msgid "Executable"
+msgstr "Eksekverbar"
+
+#: dbgmainwnd.cpp:193
+msgid "Open a source file"
+msgstr "Åben en kilde kode fil"
+
+#: dbgmainwnd.cpp:195
+msgid "Reload source file"
+msgstr "Genlæs kilde kode"
+
+#: dbgmainwnd.cpp:198
+msgid "Run/Continue"
+msgstr "Udfør/fortsæt"
+
+#: dbgmainwnd.cpp:200
+msgid "Step into"
+msgstr "Hop ind i"
+
+#: dbgmainwnd.cpp:202
+msgid "Step over"
+msgstr "Spring over"
+
+#: dbgmainwnd.cpp:204
+msgid "Step out"
+msgstr "Hop ud"
+
+#: dbgmainwnd.cpp:207
+msgid "Breakpoint"
+msgstr ""
+
+#: dbgmainwnd.cpp:210
+msgid "Search"
+msgstr "Søg"
+
+#: dbgmainwnd.cpp:218
+msgid "Line 00000"
+msgstr "Linie 00000"
+
+#: dbgmainwnd.cpp:222
+msgid "Restart"
+msgstr "Genstart"
+
+#: dbgmainwnd.cpp:223
+msgid "Core dump"
+msgstr ""
+
+#: dbgmainwnd.cpp:597
+#, c-format
+msgid "Line %d"
+msgstr "Linie %d"
+
+#: main.cpp:54
+msgid "Cannot start debugger."
+msgstr "Kan ikke starte debugger"

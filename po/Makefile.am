@@ -1,5 +1,5 @@
 
-GMOFILES = cs.gmo de.gmo fr.gmo hr.gmo \
+GMOFILES = cs.gmo da.gmo de.gmo fr.gmo hr.gmo \
 	no.gmo pt.gmo ro.gmo ru.gmo sk.gmo zh_CN.GB2312.gmo
 POFILES = $(GMOFILES:.gmo=.po) 
 
@@ -31,7 +31,7 @@ all-no:
 install-yes: all
 	@catalogs='$(GMOFILES)'; \
 	for cat in $$catalogs; do \
-	destdir=$(localedir); \
+	destdir="$(DESTDIR)$(localedir)"; \
 	lang=`echo $$cat | sed 's/\.gmo//'`; \
 	name=$(PACKAGE).mo \
 	dir=$$destdir/$$lang/LC_MESSAGES; \
@@ -45,7 +45,7 @@ install-no:
 uninstall-local:
 	@catalogs='$(GMOFILES)'; \
 	for cat in $$catalogs; do \
-	destdir=$(localedir); \
+	destdir="$(DESTDIR)$(localedir)"; \
 	lang=`echo $$cat | sed 's/\.gmo//'`; \
 	name=$(PACKAGE).mo; \
 	dir=$$destdir/$$lang/LC_MESSAGES; \
