@@ -34,6 +34,7 @@ bin_PROGRAMS = 	kdbg
 kdbg_SOURCES = \
 	brkpt.cpp \
 	pgmargs.cpp \
+	procattach.cpp \
 	ktreeview.cpp \
 	parsevar.cpp \
 	textvw.cpp \
@@ -56,6 +57,7 @@ kdbg_LDADD   = -lkfile -lkfm -lkdeui -lkdecore -lqt -lXext -lX11 $(LIBSOCKET)
 noinst_HEADERS = \
 	brkpt.h \
 	pgmargs.h \
+	procattach.h \
 	parsevar.h \
 	textvw.h \
 	debugger.h \
@@ -154,10 +156,6 @@ testfile_LDADD = -lqt -lXext -lX11 $(LIBSOCKET)
 debugger.cpp: debugger.moc
 debugger.moc: debugger.h
 	$(MOC) debugger.h -o debugger.moc
-
-pgmargs.cpp: pgmargs.moc
-pgmargs.moc: pgmargs.h
-	$(MOC) pgmargs.h -o pgmargs.moc
 
 exprwnd.cpp: exprwnd.moc
 exprwnd.moc: exprwnd.h
