@@ -5,8 +5,8 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.0\n"
-"POT-Creation-Date: 2000-08-18 17:25+0200\n"
-"PO-Revision-Date: 2000-08-18 17:35+0200\n"
+"POT-Creation-Date: 2000-08-18 21:22+0200\n"
+"PO-Revision-Date: 2000-08-18 22:35+0200\n"
 "Last-Translator: Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
@@ -58,59 +58,63 @@ msgstr ""
 "gdb wurde unerwartet beendet\n"
 "Sie müssen die Sitzung neu starten (z.B. mit Datei|Programm)."
 
-#: gdbdriver.cpp:1762
+#: gdbdriver.cpp:1775
 msgid "New working directory: "
 msgstr "Neues Arbeitsverzeichnis: "
 
-#: brkpt.cpp:62
-msgid "&Add"
-msgstr "&Hinzufügen"
+#: brkpt.cpp:63
+msgid "Add &Breakpoint"
+msgstr "&Haltepunkt"
 
-#: brkpt.cpp:71 brkpt.cpp:211
+#: brkpt.cpp:67
+msgid "Add &Watchpoint"
+msgstr "&Watchpoint"
+
+#: brkpt.cpp:76 brkpt.cpp:228
 msgid "&Disable"
 msgstr "&Deaktivieren"
 
-#: brkpt.cpp:76 brkpt.cpp:213
+#: brkpt.cpp:81 brkpt.cpp:230
 msgid "&Enable"
 msgstr "&Aktivieren"
 
-#: brkpt.cpp:86
+#: brkpt.cpp:91
 msgid "&View Code"
 msgstr "&Code anzeigen"
 
-#: brkpt.cpp:90
+#: brkpt.cpp:95
 msgid "&Conditional..."
 msgstr "&Bedingt..."
 
-#: brkpt.cpp:338 threadlist.cpp:44
+#: brkpt.cpp:355 threadlist.cpp:44
 msgid "Location"
 msgstr "Ort"
 
-#: brkpt.cpp:339 memwindow.cpp:30
+#: brkpt.cpp:356 memwindow.cpp:30
 msgid "Address"
 msgstr "Adresse"
 
-#: brkpt.cpp:340
+#: brkpt.cpp:357
 msgid "Hits"
 msgstr "Stops"
 
-#: brkpt.cpp:341
+#: brkpt.cpp:358
 msgid "Ignore"
 msgstr "Ignorieren"
 
-#: brkpt.cpp:342
+#: brkpt.cpp:359
 msgid "Condition"
 msgstr "Bedingung"
 
-#: brkpt.cpp:445
+#: brkpt.cpp:468
 msgid ": Conditional breakpoint"
 msgstr ": Bedingten Haltepunkt setzen"
 
-#: brkpt.cpp:448
+#: brkpt.cpp:471
 msgid "&Condition:"
 msgstr "&Bedingung:"
 
-#: brkpt.cpp:450
+#: brkpt.cpp:473
 msgid "Ignore &next hits:"
 msgstr "Ignoriere &nächste Treffer:"
 
@@ -626,9 +630,6 @@ msgstr "Dockende Fenster"
 #: main.cpp:156 main.cpp:171
 msgid "Cannot start debugger."
 msgstr "Kann Debugger nicht ausführen."
-
-#~ msgid "&List..."
-#~ msgstr "&Liste..."
 
 #~ msgid "&Remove"
 #~ msgstr "&Entfernen"
