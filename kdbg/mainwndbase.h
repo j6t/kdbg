@@ -139,7 +139,7 @@ protected:
 		       QListBox* backtrace);
     // which language are we debugging?
     QCString m_language;
-    static DebuggerDriver* driverFromLang(const QCString& lang);
+    DebuggerDriver* driverFromLang(const QCString& lang);
 
 public:
     /*

@@ -171,8 +171,6 @@ void DebuggerMainWndBase::setupDebugger(QWidget* parent,
 		     parent, SLOT(slotAnimationTimeout()));
     QObject::connect(m_debugger, SIGNAL(debuggerStarting()),
 		     parent, SLOT(slotDebuggerStarting()));
-
-    m_debugger->setDebuggerCmd(m_debuggerCmdStr);
 }
 
 
@@ -337,7 +335,11 @@ DebuggerDriver* DebuggerMainWndBase::driverFromLang(const QCString& lang)
     DebuggerDriver* driver = 0;
     switch (driverID) {
     case 1:
-	driver = new GdbDriver;
+	{
+	    GdbDriver* gdb = new GdbDriver;
+	    gdb->setDefaultInvocation(m_debuggerCmdStr);
+	    driver = gdb;
+	}
 	break;
     default:
 	// unknown language
@@ -700,9 +702,6 @@ void DebuggerMainWndBase::setDebuggerCmdStr(const QString& cmd)
     // make empty if it is the default
     if (m_debuggerCmdStr == GdbDriver::defaultGdb()) {
 	m_debuggerCmdStr = QString();
-    }
-    if (m_debugger != 0) {
-	m_debugger->setDebuggerCmd(m_debuggerCmdStr);
     }
 }
 

@@ -211,7 +211,11 @@ QString GdbDriver::defaultGdb()
 
 QString GdbDriver::defaultInvocation() const
 {
-    return defaultGdb();
+    if (m_defaultCmd.isEmpty()) {
+	return defaultGdb();
+    } else {
+	return m_defaultCmd;
+    }
 }
 
 bool GdbDriver::startup(QString cmdStr)

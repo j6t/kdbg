@@ -440,10 +440,8 @@ bool KDebugger::startDriver()
      * (which might also be empty, in which case the driver uses its
      * default).
      */
-    QString debuggerCmd = m_debuggerCmd.isEmpty()  ?
-	m_generalDebuggerCmd  :  m_debuggerCmd;
     m_explicitKill = false;
-    if (!m_d->startup(debuggerCmd)) {
+    if (!m_d->startup(m_debuggerCmd)) {
 	return false;
     }
 

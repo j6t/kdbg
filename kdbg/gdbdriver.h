@@ -18,6 +18,7 @@ public:
     
     virtual QString driverName() const;
     virtual QString defaultInvocation() const;
+    void setDefaultInvocation(QString cmd) { m_defaultCmd = cmd; }
     static QString defaultGdb();
     virtual bool startup(QString cmdStr);
     virtual void commandFinished(CmdQueueItem* cmd);
@@ -74,6 +75,7 @@ protected:
     QString m_programWD;		/* just an intermediate storage */
     QString m_redirect;			/* redirection to /dev/null */
     bool m_haveCoreFile;
+    QString m_defaultCmd;		/* how to invoke gdb */
 
     QString makeCmdString(DbgCommand cmd, QString strArg);
     QString makeCmdString(DbgCommand cmd, int intArg);

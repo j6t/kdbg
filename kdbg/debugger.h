@@ -225,13 +225,6 @@ public:
     const QString& executable() const { return m_executable; }
 
     /**
-     * Sets the command to invoke gdb. If cmd is the empty string, the
-     * default is substituted.
-     */
-    void setDebuggerCmd(const QString& cmd)
-    { m_generalDebuggerCmd = cmd; }
-
-    /**
      * Terminal emulation level.
      */
     enum TTYLevel {
@@ -273,7 +266,6 @@ public:
 protected:
     QString m_inferiorTerminal;
     QString m_debuggerCmd;		/* per-program setting */
-    QString m_generalDebuggerCmd;	/* global setting */
     TTYLevel m_ttyLevel;		/* level of terminal emulation */
     bool startDriver();
     void stopDriver();
