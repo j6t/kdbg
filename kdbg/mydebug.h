@@ -14,11 +14,15 @@
 #  define ASSERT(x) ((void)0)
 # else
 #  define ASSERT(x) ((x) ? (void)0 : kdDebug() << \
-					(QString("assertion failed: ") + #x).ascii() << '\n')
+					(QString("assertion failed: ") + #x).ascii() << "\n")
 # endif
 #endif
 #ifdef WANT_TRACE_OUTPUT
-# define TRACE(x) (kdDebug() << (const char*)(x) << '\n')
+#ifndef KDEBUG 
+# define TRACE(x) (kdDebug() << (const char*)(x) << "\n")
+#else
+# define TRACE(x) KDEBUG(KDEBUG_INFO,0,(x))
+#endif
 #else
 #define TRACE(x) ((void)0)
 #endif
