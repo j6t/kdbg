@@ -372,22 +372,16 @@ void WinStack::initMenu()
 {
     // Init float popup menu.
     m_menuFloat.insertItem(i18n("&Open Source..."), ID_FILE_OPEN);
-    m_menuFloat.insertItem(i18n("&Reload Source"), ID_FILE_RELOAD);
     m_menuFloat.insertSeparator();
-    m_menuFloat.insertItem(i18n("&Run"), ID_PROGRAM_RUN);
     m_menuFloat.insertItem(i18n("Step &into"), ID_PROGRAM_STEP);
     m_menuFloat.insertItem(i18n("Step &over"), ID_PROGRAM_NEXT);
     m_menuFloat.insertItem(i18n("Step o&ut"), ID_PROGRAM_FINISH);
     m_menuFloat.insertItem(i18n("Run to &cursor"), ID_PROGRAM_UNTIL);
     m_menuFloat.insertSeparator();
-    m_menuFloat.insertItem(i18n("&Break"), ID_PROGRAM_BREAK);
-    m_menuFloat.insertItem(i18n("Re&start"), ID_PROGRAM_RUN_AGAIN);
-    m_menuFloat.insertSeparator();
     m_menuFloat.insertItem(i18n("Set/Clear &breakpoint"), ID_BRKPT_SET);
 
     // Init float file popup.
     m_menuFileFloat.insertItem(i18n("&Open Source..."), ID_FILE_OPEN);
-    m_menuFileFloat.insertItem(i18n("&Reload Source"), ID_FILE_RELOAD);
     m_menuFileFloat.insertSeparator();
     m_menuFileFloat.insertItem(i18n("&Executable..."), ID_FILE_EXECUTABLE);
     m_menuFileFloat.insertItem(i18n("&Core dump..."), ID_FILE_COREFILE);
