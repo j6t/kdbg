@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 0.2.3\n"
-"POT-Creation-Date: 1998-11-07 19:26+0100\n"
+"POT-Creation-Date: 1998-12-13 12:59+0100\n"
 "PO-Revision-Date: 1998-07-10 14:24+0200\n"
 "Last-Translator: Vatafu Valerica <wally@socrates.tlnet.de>\n"
 "Language-Team: Romanian <LL@li.org>\n"
@@ -225,16 +225,23 @@ msgstr ""
 msgid "Core dump"
 msgstr ""
 
-#: debugger.cpp:819
+#: debugger.cpp:759
+#, c-format
+msgid ""
+"gdb exited unexpectedly (status 0x%x)\n"
+"Restart the session (e.g. with File|Executable)."
+msgstr ""
+
+#: debugger.cpp:834
 msgid ": Program output"
 msgstr ": Program output"
 
-#: debugger.cpp:871
+#: debugger.cpp:886
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "'%s' nu existã ca fiºier"
 
-#: debugger.cpp:2269
+#: debugger.cpp:2284
 #, c-format
 msgid "Line %d"
 msgstr ""

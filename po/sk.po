@@ -4,8 +4,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 0.2.3\n"
-"POT-Creation-Date: 1998-11-07 19:26+0100\n"
+"Project-Id-Version: kdbg 0.2.5\n"
+"POT-Creation-Date: 1998-12-13 12:59+0100\n"
 "PO-Revision-Date: 1998-10-23 20:21 MET\n"
 "Last-Translator: Peter Iványi <ivanyi@internet.sk>\n"
 "Language-Team: Slovak <bednar@isternet.sk>\n"
@@ -40,11 +40,11 @@ msgstr "Spusti» %s s týmito argumentami:"
 
 #: procattach.cpp:19
 msgid ": Attach to process"
-msgstr ""
+msgstr ": Pripoji» k procesu"
 
 #: procattach.cpp:23
 msgid "Specify the process number to attach to:"
-msgstr ""
+msgstr "©pecifikova» proces na pripojenie:"
 
 #: debugger.cpp:98
 msgid " Add "
@@ -132,7 +132,7 @@ msgstr "Re¹&tart"
 
 #: debugger.cpp:573
 msgid "A&ttach..."
-msgstr ""
+msgstr "P&ripoji»..."
 
 #: debugger.cpp:575
 msgid "&Arguments..."
@@ -228,16 +228,23 @@ msgstr "Re¹tart"
 msgid "Core dump"
 msgstr "Core dump"
 
-#: debugger.cpp:819
+#: debugger.cpp:759
+#, c-format
+msgid ""
+"gdb exited unexpectedly (status 0x%x)\n"
+"Restart the session (e.g. with File|Executable)."
+msgstr ""
+
+#: debugger.cpp:834
 msgid ": Program output"
 msgstr ": Výstup programu"
 
-#: debugger.cpp:871
+#: debugger.cpp:886
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "`%s' nie je súbor alebo neexistuje"
 
-#: debugger.cpp:2269
+#: debugger.cpp:2284
 #, c-format
 msgid "Line %d"
 msgstr "Riadok %d"

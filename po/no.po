@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 0.2.4\n"
-"POT-Creation-Date: 1998-11-07 19:26+0100\n"
+"POT-Creation-Date: 1998-12-13 12:59+0100\n"
 "PO-Revision-Date: 1998-11-14 19:11+0100\n"
 "Last-Translator: Hans Petter Bieker <zerium@webindex.no>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -229,16 +229,23 @@ msgstr "Omstart"
 msgid "Core dump"
 msgstr "Minnedump"
 
-#: debugger.cpp:819
+#: debugger.cpp:759
+#, c-format
+msgid ""
+"gdb exited unexpectedly (status 0x%x)\n"
+"Restart the session (e.g. with File|Executable)."
+msgstr ""
+
+#: debugger.cpp:834
 msgid ": Program output"
 msgstr ": Programutmating"
 
-#: debugger.cpp:871
+#: debugger.cpp:886
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "%s' er ikke en fil eller eksisterer ikke"
 
-#: debugger.cpp:2269
+#: debugger.cpp:2284
 #, c-format
 msgid "Line %d"
 msgstr "Linje %d"
