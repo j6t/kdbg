@@ -14,7 +14,6 @@ data_DATA = \
 	stack.html \
 	threads.html \
 	tips.html \
-	types.html \
 	watches.html \
 	index.html
 
