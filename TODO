@@ -43,3 +43,6 @@
 
 28. Better support for remote debugging and special versions of gdb, e.g.
     "target pilot localhost:2000".
+
+29. "Crash report" function: Stack trace with excerpts of the source code and
+    variable dumps for every frame.
