@@ -50,10 +50,15 @@ EXTRA_DIST = $(pics_DATA) kdbg.xpm mini-kdbg.xpm $(KDE2_ICONS)
 install-data-local:
 	@if test "x$(kde2_icon_install)" = "xyes"; then \
 	set -x; \
-	$(INSTALL_DATA) hi32-app-kdbg.png $(DESTDIR)$(kde_icondir)/hicolor/32x32/apps/kdbg.png; \
-	$(INSTALL_DATA) hi16-app-kdbg.png $(DESTDIR)$(kde_icondir)/hicolor/16x16/apps/kdbg.png; \
-	$(INSTALL_DATA) lo32-app-kdbg.png $(DESTDIR)$(kde_icondir)/locolor/32x32/apps/kdbg.png; \
-	$(INSTALL_DATA) lo16-app-kdbg.png $(DESTDIR)$(kde_icondir)/locolor/16x16/apps/kdbg.png; \
+	d="$(DESTDIR)$(kde_icondir)"; \
+	$(mkinstalldirs) $$d/hicolor/32x32/apps; \
+	$(INSTALL_DATA) hi32-app-kdbg.png $$d/hicolor/32x32/apps/kdbg.png; \
+	$(mkinstalldirs) $$d/hicolor/16x16/apps; \
+	$(INSTALL_DATA) hi16-app-kdbg.png $$d/hicolor/16x16/apps/kdbg.png; \
+	$(mkinstalldirs) $$d/locolor/32x32/apps; \
+	$(INSTALL_DATA) lo32-app-kdbg.png $$d/locolor/32x32/apps/kdbg.png; \
+	$(mkinstalldirs) $$d/locolor/16x16/apps; \
+	$(INSTALL_DATA) lo16-app-kdbg.png $$d/locolor/16x16/apps/kdbg.png; \
 	fi
 
 uninstall-local:
