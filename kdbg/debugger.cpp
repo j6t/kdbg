@@ -289,16 +289,16 @@ void KDebugger::menuCallback(int item)
 	    QString file;
 	    int lineNo;
 	    if (m_filesWindow.activeLine(file, lineNo)) {
-		// strip off directory part of file name
-		file.detach();
-		int offset = file.findRev("/");
-		if (offset >= 0) {
-		    file.remove(0, offset+1);
-		}
-		QString cmdString(file.length() + 30);
-		cmdString.sprintf("%sbreak %s:%d", item == ID_BRKPT_TEMP ? "t" : "",
-				  file.data(), lineNo+1);
-		enqueueCmd(DCbreak, cmdString);
+		m_bpTable.doBreakpoint(file, lineNo, item == ID_BRKPT_TEMP);
+	    }
+	}
+	break;
+    case ID_BRKPT_ENABLE:
+	if (m_haveExecutable && m_state == DSidle) {
+	    QString file;
+	    int lineNo;
+	    if (m_filesWindow.activeLine(file, lineNo)) {
+		m_bpTable.doEnableDisableBreakpoint(file, lineNo);
 	    }
 	}
 	break;
@@ -376,8 +376,8 @@ void KDebugger::updateUIItem(UpdateUI* item)
     case ID_BRKPT_TEMP:
 	item->enable(m_haveExecutable && m_state == DSidle);
 	break;
-    case ID_BRKPT_CLEAR:
-	item->enable(false);
+    case ID_BRKPT_ENABLE:
+	item->enable(m_haveExecutable && m_state == DSidle);
 	break;
     case ID_BRKPT_LIST:
 	item->setCheck(m_bpTable.isVisible());
@@ -421,12 +421,13 @@ void KDebugger::initMenu()
     m_menuProgram.setAccel(Key_F7, ID_PROGRAM_UNTIL);
 
     m_menuBrkpt.setCheckable(true);
-    m_menuBrkpt.insertItem(i18n("Set &breakpoint"), ID_BRKPT_SET);
+    m_menuBrkpt.insertItem(i18n("Set/Clear &breakpoint"), ID_BRKPT_SET);
     m_menuBrkpt.insertItem(i18n("Set &temporary breakpoint"), ID_BRKPT_TEMP);
-    m_menuBrkpt.insertItem(i18n("&Clear breakpoint"), ID_BRKPT_CLEAR);
+    m_menuBrkpt.insertItem(i18n("&Enable/Disable breakpoint"), ID_BRKPT_ENABLE);
     m_menuBrkpt.insertItem(i18n("&List..."), ID_BRKPT_LIST);
     m_menuBrkpt.setAccel(Key_F9, ID_BRKPT_SET);
     m_menuBrkpt.setAccel(SHIFT+Key_F9, ID_BRKPT_TEMP);
+    m_menuBrkpt.setAccel(CTRL+Key_F9, ID_BRKPT_ENABLE);
 
     m_menuWindow.insertItem(i18n("&More..."), ID_WINDOW_MORE);
   
@@ -655,8 +656,13 @@ bool KDebugger::debugProgram(const QString& name)
 }
 
 KDebugger::CmdQueueItem* KDebugger::enqueueCmd(KDebugger::DbgCommand cmd,
-					       QString cmdString)
+					       QString cmdString, bool checkRunning)
 {
+    // if checkRunning, report error if no executable or debugger not idle
+    if (checkRunning && !(m_haveExecutable && m_state == DSidle)) {
+	return 0;
+    }
+
     // place a new command into the queue
     CmdQueueItem* cmdItem = new CmdQueueItem(cmd, cmdString + "\n");
     m_cmdQueue.enqueue(cmdItem);
@@ -915,8 +921,14 @@ void KDebugger::parse(CmdQueueItem* cmd)
     case DCbreak:
 	updateBreakptTable();
 	break;
+    case DCdelete:
+    case DCenable:
+    case DCdisable:
+	enqueueCmd(DCinfobreak, "info breakpoints");
+	break;
     case DCinfobreak:
 	m_bpTable.updateBreakList(m_gdbOutput);
+	m_filesWindow.updateLineItems(m_bpTable);
 	break;
     }
     /*
@@ -1014,7 +1026,6 @@ void KDebugger::updateAllExprs()
 void KDebugger::updateBreakptTable()
 {
     m_bpTable.parseBreakpoint(m_gdbOutput);
-    m_filesWindow.updateLineItems(m_bpTable);
     enqueueCmd(DCinfobreak, "info breakpoints");
 }
 
@@ -1490,14 +1501,4 @@ void KDebugger::slotWatchHighlighted(int index)
     VarTree* expr = static_cast<VarTree*>(item);
     QString text = expr->computeExpr();
     m_watchEdit.setText(text);
-}
-
-bool KDebugger::setBreakpoint(const QString& bpText)
-{
-    if (!m_haveExecutable || m_state != DSidle) {
-	return false;
-    }
-
-    enqueueCmd(DCbreak, "break " + bpText);
-    return true;
 }

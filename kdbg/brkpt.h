@@ -32,7 +32,7 @@ struct Breakpoint
     QString location;
     // the following items repeat the location, but in a better usable way
     QString fileName;
-    int lineNo;
+    int lineNo;				/* zero-based line number */
 
     bool del;				/* used when list is parsed */
 };
@@ -48,7 +48,10 @@ public:
     void parseBreakpoint(const char* output);
     int numBreakpoints() const { return m_brkpts.size(); }
     const Breakpoint& breakpoint(int i) const { return *m_brkpts[i]; }
-    
+    void doBreakpoint(QString file, int lineNo, bool temporary);
+    void doEnableDisableBreakpoint(const QString& file, int lineNo);
+    Breakpoint* breakpointByFilePos(QString file, int lineNo);
+
 protected:
     KDebugger& m_debugger;
     QLineEdit m_bpEdit;

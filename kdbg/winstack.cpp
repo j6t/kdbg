@@ -35,6 +35,7 @@ FileWindow::FileWindow(const char* fileName, QWidget* parent, const char* name) 
     m_pcup = loader->loadIcon("pcup.xpm");
     m_brkena = loader->loadIcon("brkena.xpm");
     m_brkdis = loader->loadIcon("brkdis.xpm");
+    m_brktmp = loader->loadIcon("brktmp.xpm");
 }
 
 FileWindow::~FileWindow()
@@ -120,6 +121,12 @@ void FileWindow::paintCell(QPainter* p, int row, int col)
 	    if (y < 0) y = 0;
 	    p->drawPixmap(0,y,m_brkdis);
 	}
+	if (item & liBPtemporary) {
+	    // temporary breakpoint marker
+	    int y = (h - m_brktmp.height())/2;
+	    if (y < 0) y = 0;
+	    p->drawPixmap(0,y,m_brktmp);
+	}
 	if (item & liPC) {
 	    // program counter in innermost frame
 	    int y = (h - m_pcinner.height())/2;
@@ -180,12 +187,16 @@ void FileWindow::updateLineItems(const BreakpointTable& bpt)
 		if (!(m_lineItems[i] & liBP)) {
 		    m_lineItems[i] &= ~liBPany;
 		    m_lineItems[i] |= liBP;
+		    if (bp.temporary)
+			m_lineItems[i] |= liBPtemporary;
 		    updateLineItem(i);
 		}
 	    } else {
 		if (!(m_lineItems[i] & liBPdisabled)) {
 		    m_lineItems[i] &= ~liBPany;
 		    m_lineItems[i] |= liBPdisabled;
+		    if (bp.temporary)
+			m_lineItems[i] |= liBPtemporary;
 		    updateLineItem(i);
 		}
 	    }

@@ -79,6 +79,11 @@ XPMS = \
 	pgmnext.xpm \
 	pgmrun.xpm \
 	pgmstep.xpm \
+	brkena.xpm \
+	brkdis.xpm \
+	brktmp.xpm \
+	pcinner.xpm \
+	pcup.xpm \
 	pointer.xpm
 
 # if you "make clean", this files get removed. If you want to remove
@@ -90,7 +95,7 @@ EXTRA_DIST = testfile testfile.cpp $(XPMS) kdbg.xpm mini-kdbg.xpm kdbg.kdelnk
 # make messages.po. Move this one to ../po/ and "make merge" in po
 # the -x is for skipping messages already translated in kdelibs
 messages:
-	$(XGETTEXT) -C -ki18n -x ../../../kdelibs/po/kde.pot $(kdbg_SOURCES) && mv messages.po ../po/kdbg.pot
+	$(XGETTEXT) -C -ki18n -x $(includedir)/kde.pot $(kdbg_SOURCES) && mv messages.po ../po/kdbg.pot
 
 # just install datas here. Use install-exec-local for scripts and etc.
 # the binary itself is already installed from automake
@@ -116,6 +121,11 @@ uninstall-local:
 	-rm -f $(kde_icondir)/kdbg.xpm
 	-rm -f $(kde_minidir)/kdbg.xpm
 	-rm -rf $(PICSDIR)
+
+
+# compile a testfile
+testfile: testfile.cpp
+	$(CXX) -g -o $@ testfile.cpp
 
 # add a dependency for every moc file to be full portable
 # I've added a key binding to emacs for this. 

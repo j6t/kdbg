@@ -26,7 +26,7 @@
 
 #define ID_BRKPT_SET 30
 #define ID_BRKPT_TEMP 31
-#define ID_BRKPT_CLEAR 32
+#define ID_BRKPT_ENABLE 32
 #define ID_BRKPT_LIST 35
 
 #define ID_EDIT_COPY 50

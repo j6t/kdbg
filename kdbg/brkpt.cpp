@@ -264,8 +264,93 @@ void BreakpointTable::addBP()
     // set a breakpoint at the specified text
     QString bpText = m_bpEdit.text();
     bpText = bpText.stripWhiteSpace();
-    if (m_debugger.setBreakpoint(bpText)) {
+    if (m_debugger.enqueueCmd(KDebugger::DCbreak, "break " + bpText, true)) {
 	// clear text if successfully set
 	m_bpEdit.setText("");
     }
+}
+
+// this handles the menu entry: toggles breakpoint on and off
+void BreakpointTable::doBreakpoint(QString file, int lineNo, bool temporary)
+{
+    Breakpoint* bp = breakpointByFilePos(file, lineNo);
+    if (bp == 0)
+    {
+	// no such breakpoint, so set a new one
+	// strip off directory part of file name
+	file.detach();
+	int offset = file.findRev("/");
+	if (offset >= 0) {
+	    file.remove(0, offset+1);
+	}
+	QString cmdString(file.length() + 30);
+	cmdString.sprintf("%sbreak %s:%d", temporary ? "t" : "",
+			  file.data(), lineNo+1);
+	m_debugger.enqueueCmd(KDebugger::DCbreak, cmdString);
+    }
+    else
+    {
+	/*
+	 * If the breakpoint is disabled, enable it; if it's enabled,
+	 * delete that breakpoint.
+	 */
+	QString cmdString(30);
+	if (bp->enabled) {
+	    cmdString.sprintf("delete %d", bp->num);
+	    m_debugger.enqueueCmd(KDebugger::DCdelete, cmdString);
+	} else {
+	    cmdString.sprintf("enable %d", bp->num);
+	    m_debugger.enqueueCmd(KDebugger::DCenable, cmdString);
+	}
+    }
+}
+
+void BreakpointTable::doEnableDisableBreakpoint(const QString& file, int lineNo)
+{
+    Breakpoint* bp = breakpointByFilePos(file, lineNo);
+    if (bp == 0)
+	return;
+
+    // toggle enabled/disabled state
+    QString cmdString(30);
+    if (bp->enabled) {
+	cmdString.sprintf("disable %d", bp->num);
+	m_debugger.enqueueCmd(KDebugger::DCdisable, cmdString);
+    } else {
+	cmdString.sprintf("enable %d", bp->num);
+	m_debugger.enqueueCmd(KDebugger::DCenable, cmdString);
+    }
+}
+
+Breakpoint* BreakpointTable::breakpointByFilePos(QString file, int lineNo)
+{
+    // look for exact file name match
+    int i;
+    for (i = m_brkpts.size()-1; i >= 0; i--) {
+	if (m_brkpts[i]->lineNo == lineNo &&
+	    m_brkpts[i]->fileName == file)
+	{
+	    return m_brkpts[i];
+	}
+    }
+    // not found, so try basename
+    // strip off directory part of file name
+    file.detach();
+    int offset = file.findRev("/");
+    if (offset < 0) {
+	// that was already the basename, no need to scan the list again
+	return 0;
+    }
+    file.remove(0, offset+1);
+
+    for (i = m_brkpts.size()-1; i >= 0; i--) {
+	if (m_brkpts[i]->lineNo == lineNo &&
+	    m_brkpts[i]->fileName == file)
+	{
+	    return m_brkpts[i];
+	}
+    }
+
+    // not found
+    return 0;
 }

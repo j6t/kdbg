@@ -41,10 +41,8 @@ public:
     ~KDebugger();
     
     bool debugProgram(const QString& executable);
-    bool setBreakpoint(const QString& bpText);
     void menuCallbackExecutable();	/* helper to work around Qt bug */
     
-protected:
     // instance specific properties
     virtual void saveProperties(KConfig*);
     virtual void readProperties(KConfig*);
@@ -65,11 +63,15 @@ protected:
 	DCfinish,
 	DCuntil,
 	DCbreak,
+	DCdelete,
+	DCenable,
+	DCdisable,
 	DCprintthis,
 	DCprint,
 	DCframe,
 	DCinfobreak
     };
+protected:
     pid_t m_outputTermPID;
     QString m_outputTermName;
     bool createOutputWindow();
@@ -89,6 +91,7 @@ protected:
 					/* but before signal wroteStdin arrived */
     QList<VarTree> m_watchEvalExpr;	/* exprs to evaluate for watch windows */
 
+public:
     /**
      * Gdb commands are placed in a queue. Only one command at a time is
      * sent down to gdb. All other commands in the queue are retained until
@@ -114,9 +117,10 @@ protected:
 		m_exprWnd(0)
 	{ }
     };
+    CmdQueueItem* enqueueCmd(DbgCommand cmd, QString cmdString, bool onlyRunning = false);
+protected:
     QQueue<CmdQueueItem> m_cmdQueue;
     CmdQueueItem* m_activeCmd;		/* the cmd we are working on */
-    CmdQueueItem* enqueueCmd(DbgCommand cmd, QString cmdString);
     void parse(CmdQueueItem* cmd);
     VarTree* parseExpr(const char* name);
     void handleRunCommands();
