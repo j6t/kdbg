@@ -265,6 +265,7 @@ public:
     {
 	DbgCommand m_cmd;
 	QString m_cmdString;
+	bool m_committed;		/* just a debugging aid */
 	// remember which expression when printing an expression
 	VarTree* m_expr;
 	ExprWnd* m_exprWnd;
@@ -274,6 +275,7 @@ public:
 	CmdQueueItem(DbgCommand cmd, const QString& str) :
 		m_cmd(cmd),
 		m_cmdString(str),
+		m_committed(false),
 		m_expr(0),
 		m_exprWnd(0),
 		m_byUser(false)

@@ -764,6 +764,12 @@ KDebugger::CmdQueueItem* KDebugger::queueCmd(KDebugger::DbgCommand cmd,
     switch (mode) {
     case QMoverrideMoreEqual:
     case QMoverride:
+	// check whether gdb is currently processing this command
+	if (m_activeCmd != 0 &&
+	    m_activeCmd->m_cmd == cmd && m_activeCmd->m_cmdString == cmdString)
+	{
+	    return m_activeCmd;
+	}
 	// check whether there is already the same command in the queue
 	for (cmdItem = m_lopriCmdQueue.first(); cmdItem != 0; cmdItem = m_lopriCmdQueue.next()) {
 	    if (cmdItem->m_cmd == cmd && cmdItem->m_cmdString == cmdString)
@@ -837,10 +843,10 @@ void KDebugger::commandRead(KProcess*)
     // there must be an active command which is not yet commited
     ASSERT(m_state == DScommandSent || m_state == DScommandSentLow);
     ASSERT(m_activeCmd != 0);
-    ASSERT(!m_activeCmd->m_cmdString.isEmpty());
+    ASSERT(!m_activeCmd->m_committed);
 
     // commit the command
-    m_activeCmd->m_cmdString = "";
+    m_activeCmd->m_committed = true;
 
     // now the debugger is officially working on the command
     m_state = m_state == DScommandSent ? DSrunning : DSrunningLow;
@@ -878,7 +884,7 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
      */
     if (m_state == DScommandSent || m_state == DScommandSentLow) {
 	ASSERT(m_activeCmd != 0);
-	ASSERT(!m_activeCmd->m_cmdString.isEmpty());
+	ASSERT(!m_activeCmd->m_committed);
 	/*
 	 * We received output before we got signal wroteStdin. Collect this
 	 * output, it will be re-sent by commandRead when it gets the
@@ -951,9 +957,16 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
 	 * interrupted, ignore it.
 	 */
 	if (m_state != DSinterrupted) {
-	    parse(m_activeCmd);
-	    delete m_activeCmd;
+	    /*
+	     * m_state shouldn't be DSidle while we are parsing the output
+	     * so that all commands produced by parse() go into the queue
+	     * instead of being written to gdb immediately.
+	     */
+	    ASSERT(m_state != DSidle);
+	    CmdQueueItem* cmd = m_activeCmd;
 	    m_activeCmd = 0;
+	    parse(cmd);
+	    delete cmd;
 	}
 
 	// empty buffer
@@ -999,7 +1012,7 @@ void KDebugger::parse(CmdQueueItem* cmd)
     TRACE(QString(__PRETTY_FUNCTION__) + " parsing " + m_gdbOutput);
 
     // command string must be committed
-    if (!cmd->m_cmdString.isEmpty()) {
+    if (!cmd->m_committed) {
 	// not commited!
 	TRACE("calling KDebugger::parse with uncommited command:\n\t" +
 	      cmd->m_cmdString);
@@ -1946,9 +1959,7 @@ void KDebugger::exprExpandingHelper(ExprWnd* wnd, KTreeViewItem* item, bool&)
     if (exprItem->m_varKind != VarTree::VKpointer) {
 	return;
     }
-    if (m_state == DSidle) {
-	dereferencePointer(wnd, exprItem, true);
-    }
+    dereferencePointer(wnd, exprItem, true);
 }
 
 // add the expression in the edit field to the watch expressions
