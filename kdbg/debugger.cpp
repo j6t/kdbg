@@ -160,7 +160,14 @@ KDebugger::KDebugger(const char* name) :
 	    SLOT(slotToggleBreak(const QString&,int)));
     connect(&m_filesWindow, SIGNAL(enadisBreak(const QString&, int)),
 	    SLOT(slotEnaDisBreak(const QString&,int)));
+	
+    // Establish communication when right clicked on file window.
     connect(&m_filesWindow.m_menuFloat, SIGNAL(activated(int)),
+	    SLOT(menuCallback(int)));
+	
+    // Connection when right clicked on file window before any file is
+    // loaded.
+    connect(&m_filesWindow.m_menuFileFloat, SIGNAL(activated(int)),
 	    SLOT(menuCallback(int)));
 
     m_bpTable.setCaption(i18n("Breakpoints"));
@@ -489,9 +496,16 @@ void KDebugger::updateUI()
 	updateMenu.iterateMenu();
     }
 
-    // Update file window float menu items
+    // Update winstack float popup items
     {
 	UpdateMenuUI updateMenu(&m_filesWindow.m_menuFloat, this,
+				SLOT(updateUIItem(UpdateUI*)));
+	updateMenu.iterateMenu();
+    }
+
+    // Update winstack float file popup items
+    {
+	UpdateMenuUI updateMenu(&m_filesWindow.m_menuFileFloat, this,
 				SLOT(updateUIItem(UpdateUI*)));
 	updateMenu.iterateMenu();
     }

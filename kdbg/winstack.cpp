@@ -358,6 +358,10 @@ WinStack::WinStack(QWidget* parent, const char* name, const BreakpointTable& bpt
 	    SIGNAL(clicked()), SLOT(slotFindForward()));
     connect(&m_findDlg.m_buttonBackward,
 	    SIGNAL(clicked()), SLOT(slotFindBackward()));
+
+    // Check for right click event.
+    connect(this, SIGNAL(clickedRight(const QPoint &)),
+	    SLOT(slotWidgetRightClick(const QPoint &)));
 }
 
 WinStack::~WinStack()
@@ -368,6 +372,9 @@ WinStack::~WinStack()
 void WinStack::initMenu()
 {
     // Init float popup menu.
+    m_menuFloat.insertItem(i18n("&Open Source..."), ID_FILE_OPEN);
+    m_menuFloat.insertItem(i18n("&Reload Source"), ID_FILE_RELOAD);
+    m_menuFloat.insertSeparator();
     m_menuFloat.insertItem(i18n("&Run"), ID_PROGRAM_RUN);
     m_menuFloat.insertItem(i18n("Step &into"), ID_PROGRAM_STEP);
     m_menuFloat.insertItem(i18n("Step &over"), ID_PROGRAM_NEXT);
@@ -378,11 +385,13 @@ void WinStack::initMenu()
     m_menuFloat.insertItem(i18n("Re&start"), ID_PROGRAM_RUN_AGAIN);
     m_menuFloat.insertSeparator();
     m_menuFloat.insertItem(i18n("Set/Clear &breakpoint"), ID_BRKPT_SET);
-    m_menuFloat.setAccel(Key_F5, ID_PROGRAM_RUN);
-    m_menuFloat.setAccel(Key_F8, ID_PROGRAM_STEP);
-    m_menuFloat.setAccel(Key_F10, ID_PROGRAM_NEXT);
-    m_menuFloat.setAccel(Key_F6, ID_PROGRAM_FINISH);
-    m_menuFloat.setAccel(Key_F7, ID_PROGRAM_UNTIL);
+
+    // Init float file popup.
+    m_menuFileFloat.insertItem(i18n("&Open Source..."), ID_FILE_OPEN);
+    m_menuFileFloat.insertItem(i18n("&Reload Source"), ID_FILE_RELOAD);
+    m_menuFileFloat.insertSeparator();
+    m_menuFileFloat.insertItem(i18n("&Executable..."), ID_FILE_EXECUTABLE);
+    m_menuFileFloat.insertItem(i18n("&Core dump..."), ID_FILE_COREFILE);
 }
 
 void WinStack::setWindowMenu(QPopupMenu* menu)
@@ -442,6 +451,16 @@ void WinStack::openFile()
 
     activateFI(fi, 0);
 }
+
+void WinStack::mouseReleaseEvent(QMouseEvent* mouseEvent)
+{
+    // Check if right button was clicked.
+    if (mouseEvent->button() == RightButton)
+    {
+	emit clickedRight(mouseEvent->pos());
+    }
+}
+
 
 void WinStack::reloadAllFiles()
 {
@@ -681,7 +700,18 @@ void WinStack::slotFileWindowRightClick(const QPoint & pos)
     else
     {
 	m_menuFloat.popup(mapToGlobal(pos));
-	//m_menuFloat.show();
+    }
+}
+
+void WinStack::slotWidgetRightClick(const QPoint & pos)
+{
+    if (m_menuFileFloat.isVisible())
+    {
+	m_menuFileFloat.hide();
+    }
+    else
+    {
+	m_menuFileFloat.popup(mapToGlobal(pos));
     }
 }
 

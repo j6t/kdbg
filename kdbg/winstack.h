@@ -121,12 +121,16 @@ signals:
     void lineChanged();
     void toggleBreak(const QString&, int);
     void enadisBreak(const QString&, int);
+    void clickedRight(const QPoint&);
 
 public slots:
     virtual void menuCallback(int item);
     virtual void slotFindForward();
     virtual void slotFindBackward();
     virtual void slotFileWindowRightClick(const QPoint &);
+
+    // Right click on file panner when no file is loaded.
+    virtual void slotWidgetRightClick(const QPoint &);
 
 protected:
     void initMenu();
@@ -135,6 +139,7 @@ protected:
     virtual bool activateWindow(FileWindow* fw, int lineNo = -1);	/* -1 doesnt change line */
     virtual void changeWindowMenu();
     virtual void openFile();
+    virtual void mouseReleaseEvent(QMouseEvent*);
     void setPC(bool set, const QString& fileName, int lineNo, int frameNo);
     QList<FileWindow> m_fileList;
     FileWindow* m_activeWindow;
@@ -155,6 +160,7 @@ public:
 
     // Popup menu
     QPopupMenu m_menuFloat;
+    QPopupMenu m_menuFileFloat;
 };
 
 #endif // WINSTACK_H
