@@ -1,0 +1,15 @@
+<?xml version="1.0" ?>
+<!-- 
+     File : test1.xml     
+     Author: Keith Isdale <k_isdale@tpg.com.au>
+     Description: xml data for stylesheet for test "test1"
+     Copyright Reserved Under GPL     
+-->
+<html>
+<head>
+</head>
+<body>
+  <h1>test1</h1>
+  <p>text1</p>
+</body>
+</html>
