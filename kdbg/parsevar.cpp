@@ -81,10 +81,11 @@ void skipNested(const char*& s, char opening, char closing)
     s = p;
 }
 
-void skipString(const char*& p, char quote)
+void skipString(const char*& p)
 {
+moreStrings:
     // opening quote
-    p++;
+    char quote = *p++;
     while (*p != quote) {
 	if (*p == '\\') {
 	    // skip escaped character
@@ -101,6 +102,38 @@ void skipString(const char*& p, char quote)
     /* very long strings are followed by `...' */
     if (*p == '.' && p[1] == '.' && p[2] == '.') {
 	p += 3;
+    }
+    else {
+	/*
+	 * Strings can consist of several parts, some of which contain
+	 * repeated characters.
+	 */
+	if (quote == '\'') {
+	    // look ahaead for <repeats 123 times>
+	    const char* q = p+1;
+	    while (isspace(*q))
+		q++;
+	    if (strncmp(q, "<repeats ", 9) == 0) {
+		p = q+9;
+		while (*p != '\0' && *p != '>')
+		    p++;
+		if (*p != '\0') {
+		    p++;		/* skip the '>' */
+		}
+	    }
+	}
+	// is the string continued?
+	if (*p == ',') {
+	    // look ahead for another quote
+	    const char* q = p+1;
+	    while (isspace(*q))
+		q++;
+	    if (*q == '"' || *q == '\'') {
+		// yes!
+		p = q;
+		goto moreStrings;
+	    }
+	}
     }
 }
 
@@ -121,7 +154,7 @@ void skipNestedWithString(const char*& s, char opening, char closing)
 	} else if (*p == closing) {
 	    nest--;
 	} else if (*p == '\'' || *p == '\"') {
-	    skipString(p, *p);
+	    skipString(p);
 	    continue;
 	}
 	p++;
@@ -298,7 +331,7 @@ repeat:
 	    // character may have multipart: '\000' <repeats 11 times>
 	    checkMultiPart = *p == '\'';
 	    // found a string
-	    skipString(p, *p);
+	    skipString(p);
 	} else if (*p == '&') {
 	    // function pointer
 	    p++;
@@ -323,7 +356,7 @@ repeat:
 	    start = p;
 	    
 	    if (*p == '"' || *p == '\'') {
-		skipString(p, *p);
+		skipString(p);
 	    } else if (*p == '<') {
 		skipNested(p, '<', '>');
 	    }
@@ -375,7 +408,7 @@ bool parseNested(const char*& s, VarTree* variable)
      * If there is a name followed by an = or an < -- which starts a type
      * name -- or "static", it is a structure
      */
-    if (*p == '<') {
+    if (*p == '<' || *p == '}') {
 	isStruct = true;
     } else if (strncmp(p, "static ", 7) == 0) {
 	isStruct = true;
@@ -407,19 +440,26 @@ bool parseNested(const char*& s, VarTree* variable)
 bool parseVarSeq(const char*& s, VarTree* variable)
 {
     // parse a comma-separated sequence of variables
-    VarTree* var = parseVar(s);
-    while (var != 0) {
+    VarTree* var = variable;		/* var != 0 to indicate success if empty seq */
+    for (;;) {
+	if (*s == '}')
+	    break;
+	if (strncmp(s, "<No data fields>}", 17) == 0)
+	{
+	    // no member variables, so break out immediately
+	    s += 16;			/* go to the closing brace */
+	    break;
+	}
+	var = parseVar(s);
+	if (var == 0)
+	    break;			/* syntax error */
 	variable->appendChild(var);
 	if (*s != ',')
 	    break;
-	// skip the command and whitespace
+	// skip the comma and whitespace
 	s++;
 	while (isspace(*s))
 	    s++;
-	// sometimes there is a closing brace after a comma
-	if (*s == '}')
-	    break;
-	var = parseVar(s);
     }
     return var != 0;
 }

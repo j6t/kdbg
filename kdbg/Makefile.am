@@ -13,13 +13,6 @@
 # kde_toolbardir    Where general toolbar icons should go to.
 # kde_wallpaperdir  Where general wallpapers should go to.
 
-# just set the variable
-APPSDIR = $(kde_appsdir)/Applications
-# make double sure that the following directories are not common locations;
-# "make uninstall" removes them!
-PICSDIR = $(kde_datadir)/kdbg/pics
-TYPESDIR = $(kde_datadir)/kdbg/types
-
 # set the include path for X, qt and KDE
 INCLUDES= $(all_includes)
 
@@ -117,43 +110,23 @@ TYPES = \
 # them while "make distclean", use DISTCLEANFILES
 CLEANFILES = $(kdbg_METASOURCES)
 
+
 EXTRA_DIST = testfile.cpp $(XPMS) $(TYPES) kdbg.xpm mini-kdbg.xpm kdbg.kdelnk
+
+apps_DATA = kdbg.kdelnk
+appsdir = $(kde_appsdir)/Development
+icon_DATA = kdbg.xpm mini-kdbg.xpm
+icondir = $(kde_icondir)
+pics_DATA = $(XPMS)
+picsdir = $(kde_datadir)/kdbg/pics
+types_DATA = $(TYPES)
+typesdir = $(kde_datadir)/kdbg/types
+
 
 # make messages.po. Move this one to ../po/ and "make merge" in po
 # the -x is for skipping messages already translated in kdelibs
 messages:
 	$(XGETTEXT) -C -ki18n -x $(includedir)/kde.pot $(kdbg_SOURCES) && mv messages.po ../po/kdbg.pot
-
-# just install datas here. Use install-exec-local for scripts and etc.
-# the binary itself is already installed from automake
-# use mkinstalldirs, not "install -d"
-# don't install a list of file. Just one file per install.
-# if you have more of them, create a subdirectory with an extra Makefile 
-install-data-local: 
-	$(mkinstalldirs) $(DESTDIR)$(APPSDIR)
-	$(INSTALL_DATA) kdbg.kdelnk $(DESTDIR)$(APPSDIR)
-	$(mkinstalldirs) $(DESTDIR)$(kde_icondir)
-	$(INSTALL_DATA) kdbg.xpm $(DESTDIR)$(kde_icondir)
-	$(mkinstalldirs) $(DESTDIR)$(kde_minidir)
-	$(INSTALL_DATA) mini-kdbg.xpm $(DESTDIR)$(kde_minidir)/kdbg.xpm
-	$(mkinstalldirs) $(DESTDIR)$(PICSDIR)
-	@for i in $(XPMS); do \
-		echo $(INSTALL_DATA) $$i $(DESTDIR)$(PICSDIR)/$$i; \
-		$(INSTALL_DATA) $$i $(DESTDIR)$(PICSDIR)/$$i; \
-	done
-	$(mkinstalldirs) $(DESTDIR)$(TYPESDIR)
-	@for i in $(TYPES); do \
-		echo $(INSTALL_DATA) $$i $(DESTDIR)$(TYPESDIR)/$$i; \
-		$(INSTALL_DATA) $$i $(DESTDIR)$(TYPESDIR)/$$i; \
-	done
-
-# remove ALL you have installed in install-data-local or install-exec-local
-uninstall-local:
-	-rm -f $(DESTDIR)$(APPSDIR)/kdbg.kdelnk
-	-rm -f $(DESTDIR)$(kde_icondir)/kdbg.xpm
-	-rm -f $(DESTDIR)$(kde_minidir)/kdbg.xpm
-	-rm -rf $(DESTDIR)$(PICSDIR)
-	-rm -rf $(DESTDIR)$(TYPESDIR)
 
 
 # compile a testfile
