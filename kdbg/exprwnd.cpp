@@ -128,7 +128,7 @@ bool VarTree::updateValue(const QString& newValue)
     return m_valueChanged || prevValueChanged;
 }
 
-void VarTree::inferTypesOfChildren()
+void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
 {
     /*
      * Type inference works like this: We use type information of those
@@ -139,7 +139,7 @@ void VarTree::inferTypesOfChildren()
     // first recurse children
     VarTree* child = static_cast<VarTree*>(getChild());
     while (child != 0) {
-	child->inferTypesOfChildren();
+	child->inferTypesOfChildren(typeTable);
 	child = static_cast<VarTree*>(child->getSibling());
     }
 
@@ -163,7 +163,7 @@ void VarTree::inferTypesOfChildren()
 	const QString& typeName =
 	    QString(start+1, p-start-3+1) // minus 3 chars plus '\0'
 		.stripWhiteSpace();
-	m_type = typeTable()[typeName];
+	m_type = typeTable.lookup(typeName);
 	if (m_type == 0) {
 	    m_type = TypeTable::unknownType();
 	}
@@ -172,7 +172,7 @@ void VarTree::inferTypesOfChildren()
 	if (m_nameKind == NKtype) {
 	    const QString& typeName =
 		text.mid(1, text.length()-2); // strip < and >
-	    m_type = typeTable()[typeName];
+	    m_type = typeTable.lookup(typeName);
 
 	    /* if we don't have a type yet, get it from the base class */
 	    if (m_type == 0) {

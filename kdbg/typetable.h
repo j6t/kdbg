@@ -14,6 +14,7 @@ class KConfigBase;
  */
 const int typeInfoMaxExpr = 5;
 
+
 struct TypeInfo
 {
     TypeInfo(const QString& displayString);
@@ -46,19 +47,14 @@ public:
     ~TypeTable();
 
     /**
-     * Loads the structure type information from the configuration files.
+     * Load all known type libraries.
      */
-    void loadTable();
+    static void initTypeLibraries();
 
     /**
-     * Lookup a structure type.
+     * Copy type infos to the specified dictionary.
      */
-    TypeInfo* operator[](const char* type);
-
-    /**
-     * Adds a new alias for a type name.
-     */
-    void registerAlias(const char* type, TypeInfo* typeInfo);
+    void copyTypes(QDict<TypeInfo>& dict);
 
     /**
      * Gets a pointer to a TypeInfo that means: "I don't know the type"
@@ -66,15 +62,67 @@ public:
     static TypeInfo* unknownType() { return &m_unknownType; }
 
 protected:
-    void loadOneFile(const char* fileName);
+    /**
+     * Loads the structure type information from the configuration files.
+     */
+    static void loadTypeTables();
+    void loadFromFile(const QString& fileName);
     void readType(KConfigBase& cf, const char* type);
     QDict<TypeInfo> m_typeDict;
     QDict<TypeInfo> m_aliasDict;
+    QString m_displayName;
+    QString m_shlibName;
 
     static TypeInfo m_unknownType;
 };
 
 
-// the one and only TypeTable
-extern TypeTable* theTypeTable;
-inline TypeTable& typeTable() { return *theTypeTable; }
+/**
+ * This table keeps only references to the global type table. It is set up
+ * once per program.
+ */
+class ProgramTypeTable
+{
+public:
+    ProgramTypeTable();
+    ~ProgramTypeTable();
+
+    /**
+     * Load types belonging to the specified libraries.
+     */
+    void loadLibTypes(const QArray<char>& libs);
+
+    /**
+     * Load types belonging to the specified type table
+     */
+    void loadTypeTable(TypeTable* table);
+
+    /**
+     * Clears that types and starts over (e.g. for a new program).
+     */
+    void clear();
+
+    /**
+     * Lookup a structure type.
+     * 
+     * A type is looked up in the following manner:
+     * 
+     * - If the type is unknown, 0 is returned.
+     * 
+     * - If the type is known and it belongs to a shared library and that
+     * shared library was loaded, the type is returned such that isNew()
+     * returns true.
+     * 
+     * - Otherwise the type is returned such that isNew() returns true.
+     */
+    TypeInfo* lookup(const char* type);
+
+    /**
+     * Adds a new alias for a type name.
+     */
+    void registerAlias(const QString& name, TypeInfo* type);
+
+protected:
+    QDict<TypeInfo> m_types;
+    QDict<TypeInfo> m_aliasDict;
+};

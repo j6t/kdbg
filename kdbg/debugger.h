@@ -19,6 +19,7 @@
 
 class ExprWnd;
 class VarTree;
+class ProgramTypeTable;
 class KTreeViewItem;
 class KConfig;
 class QListBox;
@@ -332,6 +333,7 @@ protected:
     QString m_attachedPid;		/* user input of attaching to pid */
     QString m_programArgs;
     QDict<EnvVar> m_envVars;		/* environment variables set by user */
+    ProgramTypeTable* m_typeTable;	/* known types used by the program */
     KSimpleConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
     void saveProgramSettings();
     void restoreProgramSettings();

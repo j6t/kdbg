@@ -62,6 +62,7 @@ KDebugger::KDebugger(QWidget* parent,
 	m_haveExecutable(false),
 	m_programActive(false),
 	m_programRunning(false),
+	m_typeTable(0),
 	m_programConfig(0),
 	m_gdb(),
 	m_gdbMajor(4), m_gdbMinor(16),
@@ -121,6 +122,7 @@ KDebugger::~KDebugger()
 	m_programConfig->sync();
 	delete m_programConfig;
     }
+    delete m_typeTable;
     delete[] m_gdbOutput;
 }
 
@@ -239,6 +241,9 @@ bool KDebugger::debugProgram(const QString& name)
     if (openit) {
 	m_programConfig = new KSimpleConfig(pgmConfigFile, readonly);
 	// it is read in later in the handler of DCexecutable
+
+	// create a type table
+	m_typeTable = new ProgramTypeTable;
     }
 
     emit updateUI();
@@ -521,6 +526,10 @@ void KDebugger::gdbExited(KProcess*)
 	delete m_programConfig;
 	m_programConfig = 0;
     }
+
+    // erase types
+    delete m_typeTable;
+    m_typeTable = 0;
 
     if (m_explicitKill) {
 	TRACE("gdb exited normally");
@@ -1396,7 +1405,7 @@ void KDebugger::parseLocals(QList<VarTree>& newVars)
 	    break;
 	}
 	// get some types
-	variable->inferTypesOfChildren();
+	variable->inferTypesOfChildren(*m_typeTable);
 	/*
 	 * When gdb prints local variables, those from the innermost block
 	 * come first. We run through the list of already parsed variables
@@ -1526,7 +1535,7 @@ VarTree* KDebugger::parseExpr(const char* name, bool wantErrorValue)
 	// set name
 	variable->setText(name);
 	// get some types
-	variable->inferTypesOfChildren();
+	variable->inferTypesOfChildren(*m_typeTable);
     }
     return variable;
 }
@@ -1801,7 +1810,7 @@ void KDebugger::handleFindType(CmdQueueItem* cmd)
 
 	ASSERT(cmd != 0 && cmd->m_expr != 0);
 
-	TypeInfo* info = typeTable()[type];
+	TypeInfo* info = m_typeTable->lookup(type);
 
 	if (info == 0) {
 	    /*
@@ -1816,7 +1825,7 @@ void KDebugger::handleFindType(CmdQueueItem* cmd)
 	    // if we found a type through this method, register an alias
 	    if (info != 0) {
 		TRACE("infered alias: " + type);
-		typeTable().registerAlias(type, info);
+		m_typeTable->registerAlias(type, info);
 	    }
 	}
 	if (info == 0) {

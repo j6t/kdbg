@@ -26,10 +26,8 @@ int main(int argc, char** argv)
 
     DebuggerMainWnd debugger("kdbg_main");
 
-    /* yucky! there's only one TypeTable */
-    TypeTable typeTable;
-    typeTable.loadTable();
-    theTypeTable = &typeTable;
+    /* type libraries */
+    TypeTable::initTypeLibraries();
 
     // session management
     bool restored = false;

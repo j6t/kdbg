@@ -9,6 +9,7 @@
 #include "ktreeview.h"
 #include <qlist.h>
 
+class ProgramTypeTable;
 class TypeInfo;
 
 /* a variable's value is the tree of sub-variables */
@@ -42,7 +43,7 @@ public:
     /** update the value; return if repaint is necessary */
     bool updateValue(const QString& newValue);
     /** find out the type of this value using the child values */
-    void inferTypesOfChildren();
+    void inferTypesOfChildren(ProgramTypeTable& typeTable);
     /** get the type from base class part */
     TypeInfo* inferTypeFromBaseClass();
 };

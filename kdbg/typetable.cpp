@@ -10,11 +10,41 @@
 #include "typetable.h"
 #include "mydebug.h"
 
-// the one and only
-TypeTable* theTypeTable = 0;
+// the TypeTables of all known libraries
+static QList<TypeTable> typeTables;
+bool typeTablesInited = false;
+
 
 // the unknown type
 TypeInfo TypeTable::m_unknownType("");
+
+
+void TypeTable::initTypeLibraries()
+{
+    if (!typeTablesInited) {
+	TypeTable::loadTypeTables();
+    }
+}
+
+void TypeTable::loadTypeTables()
+{
+    typeTablesInited = true;
+
+    QDir dir(KApplication::kde_datadir() + "/kdbg/types");
+    const QStrList* files = dir.entryList("*.kdbgtt");    
+    if (files == 0) {
+	TRACE("no type tables found");
+	return;
+    }
+
+    QString fileName;
+    for (QListIterator<char> it(*files); it != 0; ++it) {
+	fileName = dir.filePath(it.current());
+	TypeTable* newTable = new TypeTable;
+	newTable->loadFromFile(fileName);
+	typeTables.append(newTable);
+    }
+}
 
 
 TypeTable::TypeTable()
@@ -28,33 +58,38 @@ TypeTable::~TypeTable()
 {
 }
 
-void TypeTable::loadTable()
-{
-    QDir dir(KApplication::kde_datadir() + "/kdbg/types");
-    const QStrList* files = dir.entryList("*.kdbgtt");
-    if (files == 0) {
-	TRACE("no type tables found");
-	return;
-    }
-
-    QString fileName;
-    for (QListIterator<char> it(*files); it != 0; ++it) {
-	fileName = dir.filePath(it.current());
-	loadOneFile(fileName);
-    }
-}
 
 static const char TypeTableGroup[] = "Type Table";
+static const char LibDisplayName[] = "LibDisplayName";
+static const char ShlibName[] = "ShlibName";
 static const char TypesEntryFmt[] = "Types%d";
 static const char DisplayEntry[] = "Display";
 static const char AliasEntry[] = "Alias";
 static const char ExprEntryFmt[] = "Expr%d";
 
 
-void TypeTable::loadOneFile(const char* fileName)
+void TypeTable::loadFromFile(const QString& fileName)
 {
-    TRACE(QString("reading file ") + fileName);
+    TRACE("reading file " + fileName);
     KSimpleConfig cf(fileName, true);	/* read-only */
+
+    /*
+     * Read library name and properties.
+     */
+    cf.setGroup(TypeTableGroup);
+    m_displayName = cf.readEntry(LibDisplayName);
+    if (m_displayName.isEmpty()) {
+	// use file name instead
+	int slash = fileName.findRev('\\');
+	m_displayName =
+	    slash >= 0 ? fileName.mid(slash+1, fileName.length()) : fileName;
+	int dot = m_displayName.findRev('.');
+	if (dot > 0) {
+	    m_displayName.truncate(dot);
+	}
+    }
+
+    m_shlibName = cf.readEntry(ShlibName);
 
     /*
      * Get the types. We search for entries of kind Types1, Types2, etc.
@@ -122,19 +157,14 @@ void TypeTable::readType(KConfigBase& cf, const char* type)
 			    info->m_numExprs));
 }
 
-TypeInfo* TypeTable::operator[](const char* type)
+void TypeTable::copyTypes(QDict<TypeInfo>& dict)
 {
-    TypeInfo* result = m_typeDict[type];
-    if (result == 0) {
-	result = m_aliasDict[type];
+    for (QDictIterator<TypeInfo> it = m_typeDict; it != 0; ++it) {
+	dict.insert(it.currentKey(), it);
     }
-    return result;
-}
-
-void TypeTable::registerAlias(const char* type, TypeInfo* info)
-{
-    ASSERT((*this)[type] == 0 || (*this)[type] == info);
-    m_aliasDict.insert(type, info);
+    for (QDictIterator<TypeInfo> it = m_aliasDict; it != 0; ++it) {
+	dict.insert(it.currentKey(), it);
+    }
 }
 
 TypeInfo::TypeInfo(const QString& displayString)
@@ -160,4 +190,45 @@ TypeInfo::TypeInfo(const QString& displayString)
 
 TypeInfo::~TypeInfo()
 {
+}
+
+
+ProgramTypeTable::ProgramTypeTable()
+{
+    m_types.setAutoDelete(false);	/* paranoia */
+    m_aliasDict.setAutoDelete(false);	/* paranoia */
+
+    // load all types
+    for (QListIterator<TypeTable> it = typeTables; it; ++it) {
+	loadTypeTable(it);
+    }
+}
+
+ProgramTypeTable::~ProgramTypeTable()
+{
+}
+
+void ProgramTypeTable::clear()
+{
+    m_types.clear();
+}
+
+void ProgramTypeTable::loadTypeTable(TypeTable* table)
+{
+    table->copyTypes(m_types);
+}
+
+TypeInfo* ProgramTypeTable::lookup(const char* type)
+{
+    TypeInfo* result = m_types[type];
+    if (result == 0) {
+	result = m_aliasDict[type];
+    }
+    return result;
+}
+
+void ProgramTypeTable::registerAlias(const QString& name, TypeInfo* type)
+{
+    ASSERT(lookup(name) == 0 || lookup(name) == type);
+    m_aliasDict.insert(name, type);
 }
