@@ -411,7 +411,21 @@ void BreakpointItem::display()
     setPixmap(0, lb->m_icons[code]);
 
     // more breakpoint info
-    setText(0, location);
+    if (!location.isEmpty()) {
+	setText(0, location);
+    } else if (!fileName.isEmpty()) {
+	// use only the file name portion
+	QString file = fileName;
+	int slash = file.findRev('/');
+	if (slash >= 0) {
+	    file = file.mid(slash+1);
+	}
+	// correct zero-based line-numbers
+	setText(0, file + ":" + QString::number(lineNo+1));
+    } else {
+	setText(0, "*" + address.asString());
+    }
+
     int c = 0;
     setText(++c, address.asString());
     QString tmp;
