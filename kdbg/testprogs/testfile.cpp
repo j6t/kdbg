@@ -169,7 +169,7 @@ int Dl::f(int x)
 
 int Dl::operator()(const QString& x, int& y) const
 {
-	cout << "ha! I know!" << endl;
+	cerr << "ha! I know!" << endl;
 	return 1;
 }
 
