@@ -56,6 +56,7 @@ public:
     virtual uint parseProgramStopped(const char* output, QString& message);
     virtual void parseSharedLibs(const char* output, QStrList& shlibs);
     virtual bool parseFindType(const char* output, QString& type);
+    virtual void parseRegisters(const char* output, QList<RegisterInfo>& regs);
 protected:
     int m_gdbMajor, m_gdbMinor;
     QString m_programWD;		/* just an intermediate storage */

@@ -17,16 +17,37 @@
 #include <ctype.h>
 #include <stdlib.h>			/* strtoul */
 #include "regwnd.h"
+#include "dbgdriver.h"
 
 
-RegisterViewItem::RegisterViewItem(RegisterView* parent, QString reg, QString value) :
+class RegisterViewItem : public QListViewItem
+{
+public:
+    RegisterViewItem(RegisterView* parent, QString reg,
+		     QString raw, QString cooked);
+    ~RegisterViewItem();
+
+    void setValue(QString raw, QString cooked);
+    RegisterInfo m_reg;
+    bool m_changes;
+    bool m_found;
+
+protected:
+    virtual void paintCell(QPainter*, const QColorGroup& cg,
+			   int column, int width, int alignment);
+
+};
+
+
+RegisterViewItem::RegisterViewItem(RegisterView* parent, QString reg,
+				   QString raw, QString cooked) :
 	QListViewItem(parent, parent->m_lastInsert),
-	m_reg(reg),
 	m_changes(false),
 	m_found(true)
 {
+    m_reg.regName = reg;
     parent->m_lastInsert = this;
-    setValue(value);
+    setValue(raw, cooked);
     setText(0, reg);
 }
 
@@ -140,39 +161,27 @@ static QString toDecimal(QString hex)
 
 #undef DIGIT
 
-void RegisterViewItem::setValue(QString value)
+void RegisterViewItem::setValue(QString raw, QString cooked)
 {
-    m_value = value;
-
-    QString coded;
-    QString decoded;
+    m_reg.rawValue = raw;
+    m_reg.cookedValue = cooked;
 
     /*
-     * We split off the first token (separated by whitespace). If that one
-     * is in hexadecimal notation, we allow to display it in different modes.
-     * The rest of the value we treat as "decoded" value and display in
-     * the third column.
+     * If the raw value is in hexadecimal notation, we allow to display it
+     * in different modes (in the second column). The cooked value is
+     * displayed in the third column.
      */
-    value = value.simplifyWhiteSpace();
-    int pos = value.find(' ');
-    if (pos < 0) {
-	coded = value;
-	decoded = QString();
-    } else {
-	coded = value.left(pos);
-	decoded = value.mid(pos+1,value.length()).stripWhiteSpace();
-    }
-    if (coded.length() > 2 && coded[0] == '0' && coded[1] == 'x') {
+    if (raw.length() > 2 && raw[0] == '0' && raw[1] == 'x') {
 	switch (static_cast<RegisterView*>(listView())->m_mode) {
-	case  2: coded = toBinary(coded); break;
-	case  8: coded = toOctal(coded); break;
-	case 10: coded = toDecimal(coded); break;
+	case  2: raw = toBinary(raw); break;
+	case  8: raw = toOctal(raw); break;
+	case 10: raw = toDecimal(raw); break;
 	default: /* no change */ break;
 	}
     }
 	
-    setText(1, coded);
-    setText(2, decoded);
+    setText(1, raw);
+    setText(2, cooked);
 }
 
 void RegisterViewItem::paintCell(QPainter* p, const QColorGroup& cg,
@@ -194,10 +203,11 @@ void RegisterViewItem::paintCell(QPainter* p, const QColorGroup& cg,
 }
 
 
-RegisterView::RegisterView(QWidget* parent, const char* name) :
+RegisterView::RegisterView(QWidget* parent, DebuggerDriver* driver, const char* name) :
 	QListView(parent, name),
 	m_lastInsert(0),
-	m_mode(16)
+	m_mode(16),
+	m_d(driver)
 {
     setSorting(-1);
 
@@ -248,7 +258,10 @@ RegisterView::~RegisterView()
 
 void RegisterView::updateRegisters( const char* output )
 {
-    if ( strncmp(output,"The program has no registers now.",33) == 0 ){
+    QList<RegisterInfo> regs;
+    m_d->parseRegisters(output, regs);
+
+    if (regs.count() == 0) {
 	clear();
 	return;
     }
@@ -260,41 +273,23 @@ void RegisterView::updateRegisters( const char* output )
 	static_cast<RegisterViewItem*>(i)->m_found = false;
     }
 
-    QString reg;
-    QString value;
-
     // parse register values
-    while (*output != '\0')
+    while (regs.count() > 0)
     {
-	// skip space at the start of the line
-	while (isspace(*output))
-	    output++;
-
-	// register name
-	const char* start = output;
-	while (*output != '\0' && !isspace(*output))
-	    output++;
-	if ( *output == '\0' ) break;
-	reg = FROM_LATIN1(start, output-start);
-
-	// skip space
-	while (isspace(*output))
-	    output++;
-	// the rest of the line is the register value
-	start = output;
-	output = strchr(output,'\n');
-	value = FROM_LATIN1(start, output  ?  output-start  :  strlen(start));
+	RegisterInfo* reg = regs.take(0);
 
 	// check if this is a new register
 	bool found = false;
 	for (QListViewItem* i = firstChild(); i; i = i->nextSibling()) {
 	    RegisterViewItem* it = static_cast<RegisterViewItem*>(i);
-	    if (it->m_reg == reg) {
+	    if (it->m_reg.regName == reg->regName) {
 		found = true;
 		it->m_found = true;
-		if (it->m_value != value) {
+		if (it->m_reg.rawValue != reg->rawValue ||
+		    it->m_reg.cookedValue != reg->cookedValue)
+		{
 		    it->m_changes = true;
-		    it->setValue(value);
+		    it->setValue(reg->rawValue, reg->cookedValue);
 		    repaintItem(it);
 		} else {
 		    /*
@@ -306,16 +301,12 @@ void RegisterView::updateRegisters( const char* output )
 			repaintItem(it);
 		    }
 		}
-		m_lastInsert = it;
 	    }
 	}
 	if (!found)
-	    new RegisterViewItem(this, reg, value);
-
-	if (!output)
-	    break;
-	// skip '\n'
-	output++;
+	    m_lastInsert = new RegisterViewItem(this, reg->regName,
+						reg->rawValue, reg->cookedValue);
+	delete reg;
     }
 
     // remove all 'not found' items;
@@ -374,7 +365,7 @@ void RegisterView::slotModeChange(int code)
 
     for (QListViewItem* i = firstChild(); i; i = i->nextSibling()) {
 	RegisterViewItem* it = static_cast<RegisterViewItem*>(i);
-	it->setValue(it->m_value);
+	it->setValue(it->m_reg.rawValue, it->m_reg.cookedValue);
     }
 }
 

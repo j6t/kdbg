@@ -1632,5 +1632,74 @@ bool GdbDriver::parseFindType(const char* output, QString& type)
     return true;
 }
 
+void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
+{
+    if (strncmp(output, "The program has no registers now", 32) == 0) {
+	return;
+    }
+
+    QString regName;
+    QString value;
+
+    // parse register values
+    while (*output != '\0')
+    {
+	// skip space at the start of the line
+	while (isspace(*output))
+	    output++;
+
+	// register name
+	const char* start = output;
+	while (*output != '\0' && !isspace(*output))
+	    output++;
+	if (*output == '\0')
+	    break;
+	regName = FROM_LATIN1(start, output-start);
+
+	// skip space
+	while (isspace(*output))
+	    output++;
+	// the rest of the line is the register value
+	start = output;
+	output = strchr(output,'\n');
+	if (output == 0)
+	    output = start + strlen(start);
+	value = FROM_LATIN1(start, output-start).simplifyWhiteSpace();
+
+	if (*output != '\0')
+	    output++;			/* skip '\n' */
+
+	RegisterInfo* reg = new RegisterInfo;
+	reg->regName = regName;
+
+	/*
+	 * We split the raw from the cooked values. For this purpose, we
+	 * split off the first token (separated by whitespace). It is the
+	 * raw value. The remainder of the line is the cooked value.
+	 */
+	int pos = value.find(' ');
+	if (pos < 0) {
+	    reg->rawValue = value;
+	    reg->cookedValue = QString();
+	} else {
+	    reg->rawValue = value.left(pos);
+	    reg->cookedValue = value.mid(pos+1,value.length());
+	    /*
+	     * Some modern gdbs explicitly say: "0.1234 (raw 0x3e4567...)".
+	     * Here the raw value is actually in the second part.
+	     */
+	    if (reg->cookedValue.left(5) == "(raw ") {
+		QString raw = reg->cookedValue.right(reg->cookedValue.length()-5);
+		if (raw[raw.length()-1] == ')')	/* remove closing bracket */
+		    raw = raw.left(raw.length()-1);
+		reg->cookedValue = reg->rawValue;
+		reg->rawValue = raw;
+	    }
+	}
+
+	regs.append(reg);
+    }
+}
+
 
 #include "gdbdriver.moc"

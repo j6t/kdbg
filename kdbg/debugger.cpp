@@ -59,7 +59,7 @@ KDebugger::KDebugger(QWidget* parent,
 	m_animationTimer(this),
 	m_animationInterval(0)
 {
-    m_regView = new RegisterView(0);
+    m_regView = new RegisterView(0, driver);
     m_regView->show();
     
     m_envVars.setAutoDelete(true);

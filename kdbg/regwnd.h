@@ -9,32 +9,14 @@
 #include <qlistview.h>
 
 class QPopupMenu;
-class RegisterView;
-
-class RegisterViewItem : public QListViewItem
-{
-public:
-    RegisterViewItem( RegisterView* parent, QString reg, QString value);
-    ~RegisterViewItem();
-
-    void setValue(QString value);
-
-    QString m_reg;
-    QString m_value;
-    bool m_changes;
-    bool m_found;
-
-protected:
-    virtual void paintCell(QPainter*, const QColorGroup& cg,
-			   int column, int width, int alignment);
-
-};
+class RegisterViewItem;
+class DebuggerDriver;
 
 class RegisterView : public QListView
 {
     Q_OBJECT
 public:
-    RegisterView(QWidget* parent, const char *name = 0L);
+    RegisterView(QWidget* parent, DebuggerDriver* driver, const char *name = 0L);
     ~RegisterView();
 
     /** Parses the output from the info all-registers command */
@@ -51,6 +33,7 @@ private:
     QPopupMenu* m_menu;
     QPopupMenu* m_modemenu;
     int m_mode;
+    DebuggerDriver* m_d;
 
 friend class RegisterViewItem;
 };

@@ -125,6 +125,16 @@ struct StackFrame
 };
 
 /**
+ * Register information
+ */
+struct RegisterInfo
+{
+    QString regName;
+    QString rawValue;
+    QString cookedValue;		/* may be empty */
+};
+
+/**
  * This is an abstract base class for debugger process.
  *
  * This class represents the debugger program. It provides the low-level
@@ -315,6 +325,11 @@ public:
      * @return true if a type was found.
      */
     virtual bool parseFindType(const char* output, QString& type) = 0;
+
+    /**
+     * Parses the output of the DCinforegisters command.
+     */
+    virtual void parseRegisters(const char* output, QList<RegisterInfo>& regs) = 0;
 
 protected:
     /** Removes all commands from the low-priority queue. */
