@@ -13,6 +13,7 @@
 #include <qlabel.h>
 #include <qradiobutton.h>
 #include <qbuttongroup.h>
+#include "config.h"
 #include "mydebug.h"
 
 
