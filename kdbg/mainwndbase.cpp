@@ -371,8 +371,15 @@ DebuggerDriver* DebuggerMainWndBase::driverFromLang(QCString lang)
     return driver;
 }
 
+/**
+ * Try to guess the language to use from the contents of the file.
+ */
 QCString DebuggerMainWndBase::driverNameFromFile(const QString& exe)
 {
+    /* Inprecise but simple test to see if file is in XSLT language */
+    if (exe.right(4).lower() == ".xsl")
+	return "XSLT";
+
     return "GDB";
 }
 

@@ -57,7 +57,7 @@ int main(int argc, char** argv)
     static KCmdLineOptions options[] = {
 	{ "t <file>", I18N_NOOP("transcript of conversation with the debugger"), 0 },
 	{ "r <device>", I18N_NOOP("remote debugging via <device>"), 0 },
-	{ "l <language>", I18N_NOOP("specify language: C, XSLT"), "C"},
+	{ "l <language>", I18N_NOOP("specify language: C, XSLT"), ""},
 	{ "x", I18N_NOOP("use language XSLT (deprecated)"), 0 },
 	{ "+[program]", I18N_NOOP("path of executable to debug"), 0 },
 	{ "+[core]", I18N_NOOP("a core file to use"), 0},
