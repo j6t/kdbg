@@ -1447,7 +1447,7 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
     QString partValue;
     if (errorValue)
     {
-	partValue = "???";
+	partValue = "?""?""?";	// 2 question marks in a row would be a trigraph
     } else {
 	partValue = partExpr->m_value;
     }
@@ -1463,7 +1463,8 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
      * 
      * If the expression we just evaluated was a guard expression, and it
      * resulted in an error, we must not evaluate the real expression, but
-     * go on to the next index. (We must still add the ??? to the value).
+     * go on to the next index. (We must still add the question marks to
+     * the value).
      * 
      * Next, if this was the length expression, we still have not seen the
      * real expression, but the length of a QString.
@@ -1472,7 +1473,7 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
 
     if (errorValue || !var->m_exprIndexUseGuard)
     {
-	// add current partValue (which might be ???)
+	// add current partValue (which might be the question marks)
 #if QT_VERSION < 200
 	var->m_partialValue.detach();
 #endif
@@ -1858,7 +1859,7 @@ void KDebugger::slotValuePopup(const QString& expr)
 	    tip += "[...]";
 	    break;
 	default:
-	    tip += "???";
+	    tip += "?""?""?";	// 2 question marks in a row would be a trigraph
 	    break;
 	}
     }
