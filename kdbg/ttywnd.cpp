@@ -7,6 +7,7 @@
 #include "ttywnd.h"
 #if QT_VERSION >= 200
 #include <kglobal.h>
+#include <klocale.h>
 #else
 #include <kapp.h>
 #endif
