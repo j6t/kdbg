@@ -17,7 +17,6 @@
 #else // QT_VERSION < 200
 #include <kmsgbox.h>
 #endif
-#include <kstdaccel.h>
 #include <kmenubar.h>
 #include "dbgmainwnd.h"
 #include "typetable.h"
@@ -76,8 +75,6 @@ int main(int argc, char** argv)
 
     KGlobal::dirs()->addResourceType("types", "share/apps/kdbg/types");
 #endif
-
-    keys = new KStdAccel();
 
     DebuggerMainWnd debugger("kdbg_main");
 

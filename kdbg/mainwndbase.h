@@ -16,13 +16,9 @@
 class KDebugger;
 class TTYWindow;
 class UpdateUI;
-class KStdAccel;
 class KToolBar;
 class KStatusBar;
 class KProcess;
-
-extern KStdAccel* keys;
-
 
 class WatchWindow : public QWidget
 {

@@ -44,9 +44,6 @@
 
 #define MAX_RECENT_FILES 4
 
-
-KStdAccel* keys = 0;
-
 WatchWindow::WatchWindow(QWidget* parent, const char* name, WFlags f) :
 	QWidget(parent, name, f),
 	m_watchEdit(this, "watch_edit"),

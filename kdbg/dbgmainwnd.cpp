@@ -199,7 +199,7 @@ void DebuggerMainWnd::initMenu()
 {
     m_menuFile = new QPopupMenu;
     m_menuFile->insertItem(i18n("&Open Source..."), this, SLOT(slotFileOpen()),
-			   keys->open(), ID_FILE_OPEN);
+			   KStdAccel::open(), ID_FILE_OPEN);
     m_menuFile->insertItem(i18n("&Reload Source"), m_filesWindow, SLOT(slotFileReload()),
 			   0, ID_FILE_RELOAD);
     m_menuFile->insertSeparator();
@@ -215,12 +215,12 @@ void DebuggerMainWnd::initMenu()
 			   0, ID_FILE_GLOBAL_OPTIONS);
     m_menuFile->insertSeparator();
     m_menuFile->insertItem(i18n("&Quit"), this, SLOT(slotFileQuit()),
-			   keys->quit(), ID_FILE_QUIT);
+			   KStdAccel::quit(), ID_FILE_QUIT);
 
     m_menuView = new QPopupMenu;
     m_menuView->setCheckable(true);
     m_menuView->insertItem(i18n("&Find..."), m_filesWindow, SLOT(slotViewFind()),
-			   keys->find(), ID_VIEW_FINDDLG);
+			   KStdAccel::find(), ID_VIEW_FINDDLG);
     m_menuView->insertSeparator();
     i18n("Source &code");
     struct { QString text; QWidget* w; int id; } dw[] = {
@@ -304,7 +304,7 @@ void DebuggerMainWnd::initFileWndMenus()
     // popup menu for file windows
     m_popupFiles = new QPopupMenu(this);
     m_popupFiles->insertItem(i18n("&Open Source..."), this, SLOT(slotFileOpen()),
-			     keys->open(), ID_FILE_OPEN);
+			     KStdAccel::open(), ID_FILE_OPEN);
     m_popupFiles->insertSeparator();
     m_popupFiles->insertItem(i18n("Step &into"), m_debugger, SLOT(programStep()),
 			     Key_F8, ID_PROGRAM_STEP);
@@ -321,7 +321,7 @@ void DebuggerMainWnd::initFileWndMenus()
     // popup menu for when no files are loaded
     m_popupFilesEmpty = new QPopupMenu(this);
     m_popupFilesEmpty->insertItem(i18n("&Open Source..."), this, SLOT(slotFileOpen()),
-				  keys->open(), ID_FILE_OPEN);
+				  KStdAccel::open(), ID_FILE_OPEN);
     m_popupFilesEmpty->insertSeparator();
     m_popupFilesEmpty->insertItem(i18n("&Executable..."), this, SLOT(slotFileExe()),
 				  0, ID_FILE_EXECUTABLE);
