@@ -687,7 +687,15 @@ VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, boo
 
     // check if this is an error indicating that gdb does not know about QString::null
     if (cmds[DCprintQStringStruct].fmt == printQStringStructFmt &&
-	strncmp(p, "Internal error: could not find static variable null", 51) == 0)
+	(strncmp(p, "Internal error: could not find static variable null", 51) == 0 ||
+	 /*
+	  * At least gdb 5.2.1 reports the following error when it accesses
+	  * QString::null. Checking for it can result in false positives
+	  * (where the error is actually triggered by a real NULL pointer
+	  * in a badly initialized QString variable) but the consequences
+	  * are mild.
+	  */
+	 strncmp(p, "Cannot access memory at address 0x0", 35) == 0))
     {
 	/* QString::null doesn't work, use an alternate expression */
 	cmds[DCprintQStringStruct].fmt = printQStringStructNoNullFmt;

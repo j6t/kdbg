@@ -11,6 +11,8 @@ Version 1.2.7
 	Support vector registers (thanks to Daniel Thor Kristjansson for
 	initial code).
 
+	Work around bug in some gdbs which inhibits printing of QString values.
+
 Version 1.2.6
 
 	Opening the Find dialog no longer toggles a breakpoint.
