@@ -25,7 +25,7 @@ fi
 
 dnl insert here your program name and version number
 KDE_USE_QT($with_kde_version)
-KDE_DO_IT_ALL(kdbg, 1.1.0-pre1)
+KDE_DO_IT_ALL(kdbg, 1.1.0)
 
 dnl in this space add everything you want to check for
 dnl examples are specific headers, libraries, etc.
