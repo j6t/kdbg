@@ -1,6 +1,6 @@
 
 # add here all files
-data_DATA = index.html types.html
+data_DATA = index.html types.html pgmsettings.html
 
 # this is the directory, where all datas are installed
 # you have given the datas in data_DATA

@@ -2,7 +2,7 @@
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="GENERATOR" content="Mozilla/4.51 [en] (X11; I; Linux 2.2.5 i586) [Netscape]">
+   <meta name="GENERATOR" content="Mozilla/4.7 [en] (X11; I; Linux 2.2.13 i586) [Netscape]">
    <title>KDbg - User's Manual</title>
 </head>
 <body>
@@ -33,6 +33,9 @@ environment variables</a></li>
 
 <li>
 <a href="#GlobalOptions">Global options</a></li>
+
+<li>
+<a href="pgmsettings.html">Program specific settings</a></li>
 </ul>
 
 <li>
@@ -86,6 +89,8 @@ caused the core dump.
 or set <b>environment variables</b>, choose <i>Execution|Arguments</i>.
 <a href="#Environment">See
 below</a> for more details.
+<p>You can also choose program specific settings that apply only to a certain
+executable using <i>File|Settings</i>. <a href="pgmsettings.html">More...</a>
 <p>In the menu <i>Execution</i> you find the commands that you need to
 <b>run</b>
 the program, <b>step</b> through code, and to <b>interrupt</b> the program
@@ -100,13 +105,16 @@ a list of active breakpoints. You can also set a breakpoint by clicking
 at the left end of the source line (using the left mouse button), and you
 can enable and disable a breakpoint by clicking it using the middle mouse
 button.
+<p>In the menu <i>View</i> you find commands to show and hide various windows.
+These are docking windows, which means that you can drag them around and
+arrange them in any manner you like.
 <h3>
 <a NAME="BrkptList"></a>The breakpoint list</h3>
-The breakpoint list can be displayed using <i>Breakpoint|List</i>. For
+The breakpoint list can be displayed using <i>View|Breakpoints</i>. For
 each breakpoint the following is shown: the breakpoint location, the hit
 count, the ignore count if set, the condition if set. The icon in front
-of the entry indicates whether the breakpoint is enabled (a full red dot)
-or disabled (a hollow circle), whether the breakpoint is temporary (a tiny
+of the entry indicates whether the breakpoint is enabled (a red dot) or
+disabled (a bright red dot), whether the breakpoint is temporary (a tiny
 clock is overlaid) or whether the breakpoint is conditional (a tiny question
 mark is overlaid).
 <p>You can set a <b>condition</b> on a breakpoint (so that the program
@@ -152,10 +160,10 @@ the command that opens a terminal for the program's output.</li>
 </ul>
 If you want to use a different version of gdb, you can specify it under
 <i>How
-to invoke GDB</i>. The default command is <tt>gdb -fullname -nx</tt>. Be
-sure to also specify these options if you change the gdb executable. If
-you leave them away, KDbg will not work. If you messed up the entry, you
-can clear it to revert to the default setting.
+to invoke GDB</i>. The default command is <tt>gdb --fullname --nx</tt>.
+Be sure to also specify these options if you change the gdb executable.
+If you leave them away, KDbg will not work. If you messed up the entry,
+you can clear it to revert to the default setting.
 <p>If you want to use a different terminal program to show the output of
 the program, specify it under <i>Terminal for program output</i>. The default
 setting is <tt>xterm -name kdbgio -title %T -e sh -c %C</tt>. In this entry,
