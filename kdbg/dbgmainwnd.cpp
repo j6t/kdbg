@@ -22,7 +22,8 @@
 
 
 DebuggerMainWnd::DebuggerMainWnd(const char* name) :
-	DebuggerMainWndBase(name),
+	KTMainWindow(name),
+	DebuggerMainWndBase(),
 #if QT_VERSION < 200
 	m_mainPanner(this, "main_pane", KNewPanner::Vertical, KNewPanner::Percent, 60),
 	m_leftPanner(&m_mainPanner, "left_pane", KNewPanner::Horizontal, KNewPanner::Percent, 70),
@@ -85,7 +86,7 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 
     restoreSettings(kapp->getConfig());
 
-    emit updateUI();
+    updateUI();
     slotFileChanged();
 }
 
@@ -375,8 +376,10 @@ void DebuggerMainWnd::menuCallback(int item)
 	break;
     default:
 	// forward all others
-	DebuggerMainWndBase::menuCallback(item);
+	if (!handleCommand(item))
+	    emit forwardMenuCallback(item);
     }
+    updateUI();
 }
 
 void DebuggerMainWnd::updateUI()
@@ -413,7 +416,14 @@ void DebuggerMainWnd::updateUI()
 	updateMenu.iterateMenu();
     }
 
-    DebuggerMainWndBase::updateUI();
+    // toolbar
+    static const int toolIds[] = {
+	ID_PROGRAM_RUN, ID_PROGRAM_STEP, ID_PROGRAM_NEXT, ID_PROGRAM_FINISH,
+	ID_BRKPT_SET
+    };
+    UpdateToolbarUI updateToolbar(toolBar(), this, SLOT(updateUIItem(UpdateUI*)),
+				  toolIds, sizeof(toolIds)/sizeof(toolIds[0]));
+    updateToolbar.iterateToolbar();
 }
 
 void DebuggerMainWnd::updateUIItem(UpdateUI* item)
@@ -434,6 +444,11 @@ void DebuggerMainWnd::updateUIItem(UpdateUI* item)
 	break;
     }
     // line number is updated in slotLineChanged
+
+    // update statusbar
+    statusBar()->changeItem(m_debugger->isProgramActive() ?
+			    static_cast<const char*>(m_statusActive) : "",
+			    ID_STATUS_ACTIVE);
 }
 
 void DebuggerMainWnd::updateLineItems()
@@ -498,6 +513,41 @@ void DebuggerMainWnd::updateLineStatus(int lineNo)
 	strLine.sprintf(i18n("Line %d"), lineNo + 1);
 	statusBar()->changeItem(strLine, ID_STATUS_LINENO);
     }
+}
+
+KToolBar* DebuggerMainWnd::dbgToolBar()
+{
+    return toolBar();
+}
+
+KStatusBar* DebuggerMainWnd::dbgStatusBar()
+{
+    return statusBar();
+}
+
+QWidget* DebuggerMainWnd::dbgMainWnd()
+{
+    return this;
+}
+
+void DebuggerMainWnd::slotNewStatusMsg()
+{
+    DebuggerMainWndBase::slotNewStatusMsg();
+}
+
+void DebuggerMainWnd::slotAnimationTimeout()
+{
+    DebuggerMainWndBase::slotAnimationTimeout();
+}
+
+void DebuggerMainWnd::slotGlobalOptions()
+{
+    DebuggerMainWndBase::slotGlobalOptions();
+}
+
+void DebuggerMainWnd::slotDebuggerStarting()
+{
+    DebuggerMainWndBase::slotDebuggerStarting();
 }
 
 #include "dbgmainwnd.moc"

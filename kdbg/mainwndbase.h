@@ -9,13 +9,15 @@
 #include <qlineedit.h>
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <ktmainwindow.h>
 #include "exprwnd.h"
+#include "sys/types.h"			/* pid_t */
 
 // forward declarations
 class KDebugger;
 class UpdateUI;
 class KStdAccel;
+class KToolBar;
+class KStatusBar;
 
 extern KStdAccel* keys;
 
@@ -46,12 +48,11 @@ protected slots:
 };
 
 
-class DebuggerMainWndBase : public KTMainWindow
+class DebuggerMainWndBase
 {
-    Q_OBJECT
 public:
-    DebuggerMainWndBase(const char* name);
-    ~DebuggerMainWndBase();
+    DebuggerMainWndBase();
+    virtual ~DebuggerMainWndBase();
 
     /**
      * Sets the command to invoke the terminal that displays the program
@@ -67,11 +68,21 @@ public:
     bool debugProgram(const QString& executable);
     void setCoreFile(const QString& corefile);
     void setRemoteDevice(const QString &remoteDevice);
+    /** returns true if the command was handled */
+    bool handleCommand(int item);
 
 protected:
     // settings
     virtual void saveSettings(KConfig*);
     virtual void restoreSettings(KConfig*);
+
+    // override must return the toolbar containing the animation and
+    // buttons to update
+    virtual KToolBar* dbgToolBar() = 0;
+    // override must return the statusbar
+    virtual KStatusBar* dbgStatusBar() = 0;
+    // override must return the main window (usually this)
+    virtual QWidget* dbgMainWnd() = 0;
 
     // statusbar texts
     QString m_statusActive;
@@ -95,14 +106,15 @@ protected:
 		       ExprWnd* watchVars,
 		       QListBox* backtrace);
 
-signals:
-    void forwardMenuCallback(int item);
-
-public slots:
-    virtual void menuCallback(int item);
-    virtual void updateUIItem(UpdateUI* item);
-    virtual void updateUI();
-    virtual void updateLineItems();
+public:
+    /*
+     * Important! The following functions must be overridden in derived
+     * classes and be declared as slots! Note: These must not be declared
+     * virtual here since Qt signal mechanism fails miserably (because this
+     * class will not be the left-most base class!).
+     */
+    void updateUIItem(UpdateUI* item);
+    void updateLineItems();
     void slotNewStatusMsg();
     void slotAnimationTimeout();
     void slotGlobalOptions();

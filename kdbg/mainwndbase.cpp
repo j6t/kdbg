@@ -10,7 +10,8 @@
 #include <kconfig.h>
 #endif
 #include <kiconloader.h>
-#include <kstdaccel.h>
+#include <kstatusbar.h>
+#include <ktoolbar.h>
 #include <qpainter.h>
 #include <qtabdialog.h>
 #include "mainwndbase.h"
@@ -93,8 +94,7 @@ const char defaultDebuggerCmdStr[] =
 	" --nx";	/* do not execute initialization files */
 
 
-DebuggerMainWndBase::DebuggerMainWndBase(const char* name) :
-	KTMainWindow(name),
+DebuggerMainWndBase::DebuggerMainWndBase() :
 	m_animationCounter(0),
 	m_outputTermCmdStr(defaultTermCmdStr),
 	m_outputTermPID(0),
@@ -118,20 +118,26 @@ void DebuggerMainWndBase::setupDebugger(ExprWnd* localVars,
 					ExprWnd* watchVars,
 					QListBox* backtrace)
 {
+    QWidget* parent = dbgMainWnd();
+
     GdbDriver* driver = new GdbDriver;
 #ifdef GDB_TRANSCRIPT
     driver->setLogFileName(GDB_TRANSCRIPT);
 #endif
-    m_debugger = new KDebugger(this, localVars, watchVars, backtrace, driver);
+    m_debugger = new KDebugger(parent, localVars, watchVars, backtrace, driver);
 
-    connect(m_debugger, SIGNAL(updateStatusMessage()), SLOT(slotNewStatusMsg()));
-    connect(m_debugger, SIGNAL(updateUI()), SLOT(updateUI()));
+    QObject::connect(m_debugger, SIGNAL(updateStatusMessage()),
+		     parent, SLOT(slotNewStatusMsg()));
+    QObject::connect(m_debugger, SIGNAL(updateUI()),
+		     parent, SLOT(updateUI()));
 
-    connect(m_debugger, SIGNAL(lineItemsChanged()),
-	    SLOT(updateLineItems()));
+    QObject::connect(m_debugger, SIGNAL(lineItemsChanged()),
+		     parent, SLOT(updateLineItems()));
     
-    connect(m_debugger, SIGNAL(animationTimeout()), SLOT(slotAnimationTimeout()));
-    connect(m_debugger, SIGNAL(debuggerStarting()), SLOT(slotDebuggerStarting()));
+    QObject::connect(m_debugger, SIGNAL(animationTimeout()),
+		     parent, SLOT(slotAnimationTimeout()));
+    QObject::connect(m_debugger, SIGNAL(debuggerStarting()),
+		     parent, SLOT(slotDebuggerStarting()));
 
     ValArray<QString> cmd;
     splitCmdStr(m_debuggerCmdStr, cmd);
@@ -196,77 +202,58 @@ bool DebuggerMainWndBase::debugProgram(const QString& executable)
     return m_debugger->debugProgram(executable);
 }
 
-void DebuggerMainWndBase::menuCallback(int item)
+bool DebuggerMainWndBase::handleCommand(int item)
 {
+    /* first commands that don't require the debugger */
     switch (item) {
-    case ID_FILE_EXECUTABLE:
-	if (m_debugger != 0)
-	    m_debugger->fileExecutable();
-	break;
-    case ID_FILE_COREFILE:
-	if (m_debugger != 0)
-	    m_debugger->fileCoreFile();
-	break;
     case ID_FILE_GLOBAL_OPTIONS:
 	slotGlobalOptions();
-	break;
-    case ID_PROGRAM_RUN:
-	if (m_debugger != 0)
-	    m_debugger->programRun();
-	break;
-    case ID_PROGRAM_ATTACH:
-	if (m_debugger != 0)
-	    m_debugger->programAttach();
-	break;
-    case ID_PROGRAM_RUN_AGAIN:
-	if (m_debugger != 0)
-	    m_debugger->programRunAgain();
-	break;
-    case ID_PROGRAM_STEP:
-	if (m_debugger != 0)
-	    m_debugger->programStep();
-	break;
-    case ID_PROGRAM_NEXT:
-	if (m_debugger != 0)
-	    m_debugger->programNext();
-	break;
-    case ID_PROGRAM_FINISH:
-	if (m_debugger != 0)
-	    m_debugger->programFinish();
-	break;
-    case ID_PROGRAM_KILL:
-	if (m_debugger != 0)
-	    m_debugger->programKill();
-	break;
-    case ID_PROGRAM_BREAK:
-	if (m_debugger != 0)
-	    m_debugger->programBreak();
-	break;
-    case ID_PROGRAM_ARGS:
-	if (m_debugger != 0)
-	    m_debugger->programArgs();
-	break;
-    case ID_BRKPT_LIST:
-	if (m_debugger != 0)
-	    m_debugger->breakListToggleVisible();
-	break;
-    default:
-	// forward all others
-	emit forwardMenuCallback(item);
+	return true;
     }
-    emit updateUI();
-}
 
-void DebuggerMainWndBase::updateUI()
-{
-    // toolbar
-    static const int toolIds[] = {
-	ID_PROGRAM_RUN, ID_PROGRAM_STEP, ID_PROGRAM_NEXT, ID_PROGRAM_FINISH,
-	ID_BRKPT_SET
-    };
-    UpdateToolbarUI updateToolbar(toolBar(), this, SLOT(updateUIItem(UpdateUI*)),
-				  toolIds, sizeof(toolIds)/sizeof(toolIds[0]));
-    updateToolbar.iterateToolbar();
+    // now commands that do
+    if (m_debugger == 0)
+	return false;
+
+    switch (item) {
+    case ID_FILE_EXECUTABLE:
+	m_debugger->fileExecutable();
+	return true;
+    case ID_FILE_COREFILE:
+	m_debugger->fileCoreFile();
+	return true;
+    case ID_PROGRAM_RUN:
+	m_debugger->programRun();
+	return true;
+    case ID_PROGRAM_ATTACH:
+	m_debugger->programAttach();
+	return true;
+    case ID_PROGRAM_RUN_AGAIN:
+	m_debugger->programRunAgain();
+	return true;
+    case ID_PROGRAM_STEP:
+	m_debugger->programStep();
+	return true;
+    case ID_PROGRAM_NEXT:
+	m_debugger->programNext();
+	return true;
+    case ID_PROGRAM_FINISH:
+	m_debugger->programFinish();
+	return true;
+    case ID_PROGRAM_KILL:
+	m_debugger->programKill();
+	return true;
+    case ID_PROGRAM_BREAK:
+	m_debugger->programBreak();
+	return true;
+    case ID_PROGRAM_ARGS:
+	m_debugger->programArgs();
+	return true;
+    case ID_BRKPT_LIST:
+	m_debugger->breakListToggleVisible();
+	return true;
+    }
+    return false;
 }
 
 void DebuggerMainWndBase::updateUIItem(UpdateUI* item)
@@ -304,7 +291,7 @@ void DebuggerMainWndBase::updateUIItem(UpdateUI* item)
     }
     
     // update statusbar
-    statusBar()->changeItem(m_debugger->isProgramActive() ?
+    dbgStatusBar()->changeItem(m_debugger->isProgramActive() ?
 			    static_cast<const char*>(m_statusActive) : "",
 			    ID_STATUS_ACTIVE);
 }
@@ -324,7 +311,7 @@ void DebuggerMainWndBase::initAnimation()
     QPixmap pixmap = BarIcon("kde1", &instance);
 #endif
 
-    KToolBar* toolbar = toolBar();
+    KToolBar* toolbar = dbgToolBar();
     toolbar->insertButton(pixmap, ID_STATUS_BUSY);
     toolbar->alignItemRight(ID_STATUS_BUSY, true);
     
@@ -361,19 +348,19 @@ void DebuggerMainWndBase::slotAnimationTimeout()
     m_animationCounter++;
     if (m_animationCounter == m_animation.count())
 	m_animationCounter = 0;
-    toolBar()->setButtonPixmap(ID_STATUS_BUSY,
+    dbgToolBar()->setButtonPixmap(ID_STATUS_BUSY,
 			       *m_animation.at(m_animationCounter));
 }
 
 void DebuggerMainWndBase::slotNewStatusMsg()
 {
     QString msg = m_debugger->statusMessage();
-    statusBar()->changeItem(msg, ID_STATUS_MSG);
+    dbgStatusBar()->changeItem(msg, ID_STATUS_MSG);
 }
 
 void DebuggerMainWndBase::slotGlobalOptions()
 {
-    QTabDialog dlg(this, "global_options", true);
+    QTabDialog dlg(dbgMainWnd(), "global_options", true);
     QString title = kapp->getCaption();
     title += i18n(": Global options");
     dlg.setCaption(title);

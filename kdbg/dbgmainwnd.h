@@ -12,11 +12,12 @@
 #else
 #include <qsplitter.h>
 #endif
+#include <ktmainwindow.h>
 #include "mainwndbase.h"
 #include "winstack.h"
 
 
-class DebuggerMainWnd : public DebuggerMainWndBase
+class DebuggerMainWnd : public KTMainWindow, public DebuggerMainWndBase
 {
     Q_OBJECT
 public:
@@ -61,16 +62,26 @@ protected:
 
 protected:
     virtual void closeEvent(QCloseEvent* e);
+    virtual KToolBar* dbgToolBar();
+    virtual KStatusBar* dbgStatusBar();
+    virtual QWidget* dbgMainWnd();
+
+signals:
+    void forwardMenuCallback(int item);
 
 public slots:
     virtual void menuCallback(int item);
-    virtual void updateUIItem(UpdateUI* item);
+    void updateUIItem(UpdateUI* item);
     virtual void updateUI();
     virtual void updateLineItems();
     void slotFileChanged();
     void slotLineChanged();
     void slotAddWatch();
     void slotNewFileLoaded();
+    void slotNewStatusMsg();
+    void slotAnimationTimeout();
+    void slotGlobalOptions();
+    void slotDebuggerStarting();
 };
 
 #endif // DBGMAINWND_H
