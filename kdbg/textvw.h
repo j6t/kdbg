@@ -24,6 +24,9 @@ protected:
     virtual void activateLine(int row);
     virtual int textCol() const;
 
+signals:
+    void lineChanged();
+
     // event handling
 protected:
     virtual void keyPressEvent(QKeyEvent* ev);

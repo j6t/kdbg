@@ -214,6 +214,7 @@ void KTextView::activateLine(int row)
     if (row >= 0) {
 	updateCell(row, col);
     }
+    emit lineChanged();
 }
 
 /* This is needed to make the kcontrol's color setup working */
