@@ -78,7 +78,7 @@ void FileWindow::reloadFile()
 
     QTextStream t(&f);
     QString s;
-    uint lineNo = 0;
+    int lineNo = 0;
     while (lineNo < m_texts.size() && !t.eof()) {
 	s = t.readLine();
 	replaceLine(lineNo, s);
@@ -93,18 +93,20 @@ void FileWindow::reloadFile()
 	}
 	// allocate line items
 	m_lineItems.resize(m_texts.size());
-	for (uint i = m_texts.size()-1; i >= lineNo; i--) {
+	for (int i = m_texts.size()-1; i >= lineNo; i--) {
 	    m_lineItems[i] = 0;
 	}
     } else {
 	// the new file has fewer lines
 	// here lineNo is the number of lines of the new file
 	// remove the excessive lines
-	for (uint i = m_texts.size()-1; i >= lineNo; i--) {
-	    delete[] m_texts[i];
-	}
-	m_texts.resize(lineNo);
+	m_texts.setSize(lineNo);
 	m_lineItems.resize(lineNo);
+	// if the cursor is in the deleted lines, move it to the last line
+	if (m_curRow >= lineNo) {
+	    m_curRow = -1;		/* at this point don't have an active row */
+	    activateLine(lineNo-1);	/* now we have */
+	}
     }
     f.close();
 
@@ -288,7 +290,11 @@ void FileWindow::find(const char* text, bool caseSensitive, FindDirection dir)
     if (line < 0)
 	line = 0;
     int curLine = line;			/* remember where we started */
+#if QT_VERSION < 200
     QString str;
+#else
+    QCString str;
+#endif
     bool found = false;
     do {
 	// advance and wrap around
@@ -433,7 +439,7 @@ void WinStack::menuCallback(int item)
 
 void WinStack::openFile()
 {
-    QString fileName = KFileDialog::getOpenFileName(m_lastOpenDir, 0, this);
+    QString fileName = KFileDialog::getOpenFileName(m_lastOpenDir, QString(), this);
     TRACE("openFile: " + fileName);
     if (fileName.isEmpty()) {
 	return;
@@ -650,8 +656,8 @@ static bool fileNamesMatch(const QString& f1, const QString& f2)
 
 void WinStack::setPC(bool set, const QString& fileName, int lineNo, int frameNo)
 {
-    TRACE(QString(fileName.length()+60).sprintf("%s PC: %s:%d#%d", set ? "set" : "clear",
-						fileName.data(), lineNo, frameNo));
+    TRACE((set ? "set PC: " : "clear PC: ") + fileName +
+	  QString().sprintf(":%d#%d", lineNo, frameNo));
     // find file
     FileWindow* fw = 0;
     for (fw = m_fileList.first(); fw != 0; fw = m_fileList.next()) {

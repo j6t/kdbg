@@ -202,7 +202,11 @@ void BreakpointTable::parseBreakList(const char* output)
 
 void BreakpointTable::insertBreakpoint(int num, const QString& fileName, int lineNo)
 {
+#if QT_VERSION < 200
     QString str(fileName.length()+20);
+#else
+    QString str;
+#endif
     str.sprintf("%s:%d", fileName.data(), lineNo);
     insertBreakpoint(num, 'k', 'y',	/* keep, enabled */
 		     str, fileName, lineNo);
@@ -318,7 +322,7 @@ void BreakpointTable::removeBP()
 	return;
     
     Breakpoint* bp = m_brkpts[sel];
-    QString cmdString(30);
+    QString cmdString;
     cmdString.sprintf("delete %d", bp->id);
     m_debugger.executeCmd(KDebugger::DCdelete, cmdString);
 }
@@ -400,12 +404,18 @@ void BreakpointTable::doBreakpoint(QString file, int lineNo, bool temporary)
     {
 	// no such breakpoint, so set a new one
 	// strip off directory part of file name
+#if QT_VERSION < 200
 	file.detach();
+#endif
 	int offset = file.findRev("/");
 	if (offset >= 0) {
 	    file.remove(0, offset+1);
 	}
+#if QT_VERSION < 200
 	QString cmdString(file.length() + 30);
+#else
+	QString cmdString;
+#endif
 	cmdString.sprintf("%sbreak %s:%d", temporary ? "t" : "",
 			  file.data(), lineNo+1);
 	m_debugger.executeCmd(KDebugger::DCbreak, cmdString);
@@ -416,7 +426,7 @@ void BreakpointTable::doBreakpoint(QString file, int lineNo, bool temporary)
 	 * If the breakpoint is disabled, enable it; if it's enabled,
 	 * delete that breakpoint.
 	 */
-	QString cmdString(30);
+	QString cmdString;
 	if (bp->enabled) {
 	    cmdString.sprintf("delete %d", bp->id);
 	    m_debugger.executeCmd(KDebugger::DCdelete, cmdString);
@@ -434,7 +444,7 @@ void BreakpointTable::doEnableDisableBreakpoint(const QString& file, int lineNo)
 	return;
 
     // toggle enabled/disabled state
-    QString cmdString(30);
+    QString cmdString;
     if (bp->enabled) {
 	cmdString.sprintf("disable %d", bp->id);
 	m_debugger.executeCmd(KDebugger::DCdisable, cmdString);
@@ -498,7 +508,9 @@ Breakpoint* BreakpointTable::breakpointByFilePos(QString file, int lineNo)
     }
     // not found, so try basename
     // strip off directory part of file name
+#if QT_VERSION < 200
     file.detach();
+#endif
     int offset = file.findRev("/");
     if (offset < 0) {
 	// that was already the basename, no need to scan the list again
@@ -540,7 +552,7 @@ const char Condition[] = "Condition";
 
 void BreakpointTable::saveBreakpoints(KSimpleConfig* config)
 {
-    QString groupName(30);
+    QString groupName;
     int i;
     for (i = 0; uint(i) < m_brkpts.size(); i++) {
 	groupName.sprintf(BPGroup, i);
@@ -571,7 +583,7 @@ void BreakpointTable::saveBreakpoints(KSimpleConfig* config)
 
 void BreakpointTable::restoreBreakpoints(KSimpleConfig* config)
 {
-    QString groupName(30);
+    QString groupName;
     QString fileName;
     int lineNo;
     bool enabled, temporary;
@@ -602,7 +614,11 @@ void BreakpointTable::restoreBreakpoints(KSimpleConfig* config)
 	 * because this isn't a fresh gdb at all), we disable the wrong
 	 * breakpoint! Oh well... for now it works.
 	 */
+#if QT_VERSION < 200
 	QString cmdString(fileName.length() + 30);
+#else
+	QString cmdString;
+#endif
 	cmdString.sprintf("%sbreak %s:%d", temporary ? "t" : "",
 			  fileName.data(), lineNo+1);
 	m_debugger.executeCmd(KDebugger::DCbreak, cmdString);
@@ -653,7 +669,7 @@ BreakpointListBox::BreakpointListBox(QWidget* parent, const char* name) :
     // get this widgets background color
     QBrush bg = lbox.backgroundColor();
 
-    QString code(5);
+    QString code;
     for (int i = 0; i < 8; i++) {
 	{
 	    QPainter p(&canvas);
@@ -700,7 +716,7 @@ void BreakpointListBox::changeItem(int id, Breakpoint* bp)
 
 QString BreakpointListBox::constructListText(Breakpoint* bp)
 {
-    QString result(200);		/* should fit most cases */
+    QString result;			/* should fit most cases */
 
     /* breakpoint icon code; keep order the same as in this class's constructor */
     result = bp->enabled ? "E" : "D";

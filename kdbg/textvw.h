@@ -7,6 +7,7 @@
 #define TEXTVW_H
 
 #include <qtablevw.h>
+#include "valarray.h"
 
 class KTextView : public QTableView
 {
@@ -14,8 +15,8 @@ class KTextView : public QTableView
 public:
     KTextView(QWidget* parent = 0, const char* name = 0, WFlags f = 0);
     ~KTextView();
-    void insertLine(const char*);
-    void replaceLine(int line, const char* text);
+    void insertLine(const QString& text);
+    void replaceLine(int line, const QString& text);
     virtual void setCursorPosition(int row, int col);
     virtual void cursorPosition(int* row, int* col);
 protected:
@@ -24,7 +25,7 @@ protected:
     virtual void paintCell(QPainter* p, int row, int col);
     virtual void activateLine(int row);
     virtual int textCol() const;
-    virtual bool updateCellSize(const char* text, int length);
+    virtual bool updateCellSize(const QString& text);
 
 signals:
     void lineChanged();
@@ -41,7 +42,7 @@ protected:
     int m_width;
     int m_height;
     
-    QArray<char*> m_texts;
+    ValArray<QString> m_texts;
     int m_curRow;			/* cursor position */
 };
 

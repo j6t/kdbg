@@ -61,6 +61,7 @@ noinst_HEADERS = \
 	procattach.h \
 	parsevar.h \
 	textvw.h \
+	valarray.h \
 	debugger.h \
 	exprwnd.h \
 	ktreeview.h \

@@ -4,7 +4,6 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include "debugger.h"
-#include "debugger.moc"
 #include "parsevar.h"
 #include "pgmargs.h"
 #include "procattach.h"
@@ -19,12 +18,8 @@
 #include <ksimpleconfig.h>
 #include <ctype.h>
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#else
-# ifndef VERSION
-# define VERSION ""
-# endif
+#ifndef VERSION				/* #ifndef HAVE_CONFIG_H */
+#define VERSION ""
 #endif
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>			/* mknod(2) */
@@ -199,7 +194,11 @@ bool KDebugger::debugProgram(const QString& name)
     QFileInfo fi(name);
     if (!fi.isFile()) {
 	QString msgFmt = i18n("`%s' is not a file or does not exist");
+#if QT_VERSION < 200
 	QString msg(msgFmt.length() + name.length() + 20);
+#else
+	QString msg;
+#endif
 	msg.sprintf(msgFmt, name.data());
 	KMsgBox::message(parentWidget(), kapp->appName(),
 			 msg,
@@ -374,12 +373,18 @@ bool KDebugger::runUntil(const QString& fileName, int lineNo)
     if (isReady() && m_programActive && !m_programRunning) {
 	// strip off directory part of file name
 	QString file = fileName;
+#if QT_VERSION < 200
 	file.detach();
+#endif
 	int offset = file.findRev("/");
 	if (offset >= 0) {
 	    file.remove(0, offset+1);
 	}
+#if QT_VERSION < 200
 	QString cmdString(file.length() + 30);
+#else
+	QString cmdString;
+#endif
 	cmdString.sprintf("until %s:%d", file.data(), lineNo+1);
 	executeCmd(DCuntil, cmdString, true);
 	m_programRunning = true;
@@ -593,7 +598,11 @@ bool KDebugger::createOutputWindow()
 	if (m_outputTermKeepScript.length() != 0) {
 	    fmt = m_outputTermKeepScript.data();
 	}
+#if QT_VERSION < 200
 	QString shellScript(strlen(fmt) + fifoName.length());
+#else
+	QString shellScript;
+#endif
 	shellScript.sprintf(fmt, fifoName.data());
 	TRACE("output window script is " + shellScript);
 
@@ -746,7 +755,9 @@ KDebugger::CmdQueueItem* KDebugger::queueCmd(KDebugger::DbgCommand cmd,
 					     QString cmdString, QueueMode mode)
 {
     // place a new command into the low-priority queue
+#if QT_VERSION < 200
     cmdString.detach();
+#endif
     cmdString += "\n";
 
     CmdQueueItem* cmdItem = 0;
@@ -978,7 +989,7 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
     }
 }
 
-static QRegExp MarkerRE = ":[0-9]+:[0-9]+:beg";
+static QRegExp MarkerRE(":[0-9]+:[0-9]+:beg");
 
 // parse len characters from m_gdbOutput
 void KDebugger::parse(CmdQueueItem* cmd)
@@ -1009,7 +1020,7 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	// get version number from preamble
 	{
 	    int len;
-	    QRegExp GDBVersion = "\\nGDB [0-9]+\\.[0-9]+";
+	    QRegExp GDBVersion("\\nGDB [0-9]+\\.[0-9]+");
 	    int offset = GDBVersion.match(m_gdbOutput, 0, &len);
 	    if (offset >= 0) {
 		char* start = m_gdbOutput + offset + 5;	// skip "\nGDB "
@@ -1388,7 +1399,11 @@ void KDebugger::parseLocals(QList<VarTree>& newVars)
 	    if (variable->getText() == v->getText()) {
 		// we found a duplicate, change name
 		block++;
+#if QT_VERSION < 200
 		QString newName(origName.length()+20);
+#else
+		QString newName;
+#endif
 		newName.sprintf("%s (%d)", origName.data(), block);
 		variable->setText(newName);
 	    }
@@ -1617,12 +1632,12 @@ void KDebugger::handleBacktrace()
     m_btWindow.clear();
     if (parseFrame(s, frameNo, func, file, lineNo)) {
 	// first frame must set PC
-	TRACE(QString(func.length()+file.length()+100).sprintf("frame %s (%s:%d)",func.data(),file.data(),lineNo));
+	TRACE("frame " + func + " (" + file + QString().sprintf(":%d)",lineNo));
 	m_btWindow.insertItem(func);
 	emit updatePC(file, lineNo-1, frameNo);
 
 	while (parseFrame(s, frameNo, func, file, lineNo)) {
-	    TRACE(QString(func.length()+file.length()+100).sprintf("frame %s (%s:%d)",func.data(),file.data(),lineNo));
+	    TRACE("frame " + func + " (" + file + QString().sprintf(":%d)",lineNo));
 	    m_btWindow.insertItem(func);
 	}
     }
@@ -1833,7 +1848,9 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd)
      * var->m_type->m_displayString to var->m_partialValue.
      */
     ASSERT(var->m_exprIndex >= 0 && var->m_exprIndex <= typeInfoMaxExpr);
+#if QT_VERSION < 200
     var->m_partialValue.detach();
+#endif
     var->m_partialValue += partValue;
     var->m_exprIndex++;			/* next part */
     var->m_partialValue += var->m_type->m_displayString[var->m_exprIndex];
@@ -1855,7 +1872,11 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 {
     QString base = var->computeExpr();
     const QString& exprFmt = var->m_type->m_exprStrings[var->m_exprIndex];
+#if QT_VERSION < 200
     QString expr(exprFmt.length() + base.length() + 10);
+#else
+    QString expr;
+#endif
     expr.sprintf(exprFmt, base.data());
     TRACE("evalStruct: " + expr);
     CmdQueueItem* cmd = queueCmd(DCprintStruct, "print " + expr,
@@ -2019,3 +2040,5 @@ void KDebugger::slotUpdateAnimation()
 	startAnimation(!slow);
     }
 }
+
+#include "debugger.moc"

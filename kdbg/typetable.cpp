@@ -39,7 +39,7 @@ void TypeTable::loadTable()
 
     QString fileName;
     for (QListIterator<char> it(*files); it != 0; ++it) {
-	fileName = dir.filePath(it);
+	fileName = dir.filePath(it.current());
 	loadOneFile(fileName);
     }
 }
@@ -62,7 +62,7 @@ void TypeTable::loadOneFile(const char* fileName)
      * libraries.
      */
     QStrList typeNames;
-    QString typesEntry(sizeof(TypesEntryFmt)+20);
+    QString typesEntry;
     for (int i = 1; ; i++) {
 	// next bunch of types
 	cf.setGroup(TypeTableGroup);
@@ -74,7 +74,7 @@ void TypeTable::loadOneFile(const char* fileName)
 	// now read them
 	QString alias;
 	for (QListIterator<char> it(typeNames); it != 0; ++it) {
-	    cf.setGroup(it);
+	    cf.setGroup(it.current());
 	    // check if this is an alias
 	    alias = cf.readEntry(AliasEntry);
 	    if (alias.isEmpty()) {
@@ -109,7 +109,7 @@ void TypeTable::readType(KConfigBase& cf, const char* type)
     }
 
     // Expr1, Expr2, etc...
-    QString exprEntry(sizeof(ExprEntryFmt)+20);
+    QString exprEntry;
     for (int j = 0; j < info->m_numExprs; j++) {
 	exprEntry.sprintf(ExprEntryFmt, j+1);
 	expr = cf.readEntry(exprEntry);

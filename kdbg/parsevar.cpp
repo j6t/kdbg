@@ -427,11 +427,10 @@ bool parseVarSeq(const char*& s, VarTree* variable)
 bool parseValueSeq(const char*& s, VarTree* variable)
 {
     // parse a comma-separated sequence of variables
-    QString name;
     int index = 0;
     bool good;
     for (;;) {
-	name.detach();			/* get our own copy for this round */
+	QString name;
 	name.sprintf("[%d]", index);
 	index++;
 	VarTree* var = new VarTree(name, VarTree::NKplain);

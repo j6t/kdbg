@@ -13,6 +13,10 @@
 #include "brkpt.h"
 #include "envvar.h"
 
+#ifdef HAVE_CONFIG_H
+#include "config.h"
+#endif
+
 class ExprWnd;
 class VarTree;
 class KTreeViewItem;

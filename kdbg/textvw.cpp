@@ -26,9 +26,6 @@ KTextView::KTextView(QWidget* parent, const char* name, WFlags f) :
 
 KTextView::~KTextView()
 {
-    for (int i = m_texts.size()-1; i >= 0; i--) {
-	delete[] m_texts[i];
-    }
 }
 
 /*
@@ -36,13 +33,13 @@ KTextView::~KTextView()
  * Cell geometry: There are 2 pixels to the left and to the right
  * and 1 pixel _below_ the line
  */
-bool KTextView::updateCellSize(const char* text, int length)
+bool KTextView::updateCellSize(const QString& text)
 {
     QPainter p(this);
     setupPainter(&p);
     QRect r = p.boundingRect(0,0, 0,0,
 			     AlignLeft | SingleLine | DontClip | ExpandTabs,
-			     text, length);
+			     text, text.length());
 
     bool update = false;
     int w = r.width() + 4;
@@ -58,16 +55,12 @@ bool KTextView::updateCellSize(const char* text, int length)
     return update;
 }
 
-void KTextView::insertLine(const char* text)
+void KTextView::insertLine(const QString& text)
 {
-    int n = m_texts.size();
-    m_texts.resize(n+1);
-    int l = strlen(text);
-    m_texts[n] = new char[l+1];
-    strcpy(m_texts[n], text);
-    setNumRows(n+1);
+    m_texts.append(text);
+    setNumRows(m_texts.size());
 
-    bool update = updateCellSize(m_texts[n], l);
+    bool update = updateCellSize(text);
 
     if (update && autoUpdate()) {
 	updateTableSize();
@@ -79,16 +72,14 @@ void KTextView::insertLine(const char* text)
  * TODO: This function doesn't shrink the line length if the longest line
  * is replaced by a shorter one.
  */
-void KTextView::replaceLine(int line, const char* text)
+void KTextView::replaceLine(int line, const QString& text)
 {
     if (line < 0 || line >= int(m_texts.size()))
 	return;
 
-    int l = strlen(text);
-    m_texts[line] = new char[l+1];
-    strcpy(m_texts[line], text);
+    m_texts[line] = text;
 
-    bool update = updateCellSize(m_texts[line], l);
+    bool update = updateCellSize(text);
 
     if (update) {
 	updateTableSize();
@@ -127,16 +118,17 @@ int KTextView::textCol() const
 
 void KTextView::paintCell(QPainter* p, int row, int /*col*/)
 {
-    if (uint(row) >= m_texts.size()) {
+    if (row >= m_texts.size()) {
 	return;
     }
     if (row == m_curRow) {
 	// paint background
 	p->fillRect(0,0, m_width,m_height, QBrush(colorGroup().background()));
     }
+    const QString& text = m_texts[row];
     p->drawText(2,0, m_width-4, m_height,
 		AlignLeft | SingleLine | DontClip | ExpandTabs,
-		m_texts[row]);
+		text, text.length());
 }
 
 void KTextView::keyPressEvent(QKeyEvent* ev)

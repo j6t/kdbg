@@ -37,6 +37,9 @@ class KTreeView;			/* forward declaration */
 
 /** Items for the KTreeView widget */
 class KTreeViewItem
+#if QT_VERSION >= 200
+: public Qt
+#endif
 {
     friend class KTreeView;
 public:

@@ -20,7 +20,6 @@ VarTree::VarTree(const QString& name, NameKind aKind) :
 	KTreeViewItem(name),
 	m_varKind(VKsimple),
 	m_nameKind(aKind),
-	m_value(100),			/* reserve some space */
 	m_valueChanged(false),
 	m_type(0),
 	m_exprIndex(0)
@@ -146,8 +145,8 @@ void VarTree::inferTypesOfChildren()
 
     // if this is a pointer, get the type from the value (less the pointer)
     if (m_varKind == VKpointer) {
-	char* p = m_value.data();
-	char* start = p;
+	const char* p = m_value.data();
+	const char* start = p;
 	// the type of the pointer shows up in the value (sometimes)
 	if (p == 0 || *p != '(')
 	    return;
