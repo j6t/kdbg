@@ -43,6 +43,8 @@
 #include <unistd.h>			/* getpid, unlink etc. */
 #endif
 
+#define MAX_RECENT_FILES 4
+
 
 KStdAccel* keys = 0;
 
@@ -139,6 +141,7 @@ DebuggerMainWndBase::DebuggerMainWndBase() :
 	m_debugger(0)
 {
     m_statusActive = i18n("active");
+    m_recentExecList.setAutoDelete(true);
 }
 
 DebuggerMainWndBase::~DebuggerMainWndBase()
@@ -210,6 +213,8 @@ const char PreferencesGroup[] = "Preferences";
 const char PopForeground[] = "PopForeground";
 const char BackTimeout[] = "BackTimeout";
 const char TabWidth[] = "TabWidth";
+const char FilesGroup[] = "Files";
+const char RecentExecutables[] = "RecentExecutables";
 const char SourceFileFilter[] = "SourceFileFilter";
 const char HeaderFileFilter[] = "HeaderFileFilter";
 
@@ -231,6 +236,9 @@ void DebuggerMainWndBase::saveSettings(KConfig* config)
     config->writeEntry(TabWidth, m_tabWidth);
     config->writeEntry(SourceFileFilter, m_sourceFilter);
     config->writeEntry(HeaderFileFilter, m_headerFilter);
+    
+    config->setGroup(FilesGroup);
+    config->writeEntry(RecentExecutables, m_recentExecList, ',');
 }
 
 void DebuggerMainWndBase::restoreSettings(KConfig* config)
@@ -257,6 +265,9 @@ void DebuggerMainWndBase::restoreSettings(KConfig* config)
     m_tabWidth = config->readNumEntry(TabWidth, 0);
     m_sourceFilter = config->readEntry(SourceFileFilter, m_sourceFilter);
     m_headerFilter = config->readEntry(HeaderFileFilter, m_headerFilter);
+    
+    config->setGroup(FilesGroup);
+    config->readListEntry(RecentExecutables, m_recentExecList,',');
 }
 
 bool DebuggerMainWndBase::debugProgram(const QString& executable)
@@ -304,37 +315,8 @@ bool DebuggerMainWndBase::handleCommand(int item)
 	    if (executable.isEmpty())
 		return true;
 
-	    // check the file name
-	    QFileInfo fi(executable);
-	    m_lastDirectory = fi.dirPath(true);
-
-	    if (!fi.isFile()) {
-		QString msgFmt = i18n("`%s' is not a file or does not exist");
-		SIZED_QString(msg, msgFmt.length() + executable.length() + 20);
-#if QT_VERSION < 200
-		msg.sprintf(msgFmt, executable.data());
-		KMsgBox::message(dbgMainWnd(), kapp->appName(),
-				 msg,
-				 KMsgBox::STOP,
-				 i18n("OK"));
-#else
-		msg.sprintf(msgFmt, executable.latin1());
-		KMessageBox::sorry(dbgMainWnd(), msg);
-#endif
-		return true;
-	    }
-
-	    if (!m_debugger->debugProgram(executable)) {
-		QString msg = i18n("Could not start the debugger process.\n"
-				   "Please shut down KDbg and resolve the problem.");
-#if QT_VERSION < 200
-		KMsgBox::message(dbgMainWnd(), kapp->appName(),
-				 msg,
-				 KMsgBox::STOP,
-				 i18n("OK"));
-#else
-		KMessageBox::sorry(dbgMainWnd(), msg);
-#endif
+	    if (debugProgramInteractive(executable)) {
+		addRecentExec(executable);
 	    }
 	}
 	return true;
@@ -726,6 +708,70 @@ void DebuggerMainWndBase::setDebuggerCmdStr(const QString& cmd)
     if (m_debugger != 0) {
 	m_debugger->setDebuggerCmd(m_debuggerCmdStr);
     }
+}
+
+void DebuggerMainWndBase::addRecentExec(const QString& executable)
+{
+    int pos = m_recentExecList.find(executable);
+    if (pos != 0) {
+	// move to top
+	if (pos > 0)
+	    m_recentExecList.remove(pos);
+	// else entry is new
+
+	// insert on top
+	m_recentExecList.insert(0, executable);
+    } // else pos == 0, which means we dont need to change the list
+
+    // shorten list
+    while (m_recentExecList.count() > MAX_RECENT_FILES) {
+	m_recentExecList.remove(MAX_RECENT_FILES);
+    }
+}
+
+void DebuggerMainWndBase::removeRecentExec(const QString& executable)
+{
+    int pos = m_recentExecList.find(executable);
+    if (pos >= 0) {
+	m_recentExecList.remove(pos);
+    }
+}
+
+bool DebuggerMainWndBase::debugProgramInteractive(const QString& executable)
+{
+    // check the file name
+    QFileInfo fi(executable);
+    m_lastDirectory = fi.dirPath(true);
+
+    if (!fi.isFile()) {
+	QString msgFmt = i18n("`%s' is not a file or does not exist");
+	SIZED_QString(msg, msgFmt.length() + executable.length() + 20);
+#if QT_VERSION < 200
+	msg.sprintf(msgFmt, executable.data());
+	KMsgBox::message(dbgMainWnd(), kapp->appName(),
+			 msg,
+			 KMsgBox::STOP,
+			 i18n("OK"));
+#else
+	msg.sprintf(msgFmt, executable.latin1());
+	KMessageBox::sorry(dbgMainWnd(), msg);
+#endif
+	return false;
+    }
+
+    if (!m_debugger->debugProgram(executable)) {
+	QString msg = i18n("Could not start the debugger process.\n"
+			   "Please shut down KDbg and resolve the problem.");
+#if QT_VERSION < 200
+	KMsgBox::message(dbgMainWnd(), kapp->appName(),
+			 msg,
+			 KMsgBox::STOP,
+			 i18n("OK"));
+#else
+	KMessageBox::sorry(dbgMainWnd(), msg);
+#endif
+    }
+    return true;
 }
 
 

@@ -61,6 +61,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     dw7->setCaption(i18n("Threads"));
     m_threads = new ThreadList(dw7, "threads");
 
+    m_menuRecentExecutables = new QPopupMenu();
+
     initMenu();
     initToolbar();
 
@@ -135,7 +137,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 
     restoreSettings(kapp->getConfig());
 
-//    dockManager->activate();
+    connect(m_menuRecentExecutables, SIGNAL(activated(int)), SLOT(slotRecentExec(int)));
+    fillRecentExecMenu();
 
     updateUI();
     m_bpTable->updateUI();
@@ -165,6 +168,7 @@ void DebuggerMainWnd::initMenu()
     m_menuFile->insertItem(i18n("&Reload Source"), ID_FILE_RELOAD);
     m_menuFile->insertSeparator();
     m_menuFile->insertItem(i18n("&Executable..."), ID_FILE_EXECUTABLE);
+    m_menuFile->insertItem(i18n("Recent E&xecutables"), m_menuRecentExecutables);
     m_menuFile->insertItem(i18n("&Settings..."), ID_FILE_PROG_SETTINGS);
     m_menuFile->insertItem(i18n("&Core dump..."), ID_FILE_COREFILE);
     m_menuFile->insertSeparator();
@@ -415,6 +419,7 @@ void DebuggerMainWnd::menuCallback(int item)
 	else if (item == ID_FILE_EXECUTABLE) {
 	    // special: this may have changed m_lastDirectory
 	    m_filesWindow->setExtraDirectory(m_lastDirectory);
+	    fillRecentExecMenu();
 	} else {
 	    // start timer to move window into background
 	    switch (item) {
@@ -737,6 +742,27 @@ void DebuggerMainWnd::intoBackground()
 void DebuggerMainWnd::slotBackTimer()
 {
     ::XLowerWindow(x11Display(), winId());
+}
+
+void DebuggerMainWnd::slotRecentExec(int item)
+{
+    if (item >= 0 && item < int(m_recentExecList.count())) {
+	QString exe = m_recentExecList.at(item);
+	if (debugProgramInteractive(exe)) {
+	    addRecentExec(exe);
+	} else {
+	    removeRecentExec(exe);
+	}
+	fillRecentExecMenu();
+    }
+}
+
+void DebuggerMainWnd::fillRecentExecMenu()
+{
+    m_menuRecentExecutables->clear();
+    for (uint i = 0; i < m_recentExecList.count(); i++) {
+	m_menuRecentExecutables->insertItem(m_recentExecList.at(i));
+    }
 }
 
 QString DebuggerMainWnd::makeSourceFilter()

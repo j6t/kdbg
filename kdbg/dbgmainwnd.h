@@ -58,6 +58,8 @@ protected:
     QPopupMenu* m_menuBrkpt;
     QPopupMenu* m_menuWindow;
 
+    QPopupMenu* m_menuRecentExecutables;
+
     QTimer m_backTimer;
 
 protected:
@@ -77,6 +79,7 @@ protected:
     void intoBackground();
 
     QString makeSourceFilter();
+    void fillRecentExecMenu();
 
 signals:
     void forwardMenuCallback(int item);
@@ -99,6 +102,7 @@ public slots:
     void slotTermEmuExited();
     void slotProgramStopped();
     void slotBackTimer();
+    void slotRecentExec(int item);
 };
 
 #endif // DBGMAINWND_H

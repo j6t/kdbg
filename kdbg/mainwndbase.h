@@ -84,6 +84,12 @@ public:
 				 QWidget* parent);
     /** invokes the global options dialog */
     virtual void doGlobalOptions();
+    /** add recent executable; moves it to top of list if present */
+    void addRecentExec(const QString& executable);
+    /** remove recent executable */
+    void removeRecentExec(const QString& executable);
+    /** start a new session; error popups appear on errors */
+    bool debugProgramInteractive(const QString& executable);
 
 protected:
     // settings
@@ -125,6 +131,9 @@ protected:
     int m_tabWidth;			/* tab width in characters (can be 0) */
     QString m_sourceFilter;
     QString m_headerFilter;
+
+    // recent execs in File menu
+    QStrList m_recentExecList;
 
     // the debugger proper
     QString m_debuggerCmdStr;
