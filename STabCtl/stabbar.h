@@ -45,7 +45,7 @@ class BarPainter;
 
 class STabBar: public QWidget
 {Q_OBJECT
-friend BarPainter;
+friend class BarPainter;
 public:
   STabBar( QWidget * parent = 0, const char * name = 0 );
   ~STabBar();
@@ -120,7 +120,7 @@ private:
 
 class BarPainter: public QWidget
 {Q_OBJECT
-friend STabBar;
+friend class STabBar;
 private:
   BarPainter( STabBar * parent );
   ~BarPainter();
