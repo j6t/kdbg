@@ -63,6 +63,7 @@ public:
 	DCattach,
 	DCinfolinemain,
 	DCinfolocals,
+	DCsetargs,
 	DCbt,
 	DCrun,
 	DCcont,
@@ -81,7 +82,9 @@ public:
 	DCprintStruct,
 	DCframe,
 	DCfindType,
-	DCinfobreak
+	DCinfobreak,
+	DCcondition,
+	DCignore
     };
 protected:
     pid_t m_outputTermPID;

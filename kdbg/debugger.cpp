@@ -357,7 +357,7 @@ void KDebugger::menuCallback(int item)
 		executeCmd(DCcont, "cont", true);
 	    } else {
 		// gdb command: run
-		executeCmd(DCrun, "run " + m_programArgs, true);
+		executeCmd(DCrun, "run", true);
 		m_programActive = true;
 	    }
 	    m_programRunning = true;
@@ -378,7 +378,7 @@ void KDebugger::menuCallback(int item)
 	break;
     case ID_PROGRAM_RUN_AGAIN:
 	if (isReady() && m_programActive && !m_programRunning) {
-	    executeCmd(DCrun, "run " + m_programArgs, true);
+	    executeCmd(DCrun, "run", true);
 	    m_programRunning = true;
 	}
 	break;
@@ -429,6 +429,7 @@ void KDebugger::menuCallback(int item)
 	    dlg.setText(m_programArgs);
 	    if (dlg.exec()) {
 		m_programArgs = dlg.text();
+		executeCmd(DCsetargs, "set args " + m_programArgs);
 		TRACE("new pgm args: " + m_programArgs + "\n");
 	    }
 	}
@@ -967,6 +968,7 @@ void KDebugger::restoreProgramSettings()
      * distinguish different versions of this configuration file.
      */
     m_programArgs = m_programConfig->readEntry(ProgramArgs);
+    executeCmd(DCsetargs, "set args " + m_programArgs);
 
     m_bpTable.restoreBreakpoints(m_programConfig);
 }
@@ -1261,6 +1263,7 @@ void KDebugger::parse(CmdQueueItem* cmd)
     switch (cmd->m_cmd) {
     case DCnoconfirm:
     case DCtty:
+    case DCsetargs:
 	// there is no output
 	break;
     case DCinitialize:
@@ -1389,6 +1392,10 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	break;
     case DCprintStruct:
 	handlePrintStruct(cmd);
+	break;
+    case DCcondition:
+    case DCignore:
+	// we are not interested in the output
 	break;
     }
     /*
