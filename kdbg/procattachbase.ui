@@ -229,7 +229,7 @@
     </connection>
     <connection>
         <sender>processList</sender>
-        <signal>clicked(QListViewItem*)</signal>
+        <signal>selectionChanged(QListViewItem*)</signal>
         <receiver>ProcAttachBase</receiver>
         <slot>processSelected(QListViewItem*)</slot>
     </connection>
@@ -238,6 +238,12 @@
         <signal>clicked()</signal>
         <receiver>ProcAttachBase</receiver>
         <slot>refresh()</slot>
+    </connection>
+    <connection>
+        <sender>pidEdit</sender>
+        <signal>textChanged(const QString&amp;)</signal>
+        <receiver>ProcAttachBase</receiver>
+        <slot>pidEdited(const QString&amp;)</slot>
     </connection>
 </connections>
 <tabstops>
@@ -249,6 +255,7 @@
 <slots>
     <slot specifier="pure virtual">processSelected(QListViewItem*)</slot>
     <slot specifier="pure virtual">refresh()</slot>
+    <slot specifier="pure virtual">pidEdited(const QString&amp;)</slot>
 </slots>
 <layoutdefaults spacing="6" margin="10"/>
 </UI>

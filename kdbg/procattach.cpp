@@ -145,8 +145,10 @@ void ProcAttachPS::pushLine()
 
 void ProcAttachPS::processSelected(QListViewItem* item)
 {
-    pidEdit->setText(item->text(1));
-    processText->setText(item->text(0));
+    if (item != 0) {
+	pidEdit->setText(item->text(1));
+	processText->setText(item->text(0));
+    }
 }
 
 void ProcAttachPS::refresh()
@@ -155,6 +157,21 @@ void ProcAttachPS::refresh()
     {
 	processList->clear();
 	runPS();
+    }
+}
+
+void ProcAttachPS::pidEdited(const QString& text)
+{
+    if (text.isEmpty())
+	return;
+
+    // get the process and select it
+    QListViewItem* item = processList->findItem(text, 1);
+    if (item == 0) {
+	processList->clearSelection();
+    } else {
+	processList->setSelected(item, true);
+	processList->ensureItemVisible(item);
     }
 }
 

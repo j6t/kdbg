@@ -35,6 +35,7 @@ protected:
     void runPS();
     virtual void processSelected(QListViewItem*);
     virtual void refresh();
+    virtual void pidEdited(const QString& text);
 
 protected slots:
     void slotTextReceived(KProcess* proc, char* buffer, int buflen);
