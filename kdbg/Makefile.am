@@ -111,12 +111,12 @@ TYPES = \
 CLEANFILES = $(kdbg_METASOURCES)
 
 
-EXTRA_DIST = testfile.cpp $(XPMS) $(TYPES) kdbg.xpm mini-kdbg.xpm kdbg.kdelnk
-
 apps_DATA = kdbg.kdelnk
 appsdir = $(kde_appsdir)/Development
-icon_DATA = kdbg.xpm mini-kdbg.xpm
+icon_DATA = kdbg.xpm
 icondir = $(kde_icondir)
+miniicon_DATA = mini-kdbg.xpm
+miniicondir = $(kde_minidir)
 pics_DATA = $(XPMS)
 picsdir = $(kde_datadir)/kdbg/pics
 types_DATA = $(TYPES)
@@ -134,6 +134,9 @@ noinst_PROGRAMS = testfile
 testfile_SOURCES = testfile.cpp
 testfile_LDFLAGS = $(all_libraries) $(KDE_RPATH)
 testfile_LDADD = -lqt -lXext -lX11 $(LIBSOCKET)
+
+EXTRA_DIST = $(pics_DATA) $(types_DATA) \
+	$(icon_DATA) $(miniicon_DATA) $(apps_DATA)
 
 # add a dependency for every moc file to be full portable
 # I've added a key binding to emacs for this. 
