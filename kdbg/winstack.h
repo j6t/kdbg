@@ -103,7 +103,7 @@ class ValueTip : public QToolTip
 public:
     ValueTip(WinStack* parent);
     virtual void maybeTip(const QPoint& p);
-    using QToolTip::tip;
+    void tip(const QRect& r, const QString& s) { QToolTip::tip(r, s); }
 };
 
 
