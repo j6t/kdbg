@@ -274,11 +274,7 @@ void RegisterView::updateRegisters( const char* output )
 	while (*output != '\0' && !isspace(*output))
 	    output++;
 	if ( *output == '\0' ) break;
-#if QT_VERSION >= 200
-	reg = QString::fromLatin1(start, output-start);
-#else
-	reg = QString(start, output-start+1);
-#endif
+	reg = FROM_LATIN1(start, output-start);
 
 	// skip space
 	while (isspace(*output))
@@ -286,14 +282,7 @@ void RegisterView::updateRegisters( const char* output )
 	// the rest of the line is the register value
 	start = output;
 	output = strchr(output,'\n');
-#if QT_VERSION >= 200
-	value = QString::fromLatin1(start, output  ?  output-start  :  -1);
-#else
-	if (output)
-	    value = QString(start, output-start+1);
-	else
-	    value = QString(start);
-#endif
+	value = FROM_LATIN1(start, output  ?  output-start  :  strlen(start));
 
 	// check if this is a new register
 	bool found = false;

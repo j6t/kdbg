@@ -169,11 +169,7 @@ void BreakpointTable::parseBreakList(const char* output)
 	    location = p;
 	    p += location.length();
 	} else {
-#if QT_VERSION < 200
-	    location = QString(p, end-p+1).stripWhiteSpace();
-#else
-	    location = QString::fromLatin1(p, end-p).stripWhiteSpace();
-#endif
+	    location = FROM_LATIN1(p, end-p).stripWhiteSpace();
 	    p = end+1;			/* skip over \n */
 	    // may be continued in next line
 	    QString continuation;
@@ -183,11 +179,7 @@ void BreakpointTable::parseBreakList(const char* output)
 		    continuation = QString(p).stripWhiteSpace();
 		    p += strlen(p);
 		} else {
-#if QT_VERSION < 200
-		    continuation = QString(p, end-p+1).stripWhiteSpace();
-#else
-		    continuation = QString::fromLatin1(p, end-p).stripWhiteSpace();
-#endif
+		    continuation = FROM_LATIN1(p, end-p).stripWhiteSpace();
 		    p = end+1;		/* skip '\n' */
 		}
 		if (strncmp(continuation, "breakpoint already hit", 22) == 0) {
@@ -215,11 +207,7 @@ void BreakpointTable::parseBreakList(const char* output)
 
 void BreakpointTable::insertBreakpoint(int num, const QString& fileName, int lineNo)
 {
-#if QT_VERSION < 200
-    QString str(fileName.length()+20);
-#else
-    QString str;
-#endif
+    SIZED_QString(str,fileName.length()+20);
     str.sprintf("%s:%d", fileName.data(), lineNo);
     insertBreakpoint(num, 'k', 'y',	/* keep, enabled */
 		     str, fileName, lineNo);
@@ -288,11 +276,7 @@ void BreakpointTable::parseBreakpoint(const char* output)
     
     // line number
     char* numStart = strstr(fileStart, ", line ");
-#if QT_VERSION < 200
-    QString fileName(fileStart, numStart-fileStart+1);
-#else
-    QString fileName = QString::fromLatin1(fileStart, numStart-fileStart);
-#endif
+    QString fileName = FROM_LATIN1(fileStart, numStart-fileStart);
     numStart += 7;
     int lineNo = strtoul(numStart, &p, 10);
     if (numStart == p)
@@ -418,11 +402,7 @@ void BreakpointTable::doBreakpoint(QString file, int lineNo, bool temporary)
 	if (offset >= 0) {
 	    file.remove(0, offset+1);
 	}
-#if QT_VERSION < 200
-	QString cmdString(file.length() + 30);
-#else
-	QString cmdString;
-#endif
+	SIZED_QString(cmdString,file.length() + 30);
 	cmdString.sprintf("%sbreak %s:%d", temporary ? "t" : "",
 			  file.data(), lineNo+1);
 	m_debugger.executeCmd(KDebugger::DCbreak, cmdString);
@@ -633,11 +613,7 @@ void BreakpointTable::restoreBreakpoints(KSimpleConfig* config)
 	 * because this isn't a fresh gdb at all), we disable the wrong
 	 * breakpoint! Oh well... for now it works.
 	 */
-#if QT_VERSION < 200
-	QString cmdString(fileName.length() + 30);
-#else
-	QString cmdString;
-#endif
+	SIZED_QString(cmdString, fileName.length() + 30);
 	cmdString.sprintf("%sbreak %s:%d", temporary ? "t" : "",
 			  fileName.data(), lineNo+1);
 	m_debugger.executeCmd(KDebugger::DCbreak, cmdString);

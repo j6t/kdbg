@@ -193,11 +193,7 @@ bool KDebugger::debugProgram(const QString& name)
 
     if (!fi.isFile()) {
 	QString msgFmt = i18n("`%s' is not a file or does not exist");
-#if QT_VERSION < 200
-	QString msg(msgFmt.length() + name.length() + 20);
-#else
-	QString msg;
-#endif
+	SIZED_QString(msg, msgFmt.length() + name.length() + 20);
 	msg.sprintf(msgFmt, name.data());
 #if QT_VERSION < 200
 	KMsgBox::message(parentWidget(), kapp->appName(),
@@ -412,11 +408,7 @@ bool KDebugger::runUntil(const QString& fileName, int lineNo)
 	if (offset >= 0) {
 	    file.remove(0, offset+1);
 	}
-#if QT_VERSION < 200
-	QString cmdString(file.length() + 30);
-#else
-	QString cmdString;
-#endif
+	SIZED_QString(cmdString, file.length() + 30);
 	cmdString.sprintf("until %s:%d", file.data(), lineNo+1);
 	executeCmd(DCuntil, cmdString, true);
 	m_programRunning = true;
@@ -1289,11 +1281,7 @@ void KDebugger::handleRunCommands()
 	    if (endOfMessage == 0) {
 		msg = start;
 	    } else {
-#if QT_VERSION < 200
-		msg = QString(start, endOfMessage-start+1);
-#else
-		msg = QString::fromLatin1(start, endOfMessage-start);
-#endif
+		msg = FROM_LATIN1(start, endOfMessage-start);
 	    }
 	} else if (strncmp(start, "Breakpoint ", 11) == 0) {
 	    /*
@@ -1541,11 +1529,7 @@ void KDebugger::parseLocals(QList<VarTree>& newVars)
 	    if (variable->getText() == v->getText()) {
 		// we found a duplicate, change name
 		block++;
-#if QT_VERSION < 200
-		QString newName(origName.length()+20);
-#else
-		QString newName;
-#endif
+		SIZED_QString(newName, origName.length()+20);
 		newName.sprintf("%s (%d)", origName.data(), block);
 		variable->setText(newName);
 	    }
@@ -1747,11 +1731,7 @@ VarTree* KDebugger::parseQCharArray(const char* name, bool wantErrorValue)
 		if (p == 0)
 		    goto error;
 		p++;			/* skip '>' */
-#if QT_VERSION < 200
-		repeatCount = QString(start, p-start+1);
-#else
-		repeatCount = QString::fromLatin1(start, p-start);
-#endif
+		repeatCount = FROM_LATIN1(start, p-start);
 		while (isspace(*p) || *p == ',')
 		    p++;
 	    }
@@ -1900,11 +1880,7 @@ bool parseFrame(const char*& s, int& frameNo, QString& func, QString& file, int&
 	do {
 	    --colon;
 	} while (*colon != ':');
-#if QT_VERSION < 200
-	file = QString(fileStart, colon-fileStart+1);
-#else
-	file = QString::fromLatin1(fileStart, colon-fileStart);
-#endif
+	file = FROM_LATIN1(fileStart, colon-fileStart);
 	lineNo = atoi(colon+1);
 	// skip new-line
 	if (*p != '\0')
@@ -1927,11 +1903,7 @@ bool parseFrame(const char*& s, int& frameNo, QString& func, QString& file, int&
     if (*p == '\0') {
 	func = start;
     } else {
-#if QT_VERSION < 200
-	func = QString(start, p-start);	/* don't include \n */
-#else
-	func = QString::fromLatin1(start, p-start-1);	/* don't include \n */
-#endif
+	func = FROM_LATIN1(start, p-start-1);	/* don't include \n */
     }
     s = p;
 
@@ -2257,11 +2229,7 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 	exprFmt = var->m_type->m_exprStrings[var->m_exprIndex];
     }
 
-#if QT_VERSION < 200
-    QString expr(exprFmt.length() + base.length() + 10);
-#else
-    QString expr;
-#endif
+    SIZED_QString(expr, exprFmt.length() + base.length() + 10);
     expr.sprintf(exprFmt, base.data());
 
     DbgCommand dbgCmd = DCprintStruct;
@@ -2374,11 +2342,7 @@ void KDebugger::handleSharedLibs()
 	    if (str == 0) {
 		shlibName = start;
 	    } else {
-#if QT_VERSION < 200
-		shlibName = QString(start, str-start+1);
-#else
-		shlibName = QString::fromLatin1(start, str-start);
-#endif
+		shlibName = FROM_LATIN1(start, str-start);
 		str++;
 	    }
 	    m_sharedLibs.append(shlibName);

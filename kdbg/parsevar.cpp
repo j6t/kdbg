@@ -182,11 +182,7 @@ bool parseName(const char*& s, QString& name, VarTree::NameKind& kind)
 
     if (*p == '<') {
 	skipNested(p, '<', '>');
-#if QT_VERSION < 200
-	name = QString(s, (p - s)+1);
-#else
-	name = QString::fromLatin1(s, p - s);
-#endif
+	name = FROM_LATIN1(s, p - s);
 	kind = VarTree::NKtype;
     }
     else
@@ -212,11 +208,7 @@ bool parseName(const char*& s, QString& name, VarTree::NameKind& kind)
 	    }
 	    len = p - s;
 	}
-#if QT_VERSION < 200
-	name = QString(s, len+1);
-#else
-	name = QString::fromLatin1(s, len);
-#endif
+	name = FROM_LATIN1(s, len);
     }
     // return the new position
     s = p;
@@ -268,11 +260,7 @@ repeat:
 
 	    while (isspace(*p))
 		p++;
-#if QT_VERSION < 200
-	    variable->m_value = QString(s, (p - s)+1);
-#else
-	    variable->m_value = QString::fromLatin1(s, p - s);
-#endif
+	    variable->m_value = FROM_LATIN1(s, p - s);
 	}
 
 	bool reference = false;
@@ -356,11 +344,7 @@ repeat:
 	    // must be an enumeration value
 	    skipName(p);
 	}
-#if QT_VERSION < 200
-	variable->m_value += QString(start, (p - start)+1);
-#else
-	variable->m_value += QString::fromLatin1(start, p - start);
-#endif
+	variable->m_value += FROM_LATIN1(start, p - start);
 
 	if (checkMultiPart) {
 	    // white space
@@ -377,11 +361,7 @@ repeat:
 	    if (p != start) {
 		// there is always a blank before the string,
 		// which we will include in the final string value
-#if QT_VERSION < 200
-		variable->m_value += QString(start-1, (p - start)+2);
-#else
-		variable->m_value += QString::fromLatin1(start-1, (p - start)+1);
-#endif
+		variable->m_value += FROM_LATIN1(start-1, (p - start)+1);
 		// if this was a pointer, reset that flag since we 
 		// now got the value
 		variable->m_varKind = VarTree::VKsimple;

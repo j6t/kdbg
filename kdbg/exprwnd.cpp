@@ -162,11 +162,7 @@ void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
 	    return;
 	}
 	const QString& typeName =
-#if QT_VERSION < 200
-	    QString(start+1, p-start-3+1) // minus 3 chars plus '\0'
-#else
-	    QString::fromLatin1(start+1, p-start-3) // minus 3 chars
-#endif
+	    FROM_LATIN1(start+1, p-start-3) // minus 3 chars
 		.stripWhiteSpace();
 	m_type = typeTable.lookup(typeName);
 	if (m_type == 0) {
