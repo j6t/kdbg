@@ -19,7 +19,7 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
 	m_wd(this, "wd"),
 	m_envLabel(this, "env_label"),
 	m_envVar(this, "env_var"),
-	m_envList(this, "env_list", 2),
+	m_envList(this, "env_list"),
 	m_buttonOK(this, "ok"),
 	m_buttonCancel(this, "cancel"),
 	m_buttonModify(this, "modify"),
@@ -71,13 +71,12 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars) :
     m_envVar.setMaxLength(10000);
 
     m_envList.setMinimumSize(330, 40);
-    m_envList.setColumn(0, i18n("Name"), 100);
-    m_envList.setColumn(1, i18n("Value"), 260);
+    m_envList.addColumn(i18n("Name"), 100);
+    m_envList.addColumn(i18n("Value"), 260);
     /* work around a non-feature of KTabListBox: */
     m_envList.setFocusPolicy(QWidget::StrongFocus);
-    m_envList.setSeparator('\n');
-    connect(&m_envList, SIGNAL(highlighted(int,int)),
-	    SLOT(envListHighlighted(int,int)));
+    connect(&m_envList, SIGNAL(currentChanged(QListViewItem*)),
+	    SLOT(envListCurrentChanged(QListViewItem*)));
     initEnvList();
 
     m_buttonOK.setText(i18n("OK"));
@@ -142,22 +141,20 @@ void PgmArgs::modifyVar()
 	    // resurrect
 	    val->value = value;
 	    val->status = EnvVar::EVdirty;
-	    val->idx = m_envList.count();
-	    m_envList.appendItem(name + "\n" + value);
+	    val->item = new QListViewItem(&m_envList, name, value);	// inserts itself
 	    m_envVars.insert(name, val);
 	} else if (value != val->value) {
 	    // change the value
 	    val->value = value;
 	    val->status = EnvVar::EVdirty;
-	    m_envList.changeItemPart(value, val->idx, 1);
+	    val->item->setText(1, value);
 	}
     } else {
 	// add the value
 	val = new EnvVar;
 	val->value = value;
 	val->status = EnvVar::EVnew;
-	val->idx = m_envList.count();
-	m_envList.appendItem(name + "\n" + value);
+	val->item = new QListViewItem(&m_envList, name, value);	// inserts itself
 	m_envVars.insert(name, val);
     }
 }
@@ -173,24 +170,16 @@ void PgmArgs::deleteVar()
 	return;
 
     // delete from list
-    int idx = val->idx;
-    m_envList.removeItem(idx);
+    QListViewItem* item = val->item;
+    val->item = 0;
+    delete item;
     // if this is a new item, delete it completely, otherwise zombie-ize it
     if (val->status == EnvVar::EVnew) {
 	m_envVars.remove(name);
 	delete val;
     } else {
 	// mark value deleted
-	val->idx = -1;
 	val->status = EnvVar::EVdeleted;
-	// update the indices of the remaining items
-	QDictIterator<EnvVar> it = m_envVars;
-	while ((val = it) != 0) {
-	    if (val->idx > idx) {
-		--val->idx;
-	    }
-	    ++it;
-	}
     }
     // clear the input
     m_envVar.setText("");
@@ -218,20 +207,21 @@ void PgmArgs::initEnvList()
 {
     QDictIterator<EnvVar> it = m_envVars;
     EnvVar* val;
-    int i = 0;
     QString name;
     for (; (val = it) != 0; ++it) {
-	val->idx = i++;
 	val->status = EnvVar::EVclean;
 	name = it.currentKey();
-	m_envList.appendItem(name + "\n" + val->value);
+	val->item = new QListViewItem(&m_envList, name, val->value);	// inserts itself
     }
 }
 
-void PgmArgs::envListHighlighted(int idx, int /*col*/)
+void PgmArgs::envListCurrentChanged(QListViewItem* item)
 {
+    if (item == 0)
+	return;
+
     // must get name from list box
-    QString name = m_envList.text(idx, 0);
+    QString name = item->text(0);
     EnvVar* val = m_envVars[name];
     ASSERT(val != 0);
     if (val != 0) {

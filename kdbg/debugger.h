@@ -9,6 +9,7 @@
 #include <qqueue.h>
 #include <qtimer.h>
 #include <qfile.h>
+#include <qdict.h>
 #include <kprocess.h>
 #include "brkpt.h"
 #include "envvar.h"

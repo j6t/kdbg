@@ -9,10 +9,11 @@
 #define BRKPT_H
 
 #include <qdialog.h>
-#include <ktablistbox.h>
+#include <qlistview.h>
 #include <qlayout.h>
 #include <qpushbutton.h>
 #include <qlineedit.h>
+#include "valarray.h"
 
 class KSimpleConfig;
 
@@ -41,6 +42,7 @@ struct Breakpoint
     int lineNo;				/* zero-based line number */
 
     bool del;				/* used when list is parsed */
+    QListViewItem* listItem;		/* the corresponding table item */
 };
 
 
@@ -48,18 +50,16 @@ struct Breakpoint
  * The class BreakpointListBox provides a simpler interface to the
  * KTabListBox.
  */
-class BreakpointListBox : public KTabListBox
+class BreakpointListBox : public QListView
 {
 public:
     BreakpointListBox(QWidget* parent, const char* name);
     ~BreakpointListBox();
 
-    void appendItem(Breakpoint* bp);
-    void changeItem(int id, Breakpoint* bp);
+    void changeItem(Breakpoint* bp);
 
 protected:
-    static QString constructListText(Breakpoint* bp);
-    virtual void keyPressEvent(QKeyEvent* e);
+    ValArray<QPixmap> m_icons;
 };
 
 
@@ -104,7 +104,8 @@ protected:
 			  int hits = 0, uint ignoreCount = 0,
 			  QString condition = QString());
     void insertBreakpoint(int num, const QString& fileName, int lineNo);
-    int breakpointById(int id);		/* returns index into m_brkpts */
+    Breakpoint* breakpointById(int id);
+    Breakpoint* breakpointByItem(QListViewItem* item);
     void updateBreakpointCondition(int id, const QString& condition,
 				   uint ignoreCount);
 

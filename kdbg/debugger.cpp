@@ -25,6 +25,7 @@
 #include <kmsgbox.h>
 #endif
 #include <ctype.h>
+#include <stdlib.h>			/* strtol, atoi */
 
 #ifndef VERSION				/* #ifndef HAVE_CONFIG_H */
 #define VERSION ""

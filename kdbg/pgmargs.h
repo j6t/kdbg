@@ -11,7 +11,8 @@
 #include <qlineedit.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
-#include <ktablistbox.h>
+#include <qlistview.h>
+#include <qdict.h>
 #include "envvar.h"
 
 class PgmArgs : public QDialog
@@ -39,7 +40,7 @@ protected:
     QLineEdit m_wd;
     QLabel m_envLabel;
     QLineEdit m_envVar;
-    KTabListBox m_envList;
+    QListView m_envList;
     QPushButton m_buttonOK;
     QPushButton m_buttonCancel;
     QPushButton m_buttonModify;
@@ -51,7 +52,7 @@ protected:
 protected slots:
     void modifyVar();
     void deleteVar();
-    void envListHighlighted(int,int);
+    void envListCurrentChanged(QListViewItem*);
     void accept();
 };
 

@@ -12,12 +12,14 @@
 #include <qkeycode.h>
 #include <qpainter.h>
 #include <qlabel.h>
+#include <qbitmap.h>
 #include "debugger.h"			/* #includes brkpt.h */
 #include "brkpt.moc"
 #include <ctype.h>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#include <stdlib.h>			/* strtol */
 #include "mydebug.h"
 
 
@@ -39,7 +41,7 @@ BreakpointTable::BreakpointTable(KDebugger& deb) :
     connect(&m_bpEdit, SIGNAL(returnPressed()), this, SLOT(addBP()));
 
     // double click on item is same as View code
-    connect(&m_list, SIGNAL(selected(int,int)), this, SLOT(viewBP()));
+    connect(&m_list, SIGNAL(doubleClicked(QListViewItem*)), this, SLOT(viewBP()));
 
     m_btAdd.setText(i18n("&Add"));
     m_btAdd.setMinimumSize(m_btAdd.sizeHint());
@@ -108,8 +110,8 @@ void BreakpointTable::updateBreakList(const char* output)
 		m_brkpts[j-1] = m_brkpts[j];
 	    }
 	    m_brkpts.resize(m_brkpts.size()-1);
+	    delete bp->listItem;
 	    delete bp;
-	    m_list.removeItem(i);
 	}
     }
 }
@@ -230,17 +232,15 @@ void BreakpointTable::insertBreakpoint(int num, char disp, char enable, const ch
     assert(lineNo != 0);		/* line numbers are 1-based */
     TRACE("insert bp " + QString().setNum(num));
     int numBreaks = m_brkpts.size();
-    int i = breakpointById(num);
-    Breakpoint* bp;
-    if (i < 0) {
+    Breakpoint* bp = breakpointById(num);
+    if (bp == 0) {
 	// not found, insert a new one
 	bp = new Breakpoint;
 	m_brkpts.resize(numBreaks+1);
 	m_brkpts[numBreaks] = bp;
 	bp->id = num;
 	bp->lineNo = -1;
-    } else {
-	bp = m_brkpts[i];
+	bp->listItem = new QListViewItem(&m_list);
     }
     bp->temporary = disp == 'd';	/* "del" */
     bp->enabled = enable == 'y';
@@ -255,13 +255,8 @@ void BreakpointTable::insertBreakpoint(int num, char disp, char enable, const ch
     if (bp->conditionInput.isEmpty())
 	bp->conditionInput = condition;
     bp->del = false;
-    if (i < 0) {
-	// add to list
-	m_list.appendItem(bp);
-    } else {
-	// update list
-	m_list.changeItem(i, bp);
-    }
+    // update list
+    m_list.changeItem(bp);
 }
 
 void BreakpointTable::parseBreakpoint(const char* output)
@@ -332,11 +327,10 @@ void BreakpointTable::addBP()
 
 void BreakpointTable::removeBP()
 {
-    int sel = m_list.currentItem();
-    if (sel < 0 || uint(sel) >= m_brkpts.size())
+    Breakpoint* bp = breakpointByItem(m_list.currentItem());
+    if (bp == 0)
 	return;
-    
-    Breakpoint* bp = m_brkpts[sel];
+
     QString cmdString;
     cmdString.sprintf("delete %d", bp->id);
     m_debugger.executeCmd(KDebugger::DCdelete, cmdString);
@@ -344,11 +338,10 @@ void BreakpointTable::removeBP()
 
 void BreakpointTable::viewBP()
 {
-    int sel = m_list.currentItem();
-    if (sel < 0 || uint(sel) >= m_brkpts.size())
+    Breakpoint* bp = breakpointByItem(m_list.currentItem());
+    if (bp == 0)
 	return;
-    
-    Breakpoint* bp = m_brkpts[sel];
+
     emit activateFileLine(bp->fileName, bp->lineNo);
 }
 
@@ -385,11 +378,10 @@ protected:
 
 void BreakpointTable::conditionalBP()
 {
-    int sel = m_list.currentItem();
-    if (sel < 0 || uint(sel) >= m_brkpts.size())
+    Breakpoint* bp = breakpointByItem(m_list.currentItem());
+    if (bp == 0)
 	return;
 
-    Breakpoint* bp = m_brkpts[sel];
     /*
      * Important: we must not keep a pointer to the Breakpoint around,
      * since it may vanish while the modal dialog is open through other
@@ -473,11 +465,10 @@ void BreakpointTable::updateBreakpointCondition(int id,
 						const QString& condition,
 						uint ignoreCount)
 {
-    int idx = breakpointById(id);
-    if (idx < 0)
+    Breakpoint* bp = breakpointById(id);
+    if (bp == 0)
 	return;				/* breakpoint no longer exists */
 
-    Breakpoint* bp = m_brkpts[idx];
     QString cmdString;
 
     if (bp->conditionInput != condition) {
@@ -500,14 +491,27 @@ void BreakpointTable::updateBreakpointCondition(int id,
 
 
 
-int BreakpointTable::breakpointById(int id)
+Breakpoint* BreakpointTable::breakpointById(int id)
 {
     for (int i = m_brkpts.size()-1; i >= 0; i--) {
 	if (m_brkpts[i]->id == id) {
-	    return i;
+	    return m_brkpts[i];
 	}
     }
-    return -1;
+    return 0;
+}
+
+Breakpoint* BreakpointTable::breakpointByItem(QListViewItem* item)
+{
+    if (item == 0)
+	return 0;
+
+    for (int i = m_brkpts.size()-1; i >= 0; i--) {
+	if (m_brkpts[i]->listItem == item) {
+	    return m_brkpts[i];
+	}
+    }
+    return 0;
 }
 
 Breakpoint* BreakpointTable::breakpointByFilePos(QString file, int lineNo)
@@ -523,14 +527,14 @@ Breakpoint* BreakpointTable::breakpointByFilePos(QString file, int lineNo)
     }
     // not found, so try basename
     // strip off directory part of file name
-#if QT_VERSION < 200
-    file.detach();
-#endif
     int offset = file.findRev("/");
     if (offset < 0) {
 	// that was already the basename, no need to scan the list again
 	return 0;
     }
+#if QT_VERSION < 200
+    file.detach();
+#endif
     file.remove(0, offset+1);
 
     for (i = m_brkpts.size()-1; i >= 0; i--) {
@@ -654,20 +658,18 @@ void BreakpointTable::restoreBreakpoints(KSimpleConfig* config)
 
 
 BreakpointListBox::BreakpointListBox(QWidget* parent, const char* name) :
-	KTabListBox(parent, name, 5)
+	QListView(parent, name)
 {
-    setColumn(0, i18n("E"),		/* Enabled/disabled */
-	      20, KTabListBox::PixmapColumn);
-    setColumn(1, i18n("Location"), 300);
-    setColumn(2, i18n("Hits"), 30);
-    setColumn(3, i18n("Ignore"), 30);
-    setColumn(4, i18n("Condition"), 200);
+    addColumn(i18n("Location"), 300);
+    addColumn(i18n("Hits"), 30);
+    addColumn(i18n("Ignore"), 30);
+    addColumn(i18n("Condition"), 200);
 
     setMinimumSize(200, 100);
     /* work around a non-feature of KTabListBox: */
     setFocusPolicy(QWidget::StrongFocus);
 
-    setSeparator('\t');
+    setSorting(-1);
 
     // add pixmaps
 #if QT_VERSION < 200
@@ -687,36 +689,31 @@ BreakpointListBox::BreakpointListBox(QWidget* parent, const char* name) :
      * breakpoint, plus an optional overlaid brktmp icon plus an optional
      * overlaid brkcond icon.
      */
+    m_icons.setSize(8);
     QPixmap canvas(16,16);
-    // get this widgets background color
-    QBrush bg = lbox.backgroundColor();
 
-    QString code;
     for (int i = 0; i < 8; i++) {
 	{
 	    QPainter p(&canvas);
 	    // clear canvas
-	    p.fillRect(0,0, canvas.width(),canvas.height(), bg);
+	    p.fillRect(0,0, canvas.width(),canvas.height(), cyan);
 	    // basic icon
 	    if (i & 1) {
-		code = "E";
 		p.drawPixmap(1,1, brkena);
 	    } else {
-		code = "D";
 		p.drawPixmap(1,1, brkdis);
 	    }
 	    // temporary overlay
 	    if (i & 2) {
-		code += "t";
 		p.drawPixmap(1,1, brktmp);
 	    }
 	    // conditional overlay
 	    if (i & 4) {
-		code += "c";
 		p.drawPixmap(1,1, brkcond);
 	    }
 	}
-	dict().insert(code, new QPixmap(canvas));
+	canvas.setMask(canvas.createHeuristicMask());
+	m_icons[i] = canvas;
     }
 }
 
@@ -724,100 +721,38 @@ BreakpointListBox::~BreakpointListBox()
 {
 }
 
-void BreakpointListBox::appendItem(Breakpoint* bp)
+void BreakpointListBox::changeItem(Breakpoint* bp)
 {
-    QString t = constructListText(bp);
-    KTabListBox::appendItem(t);
-}
-
-void BreakpointListBox::changeItem(int id, Breakpoint* bp)
-{
-    QString t = constructListText(bp);
-    KTabListBox::changeItem(t, id);
-}
-
-QString BreakpointListBox::constructListText(Breakpoint* bp)
-{
-    QString result;			/* should fit most cases */
-
     /* breakpoint icon code; keep order the same as in this class's constructor */
-    result = bp->enabled ? "E" : "D";
+    int code = bp->enabled ? 1 : 0;
     if (bp->temporary)
-	result += "t";
+	code += 2;
     if (!bp->condition.isEmpty() || bp->ignoreCount > 0)
-	result += "c";
-    result += "\t";
+	code += 4;
+    bp->listItem->setPixmap(0, m_icons[code]);
 
     // more breakpoint info
-    result += bp->location;
+    bp->listItem->setText(0, bp->location);
     QString tmp;
     if (bp->hitCount == 0) {
-	result += "\t ";
+	bp->listItem->setText(1, "");
     } else {
-	result += "\t";
-	result += tmp.setNum(bp->hitCount);
+	tmp.setNum(bp->hitCount);
+	bp->listItem->setText(1, tmp);
     }
     if (bp->ignoreCount == 0) {
-	result += "\t ";
+	bp->listItem->setText(2, "");
     } else {
-	result += "\t";
-	result += tmp.setNum(bp->ignoreCount);
+	tmp.setNum(bp->ignoreCount);
+	bp->listItem->setText(2, tmp);
     }
     if (bp->condition.isEmpty()) {
-	result += "\t ";
+	bp->listItem->setText(3, "");
     } else {
-	result += "\t";
-	result += bp->condition;
-    }
-    return result;
-}
-
-/* Grrr! Why doesn't do KTablistBox the keyboard handling? */
-void BreakpointListBox::keyPressEvent(QKeyEvent* e)
-{
-    if (numRows() == 0)
-	return;
-
-//    int newX;
-    switch (e->key()) {
-    case Key_Up:
-	// make previous item current, scroll up if necessary
-	if (currentItem() > 0) {
-	    setCurrentItem(currentItem() - 1);
-	    if (currentItem() < topItem() || currentItem() > lastRowVisible()) {
-		setTopItem(currentItem());
-	    }
-	}
-	break;
-    case Key_Down:
-	// make next item current, scroll down if necessary
-	if (currentItem() < numRows() - 1) {
-	    setCurrentItem(currentItem() + 1);
-	    if (currentItem() > lastRowVisible()) {
-		setTopItem(topItem() + currentItem() - lastRowVisible());
-	    } else if (currentItem() < topItem()) {
-		setTopItem(currentItem());
-	    }
-	}
-	break;
-
-#if 0
-    // scroll left and right by a few pixels
-    case Key_Left:
-	newX = xOffset() - viewWidth()/10;
-	setXOffset(QMAX(newX, 0));
-	break;
-    case Key_Right:
-	newX = xOffset() + viewWidth()/10;
-	setXOffset(QMIN(newX, maxXOffset()));
-	break;
-#endif
-
-    default:
-	QWidget::keyPressEvent(e);
-	break;
+	bp->listItem->setText(3, bp->condition);
     }
 }
+
 
 ConditionalDlg::ConditionalDlg(QWidget* parent) :
 	QDialog(parent, "conditional", true),
