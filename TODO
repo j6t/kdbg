@@ -43,4 +43,7 @@
 
 32. Allow to manipulate memory in the memory dump window
 
-33.
+33. Clear the status bar when the program is (re-)started (because if this takes
+    some time, you don't know whether KDbg does something.)
+
+34.
