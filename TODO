@@ -39,4 +39,8 @@
 30. Grey out watch window expressions if there are variables that are not
     in scope.
 
-31.
+31. Show the memory dump in a combined ASCII and hex view.
+
+32. Allow to manipulate memory in the memory dump window
+
+33.
