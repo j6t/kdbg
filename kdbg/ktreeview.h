@@ -923,7 +923,8 @@ protected:
      */
     virtual void expandSubTree(KTreeViewItem* item, bool emitSignal);
   void fixChildren(KTreeViewItem *parentItem);
-  virtual void focusInEvent(QFocusEvent *e);
+    virtual void focusInEvent(QFocusEvent* e);
+    virtual void focusOutEvent(QFocusEvent* e);
 
     /** internal function used to determine maximum item width */
     static bool getMaxItemWidth(KTreeViewItem* item, void *user);

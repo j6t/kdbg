@@ -112,9 +112,9 @@ QRect KTreeViewItem::boundingRect(int indent) const
 {
     const QFontMetrics& fm = owner->fontMetrics();
     int rectX = indent;
-    int rectY = 1;
+    int rectY = 0;
     int rectW = width(indent, fm) - rectX;
-    int rectH = height(fm) - 2;
+    int rectH = height(fm);
     return QRect(rectX, rectY, rectW, rectH);
 }
 
@@ -215,9 +215,9 @@ int KTreeViewItem::height() const
 int KTreeViewItem::height(const QFontMetrics& fm) const
 {
     int maxHeight = pixmap.height();
-    int textHeight = fm.ascent() + fm.leading();
+    int textHeight = fm.height();
     maxHeight = textHeight > maxHeight ? textHeight : maxHeight;
-    return maxHeight == 0 ? -1 : maxHeight + 8;
+    return maxHeight + 4;
 }
 
 // inserts child item at specified index in branch
@@ -269,6 +269,7 @@ void KTreeViewItem::paint(QPainter* p, int indent, const QColorGroup& cg,
 			  bool highlighted) const
 {
     assert(getParent() != 0);		/* can't paint root item */
+    assert(owner != 0);
 
     p->save();
 
@@ -301,13 +302,13 @@ void KTreeViewItem::paint(QPainter* p, int indent, const QColorGroup& cg,
 void KTreeViewItem::paintExpandButton(QPainter* p, int indent, int cellHeight,
 				      const QColorGroup& cg) const
 {
-    int parentLeaderX = indent - (22 / 2);
+    int parentLeaderX = indent - (owner->itemIndent / 2);
     int cellCenterY = cellHeight / 2;
 
-    expandButton.setRect(parentLeaderX - 4, cellCenterY - 4, 9, 9);
+    QRect paintRect(parentLeaderX - 4, cellCenterY - 4, 9, 9);
     p->setBrush(cg.base());
     p->setPen(cg.foreground());
-    p->drawRect(expandButton);
+    p->drawRect(paintRect);
     if (expanded) {
 	p->drawLine(parentLeaderX - 2, cellCenterY, 
 		    parentLeaderX + 2, cellCenterY);
@@ -318,6 +319,13 @@ void KTreeViewItem::paintExpandButton(QPainter* p, int indent, int cellHeight,
 		    parentLeaderX, cellCenterY + 2);
     }
     p->setBrush(NoBrush);
+
+    /*
+     * The area that the user can click to collapse and expand the tree is
+     * somewhat larger than the painted expand button.
+     */
+    expandButton.setRect(indent - owner->itemIndent, 0,
+			 owner->itemIndent, cellHeight);
 }
 
 // paint the highlight 
@@ -362,9 +370,10 @@ void KTreeViewItem::paintHighlight(QPainter* p, int indent, const QColorGroup& c
 void KTreeViewItem::paintText(QPainter* p, int indent, int cellHeight,
 			      const QColorGroup& cg, bool highlighted) const
 {
-    int textX = indent + pixmap.width() + 4;
-    int textY = cellHeight - ((cellHeight - p->fontMetrics().ascent() - 
-			       p->fontMetrics().leading()) / 2);
+    int textX = indent + pixmap.width() + 3;
+    int textY = (cellHeight - p->fontMetrics().height()) / 2 +
+	p->fontMetrics().ascent();
+
     if (highlighted) {
 	paintHighlight(p, indent, cg,
 		       owner->hasFocus(), owner->style());
@@ -382,10 +391,10 @@ void KTreeViewItem::paintText(QPainter* p, int indent, int cellHeight,
 void KTreeViewItem::paintTree(QPainter* p, int indent, int cellHeight,
 			      const QColorGroup& cg) const
 {
-    int parentLeaderX = indent - (22 / 2);
+    int parentLeaderX = indent - (owner->itemIndent / 2);
     int cellCenterY = cellHeight / 2;
     int cellBottomY = cellHeight - 1;
-    int itemLeaderX = indent - 3;
+    int itemLeaderX = indent - 1;
 
     p->setPen(cg.background());
 
@@ -422,8 +431,9 @@ void KTreeViewItem::paintTree(QPainter* p, int indent, int cellHeight,
      */
     KTreeViewItem* prevRoot = parent;
     while (prevRoot->getParent() != 0) {  /* while not root item */
+	assert(prevRoot->owner == owner);
 	if (prevRoot->hasSibling()) {
-	    int sibLeaderX = owner->indentation(prevRoot) - (22 / 2);
+	    int sibLeaderX = owner->indentation(prevRoot) - (owner->itemIndent / 2);
 	    p->drawLine(sibLeaderX, 0, sibLeaderX, cellBottomY);
 	}
 	prevRoot = prevRoot->getParent();
@@ -523,10 +533,10 @@ QRect KTreeViewItem::textBoundingRect(int indent) const
 {
     const QFontMetrics& fm = owner->fontMetrics();
     int cellHeight = height(fm);
-    int rectX = indent + pixmap.width() + 3;
-    int rectY = (cellHeight - fm.ascent() - fm.leading()) / 2 + 2;
-    int rectW = fm.width(text) + 1;
-    int rectH = fm.ascent() + fm.leading();
+    int rectX = indent + pixmap.width() + 2;
+    int rectY = (cellHeight - fm.height()) / 2;
+    int rectW = fm.width(text) + 2;
+    int rectH = fm.height();
     return QRect(rectX, rectY, rectW, rectH);
 }
 
@@ -537,11 +547,17 @@ int KTreeViewItem::width(int indent) const
     return width(indent, owner->fontMetrics());
 }
 
+// The width of an item is composed of the following:
+//  - indentation (indent with times level)
+//  - pixmap width
+//  - 2 pixels for highlight border
+//  - 1 pixel margin
+//  - text width
+//  - 1 pixel margin
+//  - 2 pixels for highlight border
 int KTreeViewItem::width(int indent, const QFontMetrics& fm) const
 {
-    int maxWidth = pixmap.width();
-    maxWidth += (4 + fm.width(text));
-    return maxWidth == 0  ?  -1  :  indent + maxWidth + 3;
+    return indent + pixmap.width() + fm.width(text) + 6;
 }
 
 
@@ -564,7 +580,7 @@ KTreeView::KTreeView(QWidget *parent,
 	drawTree(true),
 	expansion(0),
 	goingDown(false),
-	itemIndent(22),
+	itemIndent(18),
 	showText(true),
 	itemCapacity(500),
 	visibleItems(0),
@@ -1415,14 +1431,22 @@ void KTreeView::fixChildren(KTreeViewItem *parentItem)
     }	
 }
 
-// handles QFocusEvent processing by setting current item to top
-// row if there is no current item, and updates cell to add or
-// delete the focus rectangle on the highlight bar
+/*
+ * Handle QFocusEvent processing by setting current item to top row if
+ * there is no current item, and updates cell to add or delete the focus
+ * rectangle on the highlight bar. The base class is not called because it
+ * does a repaint() which causes flicker.
+ */
 void KTreeView::focusInEvent(QFocusEvent *)
 {
-  if(current < 0 && numRows() > 0)
-    setCurrentItem(topCell());
-  updateCell(current, 0);
+    if (current < 0 && numRows() > 0)
+	setCurrentItem(topCell());
+    updateCell(current, 0);
+}
+
+void KTreeView::focusOutEvent(QFocusEvent *)
+{
+    updateCell(current, 0);
 }
 
 // called by updateCellWidth() for each item in the visible list
