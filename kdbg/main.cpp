@@ -25,6 +25,7 @@
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>			/* getopt(3) */
 #endif
+#include <stdlib.h>			/* getenv(3) */
 #include "mydebug.h"
 
 
@@ -60,10 +61,14 @@ int main(int argc, char** argv)
     debugger.show();
 
     // handle optional arguments
-    while ((ch = getopt(argc, argv, "r:")) != -1) {
+    const char* transcript = 0;
+    while ((ch = getopt(argc, argv, "r:t:")) != -1) {
 	switch (ch) {
 	case 'r':
 	    debugger.setRemoteDevice(optarg);
+	    break;
+	case 't':
+	    transcript = optarg;
 	    break;
 	default:
 	    TRACE(QString().sprintf("ignoring option -%c", ch));
@@ -71,6 +76,12 @@ int main(int argc, char** argv)
     }
     argc -= optind - 1;
     argv += optind - 1;
+
+    // check environment variable for transcript file name
+    if (transcript == 0) {
+	transcript = getenv("KDBG_TRANSCRIPT");
+    }
+    debugger.setTranscript(transcript);
 
     if (!restored && argc > 1) {
 	// check for core file

@@ -63,6 +63,10 @@ public:
      * Sets the command to invoke the debugger.
      */
     void setDebuggerCmdStr(const QString& cmd);
+    /**
+     * Specifies the file where to write the transcript.
+     */
+    void setTranscript(const char* name);
 
     // the following are needed to handle program arguments
     bool debugProgram(const QString& executable);
@@ -100,6 +104,8 @@ protected:
     bool createOutputWindow();
 
     QString m_lastDirectory;		/* the dir of the most recently opened file */
+
+    QString m_transcriptFile;		/* where gdb dialog is logged */
 
     // the debugger proper
     QString m_debuggerCmdStr;

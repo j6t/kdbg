@@ -103,6 +103,9 @@ DebuggerMainWndBase::DebuggerMainWndBase() :
 	m_animationCounter(0),
 	m_outputTermCmdStr(defaultTermCmdStr),
 	m_outputTermPID(0),
+#ifdef GDB_TRANSCRIPT
+	m_transcriptFile(GDB_TRANSCRIPT),
+#endif
 	m_debuggerCmdStr(defaultDebuggerCmdStr),
 	m_debugger(0)
 {
@@ -126,9 +129,8 @@ void DebuggerMainWndBase::setupDebugger(ExprWnd* localVars,
     QWidget* parent = dbgMainWnd();
 
     GdbDriver* driver = new GdbDriver;
-#ifdef GDB_TRANSCRIPT
-    driver->setLogFileName(GDB_TRANSCRIPT);
-#endif
+    driver->setLogFileName(m_transcriptFile);
+
     m_debugger = new KDebugger(parent, localVars, watchVars, backtrace, driver);
 
     QObject::connect(m_debugger, SIGNAL(updateStatusMessage()),
@@ -161,6 +163,13 @@ void DebuggerMainWndBase::setRemoteDevice(const QString& remoteDevice)
     if (m_debugger != 0) {
 	m_debugger->setRemoteDevice(remoteDevice);
     }
+}
+
+void DebuggerMainWndBase::setTranscript(const char* name)
+{
+    m_transcriptFile = name;
+    if (m_debugger != 0)
+	m_debugger->driver()->setLogFileName(m_transcriptFile);
 }
 
 const char OutputWindowGroup[] = "OutputWindow";
