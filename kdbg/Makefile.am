@@ -69,6 +69,7 @@ noinst_HEADERS = \
 	winstack.h \
 	typetable.h \
 	dbgmainwnd.h \
+	envvar.h \
 	commandids.h \
 	mydebug.h
 
