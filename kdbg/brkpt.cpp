@@ -185,7 +185,13 @@ void BreakpointTable::addWP()
     QString wpExpr = m_bpEdit.text();
     wpExpr = wpExpr.stripWhiteSpace();
     if (m_debugger->isReady()) {
-	m_debugger->driver()->executeCmd(DCwatchpoint, wpExpr);
+	Breakpoint* bp = new Breakpoint;
+	bp->type = Breakpoint::watchpoint;
+	bp->location = wpExpr;
+
+	CmdQueueItem* cmd =
+	    m_debugger->driver()->executeCmd(DCwatchpoint, wpExpr);
+	cmd->m_brkpt = bp;
     }
 }
 

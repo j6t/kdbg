@@ -533,6 +533,7 @@ bool operator>(const DbgAddr& a1, const DbgAddr& a2)
 
 Breakpoint::Breakpoint() :
 	id(0),
+	type(breakpoint),
 	temporary(false),
 	enabled(true),
 	ignoreCount(0),

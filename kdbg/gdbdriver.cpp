@@ -1763,6 +1763,11 @@ bool GdbDriver::parseThreadList(const char* output, QList<ThreadInfo>& threads)
     return true;
 }
 
+static bool parseNewBreakpoint(const char* o, int& id,
+			       QString& file, int& lineNo, QString& address);
+static bool parseNewWatchpoint(const char* o, int& id,
+			       QString& expr);
+
 bool GdbDriver::parseBreakpoint(const char* output, int& id,
 				QString& file, int& lineNo, QString& address)
 {
@@ -1775,13 +1780,25 @@ bool GdbDriver::parseBreakpoint(const char* output, int& id,
 	o++;				/* skip newline */
     }
 
-    if (strncmp(o, "Breakpoint ", 11) != 0)
-	return false;
-    
+    if (strncmp(o, "Breakpoint ", 11) == 0) {
+	output += 11;			/* skip "Breakpoint " */
+	return ::parseNewBreakpoint(output, id, file, lineNo, address);
+    } else if (strncmp(o, "Hardware watchpoint ", 20) == 0) {
+	output += 20;
+	return ::parseNewWatchpoint(output, id, address);
+    } else if (strncmp(o, "Watchpoint ", 11) == 0) {
+	output += 11;
+	return ::parseNewWatchpoint(output, id, address);
+    }
+    return false;
+}
+
+static bool parseNewBreakpoint(const char* o, int& id,
+			       QString& file, int& lineNo, QString& address)
+{
     // breakpoint id
-    output += 11;			/* skip "Breakpoint " */
     char* p;
-    id = strtoul(output, &p, 10);
+    id = strtoul(o, &p, 10);
     if (p == o)
 	return false;
 
@@ -1810,6 +1827,24 @@ bool GdbDriver::parseBreakpoint(const char* output, int& id,
 
     file = fileName;
     lineNo = line-1;			/* zero-based! */
+    return true;
+}
+
+static bool parseNewWatchpoint(const char* o, int& id,
+			       QString& expr)
+{
+    // watchpoint id
+    char* p;
+    id = strtoul(o, &p, 10);
+    if (p == o)
+	return false;
+
+    if (strncmp(p, ": ", 2) != 0)
+	return false;
+    p += 2;
+
+    // all the rest on the line is the expression
+    expr = FROM_LATIN1(p, strlen(p)).stripWhiteSpace();
     return true;
 }
 
