@@ -4,7 +4,6 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include "pgmargs.h"
-#include "pgmargs.moc"
 #include <kapp.h>
 
 PgmArgs::PgmArgs(QWidget* parent, const char* pgm) :
@@ -24,8 +23,6 @@ PgmArgs::PgmArgs(QWidget* parent, const char* pgm) :
     QString lab;
     lab.sprintf(i18n("Run %s with these arguments:"), pgm);
     m_label.setText(lab);
-    m_label.setAlignment( 33 );
-    m_label.setMargin( -1 );
 
     m_programArgs.setMinimumSize(330, 24);
     m_programArgs.setMaxLength(10000);
@@ -53,7 +50,7 @@ PgmArgs::PgmArgs(QWidget* parent, const char* pgm) :
     m_layout.activate();
 
     m_programArgs.setFocus();
-    resize( 350, 120 );
+    resize(350, 120);
 }
 
 PgmArgs::~PgmArgs()

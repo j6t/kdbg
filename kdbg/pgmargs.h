@@ -14,19 +14,12 @@
 
 class PgmArgs : public QDialog
 {
-    Q_OBJECT
 public:
     PgmArgs(QWidget* parent, const char* pgm);
     virtual ~PgmArgs();
 
     void setText(const char* text) { m_programArgs.setText(text); }
     const char* text() const { return m_programArgs.text(); }
-
-public slots:
-
-protected slots:
-//    virtual void accept();
-//    virtual void reject();
 
 protected:
     QLabel m_label;
@@ -35,8 +28,6 @@ protected:
     QPushButton m_buttonCancel;
     QVBoxLayout m_layout;
     QHBoxLayout m_buttons;
-
-//    virtual void resizeEvent(QResizeEvent* ev);
 };
 
 #endif // PgmArgs_included
