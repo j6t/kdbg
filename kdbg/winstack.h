@@ -12,7 +12,7 @@
 #include <qdialog.h>
 #include <qlined.h>
 #include <qlayout.h>
-#include <qcheckbox.h>
+#include <qchkbox.h>
 #include <qpushbt.h>
 #include "textvw.h"
 

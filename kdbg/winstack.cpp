@@ -563,9 +563,11 @@ FindDialog::FindDialog() :
 
     // get maximum size of buttons
     QSize maxSize(80,30);
+#if QT_VERSION >= 140
     maxSize.expandedTo(m_buttonForward.sizeHint());
     maxSize.expandedTo(m_buttonBackward.sizeHint());
     maxSize.expandedTo(m_buttonClose.sizeHint());
+#endif
 
     m_buttonForward.setMinimumSize(maxSize);
     m_buttonBackward.setMinimumSize(maxSize);
