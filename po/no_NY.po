@@ -1,0 +1,657 @@
+# KDbg - Debugger GUI for gdb
+# Copyright (C) 1998-2000 Johannes Sixt
+# Johannes Sixt <Johannes.Sixt@telecom.at>, 2000
+# Norwegian (Nynorsk) KDE translation
+# Copyright (C) 2000 Gaute Hvoslef Kvalnes.
+# Gaute Hvoslef Kvalnes <ai98ghk@stud.hib.no>, 1999
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: OTHERS/kdbg\n"
+"POT-Creation-Date: 2000-11-24 21:14+0100\n"
+"PO-Revision-Date: 2000-09-27 21:50+02:00\n"
+"Last-Translator: Gaute Hvoslef Kvalnes <ai98ghk@stud.hib.no>\n"
+"Language-Team: Norsk (nynorsk)\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf8\n"
+"Content-Transfer-Encoding: 8bit\n"
+
+#: pgmargs.cpp:34
+msgid ": Program arguments"
+msgstr ": Programargument"
+
+#: pgmargs.cpp:37
+#, c-format
+msgid "Run %s with these arguments:"
+msgstr "Køyr %s med desse arguenta:"
+
+#: pgmargs.cpp:55
+msgid "Working directory:"
+msgstr "Arbeidskatalog:"
+
+#: pgmargs.cpp:65
+msgid "Environment variables (NAME=value):"
+msgstr "Miljøvariablar (NAMN=verdi):"
+
+#: pgmargs.cpp:74
+msgid "Name"
+msgstr "Namn"
+
+#: pgmargs.cpp:75 regwnd.cpp:210 regwnd.cpp:218
+msgid "Value"
+msgstr "Verdi"
+
+#: pgmargs.cpp:91
+msgid "&Modify"
+msgstr "&Endra"
+
+#: procattach.cpp:23
+msgid ": Attach to process"
+msgstr ": Knyt til prosess"
+
+#: procattach.cpp:27
+msgid "Specify the process number to attach to:"
+msgstr "Vel prosessnummeret det skal knytast til:"
+
+#: debugger.cpp:507
+msgid ""
+"gdb exited unexpectedly.\n"
+"Restart the session (e.g. with File|Executable)."
+msgstr ""
+"gdb avslutta uventa.\n"
+"Start om att (med Fil|Køyrbar fil)."
+
+#: gdbdriver.cpp:1775
+msgid "New working directory: "
+msgstr "Ny arbeidskatalog: "
+
+#: brkpt.cpp:63
+#, fuzzy
+msgid "Add &Breakpoint"
+msgstr "&Brotpunkt"
+
+#: brkpt.cpp:67
+msgid "Add &Watchpoint"
+msgstr ""
+
+#: brkpt.cpp:76 brkpt.cpp:228
+msgid "&Disable"
+msgstr ""
+
+#: brkpt.cpp:81 brkpt.cpp:230
+msgid "&Enable"
+msgstr ""
+
+#: brkpt.cpp:91
+msgid "&View Code"
+msgstr "&Vis kode"
+
+#: brkpt.cpp:95
+msgid "&Conditional..."
+msgstr "&Vilkår ..."
+
+#: brkpt.cpp:355 threadlist.cpp:44
+msgid "Location"
+msgstr "Plassering"
+
+#: brkpt.cpp:356 memwindow.cpp:30
+msgid "Address"
+msgstr ""
+
+#: brkpt.cpp:357
+msgid "Hits"
+msgstr "Treff"
+
+#: brkpt.cpp:358
+msgid "Ignore"
+msgstr "Ignorer"
+
+#: brkpt.cpp:359
+msgid "Condition"
+msgstr "Vilkår"
+
+#: brkpt.cpp:467
+msgid ": Conditional breakpoint"
+msgstr ": Brotpunkt på vilkår"
+
+#: brkpt.cpp:470
+msgid "&Condition:"
+msgstr "&Vilkår:"
+
+#: brkpt.cpp:472
+msgid "Ignore &next hits:"
+msgstr "Ignorer &neste treff:"
+
+#: regwnd.cpp:209 regwnd.cpp:217
+#, fuzzy
+msgid "Register"
+msgstr "Start om att"
+
+#: regwnd.cpp:211 regwnd.cpp:219
+msgid "Decoded value"
+msgstr ""
+
+#: memwindow.cpp:59 regwnd.cpp:235
+msgid "&Binary"
+msgstr ""
+
+#: memwindow.cpp:58 regwnd.cpp:236
+msgid "&Octal"
+msgstr ""
+
+#: regwnd.cpp:237
+msgid "&Decimal"
+msgstr ""
+
+#: memwindow.cpp:55 regwnd.cpp:238
+msgid "He&xadecimal"
+msgstr ""
+
+#: memwindow.cpp:50
+msgid "B&ytes"
+msgstr ""
+
+#: memwindow.cpp:51
+msgid "Halfwords (&2 Bytes)"
+msgstr ""
+
+#: memwindow.cpp:52
+msgid "Words (&4 Bytes)"
+msgstr ""
+
+#: memwindow.cpp:53
+msgid "Giantwords (&8 Bytes)"
+msgstr ""
+
+#: memwindow.cpp:56
+msgid "Signed &decimal"
+msgstr ""
+
+#: memwindow.cpp:57
+msgid "&Unsigned decimal"
+msgstr ""
+
+#: memwindow.cpp:60
+msgid "&Addresses"
+msgstr ""
+
+#: memwindow.cpp:61
+msgid "&Character"
+msgstr ""
+
+#: memwindow.cpp:62
+msgid "&Floatingpoint"
+msgstr ""
+
+#: memwindow.cpp:63
+msgid "&Strings"
+msgstr ""
+
+#: memwindow.cpp:64
+msgid "&Instructions"
+msgstr ""
+
+#: threadlist.cpp:43
+msgid "Thread ID"
+msgstr ""
+
+#: dbgmainwnd.cpp:189 winstack.cpp:58 winstack.cpp:68
+msgid "&Open Source..."
+msgstr "&Opna kjelde ..."
+
+#: dbgmainwnd.cpp:223 winstack.cpp:60
+msgid "Step &into"
+msgstr "Gå &inn"
+
+#: dbgmainwnd.cpp:224 winstack.cpp:61
+msgid "Step &over"
+msgstr "Hopp &over"
+
+#: dbgmainwnd.cpp:225 winstack.cpp:62
+msgid "Step o&ut"
+msgstr "Gå &ut"
+
+#: dbgmainwnd.cpp:226 winstack.cpp:63
+msgid "Run to &cursor"
+msgstr "Køyr til &skrivemerket"
+
+#: dbgmainwnd.cpp:245 winstack.cpp:65
+msgid "Set/Clear &breakpoint"
+msgstr "Set/fjern brotpunkt"
+
+#: dbgmainwnd.cpp:192 winstack.cpp:70
+msgid "&Executable..."
+msgstr "&Køyrbar fil ..."
+
+#: dbgmainwnd.cpp:195 winstack.cpp:71
+msgid "&Core dump..."
+msgstr "K&jernedump ..."
+
+#: winstack.cpp:504
+msgid ": Open Windows"
+msgstr ": Opne vindauge"
+
+#: winstack.cpp:512
+msgid "Show"
+msgstr "Vis"
+
+#: winstack.cpp:580
+msgid ": Search"
+msgstr ": Søk"
+
+#: winstack.cpp:586
+msgid "&Case sensitive"
+msgstr "&Omsyn til bokstavstorleik"
+
+#: winstack.cpp:588
+msgid "&Forward"
+msgstr "&Framover"
+
+#: winstack.cpp:590
+msgid "&Backward"
+msgstr "&Bakover"
+
+#: ttywnd.cpp:155
+msgid "&Clear"
+msgstr ""
+
+#: prefdebugger.cpp:23
+msgid "To revert to the default settings, clear the entries."
+msgstr "Slett oppføringane for å gå tilbake til standardinnstilingane."
+
+#: prefdebugger.cpp:27
+msgid "How to invoke &GDB:"
+msgstr "Korleis starta &GDB:"
+
+#: prefdebugger.cpp:34
+msgid ""
+"%T will be replaced with a title string,\n"
+"%C will be replaced by a Bourne shell script that\n"
+"keeps the terminal window open."
+msgstr ""
+"%T vert erstatta med ein titteltekst,\n"
+"%C vert erstatta me eit Bourne-skalskript som\n"
+"held terminalvindauget òpe."
+
+#: prefdebugger.cpp:40
+msgid "&Terminal for program output:"
+msgstr "&Terminal for programutskrift:"
+
+#: prefmisc.cpp:27
+msgid "&Pop into foreground when program stops"
+msgstr ""
+
+#: prefmisc.cpp:32
+msgid "Time until window goes &back (in milliseconds):"
+msgstr ""
+
+#: prefmisc.cpp:39
+msgid "&Tabstop every (characters):"
+msgstr ""
+
+#: prefmisc.cpp:41
+#, fuzzy
+msgid "File filter for &source files:"
+msgstr "Last kjeldefil om att"
+
+#: prefmisc.cpp:43
+msgid "File filter for &header files:"
+msgstr ""
+
+#: pgmsettings.cpp:26
+msgid ""
+"How to invoke &GDB - leave empty to use\n"
+"the default from the global options:"
+msgstr ""
+
+#: pgmsettings.cpp:61
+msgid "&No input and output"
+msgstr ""
+
+#: pgmsettings.cpp:66
+msgid "&Only output, simple terminal emulation"
+msgstr ""
+
+#: pgmsettings.cpp:71
+msgid "&Full terminal emulation"
+msgstr ""
+
+#: pgmsettings.cpp:111
+#, c-format
+msgid "%s: Settings for %s"
+msgstr ""
+
+#: mainwndbase.cpp:509 pgmsettings.cpp:122
+msgid "&Debugger"
+msgstr ""
+
+#: dbgmainwnd.cpp:214 pgmsettings.cpp:123
+msgid "&Output"
+msgstr ""
+
+#: mainwndbase.cpp:54
+msgid " Add "
+msgstr " Legg til "
+
+#: mainwndbase.cpp:55
+msgid " Del "
+msgstr " Slett "
+
+#: mainwndbase.cpp:143
+msgid "active"
+msgstr "aktiv"
+
+#: mainwndbase.cpp:313
+msgid "Select the executable to debug"
+msgstr "Vel den køyrbare fila som skal avlusast"
+
+#: mainwndbase.cpp:329
+msgid "Select core dump"
+msgstr "Vel kjernedump"
+
+#: mainwndbase.cpp:492
+msgid ": Global options"
+msgstr ": Globale val"
+
+#: mainwndbase.cpp:510
+msgid "&Miscellaneous"
+msgstr ""
+
+#: mainwndbase.cpp:582
+msgid ": Program output"
+msgstr ": Programutskrift"
+
+#: mainwndbase.cpp:757
+#, c-format
+msgid "`%s' is not a file or does not exist"
+msgstr "'%s' er inga fil eller finst ikkje"
+
+#: mainwndbase.cpp:773
+msgid ""
+"Could not start the debugger process.\n"
+"Please shut down KDbg and resolve the problem."
+msgstr ""
+
+#: dbgmainwnd.cpp:39
+#, fuzzy
+msgid "Source"
+msgstr "&Last kjelde om att"
+
+#: dbgmainwnd.cpp:44
+msgid "Stack"
+msgstr ""
+
+#: dbgmainwnd.cpp:47
+msgid "Locals"
+msgstr ""
+
+#: dbgmainwnd.cpp:50
+msgid "Watches"
+msgstr ""
+
+#: dbgmainwnd.cpp:53
+#, fuzzy
+msgid "Registers"
+msgstr "Start om att"
+
+#: dbgmainwnd.cpp:56
+msgid "Breakpoints"
+msgstr "Brotpunkt"
+
+#: dbgmainwnd.cpp:59
+msgid "Output"
+msgstr ""
+
+#: dbgmainwnd.cpp:62
+msgid "Threads"
+msgstr ""
+
+#: dbgmainwnd.cpp:65
+msgid "Memory"
+msgstr ""
+
+#: dbgmainwnd.cpp:190
+msgid "&Reload Source"
+msgstr "&Last kjelde om att"
+
+#: dbgmainwnd.cpp:193
+#, fuzzy
+msgid "Recent E&xecutables"
+msgstr "Køyrbar fil"
+
+#: dbgmainwnd.cpp:194
+#, fuzzy
+msgid "&Settings..."
+msgstr "&Finn ..."
+
+#: dbgmainwnd.cpp:197
+msgid "&Global Options..."
+msgstr "&Globale val ..."
+
+#: dbgmainwnd.cpp:205
+msgid "&Find..."
+msgstr "&Finn ..."
+
+#: dbgmainwnd.cpp:207
+msgid "Source &code"
+msgstr ""
+
+#: dbgmainwnd.cpp:208
+msgid "Stac&k"
+msgstr ""
+
+#: dbgmainwnd.cpp:209
+msgid "&Locals"
+msgstr ""
+
+#: dbgmainwnd.cpp:210
+msgid "&Watched expressions"
+msgstr ""
+
+#: dbgmainwnd.cpp:211
+msgid "&Registers"
+msgstr ""
+
+#: dbgmainwnd.cpp:212
+#, fuzzy
+msgid "&Breakpoints"
+msgstr "Brotpunkt"
+
+#: dbgmainwnd.cpp:213
+msgid "T&hreads"
+msgstr ""
+
+#: dbgmainwnd.cpp:215
+msgid "&Memory"
+msgstr ""
+
+#: dbgmainwnd.cpp:217
+msgid "Toggle &Toolbar"
+msgstr "&Verktøylinje av/på"
+
+#: dbgmainwnd.cpp:218
+msgid "Toggle &Statusbar"
+msgstr "&Statuslinje av/på"
+
+#: dbgmainwnd.cpp:222
+msgid "&Run"
+msgstr "&Køyr"
+
+#: dbgmainwnd.cpp:227
+msgid "Step i&nto by instruction"
+msgstr ""
+
+#: dbgmainwnd.cpp:228
+msgid "Step o&ver by instruction"
+msgstr ""
+
+#: dbgmainwnd.cpp:230
+msgid "&Break"
+msgstr "&Avbryt"
+
+#: dbgmainwnd.cpp:231
+msgid "&Kill"
+msgstr ""
+
+#: dbgmainwnd.cpp:232
+msgid "Re&start"
+msgstr "&Start om att"
+
+#: dbgmainwnd.cpp:233
+msgid "A&ttach..."
+msgstr "&Legg ved ..."
+
+#: dbgmainwnd.cpp:235
+msgid "&Arguments..."
+msgstr "&Argument ..."
+
+#: dbgmainwnd.cpp:246
+msgid "Set &temporary breakpoint"
+msgstr "Set &mellombels brotpunkt"
+
+#: dbgmainwnd.cpp:247
+msgid "&Enable/Disable breakpoint"
+msgstr "Brotpunkt &av/på"
+
+#: dbgmainwnd.cpp:253
+msgid "&More..."
+msgstr "&Meir ..."
+
+#: dbgmainwnd.cpp:264
+msgid "E&xecution"
+msgstr "&Køyring"
+
+#: dbgmainwnd.cpp:265
+msgid "&Breakpoint"
+msgstr "&Brotpunkt"
+
+#: dbgmainwnd.cpp:266
+msgid "&Window"
+msgstr "&Vindauge"
+
+#: dbgmainwnd.cpp:280
+msgid "Executable"
+msgstr "Køyrbar fil"
+
+#: dbgmainwnd.cpp:282
+msgid "Open a source file"
+msgstr "Opna ei kjeldefil"
+
+#: dbgmainwnd.cpp:284
+msgid "Reload source file"
+msgstr "Last kjeldefil om att"
+
+#: dbgmainwnd.cpp:287
+msgid "Run/Continue"
+msgstr "Køyr/fortset"
+
+#: dbgmainwnd.cpp:289
+msgid "Step into"
+msgstr "Gå inn"
+
+#: dbgmainwnd.cpp:291
+msgid "Step over"
+msgstr "Hopp over"
+
+#: dbgmainwnd.cpp:293
+msgid "Step out"
+msgstr "Gå ut"
+
+#: dbgmainwnd.cpp:295
+msgid "Step into by instruction"
+msgstr ""
+
+#: dbgmainwnd.cpp:297
+msgid "Step over by instruction"
+msgstr ""
+
+#: dbgmainwnd.cpp:300
+msgid "Breakpoint"
+msgstr "Brotpunkt"
+
+#: dbgmainwnd.cpp:303
+msgid "Search"
+msgstr "Søk"
+
+#: dbgmainwnd.cpp:312
+msgid "Line 00000"
+msgstr "Linje 00000"
+
+#: dbgmainwnd.cpp:316
+msgid "Restart"
+msgstr "Start om att"
+
+#: dbgmainwnd.cpp:317
+msgid "Core dump"
+msgstr "Kjernedump"
+
+#: dbgmainwnd.cpp:655
+#, c-format
+msgid "Line %d"
+msgstr "Linje %d"
+
+#: dbgmainwnd.cpp:816
+#, fuzzy
+msgid "|All source files\n"
+msgstr "Last kjeldefil om att"
+
+#: dbgmainwnd.cpp:817
+#, fuzzy
+msgid "|Source files\n"
+msgstr "Opna ei kjeldefil"
+
+#: dbgmainwnd.cpp:818
+msgid "|Header files\n"
+msgstr ""
+
+#: dbgmainwnd.cpp:819
+msgid "*|All files"
+msgstr ""
+
+#: main.cpp:45
+msgid ""
+"A Debugger\n"
+"by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
+"with the help of many others"
+msgstr ""
+"Ein avlusar\n"
+"av Johannes Sixt <Johannes.Sixt@telecom.at>\n"
+"med hjelp frå mange andre"
+
+#: main.cpp:50
+msgid "A Debugger"
+msgstr ""
+
+#: main.cpp:62
+msgid "Docking windows"
+msgstr ""
+
+#: main.cpp:67
+msgid "transcript of conversation with the debugger"
+msgstr ""
+
+#: main.cpp:68
+msgid "remote debugging via <device>"
+msgstr ""
+
+#: main.cpp:69
+#, fuzzy
+msgid "path of executable to debug"
+msgstr "Vel den køyrbare fila som skal avlusast"
+
+#: main.cpp:70
+msgid "a core file to use"
+msgstr ""
+
+#: main.cpp:156 main.cpp:171
+msgid "Cannot start debugger."
+msgstr "Kan ikkje starta avlusar."
+
+#~ msgid "&Add"
+#~ msgstr "&Legg til"
+
+#~ msgid "E"
+#~ msgstr "E"
+
+#~ msgid "&List..."
+#~ msgstr "&Liste ..."

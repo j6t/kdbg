@@ -1,0 +1,653 @@
+# KDbg - Debugger GUI for gdb
+# Copyright (C) 1998-2000 Johannes Sixt
+# Johannes Sixt <Johannes.Sixt@telecom.at>, 2000
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: PACKAGE VERSION\n"
+"POT-Creation-Date: 2000-11-24 21:14+0100\n"
+"PO-Revision-Date: 2000-05-12 20:54+0900\n"
+"Last-Translator: Eri Ishida <>\n"
+"Language-Team: Japanese <Kdeveloper@kde.gr.jp>\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=utf8\n"
+"Content-Transfer-Encoding: 8-bit\n"
+"X-Generator: PODB ver.0.2.0\n"
+
+#: pgmargs.cpp:34
+msgid ": Program arguments"
+msgstr "プログラムの引数"
+
+#: pgmargs.cpp:37
+#, c-format
+msgid "Run %s with these arguments:"
+msgstr "これらの引数で %s を実行"
+
+#: pgmargs.cpp:55
+msgid "Working directory:"
+msgstr "作業ディレクトリ:"
+
+#: pgmargs.cpp:65
+msgid "Environment variables (NAME=value):"
+msgstr "環境変数 (NAME=values):"
+
+#: pgmargs.cpp:74
+msgid "Name"
+msgstr "名前"
+
+#: pgmargs.cpp:75 regwnd.cpp:210 regwnd.cpp:218
+msgid "Value"
+msgstr "値"
+
+#: pgmargs.cpp:91
+msgid "&Modify"
+msgstr "変更(&M)"
+
+#: procattach.cpp:23
+msgid ": Attach to process"
+msgstr ": プロセスに接続"
+
+#: procattach.cpp:27
+msgid "Specify the process number to attach to:"
+msgstr "接続先プロセス番号を指定:"
+
+#: debugger.cpp:507
+msgid ""
+"gdb exited unexpectedly.\n"
+"Restart the session (e.g. with File|Executable)."
+msgstr ""
+"gdbの予期せぬ終了\n"
+"セッションを再スタート(例；with File|Executable)"
+
+#: gdbdriver.cpp:1775
+msgid "New working directory: "
+msgstr "新しい作業ディレクトリ:"
+
+#: brkpt.cpp:63
+#, fuzzy
+msgid "Add &Breakpoint"
+msgstr "ブレークポイント(&B)"
+
+#: brkpt.cpp:67
+msgid "Add &Watchpoint"
+msgstr ""
+
+#: brkpt.cpp:76 brkpt.cpp:228
+msgid "&Disable"
+msgstr ""
+
+#: brkpt.cpp:81 brkpt.cpp:230
+msgid "&Enable"
+msgstr ""
+
+#: brkpt.cpp:91
+msgid "&View Code"
+msgstr "コードを表示(&V)"
+
+#: brkpt.cpp:95
+msgid "&Conditional..."
+msgstr "条件付き...(&C)"
+
+#: brkpt.cpp:355 threadlist.cpp:44
+msgid "Location"
+msgstr "場所"
+
+#: brkpt.cpp:356 memwindow.cpp:30
+msgid "Address"
+msgstr ""
+
+#: brkpt.cpp:357
+msgid "Hits"
+msgstr "ヒット"
+
+#: brkpt.cpp:358
+msgid "Ignore"
+msgstr "無視"
+
+#: brkpt.cpp:359
+msgid "Condition"
+msgstr "状態"
+
+#: brkpt.cpp:467
+msgid ": Conditional breakpoint"
+msgstr ": 条件付きブレークポイント"
+
+#: brkpt.cpp:470
+msgid "&Condition:"
+msgstr "条件(&C)"
+
+#: brkpt.cpp:472
+msgid "Ignore &next hits:"
+msgstr "無視　次のヒット(&n)"
+
+#: regwnd.cpp:209 regwnd.cpp:217
+#, fuzzy
+msgid "Register"
+msgstr "再スタート"
+
+#: regwnd.cpp:211 regwnd.cpp:219
+msgid "Decoded value"
+msgstr ""
+
+#: memwindow.cpp:59 regwnd.cpp:235
+msgid "&Binary"
+msgstr ""
+
+#: memwindow.cpp:58 regwnd.cpp:236
+msgid "&Octal"
+msgstr ""
+
+#: regwnd.cpp:237
+msgid "&Decimal"
+msgstr ""
+
+#: memwindow.cpp:55 regwnd.cpp:238
+msgid "He&xadecimal"
+msgstr ""
+
+#: memwindow.cpp:50
+msgid "B&ytes"
+msgstr ""
+
+#: memwindow.cpp:51
+msgid "Halfwords (&2 Bytes)"
+msgstr ""
+
+#: memwindow.cpp:52
+msgid "Words (&4 Bytes)"
+msgstr ""
+
+#: memwindow.cpp:53
+msgid "Giantwords (&8 Bytes)"
+msgstr ""
+
+#: memwindow.cpp:56
+msgid "Signed &decimal"
+msgstr ""
+
+#: memwindow.cpp:57
+msgid "&Unsigned decimal"
+msgstr ""
+
+#: memwindow.cpp:60
+msgid "&Addresses"
+msgstr ""
+
+#: memwindow.cpp:61
+msgid "&Character"
+msgstr ""
+
+#: memwindow.cpp:62
+msgid "&Floatingpoint"
+msgstr ""
+
+#: memwindow.cpp:63
+msgid "&Strings"
+msgstr ""
+
+#: memwindow.cpp:64
+msgid "&Instructions"
+msgstr ""
+
+#: threadlist.cpp:43
+msgid "Thread ID"
+msgstr ""
+
+#: dbgmainwnd.cpp:189 winstack.cpp:58 winstack.cpp:68
+msgid "&Open Source..."
+msgstr "ソースを開く(&O)"
+
+#: dbgmainwnd.cpp:223 winstack.cpp:60
+msgid "Step &into"
+msgstr "ステップ イントゥ(&i)"
+
+#: dbgmainwnd.cpp:224 winstack.cpp:61
+msgid "Step &over"
+msgstr "ステップ オーバー(&o)"
+
+#: dbgmainwnd.cpp:225 winstack.cpp:62
+msgid "Step o&ut"
+msgstr "ステップ アウト(&u)"
+
+#: dbgmainwnd.cpp:226 winstack.cpp:63
+msgid "Run to &cursor"
+msgstr "カーソルまで行く(&c)"
+
+#: dbgmainwnd.cpp:245 winstack.cpp:65
+msgid "Set/Clear &breakpoint"
+msgstr "ブレークポイントのセット／クリア(&b)"
+
+#: dbgmainwnd.cpp:192 winstack.cpp:70
+msgid "&Executable..."
+msgstr "実行可能(&E)"
+
+#: dbgmainwnd.cpp:195 winstack.cpp:71
+msgid "&Core dump..."
+msgstr "コアダンプ(&C)"
+
+#: winstack.cpp:504
+msgid ": Open Windows"
+msgstr ": ウィンドウを開く"
+
+#: winstack.cpp:512
+msgid "Show"
+msgstr "表示"
+
+#: winstack.cpp:580
+msgid ": Search"
+msgstr ": 検索"
+
+#: winstack.cpp:586
+msgid "&Case sensitive"
+msgstr "大文字と小文字を区別する(&C)"
+
+#: winstack.cpp:588
+msgid "&Forward"
+msgstr "進む(&F)"
+
+#: winstack.cpp:590
+msgid "&Backward"
+msgstr "戻る(&B)"
+
+#: ttywnd.cpp:155
+msgid "&Clear"
+msgstr ""
+
+#: prefdebugger.cpp:23
+msgid "To revert to the default settings, clear the entries."
+msgstr ""
+"デフォルトの設定を復元するには、エントリーを削除し�"
+"�ください。"
+
+#: prefdebugger.cpp:27
+msgid "How to invoke &GDB:"
+msgstr "GDBを呼び出すには(&G):"
+
+#: prefdebugger.cpp:34
+msgid ""
+"%T will be replaced with a title string,\n"
+"%C will be replaced by a Bourne shell script that\n"
+"keeps the terminal window open."
+msgstr ""
+"%Tはタイトルの文字列と置き換わり、\n"
+"%Cはターミナルのウインドウを開いておくボーンシェル\n"
+"スクリプトに置き換わります。"
+
+#: prefdebugger.cpp:40
+msgid "&Terminal for program output:"
+msgstr "プログラムの出力用ターミナル(&T):"
+
+#: prefmisc.cpp:27
+msgid "&Pop into foreground when program stops"
+msgstr ""
+
+#: prefmisc.cpp:32
+msgid "Time until window goes &back (in milliseconds):"
+msgstr ""
+
+#: prefmisc.cpp:39
+msgid "&Tabstop every (characters):"
+msgstr ""
+
+#: prefmisc.cpp:41
+#, fuzzy
+msgid "File filter for &source files:"
+msgstr "ソースファイルを再読み込み"
+
+#: prefmisc.cpp:43
+msgid "File filter for &header files:"
+msgstr ""
+
+#: pgmsettings.cpp:26
+msgid ""
+"How to invoke &GDB - leave empty to use\n"
+"the default from the global options:"
+msgstr ""
+
+#: pgmsettings.cpp:61
+msgid "&No input and output"
+msgstr ""
+
+#: pgmsettings.cpp:66
+msgid "&Only output, simple terminal emulation"
+msgstr ""
+
+#: pgmsettings.cpp:71
+msgid "&Full terminal emulation"
+msgstr ""
+
+#: pgmsettings.cpp:111
+#, c-format
+msgid "%s: Settings for %s"
+msgstr ""
+
+#: mainwndbase.cpp:509 pgmsettings.cpp:122
+msgid "&Debugger"
+msgstr ""
+
+#: dbgmainwnd.cpp:214 pgmsettings.cpp:123
+msgid "&Output"
+msgstr ""
+
+#: mainwndbase.cpp:54
+msgid " Add "
+msgstr "追加"
+
+#: mainwndbase.cpp:55
+msgid " Del "
+msgstr "削除"
+
+#: mainwndbase.cpp:143
+msgid "active"
+msgstr "アクティブ"
+
+#: mainwndbase.cpp:313
+msgid "Select the executable to debug"
+msgstr "デバッグ可能なものを選択"
+
+#: mainwndbase.cpp:329
+msgid "Select core dump"
+msgstr "コアダンプを選択"
+
+#: mainwndbase.cpp:492
+msgid ": Global options"
+msgstr ": グローバルオプション"
+
+#: mainwndbase.cpp:510
+msgid "&Miscellaneous"
+msgstr ""
+
+#: mainwndbase.cpp:582
+msgid ": Program output"
+msgstr ": プログラムの出力"
+
+#: mainwndbase.cpp:757
+#, c-format
+msgid "`%s' is not a file or does not exist"
+msgstr "`%s'はファイルでないか、もしくは存在しません"
+
+#: mainwndbase.cpp:773
+msgid ""
+"Could not start the debugger process.\n"
+"Please shut down KDbg and resolve the problem."
+msgstr ""
+
+#: dbgmainwnd.cpp:39
+#, fuzzy
+msgid "Source"
+msgstr "ソースの再読み込み(&R)"
+
+#: dbgmainwnd.cpp:44
+msgid "Stack"
+msgstr ""
+
+#: dbgmainwnd.cpp:47
+msgid "Locals"
+msgstr ""
+
+#: dbgmainwnd.cpp:50
+msgid "Watches"
+msgstr ""
+
+#: dbgmainwnd.cpp:53
+#, fuzzy
+msgid "Registers"
+msgstr "再スタート"
+
+#: dbgmainwnd.cpp:56
+msgid "Breakpoints"
+msgstr "ブレークポイント"
+
+#: dbgmainwnd.cpp:59
+msgid "Output"
+msgstr ""
+
+#: dbgmainwnd.cpp:62
+msgid "Threads"
+msgstr ""
+
+#: dbgmainwnd.cpp:65
+msgid "Memory"
+msgstr ""
+
+#: dbgmainwnd.cpp:190
+msgid "&Reload Source"
+msgstr "ソースの再読み込み(&R)"
+
+#: dbgmainwnd.cpp:193
+#, fuzzy
+msgid "Recent E&xecutables"
+msgstr "実行可能"
+
+#: dbgmainwnd.cpp:194
+#, fuzzy
+msgid "&Settings..."
+msgstr "検索(&F)"
+
+#: dbgmainwnd.cpp:197
+msgid "&Global Options..."
+msgstr "グローバルオプション(&G)"
+
+#: dbgmainwnd.cpp:205
+msgid "&Find..."
+msgstr "検索(&F)"
+
+#: dbgmainwnd.cpp:207
+msgid "Source &code"
+msgstr ""
+
+#: dbgmainwnd.cpp:208
+msgid "Stac&k"
+msgstr ""
+
+#: dbgmainwnd.cpp:209
+msgid "&Locals"
+msgstr ""
+
+#: dbgmainwnd.cpp:210
+msgid "&Watched expressions"
+msgstr ""
+
+#: dbgmainwnd.cpp:211
+msgid "&Registers"
+msgstr ""
+
+#: dbgmainwnd.cpp:212
+#, fuzzy
+msgid "&Breakpoints"
+msgstr "ブレークポイント"
+
+#: dbgmainwnd.cpp:213
+msgid "T&hreads"
+msgstr ""
+
+#: dbgmainwnd.cpp:215
+msgid "&Memory"
+msgstr ""
+
+#: dbgmainwnd.cpp:217
+msgid "Toggle &Toolbar"
+msgstr "ツールバーをトグル(&T)"
+
+#: dbgmainwnd.cpp:218
+msgid "Toggle &Statusbar"
+msgstr "ステータスバーをトグル(&S)"
+
+#: dbgmainwnd.cpp:222
+msgid "&Run"
+msgstr "実行(&R)"
+
+#: dbgmainwnd.cpp:227
+msgid "Step i&nto by instruction"
+msgstr ""
+
+#: dbgmainwnd.cpp:228
+msgid "Step o&ver by instruction"
+msgstr ""
+
+#: dbgmainwnd.cpp:230
+msgid "&Break"
+msgstr "ブレーク(&B)"
+
+#: dbgmainwnd.cpp:231
+msgid "&Kill"
+msgstr ""
+
+#: dbgmainwnd.cpp:232
+msgid "Re&start"
+msgstr "再スタート(&s)"
+
+#: dbgmainwnd.cpp:233
+msgid "A&ttach..."
+msgstr "接続(&t)"
+
+#: dbgmainwnd.cpp:235
+msgid "&Arguments..."
+msgstr "引数(&A)"
+
+#: dbgmainwnd.cpp:246
+msgid "Set &temporary breakpoint"
+msgstr "仮ブレークポイントをセット(&t)"
+
+#: dbgmainwnd.cpp:247
+msgid "&Enable/Disable breakpoint"
+msgstr "ブレークポイントを有効／無効(&E)"
+
+#: dbgmainwnd.cpp:253
+msgid "&More..."
+msgstr "More(&M)"
+
+#: dbgmainwnd.cpp:264
+msgid "E&xecution"
+msgstr "実行(&x)"
+
+#: dbgmainwnd.cpp:265
+msgid "&Breakpoint"
+msgstr "ブレークポイント(&B)"
+
+#: dbgmainwnd.cpp:266
+msgid "&Window"
+msgstr "ウインドウ(&W)"
+
+#: dbgmainwnd.cpp:280
+msgid "Executable"
+msgstr "実行可能"
+
+#: dbgmainwnd.cpp:282
+msgid "Open a source file"
+msgstr "ソースファイルを開く"
+
+#: dbgmainwnd.cpp:284
+msgid "Reload source file"
+msgstr "ソースファイルを再読み込み"
+
+#: dbgmainwnd.cpp:287
+msgid "Run/Continue"
+msgstr "実行／続ける"
+
+#: dbgmainwnd.cpp:289
+msgid "Step into"
+msgstr "ステップイントゥ"
+
+#: dbgmainwnd.cpp:291
+msgid "Step over"
+msgstr "ステップオーバー"
+
+#: dbgmainwnd.cpp:293
+msgid "Step out"
+msgstr "ステップアウト"
+
+#: dbgmainwnd.cpp:295
+msgid "Step into by instruction"
+msgstr ""
+
+#: dbgmainwnd.cpp:297
+msgid "Step over by instruction"
+msgstr ""
+
+#: dbgmainwnd.cpp:300
+msgid "Breakpoint"
+msgstr "ブレークポイント"
+
+#: dbgmainwnd.cpp:303
+msgid "Search"
+msgstr "検索"
+
+#: dbgmainwnd.cpp:312
+msgid "Line 00000"
+msgstr "00000 行"
+
+#: dbgmainwnd.cpp:316
+msgid "Restart"
+msgstr "再スタート"
+
+#: dbgmainwnd.cpp:317
+msgid "Core dump"
+msgstr "コアダンプ"
+
+#: dbgmainwnd.cpp:655
+#, c-format
+msgid "Line %d"
+msgstr "%d 行"
+
+#: dbgmainwnd.cpp:816
+#, fuzzy
+msgid "|All source files\n"
+msgstr "ソースファイルを再読み込み"
+
+#: dbgmainwnd.cpp:817
+#, fuzzy
+msgid "|Source files\n"
+msgstr "ソースファイルを開く"
+
+#: dbgmainwnd.cpp:818
+msgid "|Header files\n"
+msgstr ""
+
+#: dbgmainwnd.cpp:819
+msgid "*|All files"
+msgstr ""
+
+#: main.cpp:45
+msgid ""
+"A Debugger\n"
+"by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
+"with the help of many others"
+msgstr ""
+"デバッガー\n"
+"by Johannes Sixt <Johannes.Sixt@telecom.at>"
+
+#: main.cpp:50
+msgid "A Debugger"
+msgstr ""
+
+#: main.cpp:62
+msgid "Docking windows"
+msgstr ""
+
+#: main.cpp:67
+msgid "transcript of conversation with the debugger"
+msgstr ""
+
+#: main.cpp:68
+msgid "remote debugging via <device>"
+msgstr ""
+
+#: main.cpp:69
+#, fuzzy
+msgid "path of executable to debug"
+msgstr "デバッグ可能なものを選択"
+
+#: main.cpp:70
+msgid "a core file to use"
+msgstr ""
+
+#: main.cpp:156 main.cpp:171
+msgid "Cannot start debugger."
+msgstr "デバッガを起動できません"
+
+#~ msgid "&Add"
+#~ msgstr "追加(&A)"
+
+#~ msgid "&List..."
+#~ msgstr "リスト(&L)"
