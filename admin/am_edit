@@ -1147,7 +1147,7 @@ sub tag_ICON()
         my $iconauto = ($2 =~ /AUTO\s*$/);
         my @appnames = ();
         if ( ! $iconauto ) {
-            my @_appnames = split(" ", $2);
+            my @_appnames = split(/[\034\s]+/, $2);
             print STDOUT "KDE_ICON processing <@_appnames>\n"   if ($verbose);
             foreach $appname (@_appnames) {
                 push(@appnames, quotemeta($appname));
@@ -1262,7 +1262,7 @@ sub tag_ICON()
 
 sub handle_POFILES($$)
 {
-  my @pofiles = split(" ", $_[0]);
+  my @pofiles = split(/[\034\s]+/, $_[0]);
   my $lang = $_[1];
 
   # Build rules for creating the gmo files
