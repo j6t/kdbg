@@ -6,10 +6,9 @@ IdentifyingType=
 Display={ % }
 Expr1=(%s).shd->data
 [QObject]
-Display={ name=% #chld=% #conn=% }
+Display={ name=% #chld=% }
 Expr1=(%s).objname
 Expr2=(%s).childObjects->numNodes
-Expr3=(%s).connections->numItems
 [QTableView]
 Alias=QObject
 [QDir]
