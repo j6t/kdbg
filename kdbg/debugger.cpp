@@ -163,12 +163,21 @@ KDebugger::~KDebugger()
 
 
 // instance properties
-void KDebugger::saveProperties(KConfig*)
+void KDebugger::saveProperties(KConfig* config)
 {
+    // session management
+    config->writeEntry("executable", m_executable);
 }
 
-void KDebugger::readProperties(KConfig*)
+void KDebugger::readProperties(KConfig* config)
 {
+    // session management
+    QString execName = config->readEntry("executable");
+
+    TRACE("readProperties: executable=" + execName);
+    if (!execName.isEmpty()) {
+	debugProgram(execName);
+    }
 }
 
 
@@ -196,7 +205,7 @@ void KDebugger::menuCallback(int item)
 	{
 	    // open a new executable
 	    // TODO: check for running program
-	    QString executable = getExecFileName();
+	    QString executable = getExecFileName(0, 0, this);
 	    if (!executable.isEmpty()) {
 		debugProgram(executable);
 	    }
@@ -503,6 +512,7 @@ bool KDebugger::startGdb()
 
     // create an output window
     if (!createOutputWindow()) {
+	TRACE("createOuputWindow failed");
 	return false;
     }
     TRACE("successfully created output window");
@@ -518,21 +528,32 @@ void KDebugger::gdbExited(KProcess*)
     m_logFile.writeBlock(txt,sizeof(txt)-1);
 }
 
-const char KDebugger::fifoName[] = "/tmp/kdbgttywin";
+const char fifoNameBase[] = "/tmp/kdbgttywin%05d";
 
+/*
+ * We use the scope operator :: in this function, so that we don't
+ * accidentally use the wrong close() function (I've been bitten ;-),
+ * outch!) (We use it for all the libc functions, to be consistent...)
+ */
 bool KDebugger::createOutputWindow()
 {
+    // create a name for a fifo
+    QString fifoName;
+    fifoName.sprintf(fifoNameBase, ::getpid());
+
     // create a fifo that will pass in the tty name
-    unlink(fifoName);			/* remove remnants */
-    if (mknod(fifoName, S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
+    ::unlink(fifoName);			/* remove remnants */
+    if (::mknod(fifoName, S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
 	// failed
+	TRACE("mknod " + fifoName + " failed");
 	return false;
     }
 
-    int pid = fork();
+    int pid = ::fork();
     if (pid < 0) {
 	// error
-	unlink(fifoName);
+	TRACE("fork failed for fifo " + fifoName);
+	::unlink(fifoName);
 	return false;
     }
     if (pid == 0) {
@@ -543,39 +564,38 @@ bool KDebugger::createOutputWindow()
 	 * a tty, but do nothing otherwise (see main.cpp).
 	 */
 #ifdef HAVE_PUTENV
-	QString specialVar;
-	specialVar.sprintf("_KDBG_TTYIOWIN=%s", fifoName);
-	putenv(specialVar);
+	QString specialVar = "_KDBG_TTYIOWIN=" + fifoName;
+	::putenv(specialVar);
 #else
-	setenv("_KDBG_TTYIOWIN", fifoName, 1);
+	::setenv("_KDBG_TTYIOWIN", fifoName, 1);
 #endif
 
 	// spawn "xterm -name kdbgio -title "KDbg: Program output" -e kdbg"
 	extern QString thisExecName;
-	execlp("xterm",
-	       "xterm",
-	       "-name", "kdbgio",
-	       "-title", "KDbg: Program output",
-	       "-e", static_cast<const char*>(thisExecName),
-	       0);
+	::execlp("xterm",
+		 "xterm",
+		 "-name", "kdbgio",
+		 "-title", "KDbg: Program output",
+		 "-e", thisExecName.data(),
+		 0);
 	
 	// failed; what can we do?
-	exit(0);
+	::exit(0);
     } else {
 	// parent process
 	// read the ttyname from the fifo
-	int f = open(fifoName, O_RDONLY);
+	int f = ::open(fifoName, O_RDONLY);
 	if (f < 0) {
 	    // error
-	    unlink(fifoName);
+	    ::unlink(fifoName);
 	    return false;
 	}
 
 	char ttyname[50];
-	int n = read(f, ttyname, sizeof(ttyname)-sizeof(char));   /* leave space for '\0' */
+	int n = ::read(f, ttyname, sizeof(ttyname)-sizeof(char));   /* leave space for '\0' */
 
-	close(f);
-	unlink(fifoName);
+	::close(f);
+	::unlink(fifoName);
 
 	if (n < 0) {
 	    // error
@@ -589,8 +609,8 @@ bool KDebugger::createOutputWindow()
 	m_outputTermName = tty.left(comma);
 	tty.remove(0, comma+1);
 	m_outputTermPID = tty.toInt();
-	KDEBUG2(KDEBUG_INFO, 0, "tty=%s, pid=%d",
-		static_cast<const char*>(m_outputTermName), m_outputTermPID);
+	TRACE(QString().sprintf("tty=%s, pid=%d",
+				m_outputTermName.data(), m_outputTermPID));
     }
     return true;
 }
@@ -620,6 +640,7 @@ bool KDebugger::debugProgram(const QString& name)
 
     if (!m_gdb.isRunning()) {
 	if (!startGdb()) {
+	    TRACE("startGdb failed");
 	    return false;
 	}
     }

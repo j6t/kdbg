@@ -70,7 +70,6 @@ protected:
 	DCframe,
 	DCinfobreak
     };
-    static const char fifoName[];
     pid_t m_outputTermPID;
     QString m_outputTermName;
     bool createOutputWindow();
