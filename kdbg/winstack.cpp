@@ -652,7 +652,7 @@ void WinStack::selectWindow(int id)
 
     if (id == 0) {
 	// more windows selected: show windows in a list
-	MoreWindowsDialog dlg(0);
+	MoreWindowsDialog dlg(this);
 	int i = 0;
 	for (FileWindow* fw = m_fileList.first(); fw != 0; fw = m_fileList.next()) {
 	    dlg.insertString(fw->fileName());
