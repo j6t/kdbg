@@ -874,7 +874,7 @@ void DockManager::drop()
 
 void DockManager::writeConfig( KConfig* c, QString group )
 {
-debug("BEGIN Write Config");
+//debug("BEGIN Write Config");
 #if QT_VERSION >= 200
   if ( !c ) c = kapp->config();
 #else
@@ -894,13 +894,13 @@ debug("BEGIN Write Config");
 	QStrList nList;
   while ( (obj=it.current()) ) {
 	  ++it;
-    debug("  +Add subdock %s", obj->name());
+//    debug("  +Add subdock %s", obj->name());
 		nList.append( obj->name() );
   }
 
 	nList.first();
   while ( nList.current() ){
-    debug("  -Try to save %s", nList.current());
+//    debug("  -Try to save %s", nList.current());
 		obj = getDockWidgetFromName( nList.current() );
     QString cname = obj->name();
     c->writeEntry( cname+":stayButton", obj->stayButton->isOn() );
@@ -923,16 +923,16 @@ debug("BEGIN Write Config");
 
         nameList.append( obj->name() );
         findList.append( obj->name() );
-        debug("  Save %s", nList.current());
+//        debug("  Save %s", nList.current());
         nList.remove();
         nList.first();
       } else {
 /*************************************************************************************************/
-        debug("  Skip %s", nList.current());
+//        debug("  Skip %s", nList.current());
         if ( findList.find( obj->firstName ) == -1 )
-          debug("  ? Not found %s", obj->firstName);
+//          debug("  ? Not found %s", obj->firstName);
         if ( findList.find( obj->lastName ) == -1 )
-          debug("  ? Not found %s", obj->lastName);
+//          debug("  ? Not found %s", obj->lastName);
         nList.next();
         if ( !nList.current() ) nList.first();
       }
@@ -956,7 +956,7 @@ debug("BEGIN Write Config");
 
         nameList.append( obj->name() );
         findList.append( obj->name() ); // not realy need !!!
-        debug("  Save %s", nList.current());
+//        debug("  Save %s", nList.current());
         nList.remove();
         nList.first();
       } else {
@@ -969,7 +969,7 @@ debug("BEGIN Write Config");
           c->writeEntry( cname+":type", "DOCK");
         }
         nameList.append( cname );
-        debug("  Save %s", nList.current());
+//        debug("  Save %s", nList.current());
         findList.append( obj->name() );
         nList.remove();
         nList.first();
@@ -991,7 +991,7 @@ debug("BEGIN Write Config");
   }
 
   c->sync();
-  debug("END Write Config");
+//  debug("END Write Config");
 }
 
 void DockManager::readConfig( KConfig* c, QString group )
