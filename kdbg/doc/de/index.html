@@ -2,7 +2,7 @@
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
-   <meta name="GENERATOR" content="Mozilla/4.51 [en] (X11; I; Linux 2.2.5 i586) [Netscape]">
+   <meta name="GENERATOR" content="Mozilla/4.7 [en] (X11; I; Linux 2.2.13 i586) [Netscape]">
    <title>KDbg</title>
 </head>
 <body>
@@ -107,14 +107,17 @@ Sie k&ouml;nnen einen Haltepunkt auch setzen, indem Sie mit der Maus in
 den Freiraum links der entsprechenden Quellcode-Zeile klicken (mit der
 linken Maustaste); weiters k&ouml;nnen sie einen vorhandenen Haltepunkt
 mit der mittleren Maustaste aktivieren und deaktivieren.
+<p>Im Menu <i>Ansicht</i> finden Sie Befehle, um verschiedene Fenster zu
+&ouml;ffnen und zu schlie&szlig;en. Bei diesen handelt es sich um dockende
+Fenster, die Sie in beliebiger Weise anordnen k&ouml;nnen.
 <h3>
 <a NAME="BrkptList"></a>Die Liste der Haltepunkte</h3>
-Die Liste der Haltepunkte k&ouml;nnen Sie mit dem Menupunkt <i>Haltepunkt|Liste</i>
+Die Liste der Haltepunkte k&ouml;nnen Sie mit dem Menupunkt <i>Ansicht|Haltepunkte</i>
 anzeigen. Diese zeigt f&uuml;r jeden Haltepunkt folgendes an: Den Ort,
 die Anzahl der Stopps, die Anzahl der n&auml;chsten zu ignorierenden Stopps
 (falls gesetzt) sowie eine Haltebedingung (falls gesetzt). Das Piktogramm
-links zeigt an, ob der Haltepunkt aktiviert (voller roter Punkt) oder deaktiviert
-(roter Kreis) ist, ob es sich um einen tempor&auml;ren Haltepunkt handelt
+links zeigt an, ob der Haltepunkt aktiviert (tiefroter Punkt) oder deaktiviert
+(hellroter Punkt) ist, ob es sich um einen tempor&auml;ren Haltepunkt handelt
 (eine winzige Uhr ist sichtbar) und ob der Haltepunkt bedingt ist (ein
 Fragezeichen ist sichtbar).
 <p>Sie k&ouml;nnen eine <b>Bedingung</b> (sodass das Programm nur stehen
@@ -174,7 +177,6 @@ Programmausgabe</i> an. Die Standardeinstellung ist <tt>xterm -name kdbgio
 &Uuml;berschrift und <tt>%C</tt> durch ein Bourne-Shell-Skript ersetzt,
 das in eine Endlosschleife landet, damit sich das Fenster nicht schlie&szlig;t.
 (Keine Sorge, das Skript frisst keine CPU-Zeit, sondern ruft einfach nur
-
 <tt>sleep 3600</tt> in einer Schleife auf :) Eine alternative f&uuml;r
 diesen Eintrag w&auml;re zm Beispiel <tt>konsole -nowelcome -name kdbgio
 -caption %T -e sh -c %C</tt>.
