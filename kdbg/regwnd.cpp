@@ -420,9 +420,9 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
     setSorting(-1);
     setFont(KGlobalSettings::fixedFont());
 
-    QPixmap iconRegs = BarIcon("regs.xpm");
-    QPixmap iconWatchcoded = BarIcon("watchcoded.xpm");
-    QPixmap iconWatch = BarIcon("watch.xpm");
+    QPixmap iconRegs = UserIcon("regs.xpm");
+    QPixmap iconWatchcoded = UserIcon("watchcoded.xpm");
+    QPixmap iconWatch = UserIcon("watch.xpm");
 
     addColumn(QIconSet(iconRegs), i18n("Register"));
     addColumn(QIconSet(iconWatchcoded), i18n("Value"));

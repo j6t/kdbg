@@ -41,7 +41,7 @@ ThreadList::ThreadList(QWidget* parent, const char* name) :
     addColumn(i18n("Location"));
 
     // load pixmaps
-    m_focusIcon = BarIcon("pcinner");
+    m_focusIcon = UserIcon("pcinner");
     makeNoFocusIcon();
 
     connect(this, SIGNAL(currentChanged(QListViewItem*)),

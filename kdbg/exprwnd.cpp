@@ -251,7 +251,7 @@ ExprWnd::ExprWnd(QWidget* parent, const char* name) :
     connect(this, SIGNAL(expanded(int)), SLOT(slotExpandOrCollapse(int)));
     connect(this, SIGNAL(collapsed(int)), SLOT(slotExpandOrCollapse(int)));
 
-    m_pixPointer = BarIcon("pointer.xpm");
+    m_pixPointer = UserIcon("pointer.xpm");
     if (m_pixPointer.isNull())
 	TRACE("Can't load pointer.xpm");
 }

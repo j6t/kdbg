@@ -26,13 +26,13 @@ SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* na
     setNumCols(3);
 
     // load pixmaps
-    m_pcinner = BarIcon("pcinner");
-    m_pcup = BarIcon("pcup");
-    m_brkena = BarIcon("brkena");
-    m_brkdis = BarIcon("brkdis");
-    m_brktmp = BarIcon("brktmp");
-    m_brkcond = BarIcon("brkcond");
-    m_brkorph = BarIcon("brkorph");
+    m_pcinner = UserIcon("pcinner");
+    m_pcup = UserIcon("pcup");
+    m_brkena = UserIcon("brkena");
+    m_brkdis = UserIcon("brkdis");
+    m_brktmp = UserIcon("brktmp");
+    m_brkcond = UserIcon("brkcond");
+    m_brkorph = UserIcon("brkorph");
     setFont(KGlobalSettings::fixedFont());
 }
 

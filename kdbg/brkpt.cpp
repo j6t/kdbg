@@ -341,13 +341,13 @@ void BreakpointTable::initListAndIcons()
     m_list.setSorting(-1);
 
     // add pixmaps
-    QPixmap brkena = BarIcon("brkena.xpm");
-    QPixmap brkdis = BarIcon("brkdis.xpm");
-    QPixmap watchena = BarIcon("watchena.xpm");
-    QPixmap watchdis = BarIcon("watchdis.xpm");
-    QPixmap brktmp = BarIcon("brktmp.xpm");
-    QPixmap brkcond = BarIcon("brkcond.xpm");
-    QPixmap brkorph = BarIcon("brkorph.xpm");
+    QPixmap brkena = UserIcon("brkena.xpm");
+    QPixmap brkdis = UserIcon("brkdis.xpm");
+    QPixmap watchena = UserIcon("watchena.xpm");
+    QPixmap watchdis = UserIcon("watchdis.xpm");
+    QPixmap brktmp = UserIcon("brktmp.xpm");
+    QPixmap brkcond = UserIcon("brkcond.xpm");
+    QPixmap brkorph = UserIcon("brkorph.xpm");
 
     /*
      * There are 32 different pixmaps: The basic enabled or disabled
