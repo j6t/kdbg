@@ -904,10 +904,32 @@ static void skipNested(const char*& s, char opening, char closing)
 	}
 	p++;
     }
-    if (nest > 0) {
+    if (nest != 0) {
 	TRACE(QString().sprintf("parse error: mismatching %c%c at %-20.20s", opening, closing, s));
     }
     s = p;
+}
+
+/**
+ * Find the end of line that is not inside braces
+ */
+static void findEnd(const char*& s)
+{
+    const char* p = s;
+    while (*p && *p!='\n') {
+	while (*p && *p!='\n' && *p!='{')
+	    p++;
+	if (*p=='{') {
+	    p++;
+	    skipNested(p, '{', '}'); p--;
+	}
+    }
+    s = p;
+}
+
+static bool isNumberish(const char ch)
+{
+    return (ch>='0' && ch<='9') || ch=='.' || ch=='x'; 
 }
 
 void skipString(const char*& p)
@@ -2041,6 +2063,41 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 		start = output;
 		skipNested(output, '{', '}');
 		value = FROM_LATIN1(start, output-start).simplifyWhiteSpace();
+	    } else {
+		// for gdb 5.3
+		// find first type that does not have an array, this is the RAW value
+		const char* end=start;
+		findEnd(end);
+		const char* cur=start; 
+		while (cur<end) {
+		    while (*cur != '=' && cur<end)
+			cur++;
+		    cur++; 
+		    while (isspace(*cur) && cur<end)
+			cur++;
+		    if (isNumberish(*cur)) {
+			end=cur;
+			while (*end && (*end!='}') && (*end!=',') && (*end!='\n'))
+			    end++;
+			QString rawValue = FROM_LATIN1(cur, end-cur).simplifyWhiteSpace();
+			reg->rawValue = rawValue;
+
+			if (rawValue.left(2)=="0x") {
+			    // ok we have a raw value, now get it's type
+			    end=cur-1;
+			    while (isspace(*end) || *end=='=') end--;
+			    end++;
+			    cur=end-1;
+			    while (*cur!='{' && *cur!=' ')
+				cur--;
+			    cur++;
+			    reg->type=FROM_LATIN1(cur, end-cur);
+			}
+
+			// end while loop 
+			cur=end;
+		    }
+		}
 		// skip to the end of line
 		while (*output != '\0' && *output != '\n')
 		    output++;

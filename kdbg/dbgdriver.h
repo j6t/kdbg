@@ -219,6 +219,7 @@ struct RegisterInfo
     QString regName;
     QString rawValue;
     QString cookedValue;		/* may be empty */
+    QString type;			/* of vector register if not empty */
 };
 
 /**
