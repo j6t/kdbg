@@ -5,8 +5,10 @@ TOOLBAR = \
 	brkpt.xpm \
 	pgmfinish.xpm \
 	pgmnext.xpm \
+	pgmnexti.xpm \
 	pgmrun.xpm \
 	pgmstep.xpm \
+	pgmstepi.xpm \
 	execopen.xpm \
 	search.xpm
 

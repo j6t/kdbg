@@ -229,18 +229,18 @@ void KDebugger::programRunAgain()
     }
 }
 
-void KDebugger::programStep()
+void KDebugger::programStep(bool byInsn)
 {
     if (canSingleStep()) {
-	m_d->executeCmd(DCstep, true);
+	m_d->executeCmd(byInsn ? DCstepi : DCstep, true);
 	m_programRunning = true;
     }
 }
 
-void KDebugger::programNext()
+void KDebugger::programNext(bool byInsn)
 {
     if (canSingleStep()) {
-	m_d->executeCmd(DCnext, true);
+	m_d->executeCmd(byInsn ? DCnexti : DCnext, true);
 	m_programRunning = true;
     }
 }
@@ -893,7 +893,9 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCrun:
     case DCcont:
     case DCstep:
+    case DCstepi:
     case DCnext:
+    case DCnexti:
     case DCfinish:
     case DCuntil:
     case DCthread:

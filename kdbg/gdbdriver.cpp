@@ -93,7 +93,9 @@ static GdbCmdInfo cmds[] = {
     { DCrun, "run\n", GdbCmdInfo::argNone },
     { DCcont, "cont\n", GdbCmdInfo::argNone },
     { DCstep, "step\n", GdbCmdInfo::argNone },
+    { DCstepi, "stepi\n", GdbCmdInfo::argNone },
     { DCnext, "next\n", GdbCmdInfo::argNone },
+    { DCnexti, "nexti\n", GdbCmdInfo::argNone },
     { DCfinish, "finish\n", GdbCmdInfo::argNone },
     { DCuntil, "until %s:%d\n", GdbCmdInfo::argStringNum },
     { DCkill, "kill\n", GdbCmdInfo::argNone },
@@ -300,7 +302,9 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
     case DCrun:
     case DCcont:
     case DCstep:
+    case DCstepi:
     case DCnext:
+    case DCnexti:
     case DCfinish:
     case DCuntil:
 	parseMarker();

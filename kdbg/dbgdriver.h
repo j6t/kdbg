@@ -59,7 +59,9 @@ enum DbgCommand {
 	DCrun,
 	DCcont,
 	DCstep,
+	DCstepi,
 	DCnext,
+	DCnexti,
 	DCfinish,
 	DCuntil,			/* line number is zero-based! */
 	DCkill,

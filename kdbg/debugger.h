@@ -77,13 +77,15 @@ public:
 
     /**
      * Performs a single-step, possibly stepping into a function call.
+     * If byInsn is true, a step by instruction is performed.
      */
-    void programStep();
+    void programStep(bool byInsn);
 
     /**
      * Performs a single-step, stepping over a function call.
+     * If byInsn is true, a step by instruction is performed.
      */
-    void programNext();
+    void programNext(bool byInsn);
 
     /**
      * Runs the program until it returns from the current function.

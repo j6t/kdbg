@@ -224,6 +224,8 @@ void DebuggerMainWnd::initMenu()
     m_menuProgram->insertItem(i18n("Step &over"), ID_PROGRAM_NEXT);
     m_menuProgram->insertItem(i18n("Step o&ut"), ID_PROGRAM_FINISH);
     m_menuProgram->insertItem(i18n("Run to &cursor"), ID_PROGRAM_UNTIL);
+    m_menuProgram->insertItem(i18n("Step i&nto by instruction"), ID_PROGRAM_STEPI);
+    m_menuProgram->insertItem(i18n("Step o&ver by instruction"), ID_PROGRAM_NEXTI);
     m_menuProgram->insertSeparator();
     m_menuProgram->insertItem(i18n("&Break"), ID_PROGRAM_BREAK);
     m_menuProgram->insertItem(i18n("&Kill"), ID_PROGRAM_KILL);
@@ -233,7 +235,9 @@ void DebuggerMainWnd::initMenu()
     m_menuProgram->insertItem(i18n("&Arguments..."), ID_PROGRAM_ARGS);
     m_menuProgram->setAccel(Key_F5, ID_PROGRAM_RUN);
     m_menuProgram->setAccel(Key_F8, ID_PROGRAM_STEP);
+    m_menuProgram->setAccel(SHIFT+Key_F8, ID_PROGRAM_STEPI);
     m_menuProgram->setAccel(Key_F10, ID_PROGRAM_NEXT);
+    m_menuProgram->setAccel(SHIFT+Key_F10, ID_PROGRAM_NEXTI);
     m_menuProgram->setAccel(Key_F6, ID_PROGRAM_FINISH);
     m_menuProgram->setAccel(Key_F7, ID_PROGRAM_UNTIL);
 
@@ -287,6 +291,10 @@ void DebuggerMainWnd::initToolbar()
 			   i18n("Step over"));
     toolbar->insertButton(BarIcon("pgmfinish.xpm"),ID_PROGRAM_FINISH, true,
 			   i18n("Step out"));
+    toolbar->insertButton(BarIcon("pgmstepi.xpm"),ID_PROGRAM_STEPI, true,
+			   i18n("Step into by instruction"));
+    toolbar->insertButton(BarIcon("pgmnexti.xpm"),ID_PROGRAM_NEXTI, true,
+			   i18n("Step over by instruction"));
     toolbar->insertSeparator();
     toolbar->insertButton(BarIcon("brkpt.xpm"),ID_BRKPT_SET, true,
 			   i18n("Breakpoint"));
@@ -450,7 +458,9 @@ void DebuggerMainWnd::menuCallback(int item)
 	    // start timer to move window into background
 	    switch (item) {
 	    case ID_PROGRAM_STEP:
+	    case ID_PROGRAM_STEPI:
 	    case ID_PROGRAM_NEXT:
+	    case ID_PROGRAM_NEXTI:
 	    case ID_PROGRAM_FINISH:
 	    case ID_PROGRAM_UNTIL:
 	    case ID_PROGRAM_RUN:
@@ -500,6 +510,7 @@ void DebuggerMainWnd::updateUI()
     // toolbar
     static const int toolIds[] = {
 	ID_PROGRAM_RUN, ID_PROGRAM_STEP, ID_PROGRAM_NEXT, ID_PROGRAM_FINISH,
+	ID_PROGRAM_STEPI, ID_PROGRAM_NEXTI,
 	ID_BRKPT_SET
     };
     UpdateToolbarUI updateToolbar(toolBar(), this, SLOT(updateUIItem(UpdateUI*)),

@@ -349,10 +349,16 @@ bool DebuggerMainWndBase::handleCommand(int item)
 	m_debugger->programRunAgain();
 	return true;
     case ID_PROGRAM_STEP:
-	m_debugger->programStep();
+	m_debugger->programStep(false);
+	return true;
+    case ID_PROGRAM_STEPI:
+	m_debugger->programStep(true);
 	return true;
     case ID_PROGRAM_NEXT:
-	m_debugger->programNext();
+	m_debugger->programNext(false);
+	return true;
+    case ID_PROGRAM_NEXTI:
+	m_debugger->programNext(true);
 	return true;
     case ID_PROGRAM_FINISH:
 	m_debugger->programFinish();
@@ -383,7 +389,9 @@ void DebuggerMainWndBase::updateUIItem(UpdateUI* item)
 	item->enable(m_debugger->canUseCoreFile());
 	break;
     case ID_PROGRAM_STEP:
+    case ID_PROGRAM_STEPI:
     case ID_PROGRAM_NEXT:
+    case ID_PROGRAM_NEXTI:
     case ID_PROGRAM_FINISH:
     case ID_PROGRAM_UNTIL:
     case ID_PROGRAM_RUN_AGAIN:
