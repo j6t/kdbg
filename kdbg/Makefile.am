@@ -59,6 +59,7 @@ noinst_HEADERS = \
 	textvw.h \
 	valarray.h \
 	debugger.h \
+	programconfig.h \
 	dbgdriver.h \
 	gdbdriver.h \
 	xsldbgdriver.h \
