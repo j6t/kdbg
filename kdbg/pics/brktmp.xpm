@@ -1,0 +1,20 @@
+/* XPM */
+static char * brktmp_xpm[] = {
+"14 14 3 1",
+" 	s None	c None",
+".	c black",
+"X	c white",
+"              ",
+"        ...   ",
+"       .X.X.  ",
+"      .XX.XX. ",
+"      .XX.... ",
+"      .XXXXX. ",
+"       .XXX.  ",
+"        ...   ",
+"              ",
+"              ",
+"              ",
+"              ",
+"              ",
+"              "};

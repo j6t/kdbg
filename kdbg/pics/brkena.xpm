@@ -1,0 +1,21 @@
+/* XPM */
+static char * brkena_xpm[] = {
+"14 14 4 1",
+" 	s None	c None",
+".	c white",
+"X	c dark red",
+"o	c red",
+"              ",
+"     ....     ",
+"    .XXXX.    ",
+"   .XooooX.   ",
+"  .XooooooX.  ",
+" .XooooooooX. ",
+" .XooooooooX. ",
+" .XooooooooX. ",
+" .XooooooooX. ",
+"  .XooooooX.  ",
+"   .XooooX.   ",
+"    .XXXX.    ",
+"     ....     ",
+"              "};
