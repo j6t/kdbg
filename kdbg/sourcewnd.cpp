@@ -4,7 +4,6 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include "debugger.h"
-#include "dbgdriver.h"
 #include "sourcewnd.h"
 #include <qtextstream.h>
 #include <qpainter.h>
@@ -142,11 +141,13 @@ void SourceWindow::reloadFile()
     }
 }
 
-void SourceWindow::scrollTo(int lineNo)
+void SourceWindow::scrollTo(int lineNo, const DbgAddr& address)
 {
-    int row = lineToRow(lineNo);
-    if (row >= 0)
-	scrollToRow(row);
+    if (lineNo < 0 || lineNo >= m_sourceCode.size())
+	return;
+
+    int row = lineToRow(lineNo, address);
+    scrollToRow(row);
 }
 
 void SourceWindow::scrollToRow(int row)
@@ -267,7 +268,10 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
 	    int j;
 	    for (j = dbg->numBreakpoints()-1; j >= 0; j--) {
 		const Breakpoint* bp = dbg->breakpoint(j);
-		if (bp->lineNo == line && fileNameMatches(bp->fileName)) {
+		if (bp->lineNo == line &&
+		    fileNameMatches(bp->fileName) &&
+		    lineToRow(line, bp->address) == i)
+		{
 		    // yes it exists; mode is changed below
 		    break;
 		}
@@ -295,7 +299,7 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
 	    if (!bp->condition.isEmpty() || bp->ignoreCount != 0)
 		flags |= liBPconditional;
 	    // update if changed
-	    int row = lineToRow(i);
+	    int row = lineToRow(i, bp->address);
 	    if ((m_lineItems[row] & liBPany) != flags) {
 		m_lineItems[row] &= ~liBPany;
 		m_lineItems[row] |= flags;
@@ -310,13 +314,13 @@ void SourceWindow::updateLineItem(int row)
     updateCell(row, 0);
 }
 
-void SourceWindow::setPC(bool set, int lineNo, int frameNo)
+void SourceWindow::setPC(bool set, int lineNo, const DbgAddr& address, int frameNo)
 {
     if (lineNo < 0 || lineNo >= int(m_sourceCode.size())) {
 	return;
     }
 
-    int row = lineToRow(lineNo);
+    int row = lineToRow(lineNo, address);
 
     uchar flag = frameNo == 0  ?  liPC  :  liPCup;
     if (set) {
@@ -340,8 +344,9 @@ void SourceWindow::find(const QString& text, bool caseSensitive, FindDirection d
     if (m_sourceCode.size() == 0 || text.isEmpty())
 	return;
 
-    int line, dummyCol;
-    cursorPosition(&line, &dummyCol);
+    int line;
+    DbgAddr dummyAddr;
+    activeLine(line, dummyAddr);
     if (line < 0)
 	line = 0;
     int curLine = line;			/* remember where we started */
@@ -357,7 +362,7 @@ void SourceWindow::find(const QString& text, bool caseSensitive, FindDirection d
 	found = m_sourceCode[line].code.find(text, 0, caseSensitive) >= 0;
     } while (!found && line != curLine);
 
-    scrollTo(line);
+    scrollTo(line, DbgAddr());
 }
 
 void SourceWindow::mousePressEvent(QMouseEvent* ev)
@@ -405,16 +410,26 @@ void SourceWindow::mousePressEvent(QMouseEvent* ev)
 	return;
     }
 
-    int line = rowToLine(row);
+    int sourceRow;
+    int line = rowToLine(row, &sourceRow);
+
+    // find address if row is disassembled code
+    DbgAddr address;
+    if (row > sourceRow) {
+	// get offset from source code line
+	int off = row - sourceRow;
+	address = m_sourceCode[line].disassAddr[off-1];
+    }
 
     switch (ev->button()) {
     case LeftButton:
 	TRACE(QString().sprintf("left-clicked line %d", line));
-	emit clickedLeft(m_fileName, line);
+	emit clickedLeft(m_fileName, line, address,
+			 (ev->state() & ShiftButton) != 0);
 	break;
     case MidButton:
 	TRACE(QString().sprintf("mid-clicked row %d", line));
-	emit clickedMid(m_fileName, line);
+	emit clickedMid(m_fileName, line, address);
 	break;
     default:;
     }
@@ -538,10 +553,10 @@ void SourceWindow::disassembled(int lineNo, const QList<DisassembledCode>& disas
     sl.disass.setSize(disass.count());
     sl.disassAddr.setSize(disass.count());
     sl.canDisass = disass.count() > 0;
-    for (int i = 0; i < disass.count(); i++) {
+    for (uint i = 0; i < disass.count(); i++) {
 	const DisassembledCode* c =
 	    const_cast<QList<DisassembledCode>&>(disass).at(i);
-	sl.disass[i] = c->address + ' ' + c->code;
+	sl.disass[i] = c->address.asString() + ' ' + c->code;
 	sl.disassAddr[i] = c->address;
     }
 
@@ -554,9 +569,16 @@ void SourceWindow::disassembled(int lineNo, const QList<DisassembledCode>& disas
     }
 }
 
-int SourceWindow::rowToLine(int row)
+int SourceWindow::rowToLine(int row, int* sourceRow)
 {
-    return m_rowToLine[row];
+    int line = m_rowToLine[row];
+    if (sourceRow != 0) {
+	// search back until we hit the first entry with the current line number
+	while (row > 0 && m_rowToLine[row-1] == line)
+	    row--;
+	*sourceRow = row;
+    }
+    return line;
 }
 
 /*
@@ -615,6 +637,15 @@ int SourceWindow::lineToRow(int line)
     return l;
 }
 
+int SourceWindow::lineToRow(int line, const DbgAddr& address)
+{
+    int row = lineToRow(line);
+    if (isRowExpanded(row)) {
+	row += m_sourceCode[line].findAddressRowOffset(address);
+    }
+    return row;
+}
+
 bool SourceWindow::isRowExpanded(int row)
 {
     assert(row >= 0);
@@ -635,6 +666,9 @@ void SourceWindow::expandRow(int row)
     int line = rowToLine(row);
     const ValArray<QString>& disass = m_sourceCode[line].disass;
 
+    // remove PC (must be set again in slot of signal expanded())
+    m_lineItems[row] &= ~(liPC|liPCup);
+
     // insert new lines
     ++row;
     m_rowToLine.insertAt(row, line, disass.size());
@@ -651,6 +685,8 @@ void SourceWindow::expandRow(int row)
 
     setNumRows(m_texts.size());
 
+    emit expanded(line);		/* must set PC */
+
     setAutoUpdate(autoU);
     if (autoU && isVisible())
 	update();
@@ -659,6 +695,8 @@ void SourceWindow::expandRow(int row)
 void SourceWindow::collapseRow(int row)
 {
     TRACE("collapsing row " + QString().setNum(row));
+    int line = rowToLine(row);
+
     // find end of this block
     int end = row+1;
     while (end < m_rowToLine.size() && m_rowToLine[end] == m_rowToLine[row]) {
@@ -674,15 +712,54 @@ void SourceWindow::collapseRow(int row)
 
     setNumRows(m_texts.size());
 
+    emit collapsed(line);
+
     setAutoUpdate(autoU);
     if (autoU && isVisible())
 	update();
 }
 
-void SourceWindow::cursorPosition(int* row, int* col)
+void SourceWindow::activeLine(int& line, DbgAddr& address)
 {
-    KTextView::cursorPosition(row, col);
-    *row = rowToLine(*row);
+    int row, col;
+    cursorPosition(&row, &col);
+
+    int sourceRow;
+    line = rowToLine(row, &sourceRow);
+    if (row > sourceRow) {
+	int off = row - sourceRow;	/* offset from source line */
+	address = m_sourceCode[line].disassAddr[off-1];
+    }
 }
+
+/**
+ * Returns the offset from the line displaying the source code to
+ * the line containing the specified address. If the address is not
+ * found, 0 is returned.
+ */
+int SourceWindow::SourceLine::findAddressRowOffset(const DbgAddr& address) const
+{
+    if (address.isEmpty())
+	return 0;
+
+    for (int i = 0; i < disassAddr.size(); i++) {
+	if (disassAddr[i] == address) {
+	    // found exact address
+	    return i+1;
+	}
+	if (disassAddr[i] > address) {
+	    /*
+	     * We have already advanced too far; the address is before this
+	     * index, but obviously we haven't found an exact match
+	     * earlier. address is somewhere between the displayed
+	     * addresses. We return the previous line.
+	     */
+	    return i;
+	}
+    }
+    // not found
+    return 0;
+}
+
 
 #include "sourcewnd.moc"

@@ -61,8 +61,8 @@ KDebugger::KDebugger(QWidget* parent,
 
     connect(&m_btWindow, SIGNAL(highlighted(int)), SLOT(gotoFrame(int)));
 
-    connect(m_d, SIGNAL(activateFileLine(const QString&,int)),
-	    this, SIGNAL(activateFileLine(const QString&,int)));
+    connect(m_d, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
+	    this, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)));
 
     // debugger process
     connect(m_d, SIGNAL(processExited(KProcess*)), SLOT(gdbExited(KProcess*)));
@@ -325,26 +325,39 @@ void KDebugger::programSettings(QWidget* parent)
     }
 }
 
-bool KDebugger::setBreakpoint(QString file, int lineNo, bool temporary)
+bool KDebugger::setBreakpoint(QString file, int lineNo,
+			      const DbgAddr& address, bool temporary)
 {
     if (!isReady()) {
 	return false;
     }
 
-    Breakpoint* bp = breakpointByFilePos(file, lineNo);
+    Breakpoint* bp = breakpointByFilePos(file, lineNo, address);
     if (bp == 0)
     {
-	// no such breakpoint, so set a new one
-	// strip off directory part of file name
+	/*
+	 * No such breakpoint, so set a new one. If we have an address, we
+	 * set the breakpoint exactly there. Otherwise we use the file name
+	 * plus line no.
+	 */
+	if (address.isEmpty())
+	{
+	    // strip off directory part of file name
 #if QT_VERSION < 200
-	file.detach();
+	    file.detach();
 #endif
-	int offset = file.findRev("/");
-	if (offset >= 0) {
-	    file.remove(0, offset+1);
+	    int offset = file.findRev("/");
+	    if (offset >= 0) {
+		file.remove(0, offset+1);
+	    }
+	    m_d->executeCmd(temporary ? DCtbreakline : DCbreakline,
+			    file, lineNo);
 	}
-	m_d->executeCmd(temporary ? DCtbreakline : DCbreakline,
-			file, lineNo);
+	else
+	{
+	    m_d->executeCmd(temporary ? DCtbreakaddr : DCbreakaddr,
+			    address.asString());
+	}
     }
     else
     {
@@ -361,13 +374,14 @@ bool KDebugger::setBreakpoint(QString file, int lineNo, bool temporary)
     return true;
 }
 
-bool KDebugger::enableDisableBreakpoint(QString file, int lineNo)
+bool KDebugger::enableDisableBreakpoint(QString file, int lineNo,
+					const DbgAddr& address)
 {
     if (!isReady()) {
 	return false;
     }
 
-    Breakpoint* bp = breakpointByFilePos(file, lineNo);
+    Breakpoint* bp = breakpointByFilePos(file, lineNo, address);
     if (bp == 0)
 	return true;
 
@@ -497,7 +511,7 @@ void KDebugger::gdbExited(KProcess*)
 
     // stop gear wheel and erase PC
     stopAnimation();
-    emit updatePC(QString(), -1, 0);
+    emit updatePC(QString(), -1, DbgAddr(), 0);
 }
 
 void KDebugger::openProgramConfig(const QString& name)
@@ -663,7 +677,7 @@ void KDebugger::saveBreakpoints(KSimpleConfig* config)
 	     */
 	    config->deleteEntry(Address, false);
 	} else {
-	    config->writeEntry(Address, bp->address);
+	    config->writeEntry(Address, bp->address.asString());
 	    /* remove remmants */
 	    config->deleteEntry(File, false);
 	    config->deleteEntry(Line, false);
@@ -862,7 +876,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCkill:
 	m_programRunning = m_programActive = false;
 	// erase PC
-	emit updatePC(QString(), -1, 0);
+	emit updatePC(QString(), -1, DbgAddr(), 0);
 	break;
     case DCbreaktext:
     case DCbreakline:
@@ -948,7 +962,7 @@ void KDebugger::handleRunCommands(const char* output)
 	m_d->queueCmd(DCbt, DebuggerDriver::QMoverride);
     } else {
 	// program finished: erase PC
-	emit updatePC(QString(), -1, 0);
+	emit updatePC(QString(), -1, DbgAddr(), 0);
 	// dequeue any commands in the queues
 	m_d->flushCommands();
     }
@@ -1187,7 +1201,7 @@ void KDebugger::handleBacktrace(const char* output)
 	StackFrame* frm = stack.take(0);
 	// first frame must set PC
 	// note: frm->lineNo is zero-based
-	emit updatePC(frm->fileName, frm->lineNo, frm->frameNo);
+	emit updatePC(frm->fileName, frm->lineNo, frm->address, frm->frameNo);
 
 	do {
 	    QString func;
@@ -1217,11 +1231,12 @@ void KDebugger::handleFrameChange(const char* output)
     QString fileName;
     int frameNo;
     int lineNo;
-    if (m_d->parseFrameChange(output, frameNo, fileName, lineNo)) {
+    DbgAddr address;
+    if (m_d->parseFrameChange(output, frameNo, fileName, lineNo, address)) {
 	/* lineNo can be negative here if we can't find a file name */
-	emit updatePC(fileName, lineNo, frameNo);
+	emit updatePC(fileName, lineNo, address, frameNo);
     } else {
-	emit updatePC(fileName, -1, frameNo);
+	emit updatePC(fileName, -1, address, frameNo);
     }
 }
 
@@ -1723,13 +1738,15 @@ bool KDebugger::haveTemporaryBP() const
     return false;
 }
 
-Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo)
+Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo,
+					   const DbgAddr& address)
 {
     // look for exact file name match
     int i;
     for (i = m_brkpts.size()-1; i >= 0; i--) {
 	if (m_brkpts[i]->lineNo == lineNo &&
-	    m_brkpts[i]->fileName == file)
+	    m_brkpts[i]->fileName == file &&
+	    (address.isEmpty() || m_brkpts[i]->address == address))
 	{
 	    return m_brkpts[i];
 	}
@@ -1748,7 +1765,8 @@ Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo)
 
     for (i = m_brkpts.size()-1; i >= 0; i--) {
 	if (m_brkpts[i]->lineNo == lineNo &&
-	    m_brkpts[i]->fileName == file)
+	    m_brkpts[i]->fileName == file &&
+	    (address.isEmpty() || m_brkpts[i]->address == address))
 	{
 	    return m_brkpts[i];
 	}

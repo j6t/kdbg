@@ -27,6 +27,7 @@ class DebuggerDriver;
 class CmdQueueItem;
 class Breakpoint;
 class DisassembledCode;
+struct DbgAddr;
 class KProcess;
 
 
@@ -127,21 +128,25 @@ public:
      *
      * @param fileName The source file in which to set the breakpoint.
      * @param lineNo The zero-based line number.
+     * @param address The exact address of the breakpoint.
      * @param temporary Specifies whether this is a temporary breakpoint
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.
      */
-    bool setBreakpoint(QString fileName, int lineNo, bool temporary);
+    bool setBreakpoint(QString fileName, int lineNo,
+		       const DbgAddr& address, bool temporary);
 
     /**
      * Enable or disable a breakpoint at the specified location.
      * 
      * @param fileName The source file in which the breakpoint is.
      * @param lineNo The zero-based line number.
+     * @param address The exact address of the breakpoint.
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.
      */
-    bool enableDisableBreakpoint(QString fileName, int lineNo);
+    bool enableDisableBreakpoint(QString fileName, int lineNo,
+				 const DbgAddr& address);
 
     /**
      * Tells whether one of the single stepping commands can be invoked
@@ -275,7 +280,8 @@ protected:
     CmdQueueItem* loadCoreFile();
     void openProgramConfig(const QString& name);
 
-    Breakpoint* breakpointByFilePos(QString file, int lineNo);
+    Breakpoint* breakpointByFilePos(QString file, int lineNo,
+				    const DbgAddr& address);
     void newBreakpoint(const char* output);
     void updateBreakList(const char* output);
     bool haveTemporaryBP() const;
@@ -335,8 +341,9 @@ signals:
      * @param lineNo specifies the line number (0-based!) (this may be
      * negative, in which case the file should be activated, but the line
      * should NOT be changed).
+     * @param address specifies the exact address of the PC or is empty.
      */
-    void activateFileLine(const QString& file, int lineNo);
+    void activateFileLine(const QString& file, int lineNo, const DbgAddr& address);
 
     /**
      * This signal is emitted when a line decoration item (those thingies
@@ -351,12 +358,15 @@ signals:
      * @param filename specifies the filename where the program stopped
      * @param lineNo specifies the line number (zero-based); it can be -1
      * if it is unknown
+     * @param address specifies the address that the instruction pointer
+     * points to.
      * @param frameNo specifies the frame number: 0 is the innermost frame,
      * positive numbers are frames somewhere up the stack (indicates points
      * where a function was called); the latter cases should be indicated
      * differently in the source window.
      */
-    void updatePC(const QString& filename, int lineNo, int frameNo);
+    void updatePC(const QString& filename, int lineNo,
+		  const DbgAddr& address, int frameNo);
 
     /**
      * This signal is emitted when gdb detects that the executable has been

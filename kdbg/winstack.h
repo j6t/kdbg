@@ -20,6 +20,7 @@ class KDebugger;
 class WinStack;
 class SourceWindow;
 class DisassembledCode;
+struct DbgAddr;
 
 class FindDialog : public QDialog
 {
@@ -77,7 +78,9 @@ public:
      * a relative path.
      */
     void setExtraDirectory(const QString& dir) { m_lastOpenDir = dir; }
+    void activateFile(const QString& fileName);
     bool activeLine(QString& filename, int& lineNo);
+    bool activeLine(QString& filename, int& lineNo, DbgAddr& address);
     void maybeTip(const QPoint& p);
 
     virtual void resizeEvent(QResizeEvent*);
@@ -85,8 +88,8 @@ public:
 signals:
     void fileChanged();
     void lineChanged();
-    void toggleBreak(const QString&, int);
-    void enadisBreak(const QString&, int);
+    void toggleBreak(const QString&, int, const DbgAddr&, bool);
+    void enadisBreak(const QString&, int, const DbgAddr&);
     void clickedRight(const QPoint&);
     void newFileLoaded();
     void initiateValuePopup(const QString&);
@@ -97,8 +100,8 @@ public slots:
     virtual void slotFindForward();
     virtual void slotFindBackward();
     virtual void slotFileWindowRightClick(const QPoint &);
-    virtual void activate(const QString& filename, int lineNo);
-    void updatePC(const QString& filename, int lineNo, int frameNo);
+    virtual void activate(const QString& filename, int lineNo, const DbgAddr& address);
+    void updatePC(const QString& filename, int lineNo, const DbgAddr& address, int frameNo);
     void reloadAllFiles();
     void updateLineItems(const KDebugger* deb);
 
@@ -112,13 +115,17 @@ public slots:
     void slotDisassembled(const QString& fileName, int lineNo,
 			  const QList<DisassembledCode>& disass);
 
+    // Updates line items after expanding/collapsing disassembled code
+    void slotExpandCollapse(int lineNo);
+
 protected:
     void initMenu();
-    bool activatePath(QString pathname, int lineNo);
-    virtual bool activateWindow(SourceWindow* fw, int lineNo = -1);	/* -1 doesnt change line */
+    bool activatePath(QString pathname, int lineNo, const DbgAddr& address);
+    virtual bool activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& address);	/* -1 doesnt change line */
     virtual void changeWindowMenu();
     virtual void mousePressEvent(QMouseEvent*);
-    void setPC(bool set, const QString& fileName, int lineNo, int frameNo);
+    void setPC(bool set, const QString& fileName, int lineNo,
+	       const DbgAddr& address, int frameNo);
     QList<SourceWindow> m_fileList;
     SourceWindow* m_activeWindow;
     QString m_lastOpenDir;		/* where user opened last file */
@@ -129,6 +136,7 @@ protected:
     // program counter
     QString m_pcFile;
     int m_pcLine;			/* -1 if no PC */
+    QString m_pcAddress;		/* exact address of PC */
     int m_pcFrame;
 
     ValueTip m_valueTip;

@@ -59,8 +59,9 @@ signals:
      * name, and if it is relative, you won't know relative to what, you
      * can only guess.
      * @param lineNo specifies the line number (0-based!).
+     * @param address specifies the exact address of the breakpoint.
      */
-    void activateFileLine(const QString& file, int lineNo);
+    void activateFileLine(const QString& file, int lineNo, const DbgAddr& address);
 public slots:
     virtual void addBP();
     virtual void removeBP();

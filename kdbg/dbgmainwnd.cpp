@@ -72,16 +72,16 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(&m_filesWindow->m_findDlg, SIGNAL(closed()), SLOT(updateUI()));
     connect(m_filesWindow, SIGNAL(newFileLoaded()),
 	    SLOT(slotNewFileLoaded()));
-    connect(m_filesWindow, SIGNAL(toggleBreak(const QString&, int)),
-	    this, SLOT(slotToggleBreak(const QString&,int)));
-    connect(m_filesWindow, SIGNAL(enadisBreak(const QString&, int)),
-	    this, SLOT(slotEnaDisBreak(const QString&,int)));
-    connect(m_debugger, SIGNAL(activateFileLine(const QString&,int)),
-	    m_filesWindow, SLOT(activate(const QString&,int)));
+    connect(m_filesWindow, SIGNAL(toggleBreak(const QString&,int,const DbgAddr&,bool)),
+	    this, SLOT(slotToggleBreak(const QString&,int,const DbgAddr&,bool)));
+    connect(m_filesWindow, SIGNAL(enadisBreak(const QString&,int,const DbgAddr&)),
+	    this, SLOT(slotEnaDisBreak(const QString&,int,const DbgAddr&)));
+    connect(m_debugger, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
+	    m_filesWindow, SLOT(activate(const QString&,int,const DbgAddr&)));
     connect(m_debugger, SIGNAL(executableUpdated()),
 	    m_filesWindow, SLOT(reloadAllFiles()));
-    connect(m_debugger, SIGNAL(updatePC(const QString&,int,int)),
-	    m_filesWindow, SLOT(updatePC(const QString&,int,int)));
+    connect(m_debugger, SIGNAL(updatePC(const QString&,int,const DbgAddr&,int)),
+	    m_filesWindow, SLOT(updatePC(const QString&,int,const DbgAddr&,int)));
     // value popup communication
     connect(m_filesWindow, SIGNAL(initiateValuePopup(const QString&)),
 	    m_debugger, SLOT(slotValuePopup(const QString&)));
@@ -109,8 +109,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(m_filesWindow, SIGNAL(lineChanged()), SLOT(slotLineChanged()));
 
     // connect breakpoint table
-    connect(m_bpTable, SIGNAL(activateFileLine(const QString&,int)),
-	    m_filesWindow, SLOT(activate(const QString&,int)));
+    connect(m_bpTable, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
+	    m_filesWindow, SLOT(activate(const QString&,int,const DbgAddr&)));
     connect(m_debugger, SIGNAL(updateUI()), m_bpTable, SLOT(updateUI()));
     connect(m_debugger, SIGNAL(breakpointsChanged()), m_bpTable, SLOT(updateBreakList()));
 
@@ -337,7 +337,7 @@ void DebuggerMainWnd::menuCallback(int item)
 		QFileInfo fi(fileName);
 		m_lastDirectory = fi.dirPath();
 		m_filesWindow->setExtraDirectory(m_lastDirectory);
-		m_filesWindow->activate(fileName, 0);
+		m_filesWindow->activateFile(fileName);
 	    }
 	}
 	break;
@@ -357,25 +357,6 @@ void DebuggerMainWnd::menuCallback(int item)
 	    int lineNo;
 	    if (m_filesWindow->activeLine(file, lineNo))
 		m_debugger->runUntil(file, lineNo);
-	}
-	break;
-    case ID_BRKPT_SET:
-    case ID_BRKPT_TEMP:
-	if (m_debugger != 0)
-	{
-	    QString file;
-	    int lineNo;
-	    if (m_filesWindow->activeLine(file, lineNo))
-		m_debugger->setBreakpoint(file, lineNo, item == ID_BRKPT_TEMP);
-	}
-	break;
-    case ID_BRKPT_ENABLE:
-	if (m_debugger != 0)
-	{
-	    QString file;
-	    int lineNo;
-	    if (m_filesWindow->activeLine(file, lineNo))
-		m_debugger->enableDisableBreakpoint(file, lineNo);
 	}
 	break;
     case ID_BRKPT_LIST:
@@ -661,19 +642,21 @@ void DebuggerMainWnd::slotDebuggerStarting()
     DebuggerMainWndBase::slotDebuggerStarting();
 }
 
-void DebuggerMainWnd::slotToggleBreak(const QString& fileName, int lineNo)
+void DebuggerMainWnd::slotToggleBreak(const QString& fileName, int lineNo,
+				      const DbgAddr& address, bool temp)
 {
     // lineNo is zero-based
     if (m_debugger != 0) {
-	m_debugger->setBreakpoint(fileName, lineNo, false);
+	m_debugger->setBreakpoint(fileName, lineNo, address, temp);
     }
 }
 
-void DebuggerMainWnd::slotEnaDisBreak(const QString& fileName, int lineNo)
+void DebuggerMainWnd::slotEnaDisBreak(const QString& fileName, int lineNo,
+				      const DbgAddr& address)
 {
     // lineNo is zero-based
     if (m_debugger != 0) {
-	m_debugger->enableDisableBreakpoint(fileName, lineNo);
+	m_debugger->enableDisableBreakpoint(fileName, lineNo, address);
     }
 }
 

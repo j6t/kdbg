@@ -16,6 +16,7 @@ class QListBox;
 class ExprWnd;
 class DockWidget;
 class BreakpointTable;
+struct DbgAddr;
 
 class DebuggerMainWnd : public DockMainWindow, public DebuggerMainWndBase
 {
@@ -84,8 +85,8 @@ public slots:
     void slotAnimationTimeout();
     void slotGlobalOptions();
     void slotDebuggerStarting();
-    void slotToggleBreak(const QString&, int);
-    void slotEnaDisBreak(const QString&, int);
+    void slotToggleBreak(const QString&, int, const DbgAddr&, bool);
+    void slotEnaDisBreak(const QString&, int, const DbgAddr&);
     void slotTermEmuExited();
 };
 

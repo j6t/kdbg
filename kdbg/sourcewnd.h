@@ -8,9 +8,11 @@
 
 #include <qpixmap.h>
 #include "textvw.h"
+#include "dbgdriver.h"
 
 // forward declarations
 class KDebugger;
+struct DbgAddr;
 
 class SourceWindow : public KTextView
 {
@@ -22,15 +24,19 @@ public:
     void loadFile();
     void reloadFile();
     bool fileNameMatches(const QString& other);
-    void scrollTo(int lineNo);
+    void scrollTo(int lineNo, const DbgAddr& address);
     const QString& fileName() const { return m_fileName; }
     void updateLineItems(const KDebugger* dbg);
-    void setPC(bool set, int lineNo, int frameNo);
+    void setPC(bool set, int lineNo, const DbgAddr& address, int frameNo);
     enum FindDirection { findForward = 1, findBackward = -1 };
     void find(const QString& text, bool caseSensitive, FindDirection dir);
     bool wordAtPoint(const QPoint& p, QString& word, QRect& r);
-    /** Translates row number (zero-based) to zero-based source line number */
-    int rowToLine(int row);
+    /**
+     * Translates row number (zero-based) to zero-based source line number.
+     * If sourceRow is non-zero, it is filled with the source code row
+     * belonging to the line number.
+     */
+    int rowToLine(int row, int* sourceRow = 0);
     /** Translates zero-based source line number to row number (zero-based) */
     int lineToRow(int line);
     /** Is the row disassembled? */
@@ -41,7 +47,7 @@ public:
     /** lineNo is zero-based */
     void disassembled(int lineNo, const QList<DisassembledCode>& disass);
 
-    virtual void cursorPosition(int* row, int* col);
+    void activeLine(int& lineNo, DbgAddr& address);
 
 protected:
     virtual int textCol() const;
@@ -53,12 +59,16 @@ protected:
     void expandRow(int row);
     void collapseRow(int row);
     void scrollToRow(int row);
+    /** translates (0-based) line number plus a code address into a row number */
+    int lineToRow(int row, const DbgAddr& address);
 
 signals:
-    void clickedLeft(const QString&, int);
-    void clickedMid(const QString&, int);
+    void clickedLeft(const QString&, int, const DbgAddr& address, bool);
+    void clickedMid(const QString&, int, const DbgAddr& address);
     void clickedRight(const QPoint &);
     void disassemble(const QString&, int);
+    void expanded(int lineNo);		/* source lineNo has been expanded */
+    void collapsed(int lineNo);		/* source lineNo has been collapsed */
 
 protected:
     QString m_fileName;
@@ -71,9 +81,10 @@ protected:
     struct SourceLine {
 	QString code;			/* a line of text */
 	ValArray<QString> disass;	/* its disassembled code */
-	ValArray<QString> disassAddr;	/* the addresses thereof */
+	ValArray<DbgAddr> disassAddr;	/* the addresses thereof */
 	bool canDisass;			/* if line can be disassembled */
 	SourceLine() : canDisass(true) { }
+	int findAddressRowOffset(const DbgAddr& address) const;
     };
     ValArray<SourceLine> m_sourceCode;
 

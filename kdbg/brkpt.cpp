@@ -161,7 +161,7 @@ void BreakpointTable::viewBP()
     if (bp == 0)
 	return;
 
-    emit activateFileLine(bp->fileName, bp->lineNo);
+    emit activateFileLine(bp->fileName, bp->lineNo, bp->address);
 }
 
 void BreakpointTable::updateUI()
@@ -263,8 +263,8 @@ BreakpointItem* BreakpointTable::itemByBreakId(int id)
 
 void BreakpointTable::initListAndIcons()
 {
-    m_list.addColumn(i18n("Location"), 300);
-    m_list.addColumn(i18n("Address"), 60);
+    m_list.addColumn(i18n("Location"), 220);
+    m_list.addColumn(i18n("Address"), 65);
     m_list.addColumn(i18n("Hits"), 30);
     m_list.addColumn(i18n("Ignore"), 30);
     m_list.addColumn(i18n("Condition"), 200);
@@ -335,7 +335,7 @@ void BreakpointItem::display()
     // more breakpoint info
     setText(0, location);
     int c = 0;
-    setText(++c, address);
+    setText(++c, address.asString());
     QString tmp;
     if (hitCount == 0) {
 	setText(++c, QString());

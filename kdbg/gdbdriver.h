@@ -48,8 +48,8 @@ public:
     virtual void interruptInferior();
     virtual VarTree* parseQCharArray(const char* output, bool wantErrorValue);
     virtual void parseBackTrace(const char* output, QList<StackFrame>& stack);
-    virtual bool parseFrameChange(const char* output,
-				  int& frameNo, QString& file, int& lineNo);
+    virtual bool parseFrameChange(const char* output, int& frameNo,
+				  QString& file, int& lineNo, DbgAddr& address);
     virtual bool parseBreakList(const char* output, QList<Breakpoint>& brks);
     virtual bool parseBreakpoint(const char* output, int& id,
 				 QString& file, int& lineNo);

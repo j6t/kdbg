@@ -445,4 +445,55 @@ StackFrame::~StackFrame()
 }
 
 
+DbgAddr::DbgAddr(const QString& aa) :
+	a(aa)
+{
+    cleanAddr();
+}
+
+/*
+ * We strip off the leading 0x and any leading zeros.
+ */
+void DbgAddr::cleanAddr()
+{
+    while (a[0] == '0' || a[0] == 'x') {
+	a.remove(0, 1);
+    }
+}
+
+void DbgAddr::operator=(const QString& aa)
+{
+    a = aa;
+    cleanAddr();
+}
+
+/* Re-attach 0x in front of the address */
+QString DbgAddr::asString() const
+{
+    return "0x" + a;
+}
+
+bool operator==(const DbgAddr& a1, const DbgAddr& a2)
+{
+#if QT_VERSION < 200
+    return strcmp(a1.a, a2.a) == 0;
+#else
+    return QString::compare(a1.a, a2.a) == 0;
+#endif
+}
+
+bool operator>(const DbgAddr& a1, const DbgAddr& a2)
+{
+    if (a1.a.length() > a2.a.length())
+	return true;
+    if (a1.a.length() < a2.a.length())
+	return false;
+#if QT_VERSION < 200
+    return strcmp(a1.a, a2.a) > 0;
+#else
+    return QString::compare(a1.a, a2.a) > 0;
+#endif
+}
+
+
 #include "dbgdriver.moc"

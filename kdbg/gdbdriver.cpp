@@ -328,13 +328,18 @@ void GdbDriver::parseMarker()
     // extract filename and line number
     static QRegExp MarkerRE(":[0-9]+:[0-9]+:[begmidl]+:0x");
 
-    int lineNoStart = MarkerRE.match(startMarker);
+    int len;
+    int lineNoStart = MarkerRE.match(startMarker, 0, &len);
     if (lineNoStart >= 0) {
 	int lineNo = atoi(startMarker + lineNoStart+1);
 
+	// get address
+	const char* addrStart = startMarker + lineNoStart + len - 2;
+	DbgAddr address = QString(addrStart).stripWhiteSpace();
+
 	// now show the window
 	startMarker[lineNoStart] = '\0';   /* split off file name */
-	emit activateFileLine(startMarker, lineNo-1);
+	emit activateFileLine(startMarker, lineNo-1, address);
     }
 }
 
@@ -1244,7 +1249,8 @@ static bool parseValueSeq(const char*& s, VarTree* variable)
 #define ISSPACE(c) (c).isSpace()
 #endif
 
-static bool parseFrame(const char*& s, int& frameNo, QString& func, QString& file, int& lineNo)
+static bool parseFrame(const char*& s, int& frameNo, QString& func,
+		       QString& file, int& lineNo, DbgAddr& address)
 {
     // Example:
     //  #1  0x8048881 in Dl::Dl (this=0xbffff418, r=3214) at testfile.cpp:72
@@ -1264,11 +1270,13 @@ static bool parseFrame(const char*& s, int& frameNo, QString& func, QString& fil
 	p++;
     // next may be a hexadecimal address
     if (*p == '0') {
+	const char* start = p;
 	p++;
 	if (*p == 'x')
 	    p++;
 	while (isxdigit(*p))
 	    p++;
+	address = FROM_LATIN1(start, p-start);
 	if (strncmp(p, " in ", 4) == 0)
 	    p += 4;
     }
@@ -1362,22 +1370,24 @@ void GdbDriver::parseBackTrace(const char* output, QList<StackFrame>& stack)
 {
     QString func, file;
     int lineNo, frameNo;
+    DbgAddr address;
 
-    while (::parseFrame(output, frameNo, func, file, lineNo)) {
+    while (::parseFrame(output, frameNo, func, file, lineNo, address)) {
 	StackFrame* frm = new StackFrame;
 	frm->frameNo = frameNo;
 	frm->fileName = file;
 	frm->lineNo = lineNo;
+	frm->address = address;
 	frm->var = new VarTree(func, VarTree::NKplain);
 	stack.append(frm);
     }
 }
 
-bool GdbDriver::parseFrameChange(const char* output,
-				 int& frameNo, QString& file, int& lineNo)
+bool GdbDriver::parseFrameChange(const char* output, int& frameNo,
+				 QString& file, int& lineNo, DbgAddr& address)
 {
     QString func;
-    return ::parseFrame(output, frameNo, func, file, lineNo);
+    return ::parseFrame(output, frameNo, func, file, lineNo, address);
 }
 
 
@@ -1856,7 +1866,7 @@ void GdbDriver::parseDisassemble(const char* output, QList<DisassembledCode>& co
     if (end == 0)
 	end = p + strlen(p);
 
-    QString address;
+    DbgAddr address;
 
     // remove function offsets from the lines
     while (p != end)

@@ -17,6 +17,26 @@ class ExprWnd;
 class KDebugger;
 
 
+/**
+ * A type representing an address.
+ */
+struct DbgAddr
+{
+    QString a;
+    DbgAddr() { }
+    DbgAddr(const QString& aa);
+    DbgAddr(const DbgAddr& src) : a(src.a) { }
+    void operator=(const QString& aa);
+    void operator=(const DbgAddr& src) { a = src.a; }
+    QString asString() const;
+    bool isEmpty() const { return a.isEmpty(); }
+protected:
+    void cleanAddr();
+};
+bool operator==(const DbgAddr& a1, const DbgAddr& a2);
+bool operator>(const DbgAddr& a1, const DbgAddr& a2);
+
+
 enum DbgCommand {
 	DCinitialize,
 	DCtty,
@@ -109,7 +129,7 @@ struct Breakpoint
     bool temporary;
     bool enabled;
     QString location;
-    QString address;			/* exact address of breakpoint */
+    DbgAddr address;			/* exact address of breakpoint */
     QString condition;			/* condition as printed by gdb */
     int ignoreCount;			/* ignore next that may hits */
     int hitCount;			/* as reported by gdb */
@@ -126,6 +146,7 @@ struct StackFrame
     int frameNo;
     QString fileName;
     int lineNo;				/* zero-based line number */
+    DbgAddr address;			/* exact address of PC */
     VarTree* var;			/* more information if non-zero */
     StackFrame() : var(0) { }
     ~StackFrame();
@@ -146,7 +167,7 @@ struct RegisterInfo
  */
 struct DisassembledCode
 {
-    QString address;
+    DbgAddr address;
     QString code;
 };
 
@@ -277,11 +298,12 @@ public:
      * @param frameNo Returns the frame number.
      * @param file Returns the source file name.
      * @param lineNo The zero-based line number.
+     * @param address Returns the exact address.
      * @return false if the frame could not be parsed successfully. The
      * output values are undefined in this case.
      */
-    virtual bool parseFrameChange(const char* output,
-				  int& frameNo, QString& file, int& lineNo) = 0;
+    virtual bool parseFrameChange(const char* output, int& frameNo,
+				  QString& file, int& lineNo, DbgAddr& address) = 0;
 
     /**
      * Parses a list of breakpoints.
@@ -450,8 +472,9 @@ signals:
      * @param lineNo specifies the line number (0-based!) (this may be
      * negative, in which case the file should be activated, but the line
      * should NOT be changed).
+     * @param address specifies the exact address of the PC or is empty.
      */
-    void activateFileLine(const QString& file, int lineNo);
+    void activateFileLine(const QString& file, int lineNo, const DbgAddr& address);
 
     /**
      * This signal is emitted when a command that starts the inferior has

@@ -106,6 +106,25 @@ void WinStack::menuCallback(int item)
 	} else {
 	    m_findDlg.show();
 	}
+    case ID_BRKPT_SET:
+    case ID_BRKPT_TEMP:
+	{
+	    QString file;
+	    int lineNo;
+	    DbgAddr address;
+	    if (activeLine(file, lineNo, address))
+		emit toggleBreak(file, lineNo, address, item == ID_BRKPT_TEMP);
+	}
+	break;
+    case ID_BRKPT_ENABLE:
+	{
+	    QString file;
+	    int lineNo;
+	    DbgAddr address;
+	    if (activeLine(file, lineNo, address))
+		emit enadisBreak(file, lineNo, address);
+	}
+	break;
     }
 }
 
@@ -129,7 +148,7 @@ void WinStack::reloadAllFiles()
     }
 }
 
-void WinStack::activate(const QString& fileName, int lineNo)
+void WinStack::activate(const QString& fileName, int lineNo, const DbgAddr& address)
 {
     QFileInfo fi(fileName);
 
@@ -148,10 +167,15 @@ void WinStack::activate(const QString& fileName, int lineNo)
 	}
     }
     // if this is not an absolute path name, make it one
-    activatePath(fi.absFilePath(), lineNo);
+    activatePath(fi.absFilePath(), lineNo, address);
 }
 
-bool WinStack::activatePath(QString pathName, int lineNo)
+void WinStack::activateFile(const QString& fileName)
+{
+    activatePath(fileName, 0, DbgAddr());
+}
+
+bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address)
 {
     // check whether the file is already open
     SourceWindow* fw;
@@ -165,10 +189,10 @@ bool WinStack::activatePath(QString pathName, int lineNo)
 	fw = new SourceWindow(pathName, this, "fileWindow");
 	m_fileList.insert(0, fw);
 	connect(fw, SIGNAL(lineChanged()),SIGNAL(lineChanged()));
-	connect(fw, SIGNAL(clickedLeft(const QString&, int)),
-		SIGNAL(toggleBreak(const QString&,int)));
-	connect(fw, SIGNAL(clickedMid(const QString&, int)),
-		SIGNAL(enadisBreak(const QString&,int)));
+	connect(fw, SIGNAL(clickedLeft(const QString&,int,const DbgAddr&,bool)),
+		SIGNAL(toggleBreak(const QString&,int,const DbgAddr&,bool)));
+	connect(fw, SIGNAL(clickedMid(const QString&,int,const DbgAddr&)),
+		SIGNAL(enadisBreak(const QString&,int,const DbgAddr&)));
 
 	// Comunication when right button is clicked.
 	connect(fw, SIGNAL(clickedRight(const QPoint &)),
@@ -177,6 +201,8 @@ bool WinStack::activatePath(QString pathName, int lineNo)
 	// disassemble code
 	connect(fw, SIGNAL(disassemble(const QString&, int)),
 		SIGNAL(disassemble(const QString&, int)));
+	connect(fw, SIGNAL(expanded(int)), SLOT(slotExpandCollapse(int)));
+	connect(fw, SIGNAL(collapsed(int)), SLOT(slotExpandCollapse(int)));
 
 	changeWindowMenu();
 	
@@ -186,13 +212,13 @@ bool WinStack::activatePath(QString pathName, int lineNo)
 	// set PC if there is one
 	emit newFileLoaded();
 	if (m_pcLine >= 0) {
-	    setPC(true, m_pcFile, m_pcLine, m_pcFrame);
+	    setPC(true, m_pcFile, m_pcLine, DbgAddr(m_pcAddress), m_pcFrame);
 	}
     }
-    return activateWindow(fw, lineNo);
+    return activateWindow(fw, lineNo, address);
 }
 
-bool WinStack::activateWindow(SourceWindow* fw, int lineNo)
+bool WinStack::activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& address)
 {
     int index = m_fileList.findRef(fw);
     ASSERT(index >= 0);
@@ -211,7 +237,7 @@ bool WinStack::activateWindow(SourceWindow* fw, int lineNo)
 
     // make the line visible
     if (lineNo >= 0) {
-	fw->scrollTo(lineNo);
+	fw->scrollTo(lineNo, address);
     }
 
     // first resize the window, then lift it to the top
@@ -236,13 +262,18 @@ bool WinStack::activateWindow(SourceWindow* fw, int lineNo)
 
 bool WinStack::activeLine(QString& fileName, int& lineNo)
 {
+    DbgAddr dummy;
+    return activeLine(fileName, lineNo, dummy);
+}
+
+bool WinStack::activeLine(QString& fileName, int& lineNo, DbgAddr& address)
+{
     if (m_activeWindow == 0) {
 	return false;
     }
     
     fileName = m_activeWindow->fileName();
-    int dummyCol;
-    m_activeWindow->cursorPosition(&lineNo, &dummyCol);
+    m_activeWindow->activeLine(lineNo, address);
     return true;
 }
 
@@ -281,28 +312,30 @@ void WinStack::updateLineItems(const KDebugger* dbg)
     }
 }
 
-void WinStack::updatePC(const QString& fileName, int lineNo, int frameNo)
+void WinStack::updatePC(const QString& fileName, int lineNo, const DbgAddr& address, int frameNo)
 {
     if (m_pcLine >= 0) {
-	setPC(false, m_pcFile, m_pcLine, m_pcFrame);
+	setPC(false, m_pcFile, m_pcLine, DbgAddr(m_pcAddress), m_pcFrame);
     }
     m_pcFile = fileName;
     m_pcLine = lineNo;
+    m_pcAddress = address.asString();
     m_pcFrame = frameNo;
     if (lineNo >= 0) {
-	setPC(true, fileName, lineNo, frameNo);
+	setPC(true, fileName, lineNo, address, frameNo);
     }
 }
 
-void WinStack::setPC(bool set, const QString& fileName, int lineNo, int frameNo)
+void WinStack::setPC(bool set, const QString& fileName, int lineNo,
+		     const DbgAddr& address, int frameNo)
 {
     TRACE((set ? "set PC: " : "clear PC: ") + fileName +
-	  QString().sprintf(":%d#%d", lineNo, frameNo));
+	  QString().sprintf(":%d#%d ", lineNo, frameNo) + address.asString());
     // find file
     SourceWindow* fw = 0;
     for (fw = m_fileList.first(); fw != 0; fw = m_fileList.next()) {
 	if (fw->fileNameMatches(fileName)) {
-	    fw->setPC(set, lineNo, frameNo);
+	    fw->setPC(set, lineNo, address, frameNo);
 	    break;
 	}
     }
@@ -396,6 +429,19 @@ void WinStack::slotDisassembled(const QString& fileName, int lineNo,
     }
 
     fw->disassembled(lineNo, disass);
+}
+
+void WinStack::slotExpandCollapse(int)
+{
+    // update line items after expanding or collapsing disassembled code
+
+    // HACK: we know that this will result in updateLineItems
+    // should be done more cleanly with a separate signal
+    emit newFileLoaded();
+
+    if (m_pcLine >= 0) {
+	setPC(true, m_pcFile, m_pcLine, DbgAddr(m_pcAddress), m_pcFrame);
+    }
 }
 
 
@@ -500,7 +546,7 @@ void WinStack::selectWindow(int id)
     }
     ASSERT(fw != 0);
 	
-    activateWindow(fw, -1);
+    activateWindow(fw, -1, DbgAddr());
 }
 
 
