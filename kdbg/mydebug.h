@@ -13,8 +13,8 @@
 # ifdef NDEBUG
 #  define ASSERT(x) ((void)0)
 # else
-#  define ASSERT(x) ((x) ? (void)0 : kdDebug() << \
-					(QString("assertion failed: ") + #x).ascii() << "\n")
+#  define ASSERT(x) ((x) ? void(0) : void(kdDebug() << \
+					(QString("assertion failed: ") + #x).ascii() << "\n"))
 # endif
 #endif
 #ifdef WANT_TRACE_OUTPUT
