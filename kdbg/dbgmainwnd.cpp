@@ -92,6 +92,9 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 DebuggerMainWnd::~DebuggerMainWnd()
 {
     saveSettings(kapp->getConfig());
+    // must delete m_debugger early since it references our windows
+    delete m_debugger;
+    m_debugger = 0;
 }
 
 void DebuggerMainWnd::initMenu()

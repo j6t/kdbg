@@ -796,11 +796,13 @@ bool KDebugger::createOutputWindow()
 
 const char GeneralGroup[] = "General";
 const char EnvironmentGroup[] = "Environment";
+const char WatchGroup[] = "Watches";
 const char FileVersion[] = "FileVersion";
 const char ProgramArgs[] = "ProgramArgs";
 const char WorkingDirectory[] = "WorkingDirectory";
 const char Variable[] = "Var%d";
 const char Value[] = "Value%d";
+const char ExprFmt[] = "Expr%d";
 
 void KDebugger::saveProgramSettings()
 {
@@ -825,6 +827,18 @@ void KDebugger::saveProgramSettings()
     }
 
     m_bpTable.saveBreakpoints(m_programConfig);
+
+    // watch expressions
+    // first get rid of whatever was in this group
+    m_programConfig->deleteGroup(WatchGroup);
+    // then start a new group
+    m_programConfig->setGroup(WatchGroup);
+    KTreeViewItem* item = m_watchVariables.itemAt(0);
+    int watchNum = 0;
+    for (; item != 0; item = item->getSibling(), ++watchNum) {
+	varName.sprintf(ExprFmt, watchNum);
+	m_programConfig->writeEntry(varName, item->getText());
+    }
 }
 
 void KDebugger::restoreProgramSettings()
@@ -869,6 +883,22 @@ void KDebugger::restoreProgramSettings()
     m_qstring2nullOk = true;
 
     m_bpTable.restoreBreakpoints(m_programConfig);
+
+    // watch expressions
+    m_programConfig->setGroup(WatchGroup);
+    for (int i = 0;; ++i) {
+	varName.sprintf(ExprFmt, i);
+	if (!m_programConfig->hasKey(varName)) {
+	    /* entry not present, assume that we've hit them all */
+	    break;
+	}
+	QString expr = m_programConfig->readEntry(varName);
+	if (expr.isEmpty()) {
+	    // skip empty expressions
+	    continue;
+	}
+	addWatch(expr);
+    }
 }
 
 
@@ -1162,7 +1192,8 @@ void KDebugger::receiveOutput(KProcess*, char* buffer, int buflen)
 		 * If there are still expressions that need to be updated,
 		 * then do so.
 		 */
-		evalExpressions();
+		if (m_programActive)
+		    evalExpressions();
 	    } else {
 		writeCommand();
 	    }
@@ -1725,6 +1756,7 @@ static bool isErrorExpr(const char* output)
 	strncmp(output, "Cannot access memory at", 23) == 0 ||
 	strncmp(output, "Attempt to dereference a generic pointer", 40) == 0 ||
 	strncmp(output, "Attempt to take contents of ", 28) == 0 ||
+	strncmp(output, "Attempt to use a type name as an expression", 43) == 0 ||
 	strncmp(output, "There is no member or method named", 34) == 0 ||
 	strncmp(output, "No symbol \"", 11) == 0 ||
 	strncmp(output, "Internal error: ", 16) == 0;
@@ -2556,12 +2588,13 @@ void KDebugger::addWatch(const QString& t)
 	return;
     VarTree* exprItem = new VarTree(expr, VarTree::NKplain);
     m_watchVariables.insertExpr(exprItem);
-    
-    m_watchEvalExpr.append(exprItem);
 
     // if we are boring ourselves, send down the command
-    if (m_state == DSidle) {
-	evalExpressions();
+    if (m_programActive) {
+	m_watchEvalExpr.append(exprItem);
+	if (m_state == DSidle) {
+	    evalExpressions();
+	}
     }
 }
 
