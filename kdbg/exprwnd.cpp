@@ -129,6 +129,85 @@ bool VarTree::updateValue(const QString& newValue)
     return m_valueChanged || prevValueChanged;
 }
 
+void VarTree::inferTypesOfChildren()
+{
+    /*
+     * Type inference works like this: We use type information of those
+     * children that have a type name in their name (base classes) or in
+     * their value (pointers)
+     */
+
+    // first recurse children
+    VarTree* child = static_cast<VarTree*>(getChild());
+    while (child != 0) {
+	child->inferTypesOfChildren();
+	child = static_cast<VarTree*>(child->getSibling());
+    }
+
+    // if this is a pointer, get the type from the value (less the pointer)
+    if (m_varKind == VKpointer) {
+	char* p = m_value.data();
+	char* start = p;
+	// the type of the pointer shows up in the value (sometimes)
+	if (p == 0 || *p != '(')
+	    return;
+	skipNested(p, '(', ')');
+	/*
+	 * We only recognize pointers to data "(int *)" but not pointers
+	 * to functions "(void (*)())".
+	 */
+	if (p-start < 3 &&		/* at least 3 chars necessary: (*) */
+	    p[-2] != '*')		/* skip back before the closing paren */
+	{
+	    return;
+	}
+	const QString& typeName =
+	    QString(start+1, p-start-3+1) // minus 3 chars plus '\0'
+		.stripWhiteSpace();
+	m_type = typeTable()[typeName];
+	if (m_type == 0) {
+	    m_type = TypeTable::unknownType();
+	}
+    } else if (m_varKind == VKstruct) {
+	// check if this is a base class part
+	if (m_nameKind == NKtype) {
+	    const QString& typeName =
+		text.mid(1, text.length()-2); // strip < and >
+	    m_type = typeTable()[typeName];
+
+	    /* if we don't have a type yet, get it from the base class */
+	    if (m_type == 0) {
+		child = static_cast<VarTree*>(getChild());
+		while (child != 0 &&
+		       // only check base class parts (i.e. type names)
+		       child->m_nameKind == NKtype)
+		{
+		    m_type = child->m_type;
+		    // if there is a known type
+		    if (m_type != 0 && m_type != TypeTable::unknownType())
+			break;
+		    child = static_cast<VarTree*>(child->getSibling());
+		}
+		/*
+		 * If there is a known type now, it is the one from the
+		 * first base class whose type we know.
+		 */
+	    }
+
+	    /*
+	     * If we still don't have a type, the type is really unknown.
+	     */
+	    if (m_type == 0) {
+		m_type = TypeTable::unknownType();
+	    }
+	} // else
+	    /*
+	     * This is not a base class part. We don't assign a type so
+	     * that later we can ask gdb.
+	     */
+    }
+}
+
 
 ExprWnd::ExprWnd(QWidget* parent, const char* name) :
 	KTreeView(parent, name),
@@ -370,6 +449,7 @@ void ExprWnd::replaceChildren(VarTree* display, VarTree* newValues)
 	VarTree* vNew = new VarTree(v->getText(), v->m_nameKind);
 	vNew->m_varKind = v->m_varKind;
 	vNew->m_value = v->m_value;
+	vNew->m_type = v->m_type;
 	vNew->setDelayedExpanding(vNew->m_varKind == VarTree::VKpointer);
 	display->appendChild(vNew);
 	// recurse

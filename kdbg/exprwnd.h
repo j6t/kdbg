@@ -41,6 +41,8 @@ public:
     bool isAncestorEq(const VarTree* child) const;
     /** update the value; return if repaint is necessary */
     bool updateValue(const QString& newValue);
+    /** find out the type of this value using the child values */
+    void inferTypesOfChildren();
 };
 
 class ExprWnd : public KTreeView
