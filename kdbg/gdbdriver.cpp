@@ -1385,12 +1385,20 @@ static void parseFrameInfo(const char*& s, QString& func,
      * Skip parameters. But notice that for complicated conversion
      * functions (eg. "operator int(**)()()", ie. convert to pointer to
      * pointer to function) as well as operator()(...) we have to skip
-     * additional pairs of parentheses.
+     * additional pairs of parentheses. Furthermore, recent gdbs write the
+     * demangled name followed by the arguments in a pair of parentheses,
+     * where the demangled name can end in "const".
      */
     do {
 	skipNestedWithString(p, '(', ')');
 	while (isspace(*p))
 	    p++;
+	// skip "const"
+	if (strncmp(p, "const", 5) == 0) {
+	    p += 5;
+	    while (isspace(*p))
+		p++;
+	}
     } while (*p == '(');
 
     // check for file position
@@ -1467,18 +1475,27 @@ static bool parseFrame(const char*& s, int& frameNo, QString& func,
 {
     // Example:
     //  #1  0x8048881 in Dl::Dl (this=0xbffff418, r=3214) at testfile.cpp:72
+    //  Breakpoint 3, Cl::f(int) const (this=0xbffff3c0, x=17) at testfile.cpp:155
 
     // must start with a hash mark followed by number
-    if (s[0] != '#' || !isdigit(s[1]))
+    // or with "Breakpoint " followed by number and comma
+    if (s[0] == '#') {
+	if (!isdigit(s[1]))
+	    return false;
+	s++;				/* skip the hash mark */
+    } else if (strncmp(s, "Breakpoint ", 11) == 0) {
+	if (!isdigit(s[11]))
+	    return false;
+	s += 11;			/* skip "Breakpoint" */
+    } else
 	return false;
 
-    s++;				/* skip the hash mark */
     // frame number
     frameNo = atoi(s);
     while (isdigit(*s))
 	s++;
-    // space
-    while (isspace(*s))
+    // space and comma
+    while (isspace(*s) || *s == ',')
 	s++;
     parseFrameInfo(s, func, file, lineNo, address);
     return true;
