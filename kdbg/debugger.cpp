@@ -58,7 +58,6 @@ KDebugger::KDebugger(QWidget* parent,
 	m_animationInterval(0)
 {
     m_envVars.setAutoDelete(true);
-    m_parsedLocals.setAutoDelete(true);
 
     connect(&m_localVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
 	    SLOT(slotLocalsExpanding(KTreeViewItem*,bool&)));
@@ -748,7 +747,6 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     TRACE(QString(__PRETTY_FUNCTION__) + " parsing " + output);
 
     switch (cmd->m_cmd) {
-    case DCinitialSet:
     case DCtargetremote:
 	// the output (if any) is uninteresting
     case DCsetargs:
@@ -827,18 +825,6 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	// parse local variables
 	if (output[0] != '\0') {
 	    handleLocals(output);
-	}
-	break;
-    case DCinfoargs:
-	// parse arguments
-	if (output[0] != '\0') {
-	    /*
-	     * m_parsedLocals collects arguments and local variables.
-	     * Arguments are retrieved first, so we clear the list here.
-	     */
-	    m_parsedLocals.clear();
-
-	    parseLocals(output, m_parsedLocals);
 	}
 	break;
     case DCinforegisters:
@@ -970,10 +956,6 @@ void KDebugger::updateAllExprs()
     if (!m_programActive)
 	return;
 
-    // retrieve parameters
-    // we must be sure that this command is executed before info locals!
-    m_d->queueCmd(DCinfoargs, DebuggerDriver::QMoverrideMoreEqual);
-
     // retrieve local variables
     m_d->queueCmd(DCinfolocals, DebuggerDriver::QMoverride);
 
@@ -1040,30 +1022,6 @@ void KDebugger::handleLocals(const char* output)
      */
     QList<VarTree> newVars;
     parseLocals(output, newVars);
-
-    /*
-     * Merge previously parsed local variables into newVars, but eliminate
-     * duplicates in such a way that variables in newVars prevail.
-     */
-    { VarTree* a;
-	/*
-	 * Note that the while loop will take out the variables from
-	 * m_parsedLocals starting from the end of the list, since the list
-	 * was created in parseLocals using append (which makes the last
-	 * item the current item).
-	 */
-	while ((a = m_parsedLocals.take()) != 0) {
-	    for (VarTree* b = newVars.first(); b != 0; b = newVars.next()) {
-		if (a->getText() == b->getText()) {
-		    delete a;
-		    goto alreadyPresent;
-		}
-	    }
-	    // place variable at the front
-	    newVars.insert(0, a);
-	alreadyPresent:;
-	}
-    }
 
     /*
      * Clear any old VarTree item pointers, so that later we don't access

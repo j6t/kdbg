@@ -74,15 +74,13 @@ static const char printQStringStructNoNullFmt[] =
  */
 static GdbCmdInfo cmds[] = {
     { DCinitialize, "", GdbCmdInfo::argNone },
-    { DCinitialSet, "", GdbCmdInfo::argNone },
     { DCtty, "tty %s\n", GdbCmdInfo::argString },
     { DCexecutable, "file \"%s\"\n", GdbCmdInfo::argString },
     { DCtargetremote, "target remote %s\n", GdbCmdInfo::argString },
     { DCcorefile, "core-file %s\n", GdbCmdInfo::argString },
     { DCattach, "attach %s\n", GdbCmdInfo::argString },
     { DCinfolinemain, "info line main\n", GdbCmdInfo::argNone },
-    { DCinfolocals, "info locals\n", GdbCmdInfo::argNone },
-    { DCinfoargs, "info args\n", GdbCmdInfo::argNone },
+    { DCinfolocals, "kdbg__alllocals\n", GdbCmdInfo::argNone },
     { DCinforegisters, "info all-registers\n", GdbCmdInfo::argNone},
     { DCsetargs, "set args %s\n", GdbCmdInfo::argString },
     { DCsetenv, "set env %s %s\n", GdbCmdInfo::argString2 },
@@ -198,17 +196,28 @@ bool GdbDriver::startup()
     if (!DebuggerDriver::startup())
 	return false;
 
-    // change prompt string and synchronize with gdb
-    executeCmdString(DCinitialize, "set prompt " PROMPT "\n", false);
+    static const char gdbInitialize[] =
+	/*
+	 * Work around buggy gdbs that do command line editing even if they
+	 * are not on a tty. The readline library echos every command back
+	 * in this case, which is confusing for us.
+	 */
+	"set editing off\n"
+	"set confirm off\n"
+	"set print static-members off\n"
+	/*
+	 * Write a short macro that prints all locals: local variables and
+	 * function arguments.
+	 */
+	"define kdbg__alllocals\n"
+	"info args\n"			/* arguments first */
+	"info locals\n"			/* local vars supersede args with same name */
+	"end\n"
+	// change prompt string and synchronize with gdb
+	"set prompt " PROMPT "\n"
+	;
 
-    /*
-     * Work around buggy gdbs that do command line editing even if they are
-     * not on a tty. The readline library echos every command back in this
-     * case, which is confusing for us.
-     */
-    executeCmdString(DCinitialSet, "set editing off\n", false);
-    executeCmdString(DCinitialSet, "set confirm off\n", false);
-    executeCmdString(DCinitialSet, "set print static-members off\n", false);
+    executeCmdString(DCinitialize, gdbInitialize, false);
 
     // assume that QString::null is ok
     cmds[DCprintQStringStruct].fmt = printQStringStructFmt;
@@ -695,8 +704,6 @@ static VarTree* parseVar(const char*& s)
 {
     const char* p = s;
     
-    // syntax is complicated
-
     // skip whitespace
     while (isspace(*p))
 	p++;
@@ -1462,14 +1469,27 @@ bool GdbDriver::parseBreakpoint(const char* output, int& id,
 void GdbDriver::parseLocals(const char* output, QList<VarTree>& newVars)
 {
     // check for possible error conditions
-    if (strncmp(output, "No symbol table", 15) == 0 ||
-	strncmp(output, "No locals", 9) == 0 ||
-	strncmp(output, "No arguments", 12) == 0)
+    if (strncmp(output, "No symbol table", 15) == 0)
     {
 	return;
     }
 
     while (*output != '\0') {
+	while (isspace(*output))
+	    output++;
+	if (*output == '\0')
+	    break;
+	// skip occurrences of "No locals" and "No args"
+	if (strncmp(output, "No locals", 9) == 0 ||
+	    strncmp(output, "No arguments", 12) == 0)
+	{
+	    output = strchr(output, '\n');
+	    if (output == 0) {
+		break;
+	    }
+	    continue;
+	}
+
 	VarTree* variable = parseVar(output);
 	if (variable == 0) {
 	    break;

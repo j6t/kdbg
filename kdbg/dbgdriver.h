@@ -19,7 +19,6 @@ class KDebugger;
 
 enum DbgCommand {
 	DCinitialize,
-	DCinitialSet,
 	DCtty,
 	DCexecutable,
 	DCtargetremote,
@@ -27,7 +26,6 @@ enum DbgCommand {
 	DCattach,
 	DCinfolinemain,
 	DCinfolocals,
-	DCinfoargs,
 	DCinforegisters,
 	DCsetargs,
 	DCsetenv,

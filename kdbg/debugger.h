@@ -220,7 +220,6 @@ protected:
     void writeCommand();
     
     QList<VarTree> m_watchEvalExpr;	/* exprs to evaluate for watch windows */
-    QList<VarTree> m_parsedLocals;	/* local variables that have just been parsed */
     QArray<Breakpoint*> m_brkpts;
 
 protected slots:
