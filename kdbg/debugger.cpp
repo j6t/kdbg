@@ -306,12 +306,14 @@ void KDebugger::programBreak()
 void KDebugger::programArgs(QWidget* parent)
 {
     if (m_haveExecutable) {
-	QStringList allOptions;
+	QStringList allOptions = m_d->boolOptionList();
 	PgmArgs dlg(parent, m_executable, m_envVars, allOptions);
 	dlg.setArgs(m_programArgs);
 	dlg.setWd(m_programWD);
+	dlg.setOptions(m_boolOptions);
 	if (dlg.exec()) {
-	    updateProgEnvironment(dlg.args(), dlg.wd(), dlg.envVars());
+	    updateProgEnvironment(dlg.args(), dlg.wd(),
+				  dlg.envVars(), dlg.options());
 	}
     }
 }
@@ -571,6 +573,7 @@ const char WatchGroup[] = "Watches";
 const char FileVersion[] = "FileVersion";
 const char ProgramArgs[] = "ProgramArgs";
 const char WorkingDirectory[] = "WorkingDirectory";
+const char OptionsSelected[] = "OptionsSelected";
 const char Variable[] = "Var%d";
 const char Value[] = "Value%d";
 const char ExprFmt[] = "Expr%d";
@@ -582,6 +585,7 @@ void KDebugger::saveProgramSettings()
     m_programConfig->writeEntry(FileVersion, 1);
     m_programConfig->writeEntry(ProgramArgs, m_programArgs);
     m_programConfig->writeEntry(WorkingDirectory, m_programWD);
+    m_programConfig->writeEntry(OptionsSelected, m_boolOptions);
     m_programConfig->writeEntry(DebuggerCmdStr, m_debuggerCmd);
     m_programConfig->writeEntry(TTYLevelEntry, int(m_ttyLevel));
     QString driverName;
@@ -633,6 +637,8 @@ void KDebugger::restoreProgramSettings()
     // m_ttyLevel has been read in already
     QString pgmArgs = m_programConfig->readEntry(ProgramArgs);
     QString pgmWd = m_programConfig->readEntry(WorkingDirectory);
+    QStringList boolOptions = m_programConfig->readListEntry(OptionsSelected);
+    m_boolOptions = QStringList();
 
     // read environment variables
     m_programConfig->setGroup(EnvironmentGroup);
@@ -659,7 +665,7 @@ void KDebugger::restoreProgramSettings()
 	pgmVars.insert(name, var);
     }
 
-    updateProgEnvironment(pgmArgs, pgmWd, pgmVars);
+    updateProgEnvironment(pgmArgs, pgmWd, pgmVars, boolOptions);
 
     restoreBreakpoints(m_programConfig);
 
@@ -808,6 +814,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	// there is no output
     case DCsetenv:
     case DCunsetenv:
+    case DCsetoption:
 	/* if value is empty, we see output, but we don't care */
 	break;
     case DCcd:
@@ -1043,7 +1050,8 @@ void KDebugger::updateAllExprs()
 }
 
 void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
-				      const QDict<EnvVar>& newVars)
+				      const QDict<EnvVar>& newVars,
+				      const QStringList& newOptions)
 {
     m_programArgs = args;
     m_d->executeCmd(DCsetargs, m_programArgs);
@@ -1055,6 +1063,7 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
 	TRACE("new wd: " + m_programWD + "\n");
     }
 
+    // update environment variables
     QDictIterator<EnvVar> it = newVars;
     EnvVar* val;
     for (; (val = it) != 0; ++it) {
@@ -1082,6 +1091,29 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
 	    // variable not changed
 	    break;
 	}
+    }
+
+    // update options
+    QStringList::ConstIterator oi;
+    for (oi = newOptions.begin(); oi != newOptions.end(); ++oi)
+    {
+	if (m_boolOptions.findIndex(*oi) < 0) {
+	    // the options is currently not set, so set it
+	    m_d->executeCmd(DCsetoption, *oi, 1);
+	} else {
+	    // option is set, no action required, but move it to the end
+	    m_boolOptions.remove(*oi);
+	}
+	m_boolOptions.append(*oi);
+    }
+    /*
+     * Now all options that should be set are at the end of m_boolOptions.
+     * If some options need to be unset, they are at the front of the list.
+     * Here we unset and remove them.
+     */
+    while (m_boolOptions.count() > newOptions.count()) {
+	m_d->executeCmd(DCsetoption, m_boolOptions.first(), 0);
+	m_boolOptions.remove(m_boolOptions.begin());
     }
 }
 

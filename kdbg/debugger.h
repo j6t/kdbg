@@ -8,6 +8,7 @@
 
 #include <qtimer.h>
 #include <qdict.h>
+#include <qstringlist.h>
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
 
@@ -294,7 +295,8 @@ protected:
     void handleRunCommands(const char* output);
     void updateAllExprs();
     void updateProgEnvironment(const QString& args, const QString& wd,
-			       const QDict<EnvVar>& newVars);
+			       const QDict<EnvVar>& newVars,
+			       const QStringList& newOptions);
     void parseLocals(const char* output, QList<VarTree>& newVars);
     void handleLocals(const char* output);
     bool handlePrint(CmdQueueItem* cmd, const char* output);
@@ -338,6 +340,7 @@ protected:
     QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
     QDict<EnvVar> m_envVars;		/* environment variables set by user */
+    QStringList m_boolOptions;		/* boolean options */
     QStrList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
     KSimpleConfig* m_programConfig;	/* program-specific settings (brkpts etc) */

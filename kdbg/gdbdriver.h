@@ -18,6 +18,7 @@ public:
     
     virtual QString driverName() const;
     virtual QString defaultInvocation() const;
+    virtual QStringList boolOptionList() const;
     void setDefaultInvocation(QString cmd) { m_defaultCmd = cmd; }
     static QString defaultGdb();
     virtual bool startup(QString cmdStr);

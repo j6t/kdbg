@@ -17,6 +17,7 @@ class VarTree;
 class ExprWnd;
 class KDebugger;
 class QStrList;
+class QStringList;
 
 
 /**
@@ -56,6 +57,7 @@ enum DbgCommand {
 	DCsetargs,
 	DCsetenv,
 	DCunsetenv,
+	DCsetoption,                    /* debugger options */
 	DCcd,
 	DCbt,
 	DCrun,
@@ -255,6 +257,11 @@ public:
      * Returns the default command string to invoke the debugger driver.
      */
     virtual QString defaultInvocation() const = 0;
+
+    /**
+     * Returns a list of options that can be  turned on and off.
+     */
+    virtual QStringList boolOptionList() const = 0;
 
     virtual bool startup(QString cmdStr);
     void dequeueCmdByVar(VarTree* var);

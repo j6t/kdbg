@@ -5,6 +5,7 @@
 
 #include "xsldbgdriver.h"
 #include "exprwnd.h"
+#include <qstringlist.h>
 #include <klocale.h>            /* i18n */
 #include <ctype.h>
 #include <stdlib.h>             /* strtol, atoi */
@@ -57,6 +58,7 @@ static XsldbgCmdInfo cmds[] = {
     {DCsetargs, "data %s\n", XsldbgCmdInfo::argString},
     {DCsetenv, "%s %s\n", XsldbgCmdInfo::argString2},
     {DCunsetenv, "unset env %s\n", XsldbgCmdInfo::argString},
+    {DCsetoption, "setoption %s %d\n", XsldbgCmdInfo::argStringNum},
     {DCcd, "chdir %s\n", XsldbgCmdInfo::argString},
     {DCbt, "where\n", XsldbgCmdInfo::argNone},
     {DCrun, "run\nsource\n", XsldbgCmdInfo::argNone}, /* Ensure that at the start
@@ -182,6 +184,23 @@ QString
 XsldbgDriver::defaultInvocation() const
 {
     return defaultXsldbg();
+}
+
+QStringList XsldbgDriver::boolOptionList() const
+{
+    QStringList allOptions;
+    allOptions.append("verbose");
+    allOptions.append("repeat");
+    allOptions.append("debug");
+    allOptions.append("novalid");
+    allOptions.append("noout");
+    allOptions.append("html");
+    allOptions.append("docbook");
+    allOptions.append("nonet");
+    allOptions.append("catalogs");
+    allOptions.append("xinclude");
+    allOptions.append("profile");
+    return allOptions;
 }
 
 

@@ -17,6 +17,7 @@ class XsldbgDriver:public DebuggerDriver {
 
     virtual QString driverName() const;
     virtual QString defaultInvocation() const;
+    virtual QStringList boolOptionList() const;
     static QString defaultXsldbg();
     virtual bool startup(QString cmdStr);
     virtual void commandFinished(CmdQueueItem * cmd);
