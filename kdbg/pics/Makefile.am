@@ -18,6 +18,9 @@ PICTOGRAMS = \
 	brkcond.xpm \
 	pcinner.xpm \
 	pcup.xpm \
+	regs.xpm \
+	watch.xpm \
+	watchcoded.xpm \
 	pointer.xpm
 
 
