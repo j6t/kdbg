@@ -142,6 +142,9 @@ KDebugger::KDebugger(const char* name) :
 
     // route unhandled menu items to winstack
     connect(this, SIGNAL(forwardMenuCallback(int)), &m_filesWindow, SLOT(menuCallback(int)));
+    // file/line updates
+    connect(&m_filesWindow, SIGNAL(fileChanged()), SLOT(slotFileChanged()));
+    connect(&m_filesWindow, SIGNAL(lineChanged()), SLOT(slotLineChanged()));
     
     // debugger process
     connect(&m_gdb, SIGNAL(receivedStdout(KProcess*,char*,int)),
@@ -153,6 +156,7 @@ KDebugger::KDebugger(const char* name) :
     resize(700, 700);
 
     emit updateUI();
+    slotFileChanged();
 }
 
 KDebugger::~KDebugger()
@@ -447,6 +451,7 @@ void KDebugger::updateUIItem(UpdateUI* item)
 			   ID_STATUS_BUSY);
     m_statusbar.changeItem(m_programActive ? static_cast<const char*>(m_statusActive) : "",
 			   ID_STATUS_ACTIVE);
+    // line number is updated in slotLineChanged
 }
 
 
@@ -537,6 +542,7 @@ void KDebugger::initToolbar()
 
     m_statusbar.insertItem(m_statusBusy, ID_STATUS_BUSY);
     m_statusbar.insertItem(m_statusActive, ID_STATUS_ACTIVE);
+    m_statusbar.insertItem(i18n("Line 00000"), ID_STATUS_LINENO);
     m_statusbar.insertItem("", ID_STATUS_MSG);	/* message pane */
 }
 
@@ -734,6 +740,7 @@ bool KDebugger::debugProgram(const QString& name)
     // it is read in later in the handler of DCexecutable
 
     emit updateUI();
+    slotFileChanged();
 
     return true;
 }
@@ -1927,5 +1934,49 @@ void KDebugger::slotFrameTabChanged(int)
 	 * commands.
 	 */
 	queueCmd(DCprintthis, "print *this", QMoverrideMoreEqual);
+    }
+}
+
+void KDebugger::slotFileChanged()
+{
+    // set caption
+    QString caption = kapp->getCaption();
+    if (m_haveExecutable) {
+	// basename part of executable
+	const char* execBase = m_executable.data();
+	int lastSlash = m_executable.findRev('/');
+	if (lastSlash >= 0)
+	    execBase += lastSlash + 1;
+	caption += ": ";
+	caption += execBase;
+    }
+    QString file;
+    int line;
+    bool anyWindows = m_filesWindow.activeLine(file, line);
+    updateLineStatus(anyWindows ? line : -1);
+    if (anyWindows) {
+	caption += " (";
+	caption += file;
+	caption += ")";
+    }
+    setCaption(caption);
+}
+
+void KDebugger::slotLineChanged()
+{
+    QString file;
+    int line;
+    bool anyWindows = m_filesWindow.activeLine(file, line);
+    updateLineStatus(anyWindows ? line : -1);
+}
+
+void KDebugger::updateLineStatus(int lineNo)
+{
+    if (lineNo < 0) {
+	m_statusbar.changeItem("", ID_STATUS_LINENO);
+    } else {
+	QString strLine;
+	strLine.sprintf(i18n("Line %d"), lineNo + 1);
+	m_statusbar.changeItem(strLine, ID_STATUS_LINENO);
     }
 }

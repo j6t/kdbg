@@ -192,6 +192,7 @@ protected:
      * Is the window that shows "this" visible?
      */
     bool isThisPaneVisible();
+    void updateLineStatus(int lineNo);	/* zero-based line number */
 
 public slots:
     virtual void menuCallback(int item);
@@ -208,6 +209,8 @@ public slots:
     void slotThisExpanding(KTreeViewItem*, bool&);
     void slotWatchExpanding(KTreeViewItem*, bool&);
     void slotFrameTabChanged(int);
+    void slotFileChanged();
+    void slotLineChanged();
     
 signals:
     void forwardMenuCallback(int item);

@@ -50,4 +50,5 @@
 #define ID_STATUS_MSG 1
 #define ID_STATUS_BUSY 2
 #define ID_STATUS_ACTIVE 3
+#define ID_STATUS_LINENO 4
 #endif // COMMANDIDS_H
