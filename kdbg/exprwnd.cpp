@@ -43,8 +43,9 @@ void VarTree::paintValue(QPainter* p)
     p->restore();
 }
 
-int VarTree::valueWidth(KTreeView* owner)
+int VarTree::valueWidth()
 {
+    assert(owner != 0);
     return owner->fontMetrics().width(m_value) + 4;
 }
 
@@ -224,7 +225,7 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues)
 	  newValues->childCount() != 0)))
     {
 	if (isExpanded) {
-	    collapseSubTree(display);
+	    collapseSubTree(display, false);
 	}
 	// update the m_varKind
 	if (newValues->m_varKind != VarTree::VKdummy) {
@@ -392,18 +393,18 @@ int ExprWnd::cellWidth(int col)
 
 void ExprWnd::updateValuesWidth()
 {
-  int maxW = 0;
-  forEveryVisibleItem((KForEveryM)&getMaxValueWidth, &maxW);
-  maxValueWidth = maxW;
-  updateTableSize();
+    int maxW = 0;
+    forEveryVisibleItem(static_cast<KForEveryFunc>(&getMaxValueWidth), &maxW);
+    maxValueWidth = maxW;
+    updateTableSize();
 }
 
 // called by updateValuesWidth() for each item in the visible list
-bool ExprWnd::getMaxValueWidth(KTreeViewItem *item, void *user)
+bool ExprWnd::getMaxValueWidth(KTreeViewItem* item, void* user)
 {
     int *maxW = (int *)user;
     VarTree* v = static_cast<VarTree*>(item);
-    int w = v->valueWidth(this);
+    int w = v->valueWidth();
     if(w > *maxW)
 	*maxW = w;
     return false;

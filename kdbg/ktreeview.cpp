@@ -770,7 +770,7 @@ int KTreeView::expandLevel() const
 // visits every item in the tree, visible or not and applies 
 // the user supplied function with the item and user data passed as parameters
 // if user supplied function returns true, traversal ends and function returns
-bool KTreeView::forEveryItem(KForEveryM func, void* user, KTreeViewItem* item)
+bool KTreeView::forEveryItem(KForEveryFunc func, void* user, KTreeViewItem* item)
 {
     if (item == 0) {
 	item = treeRoot;
@@ -780,7 +780,7 @@ bool KTreeView::forEveryItem(KForEveryM func, void* user, KTreeViewItem* item)
 
     while (item != 0) {
 	// visit the siblings
-	if ((this->*func)(item, user)) {
+	if ((*func)(item, user)) {
 	    return true;
 	}
 	// visit the children (recursively)
@@ -797,7 +797,7 @@ bool KTreeView::forEveryItem(KForEveryM func, void* user, KTreeViewItem* item)
 // user supplied function with the item and user data passed as parameters
 // if user supplied function returns TRUE, traversal ends and function
 // returns
-bool KTreeView::forEveryVisibleItem(KForEveryM func, void *user,
+bool KTreeView::forEveryVisibleItem(KForEveryFunc func, void *user,
 				    KTreeViewItem* item)
 {
     if (item == 0) {
@@ -814,7 +814,7 @@ bool KTreeView::forEveryVisibleItem(KForEveryM func, void *user,
 
     while (item != 0) {
 	// visit the siblings
-	if ((this->*func)(item, user)) {
+	if ((*func)(item, user)) {
 	    return true;
 	}
 	// visit the children (recursively)
@@ -1118,12 +1118,15 @@ void KTreeView::setCurrentItem(int row)
 // enables/disables drawing of expand button
 void KTreeView::setExpandButtonDrawing(bool enable)
 {
-  if(drawExpandButton == enable)
-    return;
-  drawExpandButton = enable;
-  forEveryItem(&KTreeView::setItemExpandButtonDrawing, 0);
-  if(autoUpdate() && isVisible())
-    repaint();
+    if (drawExpandButton == enable)
+	return;
+    drawExpandButton = enable;
+
+    // the user parameter is cast to a bool in setItemExpandButtonDrawing
+    forEveryItem(&KTreeView::setItemExpandButtonDrawing, enable ? &enable : 0);
+
+    if (autoUpdate() && isVisible())
+	repaint();
 }
 
 // sets depth to which subtrees are automatically expanded, and
@@ -1134,7 +1137,7 @@ void KTreeView::setExpandLevel(int level)
 	return;
     expansion = level;
     KTreeViewItem* item = getCurrentItem();
-    forEveryItem(&KTreeView::setItemExpanded, 0);
+    forEveryItem(&KTreeView::setItemExpandLevel, 0);
     while (item != 0) {
 	if (item->getParent()->isExpanded())
 	    break;
@@ -1167,12 +1170,15 @@ void KTreeView::setScrollBar(bool enable)
 // enables/disables display of item text (keys)
 void KTreeView::setShowItemText(bool enable)
 {
-  if(showText == enable)
-    return;
-  showText = enable;
-  forEveryItem(&KTreeView::setItemShowText, 0);
-  if(autoUpdate() && isVisible())
-    repaint();
+    if (showText == enable)
+	return;
+    showText = enable;
+
+    // the user parameter is cast to a bool in setItemShowText
+    forEveryItem(&KTreeView::setItemShowText, enable ? &enable : 0);
+
+    if (autoUpdate() && isVisible())
+	repaint();
 }
 
 // indicates whether vertical scrolling is by pixel or row
@@ -1185,12 +1191,15 @@ void KTreeView::setSmoothScrolling(bool enable)
 // enables/disables tree branch drawing
 void KTreeView::setTreeDrawing(bool enable)
 {
-  if(drawTree == enable)
-    return;
-  drawTree = enable;
-  forEveryItem(&KTreeView::setItemTreeDrawing, 0);
-  if(autoUpdate() && isVisible())
-    repaint();
+    if (drawTree == enable)
+	return;
+    drawTree = enable;
+
+    // the user parameter is cast to a bool in setItemTreeDrawing
+    forEveryItem(&KTreeView::setItemTreeDrawing, enable ? &enable : 0);
+
+    if (autoUpdate() && isVisible())
+	repaint();
 }
     
 // indicates whether item text keys are displayed
@@ -1417,9 +1426,10 @@ void KTreeView::focusInEvent(QFocusEvent *)
 }
 
 // called by updateCellWidth() for each item in the visible list
-bool KTreeView::getMaxItemWidth(KTreeViewItem *item, void *user)
+bool KTreeView::getMaxItemWidth(KTreeViewItem* item, void* user)
 {
-    int indent = indentation(item);
+    assert(item->owner != 0);
+    int indent = item->owner->indentation(item);
     int* maxW = static_cast<int*>(user);
     int w = item->width(indent);
     if (w > *maxW)
@@ -1533,16 +1543,20 @@ repeat:
 	// make previous item current, scroll up if necessary
 	if (currentItem() > 0) {
 	    setCurrentItem(currentItem() - 1);
-	    if (currentItem() < topCell())
-		setTopCell(currentItem());
+	    scrollVisible(itemAt(currentItem()), false);
 	}
 	break;
     case Key_Down:
 	// make next item current, scroll down if necessary
 	if (currentItem() < numRows() - 1) {
 	    setCurrentItem(currentItem() + 1);
-	    if (currentItem() > lastRowVisible())
+	    if (currentItem() > lastRowVisible()) {
+		// scrollVisible is not feasible here because
+		// it scrolls the item to the top
 		setTopCell(topCell() + currentItem() - lastRowVisible());
+	    } else if (currentItem() < topCell()) {
+		setTopCell(currentItem());
+	    }
 	}
 	break;
     case Key_Next:
@@ -1563,7 +1577,7 @@ repeat:
     case Key_Right:
 	// if current item has subtree and is collapsed, expand it
 	item = itemAt(currentItem());
-	if (item->isExpanded() && key == Key_Right) {
+	if (item->isExpanded() && item->hasChild() && key == Key_Right) {
 	    // going right on an expanded item is like going down
 	    key = Key_Down;
 	    goto repeat;
@@ -1576,14 +1590,17 @@ repeat:
     case Key_Left:
 	// if current item has subtree and is expanded, collapse it
 	item = itemAt(currentItem());
-	if (!item->isExpanded() && key == Key_Left) {
-	    // going left on a collapsed item is like going up
-	    key = Key_Up;
-	    goto repeat;
+	if ((!item->isExpanded() || !item->hasChild()) && key == Key_Left) {
+	    // going left on a collapsed item goes to its parent
+	    item = item->getParent();
+	    if (item == treeRoot)
+		break;			/* we're already at the top */
+	    assert(item->isVisible());
+	    setCurrentItem(itemRow(item));
 	} else {
 	    collapseSubTree(item, true);
-	    scrollVisible(item, true);
 	}
+	scrollVisible(item, false);
 	break;
     case Key_Return:
     case Key_Enter:
@@ -1875,38 +1892,47 @@ KTreeViewItem* KTreeView::recursiveFind(KPath& path)
     return sibling;
 }
 
-// called by setExpandLevel for each item in tree
-bool KTreeView::setItemExpanded(KTreeViewItem* item, void*)
+void KTreeView::setItemExpanded(KTreeViewItem* item)
 {
     if (level(item) < expansion) {
 	expandSubTree(item, true);
     } else {
 	collapseSubTree(item, true);
     }
+}
+
+// called by setExpandLevel for each item in tree
+bool KTreeView::setItemExpandLevel(KTreeViewItem* item, void*)
+{
+    assert(item->owner != 0);
+    item->owner->setItemExpanded(item);
     return false;
 }
 
 // called by setExpandButtonDrawing for every item in tree
-bool KTreeView::setItemExpandButtonDrawing(KTreeViewItem *item,
-					      void *)
+// the parameter drawButton is used as (and implicitly cast to) a bool
+bool KTreeView::setItemExpandButtonDrawing(KTreeViewItem* item,
+					   void* drawButton)
 {
-  item->setDrawExpandButton(drawExpandButton);
-  return FALSE;
+    item->setDrawExpandButton(drawButton);
+    return false;
 }
 
 // called by setShowItemText for every item in tree
-bool KTreeView::setItemShowText(KTreeViewItem *item, 
-				   void *)
+// the parameter newDrawText is used as (and implicitly cast to) a bool
+bool KTreeView::setItemShowText(KTreeViewItem* item, 
+				void* newDrawText)
 {
-  item->setDrawText(showText);
-  return FALSE;
+    item->setDrawText(newDrawText);
+    return false;
 }
 
 // called by setTreeDrawing for every item in tree
-bool KTreeView::setItemTreeDrawing(KTreeViewItem *item, void *)
+// the parameter drawTree is used as (and implicitly cast to) a bool
+bool KTreeView::setItemTreeDrawing(KTreeViewItem* item, void* drawTree)
 {
-  item->setDrawTree(drawTree);
-  return FALSE;
+    item->setDrawTree(drawTree);
+    return false;
 }
 
 // makes the item a child of the item above it, splitting

@@ -29,7 +29,7 @@ public:
     virtual ~VarTree();
 public:
     void paintValue(QPainter* painter);
-    int valueWidth(KTreeView* owner);
+    int valueWidth();
     QString computeExpr() const;
     bool isToplevelExpr() const;
 };
@@ -61,7 +61,7 @@ protected:
     virtual void paintCell(QPainter* painter, int row, int col);
     virtual int cellWidth(int col);
     void updateValuesWidth();
-    bool getMaxValueWidth(KTreeViewItem *item, void *user);
+    static bool getMaxValueWidth(KTreeViewItem* item, void* user);
     int maxValueWidth;
     QPixmap m_pixPointer;
 

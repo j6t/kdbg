@@ -501,26 +501,20 @@ public:
 	*/
   int expandLevel() const;
 
-  /**
-	Same as above functions combined into one. If sub-tree is expanded,
-	collapses it, if it is collapsed, it expands it.
-	*/
-  void expandOrCollapseItem(int index);
-
     /**
      * The type of member functions that is called by @ref #forEveryItem and
      * @ref #forEveryVisibleItem.
      */
-    typedef bool (KTreeView::*KForEveryM)(KTreeViewItem*, void*);
+    typedef bool (*KForEveryFunc)(KTreeViewItem*, void*);
 
     /**
      * Iterates every item in the tree, visible or not, and applies the
      * function func with a pointer to each item and user data supplied as
      * parameters. The children of the specified root item are visited
      * (root itself is not visited!). If root is 0 all items in the tree
-     * are visited. KForEveryM is defined as:
+     * are visited. KForEveryFunc is defined as:
      * 
-     * typedef bool (KTreeView::*KForEveryM)(KTreeViewItem*, void*); 
+     * typedef bool (KTreeView::*KForEveryFunc)(KTreeViewItem*, void*);
      * 
      * That is, a member function that returns bool and takes a pointer to
      * a KTreeViewItem and pointer to void as parameters. The traversal
@@ -533,7 +527,7 @@ public:
      * is not scanned
      * @see #forEveryVisibleItem
      */
-    bool forEveryItem(KForEveryM func, void* user,
+    bool forEveryItem(KForEveryFunc func, void* user,
 		      KTreeViewItem* root = 0);
 
     /**
@@ -547,7 +541,7 @@ public:
      * is not scanned
      * @see #forEveryItem
      */
-    bool forEveryVisibleItem(KForEveryM func, void *user,
+    bool forEveryVisibleItem(KForEveryFunc func, void *user,
 			     KTreeViewItem* root = 0);
 
   /**
@@ -917,7 +911,7 @@ protected:
     virtual void collapseSubTree(KTreeViewItem* item, bool emitSignal);
 
     /** Internal function used for counting items */
-    bool countItem(KTreeViewItem* item, void* total);
+    static bool countItem(KTreeViewItem* item, void* total);
 
     /**
      * Expands the specified subtree and updates the display. The specified
@@ -932,7 +926,7 @@ protected:
   virtual void focusInEvent(QFocusEvent *e);
 
     /** internal function used to determine maximum item width */
-    bool getMaxItemWidth(KTreeViewItem* item, void *user);
+    static bool getMaxItemWidth(KTreeViewItem* item, void *user);
 
     /**
      * @param specifies a tree item of this tree
@@ -995,10 +989,11 @@ protected:
      */
     KTreeViewItem* recursiveFind(KPath& path);
 
-  bool setItemExpanded(KTreeViewItem *item, void *);
-  bool setItemExpandButtonDrawing(KTreeViewItem *item, void *);
-  bool setItemShowText(KTreeViewItem *item, void *);
-  bool setItemTreeDrawing(KTreeViewItem *item, void *);
+    void setItemExpanded(KTreeViewItem* item);
+    static bool setItemExpandLevel(KTreeViewItem* item, void*);
+    static bool setItemExpandButtonDrawing(KTreeViewItem* item, void*);
+    static bool setItemShowText(KTreeViewItem* item, void*);
+    static bool setItemTreeDrawing(KTreeViewItem* item, void*);
   void split(KTreeViewItem *item);
   void takeItem(KTreeViewItem *item);
     virtual void updateCellWidth();
