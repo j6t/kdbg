@@ -25,20 +25,21 @@ fi
 
 dnl insert here your program name and version number
 KDE_USE_QT($with_kde_version)
-KDE_DO_IT_ALL(kdbg, 1.1.0)
+KDE_DO_IT_ALL(kdbg, 1.1.1)
 
 dnl in this space add everything you want to check for
 dnl examples are specific headers, libraries, etc.
 dnl everything to compile and run a KDE program is already checked
 
 dnl Checks for header files.
-AC_LANG_CPLUSPLUS dnl switch to C++
+AC_LANG_C dnl switch to C
 AC_HEADER_DIRENT dnl check for dirent.h
 AC_HEADER_STDC dnl check for other stdc headers. More traditional ;)
 dnl check for some more header files. You can remove some of
 dnl them, if you want to. But it doesn't hurt
 AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h sys/cdefs.h)
 AC_CHECK_HEADERS(fnmatch.h sysent.h strings.h sys/stat.h)
+AC_CHECK_HEADERS(sys/ioctl.h pty.h)
 
 dnl Checks for libraries.
 AC_CHECK_LIB(socket, socket, [LIBSOCKET="-lsocket -lnsl"]) dnl for Solaris' X11
@@ -50,7 +51,10 @@ AC_HEADER_TIME
 dnl Checks for library functions.
 AC_CHECK_FUNCS(setpgid putenv socket vsnprintf mkfifo)
 AC_CHECK_SETENV
-AC_LANG_CPLUSPLUS
+
+dnl pseudo tty support in glibc2
+AC_SEARCH_LIBS(openpty, util,
+  AC_DEFINE_UNQUOTED(HAVE_FUNC_OPENPTY, 1, [Define if you have openpty]))
 
 dnl Check whether we want much debugging output
 AC_MSG_CHECKING([whether kdbg should generate lots of trace output])
