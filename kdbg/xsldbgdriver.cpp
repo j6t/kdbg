@@ -49,7 +49,7 @@ static XsldbgCmdInfo cmds[] = {
     {DCcorefile, "data  %s\n", XsldbgCmdInfo::argString},       /* force a restart */
     {DCattach, "print 'attach %s'\n", XsldbgCmdInfo::argString},
     {DCinfolinemain, "print 'info main line'\n", XsldbgCmdInfo::argNone},
-    {DCinfolocals, "locals\n", XsldbgCmdInfo::argNone},
+    {DCinfolocals, "locals -f\n", XsldbgCmdInfo::argNone},
     {DCinforegisters, "print 'info reg'\n", XsldbgCmdInfo::argNone},
     {DCexamine, "print 'x %s %s'\n", XsldbgCmdInfo::argString2},
     {DCinfoline, "print 'templates %s:%d'\n", XsldbgCmdInfo::argStringNum},
@@ -64,7 +64,7 @@ static XsldbgCmdInfo cmds[] = {
     {DCcont, "continue\n", XsldbgCmdInfo::argNone},
     {DCstep, "step\n", XsldbgCmdInfo::argNone},
     {DCstepi, "trace\n", XsldbgCmdInfo::argNone},
-    {DCnext, "walk\n", XsldbgCmdInfo::argNone},
+    {DCnext, "walk 1\n", XsldbgCmdInfo::argNone},
     {DCnexti, "print 'nexti'\n", XsldbgCmdInfo::argNone},
     {DCfinish, "quit\n", XsldbgCmdInfo::argNone},
     {DCuntil, "continue %s:%d\n", XsldbgCmdInfo::argStringNum},
@@ -189,6 +189,7 @@ void
 XsldbgDriver::slotReceiveOutput(KProcess * process, char *buffer,
                                 int buflen)
 {
+    // TRACE(buffer);
     if (m_state != DSidle) {
         //    TRACE(buffer);
         DebuggerDriver::slotReceiveOutput(process, buffer, buflen);
@@ -595,7 +596,7 @@ XsldbgDriver::queueCmd(DbgCommand cmd, QString strArg1, QString strArg2,
 void
 XsldbgDriver::terminate()
 {
-    TRACE("XsldbgDriver::Terminate");
+    qDebug("XsldbgDriver::Terminate");
     flushCommands();
     executeCmdString(DCinitialize, "quit\n", true);
     kill(SIGTERM);
@@ -605,7 +606,7 @@ XsldbgDriver::terminate()
 void
 XsldbgDriver::detachAndTerminate()
 {
-    TRACE("XsldbgDriver::detachAndTerminate");
+    qDebug("XsldbgDriver::detachAndTerminate");
     flushCommands();
     executeCmdString(DCinitialize, "quit\n", true);
     kill(SIGINT);
@@ -615,6 +616,7 @@ void
 XsldbgDriver::interruptInferior()
 {
     // remove accidentally queued commands
+    qDebug("interruptInferior");
     flushHiPriQueue();
     kill(SIGINT);
 }
@@ -695,9 +697,8 @@ parseVar(const char *&s)
 
     VarTree::NameKind kind;
 
-    //TRACE(__PRETTY_FUNCTION__);
-    //TRACE(p);
-
+    TRACE(__PRETTY_FUNCTION__);
+    TRACE(p);
 
     if (parseErrorMessage(p, variable, false) == true) {
         TRACE("Found error message");
@@ -708,17 +709,17 @@ parseVar(const char *&s)
         foundLocalVar = true;
         /* skip " Local" */
         p = p + 6;
-        //TRACE("Found local variable");
+        TRACE("Found local variable");
     } else if (strncmp(p, " Global", 7) == 0) {
         /* skip " Global" */
         p = p + 7;
-	// TRACE("Found global variable");
+	TRACE("Found global variable");
     } else if (strncmp(p, "= ", 2) == 0) {
         /* we're processing the result of a "print command" */
         /* find next line */
         char *nextLine = strchr(p, '\n');
 
-	// TRACE("Found print expr");
+	TRACE("Found print expr");
         if (nextLine) {
             char nameBuffer[100];
 
@@ -739,15 +740,35 @@ parseVar(const char *&s)
     while (isspace(*p))
         p++;
 
-    //TRACE(QString("Parse var: name") + p);
-    if (!parseName(p, name, kind)) {
+    if (*p != '='){
+      // No value provided just a name
+      TRACE(QString("Parse var: name") + p);
+      if (!parseName(p, name, kind)) {
         return 0;
-    }
-
-
-    variable = new VarTree(name, kind);
-    if (variable != 0L) {
+      }
+      variable = new VarTree(name, kind);
+      if (variable != 0L) {
         variable->setDeleteChildren(true);
+      }
+    }else{
+      p++;
+      // skip whitespace
+      while (isspace(*p))
+        p++;
+      TRACE(QString("Parse var: name") + p);
+      if (!parseName(p, name, kind)) {
+        return 0;
+      }
+      variable = new VarTree(name, kind);
+      if (variable != 0L) {
+        variable->setDeleteChildren(true);
+      }
+      if (*p == '\n')
+	p++;
+      if (!parseValue(p, variable)) {
+	delete variable;
+	return 0;
+      }
     }
 
     if (*p == '\n')
@@ -785,10 +806,9 @@ parseName(const char *&s, QString & name, VarTree::NameKind & kind)
 
 
     name = FROM_LATIN1(s, len);
-    if (name.length() > 0)
-        name.prepend('$');      /* XSL variables must have a $ to be evaluated 
-                                 * properly */
-    TRACE(QString("parseName got name" ) +  name);
+    /* XSL variables will have a $ prefix to be evaluated 
+     * properly */
+    //TRACE(QString("parseName got name" ) +  name);
 
     // return the new position
     s = p;
@@ -800,18 +820,22 @@ parseValue(const char *&s, VarTree * variable)
 {
     const char *start = s, *end = s;
     VarTree * childValue; 
+    #define VALUE_END_MARKER_INDEX  0
 
     /* This mark the end of a value */
-    static const char *marker[7] = { "(xsldbg) ",
+    static const char *marker[] = { 
+         "\032\032",            /* value end marker*/   
+         "(xsldbg) ",
         "Breakpoint at",        /* stepped to next location */
         "Breakpoint in",        /* reached a set breakpoint */
         "Reached ",             /* reached template */
         "Error",
         "runtime error",
-        "xmlXPathEval:"
+	 "xmlXPathEval:",
+	0		     				     
     };
     static char valueBuffer[255];
-    int markerIndex, foundEnd = 0;
+    int markerIndex = 0, foundEnd = 0;
     size_t copySize;
 
     if (variable == 0L)
@@ -820,7 +844,7 @@ parseValue(const char *&s, VarTree * variable)
     variable->m_value = "";
     while (start && (*start != '\0')) {
         /* look for the next marker */
-        for (markerIndex = 0; markerIndex < 7; markerIndex++) {
+        for (markerIndex = 0; marker[markerIndex] != 0; markerIndex++) {
             foundEnd =
                 strncmp(start, marker[markerIndex],
                         strlen(marker[markerIndex])) == 0;
@@ -842,6 +866,8 @@ parseValue(const char *&s, VarTree * variable)
 
             strncpy(valueBuffer, start, copySize);
             valueBuffer[copySize] = '\0';
+	    TRACE("Got value :");
+	    TRACE(valueBuffer);
 	    childValue = new VarTree(valueBuffer, VarTree::NKplain);
             variable->appendChild(childValue);
 
@@ -853,10 +879,17 @@ parseValue(const char *&s, VarTree * variable)
         }
     }
 
+    if (foundEnd == 0)
+      TRACE(QString("Unable to find end on value near :") + start);
 
-    while (start && *start != '\0')
+    // If we've got something otherthan a end of value marker then
+    //  advance to the end of this buffer
+    if (markerIndex != VALUE_END_MARKER_INDEX){
+      while (start && *start != '\0')
         start++;
-
+    }else{
+      start = start + strlen(marker[0]);
+    }
 
     s = start;
 
