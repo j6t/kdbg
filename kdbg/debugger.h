@@ -66,6 +66,17 @@ public:
      */
     void attachProgram(const QString& pid);
 
+    /**
+     * Returns the file name of the per-program config file for the
+     * specified program.
+     */
+    static QString getConfigForExe(const QString& exe);
+
+    /**
+     * The driver name entry in the per-program config file.
+     */
+    static const char DriverNameEntry[];
+
 public slots:
     /**
      * Runs the program or continues it if it is stopped at a breakpoint.

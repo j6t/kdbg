@@ -94,6 +94,7 @@ void KDebugger::restoreSettings(KConfig* /*config*/)
 const char GeneralGroup[] = "General";
 const char DebuggerCmdStr[] = "DebuggerCmdStr";
 const char TTYLevelEntry[] = "TTYLevel";
+const char KDebugger::DriverNameEntry[] = "DriverName";
 
 bool KDebugger::debugProgram(const QString& name,
 			     DebuggerDriver* driver)
@@ -530,10 +531,8 @@ void KDebugger::gdbExited(KProcess*)
     emit updatePC(QString(), -1, DbgAddr(), 0);
 }
 
-void KDebugger::openProgramConfig(const QString& name)
+QString KDebugger::getConfigForExe(const QString& name)
 {
-    ASSERT(m_programConfig == 0);
-
     QFileInfo fi(name);
     QString pgmConfigFile = fi.dirPath(true);
     if (!pgmConfigFile.isEmpty()) {
@@ -541,6 +540,14 @@ void KDebugger::openProgramConfig(const QString& name)
     }
     pgmConfigFile += ".kdbgrc." + fi.fileName();
     TRACE("program config file = " + pgmConfigFile);
+    return pgmConfigFile;
+}
+
+void KDebugger::openProgramConfig(const QString& name)
+{
+    ASSERT(m_programConfig == 0);
+
+    QString pgmConfigFile = getConfigForExe(name);
     // check whether we can write to the file
     QFile file(pgmConfigFile);
     bool readonly = true;
@@ -575,6 +582,10 @@ void KDebugger::saveProgramSettings()
     m_programConfig->writeEntry(WorkingDirectory, m_programWD);
     m_programConfig->writeEntry(DebuggerCmdStr, m_debuggerCmd);
     m_programConfig->writeEntry(TTYLevelEntry, int(m_ttyLevel));
+    QString driverName;
+    if (m_d != 0)
+	driverName = m_d->driverName();
+    m_programConfig->writeEntry(DriverNameEntry, driverName);
 
     // write environment variables
     m_programConfig->deleteGroup(EnvironmentGroup);

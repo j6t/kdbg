@@ -13,7 +13,7 @@
 #include <kfiledialog.h>
 #include <qpainter.h>
 #include <qtabdialog.h>
-#include <qfileinfo.h>
+#include <qfile.h>
 #include "mainwndbase.h"
 #include "debugger.h"
 #include "gdbdriver.h"
@@ -184,11 +184,6 @@ void DebuggerMainWndBase::setTranscript(const char* name)
 	m_debugger->driver()->setLogFileName(m_transcriptFile);
 }
 
-void DebuggerMainWndBase::setLanguage(const QCString& lang)
-{
-    m_language = lang.lower();
-}
-
 const char OutputWindowGroup[] = "OutputWindow";
 const char TermCmdStr[] = "TermCmdStr";
 const char KeepScript[] = "KeepScript";
@@ -202,6 +197,7 @@ const char FilesGroup[] = "Files";
 const char RecentExecutables[] = "RecentExecutables";
 const char SourceFileFilter[] = "SourceFileFilter";
 const char HeaderFileFilter[] = "HeaderFileFilter";
+const char GeneralGroup[] = "General";
 
 void DebuggerMainWndBase::saveSettings(KConfig* config)
 {
@@ -255,16 +251,48 @@ void DebuggerMainWndBase::restoreSettings(KConfig* config)
     config->readListEntry(RecentExecutables, m_recentExecList,',');
 }
 
-bool DebuggerMainWndBase::debugProgram(const QString& executable, QWidget* parent)
+bool DebuggerMainWndBase::debugProgram(const QString& executable,
+				       QCString lang, QWidget* parent)
 {
     assert(m_debugger != 0);
 
-    DebuggerDriver* driver = driverFromLang(m_language);
+    TRACE(QString().sprintf("trying language '%s'...", lang.data()));
+    DebuggerDriver* driver = driverFromLang(lang);
+
+    if (driver == 0)
+    {
+	// see if there is a language in the per-program config file
+	QString configName = m_debugger->getConfigForExe(executable);
+	if (QFile::exists(configName))
+	{
+	    KSimpleConfig c(configName, true);	// read-only
+	    c.setGroup(GeneralGroup);
+
+	    // Using "GDB" as default here is for backwards compatibility:
+	    // The config file exists but doesn't have an entry,
+	    // so it must have been created by an old version of KDbg
+	    // that had only the GDB driver.
+	    lang = c.readEntry(KDebugger::DriverNameEntry, "GDB").latin1();
+
+	    TRACE(QString().sprintf("...bad, trying config driver %s...",
+			  lang.data()));
+	    driver = driverFromLang(lang);
+	}
+
+    }
+    if (driver == 0)
+    {
+	QCString name = driverNameFromFile(executable);
+
+	TRACE(QString().sprintf("...no luck, trying %s derived"
+				" from file contents", name.data()));
+	driver = driverFromLang(name);
+    }
     if (driver == 0)
     {
 	// oops
 	QString msg = i18n("Don't know how to debug language `%1'");
-	KMessageBox::sorry(parent, msg.arg(m_language));
+	KMessageBox::sorry(parent, msg.arg(lang));
 	return false;
     }
 
@@ -285,10 +313,10 @@ bool DebuggerMainWndBase::debugProgram(const QString& executable, QWidget* paren
 }
 
 // derive driver from language
-DebuggerDriver* DebuggerMainWndBase::driverFromLang(const QCString& lang)
+DebuggerDriver* DebuggerMainWndBase::driverFromLang(QCString lang)
 {
-    // lang must be in all lowercase
-    assert(lang == lang.lower());
+    // lang is needed in all lowercase
+    lang = lang.lower();
 
     // The following table relates languages and debugger drivers
     static const struct L {
@@ -300,11 +328,13 @@ DebuggerDriver* DebuggerMainWndBase::driverFromLang(const QCString& lang)
 	{ "f",       "fortran", 1 },
 	{ "p",       "python",  3 },
 	{ "x",       "xslt",    2 },
+	// the following are actually driver names
+	{ "gdb",     "gdb",     1 },
+	{ "xsldbg",  "xsldbg",  2 },
     };
     const int N = sizeof(langs)/sizeof(langs[0]);
 
     // lookup the language name
-    // note that it has been set to lower-case in setLanguage()
     int driverID = 0;
     for (int i = 0; i < N; i++)
     {
@@ -339,6 +369,11 @@ DebuggerDriver* DebuggerMainWndBase::driverFromLang(const QCString& lang)
 	break;
     }
     return driver;
+}
+
+QCString DebuggerMainWndBase::driverNameFromFile(const QString& exe)
+{
+    return "GDB";
 }
 
 // helper that gets a file name (it only differs in the caption of the dialog)

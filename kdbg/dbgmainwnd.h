@@ -14,6 +14,7 @@
 class WinStack;
 class QPopupMenu;
 class QListBox;
+class QCString;
 class ExprWnd;
 class DockWidget;
 class BreakpointTable;
@@ -28,7 +29,7 @@ public:
     DebuggerMainWnd(const char* name);
     ~DebuggerMainWnd();
 
-    bool debugProgram(const QString& exe);
+    bool debugProgram(const QString& exe, QCString lang);
 
 protected:
     // session properties

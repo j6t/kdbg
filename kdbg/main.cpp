@@ -100,13 +100,13 @@ int main(int argc, char** argv)
     if (!remote.isEmpty())
 	debugger.setRemoteDevice(remote);
 
-    // deprecated option; -l overrides it
+    QCString lang = args->getOption("l");
+
+    // deprecated option; overrides -l
     if (args->isSet("x")){
          /* run in xsldbg mode  */
-         debugger.setLanguage("xsl");
+         lang = "xslt";
     }
-
-    debugger.setLanguage(args->getOption("l"));
 
     // check environment variable for transcript file name
     if (transcript == 0) {
@@ -119,7 +119,7 @@ int main(int argc, char** argv)
 	if (args->count() > 1) {
 	    debugger.setCoreFile(args->arg(1));
 	}
-	if (!debugger.debugProgram(args->arg(0))) {
+	if (!debugger.debugProgram(args->arg(0), lang)) {
 	    // failed
 	    TRACE("cannot start debugger");
 	    KMessageBox::error(&debugger, i18n("Cannot start debugger."));

@@ -69,12 +69,15 @@ public:
      * Specifies the file where to write the transcript.
      */
     void setTranscript(const char* name);
+    /**
+     * Starts to debug the specified program using the specified language
+     * driver.
+     */
+    bool debugProgram(const QString& executable, QCString lang, QWidget* parent);
 
     // the following are needed to handle program arguments
-    bool debugProgram(const QString& executable, QWidget* parent);
     void setCoreFile(const QString& corefile);
     void setRemoteDevice(const QString &remoteDevice);
-    void setLanguage(const QCString& lang);
     /** helper around KFileDialog */
     static QString myGetFileName(QString caption,
 				 QString dir, QString filter,
@@ -135,9 +138,12 @@ protected:
 		       ExprWnd* localVars,
 		       ExprWnd* watchVars,
 		       QListBox* backtrace);
-    // which language are we debugging?
-    QCString m_language;
-    DebuggerDriver* driverFromLang(const QCString& lang);
+    DebuggerDriver* driverFromLang(QCString lang);
+    /**
+     * This function derives a driver name from the contents of the named
+     * file.
+     */
+    QCString driverNameFromFile(const QString& exe);
 
 public:
     /*

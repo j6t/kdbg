@@ -420,7 +420,7 @@ void DebuggerMainWnd::readProperties(KConfig* config)
 
     TRACE("readProperties: executable=" + execName);
     if (!execName.isEmpty()) {
-	debugProgram(execName);
+	debugProgram(execName, "");
     }
 }
 
@@ -679,7 +679,7 @@ TTYWindow* DebuggerMainWnd::ttyWindow()
     return m_ttyWindow;
 }
 
-bool DebuggerMainWnd::debugProgram(const QString& exe)
+bool DebuggerMainWnd::debugProgram(const QString& exe, QCString lang)
 {
     // check the file name
     QFileInfo fi(exe);
@@ -692,7 +692,7 @@ bool DebuggerMainWnd::debugProgram(const QString& exe)
     }
     else
     {
-	success = DebuggerMainWndBase::debugProgram(fi.absFilePath(), this);
+	success = DebuggerMainWndBase::debugProgram(fi.absFilePath(), lang, this);
     }
 
     if (success)
@@ -796,7 +796,7 @@ void DebuggerMainWnd::slotRecentExec(int item)
 {
     if (item >= 0 && item < int(m_recentExecList.count())) {
 	QString exe = m_recentExecList.at(item);
-	debugProgram(exe);
+	debugProgram(exe, "");
     }
 }
 
@@ -900,7 +900,7 @@ void DebuggerMainWnd::slotFileExe()
 	if (executable.isEmpty())
 	    return;
 
-	debugProgram(executable);
+	debugProgram(executable, "");
     }
 }
 
