@@ -1,14 +1,14 @@
 /* XPM */
 static char * pcinner_xpm[] = {
 "14 8 3 1",
-" 	s None	c None",
-".	c white",
-"X	c dark green",
+" 	c None",
+".	c #FFFFFF",
+"+	c #006400",
 " ......       ",
-" .XXXXX...    ",
-" .XXXXXXXX..  ",
-" .XXXXXXXXXX. ",
-" .XXXXXXXXXX. ",
-" .XXXXXXXX..  ",
-" .XXXXX....   ",
+" .+++++...    ",
+" .++++++++..  ",
+" .++++++++++. ",
+" .++++++++++. ",
+" .++++++++..  ",
+" .+++++....   ",
 " ......       "};
