@@ -150,15 +150,22 @@ void BreakpointTable::parseBreakList(const char* output)
 	    location = p;
 	    p += location.length();
 	} else {
-	    location = QString(p, end-p+1);
+	    location = QString(p, end-p+1).stripWhiteSpace();
 	    p = end+1;			/* skip over \n */
-	    // next line may contain number of hits
-	    if (isspace(*p)) {
+	    // may be continued in next line
+	    QString continuation;
+	    while (isspace(*p)) {	/* p points to beginning of line */
 		end = strchr(p, '\n');
 		if (end == 0) {
+		    continuation = QString(p).stripWhiteSpace();
 		    p += strlen(p);
 		} else {
-		    p = end+1;
+		    continuation = QString(p, end-p+1).stripWhiteSpace();
+		    p = end+1;		/* skip '\n' */
+		}
+		if (strncmp(continuation, "breakpoint already hit", 22) != 0) {
+		    // indeed a continuation
+		    location += " " + continuation;
 		}
 	    }
 	}
