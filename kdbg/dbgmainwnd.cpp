@@ -16,10 +16,7 @@
 KStdAccel* keys = 0;
 
 DebuggerMainWnd::DebuggerMainWnd(const char* name) :
-	KTopLevelWidget(name),
-	m_menu(this, "menu"),
-	m_toolbar(this, "toolbar"),
-	m_statusbar(this, "statusbar"),
+	KTMainWindow(name),
 	m_mainPanner(this, "main_pane", KNewPanner::Vertical, KNewPanner::Percent, 60),
 	m_leftPanner(&m_mainPanner, "left_pane", KNewPanner::Horizontal, KNewPanner::Percent, 70),
 	m_rightPanner(&m_mainPanner, "right_pane", KNewPanner::Horizontal, KNewPanner::Percent, 50),
@@ -42,12 +39,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     m_statusActive = i18n("active");
 
     initMenu();
-    setMenu(&m_menu);
-    
     initToolbar();
-    addToolBar(&m_toolbar);
     
-    setStatusBar(&m_statusbar);
     connect(m_debugger, SIGNAL(updateStatusMessage()), SLOT(newStatusMsg()));
     connect(m_debugger, SIGNAL(updateUI()), SLOT(updateUI()));
 
@@ -173,58 +166,72 @@ void DebuggerMainWnd::initMenu()
     connect(&m_menuWindow, SIGNAL(activated(int)), SLOT(menuCallback(int)));
     connect(&m_menuHelp, SIGNAL(activated(int)), SLOT(menuCallback(int)));
 
-    m_menu.insertItem(i18n("&File"), &m_menuFile);
-    m_menu.insertItem(i18n("&View"), &m_menuView);
-    m_menu.insertItem(i18n("E&xecution"), &m_menuProgram);
-    m_menu.insertItem(i18n("&Breakpoint"), &m_menuBrkpt);
-    m_menu.insertItem(i18n("&Window"), &m_menuWindow);
-    m_menu.insertSeparator();
+    KMenuBar* menu = menuBar();
+    menu->insertItem(i18n("&File"), &m_menuFile);
+    menu->insertItem(i18n("&View"), &m_menuView);
+    menu->insertItem(i18n("E&xecution"), &m_menuProgram);
+    menu->insertItem(i18n("&Breakpoint"), &m_menuBrkpt);
+    menu->insertItem(i18n("&Window"), &m_menuWindow);
+    menu->insertSeparator();
     
     QString about = "KDbg " VERSION " - ";
     about += i18n("A Debugger\n"
 		  "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 		  "with the help of many others");
-    m_menu.insertItem(i18n("&Help"),
-		      kapp->getHelpMenu(false, about));
+    menu->insertItem(i18n("&Help"),
+		     kapp->getHelpMenu(false, about));
 }
 
 void DebuggerMainWnd::initToolbar()
 {
     KIconLoader* loader = kapp->getIconLoader();
 
-    m_toolbar.insertButton(loader->loadIcon("execopen.xpm"),ID_FILE_EXECUTABLE, true,
+    KToolBar* toolbar = toolBar();
+    toolbar->insertButton(loader->loadIcon("execopen.xpm"),ID_FILE_EXECUTABLE, true,
 			   i18n("Executable"));
-    m_toolbar.insertButton(loader->loadIcon("fileopen.xpm"),ID_FILE_OPEN, true,
+    toolbar->insertButton(loader->loadIcon("fileopen.xpm"),ID_FILE_OPEN, true,
 			   i18n("Open a source file"));
-    m_toolbar.insertButton(loader->loadIcon("reload.xpm"),ID_FILE_RELOAD, true,
+    toolbar->insertButton(loader->loadIcon("reload.xpm"),ID_FILE_RELOAD, true,
 			   i18n("Reload source file"));
-    m_toolbar.insertSeparator();
-    m_toolbar.insertButton(loader->loadIcon("pgmrun.xpm"),ID_PROGRAM_RUN, true,
+    toolbar->insertSeparator();
+    toolbar->insertButton(loader->loadIcon("pgmrun.xpm"),ID_PROGRAM_RUN, true,
 			   i18n("Run/Continue"));
-    m_toolbar.insertButton(loader->loadIcon("pgmstep.xpm"),ID_PROGRAM_STEP, true,
+    toolbar->insertButton(loader->loadIcon("pgmstep.xpm"),ID_PROGRAM_STEP, true,
 			   i18n("Step into"));
-    m_toolbar.insertButton(loader->loadIcon("pgmnext.xpm"),ID_PROGRAM_NEXT, true,
+    toolbar->insertButton(loader->loadIcon("pgmnext.xpm"),ID_PROGRAM_NEXT, true,
 			   i18n("Step over"));
-    m_toolbar.insertButton(loader->loadIcon("pgmfinish.xpm"),ID_PROGRAM_FINISH, true,
+    toolbar->insertButton(loader->loadIcon("pgmfinish.xpm"),ID_PROGRAM_FINISH, true,
 			   i18n("Step out"));
-    m_toolbar.insertSeparator();
-    m_toolbar.insertButton(loader->loadIcon("brkpt.xpm"),ID_BRKPT_SET, true,
+    toolbar->insertSeparator();
+    toolbar->insertButton(loader->loadIcon("brkpt.xpm"),ID_BRKPT_SET, true,
 			   i18n("Breakpoint"));
-    m_toolbar.insertSeparator();
-    m_toolbar.insertButton(loader->loadIcon("search.xpm"),ID_VIEW_FINDDLG, true,
+    toolbar->insertSeparator();
+    toolbar->insertButton(loader->loadIcon("search.xpm"),ID_VIEW_FINDDLG, true,
 			   i18n("Search"));
 
-    connect(&m_toolbar, SIGNAL(clicked(int)), SLOT(menuCallback(int)));
+    connect(toolBar(), SIGNAL(clicked(int)), SLOT(menuCallback(int)));
     
     initAnimation();
 
-    m_statusbar.insertItem(m_statusActive, ID_STATUS_ACTIVE);
-    m_statusbar.insertItem(i18n("Line 00000"), ID_STATUS_LINENO);
-    m_statusbar.insertItem("", ID_STATUS_MSG);	/* message pane */
+    KStatusBar* statusbar = statusBar();
+    statusbar->insertItem(m_statusActive, ID_STATUS_ACTIVE);
+    statusbar->insertItem(i18n("Line 00000"), ID_STATUS_LINENO);
+    statusbar->insertItem("", ID_STATUS_MSG);	/* message pane */
 
     // reserve some translations
     i18n("Restart");
     i18n("Core dump");
+}
+
+/*
+ * We must override KTMainWindow's handling of close events since we have
+ * only one toplevel window, which lives on the stack (which KTMainWindow
+ * can't live with :-( )
+ */
+void DebuggerMainWnd::closeEvent(QCloseEvent* e)
+{
+    e->accept();
+    kapp->quit();
 }
 
 
@@ -429,7 +436,7 @@ void DebuggerMainWnd::updateUI()
 	ID_PROGRAM_RUN, ID_PROGRAM_STEP, ID_PROGRAM_NEXT, ID_PROGRAM_FINISH,
 	ID_BRKPT_SET
     };
-    UpdateToolbarUI updateToolbar(&m_toolbar, this, SLOT(updateUIItem(UpdateUI*)),
+    UpdateToolbarUI updateToolbar(toolBar(), this, SLOT(updateUIItem(UpdateUI*)),
 				  toolIds, sizeof(toolIds)/sizeof(toolIds[0]));
     updateToolbar.iterateToolbar();
 }
@@ -475,9 +482,9 @@ void DebuggerMainWnd::updateUIItem(UpdateUI* item)
     }
     
     // update statusbar
-    m_statusbar.changeItem(m_debugger->isProgramActive() ?
-			   static_cast<const char*>(m_statusActive) : "",
-			   ID_STATUS_ACTIVE);
+    statusBar()->changeItem(m_debugger->isProgramActive() ?
+			    static_cast<const char*>(m_statusActive) : "",
+			    ID_STATUS_ACTIVE);
     // line number is updated in slotLineChanged
 }
 
@@ -492,9 +499,10 @@ void DebuggerMainWnd::initAnimation()
     QString path = kapp->kde_datadir() + "/kfm/pics/";
 
     pixmap.load(path + "/kde1.xpm");
-    
-    m_toolbar.insertButton(pixmap, ID_STATUS_BUSY);
-    m_toolbar.alignItemRight(ID_STATUS_BUSY, true);
+
+    KToolBar* toolbar = toolBar();
+    toolbar->insertButton(pixmap, ID_STATUS_BUSY);
+    toolbar->alignItemRight(ID_STATUS_BUSY, true);
     
     // Load animated logo
     m_animation.setAutoDelete(true);
@@ -515,14 +523,14 @@ void DebuggerMainWnd::slotAnimationTimeout()
     m_animationCounter++;
     if (m_animationCounter == m_animation.count())
 	m_animationCounter = 0;
-    m_toolbar.setButtonPixmap(ID_STATUS_BUSY,
-			      *m_animation.at(m_animationCounter));
+    toolBar()->setButtonPixmap(ID_STATUS_BUSY,
+			       *m_animation.at(m_animationCounter));
 }
 
 void DebuggerMainWnd::newStatusMsg()
 {
     QString msg = m_debugger->statusMessage();
-    m_statusbar.changeItem(msg, ID_STATUS_MSG);
+    statusBar()->changeItem(msg, ID_STATUS_MSG);
 }
 
 void DebuggerMainWnd::slotAddWatch()
@@ -583,11 +591,11 @@ void DebuggerMainWnd::slotNewFileLoaded()
 void DebuggerMainWnd::updateLineStatus(int lineNo)
 {
     if (lineNo < 0) {
-	m_statusbar.changeItem("", ID_STATUS_LINENO);
+	statusBar()->changeItem("", ID_STATUS_LINENO);
     } else {
 	QString strLine;
 	strLine.sprintf(i18n("Line %d"), lineNo + 1);
-	m_statusbar.changeItem(strLine, ID_STATUS_LINENO);
+	statusBar()->changeItem(strLine, ID_STATUS_LINENO);
     }
 }
 

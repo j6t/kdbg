@@ -34,7 +34,7 @@ int main(int argc, char** argv)
     // session management
     bool restored = false;
     if (app.isRestored()) {
-	if (KTopLevelWidget::canBeRestored(1)) {
+	if (KTMainWindow::canBeRestored(1)) {
 	    debugger.restore(1);
 	    restored = true;
 	}

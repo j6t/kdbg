@@ -10,7 +10,7 @@
 #include <qlined.h>
 #include <qlayout.h>
 #include <qpushbt.h>
-#include <ktopwidget.h>
+#include <ktmainwindow.h>
 #include <knewpanner.h>
 #include "winstack.h"
 #include "exprwnd.h"
@@ -23,7 +23,7 @@ class KStdAccel;
 extern KStdAccel* keys;
 
 
-class DebuggerMainWnd : public KTopLevelWidget
+class DebuggerMainWnd : public KTMainWindow
 {
     Q_OBJECT
 public:
@@ -42,12 +42,8 @@ protected:
     void saveSettings(KConfig*);
     void restoreSettings(KConfig*);
 
-    void updateLineStatus(int lineNo);	/* zero-based line number */
-
-    KMenuBar m_menu;
-    KToolBar m_toolbar;
-    KStatusBar m_statusbar;
     // statusbar texts
+    void updateLineStatus(int lineNo);	/* zero-based line number */
     QString m_statusActive;
 
     void initMenu();
@@ -84,6 +80,9 @@ protected:
 
     // the debugger proper
     KDebugger* m_debugger;
+
+protected:
+    virtual void closeEvent(QCloseEvent* e);
 
 signals:
     void forwardMenuCallback(int item);
