@@ -929,9 +929,9 @@ void DockManager::writeConfig( KConfig* c, QString group )
       } else {
 /*************************************************************************************************/
 //        debug("  Skip %s", nList.current());
-        if ( findList.find( obj->firstName ) == -1 )
+//        if ( findList.find( obj->firstName ) == -1 )
 //          debug("  ? Not found %s", obj->firstName);
-        if ( findList.find( obj->lastName ) == -1 )
+//        if ( findList.find( obj->lastName ) == -1 )
 //          debug("  ? Not found %s", obj->lastName);
         nList.next();
         if ( !nList.current() ) nList.first();
