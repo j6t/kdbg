@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 0.3.0\n"
-"POT-Creation-Date: 1999-05-30 17:24+0200\n"
+"POT-Creation-Date: 1999-07-23 22:09+0200\n"
 "PO-Revision-Date: 1998-01-24 16:10+MET\n"
 "Last-Translator: Ilmar Habibulin <ilmar@ints.ru>\n"
 "Language-Team: none\n"
@@ -94,24 +94,24 @@ msgstr ": Подсоединиться к процессу"
 msgid "Specify the process number to attach to:"
 msgstr "Укажите номер порцесса: к которому будем подсоединяться:"
 
-#: debugger.cpp:106
+#: debugger.cpp:107
 msgid "Breakpoints"
 msgstr "Точки останова"
 
-#: debugger.cpp:229
+#: debugger.cpp:230
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "`%s' не файл или не существует"
 
-#: debugger.cpp:293
+#: debugger.cpp:294
 msgid "Select the executable to debug"
 msgstr "Выберите исполняемый модуль для отладки"
 
-#: debugger.cpp:335
+#: debugger.cpp:336
 msgid "Select core dump"
 msgstr "Выберите сохраненный образ памяти процесса"
 
-#: debugger.cpp:617
+#: debugger.cpp:620
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
@@ -119,11 +119,11 @@ msgstr ""
 "gdb неожиданно завершился\n"
 "Перезапустите сессию (например, через Файл|Исполняемый модуль."
 
-#: debugger.cpp:699
+#: debugger.cpp:702
 msgid ": Program output"
 msgstr ": Вывод программы"
 
-#: debugger.cpp:1153
+#: debugger.cpp:1163
 msgid "New working directory: "
 msgstr ""
 
@@ -215,7 +215,7 @@ msgstr " Удалить "
 msgid "active"
 msgstr "активный"
 
-#: mainwndbase.cpp:284
+#: mainwndbase.cpp:285
 msgid ": Global options"
 msgstr ""
 

@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 0.3.0\n"
-"POT-Creation-Date: 1999-05-30 17:24+0200\n"
+"POT-Creation-Date: 1999-07-23 22:09+0200\n"
 "PO-Revision-Date: 1998-11-24 20:21 MET\n"
 "Last-Translator: Martin ©pirk <spirk@kla.pvt.cz>\n"
 "Language-Team: Czech <flidr@kky.zcu.cz>\n"
@@ -94,34 +94,34 @@ msgstr ": Pøipojit k procesu"
 msgid "Specify the process number to attach to:"
 msgstr "Zadejte èíslo procesu pro pøipojení:"
 
-#: debugger.cpp:106
+#: debugger.cpp:107
 msgid "Breakpoints"
 msgstr "Zará¾ky"
 
-#: debugger.cpp:229
+#: debugger.cpp:230
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "`%s' není soubor nebo neexistuje"
 
-#: debugger.cpp:293
+#: debugger.cpp:294
 msgid "Select the executable to debug"
 msgstr "Vyberte spustitelný soubor který chcete trasovat"
 
-#: debugger.cpp:335
+#: debugger.cpp:336
 msgid "Select core dump"
 msgstr "Vyberte core dump"
 
-#: debugger.cpp:617
+#: debugger.cpp:620
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
 
-#: debugger.cpp:699
+#: debugger.cpp:702
 msgid ": Program output"
 msgstr ": Výstup programu"
 
-#: debugger.cpp:1153
+#: debugger.cpp:1163
 msgid "New working directory: "
 msgstr ""
 
@@ -214,7 +214,7 @@ msgstr " Smazat "
 msgid "active"
 msgstr "aktivní"
 
-#: mainwndbase.cpp:284
+#: mainwndbase.cpp:285
 msgid ": Global options"
 msgstr ""
 

@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 0.3.0\n"
-"POT-Creation-Date: 1999-05-30 17:24+0200\n"
+"POT-Creation-Date: 1999-07-23 22:09+0200\n"
 "PO-Revision-Date: 1998-05-14 20:00-0500\n"
 "Last-Translator: Vladimir Vuksan <vuksan@veus.hr>\n"
 "Language-Team: Croatian <hr@li.org>\n"
@@ -95,34 +95,34 @@ msgstr ""
 msgid "Specify the process number to attach to:"
 msgstr ""
 
-#: debugger.cpp:106
+#: debugger.cpp:107
 msgid "Breakpoints"
 msgstr "Mjesto prekida"
 
-#: debugger.cpp:229
+#: debugger.cpp:230
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "`%s' nije datoteka ili ne postoji"
 
-#: debugger.cpp:293
+#: debugger.cpp:294
 msgid "Select the executable to debug"
 msgstr "Izaberite izvr¹ni program za debugiranje"
 
-#: debugger.cpp:335
+#: debugger.cpp:336
 msgid "Select core dump"
 msgstr ""
 
-#: debugger.cpp:617
+#: debugger.cpp:620
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
 
-#: debugger.cpp:699
+#: debugger.cpp:702
 msgid ": Program output"
 msgstr ": Izlaz programa"
 
-#: debugger.cpp:1153
+#: debugger.cpp:1163
 msgid "New working directory: "
 msgstr ""
 
@@ -214,7 +214,7 @@ msgstr " Obri¹i "
 msgid "active"
 msgstr "aktivan"
 
-#: mainwndbase.cpp:284
+#: mainwndbase.cpp:285
 msgid ": Global options"
 msgstr ""
 

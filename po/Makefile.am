@@ -1,6 +1,6 @@
 
 GMOFILES = cs.gmo da.gmo de.gmo fr.gmo hr.gmo \
-	no.gmo pt.gmo ro.gmo ru.gmo sk.gmo zh_CN.GB2312.gmo
+	no.gmo pl.gmo pt.gmo ro.gmo ru.gmo sk.gmo zh_CN.GB2312.gmo
 POFILES = $(GMOFILES:.gmo=.po) 
 
 localedir = $(kde_locale)

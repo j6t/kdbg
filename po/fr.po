@@ -4,11 +4,11 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 0.3.0\n"
+"Project-Id-Version: kdbg 0.3.1\n"
 "POT-Creation-Date: 1999-05-30 17:24+0200\n"
-"PO-Revision-Date: 1998-09-15 13:10+EDT\n"
-"Last-Translator: Francois-Xavier DURANCEAU "
-"<Francois-Xavier.Duranceau@loria.fr>\n"
+"PO-Revision-Date: 1998-05-15 13:10+EDT\n"
+"Last-Translator: Xavier BRUNEAU"
+"<le_kid@club-internet.fr>\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO8859-1\n"
@@ -24,7 +24,7 @@ msgstr "&Voir le code"
 
 #: brkpt.cpp:56
 msgid "&Conditional..."
-msgstr ""
+msgstr "&Conditionnés"
 
 #: brkpt.cpp:647
 msgid "E"
@@ -40,19 +40,19 @@ msgstr ""
 
 #: brkpt.cpp:651
 msgid "Ignore"
-msgstr ""
+msgstr "Ignorer"
 
 #: brkpt.cpp:652
 msgid "Condition"
-msgstr ""
+msgstr "Condition"
 
 #: brkpt.cpp:816
 msgid ": Conditional breakpoint"
-msgstr ""
+msgstr ": Points d'arrêt conditionnés"
 
 #: brkpt.cpp:819
 msgid "&Condition:"
-msgstr ""
+msgstr "&Condition : "
 
 #: brkpt.cpp:821
 msgid "Ignore &next hits:"
@@ -65,27 +65,27 @@ msgstr ": Paramètres du programme"
 #: pgmargs.cpp:36
 #, c-format
 msgid "Run %s with these arguments:"
-msgstr "Exécuter %s avec ces paramètres"
+msgstr "Exécuter %s avec ces paramètres : "
 
 #: pgmargs.cpp:54
 msgid "Working directory:"
-msgstr ""
+msgstr "Répertoire de travail"
 
 #: pgmargs.cpp:64
 msgid "Environment variables (NAME=value):"
-msgstr ""
+msgstr "Variables d'environment (Nom=Valeur):"
 
 #: pgmargs.cpp:73
 msgid "Name"
-msgstr ""
+msgstr "Nom"
 
 #: pgmargs.cpp:74
 msgid "Value"
-msgstr ""
+msgstr "Valeur"
 
 #: pgmargs.cpp:93
 msgid "&Modify"
-msgstr ""
+msgstr "&Modifier"
 
 #: procattach.cpp:22
 msgid ": Attach to process"
@@ -117,6 +117,8 @@ msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
+"gdb c'est terminé involontairement.\n"
+"Redémarrer votre travail (avec Fichier|Exécutable)."
 
 #: debugger.cpp:699
 msgid ": Program output"
@@ -124,7 +126,7 @@ msgstr ": Sortie du programme"
 
 #: debugger.cpp:1153
 msgid "New working directory: "
-msgstr ""
+msgstr "Nouveau répertoire de travail"
 
 #: dbgmainwnd.cpp:92 winstack.cpp:386 winstack.cpp:396
 msgid "&Open Source..."
@@ -184,11 +186,11 @@ msgstr "&Précédent"
 
 #: prefdebugger.cpp:23
 msgid "To revert to the default settings, clear the entries."
-msgstr ""
+msgstr "Pour les paramêtres par défauts, effacer les valeurs"
 
 #: prefdebugger.cpp:27
 msgid "How to invoke &GDB:"
-msgstr ""
+msgstr "Comment lancer &GDB"
 
 #: prefdebugger.cpp:34
 msgid ""
@@ -196,11 +198,13 @@ msgid ""
 "%C will be replaced by a Bourne shell script that\n"
 "keeps the terminal window open."
 msgstr ""
+"%T sera remplacer par un titre,\n"
+"%C sera remplacer par un script qui\n"
+"garde la console active."
 
 #: prefdebugger.cpp:40
-#, fuzzy
 msgid "&Terminal for program output:"
-msgstr ": Sortie du programme"
+msgstr "&Sortie du programme :"
 
 #: mainwndbase.cpp:27
 msgid " Add "
@@ -216,7 +220,7 @@ msgstr "actif"
 
 #: mainwndbase.cpp:284
 msgid ": Global options"
-msgstr ""
+msgstr ": Préférences"
 
 #: dbgmainwnd.cpp:93
 msgid "&Reload Source"
@@ -224,7 +228,7 @@ msgstr "&Recharger ce fichier source"
 
 #: dbgmainwnd.cpp:98
 msgid "&Global Options..."
-msgstr ""
+msgstr "&Préférences"
 
 #: dbgmainwnd.cpp:104
 msgid "&Find..."
@@ -276,7 +280,7 @@ msgstr "&Autres..."
 
 #: dbgmainwnd.cpp:138
 msgid "&About"
-msgstr ""
+msgstr "&A propros"
 
 #: dbgmainwnd.cpp:150
 msgid "E&xecution"

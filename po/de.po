@@ -5,7 +5,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 0.3.1\n"
-"POT-Creation-Date: 1999-05-30 17:24+0200\n"
+"POT-Creation-Date: 1999-07-23 22:09+0200\n"
 "PO-Revision-Date: 1999-05-30 17:30+0200\n"
 "Last-Translator: Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "Language-Team: none\n"
@@ -94,24 +94,24 @@ msgstr ": An Prozess attachen"
 msgid "Specify the process number to attach to:"
 msgstr "Geben Sie die Prozessnummer ein:"
 
-#: debugger.cpp:106
+#: debugger.cpp:107
 msgid "Breakpoints"
 msgstr "Haltepunkte"
 
-#: debugger.cpp:229
+#: debugger.cpp:230
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "`%s' ist keine Datei oder existiert nicht"
 
-#: debugger.cpp:293
+#: debugger.cpp:294
 msgid "Select the executable to debug"
 msgstr "Ausführbares Programm zum Debuggen wählen"
 
-#: debugger.cpp:335
+#: debugger.cpp:336
 msgid "Select core dump"
 msgstr "Core dump wählen"
 
-#: debugger.cpp:617
+#: debugger.cpp:620
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
@@ -119,11 +119,11 @@ msgstr ""
 "gdb wurde unerwartet beendet\n"
 "Sie müssen die Sitzung neu starten (z.B. mit Datei|Programm)."
 
-#: debugger.cpp:699
+#: debugger.cpp:702
 msgid ": Program output"
 msgstr ": Programmausgabe"
 
-#: debugger.cpp:1153
+#: debugger.cpp:1163
 msgid "New working directory: "
 msgstr "Neues Arbeitsverzeichnis: "
 
@@ -217,7 +217,7 @@ msgstr " Entf "
 msgid "active"
 msgstr "aktiv"
 
-#: mainwndbase.cpp:284
+#: mainwndbase.cpp:285
 msgid ": Global options"
 msgstr ": Globale Einstellungen"
 

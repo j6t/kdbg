@@ -6,7 +6,7 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 0.3.0\n"
-"POT-Creation-Date: 1999-05-30 17:24+0200\n"
+"POT-Creation-Date: 1999-07-23 22:09+0200\n"
 "PO-Revision-Date: 1998-11-14 19:11+0100\n"
 "Last-Translator: Hans Petter Bieker <zerium@webindex.no>\n"
 "Language-Team: LANGUAGE <LL@li.org>\n"
@@ -77,15 +77,15 @@ msgstr ""
 
 #: pgmargs.cpp:73
 msgid "Name"
-msgstr ""
+msgstr "Navn"
 
 #: pgmargs.cpp:74
 msgid "Value"
-msgstr ""
+msgstr "Verdi"
 
 #: pgmargs.cpp:93
 msgid "&Modify"
-msgstr ""
+msgstr "&Rediger"
 
 #: procattach.cpp:22
 msgid ": Attach to process"
@@ -95,34 +95,34 @@ msgstr ": Knytt til prosess"
 msgid "Specify the process number to attach to:"
 msgstr "Oppgi prosessnummeret du vil knytte til:"
 
-#: debugger.cpp:106
+#: debugger.cpp:107
 msgid "Breakpoints"
 msgstr "Brytningspunkter"
 
-#: debugger.cpp:229
+#: debugger.cpp:230
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "`%s' er ikke en fil eller eksisterer ikke"
 
-#: debugger.cpp:293
+#: debugger.cpp:294
 msgid "Select the executable to debug"
 msgstr "Velg programmet du vil avluse"
 
-#: debugger.cpp:335
+#: debugger.cpp:336
 msgid "Select core dump"
 msgstr "Velg en minnedump"
 
-#: debugger.cpp:617
+#: debugger.cpp:620
 msgid ""
 "gdb exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
 
-#: debugger.cpp:699
+#: debugger.cpp:702
 msgid ": Program output"
 msgstr ": Programutmating"
 
-#: debugger.cpp:1153
+#: debugger.cpp:1163
 msgid "New working directory: "
 msgstr ""
 
@@ -158,7 +158,6 @@ msgstr "&Programfil..."
 msgid "&Core dump..."
 msgstr "&Minnedump..."
 
-# the following means: "windows that are open"
 #: winstack.cpp:753
 msgid ": Open Windows"
 msgstr ": Åpne vinduer"
@@ -215,7 +214,7 @@ msgstr " Slett "
 msgid "active"
 msgstr "aktiv"
 
-#: mainwndbase.cpp:284
+#: mainwndbase.cpp:285
 msgid ": Global options"
 msgstr ""
 
@@ -229,7 +228,7 @@ msgstr ""
 
 #: dbgmainwnd.cpp:104
 msgid "&Find..."
-msgstr "&Linn..."
+msgstr "&Finn..."
 
 #: dbgmainwnd.cpp:105
 msgid "Toggle &Toolbar"
@@ -277,7 +276,7 @@ msgstr "&Mer..."
 
 #: dbgmainwnd.cpp:138
 msgid "&About"
-msgstr ""
+msgstr "&Om"
 
 #: dbgmainwnd.cpp:150
 msgid "E&xecution"
