@@ -1236,6 +1236,11 @@ void KDebugger::handleLocals()
      */
     m_localVariables.clearPendingUpdates();
 
+    // reduce flicker
+    bool autoU = m_localVariables.autoUpdate();
+    m_localVariables.setAutoUpdate(false);
+    bool repaintNeeded = false;
+
     /*
      * Match old variables against new ones.
      */
@@ -1248,7 +1253,9 @@ void KDebugger::handleLocals()
 	if (v == 0) {
 	    // old variable not in the new variables
 	    TRACE(QString("old var deleted: ") + n);
-	    m_localVariables.removeExpr(n);
+	    v = m_localVariables.topLevelExprByName(n);
+	    removeExpr(&m_localVariables, v);
+	    if (v != 0) repaintNeeded = true;
 	} else {
 	    // variable in both old and new lists: update
 	    TRACE(QString("update var: ") + n);
@@ -1262,8 +1269,14 @@ void KDebugger::handleLocals()
     for (VarTree* v = newVars.first(); v != 0; v = newVars.next()) {
 	TRACE("new var: " + v->getText());
 	m_localVariables.insertExpr(v);
+	repaintNeeded = true;
     }
-    
+
+    // repaint
+    if (repaintNeeded && autoU && m_localVariables.isVisible())
+	m_localVariables.repaint();
+    m_localVariables.setAutoUpdate(autoU);
+
     // update this
     m_delayedPrintThis = false;
     if (thisPresent) {
@@ -1274,7 +1287,8 @@ void KDebugger::handleLocals()
 	    m_delayedPrintThis = true;
 	}
     } else {
-	m_this.removeExpr("this");
+	VarTree* v = m_this.topLevelExprByName("this");
+	removeExpr(&m_this, v);
     }
 }
 
@@ -1615,6 +1629,9 @@ void KDebugger::evalExpressions()
 	POINTER(m_this);
 	STRUCT(m_this);
 	TYPE(m_this);
+#undef POINTER
+#undef STRUCT
+#undef TYPE
 	return;
 
 	pointer:
@@ -1695,7 +1712,7 @@ void KDebugger::handleFindType(CmdQueueItem* cmd)
 	TypeInfo* info = typeTable()[type];
 	if (info == 0) {
 	    TRACE("unknown type");
-	    info = TypeTable::unknownType();
+	    cmd->m_expr->m_type = TypeTable::unknownType();
 	} else {
 	    cmd->m_expr->m_type = info;
 	    /* since this node has a new type, we get its value immediately */
@@ -1767,6 +1784,40 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
     cmd->m_exprWnd = wnd;
 }
 
+/* removes expression from window */
+void KDebugger::removeExpr(ExprWnd* wnd, VarTree* var)
+{
+    if (var == 0)
+	return;
+
+    // must remove any references to var from command queues
+
+    /*
+     * Check the low-priority queue: We start at the back end, but skip the
+     * last element for now. The reason is that if we delete an element the
+     * current element is stepped to the next one - except if it's on the
+     * last: then it's stepped to the previous element. By checking the
+     * last element separately we avoid that special case.
+     */
+    CmdQueueItem* cmd = m_lopriCmdQueue.last();
+    while ((cmd = m_lopriCmdQueue.prev()) != 0) {
+	if (cmd->m_expr != 0 && var->isAncestorEq(cmd->m_expr)) {
+	    // this is indeed a critical command; delete it
+	    TRACE("removing critical lopri-cmd: " + cmd->m_cmdString);
+	    m_lopriCmdQueue.remove();	/* steps to next element */
+	}
+    }
+    cmd = m_lopriCmdQueue.last();
+    if (cmd != 0) {
+	if (cmd->m_expr != 0 && var->isAncestorEq(cmd->m_expr)) {
+	    TRACE("removing critical lopri-cmd: " + cmd->m_cmdString);
+	    m_lopriCmdQueue.remove();	/* steps to next element */
+	}
+    }
+
+    wnd->removeExpr(var);
+}
+
 void KDebugger::slotLocalsExpanding(KTreeViewItem* item, bool& allow)
 {
     exprExpandingHelper(&m_localVariables, item, allow);
@@ -1831,7 +1882,7 @@ void KDebugger::slotDeleteWatch()
     if (m_watchEvalExpr.findRef(item) >= 0) {
 	m_watchEvalExpr.remove();
     }
-    m_watchVariables.removeExpr(item->getText());
+    removeExpr(&m_watchVariables, item);
     // item is invalid at this point!
 }
 

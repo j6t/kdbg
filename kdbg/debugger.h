@@ -171,6 +171,7 @@ protected:
     void exprExpandingHelper(ExprWnd* wnd, KTreeViewItem* item, bool& allow);
     void dereferencePointer(ExprWnd* wnd, VarTree* var, bool immediate);
     void determineType(ExprWnd* wnd, VarTree* var);
+    void removeExpr(ExprWnd* wnd, VarTree* var);
 
     bool m_haveExecutable;		/* has an executable been specified */
     bool m_programActive;		/* is the program active (possibly halting in a brkpt)? */
