@@ -11,7 +11,6 @@
 #include <kstddirs.h>
 #include <kcmdlineargs.h> 
 #include <kaboutdata.h>
-#include <khelpmenu.h>
 #include <kpopupmenu.h>
 #include <kmenubar.h>
 #include "dbgmainwnd.h"
@@ -70,13 +69,6 @@ int main(int argc, char** argv)
     KGlobal::dirs()->addResourceType("types", "share/apps/kdbg/types");
 
     DebuggerMainWnd debugger("kdbg_main");
-
-    // insert help menu
-    QPopupMenu* helpMenu;
-    KHelpMenu* khm = new KHelpMenu(&debugger, &aboutData, false);
-    helpMenu = khm->menu();
-    debugger.menuBar()->insertSeparator();
-    debugger.menuBar()->insertItem(i18n("&Help"), helpMenu);
 
     /* type libraries */
     TypeTable::initTypeLibraries();

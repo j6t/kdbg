@@ -1,0 +1,86 @@
+<!DOCTYPE kpartgui>
+<kpartgui name="kdbg" version="1">
+<MenuBar>
+  <Menu name="file"><text>&amp;File</text>
+    <Action name="file_reload" append="new_merge"/>
+    <Action name="file_executable"/>
+    <Action name="file_executable_recent"/>
+    <Action name="file_core_dump"/>
+
+  </Menu>
+  <Menu name="view"><text>&amp;View</text>
+    <Action name="view_find"/>
+    <Separator/>
+    <Action name="view_stack"/>
+    <Action name="view_locals"/>
+    <Action name="view_watched_expressions"/>
+    <Action name="view_registers"/>
+    <Action name="view_breakpoints"/>
+    <Action name="view_threads"/>
+    <Action name="view_output"/>
+    <Action name="view_memory"/>
+  </Menu>
+  <Menu name="execution"><text>E&amp;xecution</text>
+    <Action name="exec_run"/>
+    <Action name="exec_step_into"/>
+    <Action name="exec_step_over"/>
+    <Action name="exec_step_out"/>
+    <Action name="exec_run_to_cursor"/>
+    <Action name="exec_step_into_by_insn"/>
+    <Action name="exec_step_over_by_insn"/>
+    <Separator/>
+    <Action name="exec_break"/>
+    <Action name="exec_kill"/>
+    <Action name="exec_restart"/>
+    <Action name="exec_attach"/>
+    <Separator/>
+    <Action name="exec_arguments"/>
+  </Menu>
+  <Menu name="breakpoint"><text>&amp;Breakpoint</text>
+    <Action name="breakpoint_set"/>
+    <Action name="breakpoint_set_temporary"/>
+    <Action name="breakpoint_enable"/>
+  </Menu>
+  <Menu name="settings"><text>&amp;Settings</text>
+    <Action name="settings_program"/>
+    <Action name="settings_global"/>
+  </Menu>
+<!--  <Menu name="window" append="settings_merge"><text>&amp;Window</text>
+  </Menu> -->
+  <Action name="window"/>
+</MenuBar>
+<Menu name="popup_files">
+  <Action name="file_open"/>
+  <Separator/>
+  <Action name="exec_step_into"/>
+  <Action name="exec_step_over"/>
+  <Action name="exec_step_out"/>
+  <Action name="exec_step_run_to_cursor"/>
+  <Separator/>
+  <Action name="breakpoint_set"/>
+</Menu>
+<Menu name="popup_files_empty">
+  <Action name="file_open"/>
+  <Separator/>
+  <Action name="file_executable"/>
+  <Action name="file_core_dump"/>
+</Menu>
+<Menu name="popup_locals">
+  <Action name="watch_expression"/>
+</Menu>
+<ToolBar name="mainToolBar">
+  <Action name="file_reload"/>
+  <Action name="file_executable"/>
+  <Separator/>
+  <Action name="exec_run"/>
+  <Action name="exec_step_into"/>
+  <Action name="exec_step_over"/>
+  <Action name="exec_step_out"/>
+  <Action name="exec_step_into_by_insn"/>
+  <Action name="exec_step_over_by_insn"/>
+  <Separator/>
+  <Action name="breakpoint_set"/>
+  <Separator/>
+  <Action name="view_find"/>
+</ToolBar>
+</kpartgui>

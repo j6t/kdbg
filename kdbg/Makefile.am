@@ -26,7 +26,6 @@ kdbg_SOURCES = \
 	regwnd.cpp \
 	memwindow.cpp \
 	threadlist.cpp \
-	updateui.cpp \
 	sourcewnd.cpp \
 	winstack.cpp \
 	ttywnd.cpp \
@@ -71,7 +70,6 @@ noinst_HEADERS = \
 	memwindow.h \
 	threadlist.h \
 	ktreeview.h \
-	updateui.h \
 	sourcewnd.h \
 	winstack.h \
 	ttywnd.h \
@@ -94,10 +92,12 @@ CLEANFILES = $(kdbg_METASOURCES)
 apps_DATA = kdbg.desktop
 appsdir = $(kde_appsdir)/Development
 
+rcdir = $(kde_datadir)/kdbg
+rc_DATA = kdbgui.rc
 
 # Make messages.po and move it to $(top_srcdir)/po. "make merge" there.
 # the -x is for skipping messages already translated in kdelibs
-messages:
+messages: rc.cpp
 	LIST=`find . -name \*.h -o -name \*.hh -o -name \*.H -o -name \*.hxx -o -name \*.hpp -o -name \*.cpp -o -name \*.cc -o -name \*.cxx -o -name \*.ecpp -o -name \*.C`; \
 	if test -n "$$LIST"; then \
 	  $(XGETTEXT) -C -ki18n -kI18N_NOOP -x $(includedir)/kde.pot \

@@ -84,10 +84,6 @@ public:
 				 QWidget* parent);
     /** invokes the global options dialog */
     virtual void doGlobalOptions(QWidget* parent);
-    /** add recent executable; moves it to top of list if present */
-    void addRecentExec(const QString& executable);
-    /** remove recent executable */
-    void removeRecentExec(const QString& executable);
 
 protected:
     // settings
@@ -124,9 +120,6 @@ protected:
     QString m_sourceFilter;
     QString m_headerFilter;
 
-    // recent execs in File menu
-    QStrList m_recentExecList;
-
     // the debugger proper
     QString m_debuggerCmdStr;
     KDebugger* m_debugger;
@@ -148,7 +141,6 @@ public:
      * virtual here since Qt signal mechanism fails miserably (because this
      * class will not be the left-most base class!).
      */
-    void updateUIItem(UpdateUI* item);
     void newStatusMsg(KStatusBar* statusbar);
     void slotDebuggerStarting();
 };

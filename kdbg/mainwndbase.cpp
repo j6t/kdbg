@@ -21,7 +21,6 @@
 #include "prefdebugger.h"
 #include "prefmisc.h"
 #include "ttywnd.h"
-#include "updateui.h"
 #include "commandids.h"
 #include "valarray.h"
 #ifdef HAVE_CONFIG
@@ -127,7 +126,6 @@ DebuggerMainWndBase::DebuggerMainWndBase() :
 	m_debugger(0)
 {
     m_statusActive = i18n("active");
-    m_recentExecList.setAutoDelete(true);
 }
 
 DebuggerMainWndBase::~DebuggerMainWndBase()
@@ -194,7 +192,6 @@ const char PopForeground[] = "PopForeground";
 const char BackTimeout[] = "BackTimeout";
 const char TabWidth[] = "TabWidth";
 const char FilesGroup[] = "Files";
-const char RecentExecutables[] = "RecentExecutables";
 const char SourceFileFilter[] = "SourceFileFilter";
 const char HeaderFileFilter[] = "HeaderFileFilter";
 const char GeneralGroup[] = "General";
@@ -217,9 +214,6 @@ void DebuggerMainWndBase::saveSettings(KConfig* config)
     config->writeEntry(TabWidth, m_tabWidth);
     config->writeEntry(SourceFileFilter, m_sourceFilter);
     config->writeEntry(HeaderFileFilter, m_headerFilter);
-    
-    config->setGroup(FilesGroup);
-    config->writeEntry(RecentExecutables, m_recentExecList, ',');
 }
 
 void DebuggerMainWndBase::restoreSettings(KConfig* config)
@@ -246,9 +240,6 @@ void DebuggerMainWndBase::restoreSettings(KConfig* config)
     m_tabWidth = config->readNumEntry(TabWidth, 0);
     m_sourceFilter = config->readEntry(SourceFileFilter, m_sourceFilter);
     m_headerFilter = config->readEntry(HeaderFileFilter, m_headerFilter);
-    
-    config->setGroup(FilesGroup);
-    config->readListEntry(RecentExecutables, m_recentExecList,',');
 }
 
 bool DebuggerMainWndBase::debugProgram(const QString& executable,
@@ -397,43 +388,6 @@ QString DebuggerMainWndBase::myGetFileName(QString caption,
 	filename = dlg.selectedFile();
 
     return filename;
-}
-
-void DebuggerMainWndBase::updateUIItem(UpdateUI* item)
-{
-    switch (item->id) {
-    case ID_FILE_EXECUTABLE:
-	item->enable(m_debugger->isIdle());
-	break;
-    case ID_FILE_PROG_SETTINGS:
-	item->enable(m_debugger->haveExecutable());
-	break;
-    case ID_FILE_COREFILE:
-	item->enable(m_debugger->canUseCoreFile());
-	break;
-    case ID_PROGRAM_STEP:
-    case ID_PROGRAM_STEPI:
-    case ID_PROGRAM_NEXT:
-    case ID_PROGRAM_NEXTI:
-    case ID_PROGRAM_FINISH:
-    case ID_PROGRAM_UNTIL:
-    case ID_PROGRAM_RUN_AGAIN:
-	item->enable(m_debugger->canSingleStep());
-	break;
-    case ID_PROGRAM_ATTACH:
-    case ID_PROGRAM_RUN:
-	item->enable(m_debugger->isReady());
-	break;
-    case ID_PROGRAM_KILL:
-	item->enable(m_debugger->haveExecutable() && m_debugger->isProgramActive());
-	break;
-    case ID_PROGRAM_BREAK:
-	item->enable(m_debugger->isProgramRunning());
-	break;
-    case ID_PROGRAM_ARGS:
-	item->enable(m_debugger->haveExecutable());
-	break;
-    }
 }
 
 void DebuggerMainWndBase::initAnimation(KToolBar* toolbar)
@@ -707,33 +661,6 @@ void DebuggerMainWndBase::setDebuggerCmdStr(const QString& cmd)
     // make empty if it is the default
     if (m_debuggerCmdStr == GdbDriver::defaultGdb()) {
 	m_debuggerCmdStr = QString();
-    }
-}
-
-void DebuggerMainWndBase::addRecentExec(const QString& executable)
-{
-    int pos = m_recentExecList.find(executable);
-    if (pos != 0) {
-	// move to top
-	if (pos > 0)
-	    m_recentExecList.remove(pos);
-	// else entry is new
-
-	// insert on top
-	m_recentExecList.insert(0, executable);
-    } // else pos == 0, which means we dont need to change the list
-
-    // shorten list
-    while (m_recentExecList.count() > MAX_RECENT_FILES) {
-	m_recentExecList.remove(MAX_RECENT_FILES);
-    }
-}
-
-void DebuggerMainWndBase::removeRecentExec(const QString& executable)
-{
-    int pos = m_recentExecList.find(executable);
-    if (pos >= 0) {
-	m_recentExecList.remove(pos);
     }
 }
 
