@@ -114,7 +114,11 @@ BUILTSOURCES =	\
 CLEANFILES = $(kdbg_METASOURCES)
 
 
+if BUILDFORKDE2
+apps_DATA = kdbg.desktop
+else
 apps_DATA = kdbg.kdelnk
+endif
 appsdir = $(kde_appsdir)/Development
 
 
@@ -124,7 +128,7 @@ messages:
 	$(XGETTEXT) -C -ki18n -kI18N_NOOP -x $(includedir)/kde.pot $(kdbg_SOURCES) && mv messages.po ../po/kdbg.pot
 
 
-EXTRA_DIST = $(apps_DATA)
+EXTRA_DIST = kdbg.kdelnk kdbg.desktop
 
 # add a dependency for every moc file to be full portable
 # I've added a key binding to emacs for this. 
