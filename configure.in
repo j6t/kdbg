@@ -10,7 +10,7 @@ AM_CONFIG_HEADER(config.h)
 
 dnl insert here your program name and version number
 KDE_USE_QT(1,>= 1.42, QT_VERSION >= 142)
-KDE_DO_IT_ALL(kdbg, 0.3.0)
+KDE_DO_IT_ALL(kdbg, 0.3.1)
 
 dnl in this space add everything you want to check for
 dnl examples are specific headers, libraries, etc.
