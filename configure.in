@@ -26,7 +26,7 @@ AM_CONDITIONAL(BUILDFORKDE2, test "x$with_kde_version" = "x2")
 
 dnl insert here your program name and version number
 KDE_USE_QT($with_kde_version)
-KDE_DO_IT_ALL(kdbg, 1.2.0)
+KDE_DO_IT_ALL(kdbg, 1.2.1)
 
 dnl in this space add everything you want to check for
 dnl examples are specific headers, libraries, etc.
@@ -40,7 +40,7 @@ dnl check for some more header files. You can remove some of
 dnl them, if you want to. But it doesn't hurt
 AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h sys/cdefs.h)
 AC_CHECK_HEADERS(fnmatch.h sysent.h strings.h sys/stat.h)
-AC_CHECK_HEADERS(sys/ioctl.h pty.h)
+AC_CHECK_HEADERS(sys/ioctl.h pty.h libutil.h)
 
 dnl Checks for libraries.
 AC_CHECK_LIB(socket, socket, [LIBSOCKET="-lsocket -lnsl"]) dnl for Solaris' X11
