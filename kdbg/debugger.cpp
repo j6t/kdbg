@@ -1623,6 +1623,8 @@ VarTree* KDebugger::parseExpr(const char* name, bool wantErrorValue)
     // check for error conditions
     if (strncmp(m_gdbOutput, "Cannot access memory at", 23) == 0 ||
 	strncmp(m_gdbOutput, "Attempt to dereference a generic pointer", 40) == 0 ||
+	strncmp(m_gdbOutput, "Attempt to take contents of ", 28) == 0 ||
+	strncmp(m_gdbOutput, "There is no member or method named", 34) == 0 ||
 	strncmp(m_gdbOutput, "No symbol \"", 11) == 0)
     {
 	if (wantErrorValue) {

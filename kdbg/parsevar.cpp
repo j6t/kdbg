@@ -186,6 +186,8 @@ bool parseName(const char*& s, QString& name, VarTree::NameKind& kind)
 
 bool parseValue(const char*& s, VarTree* variable)
 {
+    variable->m_value = "";
+
 repeat:
     if (*s == '{') {
 	s++;
@@ -228,9 +230,6 @@ repeat:
 	    while (isspace(*p))
 		p++;
 	    variable->m_value = QString(s, (p - s)+1);
-	    variable->m_varKind = VarTree::VKpointer;
-	} else {
-	    variable->m_value = "";
 	}
 
 	bool reference = false;
@@ -259,9 +258,16 @@ repeat:
 	    if (!reference) {
 		variable->m_varKind = VarTree::VKpointer;
 	    } else {
-		/* references are sometimes followed by a colon */
-		if (*p == ':')
+		/*
+		 * References are followed by a colon, in which case we'll
+		 * find the value following the reference address.
+		 */
+		if (*p == ':') {
 		    p++;
+		} else {
+		    // Paranoia. (Can this happen, i.e. reference not followed by ':'?)
+		    reference = false;
+		}
 	    }
 	    checkMultiPart = true;
 	} else if (isdigit(*p)) {
@@ -331,10 +337,6 @@ repeat:
 	    }
 	}
 
-	if (variable->m_varKind == VarTree::VKpointer) {
-	    variable->setDelayedExpanding(true);
-	}
-
 	if (variable->m_value.length() == 0) {
 	    TRACE("parse error: no value for " + variable->getText());
 	    return false;
@@ -346,11 +348,15 @@ repeat:
 	s = p;
 
 	/*
-	 * Now that we've done all this we might find that this still is a
-	 * composite variable: it could be a reference!
+	 * If this was a reference, the value follows. It might even be a
+	 * composite variable!
 	 */
-	if (reference && *s == '{') {
+	if (reference) {
 	    goto repeat;
+	}
+
+	if (variable->m_varKind == VarTree::VKpointer) {
+	    variable->setDelayedExpanding(true);
 	}
     }
 

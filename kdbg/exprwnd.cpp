@@ -334,13 +334,14 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues)
 	if (isExpanded) {
 	    collapseSubTree(display, false);
 	}
+
+	replaceChildren(display, newValues);
+
 	// update the m_varKind
 	if (newValues->m_varKind != VarTree::VKdummy) {
 	    display->m_varKind = newValues->m_varKind;
 	    display->setDelayedExpanding(newValues->m_varKind == VarTree::VKpointer);
 	}
-
-	replaceChildren(display, newValues);
 
 	// (note that the new value might not have a sub-tree at all)
 	return display->m_valueChanged || isExpanded;	/* no visible change if not expanded */
