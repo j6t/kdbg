@@ -248,7 +248,11 @@ void PgmArgs::accept()
 void PgmArgs::browseWd()
 {
     // browse for the working directory
+#if QT_VERSION < 200
     QString newDir = KDirDialog::getDirectory(wd(), this);
+#else
+    QString newDir = KFileDialog::getExistingDirectory(wd(), this);
+#endif
     if (!newDir.isEmpty()) {
 	setWd(newDir);
     }
