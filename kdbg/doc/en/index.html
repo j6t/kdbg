@@ -3,12 +3,12 @@
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=iso-8859-1">
    <meta name="GENERATOR" content="Mozilla/4.51 [en] (X11; I; Linux 2.2.5 i586) [Netscape]">
-   <title>KDbg</title>
+   <title>KDbg - User's Manual</title>
 </head>
 <body>
 
 <h1>
-KDbg</h1>
+KDbg - User's Manual</h1>
 
 <h2>
 Contents</h2>
@@ -63,7 +63,7 @@ menu.
 <p>The <b>lower left</b> pane displays the backtrace (aka stack frames),
 i.e. the functions that the program has entered, but not left yet. The
 innermost frame (where the program currently executes) is shown at the
-top. Double-click on a stack frame to inspect the variables of that frame.
+top. Click on a stack frame to inspect the variables of that frame.
 <p>The <b>upper right</b> pane displays the local variables. Whenever the
 progam stops, KDbg displays the values of the local variables in this pane.
 <p>The <b>lower right</b> pane displays expressions of your choice (such
@@ -151,18 +151,20 @@ the command by which gdb is invoked,</li>
 the command that opens a terminal for the program's output.</li>
 </ul>
 If you want to use a different version of gdb, you can specify it under
-<i>How to invoke GDB</i>. The default command is <tt>gdb -fullname -nx</tt>.
-Be sure to also specify these options if you change the gdb executable.
-If you leave them away, KDbg will not work. If you messed up the entry,
-you can clear it to revert to the default setting.
+<i>How
+to invoke GDB</i>. The default command is <tt>gdb -fullname -nx</tt>. Be
+sure to also specify these options if you change the gdb executable. If
+you leave them away, KDbg will not work. If you messed up the entry, you
+can clear it to revert to the default setting.
 <p>If you want to use a different terminal program to show the output of
 the program, specify it under <i>Terminal for program output</i>. The default
 setting is <tt>xterm -name kdbgio -title %T -e sh -c %C</tt>. In this entry,
-<tt>%T</tt> will be replaced by a title string, <tt>%C</tt> will be replaced
-by a Bourne shell script that loops infinitely so that the terminal window
-doesn't close. (No, it doesn't use CPU, it calls <tt>sleep 3600</tt> in
-a loop :) An alternative for this setting could be <tt>konsole -nowelcome
--name kdbgio -caption %T -e sh -c %C</tt>.
+<tt>%T</tt>
+will be replaced by a title string, <tt>%C</tt> will be replaced by a Bourne
+shell script that loops infinitely so that the terminal window doesn't
+close. (No, it doesn't use CPU, it calls <tt>sleep 3600</tt> in a loop
+:) An alternative for this setting could be <tt>konsole -nowelcome -name
+kdbgio -caption %T -e sh -c %C</tt>.
 <h2>
 <a NAME="TipsTricks"></a>Tips and Tricks</h2>
 
