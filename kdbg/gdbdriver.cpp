@@ -1391,6 +1391,7 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 
     // split up a line
     QString location;
+    QString address;
     int hits = 0;
     uint ignoreCount = 0;
     QString condition;
@@ -1425,6 +1426,19 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	    p++;
 	if (*p == '\0')
 	    break;
+	// the address, if present
+	if (strncmp(p, "0x", 2) == 0) {
+	    const char* start = p;
+	    while (*p != '\0' && !isspace(*p))
+		p++;
+	    address = FROM_LATIN1(start, p-start);
+	    while (isspace(*p))
+		p++;
+	    if (*p == '\0')
+		break;
+	} else {
+	    address = QString();
+	}
 	// remainder is location, hit and ignore count, condition
 	hits = 0;
 	ignoreCount = 0;
@@ -1477,6 +1491,7 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	bp->temporary = disp == 'd';
 	bp->enabled = enable == 'y';
 	bp->location = location;
+	bp->address = address;
 	bp->hitCount = hits;
 	bp->ignoreCount = ignoreCount;
 	bp->condition = condition;

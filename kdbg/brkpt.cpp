@@ -264,6 +264,7 @@ BreakpointItem* BreakpointTable::itemByBreakId(int id)
 void BreakpointTable::initListAndIcons()
 {
     m_list.addColumn(i18n("Location"), 300);
+    m_list.addColumn(i18n("Address"), 60);
     m_list.addColumn(i18n("Hits"), 30);
     m_list.addColumn(i18n("Ignore"), 30);
     m_list.addColumn(i18n("Condition"), 200);
@@ -333,23 +334,25 @@ void BreakpointItem::display()
 
     // more breakpoint info
     setText(0, location);
+    int c = 0;
+    setText(++c, address);
     QString tmp;
     if (hitCount == 0) {
-	setText(1, QString());
+	setText(++c, QString());
     } else {
 	tmp.setNum(hitCount);
-	setText(1, tmp);
+	setText(++c, tmp);
     }
     if (ignoreCount == 0) {
-	setText(2, QString());
+	setText(++c, QString());
     } else {
 	tmp.setNum(ignoreCount);
-	setText(2, tmp);
+	setText(++c, tmp);
     }
     if (condition.isEmpty()) {
-	setText(3, QString());
+	setText(++c, QString());
     } else {
-	setText(3, condition);
+	setText(++c, condition);
     }
 }
 
