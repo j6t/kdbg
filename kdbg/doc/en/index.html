@@ -23,6 +23,9 @@ Contents</H2>
 <A HREF="#UsingKDbg">Using KDbg</A></LI>
 
 <LI>
+<A HREF="#TipsTricks">Tips and Tricks</A></LI>
+
+<LI>
 <A HREF="#KnownProblems">Known problems</A></LI>
 
 <LI>
@@ -77,6 +80,14 @@ program that caused the core dump.
 and type in the arguments. Next time the program is started, the arguments
 will be passed on.
 
+<P>To set <B>environment variabels</B> for the program, choose <I>Execution|Arguments</I>.
+In the environment variables section type in an expression of the form
+<TT>VARIABLE=value</TT> to set the environment variable <TT>VARIABLE</TT>
+to the value <TT>value, and</TT> click <I>Modify</I>. To remove a variable,
+select it from the list below and click <I>Remove</I>. To change the value,
+edit the value in the edit field and click <I>Modify</I>. If you change
+the name of the variable and click <I>Modify</I>, you add a new variable!
+
 <P>In the menu <I>Execution</I> you find the commands that you need to
 <B>run</B> the program, <B>step</B> through code, and to <B>interrupt</B>
 the program (<I>Break</I>) while it is running. The important commands
@@ -106,13 +117,33 @@ is only stopped if the condition is true) or set an <B>ignore count</B>
 (so that the program is not stopped the next n times that the breakpoint
 is hit). To do that, press the <I>Conditional</I> button and enter the
 condition and/or ignore count.
+<H2>
+<A NAME="TipsTricks"></A>Tips and Tricks</H2>
 
-<P>Tip: You can use breakpoints as bookmarks: Just set a breakpoint and
-disable it. Later, you can quickly come back to that breakpoint by double-clicking
+<UL>
+<LI>
+You can use breakpoints as bookmarks: Just set a breakpoint and disable
+it. Later, you can quickly come back to that breakpoint by double-clicking
 it in the breakpoint list (or select it and click <I>View Code</I>). Since
 breakpoints are persistent (i.e. KDbg remembers them across invocations
 of a program), you get them back next time you invoke KDbg for that particular
-program.
+program.</LI>
+
+<LI>
+You can change a program variable's value: In the variable watch section
+(in the lower right) type an assignment like this: <TT>var.member=17</TT>
+and click <I>Add</I>. This immediately changes the value of the variable.
+You should delete the expression from the list right away (by selecting
+it in the window below and clicking <I>Del</I>). This is because the watch
+expressions are evaluate each time the program stops, and by this the variable
+would be changed to the specified value again and again!</LI>
+
+<LI>
+You can display a value in the watch section in different way by prepending
+gdb's format specifiers in front of the variable to display. E.g. <TT>/x
+var.member</TT> displays the <TT>var.member</TT> in hexadecimal notation.</LI>
+</UL>
+
 <H2>
 <A NAME="KnownProblems"></A>Known problems</H2>
 gdb 4.16 has problems in handling C++ classes with virtual base classes.
@@ -121,9 +152,13 @@ to a segmentation violation. KDbg reports when gdb exits unexpectedly.
 Unfortunately, you cannot really do anything about it. You have to restart
 gdb by choosing <I>File|Executable</I>, which restarts your debugging session
 :-(.
+
+<P>KDbg's type recognition only works for libraries that are linked dynamically
+to the program being debugged.
 <H2>
 <A NAME="Author"></A>Author</H2>
 KDbg is written by <A HREF="mailto:Johannes.Sixt@telecom.at">Johannes Sixt</A>
 with the help of many others.
+<BR>KDbg homepage at <A HREF="http://members.telecom.at/~johsixt/kdbg.html">http://members.telecom.at/~johsixt/kdbg.html</A>.
 </BODY>
 </HTML>

@@ -9,9 +9,8 @@
 <H1>
 KDbg's type table</H1>
 KDbg's type tables are located under <TT>$KDEDIR/share/apps/kdbg/types</TT>.
-By convention, there is one table for each library like Qt, kdecore, X11,
-etc. The files are named after the library file and end with <TT>.kdbgtt</TT>.
-Example: The type table for <TT>libqt.a</TT> is named <TT>qt.kdbgtt</TT>.
+The file names end with <TT>.kdbgtt</TT>. Example: The type table for <TT>libqt.a</TT>
+is named <TT>qt.kdbgtt</TT>.
 
 <P>A type table file obeys the regular KDE configuration file syntax. The
 file has the following groups:
@@ -24,7 +23,11 @@ the debugger can identify whether the program is linked against the library.</LI
 A group for each type which has information about how the value of such
 a type is displayed by KDbg.</LI>
 </UL>
-
+In order to determine which type tables apply to the program being debugged
+KDbg list the shared libraries it is linked to. Then it matches the names
+against the <TT>ShlibRE</TT> entries of all type tables. Those that match
+are used. If a type appears in several type tables, it is unspecified which
+one will be used.
 <H2>
 The <TT>[Type Table]</TT> group</H2>
 This group contains the following entries:
@@ -40,23 +43,18 @@ no type at all). Sometimes the order in which the names are listed is important
 (see <TT>Alias</TT> types below).</LI>
 
 <LI>
-One of the following:</LI>
+<TT>ShlibRE</TT>. KDbg uses this entry to determine if the type table applies
+to the program being debugged. For this purpose KDbg determines the shared
+libraries to which the program is linked. If any of the libraries matches
+this entry, the type table applies. The regular expression is a Qt-regular
+expression (the metacharacters <TT>.*?[]^$\</TT> are recognized in the
+usual way, but there is no possibility to group characters.)</LI>
 
-<BR><TT>IdentifyingType</TT> or
-<BR><TT>IdentifyingVariable</TT> or
-<BR><TT>IdentifyingPrint</TT> and <TT>IndentifyingPrintResult</TT>
 <LI>
-These entries tell KDbg how it can determine whether the program is linked
-against the library (to which this type table applies). <TT>IdentifyingType</TT>
-names a sufficiently unique type. <TT>IdentifyingVariable</TT> names a
-(global) variable of the library. <TT>IdentifyingPrint</TT> is a print
-statement (e.g. a variable that contains a version number) and <TT>IdentifyingPrintResult</TT>
-is a regular expression that must match the print statement's result.</LI>
-
-<BR><FONT SIZE=-1>Currently this information is not used. KDbg just assumes
-that the program is linked against this library - so in effect, all type
-tables available are applied for every program. This usually doesn't hurt
-as long as there are no overlapping type names.</FONT></UL>
+<TT>LibDisplayName</TT>. This entry is used in lists where the available
+type tables are listed to identify this type table.<BR>
+<FONT SIZE=-1>This is not used currently.</FONT></LI>
+</UL>
 
 <H2>
 The type's group</H2>
@@ -86,6 +84,14 @@ this type in the <TT>Types</TT><I>x</I> entries in the <TT>Type Table</TT>.</LI>
 5. This can easily be changed if it's too restrictive, but I recommend
 not to go to that limit at all - it will slow down the debugging process.</FONT>
 
+<P>KDbg recognizes a special extension that is used to display Qt 2.0's
+unicode strings: If an <TT>Expr</TT><I>x</I> is prepended with <TT>/QString::Data</TT>,
+it is assumed that the result of the expression is a pointer to a <TT>QString::Data</TT>.
+The value displayed is the unicode string that this instance of <TT>QString::Data</TT>
+represents (which can be <TT>QString::null</TT> if it is Qt's well-defined
+null string or <TT>(null)</TT>&nbsp;if the <TT>unicode</TT> member is the
+null pointer). See <TT>qt2.kdbgtt</TT> for examples.
+
 <P>Tip: It is not necessary to define derived types if they ought to be
 treated the same as the base class - KDbg can deduce derived types and
 uses the type specification of the (leftmost) base class. You can use the
@@ -95,10 +101,13 @@ a non-leftmost base class for a multiple-inheritance class.
 An example</H2>
 The example shows how <TT>QString</TT> and <TT>QObject</TT> are defined
 in <TT>qt.kdbgtt</TT>. Additionally, <TT>QTableView</TT> is defined as
-an alias of <TT>QObject</TT>.
+an alias of <TT>QObject</TT>. This example applies to Qt 1.x, which is
+located in shared library whose name ends in <TT>libqt.so.1</TT>.
 <PRE>[Type Table]
 Types1=QString
 Types2=QObject,QTableView
+LibDisplayName=libqt 1.x
+ShlibRE=libqt\.so\.1$
 [QString]
 Display={ % }
 Expr1=(%s).shd->data
