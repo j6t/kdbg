@@ -249,7 +249,7 @@ bool KDebugger::debugProgram(const QString& name)
     }
 
     TRACE("before file cmd");
-    executeCmd(DCexecutable, "file " + name);
+    executeCmd(DCexecutable, "file \"" + name + "\"");
     m_executable = name;
 
     // create the program settings object
