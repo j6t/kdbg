@@ -1,5 +1,5 @@
 
-GMOFILES = de.gmo fr.gmo hr.gmo \
+GMOFILES = cs.gmo de.gmo fr.gmo hr.gmo \
 	no.gmo pt.gmo ro.gmo sk.gmo zh_CN.GB2312.gmo
 POFILES = $(GMOFILES:.gmo=.po) 
 
