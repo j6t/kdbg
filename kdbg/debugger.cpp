@@ -174,6 +174,8 @@ KDebugger::KDebugger(const char* name) :
 
     m_bpTable.setCaption(i18n("Breakpoints"));
     connect(&m_bpTable, SIGNAL(closed()), SLOT(updateUI()));
+    connect(&m_bpTable, SIGNAL(activateFileLine(const QString&,int)),
+	    &m_filesWindow, SLOT(activate(const QString&,int)));
 
     // route unhandled menu items to winstack
     connect(this, SIGNAL(forwardMenuCallback(int)), &m_filesWindow, SLOT(menuCallback(int)));

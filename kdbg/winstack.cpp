@@ -470,10 +470,10 @@ void WinStack::reloadAllFiles()
     }
 }
 
-bool WinStack::activate(QString fileName, int lineNo)
+void WinStack::activate(const QString& fileName, int lineNo)
 {
     QFileInfo fi(fileName);
-    return activateFI(fi, lineNo);
+    activateFI(fi, lineNo);
 }
 
 bool WinStack::activateFI(QFileInfo& fi, int lineNo)

@@ -111,6 +111,16 @@ protected:
     void closeEvent(QCloseEvent*);
     
 signals:
+    /**
+     * This signal is emitted when the user wants to go to the source code
+     * where the current breakpoint is in.
+     * 
+     * @param file specifies the file; this is not necessarily a full path
+     * name, and if it is relative, you won't know relative to what, you
+     * can only guess.
+     * @param lineNo specifies the line number (0-based!).
+     */
+    void activateFileLine(const QString& file, int lineNo);
     void closed();
 public slots:
     virtual void hide();

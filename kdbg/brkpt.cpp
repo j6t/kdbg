@@ -328,7 +328,7 @@ void BreakpointTable::viewBP()
 	return;
     
     Breakpoint* bp = m_brkpts[sel];
-    m_debugger.m_filesWindow.activate(bp->fileName, bp->lineNo);
+    emit activateFileLine(bp->fileName, bp->lineNo);
 }
 
 class ConditionalDlg : public QDialog
