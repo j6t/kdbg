@@ -223,8 +223,8 @@ bool GdbDriver::startup(QString cmdStr)
 	 * function arguments.
 	 */
 	"define kdbg__alllocals\n"
-	"info args\n"			/* arguments first */
 	"info locals\n"			/* local vars supersede args with same name */
+	"info args\n"			/* therefore, arguments must come last */
 	"end\n"
 	// change prompt string and synchronize with gdb
 	"set prompt " PROMPT "\n"
@@ -1520,7 +1520,15 @@ void GdbDriver::parseLocals(const char* output, QList<VarTree>& newVars)
 	if (variable == 0) {
 	    break;
 	}
+	// do not add duplicates
+	for (VarTree* o = newVars.first(); o != 0; o = newVars.next()) {
+	    if (o->getText() == variable->getText()) {
+		delete variable;
+		goto skipDuplicate;
+	    }
+	}
 	newVars.append(variable);
+    skipDuplicate:;
     }
 }
 
