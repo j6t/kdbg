@@ -176,22 +176,18 @@ void BreakpointTable::insertBreakpoint(int num, char disp, char enable, const ch
     assert(lineNo != 0);		/* line numbers are 1-based */
     TRACE("insert bp " + QString().setNum(num));
     int numBreaks = m_brkpts.size();
-    int i;
-    for (i = numBreaks-1; i >= 0; i--) {
-	if (m_brkpts[i]->num == num)
-	    break;
-    }
+    int i = breakpointById(num);
     Breakpoint* bp;
     if (i < 0) {
 	// not found, insert a new one
 	bp = new Breakpoint;
 	m_brkpts.resize(numBreaks+1);
 	m_brkpts[numBreaks] = bp;
+	bp->id = num;
 	bp->lineNo = -1;
     } else {
 	bp = m_brkpts[i];
     }
-    bp->num = num;
     bp->temporary = disp == 'd';	/* "del" */
     bp->enabled = enable == 'y';
     bp->location = location;
@@ -278,7 +274,7 @@ void BreakpointTable::removeBP()
     
     Breakpoint* bp = m_brkpts[sel];
     QString cmdString(30);
-    cmdString.sprintf("delete %d", bp->num);
+    cmdString.sprintf("delete %d", bp->id);
     m_debugger.enqueueCmd(KDebugger::DCdelete, cmdString);
 }
 
@@ -308,10 +304,10 @@ void BreakpointTable::doBreakpoint(QString file, int lineNo, bool temporary)
 	 */
 	QString cmdString(30);
 	if (bp->enabled) {
-	    cmdString.sprintf("delete %d", bp->num);
+	    cmdString.sprintf("delete %d", bp->id);
 	    m_debugger.enqueueCmd(KDebugger::DCdelete, cmdString);
 	} else {
-	    cmdString.sprintf("enable %d", bp->num);
+	    cmdString.sprintf("enable %d", bp->id);
 	    m_debugger.enqueueCmd(KDebugger::DCenable, cmdString);
 	}
     }
@@ -326,15 +322,25 @@ void BreakpointTable::doEnableDisableBreakpoint(const QString& file, int lineNo)
     // toggle enabled/disabled state
     QString cmdString(30);
     if (bp->enabled) {
-	cmdString.sprintf("disable %d", bp->num);
+	cmdString.sprintf("disable %d", bp->id);
 	m_debugger.enqueueCmd(KDebugger::DCdisable, cmdString);
     } else {
-	cmdString.sprintf("enable %d", bp->num);
+	cmdString.sprintf("enable %d", bp->id);
 	m_debugger.enqueueCmd(KDebugger::DCenable, cmdString);
     }
 }
 
 
+
+int BreakpointTable::breakpointById(int id)
+{
+    for (int i = m_brkpts.size()-1; i >= 0; i--) {
+	if (m_brkpts[i]->id == id) {
+	    return i;
+	}
+    }
+    return -1;
+}
 
 Breakpoint* BreakpointTable::breakpointByFilePos(QString file, int lineNo)
 {

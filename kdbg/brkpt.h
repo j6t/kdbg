@@ -28,7 +28,7 @@ class KDebugger;
 
 struct Breakpoint
 {
-    int num;				/* gdb's number */
+    int id;				/* gdb's number */
     bool temporary;
     bool enabled;
     QString location;
@@ -97,6 +97,7 @@ protected:
     void insertBreakpoint(int num, char disp, char enable, const char* location,
 			  const char* fileName = 0, int lineNo = -1);
     void insertBreakpoint(int num, const QString& fileName, int lineNo);
+    int breakpointById(int id);		/* returns index into m_brkpts */
 
     void closeEvent(QCloseEvent*);
     
