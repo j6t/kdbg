@@ -107,6 +107,7 @@ public slots:
     virtual void hide();
     virtual void addBP();
     virtual void removeBP();
+    virtual void viewBP();
 };
 
 #endif // BRKPT_H

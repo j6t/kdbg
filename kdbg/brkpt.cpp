@@ -42,6 +42,7 @@ BreakpointTable::BreakpointTable(KDebugger& deb) :
 
     m_btViewCode.setText(i18n("&View Code"));
     m_btViewCode.setMinimumSize(m_btViewCode.sizeHint());
+    connect(&m_btViewCode, SIGNAL(clicked()), this, SLOT(viewBP()));
 
     m_btClose.setText(i18n("Close"));
     m_btClose.setMinimumSize(m_btClose.sizeHint());
@@ -277,6 +278,16 @@ void BreakpointTable::removeBP()
     QString cmdString(30);
     cmdString.sprintf("delete %d", bp->id);
     m_debugger.executeCmd(KDebugger::DCdelete, cmdString);
+}
+
+void BreakpointTable::viewBP()
+{
+    int sel = m_list.currentItem();
+    if (sel < 0 || uint(sel) >= m_brkpts.size())
+	return;
+    
+    Breakpoint* bp = m_brkpts[sel];
+    m_debugger.m_filesWindow.activate(bp->fileName, bp->lineNo);
 }
 
 // this handles the menu entry: toggles breakpoint on and off
