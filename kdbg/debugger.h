@@ -61,14 +61,15 @@ public:
     void useCoreFile(QString corefile, bool batch);
 
     /**
-     * Runs the program or continues it if it is stopped at a breakpoint.
-     */
-    void programRun();
-
-    /**
      * Attaches to the specified process and debugs it.
      */
     void attachProgram(const QString& pid);
+
+public slots:
+    /**
+     * Runs the program or continues it if it is stopped at a breakpoint.
+     */
+    void programRun();
 
     /**
      * Restarts the debuggee.
@@ -79,13 +80,25 @@ public:
      * Performs a single-step, possibly stepping into a function call.
      * If byInsn is true, a step by instruction is performed.
      */
-    void programStep(bool byInsn);
+    void programStep();
 
     /**
      * Performs a single-step, stepping over a function call.
      * If byInsn is true, a step by instruction is performed.
      */
-    void programNext(bool byInsn);
+    void programNext();
+
+    /**
+     * Performs a single-step by instruction, possibly stepping into a
+     * function call.
+     */
+    void programStepi();
+
+    /**
+     * Performs a single-step by instruction, stepping over a function
+     * call.
+     */
+    void programNexti();
 
     /**
      * Runs the program until it returns from the current function.
@@ -102,6 +115,7 @@ public:
      */
     void programBreak();
 
+public:
     /**
      * Queries the user for program arguments.
      */

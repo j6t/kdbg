@@ -40,6 +40,7 @@ protected:
     void updateLineStatus(int lineNo);	/* zero-based line number */
 
     void initMenu();
+    void initFileWndMenus();
     void initToolbar();
 
     // view windows
@@ -64,21 +65,22 @@ protected:
 
     QPopupMenu* m_popupLocals;
 
+    // popup menus of the files window
+    QPopupMenu* m_popupFilesEmpty;
+    QPopupMenu* m_popupFiles;
+
     QTimer m_backTimer;
 
 protected:
     virtual void closeEvent(QCloseEvent* e);
     virtual KToolBar* dbgToolBar();
     virtual KStatusBar* dbgStatusBar();
-    virtual QWidget* dbgMainWnd();
     virtual TTYWindow* ttyWindow();
     virtual QString createOutputWindow();
-    virtual void doGlobalOptions();
 
     DockWidget* dockParent(QWidget* w);
     bool isDockVisible(QWidget* w);
     bool canChangeDockVisibility(QWidget* w);
-    void showhideWindow(QWidget* w);
     void dockUpdateHelper(UpdateUI* item, QWidget* w);
     void intoBackground();
 
@@ -90,7 +92,6 @@ protected:
     QString m_lastActiveStatusText;
 
 signals:
-    void forwardMenuCallback(int item);
     void setTabWidth(int tabWidth);
 
 public slots:
@@ -113,6 +114,21 @@ public slots:
     void slotRecentExec(int item);
     void slotLocalsPopup(int item, const QPoint& pt);
     void slotLocalsToWatch();
+
+    void slotFileOpen();
+    void slotFileQuit();
+    void slotFileExe();
+    void slotFileCore();
+    void slotFileGlobalSettings();
+    void slotFileProgSettings();
+    void slotViewToolbar();
+    void slotViewStatusbar();
+    void slotExecUntil();
+    void slotExecAttach();
+    void slotExecArgs();
+
+    void slotFileWndMenu(const QPoint& pos);
+    void slotFileWndEmptyMenu(const QPoint& pos);
 };
 
 #endif // DBGMAINWND_H

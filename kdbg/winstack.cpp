@@ -4,7 +4,6 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include "winstack.h"
-#include "commandids.h"
 #include "sourcewnd.h"
 #include <qbrush.h>
 #include <qfileinfo.h>
@@ -32,43 +31,16 @@ WinStack::WinStack(QWidget* parent, const char* name) :
 	m_tipLocation(1,1,10,10),
 	m_tabWidth(0)
 {
-    // Call menu implementation helper
-    initMenu();
-
     connect(&m_findDlg.m_buttonForward,
 	    SIGNAL(clicked()), SLOT(slotFindForward()));
     connect(&m_findDlg.m_buttonBackward,
 	    SIGNAL(clicked()), SLOT(slotFindBackward()));
 
     connect(this, SIGNAL(setTabWidth(int)), this, SLOT(slotSetTabWidth(int)));
-
-    // Check for right click event.
-    connect(this, SIGNAL(clickedRight(const QPoint &)),
-	    SLOT(slotWidgetRightClick(const QPoint &)));
 }
 
 WinStack::~WinStack()
 {
-}
-
-// All menu initializations.
-void WinStack::initMenu()
-{
-    // Init float popup menu.
-    m_menuFloat.insertItem(i18n("&Open Source..."), ID_FILE_OPEN);
-    m_menuFloat.insertSeparator();
-    m_menuFloat.insertItem(i18n("Step &into"), ID_PROGRAM_STEP);
-    m_menuFloat.insertItem(i18n("Step &over"), ID_PROGRAM_NEXT);
-    m_menuFloat.insertItem(i18n("Step o&ut"), ID_PROGRAM_FINISH);
-    m_menuFloat.insertItem(i18n("Run to &cursor"), ID_PROGRAM_UNTIL);
-    m_menuFloat.insertSeparator();
-    m_menuFloat.insertItem(i18n("Set/Clear &breakpoint"), ID_BRKPT_SET);
-
-    // Init float file popup.
-    m_menuFileFloat.insertItem(i18n("&Open Source..."), ID_FILE_OPEN);
-    m_menuFileFloat.insertSeparator();
-    m_menuFileFloat.insertItem(i18n("&Executable..."), ID_FILE_EXECUTABLE);
-    m_menuFileFloat.insertItem(i18n("&Core dump..."), ID_FILE_COREFILE);
 }
 
 void WinStack::setWindowMenu(QPopupMenu* menu)
@@ -79,56 +51,15 @@ void WinStack::setWindowMenu(QPopupMenu* menu)
     }
     
     // find entry More...
-    m_itemMore = menu->indexOf(ID_WINDOW_MORE);
+    m_itemMore = menu->indexOf(WindowMore);
     // must contain item More...
     ASSERT(m_itemMore >= 0);
 
-    m_textMore = menu->text(ID_WINDOW_MORE);
+    m_textMore = menu->text(WindowMore);
     menu->removeItemAt(m_itemMore);
-}
 
-void WinStack::menuCallback(int item)
-{
-    TRACE("menu item=" + QString().setNum(item));
-    // check for window
-    if ((item & ~ID_WINDOW_INDEX_MASK) == ID_WINDOW_MORE) {
-	selectWindow(item & ID_WINDOW_INDEX_MASK);
-	return;
-    }
-    
-    switch (item) {
-    case ID_FILE_RELOAD:
-	if (m_activeWindow != 0) {
-	    TRACE("reloading one file");
-	    m_activeWindow->reloadFile();
-	}
-	break;
-    case ID_VIEW_FINDDLG:
-	if (m_findDlg.isVisible()) {
-	    m_findDlg.done(0);
-	} else {
-	    m_findDlg.show();
-	}
-    case ID_BRKPT_SET:
-    case ID_BRKPT_TEMP:
-	{
-	    QString file;
-	    int lineNo;
-	    DbgAddr address;
-	    if (activeLine(file, lineNo, address))
-		emit toggleBreak(file, lineNo, address, item == ID_BRKPT_TEMP);
-	}
-	break;
-    case ID_BRKPT_ENABLE:
-	{
-	    QString file;
-	    int lineNo;
-	    DbgAddr address;
-	    if (activeLine(file, lineNo, address))
-		emit enadisBreak(file, lineNo, address);
-	}
-	break;
-    }
+    // hook up for menu activations
+    connect(menu, SIGNAL(activated(int)), this, SLOT(selectWindow(int)));
 }
 
 void WinStack::mousePressEvent(QMouseEvent* mouseEvent)
@@ -207,7 +138,7 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 
 	// Comunication when right button is clicked.
 	connect(fw, SIGNAL(clickedRight(const QPoint &)),
-		SLOT(slotFileWindowRightClick(const QPoint &)));
+		SIGNAL(filesRightClick(const QPoint &)));
 
 	// disassemble code
 	connect(fw, SIGNAL(disassemble(const QString&, int)),
@@ -300,7 +231,7 @@ void WinStack::changeWindowMenu()
     }
 
     // delete window entries
-    while ((m_windowMenu->idAt(m_itemMore) & ~ID_WINDOW_INDEX_MASK) == ID_WINDOW_MORE) {
+    while ((m_windowMenu->idAt(m_itemMore) & ~WindowMask) == WindowMore) {
 	m_windowMenu->removeItemAt(m_itemMore);
     }
 
@@ -311,12 +242,12 @@ void WinStack::changeWindowMenu()
     for (fw = m_fileList.first(); fw != 0 && index < 10; fw = m_fileList.next()) {
 	text.sprintf("&%d ", index);
 	text += fw->fileName();
-	m_windowMenu->insertItem(text, ID_WINDOW_MORE+index, m_itemMore+index-1);
+	m_windowMenu->insertItem(text, WindowMore+index, m_itemMore+index-1);
 	index++;
     }
     if (fw != 0) {
 	// there are still windows
-	m_windowMenu->insertItem(m_textMore, ID_WINDOW_MORE, m_itemMore+9);
+	m_windowMenu->insertItem(m_textMore, WindowMore, m_itemMore+9);
     }
 }
 
@@ -377,30 +308,6 @@ void WinStack::slotFindBackward()
     if (m_activeWindow != 0)
 	m_activeWindow->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
 			     SourceWindow::findBackward);
-}
-
-void WinStack::slotFileWindowRightClick(const QPoint & pos)
-{
-    if (m_menuFloat.isVisible())
-    {
-	m_menuFloat.hide();
-    }
-    else
-    {
-	m_menuFloat.popup(mapToGlobal(pos));
-    }
-}
-
-void WinStack::slotWidgetRightClick(const QPoint & pos)
-{
-    if (m_menuFileFloat.isVisible())
-    {
-	m_menuFileFloat.hide();
-    }
-    else
-    {
-	m_menuFileFloat.popup(mapToGlobal(pos));
-    }
 }
 
 void WinStack::maybeTip(const QPoint& p)
@@ -464,6 +371,50 @@ void WinStack::slotExpandCollapse(int)
 void WinStack::slotSetTabWidth(int numChars)
 {
     m_tabWidth = numChars;
+}
+
+void WinStack::slotFileReload()
+{
+    if (m_activeWindow != 0) {
+	TRACE("reloading one file");
+	m_activeWindow->reloadFile();
+    }
+}
+
+void WinStack::slotViewFind()
+{
+    if (m_findDlg.isVisible()) {
+	m_findDlg.done(0);
+    } else {
+	m_findDlg.show();
+    }
+}
+
+void WinStack::slotBrkptSet()
+{
+    QString file;
+    int lineNo;
+    DbgAddr address;
+    if (activeLine(file, lineNo, address))
+	emit toggleBreak(file, lineNo, address, false);
+}
+
+void WinStack::slotBrkptSetTemp()
+{
+    QString file;
+    int lineNo;
+    DbgAddr address;
+    if (activeLine(file, lineNo, address))
+	emit toggleBreak(file, lineNo, address, true);
+}
+
+void WinStack::slotBrkptEnable()
+{
+    QString file;
+    int lineNo;
+    DbgAddr address;
+    if (activeLine(file, lineNo, address))
+	emit enadisBreak(file, lineNo, address);
 }
 
 
@@ -541,6 +492,13 @@ MoreWindowsDialog::~MoreWindowsDialog()
 
 void WinStack::selectWindow(int id)
 {
+    // react only on menu entries concerning windows
+    if ((id & ~WindowMask) != WindowMore) {
+	return;
+    }
+
+    id &= WindowMask;
+
     int index = 0;
 
     if (id == 0) {
@@ -559,7 +517,7 @@ void WinStack::selectWindow(int id)
 	    return;
 	index = dlg.listIndex();
     } else {
-	index = (id & ID_WINDOW_INDEX_MASK)-1;
+	index = (id & WindowMask)-1;
     }
 
     SourceWindow* fw = m_fileList.first();

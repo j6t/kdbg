@@ -64,15 +64,16 @@ class WinStack : public QWidget
 public:
     WinStack(QWidget* parent, const char* name);
     virtual ~WinStack();
-    
+
+    enum { WindowMore=0x100, WindowMask=0xf };
+
     /**
      * The menu set with setWindowMenu will be modified by this widget to
      * list the available windows. The specified popup menu must be set up
-     * to contain an entry with ID_WINDOW_MORE. The windows will be inserted
+     * to contain an entry with ID WindowMore. The windows will be inserted
      * before this entry.
      */
     void setWindowMenu(QPopupMenu* menu);
-    void selectWindow(int index);	/* 1-based index, 0 means dialog More... */
     /**
      * Slot activate also looks in this directory when the specified file is
      * a relative path.
@@ -91,24 +92,27 @@ signals:
     void toggleBreak(const QString&, int, const DbgAddr&, bool);
     void enadisBreak(const QString&, int, const DbgAddr&);
     void clickedRight(const QPoint&);
+    void filesRightClick(const QPoint&);
     void newFileLoaded();
     void initiateValuePopup(const QString&);
     void disassemble(const QString&, int);
     void setTabWidth(int numChars);
 
 public slots:
-    virtual void menuCallback(int item);
+    void selectWindow(int id);		/* 1-based index, 0 means dialog More... */
     virtual void slotFindForward();
     virtual void slotFindBackward();
-    virtual void slotFileWindowRightClick(const QPoint &);
     virtual void activate(const QString& filename, int lineNo, const DbgAddr& address);
     void updatePC(const QString& filename, int lineNo, const DbgAddr& address, int frameNo);
     void reloadAllFiles();
     void updateLineItems(const KDebugger* deb);
     void slotSetTabWidth(int numChars);
 
-    // Right click on file panner when no file is loaded.
-    virtual void slotWidgetRightClick(const QPoint &);
+    void slotFileReload();
+    void slotViewFind();
+    void slotBrkptSet();
+    void slotBrkptSetTemp();
+    void slotBrkptEnable();
 
     // Displays the value tip at m_tipLocation
     void slotShowValueTip(const QString& tipText);
@@ -121,7 +125,6 @@ public slots:
     void slotExpandCollapse(int lineNo);
 
 protected:
-    void initMenu();
     bool activatePath(QString pathname, int lineNo, const DbgAddr& address);
     virtual bool activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& address);	/* -1 doesnt change line */
     virtual void changeWindowMenu();
@@ -149,10 +152,6 @@ protected:
 public:
     // find dialog
     FindDialog m_findDlg;
-
-    // Popup menu
-    QPopupMenu m_menuFloat;
-    QPopupMenu m_menuFileFloat;
 };
 
 #endif // WINSTACK_H

@@ -227,18 +227,34 @@ void KDebugger::programRunAgain()
     }
 }
 
-void KDebugger::programStep(bool byInsn)
+void KDebugger::programStep()
 {
     if (canSingleStep()) {
-	m_d->executeCmd(byInsn ? DCstepi : DCstep, true);
+	m_d->executeCmd(DCstep, true);
 	m_programRunning = true;
     }
 }
 
-void KDebugger::programNext(bool byInsn)
+void KDebugger::programNext()
 {
     if (canSingleStep()) {
-	m_d->executeCmd(byInsn ? DCnexti : DCnext, true);
+	m_d->executeCmd(DCnext, true);
+	m_programRunning = true;
+    }
+}
+
+void KDebugger::programStepi()
+{
+    if (canSingleStep()) {
+	m_d->executeCmd(DCstepi, true);
+	m_programRunning = true;
+    }
+}
+
+void KDebugger::programNexti()
+{
+    if (canSingleStep()) {
+	m_d->executeCmd(DCnexti, true);
 	m_programRunning = true;
     }
 }

@@ -24,7 +24,6 @@
 #include "gdbdriver.h"
 #include "prefdebugger.h"
 #include "prefmisc.h"
-#include "procattach.h"
 #include "ttywnd.h"
 #include "updateui.h"
 #include "commandids.h"
@@ -156,12 +155,11 @@ DebuggerMainWndBase::~DebuggerMainWndBase()
     }
 }
 
-void DebuggerMainWndBase::setupDebugger(ExprWnd* localVars,
+void DebuggerMainWndBase::setupDebugger(QWidget* parent,
+					ExprWnd* localVars,
 					ExprWnd* watchVars,
 					QListBox* backtrace)
 {
-    QWidget* parent = dbgMainWnd();
-
     GdbDriver* driver = new GdbDriver;
     driver->setLogFileName(m_transcriptFile);
 
@@ -292,90 +290,6 @@ QString DebuggerMainWndBase::myGetFileName(QString caption,
     return filename;
 }
 
-bool DebuggerMainWndBase::handleCommand(int item)
-{
-    /* first commands that don't require the debugger */
-    switch (item) {
-    case ID_FILE_GLOBAL_OPTIONS:
-	doGlobalOptions();
-	return true;
-    }
-
-    // now commands that do
-    if (m_debugger == 0)
-	return false;
-
-    switch (item) {
-    case ID_FILE_EXECUTABLE:
-	if (m_debugger->isIdle())
-	{
-	    // open a new executable
-	    QString executable = myGetFileName(i18n("Select the executable to debug"),
-					     m_lastDirectory, 0, dbgMainWnd());
-	    if (executable.isEmpty())
-		return true;
-
-	    if (debugProgramInteractive(executable)) {
-		addRecentExec(executable);
-	    }
-	}
-	return true;
-    case ID_FILE_PROG_SETTINGS:
-	m_debugger->programSettings(dbgMainWnd());
-	return true;
-    case ID_FILE_COREFILE:
-	if (m_debugger->canUseCoreFile())
-	{
-	    QString corefile = myGetFileName(i18n("Select core dump"),
-					   m_lastDirectory, 0, dbgMainWnd());
-	    if (!corefile.isEmpty()) {
-		m_debugger->useCoreFile(corefile, false);
-	    }
-	}
-	return true;
-    case ID_PROGRAM_RUN:
-	m_debugger->programRun();
-	return true;
-    case ID_PROGRAM_ATTACH:
-	{
-	    ProcAttach dlg(dbgMainWnd());
-	    dlg.setText(m_debugger->attachedPid());
-	    if (dlg.exec()) {
-		m_debugger->attachProgram(dlg.text());
-	    }
-	}
-	return true;
-    case ID_PROGRAM_RUN_AGAIN:
-	m_debugger->programRunAgain();
-	return true;
-    case ID_PROGRAM_STEP:
-	m_debugger->programStep(false);
-	return true;
-    case ID_PROGRAM_STEPI:
-	m_debugger->programStep(true);
-	return true;
-    case ID_PROGRAM_NEXT:
-	m_debugger->programNext(false);
-	return true;
-    case ID_PROGRAM_NEXTI:
-	m_debugger->programNext(true);
-	return true;
-    case ID_PROGRAM_FINISH:
-	m_debugger->programFinish();
-	return true;
-    case ID_PROGRAM_KILL:
-	m_debugger->programKill();
-	return true;
-    case ID_PROGRAM_BREAK:
-	m_debugger->programBreak();
-	return true;
-    case ID_PROGRAM_ARGS:
-	m_debugger->programArgs(dbgMainWnd());
-	return true;
-    }
-    return false;
-}
-
 void DebuggerMainWndBase::updateUIItem(UpdateUI* item)
 {
     switch (item->id) {
@@ -485,9 +399,9 @@ void DebuggerMainWndBase::slotNewStatusMsg()
     dbgStatusBar()->changeItem(msg, ID_STATUS_MSG);
 }
 
-void DebuggerMainWndBase::doGlobalOptions()
+void DebuggerMainWndBase::doGlobalOptions(QWidget* parent)
 {
-    QTabDialog dlg(dbgMainWnd(), "global_options", true);
+    QTabDialog dlg(parent, "global_options", true);
     QString title = kapp->getCaption();
     title += i18n(": Global options");
     dlg.setCaption(title);
@@ -747,7 +661,8 @@ void DebuggerMainWndBase::removeRecentExec(const QString& executable)
     }
 }
 
-bool DebuggerMainWndBase::debugProgramInteractive(const QString& executable)
+bool DebuggerMainWndBase::debugProgramInteractive(const QString& executable,
+						  QWidget* parent)
 {
     // check the file name
     QFileInfo fi(executable);
@@ -758,13 +673,13 @@ bool DebuggerMainWndBase::debugProgramInteractive(const QString& executable)
 	SIZED_QString(msg, msgFmt.length() + executable.length() + 20);
 #if QT_VERSION < 200
 	msg.sprintf(msgFmt, executable.data());
-	KMsgBox::message(dbgMainWnd(), kapp->appName(),
+	KMsgBox::message(parent, kapp->appName(),
 			 msg,
 			 KMsgBox::STOP,
 			 i18n("OK"));
 #else
 	msg.sprintf(msgFmt, executable.latin1());
-	KMessageBox::sorry(dbgMainWnd(), msg);
+	KMessageBox::sorry(parent, msg);
 #endif
 	return false;
     }
@@ -773,12 +688,12 @@ bool DebuggerMainWndBase::debugProgramInteractive(const QString& executable)
 	QString msg = i18n("Could not start the debugger process.\n"
 			   "Please shut down KDbg and resolve the problem.");
 #if QT_VERSION < 200
-	KMsgBox::message(dbgMainWnd(), kapp->appName(),
+	KMsgBox::message(parent, kapp->appName(),
 			 msg,
 			 KMsgBox::STOP,
 			 i18n("OK"));
 #else
-	KMessageBox::sorry(dbgMainWnd(), msg);
+	KMessageBox::sorry(parent, msg);
 #endif
     }
     return true;

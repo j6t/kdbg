@@ -76,20 +76,18 @@ public:
     bool debugProgram(const QString& executable);
     void setCoreFile(const QString& corefile);
     void setRemoteDevice(const QString &remoteDevice);
-    /** returns true if the command was handled */
-    bool handleCommand(int item);
     /** helper around KFileDialog */
     static QString myGetFileName(QString caption,
 				 QString dir, QString filter,
 				 QWidget* parent);
     /** invokes the global options dialog */
-    virtual void doGlobalOptions();
+    virtual void doGlobalOptions(QWidget* parent);
     /** add recent executable; moves it to top of list if present */
     void addRecentExec(const QString& executable);
     /** remove recent executable */
     void removeRecentExec(const QString& executable);
     /** start a new session; error popups appear on errors */
-    bool debugProgramInteractive(const QString& executable);
+    bool debugProgramInteractive(const QString& executable, QWidget* parent);
 
 protected:
     // settings
@@ -101,8 +99,6 @@ protected:
     virtual KToolBar* dbgToolBar() = 0;
     // override must return the statusbar
     virtual KStatusBar* dbgStatusBar() = 0;
-    // override must return the main window (usually this)
-    virtual QWidget* dbgMainWnd() = 0;
     // override must return the integrated output window
     virtual TTYWindow* ttyWindow() = 0;
 
@@ -138,7 +134,8 @@ protected:
     // the debugger proper
     QString m_debuggerCmdStr;
     KDebugger* m_debugger;
-    void setupDebugger(ExprWnd* localVars,
+    void setupDebugger(QWidget* parent,
+		       ExprWnd* localVars,
 		       ExprWnd* watchVars,
 		       QListBox* backtrace);
 

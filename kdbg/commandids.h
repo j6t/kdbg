@@ -58,10 +58,6 @@
 #define ID_HELP_ABOUT 100
 #define ID_HELP_HELP  101
 
-// 0x101..0x10f are window menu entries
-#define ID_WINDOW_MORE 0x100
-#define ID_WINDOW_INDEX_MASK 0xf
-
 // statusbar ids
 #define ID_STATUS_MSG 191
 #define ID_STATUS_BUSY 192
