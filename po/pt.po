@@ -4,26 +4,54 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 0.2.3\n"
-"POT-Creation-Date: 1998-12-13 12:59+0100\n"
+"Project-Id-Version: kdbg 0.2.5\n"
+"POT-Creation-Date: 1999-01-10 21:35+0100\n"
 "PO-Revision-Date: 1998-05-26 12:00+0000\n"
 "Last-Translator: Pedro Morais <morais@kde.org>\n"
 
-#: brkpt.cpp:38
+#: brkpt.cpp:39
 msgid "&Add"
 msgstr "&Adicionar"
 
-#: brkpt.cpp:46
+#: brkpt.cpp:47
 msgid "&View Code"
 msgstr "&Ver Código"
 
-#: brkpt.cpp:495
+#: brkpt.cpp:51
+msgid "&Conditional..."
+msgstr ""
+
+#: brkpt.cpp:618
 msgid "E"
 msgstr "E"
 
-#: brkpt.cpp:497
+#: brkpt.cpp:620
 msgid "Location"
 msgstr "Localização"
+
+#: brkpt.cpp:621
+msgid "Hits"
+msgstr ""
+
+#: brkpt.cpp:622
+msgid "Ignore"
+msgstr ""
+
+#: brkpt.cpp:623
+msgid "Condition"
+msgstr ""
+
+#: brkpt.cpp:739
+msgid ": Conditional breakpoint"
+msgstr ""
+
+#: brkpt.cpp:743
+msgid "&Condition:"
+msgstr ""
+
+#: brkpt.cpp:745
+msgid "Ignore &next hits:"
+msgstr ""
 
 #: pgmargs.cpp:19
 msgid ": Program arguments"
@@ -62,182 +90,186 @@ msgstr "Locals"
 msgid "Breakpoints"
 msgstr "Breakpoints"
 
-#: debugger.cpp:292
+#: debugger.cpp:302
 msgid "Select the executable to debug"
 msgstr "Seleccione o executavel a depurar"
 
-#: debugger.cpp:325
+#: debugger.cpp:335
 msgid "Select core dump"
 msgstr ""
 
-#: debugger.cpp:550
+#: debugger.cpp:561
 msgid "&Open Source..."
 msgstr "&Abrir Código..."
 
-#: debugger.cpp:551
+#: debugger.cpp:562
 msgid "&Reload Source"
 msgstr ""
 
-#: debugger.cpp:553
+#: debugger.cpp:564
 msgid "&Executable..."
 msgstr "&Executavel..."
 
-#: debugger.cpp:554
+#: debugger.cpp:565
 msgid "&Core dump..."
 msgstr ""
 
-#: debugger.cpp:560
+#: debugger.cpp:571
 msgid "&Find..."
 msgstr ""
 
-#: debugger.cpp:561
+#: debugger.cpp:572
 msgid "Toggle &Toolbar"
 msgstr "Mostrar Barra de &Ferramentas"
 
-#: debugger.cpp:562
+#: debugger.cpp:573
 msgid "Toggle &Statusbar"
 msgstr "Mostrar Barra de &Status"
 
-#: debugger.cpp:565
+#: debugger.cpp:576
 msgid "&Run"
 msgstr "&Correr"
 
-#: debugger.cpp:566
+#: debugger.cpp:577
 msgid "Step &into"
 msgstr "&Entrar"
 
-#: debugger.cpp:567
+#: debugger.cpp:578
 msgid "Step &over"
 msgstr "&Saltar"
 
-#: debugger.cpp:568
+#: debugger.cpp:579
 msgid "Step o&ut"
 msgstr "S&air"
 
-#: debugger.cpp:569
+#: debugger.cpp:580
 msgid "Run to &cursor"
 msgstr "Correr até ao &cursor"
 
-#: debugger.cpp:571
+#: debugger.cpp:582
 msgid "&Break"
 msgstr "&Paragens"
 
-#: debugger.cpp:572
+#: debugger.cpp:583
 msgid "Re&start"
 msgstr ""
 
-#: debugger.cpp:573
+#: debugger.cpp:584
 msgid "A&ttach..."
 msgstr ""
 
-#: debugger.cpp:575
+#: debugger.cpp:586
 msgid "&Arguments..."
 msgstr "&Argumentos..."
 
-#: debugger.cpp:583
+#: debugger.cpp:594
 msgid "Set/Clear &breakpoint"
 msgstr "Colocar/tirar &breakpoint"
 
-#: debugger.cpp:584
+#: debugger.cpp:595
 msgid "Set &temporary breakpoint"
 msgstr "Colocar breakpoint &temporario"
 
-#: debugger.cpp:585
+#: debugger.cpp:596
 msgid "&Enable/Disable breakpoint"
 msgstr "&Activar/desactivar breakpoint"
 
-#: debugger.cpp:586
+#: debugger.cpp:597
 msgid "&List..."
 msgstr "&Listar..."
 
-#: debugger.cpp:591
+#: debugger.cpp:602
 msgid "&More..."
 msgstr "&Mais..."
 
 #: debugger.cpp:605
+msgid "&About"
+msgstr ""
+
+#: debugger.cpp:616
 msgid "E&xecution"
 msgstr "E&xecução"
 
-#: debugger.cpp:606
+#: debugger.cpp:617
 msgid "&Breakpoint"
 msgstr "&Breakpoint"
 
-#: debugger.cpp:607
+#: debugger.cpp:618
 msgid "&Window"
 msgstr "&Janela"
 
-#: debugger.cpp:611
+#: debugger.cpp:622
 msgid ""
 "A Debugger\n"
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "with the help of many others"
 msgstr ""
 
-#: debugger.cpp:623
+#: debugger.cpp:634
 msgid "Executable"
 msgstr "Executavel..."
 
-#: debugger.cpp:625
+#: debugger.cpp:636
 msgid "Open a source file"
 msgstr "Abrir o ficheiro com o código"
 
-#: debugger.cpp:627
+#: debugger.cpp:638
 msgid "Reload source file"
 msgstr ""
 
-#: debugger.cpp:630
+#: debugger.cpp:641
 msgid "Run/Continue"
 msgstr "Correr/Continuar"
 
-#: debugger.cpp:632
+#: debugger.cpp:643
 msgid "Step into"
 msgstr "Entrar"
 
-#: debugger.cpp:634
+#: debugger.cpp:645
 msgid "Step over"
 msgstr "Saltar"
 
-#: debugger.cpp:636
+#: debugger.cpp:647
 msgid "Step out"
 msgstr "Sair"
 
-#: debugger.cpp:639
+#: debugger.cpp:650
 msgid "Breakpoint"
 msgstr "Breakpoint"
 
-#: debugger.cpp:642
+#: debugger.cpp:653
 msgid "Search"
 msgstr ""
 
-#: debugger.cpp:649
+#: debugger.cpp:660
 msgid "Line 00000"
 msgstr ""
 
-#: debugger.cpp:653
+#: debugger.cpp:664
 msgid "Restart"
 msgstr ""
 
-#: debugger.cpp:654
+#: debugger.cpp:665
 msgid "Core dump"
 msgstr ""
 
-#: debugger.cpp:759
+#: debugger.cpp:770
 #, c-format
 msgid ""
 "gdb exited unexpectedly (status 0x%x)\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
 
-#: debugger.cpp:834
+#: debugger.cpp:850
 msgid ": Program output"
 msgstr ": Saída do programa"
 
-#: debugger.cpp:886
+#: debugger.cpp:898
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "`%s' não é um ficheiro ou não existe"
 
-#: debugger.cpp:2284
+#: debugger.cpp:2302
 #, c-format
 msgid "Line %d"
 msgstr ""
@@ -266,7 +298,7 @@ msgstr ""
 msgid "&Backward"
 msgstr ""
 
-#: main.cpp:69
+#: main.cpp:56
 msgid "Cannot start debugger."
 msgstr "Não consigo iniciar o depurador."
 

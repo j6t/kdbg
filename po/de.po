@@ -5,29 +5,57 @@
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 0.2.5\n"
-"POT-Creation-Date: 1998-12-13 12:59+0100\n"
-"PO-Revision-Date: 1998-12-13 13:40+0100\n"
+"POT-Creation-Date: 1999-01-10 21:35+0100\n"
+"PO-Revision-Date: 1999-01-10 21:41+0100\n"
 "Last-Translator: Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "Language-Team: none\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=ISO8859-1\n"
 "Content-Transfer-Encoding: 8-bit\n"
 
-#: brkpt.cpp:38
+#: brkpt.cpp:39
 msgid "&Add"
 msgstr "&Hinzufügen"
 
-#: brkpt.cpp:46
+#: brkpt.cpp:47
 msgid "&View Code"
 msgstr "&Code anzeigen"
 
-#: brkpt.cpp:495
+#: brkpt.cpp:51
+msgid "&Conditional..."
+msgstr "&Bedingt..."
+
+#: brkpt.cpp:618
 msgid "E"
 msgstr "A"
 
-#: brkpt.cpp:497
+#: brkpt.cpp:620
 msgid "Location"
 msgstr "Ort"
+
+#: brkpt.cpp:621
+msgid "Hits"
+msgstr "Stops"
+
+#: brkpt.cpp:622
+msgid "Ignore"
+msgstr "Ignorieren"
+
+#: brkpt.cpp:623
+msgid "Condition"
+msgstr "Bedingung"
+
+#: brkpt.cpp:739
+msgid ": Conditional breakpoint"
+msgstr ": Bedingten Haltepunkt setzen"
+
+#: brkpt.cpp:743
+msgid "&Condition:"
+msgstr "&Bedingung:"
+
+#: brkpt.cpp:745
+msgid "Ignore &next hits:"
+msgstr "Ignoriere &nächste Treffer:"
 
 #: pgmargs.cpp:19
 msgid ": Program arguments"
@@ -66,111 +94,115 @@ msgstr "Lokale Var"
 msgid "Breakpoints"
 msgstr "Haltepunkte"
 
-#: debugger.cpp:292
+#: debugger.cpp:302
 msgid "Select the executable to debug"
 msgstr "Ausführbares Programm zum Debuggen wählen"
 
-#: debugger.cpp:325
+#: debugger.cpp:335
 msgid "Select core dump"
 msgstr "Core dump wählen"
 
-#: debugger.cpp:550
+#: debugger.cpp:561
 msgid "&Open Source..."
 msgstr "Quellcode Ö&ffnen..."
 
-#: debugger.cpp:551
+#: debugger.cpp:562
 msgid "&Reload Source"
 msgstr "E&rneut laden"
 
-#: debugger.cpp:553
+#: debugger.cpp:564
 msgid "&Executable..."
 msgstr "&Programm..."
 
-#: debugger.cpp:554
+#: debugger.cpp:565
 msgid "&Core dump..."
 msgstr "&Core dump..."
 
-#: debugger.cpp:560
+#: debugger.cpp:571
 msgid "&Find..."
 msgstr "S&uchen..."
 
-#: debugger.cpp:561
+#: debugger.cpp:572
 msgid "Toggle &Toolbar"
 msgstr "&Werkzeugleiste ein-/ausblenden"
 
-#: debugger.cpp:562
+#: debugger.cpp:573
 msgid "Toggle &Statusbar"
 msgstr "&Statusleiste ein-/ausblenden"
 
-#: debugger.cpp:565
+#: debugger.cpp:576
 msgid "&Run"
 msgstr "Aus&führen"
 
-#: debugger.cpp:566
+#: debugger.cpp:577
 msgid "Step &into"
 msgstr "&In Funktion"
 
-#: debugger.cpp:567
+#: debugger.cpp:578
 msgid "Step &over"
 msgstr "Ü&ber Funktion"
 
-#: debugger.cpp:568
+#: debugger.cpp:579
 msgid "Step o&ut"
 msgstr "&Aus Funktion"
 
-#: debugger.cpp:569
+#: debugger.cpp:580
 msgid "Run to &cursor"
 msgstr "&Zum Cursor"
 
-#: debugger.cpp:571
+#: debugger.cpp:582
 msgid "&Break"
 msgstr "&Unterbrechen"
 
-#: debugger.cpp:572
+#: debugger.cpp:583
 msgid "Re&start"
 msgstr "&Erneut ausführen"
 
-#: debugger.cpp:573
+#: debugger.cpp:584
 msgid "A&ttach..."
 msgstr "A&ttachen..."
 
-#: debugger.cpp:575
+#: debugger.cpp:586
 msgid "&Arguments..."
 msgstr "Argu&mente..."
 
-#: debugger.cpp:583
+#: debugger.cpp:594
 msgid "Set/Clear &breakpoint"
 msgstr "&Setzen/entfernen"
 
-#: debugger.cpp:584
+#: debugger.cpp:595
 msgid "Set &temporary breakpoint"
 msgstr "&Temporären Haltepunkt setzen"
 
-#: debugger.cpp:585
+#: debugger.cpp:596
 msgid "&Enable/Disable breakpoint"
 msgstr "&Aktiv/inaktiv"
 
-#: debugger.cpp:586
+#: debugger.cpp:597
 msgid "&List..."
 msgstr "&Liste..."
 
-#: debugger.cpp:591
+#: debugger.cpp:602
 msgid "&More..."
 msgstr "&Weitere..."
 
 #: debugger.cpp:605
+msgid "&About"
+msgstr "&Info..."
+
+#: debugger.cpp:616
 msgid "E&xecution"
 msgstr "A&usführung"
 
-#: debugger.cpp:606
+#: debugger.cpp:617
 msgid "&Breakpoint"
 msgstr "Halte&punkt"
 
-#: debugger.cpp:607
+#: debugger.cpp:618
 msgid "&Window"
 msgstr "&Fenster"
 
-#: debugger.cpp:611
+#: debugger.cpp:622
 msgid ""
 "A Debugger\n"
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
@@ -180,55 +212,55 @@ msgstr ""
 "von Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "und vielen weiteren Helfern"
 
-#: debugger.cpp:623
+#: debugger.cpp:634
 msgid "Executable"
 msgstr "Programm"
 
-#: debugger.cpp:625
+#: debugger.cpp:636
 msgid "Open a source file"
 msgstr "Quelldatei öffnen"
 
-#: debugger.cpp:627
+#: debugger.cpp:638
 msgid "Reload source file"
 msgstr "Erneut laden"
 
-#: debugger.cpp:630
+#: debugger.cpp:641
 msgid "Run/Continue"
 msgstr "Ausführen/Fortsetzen"
 
-#: debugger.cpp:632
+#: debugger.cpp:643
 msgid "Step into"
 msgstr "In Funktion"
 
-#: debugger.cpp:634
+#: debugger.cpp:645
 msgid "Step over"
 msgstr "Über Funktion"
 
-#: debugger.cpp:636
+#: debugger.cpp:647
 msgid "Step out"
 msgstr "Aus Funktion"
 
-#: debugger.cpp:639
+#: debugger.cpp:650
 msgid "Breakpoint"
 msgstr "Haltepunkt"
 
-#: debugger.cpp:642
+#: debugger.cpp:653
 msgid "Search"
 msgstr "Suche"
 
-#: debugger.cpp:649
+#: debugger.cpp:660
 msgid "Line 00000"
 msgstr "Zeile 00000"
 
-#: debugger.cpp:653
+#: debugger.cpp:664
 msgid "Restart"
 msgstr "Erneut ausführen"
 
-#: debugger.cpp:654
+#: debugger.cpp:665
 msgid "Core dump"
 msgstr "Core dump"
 
-#: debugger.cpp:759
+#: debugger.cpp:770
 #, c-format
 msgid ""
 "gdb exited unexpectedly (status 0x%x)\n"
@@ -237,16 +269,16 @@ msgstr ""
 "gdb wurde unerwartet beendet (Status 0x%x)\n"
 "Sie müssen die Sitzung neu starten (z.B. mit Datei|Programm)."
 
-#: debugger.cpp:834
+#: debugger.cpp:850
 msgid ": Program output"
 msgstr ": Programmausgabe"
 
-#: debugger.cpp:886
+#: debugger.cpp:898
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "`%s' ist keine Datei oder existiert nicht"
 
-#: debugger.cpp:2284
+#: debugger.cpp:2302
 #, c-format
 msgid "Line %d"
 msgstr "Zeile %d"
@@ -275,7 +307,7 @@ msgstr "&Vorwärts"
 msgid "&Backward"
 msgstr "&Rückwärts"
 
-#: main.cpp:69
+#: main.cpp:56
 msgid "Cannot start debugger."
 msgstr "Kann Debugger nicht ausführen."
 
@@ -296,12 +328,6 @@ msgstr "Kann Debugger nicht ausführen."
 
 #~ msgid "&Quit"
 #~ msgstr "&Beenden"
-
-#~ msgid "&Contents"
-#~ msgstr "&Inhalt"
-
-#~ msgid "&About"
-#~ msgstr "&Info..."
 
 #~ msgid "&File"
 #~ msgstr "&Datei"

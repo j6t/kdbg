@@ -4,8 +4,8 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 0.2.4\n"
-"POT-Creation-Date: 1998-12-13 12:59+0100\n"
+"Project-Id-Version: kdbg 0.2.5\n"
+"POT-Creation-Date: 1999-01-10 21:35+0100\n"
 "PO-Revision-Date: 1998-11-24 20:21 MET\n"
 "Last-Translator: Martin ©pirk <spirk@kla.pvt.cz>\n"
 "Language-Team: Czech <flidr@kky.zcu.cz>\n"
@@ -13,21 +13,49 @@ msgstr ""
 "Content-Type: text/plain; charset=iso-8859-2\n"
 "Content-Transfer-Encoding: 8bit\n"
 
-#: brkpt.cpp:38
+#: brkpt.cpp:39
 msgid "&Add"
 msgstr "&Pøidat"
 
-#: brkpt.cpp:46
+#: brkpt.cpp:47
 msgid "&View Code"
 msgstr "&Zobrazit kód"
 
-#: brkpt.cpp:495
+#: brkpt.cpp:51
+msgid "&Conditional..."
+msgstr ""
+
+#: brkpt.cpp:618
 msgid "E"
 msgstr "E"
 
-#: brkpt.cpp:497
+#: brkpt.cpp:620
 msgid "Location"
 msgstr "Umístìní"
+
+#: brkpt.cpp:621
+msgid "Hits"
+msgstr ""
+
+#: brkpt.cpp:622
+msgid "Ignore"
+msgstr ""
+
+#: brkpt.cpp:623
+msgid "Condition"
+msgstr ""
+
+#: brkpt.cpp:739
+msgid ": Conditional breakpoint"
+msgstr ""
+
+#: brkpt.cpp:743
+msgid "&Condition:"
+msgstr ""
+
+#: brkpt.cpp:745
+msgid "Ignore &next hits:"
+msgstr ""
 
 #: pgmargs.cpp:19
 msgid ": Program arguments"
@@ -66,111 +94,115 @@ msgstr "Lokální"
 msgid "Breakpoints"
 msgstr "Zará¾ky"
 
-#: debugger.cpp:292
+#: debugger.cpp:302
 msgid "Select the executable to debug"
 msgstr "Vyberte spustitelný soubor který chcete trasovat"
 
-#: debugger.cpp:325
+#: debugger.cpp:335
 msgid "Select core dump"
 msgstr "Vyberte core dump"
 
-#: debugger.cpp:550
+#: debugger.cpp:561
 msgid "&Open Source..."
 msgstr "&Otevøít zdroj..."
 
-#: debugger.cpp:551
+#: debugger.cpp:562
 msgid "&Reload Source"
 msgstr "&Znovu naèíst zdroj"
 
-#: debugger.cpp:553
+#: debugger.cpp:564
 msgid "&Executable..."
 msgstr "Spustit&elný soubor..."
 
-#: debugger.cpp:554
+#: debugger.cpp:565
 msgid "&Core dump..."
 msgstr "&Core dump..."
 
-#: debugger.cpp:560
+#: debugger.cpp:571
 msgid "&Find..."
 msgstr "&Hledat..."
 
-#: debugger.cpp:561
+#: debugger.cpp:572
 msgid "Toggle &Toolbar"
 msgstr "Pøepnout panel &nástrojù"
 
-#: debugger.cpp:562
+#: debugger.cpp:573
 msgid "Toggle &Statusbar"
 msgstr "Pøepnout &stavový øádek"
 
-#: debugger.cpp:565
+#: debugger.cpp:576
 msgid "&Run"
 msgstr "S&pustit"
 
-#: debugger.cpp:566
+#: debugger.cpp:577
 msgid "Step &into"
 msgstr "Krok &do"
 
-#: debugger.cpp:567
+#: debugger.cpp:578
 msgid "Step &over"
 msgstr "Krok &pøes"
 
-#: debugger.cpp:568
+#: debugger.cpp:579
 msgid "Step o&ut"
 msgstr "Krok &ven"
 
-#: debugger.cpp:569
+#: debugger.cpp:580
 msgid "Run to &cursor"
 msgstr "Spustit ke &kurzoru"
 
-#: debugger.cpp:571
+#: debugger.cpp:582
 msgid "&Break"
 msgstr "&Pøeru¹ení"
 
-#: debugger.cpp:572
+#: debugger.cpp:583
 msgid "Re&start"
 msgstr "Res&tart"
 
-#: debugger.cpp:573
+#: debugger.cpp:584
 msgid "A&ttach..."
 msgstr "Pøipojit..."
 
-#: debugger.cpp:575
+#: debugger.cpp:586
 msgid "&Arguments..."
 msgstr "&Argumenty..."
 
-#: debugger.cpp:583
+#: debugger.cpp:594
 msgid "Set/Clear &breakpoint"
 msgstr "Nastavit/smazat &zará¾ku"
 
-#: debugger.cpp:584
+#: debugger.cpp:595
 msgid "Set &temporary breakpoint"
 msgstr "Nastavit &doèasnou zará¾ku"
 
-#: debugger.cpp:585
+#: debugger.cpp:596
 msgid "&Enable/Disable breakpoint"
 msgstr "Po&volit/zakázat &zará¾ku"
 
-#: debugger.cpp:586
+#: debugger.cpp:597
 msgid "&List..."
 msgstr "Sezna&m..."
 
-#: debugger.cpp:591
+#: debugger.cpp:602
 msgid "&More..."
 msgstr "&Dal¹í..."
 
 #: debugger.cpp:605
+msgid "&About"
+msgstr ""
+
+#: debugger.cpp:616
 msgid "E&xecution"
 msgstr "Spu¹t&ìní"
 
-#: debugger.cpp:606
+#: debugger.cpp:617
 msgid "&Breakpoint"
 msgstr "&Zará¾ka"
 
-#: debugger.cpp:607
+#: debugger.cpp:618
 msgid "&Window"
 msgstr "&Okno"
 
-#: debugger.cpp:611
+#: debugger.cpp:622
 msgid ""
 "A Debugger\n"
 "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
@@ -180,71 +212,71 @@ msgstr ""
 "napsal Johannes Sixt <Johannes.Sixt@telecom.at>\n"
 "s pomocí mnohých dal¹ích"
 
-#: debugger.cpp:623
+#: debugger.cpp:634
 msgid "Executable"
 msgstr "Spustitelný soubor"
 
-#: debugger.cpp:625
+#: debugger.cpp:636
 msgid "Open a source file"
 msgstr "Otevøít zdrojový soubor"
 
-#: debugger.cpp:627
+#: debugger.cpp:638
 msgid "Reload source file"
 msgstr "Znovu naèíst zdrojový soubor"
 
-#: debugger.cpp:630
+#: debugger.cpp:641
 msgid "Run/Continue"
 msgstr "Spustit/pokraèovat"
 
-#: debugger.cpp:632
+#: debugger.cpp:643
 msgid "Step into"
 msgstr "Krok do"
 
-#: debugger.cpp:634
+#: debugger.cpp:645
 msgid "Step over"
 msgstr "Krok pøes"
 
-#: debugger.cpp:636
+#: debugger.cpp:647
 msgid "Step out"
 msgstr "Krok ven"
 
-#: debugger.cpp:639
+#: debugger.cpp:650
 msgid "Breakpoint"
 msgstr "Zará¾ka"
 
-#: debugger.cpp:642
+#: debugger.cpp:653
 msgid "Search"
 msgstr "Hledat"
 
-#: debugger.cpp:649
+#: debugger.cpp:660
 msgid "Line 00000"
 msgstr "Øádek 00000"
 
-#: debugger.cpp:653
+#: debugger.cpp:664
 msgid "Restart"
 msgstr "Restart"
 
-#: debugger.cpp:654
+#: debugger.cpp:665
 msgid "Core dump"
 msgstr "Core dump"
 
-#: debugger.cpp:759
+#: debugger.cpp:770
 #, c-format
 msgid ""
 "gdb exited unexpectedly (status 0x%x)\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
 
-#: debugger.cpp:834
+#: debugger.cpp:850
 msgid ": Program output"
 msgstr ": Výstup programu"
 
-#: debugger.cpp:886
+#: debugger.cpp:898
 #, c-format
 msgid "`%s' is not a file or does not exist"
 msgstr "`%s' není soubor nebo neexistuje"
 
-#: debugger.cpp:2284
+#: debugger.cpp:2302
 #, c-format
 msgid "Line %d"
 msgstr "Øádek %d"
@@ -274,7 +306,7 @@ msgstr "&Vpøed"
 msgid "&Backward"
 msgstr "V&zad"
 
-#: main.cpp:69
+#: main.cpp:56
 msgid "Cannot start debugger."
 msgstr "Nelze spustit debuger."
 
