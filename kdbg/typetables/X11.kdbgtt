@@ -1,0 +1,8 @@
+[Type Table]
+Types1=_XDisplay,Display
+IdentifyingVariable=
+[_XDisplay]
+Display={ name=% }
+Expr1=(%1).display_name
+[Display]
+Alias=_XDisplay
