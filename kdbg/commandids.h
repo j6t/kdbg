@@ -14,7 +14,7 @@
 #define ID_FILE_CLOSE 6
 #define ID_FILE_EXECUTABLE 7
 #define ID_FILE_QUIT 8
-#define ID_FILE_PRINT 9
+#define ID_FILE_COREFILE 9
 
 #define ID_PROGRAM_RUN 20
 #define ID_PROGRAM_STEP 21

@@ -256,14 +256,15 @@ void KDebugger::restoreSettings(KConfig* config)
 }
 
 
-// helper that opens an executable file (it only differs in the caption of the dialog)
-static QString getExecFileName(const char* dir = 0, const char* filter = 0,
-			       QWidget* parent = 0, const char* name = 0)
+// helper that gets a file name (it only differs in the caption of the dialog)
+static QString getFileName(const char* caption,
+			   const char* dir = 0, const char* filter = 0,
+			   QWidget* parent = 0, const char* name = 0)
 {
     QString filename;
     KFileDialog dlg(dir, filter, parent, name, true, false);
 
-    dlg.setCaption(i18n("Select the executable to debug"));
+    dlg.setCaption(caption);
 
     if (dlg.exec() == QDialog::Accepted)
 	filename = dlg.selectedFile();
@@ -279,7 +280,8 @@ void KDebugger::menuCallback(int item)
 	if (m_state == DSidle)
 	{
 	    // open a new executable
-	    QString executable = getExecFileName(0, 0, this);
+	    QString executable = getFileName(i18n("Select the executable to debug"),
+					     0, 0, this);
 	    if (!executable.isEmpty()) {
 		if (m_haveExecutable)
 		{
@@ -305,6 +307,18 @@ void KDebugger::menuCallback(int item)
 		    }
 		}
 		debugProgram(executable);
+	    }
+	}
+	break;
+    case ID_FILE_COREFILE:
+	if (isReady() && !m_programRunning) {
+	    // use a core dump
+	    QString corefile = getFileName(i18n("Select core dump"),
+					   0, 0, this);
+	    if (!corefile.isEmpty()) {
+		m_corefile = corefile;
+		CmdQueueItem* cmd = loadCoreFile();
+		cmd->m_byUser = true;
 	    }
 	}
 	break;
@@ -459,6 +473,9 @@ void KDebugger::updateUIItem(UpdateUI* item)
     case ID_FILE_EXECUTABLE:
 	item->enable(m_state == DSidle);
 	break;
+    case ID_FILE_COREFILE:
+	item->enable(isReady() && !m_programRunning);
+	break;
     case ID_PROGRAM_STEP:
     case ID_PROGRAM_NEXT:
     case ID_PROGRAM_FINISH:
@@ -502,6 +519,7 @@ void KDebugger::initMenu()
     m_menuFile.insertItem(i18n("&Reload Source"), ID_FILE_RELOAD);
     m_menuFile.insertSeparator();
     m_menuFile.insertItem(i18n("&Executable..."), ID_FILE_EXECUTABLE);
+    m_menuFile.insertItem(i18n("&Core dump..."), ID_FILE_COREFILE);
     m_menuFile.insertSeparator();
     m_menuFile.insertItem(i18n("&Quit"), ID_FILE_QUIT);
     m_menuFile.setAccel(keys->open(), ID_FILE_OPEN);
@@ -555,9 +573,11 @@ void KDebugger::initMenu()
     m_menu.insertItem(i18n("&Breakpoint"), &m_menuBrkpt);
     m_menu.insertItem(i18n("&Window"), &m_menuWindow);
     m_menu.insertSeparator();
-    static const char about[] =
-	"KDbg " VERSION " - A Debugger\n"
-	"by Johannes Sixt <Johannes.Sixt@telecom.at>";
+    
+    QString about = "KDbg " VERSION " - ";
+    about += i18n("A Debugger\n"
+		  "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
+		  "with the help of many others");
     m_menu.insertItem(i18n("&Help"),
 		      kapp->getHelpMenu(false, about));
 }
@@ -585,7 +605,6 @@ void KDebugger::initToolbar()
     m_toolbar.insertSeparator();
     m_toolbar.insertButton(loader->loadIcon("search.xpm"),ID_VIEW_FINDDLG, true,
 			   i18n("Search"));
-    i18n("Restart");			/* to have a translation right from the beginning */
 
     connect(&m_toolbar, SIGNAL(clicked(int)), SLOT(menuCallback(int)));
 
@@ -593,6 +612,11 @@ void KDebugger::initToolbar()
     m_statusbar.insertItem(m_statusActive, ID_STATUS_ACTIVE);
     m_statusbar.insertItem(i18n("Line 00000"), ID_STATUS_LINENO);
     m_statusbar.insertItem("", ID_STATUS_MSG);	/* message pane */
+
+    // reserve some translations
+    i18n("Restart");
+    i18n("Executable");
+    i18n("Core dump");
 }
 
 #ifdef WANT_THIS_PANE
@@ -1158,21 +1182,46 @@ void KDebugger::parse(CmdQueueItem* cmd)
     case DCexecutable:
 	// there is no output if the command is successful
 	if (m_gdbOutput[0] == '\0') {
-	    // success; now load file containing main()
-	    queueCmd(DCinfolinemain, "info line main", QMnormal);
-	    // restore breakpoints etc.
+	    // success; restore breakpoints etc.
 	    restoreProgramSettings();
+	    // load file containing main() or core file
+	    if (m_corefile.isEmpty()) {
+		queueCmd(DCinfolinemain, "info line main", QMnormal);
+	    } else {
+		// load core file
+		loadCoreFile();
+	    }
 	} else {
 	    QString msg = "gdb: " + QString(m_gdbOutput);
 	    KMsgBox::message(this, kapp->appName(), msg,
 			     KMsgBox::STOP, i18n("OK"));
+	    m_corefile = "";		/* don't process core file */
 	}
+	break;
+    case DCcorefile:
+	// in any event we have an executable at this point
+	m_haveExecutable = true;
+	// if command succeeded, gdb emits a marker
+	parseMarker = strstr(m_gdbOutput, "\032\032") != 0;
+	if (parseMarker) {		/* i.e. if we found it */
+	    // loading a core is like stopping at a breakpoint
+	    handleRunCommands();
+	} else {
+	    // report error
+	    QString msg = "gdb: " + QString(m_gdbOutput);
+	    KMsgBox::message(this, kapp->appName(), msg,
+			     KMsgBox::EXCLAMATION, i18n("OK"));
+	    // if core file was loaded from command line, revert to info line main
+	    if (!cmd->m_byUser) {
+		queueCmd(DCinfolinemain, "info line main", QMnormal);
+	    }
+	}
+	m_corefile = "";		/* core file not available any more */
 	break;
     case DCinfolinemain:
 	// ignore the output, marked file info follows
 	parseMarker = true;
 	m_haveExecutable = true;
-	TRACE(QString().sprintf("haveExecutable=%d", int(m_haveExecutable)));
 	break;
     case DCinfolocals:
 	// parse local variables
@@ -1311,8 +1360,8 @@ void KDebugger::handleRunCommands()
 	queueCmd(DCinfobreak, "info breakpoints", QMoverride);
     }
 
-    // get the backtrace
-    if (m_programActive) {
+    // get the backtrace if the program is running or if we have a core file
+    if (m_programActive || !m_corefile.isEmpty()) {
 	queueCmd(DCbt, "bt", QMoverride);
     } else {
 	// program finished: erase PC
@@ -1976,6 +2025,15 @@ void KDebugger::removeExpr(ExprWnd* wnd, VarTree* var)
     }
 
     wnd->removeExpr(var);
+}
+
+KDebugger::CmdQueueItem* KDebugger::loadCoreFile()
+{
+    if (m_gdbMajor > 4 || (m_gdbMajor == 4 && m_gdbMinor >= 16)) {
+	return queueCmd(DCcorefile, "target core " + m_corefile, QMoverride);
+    } else {
+	return queueCmd(DCcorefile, "core-file " + m_corefile, QMoverride);
+    }
 }
 
 void KDebugger::slotLocalsExpanding(KTreeViewItem* item, bool& allow)

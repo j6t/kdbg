@@ -41,6 +41,7 @@ public:
     ~KDebugger();
     
     bool debugProgram(const QString& executable);
+    void setCoreFile(const QString& corefile) { m_corefile = corefile; }
 
 protected:
     // session properties
@@ -57,6 +58,7 @@ public:
 	DCnoconfirm,
 	DCtty,
 	DCexecutable,
+	DCcorefile,
 	DCinfolinemain,
 	DCinfolocals,
 	DCbt,
@@ -121,12 +123,15 @@ public:
 	// remember which expression when printing an expression
 	VarTree* m_expr;
 	ExprWnd* m_exprWnd;
+	// whether command was emitted due to direct user request (only set when relevant)
+	bool m_byUser;
 
 	CmdQueueItem(DbgCommand cmd, const QString& str) :
 		m_cmd(cmd),
 		m_cmdString(str),
 		m_expr(0),
-		m_exprWnd(0)
+		m_exprWnd(0),
+		m_byUser(false)
 	{ }
     };
     /**
@@ -175,11 +180,13 @@ protected:
     void dereferencePointer(ExprWnd* wnd, VarTree* var, bool immediate);
     void determineType(ExprWnd* wnd, VarTree* var);
     void removeExpr(ExprWnd* wnd, VarTree* var);
+    CmdQueueItem* loadCoreFile();
 
     bool m_haveExecutable;		/* has an executable been specified */
     bool m_programActive;		/* is the program active (possibly halting in a brkpt)? */
     bool m_programRunning;		/* is the program executing (not stopped)? */
     QString m_executable;
+    QString m_corefile;
     QString m_programArgs;
     KSimpleConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
     void saveProgramSettings();

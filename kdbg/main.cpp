@@ -58,15 +58,18 @@ int main(int argc, char** argv)
     debugger.show();
 
     if (!restored && argc > 1) {
+	// check for core file
+	if (argc > 2) {
+	    debugger.setCoreFile(argv[2]);
+	}
 	if (!debugger.debugProgram(argv[1])) {
 	    // failed
 	    TRACE("cannot start debugger");
 	    KMsgBox::message(&debugger, kapp->appName(),
-			     i18n("Cannot start debugger.\nExiting..."),
+			     i18n("Cannot start debugger."),
 			     KMsgBox::STOP,
 			     i18n("OK"));
 //	    delete keys;
-	    return 1;
 	}
     }
 
