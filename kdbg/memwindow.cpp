@@ -9,13 +9,14 @@
 #else
 #include <kapp.h>
 #endif
+#include <ksimpleconfig.h>
 #include "debugger.h"
 #include "dbgdriver.h"			/* memory dump formats */
 
 MemoryWindow::MemoryWindow(QWidget* parent, const char* name) :
 	QWidget(parent, name),
 	m_debugger(0),
-	m_expression(this, "expression"),
+	m_expression(true, this, "expression"),
 	m_memory(this, "memory"),
 	m_layout(this, 0, 2),
 	m_format(MDTword | MDThex)
@@ -29,6 +30,9 @@ MemoryWindow::MemoryWindow(QWidget* parent, const char* name) :
 
     QSize minSize = m_expression.sizeHint();
     m_expression.setMinimumSize(minSize);
+    m_expression.setInsertionPolicy(QComboBox::NoInsertion);
+    m_expression.setMaxCount(15);
+
     QSize memSize = m_memory.sizeHint();
     if (memSize.width() < 0 || memSize.height() < 0)	// sizeHint unimplemented?
 	memSize = minSize;
@@ -40,7 +44,13 @@ MemoryWindow::MemoryWindow(QWidget* parent, const char* name) :
     m_layout.activate();
 
     m_memory.setReadOnly(true);
-    connect(&m_expression, SIGNAL(returnPressed()), this, SLOT(slotNewExpression()));
+#if QT_VERSION < 200
+    connect(&m_expression, SIGNAL(activated(const char*)),
+	    this, SLOT(slotNewExpression(const char*)));
+#else
+    connect(&m_expression, SIGNAL(activated(const QString&)),
+	    this, SLOT(slotNewExpression(const QString&)));
+#endif
 
     // the popup menu
     m_popup.insertItem("&Bytes", MDTbyte);
@@ -62,6 +72,8 @@ MemoryWindow::MemoryWindow(QWidget* parent, const char* name) :
 
     m_expression.installEventFilter(this);
     m_memory.installEventFilter(this);
+
+    m_formatCache.setAutoDelete(true);
 }
 
 MemoryWindow::~MemoryWindow()
@@ -116,11 +128,49 @@ void MemoryWindow::handlePopup(QMouseEvent* ev)
     }
 }
 
-void MemoryWindow::slotNewExpression()
+// this slot is only needed for Qt 1.44
+void MemoryWindow::slotNewExpression(const char* newText)
 {
-    QString expr = m_expression.text();
-    expr = expr.simplifyWhiteSpace();
+    slotNewExpression(QString(newText));
+}
+
+void MemoryWindow::slotNewExpression(const QString& newText)
+{
+    QString text = newText.simplifyWhiteSpace();
+
+    // see if the string is in the list
+    // (note: must count downwards because of removeItem!)
+    for (int i = m_expression.count()-1; i >= 0; i--)
+    {
+	if (m_expression.text(i) == text) {
+	    // yes it is!
+	    // look up the format that was used last time for this expr
+	    unsigned* pFormat = m_formatCache[text];
+	    if (pFormat != 0) {
+		m_format = *pFormat;
+		m_debugger->setMemoryFormat(m_format);
+	    }
+	    // remove this text, will be inserted at the top
+	    m_expression.removeItem(i);
+	}
+    }
+    m_expression.insertItem(text, 0);
+
+    if (text.isEmpty()) {
+	// if format was not in the cache, insert it
+	if (m_formatCache[text] == 0) {
+	    m_formatCache.insert(text, new unsigned(m_format));
+	    
+	}
+    }
+
+    displayNewExpression(text);
+}
+
+void MemoryWindow::displayNewExpression(const QString& expr)
+{
     m_debugger->setMemoryExpression(expr);
+    m_expression.setEditText(expr);
 
     // clear memory dump if no dump wanted
     if (expr.isEmpty()) {
@@ -137,13 +187,74 @@ void MemoryWindow::slotTypeChange(int id)
 	m_format = (m_format & ~MDTformatmask) | id;
     m_debugger->setMemoryFormat(m_format);
 
+    // change the format in the cache
+    QString expr = m_expression.currentText();
+    expr = expr.simplifyWhiteSpace();
+    unsigned* pFormat = m_formatCache[expr];
+    if (pFormat != 0)
+	*pFormat = m_format;
+
     // force redisplay
-    slotNewExpression();
+    displayNewExpression(expr);
 }
 
 void MemoryWindow::slotNewMemoryDump(const QString& dump)
 {
     m_memory.setText(dump);
+}
+
+static const char MemoryGroup[] = "Memory";
+static const char NumExprs[] = "NumExprs";
+static const char ExpressionFmt[] = "Expression%d";
+static const char FormatFmt[] = "Format%d";
+
+void MemoryWindow::saveProgramSpecific(KSimpleConfig* config)
+{
+    KConfigGroupSaver s(config, MemoryGroup);
+
+    int numEntries = m_expression.count();
+    config->writeEntry(NumExprs, numEntries);
+    QString exprEntry;
+    QString fmtEntry;
+    for (int i = 0; i < numEntries;) {
+	QString text = m_expression.text(i);
+	i++;				/* entries are counted 1-based */
+	exprEntry.sprintf(ExpressionFmt, i);
+	fmtEntry.sprintf(FormatFmt, i);
+	config->writeEntry(exprEntry, text);
+	unsigned* pFormat = m_formatCache[text];
+	unsigned fmt = pFormat != 0  ?  *pFormat  :  MDTword | MDThex;
+	config->writeEntry(fmtEntry, fmt);
+    }
+}
+
+void MemoryWindow::restoreProgramSpecific(KSimpleConfig* config)
+{
+    KConfigGroupSaver s(config, MemoryGroup);
+
+    int numEntries = config->readNumEntry(NumExprs, 0);
+    m_expression.clear();
+
+    QString exprEntry;
+    QString fmtEntry;
+    // entries are counted 1-based
+    for (int i = 1; i <= numEntries; i++) {
+	exprEntry.sprintf(ExpressionFmt, i);
+	fmtEntry.sprintf(FormatFmt, i);
+	QString expr = config->readEntry(exprEntry);
+	unsigned fmt = config->readNumEntry(fmtEntry, MDTword | MDThex);
+	m_expression.insertItem(expr);
+	m_formatCache.replace(expr, new unsigned(fmt & (MDTsizemask | MDTformatmask)));
+    }
+
+    // initialize with top expression
+    if (numEntries > 0) {
+	m_expression.setCurrentItem(0);
+	QString expr = m_expression.text(0);
+	m_format = *m_formatCache[expr];
+	m_debugger->setMemoryFormat(m_format);
+	displayNewExpression(expr);
+    }
 }
 
 

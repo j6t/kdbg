@@ -451,6 +451,16 @@ signals:
      */
     void memoryDumpChanged(const QString&);
 
+    /**
+     * Gives other objects a chance to save program specific settings.
+     */
+    void saveProgramSpecific(KSimpleConfig* config);
+
+    /**
+     * Gives other objects a chance to restore program specific settings.
+     */
+    void restoreProgramSpecific(KSimpleConfig* config);
+
 protected:
     ExprWnd& m_localVariables;
     ExprWnd& m_watchVariables;

@@ -6,16 +6,18 @@
 #ifndef MEMWINDOW_H
 #define MEMWINDOW_H
 
+#include <qpopupmenu.h>
 #if QT_VERSION >= 200
 #include <qmultilineedit.h>
 #else
 #include <qmultilinedit.h>
 #endif
-#include <qlineedit.h>
+#include <qcombobox.h>
 #include <qlayout.h>
-#include <qpopupmenu.h>
+#include <qdict.h>
 
 class KDebugger;
+class KSimpleConfig;
 
 class MemoryWindow : public QWidget
 {
@@ -28,11 +30,12 @@ public:
 
 protected:
     KDebugger* m_debugger;
-    QLineEdit m_expression;
+    QComboBox m_expression;
     QMultiLineEdit m_memory;
     QVBoxLayout m_layout;
 
     unsigned m_format;
+    QDict<unsigned> m_formatCache;
 
     QPopupMenu m_popup;
 
@@ -41,11 +44,15 @@ protected:
     virtual bool eventFilter(QObject* o, QEvent* ev);
 
     void handlePopup(QMouseEvent* ev);
+    void displayNewExpression(const QString& expr);
 
 public slots:
-    void slotNewExpression();
+    void slotNewExpression(const char*);
+    void slotNewExpression(const QString&);
     void slotTypeChange(int id);
     void slotNewMemoryDump(const QString&);
+    void saveProgramSpecific(KSimpleConfig* config);
+    void restoreProgramSpecific(KSimpleConfig* config);
 };
 
 #endif // MEMWINDOW_H

@@ -603,6 +603,9 @@ void KDebugger::saveProgramSettings()
 	varName.sprintf(ExprFmt, watchNum);
 	m_programConfig->writeEntry(varName, item->getText());
     }
+
+    // give others a chance
+    emit saveProgramSpecific(m_programConfig);
 }
 
 void KDebugger::restoreProgramSettings()
@@ -663,6 +666,9 @@ void KDebugger::restoreProgramSettings()
 	}
 	addWatch(expr);
     }
+
+    // give others a chance
+    emit restoreProgramSpecific(m_programConfig);
 }
 
 /*

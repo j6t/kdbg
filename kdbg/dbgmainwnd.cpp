@@ -133,6 +133,10 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 
     connect(m_debugger, SIGNAL(memoryDumpChanged(const QString&)),
 	    m_memoryWindow, SLOT(slotNewMemoryDump(const QString&)));
+    connect(m_debugger, SIGNAL(saveProgramSpecific(KSimpleConfig*)),
+	    m_memoryWindow, SLOT(saveProgramSpecific(KSimpleConfig*)));
+    connect(m_debugger, SIGNAL(restoreProgramSpecific(KSimpleConfig*)),
+	    m_memoryWindow, SLOT(restoreProgramSpecific(KSimpleConfig*)));
 
     // thread window
     connect(m_debugger, SIGNAL(threadsChanged(QList<ThreadInfo>&)),
@@ -190,7 +194,7 @@ void DebuggerMainWnd::initMenu()
     m_menuView->setCheckable(true);
     m_menuView->insertItem(i18n("&Find..."), ID_VIEW_FINDDLG);
     m_menuView->insertSeparator();
-    m_menuView->insertItem(i18n("Source &code"), ID_VIEW_SOURCE);
+    i18n("Source &code");
     m_menuView->insertItem(i18n("Stac&k"), ID_VIEW_STACK);
     m_menuView->insertItem(i18n("&Locals"), ID_VIEW_LOCALS);
     m_menuView->insertItem(i18n("&Watched expressions"), ID_VIEW_WATCHES);
@@ -537,6 +541,9 @@ void DebuggerMainWnd::updateUIItem(UpdateUI* item)
 	break;
     case ID_VIEW_THREADS:
 	dockUpdateHelper(item, m_threads);
+	break;
+    case ID_VIEW_MEMORY:
+	dockUpdateHelper(item, m_memoryWindow);
 	break;
     case ID_VIEW_OUTPUT:
 	dockUpdateHelper(item, m_ttyWindow);
