@@ -9,10 +9,10 @@
 #include <qbrush.h>
 #include <qfileinfo.h>
 #include <qlistbox.h>
+#include <kapp.h>
 #if QT_VERSION >= 200
 #include <klocale.h>			/* i18n */
 #else
-#include <kapp.h>			/* i18n */
 #include <ctype.h>
 #endif
 #ifdef HAVE_CONFIG_H
