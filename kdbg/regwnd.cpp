@@ -15,6 +15,7 @@
 #endif
 #include <qpopmenu.h>
 #include <ctype.h>
+#include <stdlib.h>			/* strtoul */
 #include "regwnd.h"
 
 
@@ -117,7 +118,24 @@ static QString toOctal(QString hex)
 
 static QString toDecimal(QString hex)
 {
-    return hex;
+    /*
+     * We convert only numbers that are small enough for this computer's
+     * size of long integers.
+     */
+    if (hex.length() > sizeof(unsigned long)*2+2)	/*  count in leading "0x" */
+	return hex;
+
+#if QT_VERSION >= 200
+    const char* start = hex.latin1();
+#else
+    const char* start = hex;
+#endif
+    char* end;
+    unsigned long val = strtoul(start, &end, 0);
+    if (start == end)
+	return hex;
+    else
+	return QString().setNum(val);
 }
 
 #undef DIGIT
