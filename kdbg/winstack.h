@@ -33,6 +33,8 @@ public:
     const QString& fileName() const { return m_fileName; }
     void updateLineItems(const BreakpointTable& bpt);
     void setPC(bool set, int lineNo, int frameNo);
+    enum FindDirection { findForward = 1, findBackward = -1 };
+    void find(const char* text, bool caseSensitive, FindDirection dir);
 
 protected:
     virtual int textCol() const;
@@ -65,22 +67,17 @@ public:
     const char* searchText() const { return m_searchText.text(); }
     virtual void done(int result);
 
-signals:
-    void findForwardClicked();
-    void findBackwardClicked();
-    void closed();
-
-public slots:
-    void slotFindForward();
-    void slotFindBackward();
-
-protected:
-    virtual void closeEvent(QCloseEvent* ev);
     QLineEdit m_searchText;
     QCheckBox m_caseCheck;
     QPushButton m_buttonForward;
     QPushButton m_buttonBackward;
     QPushButton m_buttonClose;
+
+signals:
+    void closed();
+
+protected:
+    virtual void closeEvent(QCloseEvent* ev);
     QVBoxLayout m_layout;
     QHBoxLayout m_buttons;
 };

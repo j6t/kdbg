@@ -230,6 +230,40 @@ void FileWindow::setPC(bool set, int lineNo, int frameNo)
     }
 }
 
+void FileWindow::find(const char* text, bool caseSensitive, FindDirection dir)
+{
+    ASSERT(dir == 1 || dir == -1);
+    if (m_texts.size() == 0 || text == 0 || *text == '\0')
+	return;
+
+    int line, dummyCol;
+    cursorPosition(&line, &dummyCol);
+    if (line < 0)
+	line = 0;
+    int curLine = line;			/* remember where we started */
+    QString str;
+    bool found = false;
+    do {
+	// advance and wrap around
+	line += dir;
+	if (line < 0)
+	    line = m_texts.size()-1;
+	else if (line >= int(m_texts.size()))
+	    line = 0;
+	// search text
+	if (caseSensitive) {
+	    found = strstr(m_texts[line], text) != 0;
+	} else {
+	    int len = strlen(m_texts[line]);
+	    str.setRawData(m_texts[line], len);
+	    found = str.find(text, 0, false) >= 0;
+	    str.resetRawData(m_texts[line], len);
+	}
+    } while (!found && line != curLine);
+
+    scrollTo(line);
+}
+
 
 
 WinStack::WinStack(QWidget* parent, const char* name, const BreakpointTable& bpt) :
@@ -240,6 +274,10 @@ WinStack::WinStack(QWidget* parent, const char* name, const BreakpointTable& bpt
 	m_pcLine(-1),
 	m_bpTable(bpt)
 {
+    connect(&m_findDlg.m_buttonForward,
+	    SIGNAL(clicked()), SLOT(slotFindForward()));
+    connect(&m_findDlg.m_buttonBackward,
+	    SIGNAL(clicked()), SLOT(slotFindBackward()));
 }
 
 WinStack::~WinStack()
@@ -485,10 +523,16 @@ void WinStack::slotLineChanged()
 
 void WinStack::slotFindForward()
 {
+    if (m_activeWindow != 0)
+	m_activeWindow->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
+			     FileWindow::findForward);
 }
 
 void WinStack::slotFindBackward()
 {
+    if (m_activeWindow != 0)
+	m_activeWindow->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
+			     FileWindow::findBackward);
 }
 
 
@@ -524,12 +568,9 @@ FindDialog::FindDialog() :
     maxSize.expandedTo(m_buttonClose.sizeHint());
 
     m_buttonForward.setMinimumSize(maxSize);
-    connect(&m_buttonForward, SIGNAL(clicked()), SLOT(slotFindForward()));
-
     m_buttonBackward.setMinimumSize(maxSize);
-    connect(&m_buttonBackward, SIGNAL(clicked()), SLOT(slotFindBackward()));
-
     m_buttonClose.setMinimumSize(maxSize);
+
     connect(&m_buttonClose, SIGNAL(clicked()), SLOT(reject()));
 
     m_layout.addWidget(&m_searchText);
@@ -550,16 +591,6 @@ FindDialog::FindDialog() :
 
 FindDialog::~FindDialog()
 {
-}
-
-void FindDialog::slotFindForward()
-{
-    emit findForwardClicked();
-}
-
-void FindDialog::slotFindBackward()
-{
-    emit findBackwardClicked();
 }
 
 void FindDialog::closeEvent(QCloseEvent* ev)
