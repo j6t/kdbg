@@ -42,6 +42,11 @@ public:
     KDebugger(const char* name);
     ~KDebugger();
     
+    /**
+     * This function starts to debug the specified executable.
+     * @return false if an error occurs, in particular if a program is
+     * currently being debugged
+     */
     bool debugProgram(const QString& executable);
     void setCoreFile(const QString& corefile) { m_corefile = corefile; }
 
@@ -206,6 +211,7 @@ protected:
     // debugger process
     GdbProcess m_gdb;
     int m_gdbMajor, m_gdbMinor;
+    bool m_explicitKill;		/* whether we are killing gdb ourselves */
 
 #ifdef GDB_TRANSCRIPT
     // log file
@@ -247,6 +253,46 @@ public slots:
     void slotFrameTabChanged(int);
     
 signals:
+    /**
+     * This signal is emitted whenever a part of the debugger needs to
+     * highlight the specfied source code line (e.g. when the program
+     * stops).
+     * 
+     * @param file specifies the file; this is not necessarily a full path
+     * name, and if it is relative, you won't know relative to what, you
+     * can only guess.
+     * @param lineNo specifies the line number (0-based!) (this may be
+     * negative, in which case the file should be activated, but the line
+     * should NOT be changed).
+     */
+    void activateFileLine(const QString& file, int lineNo);
+
+    /**
+     * This signal is emitted when a line decoration item (those thingies
+     * that indicate breakpoints) must be changed.
+     */
+    void lineItemsChanged();
+
+    /**
+     * This signal is a special case of @ref #lineItemsChanged because it
+     * indicates that only the program counter has changed.
+     *
+     * @param filename specifies the filename where the program stopped
+     * @param lineNo specifies the line number (zero-based); it can be -1
+     * if it is unknown
+     * @param frameNo specifies the frame number: 0 is the innermost frame,
+     * positive numbers are frames somewhere up the stack (indicates points
+     * where a function was called); the latter cases should be indicated
+     * differently in the source window.
+     */
+    void updatePC(const QString& filename, int lineNo, int frameNo);
+
+    /**
+     * This signal is emitted when gdb detects that the executable has been
+     * updated, e.g. recompiled. (You usually need not handle this signal
+     * if you are the editor which changed the executable.)
+     */
+    void executableUpdated();
     void forwardMenuCallback(int item);
     
 protected:

@@ -109,9 +109,6 @@ public:
     void setWindowMenu(QPopupMenu* menu);
     void selectWindow(int index);	/* 1-based index, 0 means dialog More... */
     bool activeLine(QString& filename, int& lineNo);
-    void updateLineItems();
-    void updatePC(const QString& filename, int lineNo, int frameNo);
-    void reloadAllFiles();
 
     virtual void resizeEvent(QResizeEvent*);
 
@@ -128,6 +125,9 @@ public slots:
     virtual void slotFindBackward();
     virtual void slotFileWindowRightClick(const QPoint &);
     virtual void activate(const QString& filename, int lineNo);
+    void updatePC(const QString& filename, int lineNo, int frameNo);
+    void reloadAllFiles();
+    void updateLineItems();
 
     // Right click on file panner when no file is loaded.
     virtual void slotWidgetRightClick(const QPoint &);

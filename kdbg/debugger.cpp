@@ -131,9 +131,6 @@ KDebugger::KDebugger(const char* name) :
 	    SLOT(slotLocalsExpanding(KTreeViewItem*,bool&)));
 
     m_leftPanner.activate(&m_filesWindow, &m_btWindow);
-    connect(&m_btWindow, SIGNAL(highlighted(int)), SLOT(gotoFrame(int)));
-    connect(&m_watchVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
-	    SLOT(slotWatchExpanding(KTreeViewItem*,bool&)));
 
 #ifdef WANT_THIS_PANE
     // must set minimum size to make panner work
@@ -146,6 +143,8 @@ KDebugger::KDebugger(const char* name) :
     connect(&m_watchAdd, SIGNAL(clicked()), SLOT(slotAddWatch()));
     connect(&m_watchDelete, SIGNAL(clicked()), SLOT(slotDeleteWatch()));
     connect(&m_watchVariables, SIGNAL(highlighted(int)), SLOT(slotWatchHighlighted(int)));
+    connect(&m_watchVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
+	    SLOT(slotWatchExpanding(KTreeViewItem*,bool&)));
     
     // setup the watch window layout
     m_watchAdd.setMinimumSize(m_watchAdd.sizeHint());
@@ -162,6 +161,14 @@ KDebugger::KDebugger(const char* name) :
 	    SLOT(slotToggleBreak(const QString&,int)));
     connect(&m_filesWindow, SIGNAL(enadisBreak(const QString&, int)),
 	    SLOT(slotEnaDisBreak(const QString&,int)));
+    connect(this, SIGNAL(activateFileLine(const QString&,int)),
+	    &m_filesWindow, SLOT(activate(const QString&,int)));
+    connect(this, SIGNAL(executableUpdated()),
+	    &m_filesWindow, SLOT(reloadAllFiles()));
+    connect(this, SIGNAL(updatePC(const QString&,int,int)),
+	    &m_filesWindow, SLOT(updatePC(const QString&,int,int)));
+    connect(this, SIGNAL(lineItemsChanged()),
+	    &m_filesWindow, SLOT(updateLineItems()));
 	
     // Establish communication when right clicked on file window.
     connect(&m_filesWindow.m_menuFloat, SIGNAL(activated(int)),
@@ -171,6 +178,8 @@ KDebugger::KDebugger(const char* name) :
     // loaded.
     connect(&m_filesWindow.m_menuFileFloat, SIGNAL(activated(int)),
 	    SLOT(menuCallback(int)));
+
+    connect(&m_btWindow, SIGNAL(highlighted(int)), SLOT(gotoFrame(int)));
 
     m_bpTable.setCaption(i18n("Breakpoints"));
     connect(&m_bpTable, SIGNAL(closed()), SLOT(updateUI()));
@@ -714,6 +723,71 @@ void KDebugger::initAnimation()
     connect(&m_animationTimer, SIGNAL(timeout()), SLOT(slotAnimationTimeout()));
 }
 
+
+//////////////////////////////////////////////////////////////////////
+// external interface
+
+bool KDebugger::debugProgram(const QString& name)
+{
+    TRACE(__PRETTY_FUNCTION__);
+    // check for running program
+    if (!m_executable.isEmpty()) {
+	return false;
+    }
+
+    // check the file name
+    QFileInfo fi(name);
+    if (!fi.isFile()) {
+	QString msgFmt = i18n("`%s' is not a file or does not exist");
+	QString msg(msgFmt.length() + name.length() + 20);
+	msg.sprintf(msgFmt, name.data());
+	KMsgBox::message(this, kapp->appName(),
+			 msg,
+			 KMsgBox::STOP,
+			 i18n("OK"));
+	return false;
+    }
+
+    if (!m_gdb.isRunning()) {
+	if (!startGdb()) {
+	    TRACE("startGdb failed");
+	    return false;
+	}
+    }
+
+    TRACE("before file cmd");
+    executeCmd(DCexecutable, "file " + name);
+    m_executable = name;
+
+    // create the program settings object
+    QString pgmConfigFile = fi.dirPath(false);
+    if (!pgmConfigFile.isEmpty()) {
+	pgmConfigFile += '/';
+    }
+    pgmConfigFile += ".kdbgrc." + fi.fileName();
+    TRACE("program config file = " + pgmConfigFile);
+    // check whether we can write to the file
+    QFile file(pgmConfigFile);
+    bool readonly = true;
+    bool openit = true;
+    if (file.open(IO_ReadWrite)) {	/* don't truncate! */
+	readonly = false;
+	// the file exists now
+    } else if (!file.open(IO_ReadOnly)) {
+	/* file does not exist and cannot be created: don't use it */
+	openit = false;
+    }
+    if (openit) {
+	m_programConfig = new KSimpleConfig(pgmConfigFile, readonly);
+	// it is read in later in the handler of DCexecutable
+    }
+
+    emit updateUI();
+    slotFileChanged();
+
+    return true;
+}
+
 #ifdef WANT_THIS_PANE
 bool KDebugger::isThisPaneVisible()
 {
@@ -748,6 +822,7 @@ bool KDebugger::startGdb()
 	<< "-fullname"			/* to get standard file names each time the prog stops */
 	<< "-nx";			/* do not execute initialization files */
 
+    m_explicitKill = false;
     if (!m_gdb.start(KProcess::NotifyOnExit,
 		     KProcess::Communication(KProcess::Stdin|KProcess::Stdout))) {
 	return false;
@@ -769,6 +844,7 @@ bool KDebugger::startGdb()
 
 void KDebugger::stopGdb()
 {
+    m_explicitKill = true;
     m_gdb.kill(SIGTERM);
     m_state = DSidle;
 }
@@ -788,14 +864,11 @@ void KDebugger::gdbExited(KProcess*)
 	m_programConfig = 0;
     }
 
-    if (m_gdb.normalExit()) {
+    if (m_explicitKill) {
 	TRACE("gdb exited normally");
     } else {
-	int status = m_gdb.exitStatus();
-	QString msgFmt = i18n("gdb exited unexpectedly (status 0x%x)\n"
-			      "Restart the session (e.g. with File|Executable).");
-	QString msg(msgFmt.length()+20);
-	msg.sprintf(msgFmt, status);
+	const char* msg = i18n("gdb exited unexpectedly.\n"
+			       "Restart the session (e.g. with File|Executable).");
 	KMsgBox::message(this, kapp->appName(), msg, KMsgBox::EXCLAMATION);
     }
 
@@ -805,13 +878,14 @@ void KDebugger::gdbExited(KProcess*)
     m_executable = "";
     m_programActive = false;
     m_programRunning = false;
+    m_explicitKill = false;
     // empty buffer
     m_gdbOutputLen = 0;
     *m_gdbOutput = '\0';
 
     // stop gear wheel and erase PC
     stopAnimation();
-    m_filesWindow.updatePC(QString(), -1, 0);
+    emit updatePC(QString(), -1, 0);
 }
 
 const char fifoNameBase[] = "/tmp/kdbgttywin%05d";
@@ -909,64 +983,6 @@ bool KDebugger::createOutputWindow()
 	m_outputTermPID = pid;
 	TRACE(QString().sprintf("tty=%s", m_outputTermName.data()));
     }
-    return true;
-}
-
-bool KDebugger::debugProgram(const QString& name)
-{
-    TRACE(__PRETTY_FUNCTION__);
-    // TODO: check for running program
-
-    // check the file name
-    QFileInfo fi(name);
-    if (!fi.isFile()) {
-	QString msgFmt = i18n("`%s' is not a file or does not exist");
-	QString msg(msgFmt.length() + name.length() + 20);
-	msg.sprintf(msgFmt, name.data());
-	KMsgBox::message(this, kapp->appName(),
-			 msg,
-			 KMsgBox::STOP,
-			 i18n("OK"));
-	return false;
-    }
-
-    if (!m_gdb.isRunning()) {
-	if (!startGdb()) {
-	    TRACE("startGdb failed");
-	    return false;
-	}
-    }
-
-    TRACE("before file cmd");
-    executeCmd(DCexecutable, "file " + name);
-    m_executable = name;
-
-    // create the program settings object
-    QString pgmConfigFile = fi.dirPath(false);
-    if (!pgmConfigFile.isEmpty()) {
-	pgmConfigFile += '/';
-    }
-    pgmConfigFile += ".kdbgrc." + fi.fileName();
-    TRACE("program config file = " + pgmConfigFile);
-    // check whether we can write to the file
-    QFile file(pgmConfigFile);
-    bool readonly = true;
-    bool openit = true;
-    if (file.open(IO_ReadWrite)) {	/* don't truncate! */
-	readonly = false;
-	// the file exists now
-    } else if (!file.open(IO_ReadOnly)) {
-	/* file does not exist and cannot be created: don't use it */
-	openit = false;
-    }
-    if (openit) {
-	m_programConfig = new KSimpleConfig(pgmConfigFile, readonly);
-	// it is read in later in the handler of DCexecutable
-    }
-
-    emit updateUI();
-    slotFileChanged();
-
     return true;
 }
 
@@ -1412,7 +1428,7 @@ void KDebugger::parse(CmdQueueItem* cmd)
 	// note: this handler must not enqueue a command, since
 	// DCinfobreak is used at various different places.
 	m_bpTable.updateBreakList(m_gdbOutput);
-	m_filesWindow.updateLineItems();
+	emit lineItemsChanged();
 	break;
     case DCfindType:
 	handleFindType(cmd);
@@ -1447,7 +1463,7 @@ void KDebugger::parse(CmdQueueItem* cmd)
 
 		    // now show the window
 		    startMarker[lineNoStart] = '\0';   /* split off file name */
-		    m_filesWindow.activate(startMarker, lineNo-1);
+		    emit activateFileLine(startMarker, lineNo-1);
 		}
 	    }
 	}
@@ -1506,7 +1522,7 @@ void KDebugger::handleRunCommands()
     // refresh files if necessary
     if (refreshNeeded) {
 	TRACE("re-reading files");
-	m_filesWindow.reloadAllFiles();
+	emit executableUpdated();
     }
 
     /*
@@ -1523,7 +1539,7 @@ void KDebugger::handleRunCommands()
 	queueCmd(DCbt, "bt", QMoverride);
     } else {
 	// program finished: erase PC
-	m_filesWindow.updatePC(QString(), -1, 0);
+	emit updatePC(QString(), -1, 0);
     }
 
     m_programRunning = false;
@@ -1936,7 +1952,7 @@ void KDebugger::handleBacktrace()
 	// first frame must set PC
 	TRACE(QString(func.length()+file.length()+100).sprintf("frame %s (%s:%d)",func.data(),file.data(),lineNo));
 	m_btWindow.insertItem(func);
-	m_filesWindow.updatePC(file, lineNo-1, frameNo);
+	emit updatePC(file, lineNo-1, frameNo);
 
 	while (parseFrame(s, frameNo, func, file, lineNo)) {
 	    TRACE(QString(func.length()+file.length()+100).sprintf("frame %s (%s:%d)",func.data(),file.data(),lineNo));
@@ -1962,9 +1978,9 @@ void KDebugger::handleFrameChange()
     const char* s = m_gdbOutput;
     if (parseFrame(s, frameNo, func, fileName, lineNo)) {
 	/* lineNo can be 0 here if we can't find a file name */
-	m_filesWindow.updatePC(fileName, lineNo-1, frameNo);
+	emit updatePC(fileName, lineNo-1, frameNo);
     } else {
-	m_filesWindow.updatePC(fileName, -1, frameNo);
+	emit updatePC(fileName, -1, frameNo);
     }
 }
 
