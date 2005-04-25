@@ -3,6 +3,7 @@ html_DATA = \
 	breakptlist.html \
 	globaloptions.html \
 	howdoi.html \
+	invocation.html \
 	localvars.html \
 	memory.html \
 	pgmoutput.html \
@@ -14,6 +15,7 @@ html_DATA = \
 	tips.html \
 	types.html \
 	watches.html \
+	xslt.html \
 	index.html
 
 htmldir = $(kde_htmldir)/en/kdbg
