@@ -2050,12 +2050,17 @@ bool GdbDriver::parseFindType(const char* output, QString& type)
 	return false;
 
     /*
-     * Everything else is the type. We strip off all white-space from the
-     * type.
+     * Everything else is the type. We strip off any leading "const" and any
+     * trailing "&" on the grounds that neither affects the decoding of the
+     * object. We also strip off all white-space from the type.
      */
     output += 7;
+    if (strncmp(output, "const ", 6) == 0)
+        output += 6;
     type = output;
     type.replace(QRegExp("\\s+"), "");
+    if (type.endsWith("&"))
+        type.truncate(type.length() - 1);
     return true;
 }
 

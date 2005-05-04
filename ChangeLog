@@ -1,3 +1,8 @@
+Version 1.9.8
+
+	References and const types are treated like the base type (thanks to
+	Shaheed).
+
 Version 1.9.7
 
 	Added a new animated button in the toolbar.
