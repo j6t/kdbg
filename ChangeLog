@@ -3,6 +3,9 @@ Version 1.9.8
 	References and const types are treated like the base type (thanks to
 	Shaheed).
 
+	Fixed parsing of large arrays with many different values, which were
+	terminated by "...".
+
 Version 1.9.7
 
 	Added a new animated button in the toolbar.

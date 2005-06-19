@@ -26,12 +26,16 @@ int main()
     for (int i = 1; i < 29; i++)
 	apf[i] = f;
 
-    QString s[50];
+    QString s[300];
 
-    for (int i = 0; i < 50; i++)
+    for (int i = 0; i < 300; i++)
 	s[i].sprintf("String %d", i);
 
     s[21] = s[48];
+
+    int many[300];
+    for (int i = 0; i < 300; i++)
+	    many[i] = i;
 
     return 0;
 }

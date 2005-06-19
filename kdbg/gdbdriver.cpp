@@ -1147,10 +1147,14 @@ repeat:
 	    while (isdigit(*p))
 		p++;
 	    if (*p == '.') {		/* TODO: obey i18n? */
-		// fractional part
-		p++;
-		while (isdigit(*p))
+		// In long arrays an integer may be followed by '...'.
+		// We test for this situation and don't gobble the '...'.
+		if (p[1] != '.' || p[0] != '.') {
+		    // fractional part
 		    p++;
+		    while (isdigit(*p))
+			p++;
+		}
 	    }
 	    if (*p == 'e' || *p == 'E') {
 		p++;
@@ -1352,6 +1356,15 @@ static bool parseValueSeq(const char*& s, VarTree* variable)
 	    index++;
 	}
 	variable->appendChild(var);
+	// long arrays may be terminated by '...'
+	if (strncmp(s, "...", 3) == 0) {
+	    s += 3;
+	    VarTree* var = new VarTree("...", VarTree::NKplain);
+	    var->setDeleteChildren(true);
+	    var->m_value = i18n("<additional entries of the array suppressed>");
+	    variable->appendChild(var);
+	    break;
+	}
 	if (*s != ',') {
 	    break;
 	}
