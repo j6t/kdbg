@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-03-12 11:26+0100\n"
+"POT-Creation-Date: 2005-07-10 15:01+0200\n"
 "PO-Revision-Date: 2002-03-03 16:16MDT\n"
 "Last-Translator: Mucsi László <lmucsi@freemail.hu>\n"
 "Language-Team: Hungarian <kde-lista@sophia.jpte.hu>\n"
@@ -127,7 +127,11 @@ msgstr "&Feltétel:"
 msgid "Ignore &next hits:"
 msgstr "Következö találatok &kihagyása:"
 
-#: gdbdriver.cpp:1906 xsldbgdriver.cpp:1351
+#: gdbdriver.cpp:1364
+msgid "<additional entries of the array suppressed>"
+msgstr ""
+
+#: gdbdriver.cpp:1919 xsldbgdriver.cpp:1351
 msgid "New working directory: "
 msgstr "Új munkakönyvtár"
 

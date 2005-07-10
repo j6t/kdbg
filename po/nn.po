@@ -9,7 +9,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: OTHERS/kdbg\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-03-12 11:26+0100\n"
+"POT-Creation-Date: 2005-07-10 15:01+0200\n"
 "PO-Revision-Date: 2002-03-03 16:10MDT\n"
 "Last-Translator: Gaute Hvoslef Kvalnes <ai98ghk@stud.hib.no>\n"
 "Language-Team: Norsk (nynorsk)\n"
@@ -131,7 +131,11 @@ msgstr "&Vilkår:"
 msgid "Ignore &next hits:"
 msgstr "Ignorer &neste treff:"
 
-#: gdbdriver.cpp:1906 xsldbgdriver.cpp:1351
+#: gdbdriver.cpp:1364
+msgid "<additional entries of the array suppressed>"
+msgstr ""
+
+#: gdbdriver.cpp:1919 xsldbgdriver.cpp:1351
 msgid "New working directory: "
 msgstr "Ny arbeidskatalog: "
 
