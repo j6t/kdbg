@@ -9,6 +9,8 @@ Version 2.0.0
 	Fixed the kdbg.desktop file: Encoding is UTF-8, install in XDG menu
 	location.
 
+	Fixed PS_COMMAND detection for Solaris' /bin/sh.
+
 Version 1.9.7
 
 	Added a new animated button in the toolbar.

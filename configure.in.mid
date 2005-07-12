@@ -105,7 +105,7 @@ if test -n "$PS_COMMAND"; then
 
   if test -n "$PS_COMMAND"; then
     AC_MSG_RESULT($PS_COMMAND)
-    PS_COMMAND="\"`echo $PS_COMMAND | sed -e 's/ /", "/g'`\""
+    PS_COMMAND=\"`echo $PS_COMMAND | sed -e 's/ /", "/g'`\"
     AC_DEFINE_UNQUOTED(PS_COMMAND, $PS_COMMAND,
       [Define how to invoke ps])
   else
