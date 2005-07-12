@@ -6,7 +6,8 @@ Version 2.0.0
 	Fixed parsing of large arrays with many different values, which were
 	terminated by "...".
 
-	Fixed the encoding of the kdbg.desktop file to UTF-8.
+	Fixed the kdbg.desktop file: Encoding is UTF-8, install in XDG menu
+	location.
 
 Version 1.9.7
 

@@ -93,8 +93,7 @@ kdbg_METASOURCES = AUTO
 # them while "make distclean", use DISTCLEANFILES
 CLEANFILES = $(kdbg_METASOURCES)
 
-apps_DATA = kdbg.desktop
-appsdir = $(kde_appsdir)/Development
+xdg_apps_DATA = kdbg.desktop
 
 rcdir = $(kde_datadir)/kdbg
 rc_DATA = kdbgui.rc
