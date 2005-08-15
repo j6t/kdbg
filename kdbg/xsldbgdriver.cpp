@@ -770,17 +770,14 @@ parseVar(const char *&s)
 
 	TRACE("Found print expr");
         if (nextLine) {
-            char nameBuffer[100];
-
             p = p + 2;          /* skip the "= " */
-            strncpy(nameBuffer, p, nextLine - p);
+            name = FROM_LATIN1(p, nextLine - p);
+            kind = VarTree::NKplain;
             p = nextLine + 1;
-            variable = new VarTree(nameBuffer, kind);
-            if (variable != 0L) {
-		variable->m_varKind = VarTree::VKsimple;
-                variable->setDeleteChildren(true);
-                parseValue(p, variable);
-            }
+            variable = new VarTree(name, kind);
+            variable->m_varKind = VarTree::VKsimple;
+            variable->setDeleteChildren(true);
+            parseValue(p, variable);
             return variable;
         }
     } else
