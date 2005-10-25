@@ -72,7 +72,7 @@ static GdbCmdInfo cmds[] = {
     { DCtargetremote, "target remote %s\n", GdbCmdInfo::argString },
     { DCcorefile, "core-file %s\n", GdbCmdInfo::argString },
     { DCattach, "attach %s\n", GdbCmdInfo::argString },
-    { DCinfolinemain, "info line main\n", GdbCmdInfo::argNone },
+    { DCinfolinemain, "kdbg_infolinemain\n", GdbCmdInfo::argNone },
     { DCinfolocals, "kdbg__alllocals\n", GdbCmdInfo::argNone },
     { DCinforegisters, "info all-registers\n", GdbCmdInfo::argNone},
     { DCexamine, "x %s %s\n", GdbCmdInfo::argString2 },
@@ -242,6 +242,13 @@ bool GdbDriver::startup(QString cmdStr)
 	"define kdbg__alllocals\n"
 	"info locals\n"			/* local vars supersede args with same name */
 	"info args\n"			/* therefore, arguments must come last */
+	"end\n"
+	/*
+	 * Work around a bug in gdb-6.3: "info line main" crashes gdb.
+	 */
+	"define kdbg_infolinemain\n"
+	"list\n"
+	"info line\n"
 	"end\n"
 	// change prompt string and synchronize with gdb
 	"set prompt " PROMPT "\n"

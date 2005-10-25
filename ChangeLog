@@ -2,6 +2,9 @@ Version 2.0.1
 
 	Updated Hungarian translation (thanks to Tamas Szanto).
 
+	Worked around gdb 6.3 crashes at "info line main" command (thanks to
+	Stefan Taferner).
+
 Version 2.0.0
 
 	References and const types are treated like the base type (thanks to
