@@ -104,11 +104,11 @@ static XsldbgCmdInfo cmds[] = {
 XsldbgDriver::XsldbgDriver():
 DebuggerDriver(), m_gdbMajor(2), m_gdbMinor(0)
 {
-    m_promptRE.setPattern("\\(xsldbg\\) .*> $");
+    m_promptRE.setPattern("\\(xsldbg\\) .*> ");
     m_promptMinLen = 11;
     m_promptLastChar = ' ';
   
-    m_markerRE.setPattern("^Breakpoint at file ");
+    m_markerRE.setPattern("^Breakpoint for file ");
     m_haveDataFile = FALSE;
 
 #ifndef NDEBUG
@@ -183,7 +183,7 @@ XsldbgDriver::driverName() const
 QString
 XsldbgDriver::defaultXsldbg()
 {
-    return "xsldbg --shell --gdb";
+    return "xsldbg --lang en --shell --gdb";
 }
 
 QString
@@ -235,7 +235,7 @@ XsldbgDriver::startup(QString cmdStr)
     if (!DebuggerDriver::startup(cmdStr))
 	return false;
 
-    static const char xsldbgInitialize[] = "pwd\n";     /* don't need to do anything else */
+    static const char xsldbgInitialize[] = "pwd\nsetoption gdb 2\n";     /* don't need to do anything else */
 
     executeCmdString(DCinitialize, xsldbgInitialize, false);
 
@@ -356,7 +356,7 @@ XsldbgDriver::parseMarker()
     *endMarker = '\0';
 
     // extract filename and line number
-    static QRegExp MarkerRE(" : line [0-9]+");
+    static QRegExp MarkerRE(" at line [0-9]+");
 
     int lineNoStart = MarkerRE.match(startMarker, 0, &len);
 
@@ -366,8 +366,9 @@ XsldbgDriver::parseMarker()
         DbgAddr address;
 
         // now show the window
-        startMarker[lineNoStart] = '\0';        /* split off file name */
+        startMarker[lineNoStart-1] = '\0';        /* split off file name */
         TRACE("Got file and line number");
+	startMarker++;
         TRACE(QString(startMarker) + ": " +  QString::number(lineNo));
         emit activateFileLine(startMarker, lineNo - 1, address);
     }
@@ -666,20 +667,22 @@ isErrorExpr(const char *output)
 {
     int  wordIndex;
     bool result = false;
-#define   ERROR_WORD_COUNT 5
+#define   ERROR_WORD_COUNT 6
     static const char *errorWords[ERROR_WORD_COUNT] = {
       "Error:", 
       "error:", // libxslt error 
       "Unknown command",  
       "Warning:",
-      "warning:" // libxslt warning
+      "warning:", // libxslt warning
+      "Information:" // xsldbg information	
     };
     static int errorWordLength[ERROR_WORD_COUNT] = {
       6,  /* Error */
       6,  /* rror */
       15, /* Unknown command*/ 
       8,  /* Warning */
-      8  /* warning */
+      8,  /* warning */
+      12  /* Information */
     };
     
     for (wordIndex = 0; wordIndex < ERROR_WORD_COUNT; wordIndex++){
@@ -687,7 +690,7 @@ isErrorExpr(const char *output)
 		  errorWords[wordIndex], 
 		  errorWordLength[wordIndex]) == 0){
 	result = true;
-        TRACE(QString("Error/Warning from xsldbg ") + output);
+        TRACE(QString("Error/Warning/Information from xsldbg ") + output);
 	break;
       }
     }
@@ -880,6 +883,7 @@ parseValue(const char *&s, VarTree * variable)
         "Reached ",             /* reached template */
         "Error:",
 	 "Warning:",
+	 "Information:",
         "runtime error",
 	 "xmlXPathEval:",
 	0		     				     
@@ -969,17 +973,22 @@ parseFrameInfo(const char *&s, QString & func,
     const char *p = s, *endPos = s + strlen(s);
     QString lineNoString;
 
+    TRACE("parseFrameInfo");
+
     lineNo = -1;
 
     /* skip 'template :\" */
     p = p + 11;
-    //TRACE("parseFrameInfo");
     //    TRACE(p);
     func = "";
     while ((*p != '\"') && (*p != '\0')) {
         func.append(*p);
         p++;
     }
+    while ((*p != '\0') && *p != '"')
+      p++;
+    if (*p != '\0')
+      p++;
     ASSERT(p <= endPos);
     if (p >= endPos) {
         /* panic */
@@ -987,38 +996,41 @@ parseFrameInfo(const char *&s, QString & func,
     }
 
     /* skip  mode :".*" */
-    while (p && *p != '"')
-      p++;
-    if (p)
-      p++;
-    while (p && *p != '"')
+    while ((*p != '\0') && *p != '"')
       p++;   
-    if (p)
+    if (*p != '\0')
       p++;
-    while (p && *p != '"')
-      p++; 
+    while ((*p != '\0')  && *p != '"')
+      p++;
+ 
     /* skip '" in file ' */
     p = p + 10;
+    if(*p == '"')
+      p++; 
     //   TRACE(p);
     file = "";
-    while (!isspace(*p) && (*p != '\0')) {
+    while (!isspace(*p) && (*p != '\"') && (*p != '\0')) {
         file.append(*p);
         p++;
     }
+    if(*p == '"')
+      p++; 
     ASSERT(p <= endPos);
     if (p >= endPos) {
         /* panic */
         return;
     }
+
     //    TRACE(p);
     /* skip  ' : line '" */
-    p = p + 8;
+    p = p + 9;
     //    TRACE(p);
     ASSERT(p <= endPos);
     if (p >= endPos) {
         /* panic */
         return;
     }
+    //    TRACE(p);
     if (isdigit(*p)) {
         /* KDbg uses an offset of +1 for its line numbers */
         lineNo = atoi(p) - 1;
@@ -1029,9 +1041,6 @@ parseFrameInfo(const char *&s, QString & func,
     func.append(file);
     func.append(':');
     func.append(lineNoString);
-
-    //TRACE(QString("Got frame : template :\"") + func + "\"file:" +
-    //      file + " line : " + lineNoString);
 
     /*advance to next line */
     p = strchr(p, '\n');
@@ -1134,8 +1143,9 @@ XsldbgDriver::parseBreakList(const char *output,
     p =  strchr(output, '\n');/* skip the first blank line*/
 
     while ((p != 0) && (*p != '\0')) {
+	if (*p == '\n')
+	    p++;
         templateName = QString();
-        p++;
         Breakpoint::Type bpType = Breakpoint::breakpoint;
         //qDebug("Looking at :%s", p);
         if (strncmp(p, " Breakpoint", 11) != 0)
@@ -1171,9 +1181,7 @@ XsldbgDriver::parseBreakList(const char *output,
 
 	//TRACE("Looking for template");
 	//TRACE(p);
-
-	/* check for ' for template :"'*/
-	if (strncmp(p, " for template :\"", 16) == 0){ 
+	if (strncmp(p, " for template: \"", 16) == 0){
 	  p = p + 16;
 	  //TRACE("Looking for template name near");
 	  //TRACE(p);
@@ -1192,7 +1200,7 @@ XsldbgDriver::parseBreakList(const char *output,
 
 	//TRACE("Looking for mode near");
 	//TRACE(p);
-	if (strncmp(p, " mode :\"", 8) == 0) {
+        if (strncmp(p, " mode: \"", 8) == 0){ 
 	  p = p + 8;
 	  while (p && *p != '\"')
 	    p++;
@@ -1211,16 +1219,23 @@ XsldbgDriver::parseBreakList(const char *output,
         p = p + 9;
 	//	TRACE(p);
 
+	if (*p == '\"')
+	    p++;
         /* grab file name */
-        while (!isspace(*p)) {
+        while ((*p != '\"') && !isspace(*p)) {
             file.append(*p);
             p++;
         }
+	if (*p == '\"')
+	    p++;
         if (*p == '\0')
             break;
 
         /* skip ' : line ' */
         p = p + 8;
+        while (isspace(*p)) {
+            p++;
+        }
         //TRACE(p);    
         while (isdigit(*p)) {
             lineNo.append(*p);
@@ -1228,13 +1243,11 @@ XsldbgDriver::parseBreakList(const char *output,
         }
 
 
-        //TRACE("Got breakpoint");
 
         Breakpoint *bp = new Breakpoint;
-
         if (bp != 0) {
             // take 1 of line number
-            lineNo.setNum(lineNo.toInt() - 1);
+            lineNo.setNum(lineNo.toInt() -1);
             bp->id = bpNum;
             bp->type = bpType;
             bp->temporary = false;
@@ -1257,6 +1270,8 @@ XsldbgDriver::parseBreakList(const char *output,
 
         if (p != 0) {
             p = strchr(p, '\n');
+	    if (p)
+		p++;
         }
     }
     return true;
@@ -1363,7 +1378,7 @@ XsldbgDriver::parseChangeExecutable(const char *output, QString & message)
      * The command is successful if there is no output or the single
      * message (no debugging symbols found)...
      */
-    QRegExp exp(".*Load of source deferred use run command.*");
+    QRegExp exp(".*Load of source deferred. Use the run command.*");
     int len, index = exp.match(output, 0, &len);
 
     if (index != -1) {
@@ -1378,12 +1393,12 @@ XsldbgDriver::parseCoreFile(const char *output)
 {
     TRACE("XsldbgDriver::parseCoreFile");
     TRACE(output);
-    QRegExp exp(".*Load of xml data deferred use run command.*");
+    QRegExp exp(".*Load of data file deferred. Use the run command.*");
     int len, index = exp.match(output, 0, &len);
 
     if (index != -1) {
         m_haveCoreFile = true;
-        TRACE("Parsed xml data file");
+        TRACE("Parsed data file name");
     }
 
     return m_haveCoreFile;
@@ -1406,7 +1421,7 @@ XsldbgDriver::parseProgramStopped(const char *output, QString & message)
         start++;                /* skip '\n' */
 
         if (strncmp(start, "Finished stylesheet\n\032\032\n", 21) == 0){ 
-            flags &= ~SFprogramActive;
+       //     flags &= ~SFprogramActive;
 	    break;
 	}
 

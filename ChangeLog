@@ -5,6 +5,8 @@ Version 2.0.1
 	Worked around gdb 6.3 crashes at "info line main" command (thanks to
 	Stefan Taferner).
 
+	Updated XSLT debugger parser for xsldbg >= 3.4.0 (by Keith Isdale).
+
 Version 2.0.0
 
 	References and const types are treated like the base type (thanks to
