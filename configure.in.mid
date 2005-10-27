@@ -92,8 +92,8 @@ if test -n "$PS_COMMAND"; then
 
   PS_COMMAND="$PS_COMMAND -eo pid,ppid,uid,vsz,etime,time,args"
   if $PS_COMMAND > /dev/null 2>&1; then
-    # works in principle; check output
-    set x `$PS_COMMAND | head -1`
+    # works in principle; check output: extract first line, but avoid 'head -1'
+    set x `$PS_COMMAND | (read firstline; echo "$firstline")`
     if test "$*" = "x PID PPID UID VSZ ELAPSED TIME COMMAND"; then
       : # fine
     else
