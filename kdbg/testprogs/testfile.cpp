@@ -38,6 +38,7 @@ public:
 	operator PtrFunc*();
 };
 
+namespace {
 void g()
 {
 	S s1, s2;
@@ -46,6 +47,7 @@ void g()
 	s1.s = &s2;
 	s2.s = &s1;
 }
+} // namespace
 
 void f(E e[3], char c)
 {

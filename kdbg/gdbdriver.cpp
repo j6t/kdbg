@@ -1422,6 +1422,14 @@ static void parseFrameInfo(const char*& s, QString& func,
     // search opening parenthesis
     while (*p != '\0' && *p != '(')
 	p++;
+
+    // skip (anonymous namespace)
+    if (strncmp(p, "(anonymous namespace)", 21) == 0) {
+	p+=21;
+	while (*p != '\0' && *p != '(')
+	    p++;
+    }
+
     if (*p == '\0') {
 	func = start;
 	file = QString();
