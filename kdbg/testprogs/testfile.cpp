@@ -38,6 +38,10 @@ public:
 	operator PtrFunc*();
 };
 
+namespace A {
+namespace {
+namespace B {
+namespace {
 namespace {
 void g()
 {
@@ -48,6 +52,14 @@ void g()
 	s2.s = &s1;
 }
 } // namespace
+void Banong() { g(); }
+} // namespace
+void g() { Banong(); }
+} // namespace B
+void Aanong() { B::g(); }
+} // namespace
+void g() { Aanong(); }
+} // namespace A
 
 void f(E e[3], char c)
 {
@@ -59,7 +71,7 @@ void f(E e[3], char c)
 		int x = 17;
 		x;
 	}
-	g();
+	A::g();
 	char buffer[300];
 	memset(buffer, 1, 300);
 	for (int i = 0; i < sizeof(buffer); i +=15) buffer[i] = '\02';
