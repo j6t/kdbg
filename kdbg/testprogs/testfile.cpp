@@ -97,6 +97,11 @@ void strtest(const char* t)
     std::cout << s2 << std::endl;
 }
 
+template<typename F>
+void templated_strtest(F f, const char* t)
+{
+	f(t);
+}
 
 void segFault()
 {
@@ -135,7 +140,7 @@ int main(int argc, char* argv[])
 
 	const QString& strref = s;
 
-	strtest(s);
+	templated_strtest(strtest, s);
 	s = "asbcxxxxxxxxxxxxxxxxxxxxxxxxxxx";
 	strtest(s);
 	s += "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiii";

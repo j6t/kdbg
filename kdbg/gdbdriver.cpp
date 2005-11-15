@@ -1419,10 +1419,25 @@ static void parseFrameInfo(const char*& s, QString& func,
 	    s++;
 	return;
     }
-restartName:
-    // search opening parenthesis
-    while (*p != '\0' && *p != '(')
-	p++;
+
+    /*
+     * Skip the function name. It is terminated by a left parenthesis
+     * which does not delimit "(anonymous namespace)" and which is
+     * outside the angle brackets <> of template parameter lists.
+     */
+    while (*p != '\0')
+    {
+	if (*p == '<') {
+	    // skip template parameter list
+	    skipNested(p, '<', '>');
+	} else if (*p == '(') {
+	    if (strncmp(p, "(anonymous namespace)", 21) != 0)
+		break;	// parameter list found
+	    p += 21;
+	} else {
+	    p++;
+	}
+    }
 
     if (*p == '\0') {
 	func = start;
@@ -1438,15 +1453,8 @@ restartName:
      * additional pairs of parentheses. Furthermore, recent gdbs write the
      * demangled name followed by the arguments in a pair of parentheses,
      * where the demangled name can end in "const".
-     * In addition, if we encounter "(anonymous namespace)", the parameter list
-     * has not been reached, and we jump back out and restart parsing names.
      */
     do {
-	if (strncmp(p, "(anonymous namespace)", 21) == 0) {
-	    p += 21;
-	    goto restartName;
-	}
-
 	skipNestedWithString(p, '(', ')');
 	while (isspace(*p))
 	    p++;
