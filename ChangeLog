@@ -4,6 +4,9 @@ Version 2.0.2
 	for functions whose names involve template parameter lists (thanks to
 	André Wöbbeking).
 
+	Fixed environment list which would add back the entry from the edit box
+	even if it was just deleted.
+
 Version 2.0.1
 
 	Updated Hungarian translation (thanks to Tamas Szanto).

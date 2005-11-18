@@ -199,7 +199,13 @@ QStringList PgmArgs::options() const
     return sel;
 }
 
+// this is a slot
 void PgmArgs::modifyVar()
+{
+    modifyVar(true);	// re-add deleted entries
+}
+
+void PgmArgs::modifyVar(bool resurrect)
 {
     QString name, value;
     parseEnvInput(name, value);
@@ -212,10 +218,13 @@ void PgmArgs::modifyVar()
 	// see if this is a zombie
 	if (val->status == EnvVar::EVdeleted) {
 	    // resurrect
-	    val->value = value;
-	    val->status = EnvVar::EVdirty;
-	    val->item = new QListViewItem(&m_envList, name, value);	// inserts itself
-	    m_envVars.insert(name, val);
+	    if (resurrect)
+	    {
+		val->value = value;
+		val->status = EnvVar::EVdirty;
+		val->item = new QListViewItem(&m_envList, name, value);	// inserts itself
+		m_envVars.insert(name, val);
+	    }
 	} else if (value != val->value) {
 	    // change the value
 	    val->value = value;
@@ -310,7 +319,9 @@ void PgmArgs::envListCurrentChanged(QListViewItem* item)
 
 void PgmArgs::accept()
 {
-    modifyVar();
+    // simulate that the Modify button was pressed, but don't revive
+    // dead entries even if the user changed the edit box
+    modifyVar(false);
     QDialog::accept();
 }
 

@@ -39,6 +39,7 @@ protected:
 
     void initEnvList();
     void parseEnvInput(QString& name, QString& value);
+    void modifyVar(bool resurrect);
 
     QLabel m_label;
     QLineEdit m_programArgs;
