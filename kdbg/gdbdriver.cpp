@@ -1098,6 +1098,7 @@ repeat:
 	//  red
 	//  &parseP (HTMLClueV *, char *)
 	//  Variable "x" is not available.
+	//  The value of variable 'x' is distributed...
 
 	const char*p = s;
     
@@ -1199,11 +1200,24 @@ repeat:
 	    if (strncmp(p, "\" is not available.", 19) == 0) {
 		p += 19;
 	    }
+	} else if (strncmp(p, "The value of variable '", 23) == 0) {
+	    p += 23;
+	    skipName(p);
+	    const char* e = strchr(p, '.');
+	    if (e == 0) {
+		p += strlen(p);
+	    } else {
+		p = e+1;
+	    }
 	} else {
 	    // must be an enumeration value
 	    skipName(p);
 	}
 	variable->m_value += FROM_LATIN1(start, p - start);
+
+	// remove line breaks from the value; this is ok since
+	// string values never contain a literal line break
+	variable->m_value.replace('\n', ' ');
 
 	if (checkMultiPart) {
 	    // white space
