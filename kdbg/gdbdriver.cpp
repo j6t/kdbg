@@ -1068,19 +1068,38 @@ static bool parseValue(const char*& s, VarTree* variable)
 
 repeat:
     if (*s == '{') {
-	s++;
-	if (!parseNested(s, variable)) {
-	    return false;
+	// Sometimes we find the following output:
+	//  {<text variable, no debug info>} 0x40012000 <access>
+	//  {<data variable, no debug info>}
+	//  {<variable (not text or data), no debug info>}
+	if (strncmp(s, "{<text variable, ", 17) == 0 ||
+	    strncmp(s, "{<data variable, ", 17) == 0 ||
+	    strncmp(s, "{<variable (not text or data), ", 31) == 0)
+	{
+	    const char* start = s;
+	    skipNested(s, '{', '}');
+	    variable->m_value = FROM_LATIN1(start, s-start);
+	    variable->m_value += ' ';	// add only a single space
+	    while (isspace(*s))
+		s++;
+	    goto repeat;
 	}
-	// must be the closing brace
-	if (*s != '}') {
-	    TRACE("parse error: missing } of " +  variable->getText());
-	    return false;
-	}
-	s++;
-	// final white space
-	while (isspace(*s))
+	else
+	{
 	    s++;
+	    if (!parseNested(s, variable)) {
+		return false;
+	    }
+	    // must be the closing brace
+	    if (*s != '}') {
+		TRACE("parse error: missing } of " +  variable->getText());
+		return false;
+	    }
+	    s++;
+	    // final white space
+	    while (isspace(*s))
+		s++;
+	}
     } else {
 	// examples of leaf values (cannot be the empty string):
 	//  123
