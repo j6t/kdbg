@@ -240,9 +240,9 @@ public:
     bool canChangeBreakpoints();
 
     /**
-     * Tells whether the debuggee can be changed.
+     * Tells whether a the program is loaded, but not active.
      */
-    bool canUseCoreFile() { return isReady() && !m_programActive; }
+    bool canStart();
 
     /**
      * Add a watch expression.

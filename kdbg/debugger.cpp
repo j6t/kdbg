@@ -523,6 +523,11 @@ bool KDebugger::canChangeBreakpoints()
     return isReady() && !m_programRunning;
 }
 
+bool KDebugger::canStart()
+{
+    return isReady() && !m_programActive;
+}
+
 bool KDebugger::isReady() const 
 {
     return m_haveExecutable &&

@@ -7,6 +7,9 @@ Version 2.0.2
 	Fixed environment list which would add back the entry from the edit box
 	even if it was just deleted.
 
+	Fixed that the Run/Continue button was enabled while the program was
+	running.
+
 Version 2.0.1
 
 	Updated Hungarian translation (thanks to Tamas Szanto).

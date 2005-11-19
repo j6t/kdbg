@@ -428,7 +428,7 @@ void DebuggerMainWnd::updateUI()
     // AB: maybe in mainwndbase.cpp?
     actionCollection()->action("file_executable")->setEnabled(m_debugger->isIdle());
     actionCollection()->action("settings_program")->setEnabled(m_debugger->haveExecutable());
-    actionCollection()->action("file_core_dump")->setEnabled(m_debugger->canUseCoreFile());
+    actionCollection()->action("file_core_dump")->setEnabled(m_debugger->canStart());
     actionCollection()->action("exec_step_into")->setEnabled(m_debugger->canSingleStep());
     actionCollection()->action("exec_step_into_by_insn")->setEnabled(m_debugger->canSingleStep());
     actionCollection()->action("exec_step_over")->setEnabled(m_debugger->canSingleStep());
@@ -438,7 +438,7 @@ void DebuggerMainWnd::updateUI()
     actionCollection()->action("exec_movepc")->setEnabled(m_debugger->canSingleStep());
     actionCollection()->action("exec_restart")->setEnabled(m_debugger->canSingleStep());
     actionCollection()->action("exec_attach")->setEnabled(m_debugger->isReady());
-    actionCollection()->action("exec_run")->setEnabled(m_debugger->isReady());
+    actionCollection()->action("exec_run")->setEnabled(m_debugger->canStart() || m_debugger->canSingleStep());
     actionCollection()->action("exec_kill")->setEnabled(m_debugger->haveExecutable() && m_debugger->isProgramActive());
     actionCollection()->action("exec_break")->setEnabled(m_debugger->isProgramRunning());
     actionCollection()->action("exec_arguments")->setEnabled(m_debugger->haveExecutable());
@@ -863,7 +863,7 @@ void DebuggerMainWnd::slotFileExe()
 
 void DebuggerMainWnd::slotFileCore()
 {
-    if (m_debugger->canUseCoreFile())
+    if (m_debugger->canStart())
     {
 	QString corefile = myGetFileName(i18n("Select core dump"),
 					 m_lastDirectory, 0, this);
