@@ -1118,6 +1118,7 @@ repeat:
 	//  &parseP (HTMLClueV *, char *)
 	//  Variable "x" is not available.
 	//  The value of variable 'x' is distributed...
+	//  -nan(0xfffff081defa0)
 
 	const char*p = s;
     
@@ -1231,6 +1232,10 @@ repeat:
 	} else {
 	    // must be an enumeration value
 	    skipName(p);
+	    // hmm, not necessarily: nan (floating point Not a Number)
+	    // is followed by a number in ()
+	    if (*p == '(')
+		skipNested(p, '(', ')');
 	}
 	variable->m_value += FROM_LATIN1(start, p - start);
 
