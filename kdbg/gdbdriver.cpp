@@ -236,6 +236,11 @@ bool GdbDriver::startup(QString cmdStr)
 	"set print static-members off\n"
 	"set print asm-demangle on\n"
 	/*
+	 * Don't assume that program functions invoked from a watch expression
+	 * always succeed.
+	 */
+	"set unwindonsignal on\n"
+	/*
 	 * Write a short macro that prints all locals: local variables and
 	 * function arguments.
 	 */
