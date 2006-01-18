@@ -344,6 +344,8 @@ void TableView::updateScrollBars()
 	 */
 	if (needV) {
 	    w -= m_sbV->width();
+	    if (w < 0)
+		w = 0;
 	    needH = m_totalSize.width() > w;
 	    if (needH) {
 		h -= m_sbH->height();
@@ -351,6 +353,8 @@ void TableView::updateScrollBars()
 	} else {
 	    // assert(needH)
 	    h -= m_sbH->height();
+	    if (h < 0)
+		h = 0;
 	    needV = m_totalSize.height() > h;
 	    if (needV) {
 		w -= m_sbV->width();
