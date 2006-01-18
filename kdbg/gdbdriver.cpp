@@ -912,6 +912,49 @@ static void skipNested(const char*& s, char opening, char closing)
 }
 
 /**
+ * This function skips text that is delimited by nested angle bracktes, '<>'.
+ * A complication arises because the delimited text can contain the names of
+ * operator<<, operator>>, operator<, and operator>, which have to be treated
+ * specially so that they do not count towards the nesting of '<>'.
+ * This function assumes that the delimited text does not contain strings.
+ */
+static void skipNestedAngles(const char*& s)
+{
+    const char* p = s;
+
+    int nest = 1;
+    p++;		// skip the initial '<'
+    while (*p && nest > 0)
+    {
+	// Below we can check for p-s >= 9 instead of 8 because
+	// *s is '<' and cannot be part of "operator".
+	if (*p == '<')
+	{
+	    if (p-s >= 9 && strncmp(p-8, "operator", 8) == 0) {
+		if (p[1] == '<')
+		    p++;
+	    } else {
+		nest++;
+	    }
+	}
+	else if (*p == '>')
+	{
+	    if (p-s >= 9 && strncmp(p-8, "operator", 8) == 0) {
+		if (p[1] == '>')
+		    p++;
+	    } else {
+		nest--;
+	    }
+	}
+	p++;
+    }
+    if (nest != 0) {
+	TRACE(QString().sprintf("parse error: mismatching <> at %-20.20s", s));
+    }
+    s = p;
+}
+
+/**
  * Find the end of line that is not inside braces
  */
 static void findEnd(const char*& s)
@@ -1033,7 +1076,7 @@ static bool parseName(const char*& s, QString& name, VarTree::NameKind& kind)
     //  <string<a,b<c>,7> >
 
     if (*p == '<') {
-	skipNested(p, '<', '>');
+	skipNestedAngles(p);
 	name = FROM_LATIN1(s, p - s);
 	kind = VarTree::NKtype;
     }
@@ -1202,7 +1245,7 @@ repeat:
 	    checkMultiPart = true;
 	} else if (*p == '<') {
 	    // e.g. <optimized out>
-	    skipNested(p, '<', '>');
+	    skipNestedAngles(p);
 	} else if (*p == '"' || *p == '\'') {
 	    // character may have multipart: '\000' <repeats 11 times>
 	    checkMultiPart = *p == '\'';
@@ -1261,7 +1304,7 @@ repeat:
 		// if this value is part of an array, it might be followed
 		// by <repeats 15 times>, which we don't skip here
 		if (strncmp(p, "<repeats ", 9) != 0)
-		    skipNested(p, '<', '>');
+		    skipNestedAngles(p);
 	    }
 	    if (p != start) {
 		// there is always a blank before the string,
@@ -1472,7 +1515,7 @@ static void parseFrameInfo(const char*& s, QString& func,
     {
 	if (*p == '<') {
 	    // skip template parameter list
-	    skipNested(p, '<', '>');
+	    skipNestedAngles(p);
 	} else if (*p == '(') {
 	    if (strncmp(p, "(anonymous namespace)", 21) != 0)
 		break;	// parameter list found
@@ -2361,7 +2404,7 @@ void GdbDriver::parseDisassemble(const char* output, QList<DisassembledCode>& co
 	while (p != end && *p != '<')
 	    p++;
 	if (*p == '<')
-	    skipNested(p, '<', '>');
+	    skipNestedAngles(p);
 	if (*p == ':')
 	    p++;
 
