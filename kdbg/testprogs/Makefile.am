@@ -9,7 +9,7 @@ INCLUDES= $(all_includes)
 AM_CXXFLAGS = -g
 
 if BUILDTESTPROGS
-PROGS = testfile locals maths repeats std
+PROGS = testfile locals maths repeats std templates
 else
 PROGS =
 endif
@@ -32,3 +32,6 @@ repeats_LDADD = $(LIB_QT)
 
 std_SOURCES = std.cpp
 std_LDFLAGS = -g
+
+templates_SOURCES = templates.cpp
+templates_LDFLAGS = -g

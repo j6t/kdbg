@@ -1514,8 +1514,18 @@ static void parseFrameInfo(const char*& s, QString& func,
     while (*p != '\0')
     {
 	if (*p == '<') {
-	    // skip template parameter list
-	    skipNestedAngles(p);
+	    // check for operator<< and operator<
+	    if (p-start >= 8 && strncmp(p-8, "operator", 8) == 0)
+	    {
+		p++;
+		if (*p == '<')
+		    p++;
+	    }
+	    else
+	    {
+		// skip template parameter list
+		skipNestedAngles(p);
+	    }
 	} else if (*p == '(') {
 	    if (strncmp(p, "(anonymous namespace)", 21) != 0)
 		break;	// parameter list found

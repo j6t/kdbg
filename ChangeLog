@@ -2,6 +2,10 @@ Version 2.0.3
 
 	Fixed parsing of gdb output that mentions "operator<<", "operator>>",
 	"operator<", and "operator>" within text delimited by angle brackets <>.
+	This fixes a crash when any such function is disassembled and other
+	misbehaviors.
+
+	Fixed parsing stack frames that mention "operator<<" or "operator<".
 	Thanks to Charles Samuels, who pointed out the problem and provided
 	an initial fix.
 
