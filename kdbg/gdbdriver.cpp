@@ -652,10 +652,22 @@ static bool isErrorExpr(const char* output)
 /**
  * Returns true if the output is an error message. If wantErrorValue is
  * true, a new VarTree object is created and filled with the error message.
+ * If there are warnings, they are skipped and output points past the warnings
+ * on return (even if there \e are errors).
  */
-static bool parseErrorMessage(const char* output,
+static bool parseErrorMessage(const char*& output,
 			      VarTree*& variable, bool wantErrorValue)
 {
+    // skip warnings
+    while (strncmp(output, "warning:", 8) == 0)
+    {
+	char* end = strchr(output+8, '\n');
+	if (end == 0)
+	    output += strlen(output);
+	else
+	    output = end+1;
+    }
+
     if (isErrorExpr(output))
     {
 	if (wantErrorValue) {
@@ -700,12 +712,11 @@ VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, boo
      * Parse off white space. gdb sometimes prints white space first if the
      * printed array leaded to an error.
      */
-    const char* p = output;
-    while (isspace(*p))
-	p++;
+    while (isspace(*output))
+	output++;
 
     // special case: empty string (0 repetitions)
-    if (strncmp(p, "Invalid number 0 of repetitions", 31) == 0)
+    if (strncmp(output, "Invalid number 0 of repetitions", 31) == 0)
     {
 	variable = new VarTree(QString(), VarTree::NKplain);
 	variable->m_value = "\"\"";
@@ -713,12 +724,13 @@ VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, boo
     }
 
     // check for error conditions
-    if (parseErrorMessage(p, variable, wantErrorValue))
+    if (parseErrorMessage(output, variable, wantErrorValue))
 	return variable;
 
     // parse the array
 
     // find '='
+    const char* p = output;
     p = strchr(p, '=');
     if (p == 0) {
 	goto error;
