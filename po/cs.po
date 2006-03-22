@@ -77,7 +77,7 @@ msgstr "&Instrukce"
 
 #: brkpt.cpp:61
 msgid "Add &Breakpoint"
-msgstr "Přidat &Zaráľku"
+msgstr "Přidat &Zarážku"
 
 #: brkpt.cpp:65
 msgid "Add &Watchpoint"
@@ -117,7 +117,7 @@ msgstr "Podmínka"
 
 #: brkpt.cpp:460
 msgid ": Conditional breakpoint"
-msgstr ": Podmíněná zaráľka"
+msgstr ": Podmíněná zarážka"
 
 #: brkpt.cpp:463
 msgid "&Condition:"
@@ -228,7 +228,7 @@ msgstr "Vyberte spustitelný soubor, který chcete trasovat"
 
 #: main.cpp:60
 msgid "a core file to use"
-msgstr "soubor core, který chcete pouľít"
+msgstr "soubor core, který chcete použít"
 
 #: main.cpp:125
 msgid "Cannot start debugger."
@@ -236,11 +236,11 @@ msgstr "Nelze spustit debuger."
 
 #: prefdebugger.cpp:20
 msgid "To revert to the default settings, clear the entries."
-msgstr "Chcete-li pouľít základní nastavení, smaľte zadané hodnoty."
+msgstr "Chcete-li použít základní nastavení, smažte zadané hodnoty."
 
 #: prefdebugger.cpp:24
 msgid "How to invoke &GDB:"
-msgstr "Spuątění &GDB:"
+msgstr "Spuštění &GDB:"
 
 #: prefdebugger.cpp:31
 msgid ""
@@ -269,11 +269,11 @@ msgid ""
 "the default from the global options:"
 msgstr ""
 "Jak spustit &GDB - ponechte prázdné,\n"
-"pokud chcete pouľít základní nastavení:"
+"pokud chcete použít základní nastavení:"
 
 #: pgmsettings.cpp:59
 msgid "&No input and output"
-msgstr "Žád&ný vstup a výstup"
+msgstr "ád&ný vstup a výstup"
 
 #: pgmsettings.cpp:64
 msgid "&Only output, simple terminal emulation"
@@ -311,7 +311,7 @@ msgstr ": Hledat"
 
 #: winstack.cpp:541
 msgid "&Case sensitive"
-msgstr "&Rozliąovat velká/malá"
+msgstr "&Rozlišovat velká/malá"
 
 #: winstack.cpp:543
 msgid "&Forward"
@@ -323,11 +323,11 @@ msgstr "V&zad"
 
 #: rc.cpp:3
 msgid "E&xecution"
-msgstr "Spuąt&ění"
+msgstr "Spušt&ění"
 
 #: rc.cpp:4
 msgid "&Breakpoint"
-msgstr "&Zaráľka"
+msgstr "&Zarážka"
 
 #: threadlist.cpp:40
 msgid "Thread ID"
@@ -355,7 +355,7 @@ msgstr "Registry"
 
 #: dbgmainwnd.cpp:64
 msgid "Breakpoints"
-msgstr "Zaráľky"
+msgstr "Zarážky"
 
 #: dbgmainwnd.cpp:67
 msgid "Output"
@@ -383,7 +383,7 @@ msgstr "Spustit&elný soubor..."
 
 #: dbgmainwnd.cpp:200
 msgid "Recent E&xecutables"
-msgstr "Naposledy spuątěné soubory"
+msgstr "Naposledy spuštěné soubory"
 
 #: dbgmainwnd.cpp:203
 msgid "&Core dump..."
@@ -424,7 +424,7 @@ msgstr "&Registry"
 
 #: dbgmainwnd.cpp:228
 msgid "&Breakpoints"
-msgstr "&Zaráľky"
+msgstr "&Zarážky"
 
 #: dbgmainwnd.cpp:229
 msgid "T&hreads"
@@ -432,7 +432,7 @@ msgstr "V&lákna"
 
 #: dbgmainwnd.cpp:231
 msgid "&Memory"
-msgstr "Pa&měť"
+msgstr "Pa&mě"
 
 #: dbgmainwnd.cpp:241
 msgid "&Run"
@@ -468,7 +468,7 @@ msgstr ""
 
 #: dbgmainwnd.cpp:271
 msgid "&Break"
-msgstr "P&řeruąit"
+msgstr "P&řerušit"
 
 #: dbgmainwnd.cpp:274
 msgid "&Kill"
@@ -488,15 +488,15 @@ msgstr "&Argumenty..."
 
 #: dbgmainwnd.cpp:288
 msgid "Set/Clear &breakpoint"
-msgstr "Nastavit/smazat &zaráľku"
+msgstr "Nastavit/smazat &zarážku"
 
 #: dbgmainwnd.cpp:291
 msgid "Set &temporary breakpoint"
-msgstr "Nastavit &dočasnou zaráľku"
+msgstr "Nastavit &dočasnou zarážku"
 
 #: dbgmainwnd.cpp:294
 msgid "&Enable/Disable breakpoint"
-msgstr "Po&volit/zakázat zaráľku"
+msgstr "Po&volit/zakázat zarážku"
 
 #: dbgmainwnd.cpp:299
 msgid "Watch Expression"
@@ -534,7 +534,7 @@ msgstr "`%1' není souborem nebo neexistuje"
 
 #: dbgmainwnd.cpp:723
 msgid "|All source files\n"
-msgstr "|Vąechny zdrojové soubory\n"
+msgstr "|Všechny zdrojové soubory\n"
 
 #: dbgmainwnd.cpp:724
 msgid "|Source files\n"
@@ -546,7 +546,7 @@ msgstr "|Hlavičkové soubory\n"
 
 #: dbgmainwnd.cpp:726
 msgid "*|All files"
-msgstr "*|Vąechny soubory"
+msgstr "*|Všechny soubory"
 
 #: dbgmainwnd.cpp:855
 msgid "Select the executable to debug"
@@ -693,7 +693,7 @@ msgstr ""
 #~ msgstr "Krok přes po instrukci"
 
 #~ msgid "Breakpoint"
-#~ msgstr "Zaráľka"
+#~ msgstr "Zarážka"
 
 #~ msgid "Search"
 #~ msgstr "Hledat"
