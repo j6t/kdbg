@@ -1,0 +1,10 @@
+Makefile.in
+autom4te.cache
+acinclude.m4
+aclocal.m4
+config.h.in
+configure
+configure.in
+configure.files
+stamp-h.in
+subdirs
