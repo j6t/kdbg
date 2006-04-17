@@ -1,7 +1,7 @@
 [Type Table]
 Types1=QString
 LibDisplayName=libQtCore 4.x
-ShlibRE=libQtCore\.so\.4$
+ShlibRE=libQtCore(_debug)?\.so\.4$
 EnableBuiltin=QString::Data,QCharIsShort
 PrintQStringCmd=print ($qstrunicode=($qstrdata=(%s))->data)?(*(unsigned short*)$qstrunicode)@(($qstrlen=(unsigned int)($qstrdata->size))>100?100:$qstrlen):1==0\n
 [QString]

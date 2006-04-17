@@ -2,6 +2,8 @@ Version 2.0.4
 
 	Fixed encoding of the Czech translation thanks to Jakub Galgonek.
 
+	Added support for QString in Qt4's debug libraries.
+
 Version 2.0.3
 
 	Fixed parsing of gdb output that mentions "operator<<", "operator>>",
