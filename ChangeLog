@@ -4,6 +4,10 @@ Version 2.0.4
 
 	Added support for QString in Qt4's debug libraries.
 
+	Fixed that the debugger window really comes to the foreground and
+	receives the focus when the debuggee stops at a breakpoint, when this
+	option is on (http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=171845).
+
 Version 2.0.3
 
 	Fixed parsing of gdb output that mentions "operator<<", "operator>>",

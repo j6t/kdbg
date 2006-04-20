@@ -17,6 +17,7 @@
 #include <kprocess.h>
 #include <kkeydialog.h>
 #include <kanimwidget.h>
+#include <kwin.h>
 #include <qlistbox.h>
 #include <qfileinfo.h>
 #include "dbgmainwnd.h"
@@ -688,13 +689,13 @@ void DebuggerMainWnd::slotTermEmuExited()
     shutdownTermWindow();
 }
 
-#include <X11/Xlib.h>			/* XRaiseWindow, XLowerWindow */
-
 void DebuggerMainWnd::slotProgramStopped()
 {
     // when the program stopped, move the window to the foreground
     if (m_popForeground) {
-	::XRaiseWindow(x11Display(), winId());
+	// unfortunately, this requires quite some force to work :-(
+	KWin::raiseWindow(winId());
+	KWin::forceActiveWindow(winId());
     }
     m_backTimer.stop();
 }
@@ -708,7 +709,7 @@ void DebuggerMainWnd::intoBackground()
 
 void DebuggerMainWnd::slotBackTimer()
 {
-    ::XLowerWindow(x11Display(), winId());
+    lower();
 }
 
 void DebuggerMainWnd::slotRecentExec(const KURL& url)
