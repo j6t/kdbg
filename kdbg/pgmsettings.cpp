@@ -104,7 +104,7 @@ ProgramSettings::ProgramSettings(QWidget* parent, QString exeName, bool modal) :
     }
     QString cap = kapp->caption();
     QString fmt = i18n("%s: Settings for %s");
-    SIZED_QString(title, fmt.length() + cap.length() + exeName.length());
+    QString title;
     title.sprintf(fmt, cap.data(), exeName.data());
     setCaption(title);
 

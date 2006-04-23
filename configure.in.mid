@@ -113,14 +113,3 @@ if test -n "$PS_COMMAND"; then
   fi
 fi
 AM_CONDITIONAL(HAVE_PS_COMMAND, test -n "$PS_COMMAND")
-
-AH_VERBATIM([SIZED_QString],
-[#ifdef QT_VERSION
-# if QT_VERSION < 200
-#  define SIZED_QString(name,size) QString name(size)
-#  define FROM_LATIN1(cstr,len) QString(cstr,(len)+1)
-# else
-#  define SIZED_QString(name,size) QString name
-#  define FROM_LATIN1(cstr,len) QString::fromLatin1(cstr,len)
-# endif
-#endif])
