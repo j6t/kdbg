@@ -16,7 +16,7 @@ Distribution: RedHat 7.0
 Vendor: Johannes Sixt <johannes.sixt@telecom.at>
 Packager: Ullrich von Bassewitz <uz@musoftware.de>
 Source: %{name}-%{version}.tar.gz
-URL: http://members.nextra.at/johsixt/kdbg.html
+URL: http://www.kdbg.org/
 Requires: kdelibs >= 2.0
 BuildRoot: /tmp/build-%{name}-%{version}
 

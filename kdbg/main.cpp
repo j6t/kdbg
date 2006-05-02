@@ -39,7 +39,7 @@ int main(int argc, char** argv)
 			 KAboutData::License_GPL, 
 			 "(c) 1998-2005 Johannes Sixt",
 			 0,		/* any text */
-			 "http://members.nextra.at/johsixt/kdbg.html",
+			 "http://www.kdbg.org/",
 			 "Johannes.Sixt@telecom.at");
     aboutData.addAuthor("Johannes Sixt", 0, "Johannes.Sixt@telecom.at");
     aboutData.addCredit("Keith Isdale",
