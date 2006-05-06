@@ -912,6 +912,9 @@ void DebuggerMainWnd::slotExecAttach()
 {
 #ifdef PS_COMMAND
     ProcAttachPS dlg(this);
+    // seed filter with executable name
+    QFileInfo fi = m_debugger->executable();
+    dlg.filterEdit->setText(fi.fileName());
 #else
     ProcAttach dlg(this);
     dlg.setText(m_debugger->attachedPid());

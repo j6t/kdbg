@@ -219,7 +219,9 @@ void ProcAttachPS::refresh()
 void ProcAttachPS::filterEdited(const QString& text)
 {
     QListViewItem* i = processList->firstChild();
-    setVisibility(i, text);
+    if (i) {
+	setVisibility(i, text);
+    }
 }
 
 /**
