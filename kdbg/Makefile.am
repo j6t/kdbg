@@ -100,11 +100,14 @@ rc_DATA = kdbgui.rc
 
 # Make messages.po and move it to $(top_srcdir)/po. "make merge" there.
 # the -x is for skipping messages already translated in kdelibs
-messages: rc.cpp
-	LIST=`find . -name \*.h -o -name \*.hh -o -name \*.H -o -name \*.hxx -o -name \*.hpp -o -name \*.cpp -o -name \*.cc -o -name \*.cxx -o -name \*.ecpp -o -name \*.C`; \
-	if test -n "$$LIST"; then \
-	  $(XGETTEXT) -C -ki18n -kI18N_NOOP -x $(includedir)/kde.pot \
+# Messages are generated in the source directory so that file names
+# mentioned in the .pot file are not prefixed by $(srcdir).
+messages:
+	cd $(srcdir) && \
+	extractrc *.rc *.ui > rc.cpp && \
+	LIST=`find . -name \*.h -o -name \*.cpp -o -name \*.cc -o -name \*.cxx -o -name \*.C` && \
+	$(XGETTEXT) -C -ki18n -kI18N_NOOP -x $(includedir)/kde.pot \
 		$$LIST && mv messages.po $(top_srcdir)/po/kdbg.pot; \
-	fi
+	rm -f rc.cpp
 
 EXTRA_DIST = kdbg.desktop
