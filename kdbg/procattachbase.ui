@@ -158,9 +158,6 @@
                             <property name="text">
                                 <string>&amp;Refresh</string>
                             </property>
-                            <property name="accel">
-                                <string>Alt+R</string>
-                            </property>
                             <property name="whatsThis" stdset="0">
                                 <string>This button updates the list of processes.</string>
                             </property>
