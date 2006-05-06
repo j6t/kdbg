@@ -25,6 +25,8 @@ ProcAttachPS::ProcAttachPS(QWidget* parent) :
     m_ps = new KProcess;
     connect(m_ps, SIGNAL(receivedStdout(KProcess*, char*, int)),
 	    this, SLOT(slotTextReceived(KProcess*, char*, int)));
+    connect(m_ps, SIGNAL(processExited(KProcess*)),
+	    this, SLOT(slotPSDone()));
 
     QIconSet icon = SmallIconSet("clear_left");
     filterClear->setIconSet(icon);
@@ -188,6 +190,11 @@ void ProcAttachPS::pushLine()
 	    }
 	}
     }
+}
+
+void ProcAttachPS::slotPSDone()
+{
+    filterEdited(filterEdit->text());
 }
 
 QString ProcAttachPS::text() const

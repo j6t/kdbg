@@ -38,6 +38,7 @@ protected:
 
 protected slots:
     void slotTextReceived(KProcess* proc, char* buffer, int buflen);
+    void slotPSDone();
 
 protected:
     void pushLine();
