@@ -5,9 +5,12 @@
 
 #include "procattach.h"
 #include <qlistview.h>
+#include <qtoolbutton.h>
+#include <qlineedit.h>
 #include <kprocess.h>
 #include <ctype.h>
 #include <kapp.h>
+#include <kiconloader.h>
 #include <klocale.h>			/* i18n */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -22,6 +25,9 @@ ProcAttachPS::ProcAttachPS(QWidget* parent) :
     m_ps = new KProcess;
     connect(m_ps, SIGNAL(receivedStdout(KProcess*, char*, int)),
 	    this, SLOT(slotTextReceived(KProcess*, char*, int)));
+
+    QIconSet icon = SmallIconSet("clear_left");
+    filterClear->setIconSet(icon);
 
     processList->setColumnWidth(0, 300);
     processList->setColumnWidthMode(0, QListView::Manual);
@@ -184,12 +190,14 @@ void ProcAttachPS::pushLine()
     }
 }
 
-void ProcAttachPS::processSelected(QListViewItem* item)
+QString ProcAttachPS::text() const
 {
-    if (item != 0) {
-	pidEdit->setText(item->text(1));
-	processText->setText(item->text(0));
-    }
+    QListViewItem* item = processList->selectedItem();
+
+    if (item == 0)
+	return QString();
+
+    return item->text(1);
 }
 
 void ProcAttachPS::refresh()
@@ -201,19 +209,32 @@ void ProcAttachPS::refresh()
     }
 }
 
-void ProcAttachPS::pidEdited(const QString& text)
+void ProcAttachPS::filterEdited(const QString& text)
 {
-    if (text.isEmpty())
-	return;
+    QListViewItem* i = processList->firstChild();
+    setVisibility(i, text);
+}
 
-    // get the process and select it
-    QListViewItem* item = processList->findItem(text, 1);
-    if (item == 0) {
-	processList->clearSelection();
-    } else {
-	processList->setSelected(item, true);
-	processList->ensureItemVisible(item);
+/**
+ * Sets the visibility of \a i and
+ * returns whether it was made visible.
+ */
+bool ProcAttachPS::setVisibility(QListViewItem* i, const QString& text)
+{
+    bool visible = false;
+    for (QListViewItem* j = i->firstChild(); j; j = j->nextSibling())
+    {
+	if (setVisibility(j, text))
+	    visible = true;
     }
+    // look for text in the process name and in the PID
+    visible = visible || text.isEmpty() ||
+	i->text(0).find(text, 0, false) >= 0 ||
+	i->text(1).find(text) >= 0;
+
+    i->setVisible(visible);
+
+    return visible;
 }
 
 
