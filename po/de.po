@@ -1,20 +1,20 @@
 # translation of de.po to Deutsch
 # KDbg - Debugger GUI for gdb
 # Copyright (C) Johannes Sixt <Johannes.Sixt@telecom.at>, 1998-2005.
-# Johannes Sixt <johannes.sixt@telecom.at>, 2005.
 #
+# Johannes Sixt <johannes.sixt@telecom.at>, 2005, 2006.
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 1.9.7\n"
+"Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-10 15:01+0200\n"
-"PO-Revision-Date: 2005-07-10 16:23+0200\n"
+"POT-Creation-Date: 2006-05-06 22:52+0200\n"
+"PO-Revision-Date: 2006-05-06 23:04+0200\n"
 "Last-Translator: Johannes Sixt <johannes.sixt@telecom.at>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 1.10\n"
+"X-Generator: KBabel 1.11.2\n"
 
 #: memwindow.cpp:55 brkpt.cpp:334
 msgid "Address"
@@ -128,15 +128,15 @@ msgstr "&Bedingung:"
 msgid "Ignore &next hits:"
 msgstr "Ignoriere &nächste Treffer:"
 
-#: gdbdriver.cpp:1364
+#: gdbdriver.cpp:1469
 msgid "<additional entries of the array suppressed>"
 msgstr "<weitere Einträge unterdrückt>"
 
-#: gdbdriver.cpp:1919 xsldbgdriver.cpp:1351
+#: gdbdriver.cpp:2051 xsldbgdriver.cpp:1363
 msgid "New working directory: "
 msgstr "Neues Arbeitsverzeichnis: "
 
-#: debugger.cpp:630
+#: debugger.cpp:635
 msgid ""
 "%1 exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
@@ -144,7 +144,7 @@ msgstr ""
 "%1 wurde unerwartet beendet\n"
 "Sie müssen die Sitzung neu starten (z.B. mit Datei|Programm)."
 
-#: debugger.cpp:806
+#: debugger.cpp:811
 msgid ""
 "The settings for this program specify the following debugger command:\n"
 "%1\n"
@@ -261,11 +261,11 @@ msgstr ""
 msgid "&Terminal for program output:"
 msgstr "&Terminal für die Programmausgabe"
 
-#: procattach.cpp:230
+#: procattach.cpp:251
 msgid ": Attach to process"
 msgstr ": An Prozess attachen"
 
-#: procattach.cpp:234
+#: procattach.cpp:255
 msgid "Specify the process number to attach to:"
 msgstr "Geben Sie die Prozessnummer ein:"
 
@@ -294,7 +294,7 @@ msgstr "&Volle Terminalemulation"
 msgid "%s: Settings for %s"
 msgstr "%s: Einstellungen für %s"
 
-#: pgmsettings.cpp:115 dbgmainwnd.cpp:230
+#: pgmsettings.cpp:115 dbgmainwnd.cpp:231
 msgid "&Output"
 msgstr "&Ausgabe"
 
@@ -326,240 +326,318 @@ msgstr "&Vorwärts"
 msgid "&Backward"
 msgstr "&Rückwärts"
 
-#: rc.cpp:3
+#: rc.cpp:9
+#, no-c-format
 msgid "E&xecution"
 msgstr "A&usführung"
 
-#: rc.cpp:4
+#: rc.cpp:12
+#, no-c-format
 msgid "&Breakpoint"
 msgstr "Halte&punkt"
+
+#: rc.cpp:18
+#, no-c-format
+msgid "Attach to Process"
+msgstr "An Prozess attachen"
+
+#: rc.cpp:21
+#, no-c-format
+msgid "&Filter or PID:"
+msgstr "&Filter oder PID:"
+
+#: rc.cpp:24
+#, no-c-format
+msgid ""
+"Type the name of the process or its process ID (PID) here to reduce the "
+"number of entries in the list."
+msgstr "Geben Sie hier den Programmnamen oder die Prozess-ID (PID) an, sodass weniger Einträge in der Tabelle aufscheinen."
+
+#: rc.cpp:27
+#, no-c-format
+msgid "..."
+msgstr "..."
+
+#: rc.cpp:30
+#, no-c-format
+msgid "Clear filter"
+msgstr "Filter löschen"
+
+#: rc.cpp:33
+#, no-c-format
+msgid "Use this button to clear the filter text so that all processes are displayed."
+msgstr "Mit dieser Schaltfläche können Sie die Filtereingabe löschen, sodass alle Prozesse angezeigt werden."
+
+#: rc.cpp:36
+#, no-c-format
+msgid "Command"
+msgstr "Befehlszeile"
+
+#: rc.cpp:39
+#, no-c-format
+msgid "PID"
+msgstr "PID"
+
+#: rc.cpp:42
+#, no-c-format
+msgid "PPID"
+msgstr "PPID"
+
+#: rc.cpp:45
+#, no-c-format
+msgid ""
+"<p>This list displays all processes that are currently running. You must "
+"select the process that you want KDbg to attach to. Use the <b>Filter or "
+"PID</b> edit box to reduce the number of entries in this list.<p>The text in "
+"the <i>Command</i> column is usually, but not always, the command that was "
+"used to start the process. The <i>PID</i> column shows the process ID. The "
+"<i>PPID</i> column shows the process ID of the parent process. Additional "
+"columns show more information about the processes that is also available via "
+"the system's <i>ps</i> comand.</p><p>The list is not updated automatically. "
+"Use the <b>Refresh</b> button to update it.</p>"
+msgstr "<p>Diese Tabelle zeigt alle Prozesse an, die gerade auf dem System laufen. Sie müssen einen Prozess auswählen, an den sich KDbg attachen soll. Geben Sie in <b>Filter oder PID</b> den Programmnamen oder die Prozess-ID ein; damit wird die Tabelle kürzer.<p>Der Text in der Spalte <i>Befehlszeile</i> ist normalerweise (aber nicht immer) der Befehl, mit dem der Prozess gestartet wurde. Die Spalte <i>PID</i> zeigt die Prozess-ID. Die Spalte <i>PPID</i> zeigt die Prozess-ID des Vater-Prozesses. In den weiteren Spalten stehen zusätzliche Informationen über die Prozesse, die auch mit dem Systembefehl <i>ps</i> angezeigt werden können.</p><p>Die Tabelle wird nicht automatisch aktualisiert. Benutzen Sie dazu die Schaltfläche <b>Aktualisieren</b>.</p>"
+
+#: rc.cpp:48
+#, no-c-format
+msgid "&Refresh"
+msgstr "&Aktualisieren"
+
+#: rc.cpp:51
+#, no-c-format
+msgid "Alt+R"
+msgstr "Alt+R"
+
+#: rc.cpp:54
+#, no-c-format
+msgid "This button updates the list of processes."
+msgstr "Diese Schaltfläche aktualisiert die Anzeige."
 
 #: threadlist.cpp:40
 msgid "Thread ID"
 msgstr "Thread-ID"
 
-#: dbgmainwnd.cpp:44
+#: dbgmainwnd.cpp:45
 msgid "Source"
 msgstr "Quellcode"
 
-#: dbgmainwnd.cpp:52
+#: dbgmainwnd.cpp:53
 msgid "Stack"
 msgstr "Stack"
 
-#: dbgmainwnd.cpp:55
+#: dbgmainwnd.cpp:56
 msgid "Locals"
 msgstr "Lokale Variablen"
 
-#: dbgmainwnd.cpp:58
+#: dbgmainwnd.cpp:59
 msgid "Watches"
 msgstr "Ausdrücke"
 
-#: dbgmainwnd.cpp:61
+#: dbgmainwnd.cpp:62
 msgid "Registers"
 msgstr "Register"
 
-#: dbgmainwnd.cpp:64
+#: dbgmainwnd.cpp:65
 msgid "Breakpoints"
 msgstr "Haltepunkte"
 
-#: dbgmainwnd.cpp:67
+#: dbgmainwnd.cpp:68
 msgid "Output"
 msgstr "Ausgabe"
 
-#: dbgmainwnd.cpp:70
+#: dbgmainwnd.cpp:71
 msgid "Threads"
 msgstr "Threads"
 
-#: dbgmainwnd.cpp:73
+#: dbgmainwnd.cpp:74
 msgid "Memory"
 msgstr "Speicher"
 
-#: dbgmainwnd.cpp:193
+#: dbgmainwnd.cpp:194
 msgid "&Open Source..."
 msgstr "Quellcode Ö&ffnen..."
 
-#: dbgmainwnd.cpp:194
+#: dbgmainwnd.cpp:195
 msgid "&Reload Source"
 msgstr "E&rneut laden"
 
-#: dbgmainwnd.cpp:197
+#: dbgmainwnd.cpp:198
 msgid "&Executable..."
 msgstr "&Programm..."
 
-#: dbgmainwnd.cpp:200
+#: dbgmainwnd.cpp:201
 msgid "Recent E&xecutables"
 msgstr "&Zuletzt geöffnete Programme"
 
-#: dbgmainwnd.cpp:203
+#: dbgmainwnd.cpp:204
 msgid "&Core dump..."
 msgstr "&Core dump..."
 
-#: dbgmainwnd.cpp:208
+#: dbgmainwnd.cpp:209
 msgid "This &Program..."
 msgstr "Dieses &Programm"
 
-#: dbgmainwnd.cpp:211
+#: dbgmainwnd.cpp:212
 msgid "&Global Options..."
 msgstr "&Globale Einstellungen..."
 
-#: dbgmainwnd.cpp:219
+#: dbgmainwnd.cpp:220
 msgid "&Find"
 msgstr "&Suche"
 
-#: dbgmainwnd.cpp:222
+#: dbgmainwnd.cpp:223
 msgid "Source &code"
 msgstr "&Quellcode"
 
-#: dbgmainwnd.cpp:224
+#: dbgmainwnd.cpp:225
 msgid "Stac&k"
 msgstr "Stac&k"
 
-#: dbgmainwnd.cpp:225
+#: dbgmainwnd.cpp:226
 msgid "&Locals"
 msgstr "&Lokale Variablen"
 
-#: dbgmainwnd.cpp:226
+#: dbgmainwnd.cpp:227
 msgid "&Watched expressions"
 msgstr "&Ausdrücke"
 
-#: dbgmainwnd.cpp:227
+#: dbgmainwnd.cpp:228
 msgid "&Registers"
 msgstr "&Register"
 
-#: dbgmainwnd.cpp:228
+#: dbgmainwnd.cpp:229
 msgid "&Breakpoints"
 msgstr "&Haltepunkte"
 
-#: dbgmainwnd.cpp:229
+#: dbgmainwnd.cpp:230
 msgid "T&hreads"
 msgstr "&Threads"
 
-#: dbgmainwnd.cpp:231
+#: dbgmainwnd.cpp:232
 msgid "&Memory"
 msgstr "&Speicher"
 
-#: dbgmainwnd.cpp:241
+#: dbgmainwnd.cpp:242
 msgid "&Run"
 msgstr "Aus&führen"
 
-#: dbgmainwnd.cpp:244
+#: dbgmainwnd.cpp:245
 msgid "Step &into"
 msgstr "&In Funktion"
 
-#: dbgmainwnd.cpp:248
+#: dbgmainwnd.cpp:249
 msgid "Step &over"
 msgstr "Ü&ber Funktion"
 
-#: dbgmainwnd.cpp:252
+#: dbgmainwnd.cpp:253
 msgid "Step o&ut"
 msgstr "&Aus Funktion"
 
-#: dbgmainwnd.cpp:256
+#: dbgmainwnd.cpp:257
 msgid "Run to &cursor"
 msgstr "&Zum Cursor"
 
-#: dbgmainwnd.cpp:260
+#: dbgmainwnd.cpp:261
 msgid "Step i&nto by instruction"
 msgstr "I&nstruktion - in Funktion"
 
-#: dbgmainwnd.cpp:264
+#: dbgmainwnd.cpp:265
 msgid "Step o&ver by instruction"
 msgstr "In&struktion - über Funktion"
 
-#: dbgmainwnd.cpp:268
+#: dbgmainwnd.cpp:269
 msgid "&Program counter to current line"
 msgstr "&Programmzähler auf aktuelle Zeile"
 
-#: dbgmainwnd.cpp:271
+#: dbgmainwnd.cpp:272
 msgid "&Break"
 msgstr "&Unterbrechen"
 
-#: dbgmainwnd.cpp:274
+#: dbgmainwnd.cpp:275
 msgid "&Kill"
 msgstr "Been&den"
 
-#: dbgmainwnd.cpp:277
+#: dbgmainwnd.cpp:278
 msgid "Re&start"
 msgstr "&Erneut ausführen"
 
-#: dbgmainwnd.cpp:280
+#: dbgmainwnd.cpp:281
 msgid "A&ttach..."
 msgstr "A&ttachen..."
 
-#: dbgmainwnd.cpp:283
+#: dbgmainwnd.cpp:284
 msgid "&Arguments..."
 msgstr "Argu&mente..."
 
-#: dbgmainwnd.cpp:288
+#: dbgmainwnd.cpp:289
 msgid "Set/Clear &breakpoint"
 msgstr "&Setzen/entfernen"
 
-#: dbgmainwnd.cpp:291
+#: dbgmainwnd.cpp:292
 msgid "Set &temporary breakpoint"
 msgstr "&Temporären Haltepunkt setzen"
 
-#: dbgmainwnd.cpp:294
+#: dbgmainwnd.cpp:295
 msgid "&Enable/Disable breakpoint"
 msgstr "&Aktiv/inaktiv"
 
-#: dbgmainwnd.cpp:299
+#: dbgmainwnd.cpp:300
 msgid "Watch Expression"
 msgstr "Ausdruck beobachten"
 
-#: dbgmainwnd.cpp:302
+#: dbgmainwnd.cpp:303
 msgid "Edit Value"
 msgstr "Wert bearbeiten"
 
-#: dbgmainwnd.cpp:306
+#: dbgmainwnd.cpp:307
 msgid "&Window"
 msgstr "&Fenster"
 
-#: dbgmainwnd.cpp:333
+#: dbgmainwnd.cpp:334
 msgid "Line 00000"
 msgstr "Zeile 00000"
 
-#: dbgmainwnd.cpp:337
+#: dbgmainwnd.cpp:338
 msgid "Restart"
 msgstr "Erneut ausführen"
 
-#: dbgmainwnd.cpp:338
+#: dbgmainwnd.cpp:339
 msgid "Core dump"
 msgstr "Core dump"
 
-#: dbgmainwnd.cpp:541
+#: dbgmainwnd.cpp:542
 #, c-format
 msgid "Line %d"
 msgstr "Zeile %d"
 
-#: dbgmainwnd.cpp:613
+#: dbgmainwnd.cpp:614
 msgid "`%1' is not a file or does not exist"
 msgstr "`%1' ist keine Datei oder existiert nicht"
 
-#: dbgmainwnd.cpp:723
+#: dbgmainwnd.cpp:724
 msgid "|All source files\n"
 msgstr "|Alle Quellcodedateien\n"
 
-#: dbgmainwnd.cpp:724
+#: dbgmainwnd.cpp:725
 msgid "|Source files\n"
 msgstr "|Quellcodedateien\n"
 
-#: dbgmainwnd.cpp:725
+#: dbgmainwnd.cpp:726
 msgid "|Header files\n"
 msgstr "|Header-Dateien\n"
 
-#: dbgmainwnd.cpp:726
+#: dbgmainwnd.cpp:727
 msgid "*|All files"
 msgstr "*|Alle Dateien"
 
-#: dbgmainwnd.cpp:855
+#: dbgmainwnd.cpp:856
 msgid "Select the executable to debug"
 msgstr "Ausführbares Programm zum Debuggen wählen"
 
-#: dbgmainwnd.cpp:868
+#: dbgmainwnd.cpp:869
 msgid "Select core dump"
 msgstr "Core dump wählen"
 
-#: xsldbgdriver.cpp:1460
+#: xsldbgdriver.cpp:1472
 msgid "No memory dump available"
 msgstr "Speicherinhalt nicht verfügbar"
 
@@ -617,7 +695,7 @@ msgstr "Name"
 msgid "Value"
 msgstr "Wert"
 
-#: pgmargs.cpp:328
+#: pgmargs.cpp:339
 msgid "Select a file name to insert as program argument"
 msgstr "Als Programmargument einzusetzende Datei wählen"
 
