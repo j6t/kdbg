@@ -212,6 +212,7 @@ void ProcAttachPS::refresh()
     if (!m_ps->isRunning())
     {
 	processList->clear();
+	buttonOk->setEnabled(false);	// selection was cleared
 	runPS();
     }
 }
@@ -243,7 +244,16 @@ bool ProcAttachPS::setVisibility(QListViewItem* i, const QString& text)
 
     i->setVisible(visible);
 
+    // disable the OK button if the selected item becomes invisible
+    if (i->isSelected())
+	buttonOk->setEnabled(visible);
+
     return visible;
+}
+
+void ProcAttachPS::selectedChanged()
+{
+    buttonOk->setEnabled(processList->selectedItem() != 0);
 }
 
 

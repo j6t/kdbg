@@ -35,6 +35,7 @@ protected:
     void runPS();
     virtual void refresh();
     virtual void filterEdited(const QString& text);
+    virtual void selectedChanged();
 
 protected slots:
     void slotTextReceived(KProcess* proc, char* buffer, int buflen);

@@ -183,6 +183,9 @@
                             <property name="name">
                                 <cstring>buttonOk</cstring>
                             </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
                             <property name="text">
                                 <string>&amp;OK</string>
                             </property>
@@ -194,6 +197,9 @@
                             </property>
                             <property name="default">
                                 <bool>true</bool>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>You must select a process from the list. Then click the &lt;b&gt;OK&lt;/b&gt; button to attach to that process.</string>
                             </property>
                         </widget>
                         <widget class="QPushButton">
@@ -247,6 +253,12 @@
         <receiver>filterEdit</receiver>
         <slot>clear()</slot>
     </connection>
+    <connection>
+        <sender>processList</sender>
+        <signal>selectionChanged()</signal>
+        <receiver>ProcAttachBase</receiver>
+        <slot>selectedChanged()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>filterEdit</tabstop>
@@ -258,6 +270,7 @@
 <slots>
     <slot specifier="pure virtual">refresh()</slot>
     <slot specifier="pure virtual">filterEdited(const QString&amp;)</slot>
+    <slot specifier="pure virtual">selectedChanged()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="10"/>
 </UI>
