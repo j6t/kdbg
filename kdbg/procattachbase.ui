@@ -17,7 +17,7 @@
         <string>Attach to Process</string>
     </property>
     <property name="sizeGripEnabled">
-        <bool>false</bool>
+        <bool>true</bool>
     </property>
     <hbox>
         <property name="name">
