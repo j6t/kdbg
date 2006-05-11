@@ -6,7 +6,7 @@
 #ifndef PgmArgs_included
 #define PgmArgs_included
 
-#include <qdialog.h>
+#include "pgmargsbase.h"
 #include <qlabel.h>
 #include <qlineedit.h>
 #include <qpushbutton.h>
@@ -18,7 +18,7 @@
 
 class QStringList;
 
-class PgmArgs : public QDialog
+class PgmArgs : public PgmArgsBase
 {
     Q_OBJECT
 public:
@@ -26,12 +26,12 @@ public:
 	    const QStringList& allOptions);
     virtual ~PgmArgs();
 
-    void setArgs(const QString& text) { m_programArgs.setText(text); }
-    const char* args() const { return m_programArgs.text(); }
+    void setArgs(const QString& text) { programArgs->setText(text); }
+    QString args() const { return programArgs->text(); }
     void setOptions(const QStringList& selectedOptions);
     QStringList options() const;
-    void setWd(const QString& wd) { m_wd.setText(wd); }
-    QString wd() const { return m_wd.text(); }
+    void setWd(const QString& wd) { wdEdit->setText(wd); }
+    QString wd() const { return wdEdit->text(); }
     QDict<EnvVar>& envVars() { return m_envVars; }
 
 protected:
@@ -41,31 +41,13 @@ protected:
     void parseEnvInput(QString& name, QString& value);
     void modifyVar(bool resurrect);
 
-    QLabel m_label;
-    QLineEdit m_programArgs;
-    QPushButton m_fileBrowse;
     QLabel m_optionsLabel;
     QListBox m_options;
-    QLabel m_wdLabel;
-    QLineEdit m_wd;
-    QPushButton m_wdBrowse;
-    QLabel m_envLabel;
-    QLineEdit m_envVar;
-    QListView m_envList;
-    QPushButton m_buttonOK;
-    QPushButton m_buttonCancel;
-    QPushButton m_buttonModify;
-    QPushButton m_buttonDelete;
-    QHBoxLayout m_layout;
-    QVBoxLayout m_edits;
-    QVBoxLayout m_buttons;
-    QHBoxLayout m_pgmArgsEdit;
-    QHBoxLayout m_wdEdit;
 
 protected slots:
     void modifyVar();
     void deleteVar();
-    void envListCurrentChanged(QListViewItem*);
+    void envListCurrentChanged();
     void accept();
     void browseWd();
     void browseArgs();
