@@ -74,6 +74,9 @@
                                         <property name="name">
                                             <cstring>programArgs</cstring>
                                         </property>
+                                        <property name="whatsThis" stdset="0">
+                                            <string>Specify the arguments with which the program shall be invoked for this debugging session. You specify the arguments just as you would on the command line, that is, you can even use quotes and environment variables, for example:&lt;p&gt;&lt;tt&gt;--message 'start in: ' $HOME&lt;/tt&gt;</string>
+                                        </property>
                                     </widget>
                                     <widget class="QLayoutWidget">
                                         <property name="name">
@@ -92,6 +95,9 @@
                                                 </property>
                                                 <property name="accel">
                                                     <string>Alt+F</string>
+                                                </property>
+                                                <property name="whatsThis" stdset="0">
+                                                    <string>Browse for a file; the full path name will be inserted at the current cursor location in the edit box above.</string>
                                                 </property>
                                             </widget>
                                             <spacer>
@@ -157,6 +163,9 @@
                                         <property name="name">
                                             <cstring>wdEdit</cstring>
                                         </property>
+                                        <property name="whatsThis" stdset="0">
+                                            <string>Specify here the initial working directory where the program is run.</string>
+                                        </property>
                                     </widget>
                                     <widget class="QLayoutWidget">
                                         <property name="name">
@@ -175,6 +184,9 @@
                                                 </property>
                                                 <property name="accel">
                                                     <string>Alt+B</string>
+                                                </property>
+                                                <property name="whatsThis" stdset="0">
+                                                    <string>Browse for the initial working directory where the program is run.</string>
                                                 </property>
                                             </widget>
                                             <spacer>
