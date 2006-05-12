@@ -7,12 +7,7 @@
 #define PgmArgs_included
 
 #include "pgmargsbase.h"
-#include <qlabel.h>
 #include <qlineedit.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
-#include <qlistview.h>
-#include <qlistbox.h>
 #include <qdict.h>
 #include "envvar.h"
 
@@ -40,9 +35,6 @@ protected:
     void initEnvList();
     void parseEnvInput(QString& name, QString& value);
     void modifyVar(bool resurrect);
-
-    QLabel m_optionsLabel;
-    QListBox m_options;
 
 protected slots:
     void modifyVar();

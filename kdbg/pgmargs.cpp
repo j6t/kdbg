@@ -4,6 +4,11 @@
 // This file is under GPL, the GNU General Public Licence
 
 #include "pgmargs.h"
+#include <qlabel.h>
+#include <qpushbutton.h>
+#include <qlistview.h>
+#include <qlistbox.h>
+#include <qtabwidget.h>
 #include <kapp.h>
 #include <kfiledialog.h>
 #include <klocale.h>			/* i18n */
@@ -13,9 +18,7 @@
 PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars,
 		 const QStringList& allOptions) :
 	PgmArgsBase(parent, "pgmargs", true),
-	m_envVars(envVars),
-	m_optionsLabel(this, "options_label"),
-	m_options(this, "options")
+	m_envVars(envVars)
 {
     m_envVars.setAutoDelete(false);
 
@@ -28,34 +31,15 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars,
     // add options only if the option list is non-empty
     if (!allOptions.isEmpty()) 
     {
-	QSize s;
-	m_optionsLabel.setText(i18n("Options:"));
-	s = m_optionsLabel.sizeHint();
-	m_optionsLabel.setMinimumSize(s);
-
-	m_options.setSelectionMode(QListBox::Multi);
-
-	// add 5 entries, then get size hint, then add the rest
-	QStringList rest = allOptions;
-	for (int i = 0; i < 5 && !rest.isEmpty(); i++) {
-	    m_options.insertItem(rest.first());
-	    rest.remove(rest.begin());
-	}
-	s = m_options.sizeHint();
-	m_options.insertStringList(rest);
-
-	m_options.setMinimumSize(s);
-	m_options.setMaximumHeight(s.height());
+	xsldbgOptions->insertStringList(allOptions);
+    }
+    else
+    {
+	delete xsldbgOptionsPage;
+	xsldbgOptionsPage = 0;
     }
 
     initEnvList();
-
-    if (!allOptions.isEmpty()) {
-    } else {
-	m_optionsLabel.hide();
-	m_options.hide();
-	m_options.setEnabled(false);
-    }
 }
 
 PgmArgs::~PgmArgs()
@@ -67,9 +51,9 @@ void PgmArgs::setOptions(const QStringList& selectedOptions)
 {
     QStringList::ConstIterator it;
     for (it = selectedOptions.begin(); it != selectedOptions.end(); ++it) {
-	for (uint i = 0; i < m_options.count(); i++) {
-	    if (m_options.text(i) == *it) {
-		m_options.setSelected(i, true);
+	for (uint i = 0; i < xsldbgOptions->count(); i++) {
+	    if (xsldbgOptions->text(i) == *it) {
+		xsldbgOptions->setSelected(i, true);
 		break;
 	    }
 	}
@@ -80,9 +64,12 @@ void PgmArgs::setOptions(const QStringList& selectedOptions)
 QStringList PgmArgs::options() const
 {
     QStringList sel;
-    for (uint i = 0; i < m_options.count(); i++) {
-	if (m_options.isSelected(i))
-	    sel.append(m_options.text(i));
+    if (xsldbgOptionsPage != 0)
+    {
+	for (uint i = 0; i < xsldbgOptions->count(); i++) {
+	    if (xsldbgOptions->isSelected(i))
+		sel.append(xsldbgOptions->text(i));
+	}
     }
     return sel;
 }

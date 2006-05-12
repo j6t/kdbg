@@ -42,7 +42,7 @@
                     </property>
                     <widget class="QWidget">
                         <property name="name">
-                            <cstring>Widget8</cstring>
+                            <cstring>argsPage</cstring>
                         </property>
                         <attribute name="title">
                             <string>&amp;Arguments</string>
@@ -136,7 +136,7 @@
                     </widget>
                     <widget class="QWidget">
                         <property name="name">
-                            <cstring>Widget9</cstring>
+                            <cstring>wdPage</cstring>
                         </property>
                         <attribute name="title">
                             <string>&amp;Working Directory</string>
@@ -219,7 +219,7 @@
                     </widget>
                     <widget class="QWidget">
                         <property name="name">
-                            <cstring>TabPage</cstring>
+                            <cstring>envPage</cstring>
                         </property>
                         <attribute name="title">
                             <string>&amp;Environment</string>
@@ -342,6 +342,27 @@
                                         </vbox>
                                     </widget>
                                 </hbox>
+                            </widget>
+                        </hbox>
+                    </widget>
+                    <widget class="QWidget">
+                        <property name="name">
+                            <cstring>xsldbgOptionsPage</cstring>
+                        </property>
+                        <attribute name="title">
+                            <string>&amp;xsldbg Options</string>
+                        </attribute>
+                        <hbox>
+                            <property name="name">
+                                <cstring>unnamed</cstring>
+                            </property>
+                            <widget class="QListBox">
+                                <property name="name">
+                                    <cstring>xsldbgOptions</cstring>
+                                </property>
+                                <property name="selectionMode">
+                                    <enum>Multi</enum>
+                                </property>
                             </widget>
                         </hbox>
                     </widget>
