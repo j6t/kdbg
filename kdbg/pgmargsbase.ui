@@ -261,7 +261,7 @@
                                                     <cstring>envLabel</cstring>
                                                 </property>
                                                 <property name="text">
-                                                    <string>Environment variables (NAME=value):</string>
+                                                    <string>Environment variables (&lt;tt&gt;NAME=value&lt;/tt&gt;):</string>
                                                 </property>
                                                 <property name="buddy" stdset="0">
                                                     <cstring>envVar</cstring>
@@ -270,6 +270,9 @@
                                             <widget class="QLineEdit">
                                                 <property name="name">
                                                     <cstring>envVar</cstring>
+                                                </property>
+                                                <property name="whatsThis" stdset="0">
+                                                    <string>To add a new environment variable or to modify one, specify it here in the form &lt;tt&gt;NAME=value&lt;/tt&gt; and click &lt;b&gt;Modify&lt;/b&gt;.</string>
                                                 </property>
                                             </widget>
                                             <widget class="QListView">
@@ -301,6 +304,9 @@
                                                 <property name="selectionMode">
                                                     <enum>Single</enum>
                                                 </property>
+                                                <property name="whatsThis" stdset="0">
+                                                    <string>Environment variables that are set &lt;i&gt;in addition&lt;/i&gt; to those that are inherited are listed in this table. To add new environment variables, specify them as &lt;tt&gt;NAME=value&lt;/tt&gt; in the edit box above and click &lt;b&gt;Modify&lt;/b&gt;. To modify a value, select it in this list and click &lt;b&gt;Modify&lt;/b&gt;. To delete an environment variable, select it in this list and click &lt;b&gt;Delete&lt;/b&gt;.</string>
+                                                </property>
                                             </widget>
                                         </vbox>
                                     </widget>
@@ -322,6 +328,9 @@
                                                 <property name="accel">
                                                     <string>Alt+M</string>
                                                 </property>
+                                                <property name="whatsThis" stdset="0">
+                                                    <string>Enters the environment variable that is currently specified in the edit box into the list. If the named variable is already in the list, it receives a new value; otherwise, a new entry is created.</string>
+                                                </property>
                                             </widget>
                                             <widget class="QPushButton">
                                                 <property name="name">
@@ -332,6 +341,9 @@
                                                 </property>
                                                 <property name="accel">
                                                     <string>Alt+D</string>
+                                                </property>
+                                                <property name="whatsThis" stdset="0">
+                                                    <string>Deletes the selected environment variable from the list. This cannot be used to delete environment variables that are inherited.</string>
                                                 </property>
                                             </widget>
                                             <spacer>
