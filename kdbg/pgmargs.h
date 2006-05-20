@@ -43,6 +43,7 @@ protected slots:
     void accept();
     void browseWd();
     void browseArgs();
+    void invokeHelp();
 };
 
 #endif // PgmArgs_included

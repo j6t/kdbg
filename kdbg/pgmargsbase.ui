@@ -516,6 +516,12 @@
         <receiver>PgmArgsBase</receiver>
         <slot>envListCurrentChanged()</slot>
     </connection>
+    <connection>
+        <sender>buttonHelp</sender>
+        <signal>clicked()</signal>
+        <receiver>PgmArgsBase</receiver>
+        <slot>invokeHelp()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>envVar</tabstop>
@@ -537,6 +543,7 @@
     <slot specifier="pure virtual">modifyVar()</slot>
     <slot specifier="pure virtual">deleteVar()</slot>
     <slot specifier="pure virtual">envListCurrentChanged()</slot>
+    <slot specifier="pure virtual">invokeHelp()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

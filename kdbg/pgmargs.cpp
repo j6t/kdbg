@@ -224,4 +224,9 @@ void PgmArgs::browseArgs()
     }
 }
 
+void PgmArgs::invokeHelp()
+{
+    kapp->invokeHTMLHelp("kdbg/argspwdenv.html");
+}
+
 #include "pgmargs.moc"
