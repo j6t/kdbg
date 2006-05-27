@@ -37,7 +37,7 @@ int main(int argc, char** argv)
 			 VERSION,
 			 I18N_NOOP("A Debugger"),
 			 KAboutData::License_GPL, 
-			 "(c) 1998-2005 Johannes Sixt",
+			 "(c) 1998-2006 Johannes Sixt",
 			 0,		/* any text */
 			 "http://www.kdbg.org/",
 			 "Johannes.Sixt@telecom.at");
