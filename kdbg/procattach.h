@@ -29,19 +29,21 @@ public:
     ProcAttachPS(QWidget* parent);
     ~ProcAttachPS();
 
-    QString text() const { return pidEdit->text(); }
+    QString text() const;
 
 protected:
     void runPS();
-    virtual void processSelected(QListViewItem*);
     virtual void refresh();
-    virtual void pidEdited(const QString& text);
+    virtual void filterEdited(const QString& text);
+    virtual void selectedChanged();
 
 protected slots:
     void slotTextReceived(KProcess* proc, char* buffer, int buflen);
+    void slotPSDone();
 
 protected:
     void pushLine();
+    bool setVisibility(QListViewItem* i, const QString& text);
 
     KProcess* m_ps;
     // parse state

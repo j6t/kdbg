@@ -1,4 +1,4 @@
-<!DOCTYPE UI><UI version="3.1" stdsetdef="1">
+<!DOCTYPE UI><UI version="3.3" stdsetdef="1">
 <class>ProcAttachBase</class>
 <author>Johannes Sixt</author>
 <widget class="QDialog">
@@ -17,7 +17,7 @@
         <string>Attach to Process</string>
     </property>
     <property name="sizeGripEnabled">
-        <bool>false</bool>
+        <bool>true</bool>
     </property>
     <hbox>
         <property name="name">
@@ -25,30 +25,65 @@
         </property>
         <widget class="QLayoutWidget">
             <property name="name">
-                <cstring>layout1</cstring>
+                <cstring>layout7</cstring>
             </property>
             <vbox>
                 <property name="name">
                     <cstring>unnamed</cstring>
                 </property>
-                <widget class="QLabel">
+                <widget class="QLayoutWidget">
                     <property name="name">
-                        <cstring>textLabel3</cstring>
+                        <cstring>layout6</cstring>
                     </property>
-                    <property name="sizePolicy">
-                        <sizepolicy>
-                            <hsizetype>7</hsizetype>
-                            <vsizetype>5</vsizetype>
-                            <horstretch>0</horstretch>
-                            <verstretch>0</verstretch>
-                        </sizepolicy>
-                    </property>
-                    <property name="text">
-                        <string>&amp;Currently running processes:</string>
-                    </property>
-                    <property name="buddy" stdset="0">
-                        <cstring>processList</cstring>
-                    </property>
+                    <hbox>
+                        <property name="name">
+                            <cstring>unnamed</cstring>
+                        </property>
+                        <widget class="QLabel">
+                            <property name="name">
+                                <cstring>filterLabel</cstring>
+                            </property>
+                            <property name="text">
+                                <string>&amp;Filter or PID:</string>
+                            </property>
+                            <property name="buddy" stdset="0">
+                                <cstring>filterEdit</cstring>
+                            </property>
+                        </widget>
+                        <widget class="QLineEdit">
+                            <property name="name">
+                                <cstring>filterEdit</cstring>
+                            </property>
+                            <property name="sizePolicy">
+                                <sizepolicy>
+                                    <hsizetype>7</hsizetype>
+                                    <vsizetype>5</vsizetype>
+                                    <horstretch>0</horstretch>
+                                    <verstretch>0</verstretch>
+                                </sizepolicy>
+                            </property>
+                            <property name="maxLength">
+                                <number>20</number>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Type the name of the process or its process ID (PID) here to reduce the number of entries in the list.</string>
+                            </property>
+                        </widget>
+                        <widget class="QToolButton">
+                            <property name="name">
+                                <cstring>filterClear</cstring>
+                            </property>
+                            <property name="text">
+                                <string>...</string>
+                            </property>
+                            <property name="toolTip" stdset="0">
+                                <string>Clear filter</string>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>Use this button to clear the filter text so that all processes are displayed.</string>
+                            </property>
+                        </widget>
+                    </hbox>
                 </widget>
                 <widget class="QListView">
                     <column>
@@ -96,56 +131,9 @@
                     <property name="allColumnsShowFocus">
                         <bool>true</bool>
                     </property>
-                </widget>
-                <widget class="QLayoutWidget">
-                    <property name="name">
-                        <cstring>layout2</cstring>
+                    <property name="whatsThis" stdset="0">
+                        <string>&lt;p&gt;This list displays all processes that are currently running. You must select the process that you want KDbg to attach to. Use the &lt;b&gt;Filter or PID&lt;/b&gt; edit box to reduce the number of entries in this list.&lt;p&gt;The text in the &lt;i&gt;Command&lt;/i&gt; column is usually, but not always, the command that was used to start the process. The &lt;i&gt;PID&lt;/i&gt; column shows the process ID. The &lt;i&gt;PPID&lt;/i&gt; column shows the process ID of the parent process. Additional columns show more information about the processes that is also available via the system's &lt;i&gt;ps&lt;/i&gt; comand.&lt;/p&gt;&lt;p&gt;The list is not updated automatically. Use the &lt;b&gt;Refresh&lt;/b&gt; button to update it.&lt;/p&gt;</string>
                     </property>
-                    <hbox>
-                        <property name="name">
-                            <cstring>unnamed</cstring>
-                        </property>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>pidLabel</cstring>
-                            </property>
-                            <property name="text">
-                                <string>&amp;Process number:</string>
-                            </property>
-                            <property name="buddy" stdset="0">
-                                <cstring>pidEdit</cstring>
-                            </property>
-                        </widget>
-                        <widget class="QLineEdit">
-                            <property name="name">
-                                <cstring>pidEdit</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>0</hsizetype>
-                                    <vsizetype>5</vsizetype>
-                                    <horstretch>0</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                            <property name="maxLength">
-                                <number>20</number>
-                            </property>
-                        </widget>
-                        <widget class="QLabel">
-                            <property name="name">
-                                <cstring>processText</cstring>
-                            </property>
-                            <property name="sizePolicy">
-                                <sizepolicy>
-                                    <hsizetype>2</hsizetype>
-                                    <vsizetype>5</vsizetype>
-                                    <horstretch>1</horstretch>
-                                    <verstretch>0</verstretch>
-                                </sizepolicy>
-                            </property>
-                        </widget>
-                    </hbox>
                 </widget>
                 <widget class="QLayoutWidget">
                     <property name="name">
@@ -170,6 +158,9 @@
                             <property name="text">
                                 <string>&amp;Refresh</string>
                             </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>This button updates the list of processes.</string>
+                            </property>
                         </widget>
                         <spacer>
                             <property name="name">
@@ -192,6 +183,9 @@
                             <property name="name">
                                 <cstring>buttonOk</cstring>
                             </property>
+                            <property name="enabled">
+                                <bool>false</bool>
+                            </property>
                             <property name="text">
                                 <string>&amp;OK</string>
                             </property>
@@ -203,6 +197,9 @@
                             </property>
                             <property name="default">
                                 <bool>true</bool>
+                            </property>
+                            <property name="whatsThis" stdset="0">
+                                <string>You must select a process from the list. Then click the &lt;b&gt;OK&lt;/b&gt; button to attach to that process.</string>
                             </property>
                         </widget>
                         <widget class="QPushButton">
@@ -239,34 +236,41 @@
         <slot>reject()</slot>
     </connection>
     <connection>
-        <sender>processList</sender>
-        <signal>selectionChanged(QListViewItem*)</signal>
-        <receiver>ProcAttachBase</receiver>
-        <slot>processSelected(QListViewItem*)</slot>
-    </connection>
-    <connection>
         <sender>buttonRefresh</sender>
         <signal>clicked()</signal>
         <receiver>ProcAttachBase</receiver>
         <slot>refresh()</slot>
     </connection>
     <connection>
-        <sender>pidEdit</sender>
+        <sender>filterEdit</sender>
         <signal>textChanged(const QString&amp;)</signal>
         <receiver>ProcAttachBase</receiver>
-        <slot>pidEdited(const QString&amp;)</slot>
+        <slot>filterEdited(const QString&amp;)</slot>
+    </connection>
+    <connection>
+        <sender>filterClear</sender>
+        <signal>clicked()</signal>
+        <receiver>filterEdit</receiver>
+        <slot>clear()</slot>
+    </connection>
+    <connection>
+        <sender>processList</sender>
+        <signal>selectionChanged()</signal>
+        <receiver>ProcAttachBase</receiver>
+        <slot>selectedChanged()</slot>
     </connection>
 </connections>
 <tabstops>
+    <tabstop>filterEdit</tabstop>
     <tabstop>processList</tabstop>
-    <tabstop>pidEdit</tabstop>
+    <tabstop>buttonRefresh</tabstop>
     <tabstop>buttonOk</tabstop>
     <tabstop>buttonCancel</tabstop>
 </tabstops>
 <slots>
-    <slot specifier="pure virtual">processSelected(QListViewItem*)</slot>
     <slot specifier="pure virtual">refresh()</slot>
-    <slot specifier="pure virtual">pidEdited(const QString&amp;)</slot>
+    <slot specifier="pure virtual">filterEdited(const QString&amp;)</slot>
+    <slot specifier="pure virtual">selectedChanged()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="10"/>
 </UI>

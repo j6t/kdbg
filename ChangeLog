@@ -8,6 +8,9 @@ Version 2.0.4
 	receives the focus when the debuggee stops at a breakpoint, when this
 	option is on (http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=171845).
 
+	Added a filter edit box to the Attach to Process dialog to improve
+	usability.
+
 Version 2.0.3
 
 	Fixed parsing of gdb output that mentions "operator<<", "operator>>",
