@@ -100,6 +100,20 @@
                                                     <string>Browse for a file; the full path name will be inserted at the current cursor location in the edit box above.</string>
                                                 </property>
                                             </widget>
+                                            <widget class="QPushButton">
+                                                <property name="name">
+                                                    <cstring>insertDir</cstring>
+                                                </property>
+                                                <property name="text">
+                                                    <string>Insert &amp;directory name...</string>
+                                                </property>
+                                                <property name="accel">
+                                                    <string>Alt+D</string>
+                                                </property>
+                                                <property name="whatsThis" stdset="0">
+                                                    <string>Browse for a directory; the full path name will be inserted at the current cursor location in the edit box above.</string>
+                                                </property>
+                                            </widget>
                                             <spacer>
                                                 <property name="name">
                                                     <cstring>spacer1</cstring>
@@ -490,7 +504,7 @@
         <sender>insertFile</sender>
         <signal>clicked()</signal>
         <receiver>PgmArgsBase</receiver>
-        <slot>browseArgs()</slot>
+        <slot>browseArgFile()</slot>
     </connection>
     <connection>
         <sender>wdBrowse</sender>
@@ -522,6 +536,12 @@
         <receiver>PgmArgsBase</receiver>
         <slot>invokeHelp()</slot>
     </connection>
+    <connection>
+        <sender>insertDir</sender>
+        <signal>clicked()</signal>
+        <receiver>PgmArgsBase</receiver>
+        <slot>browseArgDir()</slot>
+    </connection>
 </connections>
 <tabstops>
     <tabstop>envVar</tabstop>
@@ -530,6 +550,7 @@
     <tabstop>buttonDelete</tabstop>
     <tabstop>programArgs</tabstop>
     <tabstop>insertFile</tabstop>
+    <tabstop>insertDir</tabstop>
     <tabstop>buttonHelp</tabstop>
     <tabstop>buttonOk</tabstop>
     <tabstop>buttonCancel</tabstop>
@@ -538,12 +559,13 @@
     <tabstop>wdBrowse</tabstop>
 </tabstops>
 <slots>
-    <slot specifier="pure virtual">browseArgs()</slot>
+    <slot specifier="pure virtual">browseArgFile()</slot>
     <slot specifier="pure virtual">browseWd()</slot>
     <slot specifier="pure virtual">modifyVar()</slot>
     <slot specifier="pure virtual">deleteVar()</slot>
     <slot specifier="pure virtual">envListCurrentChanged()</slot>
     <slot specifier="pure virtual">invokeHelp()</slot>
+    <slot specifier="pure virtual">browseArgDir()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>
 </UI>

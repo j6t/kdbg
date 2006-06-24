@@ -42,7 +42,8 @@ protected slots:
     void envListCurrentChanged();
     void accept();
     void browseWd();
-    void browseArgs();
+    void browseArgFile();
+    void browseArgDir();
     void invokeHelp();
 };
 

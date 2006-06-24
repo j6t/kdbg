@@ -210,7 +210,7 @@ void PgmArgs::browseWd()
     }
 }
 
-void PgmArgs::browseArgs()
+void PgmArgs::browseArgFile()
 {
     QString caption = i18n("Select a file name to insert as program argument");
 
@@ -218,7 +218,20 @@ void PgmArgs::browseArgs()
     QString f = programArgs->markedText();
     f = KFileDialog::getSaveFileName(f, QString::null,
 				     this, caption);
-    // don't clear the selection of no file was selected
+    // don't clear the selection if no file was selected
+    if (!f.isEmpty()) {
+	programArgs->insert(f);
+    }
+}
+
+void PgmArgs::browseArgDir()
+{
+    QString caption = i18n("Select a directory to insert as program argument");
+
+    // use the selection as default
+    QString f = programArgs->markedText();
+    f = KFileDialog::getExistingDirectory(f, this, caption);
+    // don't clear the selection if no file was selected
     if (!f.isEmpty()) {
 	programArgs->insert(f);
     }
