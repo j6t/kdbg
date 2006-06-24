@@ -3,6 +3,7 @@
 #include <qfile.h>
 #include <qfileinfo.h>
 #include <qdir.h>
+#include <math.h>
 
 enum E { red, green, blue, yellow };
 struct S { int x, y; S* s; };
