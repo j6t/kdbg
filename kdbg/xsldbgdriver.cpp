@@ -409,7 +409,7 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg)
 	m_xslFile = strArg;
     }
 
-    SIZED_QString(cmdString, MAX_FMTLEN + strArg.length());
+    QString cmdString;
     cmdString.sprintf(cmds[cmd].fmt, strArg.latin1());
     return cmdString;
 }
@@ -420,8 +420,7 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, int intArg)
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == XsldbgCmdInfo::argNum);
 
-    SIZED_QString(cmdString, MAX_FMTLEN + 30);
-
+    QString cmdString;
     cmdString.sprintf(cmds[cmd].fmt, intArg);
     return cmdString;
 }
@@ -436,7 +435,7 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
 
     normalizeStringArg(strArg);
 
-    SIZED_QString(cmdString, MAX_FMTLEN + 30 + strArg.length());
+    QString cmdString;
 
     if (cmd == DCtty) {
         /*
@@ -535,8 +534,7 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg1,
     normalizeStringArg(strArg1);
     normalizeStringArg(strArg2);
 
-    SIZED_QString(cmdString,
-                  MAX_FMTLEN + strArg1.length() + strArg2.length());
+    QString cmdString;
     cmdString.sprintf(cmds[cmd].fmt, strArg1.latin1(), strArg2.latin1());
     return cmdString;
 }
@@ -547,7 +545,7 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, int intArg1, int intArg2)
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == XsldbgCmdInfo::argNum2);
 
-    SIZED_QString(cmdString, MAX_FMTLEN + 60);
+    QString cmdString;
     cmdString.sprintf(cmds[cmd].fmt, intArg1, intArg2);
     return cmdString;
 }
@@ -714,7 +712,7 @@ parseErrorMessage(const char *output,
 
             if (endMsg == 0)
                 endMsg = output + strlen(output);
-            variable->m_value = FROM_LATIN1(output, endMsg - output);
+            variable->m_value = QString::fromLatin1(output, endMsg - output);
         } else {
             variable = 0;
         }
@@ -774,7 +772,7 @@ parseVar(const char *&s)
 	TRACE("Found print expr");
         if (nextLine) {
             p = p + 2;          /* skip the "= " */
-            name = FROM_LATIN1(p, nextLine - p);
+            name = QString::fromLatin1(p, nextLine - p);
             kind = VarTree::NKplain;
             p = nextLine + 1;
             variable = new VarTree(name, kind);
@@ -857,7 +855,7 @@ parseName(const char *&s, QString & name, VarTree::NameKind & kind)
     }
 
 
-    name = FROM_LATIN1(s, len);
+    name = QString::fromLatin1(s, len);
     /* XSL variables will have a $ prefix to be evaluated 
      * properly */
     //TRACE(QString("parseName got name" ) +  name);

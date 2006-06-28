@@ -113,35 +113,3 @@ if test -n "$PS_COMMAND"; then
   fi
 fi
 AM_CONDITIONAL(HAVE_PS_COMMAND, test -n "$PS_COMMAND")
-
-AH_VERBATIM([SIZED_QString],
-[#ifdef QT_VERSION
-# if QT_VERSION < 200
-#  define SIZED_QString(name,size) QString name(size)
-#  define FROM_LATIN1(cstr,len) QString(cstr,(len)+1)
-# else
-#  define SIZED_QString(name,size) QString name
-#  define FROM_LATIN1(cstr,len) QString::fromLatin1(cstr,len)
-# endif
-#endif])
-
-dnl -----------------
-AC_MSG_CHECKING(for KDE 3)
-
-AC_LANG_CPLUSPLUS
-ac_cxxflags_safe="$CXXFLAGS"
-CXXFLAGS="$CXXFLAGS -I$qt_includes $all_includes"
-
-AC_TRY_COMPILE([
-#include <kapp.h>
-], [
-#if KDE_VERSION < 292
-give me an error, this is KDE 2
-#endif
-], [this_is_kde3=yes],[this_is_kde3=no])
-
-AM_CONDITIONAL(BUILD_FOR_KDE3, test x$this_is_kde3 = xyes)
-
-CXXFLAGS="$ac_cxxflags_safe"
-
-AC_MSG_RESULT($this_is_kde3)

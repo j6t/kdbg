@@ -45,13 +45,7 @@ kdbg_LDFLAGS = \
 	$(all_libraries) $(KDE_RPATH)
 
 # the libraries to link against.
-if BUILD_FOR_KDE3
-MYKDELIBS=$(LIB_KIO)
-else
-MYKDELIBS=$(LIB_KFILE)
-endif
-
-kdbg_LDADD = $(MYKDELIBS)
+kdbg_LDADD = $(LIB_KIO)
 
 # this option you can leave out. Just, if you use "make dist", you need it
 noinst_HEADERS = \

@@ -1741,7 +1741,7 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 	exprFmt = var->m_type->m_exprStrings[var->m_exprIndex];
     }
 
-    SIZED_QString(expr, exprFmt.length() + base.length() + 10);
+    QString expr;
     expr.sprintf(exprFmt, base.data());
 
     DbgCommand dbgCmd = DCprintStruct;
