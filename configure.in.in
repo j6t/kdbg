@@ -1,4 +1,4 @@
 #MIN_CONFIG
 
-AM_INIT_AUTOMAKE(kdbg, 2.0.4)
+AM_INIT_AUTOMAKE(kdbg, 2.1pre)
 
