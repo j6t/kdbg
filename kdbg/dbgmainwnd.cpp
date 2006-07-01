@@ -401,6 +401,28 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
     fixDockConfig(config, true);	// upgrade
     readDockConfig(config);
 
+    // Workaround bug #87787: KDockManager stores the titles of the KDockWidgets
+    // in the config files, although they are localized:
+    // If the user changes the language, the titles remain in the previous language.
+    struct { QString text; QWidget* w; } dw[] = {
+	{ i18n("Stack"), m_btWindow },
+	{ i18n("Locals"), m_localVariables },
+	{ i18n("Watches"), m_watches },
+	{ i18n("Registers"), m_registers },
+	{ i18n("Breakpoints"), m_bpTable },
+	{ i18n("Threads"), m_threads },
+	{ i18n("Output"), m_ttyWindow },
+	{ i18n("Memory"), m_memoryWindow }
+    };
+    for (int i = 0; i < sizeof(dw)/sizeof(dw[0]); i++)
+    {
+	KDockWidget* w = dockParent(dw[i].w);
+	w->setTabPageLabel(dw[i].text);
+	// this actually changes the captions in the tabs:
+	QEvent ev(QEvent::CaptionChange);
+	w->event(&ev);
+    }
+
     m_recentExecAction->loadEntries(config, RecentExecutables);
 
     DebuggerMainWndBase::restoreSettings(config);
