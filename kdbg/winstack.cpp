@@ -68,6 +68,11 @@ void WinStack::reloadAllFiles()
     }
 }
 
+QSize WinStack::sizeHint() const
+{
+    return QSize(640, 480);
+}
+
 void WinStack::activate(const QString& fileName, int lineNo, const DbgAddr& address)
 {
     QFileInfo fi(fileName);

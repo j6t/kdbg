@@ -86,6 +86,9 @@ CLEANFILES = $(kdbg_METASOURCES)
 
 xdg_apps_DATA = kdbg.desktop
 
+configdir = $(kde_confdir)
+config_DATA = kdbgrc
+
 rcdir = $(kde_datadir)/kdbg
 rc_DATA = kdbgui.rc
 
@@ -101,4 +104,4 @@ messages:
 		$$LIST && mv messages.po $(top_srcdir)/po/kdbg.pot; \
 	rm -f rc.cpp
 
-EXTRA_DIST = kdbg.desktop
+EXTRA_DIST = kdbg.desktop kdbgrc

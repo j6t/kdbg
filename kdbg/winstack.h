@@ -86,6 +86,7 @@ public:
     void maybeTip(const QPoint& p);
     bool hasWindows() const { return m_fileList.size() > 0; }
 
+    virtual QSize sizeHint() const;
     virtual void resizeEvent(QResizeEvent*);
 
 signals:
