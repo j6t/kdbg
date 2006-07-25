@@ -46,4 +46,9 @@
 33. Clear the status bar when the program is (re-)started (because if this takes
     some time, you don't know whether KDbg does something.)
 
-34.
+34. For values in popups, check also for members, i.e. try this->foo, otherwise
+    member values never appear in popups.
+
+35. Allow to copy variable values to the clipboard.
+
+36.
