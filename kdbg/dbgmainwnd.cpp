@@ -217,7 +217,7 @@ void DebuggerMainWnd::initKAction()
     KStdAction::showStatusbar(this, SLOT(slotViewStatusbar()), actionCollection());
 
     // view menu
-    (void)new KToggleAction(i18n("&Find"), "find", 0, m_filesWindow,
+    (void)new KToggleAction(i18n("&Find"), "find", CTRL+Key_F, m_filesWindow,
 			    SLOT(slotViewFind()), actionCollection(),
 			    "view_find");
     i18n("Source &code");
