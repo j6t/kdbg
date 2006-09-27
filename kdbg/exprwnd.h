@@ -97,6 +97,8 @@ public:
     VarTree* topLevelExprByName(const char* name);
     /** return a member of the struct that pointer \a v refers to */
     static VarTree* ptrMemberByName(VarTree* v, const QString& name);
+    /** return a member of the struct \a v */
+    static VarTree* memberByName(VarTree* v, const QString& name);
     /** removes an expression; must be on the topmost level*/
     void removeExpr(VarTree* item);
     /** retrieves the expression string at the specified line */

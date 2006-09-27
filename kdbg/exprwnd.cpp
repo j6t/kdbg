@@ -551,13 +551,30 @@ VarTree* ExprWnd::ptrMemberByName(VarTree* v, const QString& name)
 
     // the only child of v is the pointer value that represents the struct
     KTreeViewItem* item = v->getChild();
+    return memberByName(static_cast<VarTree*>(item), name);
+}
 
-    // search the children for name
-    item = item->getChild();
+VarTree* ExprWnd::memberByName(VarTree* v, const QString& name)
+{
+    // search immediate children for name
+    KTreeViewItem* item = v->getChild();
     while (item != 0 && item->getText() != name)
 	item = item->getSibling();
 
-    return static_cast<VarTree*>(item);
+    if (item != 0)
+	return static_cast<VarTree*>(item);
+
+    // try in base classes
+    item = v->getChild();
+    while (item != 0 &&
+	   static_cast<VarTree*>(item)->m_nameKind == VarTree::NKtype)
+    {
+	v = memberByName(static_cast<VarTree*>(item), name);
+	if (v != 0)
+	    return v;
+	item = item->getSibling();
+    }
+    return 0;
 }
 
 void ExprWnd::removeExpr(VarTree* item)
