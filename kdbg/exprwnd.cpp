@@ -543,6 +543,23 @@ VarTree* ExprWnd::topLevelExprByName(const char* name)
     return static_cast<VarTree*>(item);
 }
 
+VarTree* ExprWnd::ptrMemberByName(VarTree* v, const QString& name)
+{
+    // v must be a pointer variable, must have children
+    if (v->m_varKind != VarTree::VKpointer || v->childCount() == 0)
+	return 0;
+
+    // the only child of v is the pointer value that represents the struct
+    KTreeViewItem* item = v->getChild();
+
+    // search the children for name
+    item = item->getChild();
+    while (item != 0 && item->getText() != name)
+	item = item->getSibling();
+
+    return static_cast<VarTree*>(item);
+}
+
 void ExprWnd::removeExpr(VarTree* item)
 {
     // must remove any pointers scheduled for update from the list
