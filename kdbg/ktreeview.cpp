@@ -27,6 +27,7 @@
 #include <qapplication.h>		/* used for QApplication::closingDown() */
 #include <qkeycode.h>			/* used for keyboard interface */
 #include <qpainter.h>			/* used to paint items */
+#include <qptrstack.h>
 #include <assert.h>
 
 /*
@@ -918,9 +919,7 @@ KTreeViewItem* KTreeView::itemAt(const KPath& path)
 	return 0;
 
     // need a copy of the path because recursiveFind will destroy it
-    KPath pathCopy;
-    pathCopy.setAutoDelete(false);
-    pathCopy = path;
+    KPath pathCopy = path;
 
     return recursiveFind(pathCopy);
 }
@@ -1463,7 +1462,7 @@ void KTreeView::itemPath(KTreeViewItem* item, KPath& path) const
     assert(item->owner == this);
     if (item != treeRoot) {
 	itemPath(item->getParent(), path);
-	path.push(new QString(item->getText()));
+	path.push(item->getText());
     }
 }
 
@@ -1854,7 +1853,7 @@ KTreeViewItem* KTreeView::recursiveFind(KPath& path)
 	return treeRoot;
 
     // get the next key
-    QString* searchString = path.pop();
+    QString searchString = path.pop();
 
     // find the parent item
     KTreeViewItem* parent = recursiveFind(path);
@@ -1866,7 +1865,7 @@ KTreeViewItem* KTreeView::recursiveFind(KPath& path)
      */
     KTreeViewItem* sibling = parent->getChild();
     while (sibling != 0) {
-	if (*searchString == sibling->getText()) {
+	if (searchString == sibling->getText()) {
 	    break;			/* found it! */
 	}
 	sibling = sibling->getSibling();

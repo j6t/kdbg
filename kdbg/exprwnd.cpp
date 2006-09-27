@@ -282,11 +282,9 @@ void ExprWnd::insertExpr(VarTree* expr)
 void ExprWnd::updateExpr(VarTree* expr)
 {
     // search the root variable
-    QString p = expr->getText();
     KPath path;
-    path.push(&p);
+    path.push(expr->getText());
     KTreeViewItem* item = itemAt(path);
-    path.pop();
     if (item == 0) {
 	return;
     }
@@ -538,11 +536,9 @@ bool ExprWnd::collectUnknownTypes(KTreeViewItem* item, void* user)
 
 VarTree* ExprWnd::topLevelExprByName(const char* name)
 {
-    QString p = name;
     KPath path;
-    path.push(&p);
+    path.push(name);
     KTreeViewItem* item = itemAt(path);
-    path.pop();
 
     return static_cast<VarTree*>(item);
 }

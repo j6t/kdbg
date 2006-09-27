@@ -26,12 +26,12 @@
 #define KDE_KTREE_VIEW_H
 
 #include <qpixmap.h>			/* used in items */
-#include <qptrstack.h>			/* used to specify tree paths */
+#include <qvaluestack.h>		/* used to specify tree paths */
 #include <qstring.h>			/* used in items */
 #include "tableview.h"			/* base class for widget */
 
 // use stack of strings to represent path information
-typedef QStack<QString> KPath;
+typedef QValueStack<QString> KPath;
 
 class KTreeView;			/* forward declaration */
 
