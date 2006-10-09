@@ -115,6 +115,7 @@ static GdbCmdInfo cmds[] = {
     { DCcondition, "condition %d %s\n", GdbCmdInfo::argNumString},
     { DCsetpc, "set variable $pc=%s\n", GdbCmdInfo::argString },
     { DCignore, "ignore %d %d\n", GdbCmdInfo::argNum2},
+    { DCprintWChar, "print ($s=%s)?*$s@wcslen($s):0x0\n", GdbCmdInfo::argString },
     { DCsetvariable, "set variable %s=%s\n", GdbCmdInfo::argString2 },
 };
 
@@ -2025,6 +2026,16 @@ void GdbDriver::parseLocals(const char* output, QList<VarTree>& newVars)
 		goto skipDuplicate;
 	    }
 	}
+        if ((variable->m_value.startsWith("(const wchar_t *)") ||
+             variable->m_value.startsWith("(wchar_t *)")) &&
+	    !variable->m_value.endsWith(" 0x0"))
+        {
+            variable->m_varKind = VarTree::VKsimple;
+            variable->m_partialValue = variable->m_value;
+            variable->m_value = QString::null;
+            CmdQueueItem *c = executeCmd(DCprintWChar, variable->getText());
+            c->m_expr = new VarTree(*variable);
+        }
 	newVars.append(variable);
     skipDuplicate:;
     }

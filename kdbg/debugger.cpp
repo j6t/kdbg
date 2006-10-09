@@ -1045,6 +1045,9 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCprintDeref:
 	handlePrintDeref(cmd, output);
 	break;
+    case DCprintWChar:
+        handlePrintWChar(cmd, output);
+        break;
     case DCattach:
 	m_haveExecutable = true;
 	// fall through
@@ -1397,6 +1400,34 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
     return true;
 }
 
+bool KDebugger::handlePrintWChar(CmdQueueItem* cmd, const char* output)
+{
+   ASSERT(cmd->m_expr != 0);
+
+   VarTree* variable = m_d->parseQCharArray(output, false, true);
+   if (variable == 0) return false;
+
+   variable->setText(cmd->m_expr->getText());
+   variable->m_nameKind = VarTree::NKplain;
+   variable->m_varKind = VarTree::VKsimple;
+//    variable->m_value = partValue;
+
+   QString val = cmd->m_expr->m_partialValue;
+   int pos = val.find(") ");
+   if (pos>0) val = val.mid(pos+2);
+   variable->m_value = val+" L"+variable->m_value;
+
+   m_localVariables.updateExpr(variable);
+   delete variable;
+
+   delete cmd->m_expr;
+   cmd->m_expr = 0;
+
+   evalExpressions();                  /* enqueue dereferenced pointers */
+
+   return true;
+}
+
 bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 {
     ASSERT(cmd->m_expr != 0);
@@ -1578,14 +1609,23 @@ void KDebugger::dereferencePointer(ExprWnd* wnd, VarTree* exprItem,
 				   bool immediate)
 {
     ASSERT(exprItem->m_varKind == VarTree::VKpointer);
+    DbgCommand dbgCmd = DCprintDeref;
 
     QString expr = exprItem->computeExpr();
+
+    if (strncmp(exprItem->m_value, "(const wchar_t *)", 17)==0 ||
+        strncmp(exprItem->m_value, "(wchar_t *)", 11)==0)
+    {
+       expr = "*"+expr+"@wcslen("+expr+")";
+       dbgCmd = DCprintWChar;
+    }
+
     TRACE("dereferencing pointer: " + expr);
     CmdQueueItem* cmd;
     if (immediate) {
-	cmd = m_d->queueCmd(DCprintDeref, expr, DebuggerDriver::QMoverrideMoreEqual);
+        cmd = m_d->queueCmd(dbgCmd, expr, DebuggerDriver::QMoverrideMoreEqual);
     } else {
-	cmd = m_d->queueCmd(DCprintDeref, expr, DebuggerDriver::QMoverride);
+        cmd = m_d->queueCmd(dbgCmd, expr, DebuggerDriver::QMoverride);
     }
     // remember which expr this was
     cmd->m_expr = exprItem;
@@ -1632,7 +1672,7 @@ void KDebugger::handleFindType(CmdQueueItem* cmd, const char* output)
 	    }
 	}
 	if (info == 0) {
-	    TRACE("unknown type");
+            TRACE("unknown type "+type);
 	    cmd->m_expr->m_type = TypeInfo::unknownType();
 	} else {
 	    cmd->m_expr->m_type = info;

@@ -355,6 +355,7 @@ protected:
     void handleLocals(const char* output);
     bool handlePrint(CmdQueueItem* cmd, const char* output);
     bool handlePrintDeref(CmdQueueItem* cmd, const char* output);
+    bool handlePrintWChar(CmdQueueItem* cmd, const char* output);
     void handleBacktrace(const char* output);
     void handleFrameChange(const char* output);
     void handleFindType(CmdQueueItem* cmd, const char* output);

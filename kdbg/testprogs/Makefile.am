@@ -13,7 +13,7 @@ AM_CXXFLAGS = -g
 CXXFLAGS:=$(patsubst -O%,,$(CXXFLAGS))
 
 if BUILDTESTPROGS
-PROGS = testfile locals maths repeats std templates
+PROGS = testfile locals maths repeats std templates widechar
 else
 PROGS =
 endif
@@ -39,3 +39,6 @@ std_LDFLAGS = -g
 
 templates_SOURCES = templates.cpp
 templates_LDFLAGS = -g
+
+widechar_SOURCES = widechar.cpp
+widechar_LDFLAGS = -g
