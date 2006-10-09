@@ -8,6 +8,10 @@ INCLUDES= $(all_includes)
 # always compile with debugging info switched on
 AM_CXXFLAGS = -g
 
+# Disable optimization to ensure that variables are not hidden by the
+# compiler
+CXXFLAGS:=$(patsubst -O%,,$(CXXFLAGS))
+
 if BUILDTESTPROGS
 PROGS = testfile locals maths repeats std templates
 else
