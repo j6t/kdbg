@@ -287,6 +287,14 @@ void WinStack::resizeEvent(QResizeEvent*)
     }
 }
 
+QString WinStack::activeFileName() const
+{
+    QString f;
+    if (m_activeWindow != 0)
+	f = m_activeWindow->fileName();
+    return f;
+}
+
 void WinStack::slotFindForward()
 {
     if (m_activeWindow != 0)

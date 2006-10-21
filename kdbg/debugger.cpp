@@ -2126,8 +2126,14 @@ void KDebugger::slotValuePopup(const QString& expr)
 	// not found, check watch expressions
 	v = m_watchVariables.topLevelExprByName(expr);
 	if (v == 0) {
-	    // nothing found; do nothing
-	    return;
+	    // try a member of 'this'
+	    v = m_localVariables.topLevelExprByName("this");
+	    if (v != 0)
+		v = ExprWnd::ptrMemberByName(v, expr);
+	    if (v == 0) {
+		// nothing found; do nothing
+		return;
+	    }
 	}
     }
 

@@ -217,7 +217,7 @@ void DebuggerMainWnd::initKAction()
     KStdAction::showStatusbar(this, SLOT(slotViewStatusbar()), actionCollection());
 
     // view menu
-    (void)new KToggleAction(i18n("&Find"), "find", 0, m_filesWindow,
+    (void)new KToggleAction(i18n("&Find"), "find", CTRL+Key_F, m_filesWindow,
 			    SLOT(slotViewFind()), actionCollection(),
 			    "view_find");
     i18n("Source &code");
@@ -849,9 +849,18 @@ void DebuggerMainWnd::slotFileWndEmptyMenu(const QPoint& pos)
 
 void DebuggerMainWnd::slotFileOpen()
 {
-    QString fileName = myGetFileName(i18n("Open"),
-				     m_lastDirectory,
-				     makeSourceFilter(), this);
+    // start browsing in the active file's directory
+    // fall back to last used directory (executable)
+    QString dir = m_lastDirectory;
+    QString fileName = m_filesWindow->activeFileName();
+    if (!fileName.isEmpty()) {
+	QFileInfo fi(fileName);
+	dir = fi.dirPath();
+    }
+
+    fileName = myGetFileName(i18n("Open"),
+			     dir,
+			     makeSourceFilter(), this);
 
     if (!fileName.isEmpty())
     {

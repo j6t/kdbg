@@ -282,11 +282,9 @@ void ExprWnd::insertExpr(VarTree* expr)
 void ExprWnd::updateExpr(VarTree* expr)
 {
     // search the root variable
-    QString p = expr->getText();
     KPath path;
-    path.push(&p);
+    path.push(expr->getText());
     KTreeViewItem* item = itemAt(path);
-    path.pop();
     if (item == 0) {
 	return;
     }
@@ -538,13 +536,45 @@ bool ExprWnd::collectUnknownTypes(KTreeViewItem* item, void* user)
 
 VarTree* ExprWnd::topLevelExprByName(const char* name)
 {
-    QString p = name;
     KPath path;
-    path.push(&p);
+    path.push(name);
     KTreeViewItem* item = itemAt(path);
-    path.pop();
 
     return static_cast<VarTree*>(item);
+}
+
+VarTree* ExprWnd::ptrMemberByName(VarTree* v, const QString& name)
+{
+    // v must be a pointer variable, must have children
+    if (v->m_varKind != VarTree::VKpointer || v->childCount() == 0)
+	return 0;
+
+    // the only child of v is the pointer value that represents the struct
+    KTreeViewItem* item = v->getChild();
+    return memberByName(static_cast<VarTree*>(item), name);
+}
+
+VarTree* ExprWnd::memberByName(VarTree* v, const QString& name)
+{
+    // search immediate children for name
+    KTreeViewItem* item = v->getChild();
+    while (item != 0 && item->getText() != name)
+	item = item->getSibling();
+
+    if (item != 0)
+	return static_cast<VarTree*>(item);
+
+    // try in base classes
+    item = v->getChild();
+    while (item != 0 &&
+	   static_cast<VarTree*>(item)->m_nameKind == VarTree::NKtype)
+    {
+	v = memberByName(static_cast<VarTree*>(item), name);
+	if (v != 0)
+	    return v;
+	item = item->getSibling();
+    }
+    return 0;
 }
 
 void ExprWnd::removeExpr(VarTree* item)
