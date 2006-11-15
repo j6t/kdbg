@@ -1452,7 +1452,6 @@ bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 	variable->m_nameKind = VarTree::NKaddress;
 
 	dummyParent->appendChild(variable);
-	dummyParent->setDeleteChildren(true);
 	// expand the first level for convenience
 	variable->setExpanded(true);
 	TRACE("update ptr: " + cmd->m_expr->getText());

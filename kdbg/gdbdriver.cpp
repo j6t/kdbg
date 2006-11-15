@@ -888,7 +888,6 @@ static VarTree* parseVar(const char*& s)
 	p++;
 
     VarTree* variable = new VarTree(name, kind);
-    variable->setDeleteChildren(true);
     
     if (!parseValue(p, variable)) {
 	delete variable;
@@ -1431,7 +1430,6 @@ static bool parseValueSeq(const char*& s, VarTree* variable)
 	QString name;
 	name.sprintf("[%d]", index);
 	VarTree* var = new VarTree(name, VarTree::NKplain);
-	var->setDeleteChildren(true);
 	good = parseValue(s, var);
 	if (!good) {
 	    delete var;
@@ -1465,7 +1463,6 @@ static bool parseValueSeq(const char*& s, VarTree* variable)
 	if (strncmp(s, "...", 3) == 0) {
 	    s += 3;
 	    VarTree* var = new VarTree("...", VarTree::NKplain);
-	    var->setDeleteChildren(true);
 	    var->m_value = i18n("<additional entries of the array suppressed>");
 	    variable->appendChild(var);
 	    break;

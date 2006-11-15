@@ -65,8 +65,7 @@ public:
     KTreeViewItem(const QString& text, const QPixmap& pixmap);
 
     /**
-     * Destructor. It destroys its children if this item has been marked
-     * with setDeleteChildren(true).
+     * Destructor. It also destroys its children.
      */
     virtual ~KTreeViewItem();
 
@@ -195,13 +194,6 @@ public:
      * doesn't have children.
      */
     void setDelayedExpanding(bool flag);
-
-    /**
-     * Tells the item whether it should delete its children when it is
-     * deleted. The default is false, which means that the child items must
-     * be deleted explicitly.
-     */
-    void setDeleteChildren(bool flag);
 
     /**
      * Tells the item whether it should draw the expand button. The default
@@ -359,7 +351,6 @@ protected:
     KTreeViewItem* sibling;
     QPixmap pixmap;
     QString text;
-    bool deleteChildren;
 };
 
 /**
@@ -411,8 +402,7 @@ public:
     KTreeView(QWidget* parent = 0, const char* name = 0, WFlags f = 0);
 
     /**
-     * Desctructor. Deletes all items from the topmost level that have been
-     * marked with setDeleteChildren(true).
+     * Desctructor. Deletes all items.
      */
     virtual ~KTreeView();
 

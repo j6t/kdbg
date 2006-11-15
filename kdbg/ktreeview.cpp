@@ -49,8 +49,7 @@ KTreeViewItem::KTreeViewItem(const QString& theText) :
 	doText(true),
 	child(0),
 	parent(0),
-	sibling(0),
-	deleteChildren(false)
+	sibling(0)
 {
     text = theText;
 }
@@ -67,8 +66,7 @@ KTreeViewItem::KTreeViewItem(const QString& theText,
 	doText(true),
 	child(0),
 	parent(0),
-	sibling(0),
-	deleteChildren(false)
+	sibling(0)
 {
     text = theText;
     pixmap = thePixmap;
@@ -77,14 +75,12 @@ KTreeViewItem::KTreeViewItem(const QString& theText,
 // destructor
 KTreeViewItem::~KTreeViewItem()
 {
-    if (deleteChildren) {
-	// remove the children
-	KTreeViewItem* i = child;
-	while (i) {
-	    KTreeViewItem* d = i;
-	    i = i->getSibling();
-	    delete d;
-	}
+    // remove the children
+    KTreeViewItem* i = child;
+    while (i) {
+	KTreeViewItem* d = i;
+	i = i->getSibling();
+	delete d;
     }
 }
 
@@ -463,12 +459,6 @@ void KTreeViewItem::setDelayedExpanding(bool flag)
     delayedExpanding = flag;
 }
 
-// tells the item whether it shall delete child items
-void KTreeViewItem::setDeleteChildren(bool flag)
-{
-    deleteChildren = flag;
-}
-
 // sets the draw expand button flag of this item
 void KTreeViewItem::setDrawExpandButton(bool doit)
 {
@@ -619,7 +609,6 @@ void KTreeView::appendChildItem(const char* theText, const QPixmap& thePixmap,
 				int index)
 {
     KTreeViewItem* item = new KTreeViewItem(theText, thePixmap);
-    item->setDeleteChildren(true);
     appendChildItem(item, index);
 }
 
@@ -629,7 +618,6 @@ void KTreeView::appendChildItem(const char* theText, const QPixmap& thePixmap,
 				const KPath& thePath)
 {
     KTreeViewItem* item = new KTreeViewItem(theText, thePixmap);
-    item->setDeleteChildren(true);
     appendChildItem(item, thePath);
 }
 
@@ -841,7 +829,6 @@ bool KTreeView::insertItem(const char* theText, const QPixmap& thePixmap,
     KTreeViewItem* refItem = itemAt(row);
 
     KTreeViewItem* item = new KTreeViewItem(theText, thePixmap);
-    item->setDeleteChildren(true);
 
     bool success = insertItem(refItem, item, prefix);
     if (!success)
@@ -858,7 +845,6 @@ bool KTreeView::insertItem(const char* theText, const QPixmap& thePixmap,
     KTreeViewItem* refItem = itemAt(path);
 
     KTreeViewItem* item = new KTreeViewItem(theText, thePixmap);
-    item->setDeleteChildren(true);
 
     bool success = insertItem(refItem, item, prefix);
     if (!success)

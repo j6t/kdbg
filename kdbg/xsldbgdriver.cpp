@@ -777,7 +777,6 @@ parseVar(const char *&s)
             p = nextLine + 1;
             variable = new VarTree(name, kind);
             variable->m_varKind = VarTree::VKsimple;
-            variable->setDeleteChildren(true);
             parseValue(p, variable);
             return variable;
         }
@@ -797,7 +796,6 @@ parseVar(const char *&s)
       variable = new VarTree(name, kind);
       if (variable != 0L) {
 	  variable->m_varKind = VarTree::VKsimple;
-        variable->setDeleteChildren(true);
       }
     }else{
       p++;
@@ -811,7 +809,6 @@ parseVar(const char *&s)
       variable = new VarTree(name, kind);
       if (variable != 0L) {
 	  variable->m_varKind = VarTree::VKsimple;
-	  variable->setDeleteChildren(true);
       }
       if (*p == '\n')
 	p++;
