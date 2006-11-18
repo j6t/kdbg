@@ -121,6 +121,10 @@ bool KDebugger::debugProgram(const QString& name,
     connect(driver, SIGNAL(inferiorRunning()), SLOT(slotInferiorRunning()));
     connect(driver, SIGNAL(enterIdleState()), SLOT(backgroundUpdate()));
     connect(driver, SIGNAL(enterIdleState()), SIGNAL(updateUI()));
+    connect(&m_localVariables, SIGNAL(removingItem(VarTree*)),
+	    driver, SLOT(dequeueCmdByVar(VarTree*)));
+    connect(&m_watchVariables, SIGNAL(removingItem(VarTree*)),
+	    driver, SLOT(dequeueCmdByVar(VarTree*)));
 
     // create the program settings object
     openProgramConfig(name);
@@ -1316,8 +1320,10 @@ void KDebugger::handleLocals(const char* output)
 	    // old variable not in the new variables
 	    TRACE(QString("old var deleted: ") + n);
 	    v = m_localVariables.topLevelExprByName(n);
-	    removeExpr(&m_localVariables, v);
-	    if (v != 0) repaintNeeded = true;
+	    if (v != 0) {
+		m_localVariables.removeExpr(v);
+		repaintNeeded = true;
+	    }
 	} else {
 	    // variable in both old and new lists: update
 	    TRACE(QString("update var: ") + n);
@@ -1775,18 +1781,6 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
     cmd->m_exprWnd = wnd;
 }
 
-/* removes expression from window */
-void KDebugger::removeExpr(ExprWnd* wnd, VarTree* var)
-{
-    if (var == 0)
-	return;
-
-    // must remove any references to var from command queues
-    m_d->dequeueCmdByVar(var);
-
-    wnd->removeExpr(var);
-}
-
 void KDebugger::handleSharedLibs(const char* output)
 {
     // delete all known libraries
@@ -1865,7 +1859,7 @@ void KDebugger::slotDeleteWatch()
     if (m_watchEvalExpr.findRef(item) >= 0) {
 	m_watchEvalExpr.remove();
     }
-    removeExpr(&m_watchVariables, item);
+    m_watchVariables.removeExpr(item);
     // item is invalid at this point!
 }
 

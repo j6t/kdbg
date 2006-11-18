@@ -373,7 +373,6 @@ protected:
     void exprExpandingHelper(ExprWnd* wnd, KTreeViewItem* item, bool& allow);
     void dereferencePointer(ExprWnd* wnd, VarTree* var, bool immediate);
     void determineType(ExprWnd* wnd, VarTree* var);
-    void removeExpr(ExprWnd* wnd, VarTree* var);
     void queueMemoryDump(bool immediate);
     CmdQueueItem* loadCoreFile();
     void openProgramConfig(const QString& name);

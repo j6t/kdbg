@@ -472,12 +472,13 @@ void ExprWnd::replaceChildren(VarTree* display, VarTree* newValues)
     ASSERT(display->childCount() == 0 || display->m_varKind != VarTree::VKsimple);
 
     // delete all children of display
-    KTreeViewItem* c;
-    while ((c = display->getChild()) != 0) {
+    while (VarTree* c = static_cast<VarTree*>(display->getChild())) {
+	unhookSubtree(c);
 	display->removeChild(c);
+	delete c;
     }
     // insert copies of the newValues
-    for (c = newValues->getChild(); c != 0; c = c->getSibling()) {
+    for (KTreeViewItem* c = newValues->getChild(); c != 0; c = c->getSibling()) {
 	VarTree* v = static_cast<VarTree*>(c);
 	VarTree* vNew = new VarTree(v->getText(), v->m_nameKind);
 	vNew->m_varKind = v->m_varKind;
@@ -579,10 +580,7 @@ VarTree* ExprWnd::memberByName(VarTree* v, const QString& name)
 
 void ExprWnd::removeExpr(VarTree* item)
 {
-    // must remove any pointers scheduled for update from the list
-    sweepList(m_updatePtrs, item);
-    sweepList(m_updateType, item);
-    sweepList(m_updateStruct, item);
+    unhookSubtree(item);
 
     takeItem(item);
     delete item;
@@ -590,7 +588,16 @@ void ExprWnd::removeExpr(VarTree* item)
     updateValuesWidth();
 }
 
-void ExprWnd::sweepList(QList<VarTree>& list, VarTree* subTree)
+void ExprWnd::unhookSubtree(VarTree* subTree)
+{
+    // must remove any pointers scheduled for update from the list
+    unhookSubtree(m_updatePtrs, subTree);
+    unhookSubtree(m_updateType, subTree);
+    unhookSubtree(m_updateStruct, subTree);
+    emit removingItem(subTree);
+}
+
+void ExprWnd::unhookSubtree(QList<VarTree>& list, VarTree* subTree)
 {
     if (subTree == 0)
 	return;
