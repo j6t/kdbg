@@ -135,12 +135,14 @@ protected:
     ValueEdit m_edit;
 
     /** remove items that are in the subTree from the list */
-    static void sweepList(QList<VarTree>& list, VarTree* subTree);
+    void unhookSubtree(VarTree* subTree);
+    static void unhookSubtree(QList<VarTree>& list, VarTree* subTree);
 
 protected slots:
     void slotExpandOrCollapse(int);
 
 signals:
+    void removingItem(VarTree*);
     void editValueCommitted(int, const QString&);
 };
 

@@ -398,9 +398,12 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg)
     if (cmd == DCcd) {
 	// need the working directory when parsing the output
 	m_programWD = strArg;
-    } else if (cmd == DCsetargs) {
-	// attach saved redirection
-	strArg += m_redirect;
+    } else if (cmd == DCsetargs && !m_redirect.isEmpty()) {
+	/*
+	 * Use saved redirection. We prepend it in front of the user's
+	 * arguments so that the user can override the redirections.
+	*/
+	strArg = m_redirect + " " + strArg;
     }
 
     QString cmdString;
@@ -443,13 +446,13 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
 	 */
 	static const char* const runRedir[8] = {
 	    "",
-	    " </dev/null",
-	    " >/dev/null",
-	    " </dev/null >/dev/null",
-	    " 2>/dev/null",
-	    " </dev/null 2>/dev/null",
-	    " >/dev/null 2>&1",
-	    " </dev/null >/dev/null 2>&1"
+	    "</dev/null",
+	    ">/dev/null",
+	    "</dev/null >/dev/null",
+	    "2>/dev/null",
+	    "</dev/null 2>/dev/null",
+	    ">/dev/null 2>&1",
+	    "</dev/null >/dev/null 2>&1"
 	};
 	if (strArg.isEmpty())
 	    intArg = 7;			/* failsafe if no tty */

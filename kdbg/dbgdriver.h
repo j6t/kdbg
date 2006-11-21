@@ -277,7 +277,6 @@ public:
     virtual QStringList boolOptionList() const = 0;
 
     virtual bool startup(QString cmdStr);
-    void dequeueCmdByVar(VarTree* var);
     void setLogFileName(const QString& fname) { m_logFileName = fname; }
 
 protected:
@@ -569,6 +568,9 @@ protected:
     // log file
     QString m_logFileName;
     QFile m_logFile;
+
+public slots:
+    void dequeueCmdByVar(VarTree* var);
 
 protected slots:
     virtual void slotReceiveOutput(KProcess*, char* buffer, int buflen);
