@@ -120,6 +120,7 @@ protected:
     static bool getMaxValueWidth(KTreeViewItem* item, void* user);
     void collectUnknownTypes(VarTree* item);
     static bool collectUnknownTypes(KTreeViewItem* item, void* user);
+    static QString formatWCharPointer(QString value);
     int maxValueWidth;
     QPixmap m_pixPointer;
 

@@ -467,7 +467,7 @@ void ExprWnd::updateSingleExpr(VarTree* display, VarTree* newValue)
 	     * Then the display will change its color only when the new value
 	     * is completed.
 	     */
-	    display->m_partialValue = newValue->m_value + " L";
+	    display->m_partialValue = formatWCharPointer(newValue->m_value);
 	}
 	else
 	    display->m_partialValue = display->m_type->m_displayString[0];
@@ -544,7 +544,7 @@ void ExprWnd::collectUnknownTypes(VarTree* var)
 	{
 	    var->m_type = TypeInfo::wchartType();
 	    // see updateSingleExpr() why we move the value
-	    var->m_partialValue = var->m_value + " L";
+	    var->m_partialValue = formatWCharPointer(var->m_value);
 	    var->m_value.truncate(0);
 	    m_updateStruct.append(var);
 	}
@@ -576,7 +576,7 @@ bool ExprWnd::collectUnknownTypes(KTreeViewItem* item, void* user)
 	{
 	    var->m_type = TypeInfo::wchartType();
 	    // see updateSingleExpr() why we move the value
-	    var->m_partialValue = var->m_value + " L";
+	    var->m_partialValue = formatWCharPointer(var->m_value);
 	    var->m_value.truncate(0);
 	    tree->m_updateStruct.append(var);
 	}
@@ -586,6 +586,14 @@ bool ExprWnd::collectUnknownTypes(KTreeViewItem* item, void* user)
 	var->setPixmap(tree->m_pixPointer);
     }
     return false;
+}
+
+QString ExprWnd::formatWCharPointer(QString value)
+{
+    int pos = value.find(") ");
+    if (pos > 0)
+	value = value.mid(pos+2);
+    return value + " L";
 }
 
 
