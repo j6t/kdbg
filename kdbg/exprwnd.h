@@ -49,6 +49,8 @@ public:
     void inferTypesOfChildren(ProgramTypeTable& typeTable);
     /** get the type from base class part */
     TypeInfo* inferTypeFromBaseClass();
+    /** returns whether the pointer is a wchar_t */
+    bool isWcharT() const;
 };
 
 

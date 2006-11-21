@@ -19,6 +19,8 @@ static QList<TypeTable> typeTables;
 bool typeTablesInited = false;
 
 
+// an indentifier for wchar_t
+TypeInfo TypeInfo::m_wchartType("");
 // the unknown type
 TypeInfo TypeInfo::m_unknownType("");
 

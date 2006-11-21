@@ -1045,9 +1045,6 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCprintDeref:
 	handlePrintDeref(cmd, output);
 	break;
-    case DCprintWChar:
-        handlePrintWChar(cmd, output);
-        break;
     case DCattach:
 	m_haveExecutable = true;
 	// fall through
@@ -1091,6 +1088,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	break;
     case DCprintStruct:
     case DCprintQStringStruct:
+    case DCprintWChar:
 	handlePrintStruct(cmd, output);
 	break;
     case DCinfosharedlib:
@@ -1400,34 +1398,6 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
     return true;
 }
 
-bool KDebugger::handlePrintWChar(CmdQueueItem* cmd, const char* output)
-{
-   ASSERT(cmd->m_expr != 0);
-
-   VarTree* variable = m_d->parseQCharArray(output, false, true);
-   if (variable == 0) return false;
-
-   variable->setText(cmd->m_expr->getText());
-   variable->m_nameKind = VarTree::NKplain;
-   variable->m_varKind = VarTree::VKsimple;
-//    variable->m_value = partValue;
-
-   QString val = cmd->m_expr->m_partialValue;
-   int pos = val.find(") ");
-   if (pos>0) val = val.mid(pos+2);
-   variable->m_value = val+" L"+variable->m_value;
-
-   m_localVariables.updateExpr(variable);
-   delete variable;
-
-   delete cmd->m_expr;
-   cmd->m_expr = 0;
-
-   evalExpressions();                  /* enqueue dereferenced pointers */
-
-   return true;
-}
-
 bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 {
     ASSERT(cmd->m_expr != 0);
@@ -1609,23 +1579,14 @@ void KDebugger::dereferencePointer(ExprWnd* wnd, VarTree* exprItem,
 				   bool immediate)
 {
     ASSERT(exprItem->m_varKind == VarTree::VKpointer);
-    DbgCommand dbgCmd = DCprintDeref;
 
     QString expr = exprItem->computeExpr();
-
-    if (strncmp(exprItem->m_value, "(const wchar_t *)", 17)==0 ||
-        strncmp(exprItem->m_value, "(wchar_t *)", 11)==0)
-    {
-       expr = "*"+expr+"@wcslen("+expr+")";
-       dbgCmd = DCprintWChar;
-    }
-
     TRACE("dereferencing pointer: " + expr);
     CmdQueueItem* cmd;
     if (immediate) {
-        cmd = m_d->queueCmd(dbgCmd, expr, DebuggerDriver::QMoverrideMoreEqual);
+	cmd = m_d->queueCmd(DCprintDeref, expr, DebuggerDriver::QMoverrideMoreEqual);
     } else {
-        cmd = m_d->queueCmd(dbgCmd, expr, DebuggerDriver::QMoverride);
+	cmd = m_d->queueCmd(DCprintDeref, expr, DebuggerDriver::QMoverride);
     }
     // remember which expr this was
     cmd->m_expr = exprItem;
@@ -1692,10 +1653,12 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
     ASSERT(var->m_varKind == VarTree::VKstruct);
 
     VarTree* partExpr;
-    if (cmd->m_cmd != DCprintQStringStruct) {
-	partExpr = parseExpr(output, false);
-    } else {
+    if (cmd->m_cmd == DCprintQStringStruct) {
 	partExpr = m_d->parseQCharArray(output, false, m_typeTable->qCharIsShort());
+    } else if (cmd->m_cmd == DCprintWChar) {
+	partExpr = m_d->parseQCharArray(output, false, true);
+    } else {
+	partExpr = parseExpr(output, false);
     }
     bool errorValue =
 	partExpr == 0 ||
@@ -1760,9 +1723,23 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
 void KDebugger::evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 {
     var->m_exprIndex = 0;
-    var->m_exprIndexUseGuard = true;
-    var->m_partialValue = var->m_type->m_displayString[0];
-    evalStructExpression(var, wnd, immediate);
+    if (var->m_type != TypeInfo::wchartType())
+    {
+	var->m_exprIndexUseGuard = true;
+	var->m_partialValue = var->m_type->m_displayString[0];
+	evalStructExpression(var, wnd, immediate);
+    }
+    else
+    {
+	var->m_exprIndexUseGuard = false;
+	QString expr = var->computeExpr();
+	CmdQueueItem* cmd = m_d->queueCmd(DCprintWChar, expr,
+				immediate  ?  DebuggerDriver::QMoverrideMoreEqual
+				: DebuggerDriver::QMoverride);
+	// remember which expression this was
+	cmd->m_expr = var;
+	cmd->m_exprWnd = wnd;
+    }
 }
 
 /* queues a printStruct command; var must have been initialized correctly */
