@@ -49,6 +49,8 @@ public:
     void inferTypesOfChildren(ProgramTypeTable& typeTable);
     /** get the type from base class part */
     TypeInfo* inferTypeFromBaseClass();
+    /** returns whether the pointer is a wchar_t */
+    bool isWcharT() const;
 };
 
 
@@ -122,6 +124,7 @@ protected:
     static bool getMaxValueWidth(KTreeViewItem* item, void* user);
     void collectUnknownTypes(VarTree* item);
     static bool collectUnknownTypes(KTreeViewItem* item, void* user);
+    static QString formatWCharPointer(QString value);
     int maxValueWidth;
     QPixmap m_pixPointer;
 

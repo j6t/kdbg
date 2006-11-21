@@ -2022,16 +2022,6 @@ void GdbDriver::parseLocals(const char* output, QList<VarTree>& newVars)
 		goto skipDuplicate;
 	    }
 	}
-        if ((variable->m_value.startsWith("(const wchar_t *)") ||
-             variable->m_value.startsWith("(wchar_t *)")) &&
-	    !variable->m_value.endsWith(" 0x0"))
-        {
-            variable->m_varKind = VarTree::VKsimple;
-            variable->m_partialValue = variable->m_value;
-            variable->m_value = QString::null;
-            CmdQueueItem *c = executeCmd(DCprintWChar, variable->getText());
-            c->m_expr = new VarTree(*variable);
-        }
 	newVars.append(variable);
     skipDuplicate:;
     }

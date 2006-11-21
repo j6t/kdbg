@@ -49,11 +49,16 @@ struct TypeInfo
      */
     QString m_guardStrings[typeInfoMaxExpr];
     /**
+     * Returns a pointer to a TypeInfo that identifies wchar_t
+     */
+    static TypeInfo* wchartType() { return &m_wchartType; }
+    /**
      * Gets a pointer to a TypeInfo that means: "I don't know the type"
      */
     static TypeInfo* unknownType() { return &m_unknownType; }
 
 protected:
+    static TypeInfo m_wchartType;
     static TypeInfo m_unknownType;
 };
 

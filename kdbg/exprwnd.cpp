@@ -161,6 +161,16 @@ void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
 
     // if this is a pointer, get the type from the value (less the pointer)
     if (m_varKind == VKpointer) {
+	if (isWcharT())
+	{
+	    /*
+	     * wchart_t pointers must be treated as struct, because the array
+	     * of characters is printed similar to how QStrings are decoded.
+	     */
+	    m_varKind = VKstruct;
+	    setDelayedExpanding(false);
+	    return;
+	}
 #ifndef I_know_a_way_to_do_this_cleanly
 	return;
 #else
@@ -215,6 +225,13 @@ void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
 	     * that later we can ask gdb.
 	     */
     }
+}
+
+// the value contains the pointer type in parenthesis
+bool VarTree::isWcharT() const
+{
+    return m_value.startsWith("(const wchar_t *)") ||
+	    m_value.startsWith("(wchar_t *)");
 }
 
 /*
@@ -431,13 +448,27 @@ void ExprWnd::updateSingleExpr(VarTree* display, VarTree* newValue)
      * If this node is a struct and we know its type then don't update its
      * value now. This is a node for which we know how to find a nested
      * value. So register the node for an update.
+     *
+     * wchar_t types are also treated specially here: We consider them
+     * as struct (has been set in inferTypesOfChildren()).
      */
     if (display->m_varKind == VarTree::VKstruct &&
 	display->m_type != 0 &&
 	display->m_type != TypeInfo::unknownType())
     {
 	ASSERT(newValue->m_varKind == VarTree::VKstruct);
-	display->m_partialValue = display->m_type->m_displayString[0];
+	if (display->m_type == TypeInfo::wchartType())
+	{
+	    /*
+	     * We do not copy the new pointer value to the destination right
+	     * away, but consider it as the first part of the nested value.
+	     * Then the display will change its color only when the new value
+	     * is completed.
+	     */
+	    display->m_partialValue = formatWCharPointer(newValue->m_value);
+	}
+	else
+	    display->m_partialValue = display->m_type->m_displayString[0];
 	m_updateStruct.append(display);
     }
     else
@@ -502,8 +533,19 @@ void ExprWnd::collectUnknownTypes(VarTree* var)
 	var->m_varKind == VarTree::VKstruct &&
 	var->m_nameKind != VarTree::NKtype)
     {
-	/* this struct node doesn't have a type yet: register it */
-	m_updateType.append(var);
+	if (!var->isWcharT())
+	{
+	    /* this struct node doesn't have a type yet: register it */
+	    m_updateType.append(var);
+	}
+	else
+	{
+	    var->m_type = TypeInfo::wchartType();
+	    // see updateSingleExpr() why we move the value
+	    var->m_partialValue = formatWCharPointer(var->m_value);
+	    var->m_value.truncate(0);
+	    m_updateStruct.append(var);
+	}
     }
 
     // add pointer pixmap to pointers
@@ -523,14 +565,33 @@ bool ExprWnd::collectUnknownTypes(KTreeViewItem* item, void* user)
 	var->m_varKind == VarTree::VKstruct &&
 	var->m_nameKind != VarTree::NKtype)
     {
-	/* this struct node doesn't have a type yet: register it */
-	tree->m_updateType.append(var);
+	if (!var->isWcharT())
+	{
+	    /* this struct node doesn't have a type yet: register it */
+	    tree->m_updateType.append(var);
+	}
+	else
+	{
+	    var->m_type = TypeInfo::wchartType();
+	    // see updateSingleExpr() why we move the value
+	    var->m_partialValue = formatWCharPointer(var->m_value);
+	    var->m_value.truncate(0);
+	    tree->m_updateStruct.append(var);
+	}
     }
     // add pointer pixmap to pointers
     if (var->m_varKind == VarTree::VKpointer) {
 	var->setPixmap(tree->m_pixPointer);
     }
     return false;
+}
+
+QString ExprWnd::formatWCharPointer(QString value)
+{
+    int pos = value.find(") ");
+    if (pos > 0)
+	value = value.mid(pos+2);
+    return value + " L";
 }
 
 
