@@ -689,14 +689,6 @@ void ExprWnd::unhookSubtree(QList<VarTree>& list, VarTree* subTree)
     }
 }
 
-QString ExprWnd::exprStringAt(int index)
-{
-    KTreeViewItem* item = itemAt(index);
-    if (item == 0) return QString();	/* paranoia */
-    VarTree* expr = static_cast<VarTree*>(item);
-    return expr->computeExpr();
-}
-
 void ExprWnd::clearPendingUpdates()
 {
     m_updatePtrs.clear();

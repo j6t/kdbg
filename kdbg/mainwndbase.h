@@ -46,7 +46,7 @@ signals:
     void deleteWatch();
 
 protected slots:
-    void slotWatchHighlighted(int);
+    void slotWatchHighlighted();
 };
 
 

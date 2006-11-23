@@ -772,10 +772,10 @@ void DebuggerMainWnd::slotLocalsPopup(int, const QPoint& pt)
  */
 void DebuggerMainWnd::slotLocalsToWatch()
 {
-    int idx = m_localVariables->currentItem();
+    VarTree* item = m_localVariables->selectedItem();
 
-    if (idx >= 0 && m_debugger != 0) {
-	QString text = m_localVariables->exprStringAt(idx);
+    if (item != 0 && m_debugger != 0) {
+	QString text = item->computeExpr();
 	m_debugger->addWatch(text);
     }
 }

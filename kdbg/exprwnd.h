@@ -103,8 +103,6 @@ public:
     static VarTree* memberByName(VarTree* v, const QString& name);
     /** removes an expression; must be on the topmost level*/
     void removeExpr(VarTree* item);
-    /** retrieves the expression string at the specified line */
-    QString exprStringAt(int index);
     /** clears the list of pointers needing updates */
     void clearPendingUpdates();
     /** returns a pointer to update (or 0) and removes it from the list */
@@ -114,6 +112,8 @@ public:
     void editValue(int row, const QString& text);
     /** tells whether the a value is currently edited */
     bool isEditing() const;
+
+    VarTree* selectedItem() const { return static_cast<VarTree*>(getCurrentItem()); }
 
 protected:
     bool updateExprRec(VarTree* display, VarTree* newValues);

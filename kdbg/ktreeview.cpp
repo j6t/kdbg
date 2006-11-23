@@ -807,7 +807,7 @@ bool KTreeView::forEveryVisibleItem(KForEveryFunc func, void *user,
 
 // returns a pointer to the KTreeViewItem at the current index
 // or 0 if no current item
-KTreeViewItem *KTreeView::getCurrentItem()
+KTreeViewItem *KTreeView::getCurrentItem() const
 {
   if(current == -1) return 0;
   return itemAt(current);

@@ -570,7 +570,7 @@ public:
   /**
 	Returns a pointer to the current item if there is one, or 0.
 	*/
-  KTreeViewItem *getCurrentItem();
+  KTreeViewItem *getCurrentItem() const;
 
     /**
      * Returns the number of pixels an item is indented for each level. If,

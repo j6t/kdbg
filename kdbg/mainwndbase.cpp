@@ -57,7 +57,7 @@ WatchWindow::WatchWindow(QWidget* parent, const char* name, WFlags f) :
     connect(&m_watchEdit, SIGNAL(returnPressed()), SIGNAL(addWatch()));
     connect(&m_watchAdd, SIGNAL(clicked()), SIGNAL(addWatch()));
     connect(&m_watchDelete, SIGNAL(clicked()), SIGNAL(deleteWatch()));
-    connect(&m_watchVariables, SIGNAL(highlighted(int)), SLOT(slotWatchHighlighted(int)));
+    connect(&m_watchVariables, SIGNAL(highlighted(int)), SLOT(slotWatchHighlighted()));
 
     m_watchVariables.setMoveCurrentToSibling(true);
     m_watchVariables.installEventFilter(this);
@@ -82,9 +82,10 @@ bool WatchWindow::eventFilter(QObject*, QEvent* ev)
 
 
 // place the text of the hightlighted watch expr in the edit field
-void WatchWindow::slotWatchHighlighted(int idx)
+void WatchWindow::slotWatchHighlighted()
 {
-    QString text = m_watchVariables.exprStringAt(idx);
+    VarTree* expr = m_watchVariables.selectedItem();
+    QString text = expr ? expr->computeExpr() : QString();
     m_watchEdit.setText(text);
 }
 
