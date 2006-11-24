@@ -286,14 +286,15 @@ void ExprWnd::exprList(QStrList& exprs)
     }
 }
 
-void ExprWnd::insertExpr(VarTree* expr)
+VarTree* ExprWnd::insertExpr(VarTree* expr)
 {
-    // append the expression
-    insertItem(expr);
+    // append a new dummy expression
+    VarTree* display = new VarTree(expr->getText(), VarTree::NKplain);
+    insertItem(display);
 
-    collectUnknownTypes(expr);
-
-    updateValuesWidth();
+    // replace it right away
+    updateExpr(display, expr);
+    return display;
 }
 
 void ExprWnd::updateExpr(VarTree* expr)

@@ -86,8 +86,9 @@ public:
 
     /** fills the list with the expressions at the topmost level */
     void exprList(QStrList& exprs);
-    /** appends var the the end of the tree at the topmost level */
-    void insertExpr(VarTree* expr);
+    /** appends a copy of expr to the end of the tree at the topmost level;
+     * returns a pointer to the inserted top-level item */
+    VarTree* insertExpr(VarTree* expr);
     /** updates an existing expression */
     void updateExpr(VarTree* expr);
     void updateExpr(VarTree* display, VarTree* newValues);

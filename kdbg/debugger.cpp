@@ -1336,9 +1336,12 @@ void KDebugger::handleLocals(const char* output)
 	}
     }
     // insert all remaining new variables
-    for (VarTree* v = newVars.first(); v != 0; v = newVars.next()) {
+    while (!newVars.isEmpty())
+    {
+	VarTree* v = newVars.take(0);
 	TRACE("new var: " + v->getText());
 	m_localVariables.insertExpr(v);
+	delete v;
 	repaintNeeded = true;
     }
 
@@ -1843,8 +1846,8 @@ void KDebugger::addWatch(const QString& t)
     QString expr = t.stripWhiteSpace();
     if (expr.isEmpty())
 	return;
-    VarTree* exprItem = new VarTree(expr, VarTree::NKplain);
-    m_watchVariables.insertExpr(exprItem);
+    VarTree e(expr, VarTree::NKplain);
+    VarTree* exprItem = m_watchVariables.insertExpr(&e);
 
     // if we are boring ourselves, send down the command
     if (m_programActive) {
