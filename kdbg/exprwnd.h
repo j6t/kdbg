@@ -88,10 +88,10 @@ public:
     void exprList(QStrList& exprs);
     /** appends a copy of expr to the end of the tree at the topmost level;
      * returns a pointer to the inserted top-level item */
-    VarTree* insertExpr(VarTree* expr);
+    VarTree* insertExpr(VarTree* expr, ProgramTypeTable& typeTable);
     /** updates an existing expression */
-    void updateExpr(VarTree* expr);
-    void updateExpr(VarTree* display, VarTree* newValues);
+    void updateExpr(VarTree* expr, ProgramTypeTable& typeTable);
+    void updateExpr(VarTree* display, VarTree* newValues, ProgramTypeTable& typeTable);
     /** updates the value and repaints it for a single item (not the children) */
     void updateSingleExpr(VarTree* display, VarTree* newValues);
     /** updates only the value of the node */
@@ -117,7 +117,7 @@ public:
     VarTree* selectedItem() const { return static_cast<VarTree*>(getCurrentItem()); }
 
 protected:
-    bool updateExprRec(VarTree* display, VarTree* newValues);
+    bool updateExprRec(VarTree* display, VarTree* newValues, ProgramTypeTable& typeTable);
     void replaceChildren(VarTree* display, VarTree* newValues);
     virtual void paintCell(QPainter* painter, int row, int col);
     virtual int cellWidth(int col) const;

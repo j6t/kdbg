@@ -1328,7 +1328,7 @@ void KDebugger::handleLocals(const char* output)
 	} else {
 	    // variable in both old and new lists: update
 	    TRACE(QString("update var: ") + n);
-	    m_localVariables.updateExpr(newVars.current());
+	    m_localVariables.updateExpr(newVars.current(), *m_typeTable);
 	    // remove the new variable from the list
 	    newVars.remove();
 	    delete v;
@@ -1340,7 +1340,7 @@ void KDebugger::handleLocals(const char* output)
     {
 	VarTree* v = newVars.take(0);
 	TRACE("new var: " + v->getText());
-	m_localVariables.insertExpr(v);
+	m_localVariables.insertExpr(v, *m_typeTable);
 	delete v;
 	repaintNeeded = true;
     }
@@ -1360,8 +1360,6 @@ void KDebugger::parseLocals(const char* output, QList<VarTree>& newVars)
     while (vars.count() > 0)
     {
 	VarTree* variable = vars.take(0);
-	// get some types
-	variable->inferTypesOfChildren(*m_typeTable);
 	/*
 	 * When gdb prints local variables, those from the innermost block
 	 * come first. We run through the list of already parsed variables
@@ -1398,7 +1396,7 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
 
     {
 	TRACE("update expr: " + cmd->m_expr->getText());
-	cmd->m_exprWnd->updateExpr(cmd->m_expr, variable);
+	cmd->m_exprWnd->updateExpr(cmd->m_expr, variable, *m_typeTable);
 	delete variable;
     }
 
@@ -1434,7 +1432,7 @@ bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 	// expand the first level for convenience
 	variable->setExpanded(true);
 	TRACE("update ptr: " + cmd->m_expr->getText());
-	cmd->m_exprWnd->updateExpr(cmd->m_expr, dummyParent);
+	cmd->m_exprWnd->updateExpr(cmd->m_expr, dummyParent, *m_typeTable);
 	delete dummyParent;
     }
 
@@ -1446,15 +1444,8 @@ bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 VarTree* KDebugger::parseExpr(const char* output, bool wantErrorValue)
 {
     VarTree* variable;
+    m_d->parsePrintExpr(output, wantErrorValue, variable);
 
-    // check for error conditions
-    bool goodValue = m_d->parsePrintExpr(output, wantErrorValue, variable);
-
-    if (variable != 0 && goodValue)
-    {
-	// get some types
-	variable->inferTypesOfChildren(*m_typeTable);
-    }
     return variable;
 }
 
@@ -1847,7 +1838,7 @@ void KDebugger::addWatch(const QString& t)
     if (expr.isEmpty())
 	return;
     VarTree e(expr, VarTree::NKplain);
-    VarTree* exprItem = m_watchVariables.insertExpr(&e);
+    VarTree* exprItem = m_watchVariables.insertExpr(&e, *m_typeTable);
 
     // if we are boring ourselves, send down the command
     if (m_programActive) {

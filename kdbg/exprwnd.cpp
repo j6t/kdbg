@@ -286,18 +286,18 @@ void ExprWnd::exprList(QStrList& exprs)
     }
 }
 
-VarTree* ExprWnd::insertExpr(VarTree* expr)
+VarTree* ExprWnd::insertExpr(VarTree* expr, ProgramTypeTable& typeTable)
 {
     // append a new dummy expression
     VarTree* display = new VarTree(expr->getText(), VarTree::NKplain);
     insertItem(display);
 
     // replace it right away
-    updateExpr(display, expr);
+    updateExpr(display, expr, typeTable);
     return display;
 }
 
-void ExprWnd::updateExpr(VarTree* expr)
+void ExprWnd::updateExpr(VarTree* expr, ProgramTypeTable& typeTable)
 {
     // search the root variable
     KPath path;
@@ -307,7 +307,7 @@ void ExprWnd::updateExpr(VarTree* expr)
 	return;
     }
     // now update it
-    if (updateExprRec(static_cast<VarTree*>(item), expr)) {
+    if (updateExprRec(static_cast<VarTree*>(item), expr, typeTable)) {
 	updateVisibleItems();
 	updateValuesWidth();
 	repaint();
@@ -315,9 +315,11 @@ void ExprWnd::updateExpr(VarTree* expr)
     collectUnknownTypes(static_cast<VarTree*>(item));
 }
 
-void ExprWnd::updateExpr(VarTree* display, VarTree* newValues)
+void ExprWnd::updateExpr(VarTree* display, VarTree* newValues, ProgramTypeTable& typeTable)
 {
-    if (updateExprRec(display, newValues) && display->isVisible()) {
+    if (updateExprRec(display, newValues, typeTable) &&
+	display->isVisible())
+    {
 	updateVisibleItems();
 	updateValuesWidth();
 	repaint();
@@ -328,7 +330,7 @@ void ExprWnd::updateExpr(VarTree* display, VarTree* newValues)
 /*
  * returns true if there's a visible change
  */
-bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues)
+bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues, ProgramTypeTable& typeTable)
 {
     bool isExpanded = display->isExpanded();
 
@@ -379,6 +381,9 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues)
 	    display->setDelayedExpanding(newValues->m_varKind == VarTree::VKpointer);
 	}
 
+	// get some types (after the new m_varKind has been set!)
+	display->inferTypesOfChildren(typeTable);
+
 	// (note that the new value might not have a sub-tree at all)
 	return display->m_valueChanged || isExpanded;	/* no visible change if not expanded */
     }
@@ -424,7 +429,7 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues)
 	    }
 	}
 	// recurse
-	if (updateExprRec(vDisplay, vNew)) {
+	if (updateExprRec(vDisplay, vNew, typeTable)) {
 	    childChanged = true;
 	}
 	vDisplay = static_cast<VarTree*>(vDisplay->getSibling());
