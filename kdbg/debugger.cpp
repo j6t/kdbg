@@ -1387,7 +1387,7 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
 {
     ASSERT(cmd->m_expr != 0);
 
-    VarTree* variable = parseExpr(output, true);
+    VarTree* variable = m_d->parsePrintExpr(output, true);
     if (variable == 0)
 	return false;
 
@@ -1409,7 +1409,7 @@ bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 {
     ASSERT(cmd->m_expr != 0);
 
-    VarTree* variable = parseExpr(output, true);
+    VarTree* variable = m_d->parsePrintExpr(output, true);
     if (variable == 0)
 	return false;
 
@@ -1439,14 +1439,6 @@ bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
     evalExpressions();			/* enqueue dereferenced pointers */
 
     return true;
-}
-
-VarTree* KDebugger::parseExpr(const char* output, bool wantErrorValue)
-{
-    VarTree* variable;
-    m_d->parsePrintExpr(output, wantErrorValue, variable);
-
-    return variable;
 }
 
 // parse the output of bt
@@ -1657,7 +1649,7 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
     } else if (cmd->m_cmd == DCprintWChar) {
 	partExpr = m_d->parseQCharArray(output, false, true);
     } else {
-	partExpr = parseExpr(output, false);
+	partExpr = m_d->parsePrintExpr(output, false);
     }
     bool errorValue =
 	partExpr == 0 ||

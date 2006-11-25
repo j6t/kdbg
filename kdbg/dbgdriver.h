@@ -442,16 +442,12 @@ public:
      * @param output The output of the debugger.
      * @param wantErrorValue Specifies whether the error message should be
      * provided as the value of a NKplain variable. If this is false,
-     * #var will be 0 if the printed value is an error message.
-     * @param var Returns the variable value. It is set to 0 if there was
-     * a parse error or if the output is an error message and wantErrorValue
-     * is false. If it is not 0, #var->text() will return junk and must be
-     * set using #var->setText().
-     * @return false if the output is an error message. Even if true is
-     * returned, #var might still be 0 (due to a parse error).
+     * 0 is returned if the printed value is an error message.
+     * @return the parsed value. It is 0 if there was a parse error
+     * or if the output is an error message and #wantErrorValue
+     * is \c false. The returned object's text() is undefined.
      */
-    virtual bool parsePrintExpr(const char* output, bool wantErrorValue,
-				VarTree*& var) = 0;
+    virtual VarTree* parsePrintExpr(const char* output, bool wantErrorValue) = 0;
 
     /**
      * Parses the output of the DCcd command.

@@ -345,7 +345,6 @@ protected:
 protected slots:
     void parse(CmdQueueItem* cmd, const char* output);
 protected:
-    VarTree* parseExpr(const char* output, bool wantErrorValue);
     void handleRunCommands(const char* output);
     void updateAllExprs();
     void updateProgEnvironment(const QString& args, const QString& wd,

@@ -1332,18 +1332,16 @@ XsldbgDriver::parseLocals(const char *output, QList < VarTree > &newVars)
 }
 
 
-bool
-XsldbgDriver::parsePrintExpr(const char *output, bool wantErrorValue,
-                             VarTree * &var)
+VarTree *
+XsldbgDriver::parsePrintExpr(const char *output, bool wantErrorValue)
 {
+    VarTree* var = 0;
     // check for error conditions
-    if (parseErrorMessage(output, var, wantErrorValue)) {
-        return false;
-    } else {
+    if (!parseErrorMessage(output, var, wantErrorValue)) {
         // parse the variable
         var = parseVar(output);
-        return true;
     }
+    return var;
 }
 
 bool
