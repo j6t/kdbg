@@ -1213,7 +1213,7 @@ void KDebugger::updateAllExprs()
     // update watch expressions
     KTreeViewItem* item = m_watchVariables.itemAt(0);
     for (; item != 0; item = item->getSibling()) {
-	m_watchEvalExpr.append(static_cast<VarTree*>(item));
+	m_watchEvalExpr.push_back(static_cast<VarTree*>(item)->getText());
     }
 }
 
@@ -1503,21 +1503,22 @@ void KDebugger::evalExpressions()
     //   pointers in watch expressions
     //   types in local variables
     //   types in watch expressions
-    //   pointers in 'this'
-    //   types in 'this'
-    
-    VarTree* exprItem = m_watchEvalExpr.first();
+    //   struct members in local variables
+    //   struct members in watch expressions
+    VarTree* exprItem = 0;
+    if (!m_watchEvalExpr.empty())
+    {
+	QString expr = m_watchEvalExpr.front();
+	m_watchEvalExpr.pop_front();
+	exprItem = m_watchVariables.topLevelExprByName(expr);
+    }
     if (exprItem != 0) {
-	m_watchEvalExpr.remove();
-	QString expr = exprItem->computeExpr();
-	TRACE("watch expr: " + expr);
-	CmdQueueItem* cmd = m_d->queueCmd(DCprint, expr, DebuggerDriver::QMoverride);
+	CmdQueueItem* cmd = m_d->queueCmd(DCprint, exprItem->getText(), DebuggerDriver::QMoverride);
 	// remember which expr this was
 	cmd->m_expr = exprItem;
 	cmd->m_exprWnd = &m_watchVariables;
     } else {
 	ExprWnd* wnd;
-	VarTree* exprItem;
 #define POINTER(widget) \
 		wnd = &widget; \
 		exprItem = widget.nextUpdatePtr(); \
@@ -1827,14 +1828,15 @@ void KDebugger::exprExpandingHelper(ExprWnd* wnd, KTreeViewItem* item, bool&)
 void KDebugger::addWatch(const QString& t)
 {
     QString expr = t.stripWhiteSpace();
-    if (expr.isEmpty())
+    // don't add a watched expression again
+    if (expr.isEmpty() || m_watchVariables.topLevelExprByName(expr) != 0)
 	return;
     VarTree e(expr, VarTree::NKplain);
-    VarTree* exprItem = m_watchVariables.insertExpr(&e, *m_typeTable);
+    m_watchVariables.insertExpr(&e, *m_typeTable);
 
     // if we are boring ourselves, send down the command
     if (m_programActive) {
-	m_watchEvalExpr.append(exprItem);
+	m_watchEvalExpr.push_back(expr);
 	if (m_d->isIdle()) {
 	    evalExpressions();
 	}
@@ -1858,8 +1860,9 @@ void KDebugger::slotDeleteWatch()
 	return;
 
     // remove the variable from the list to evaluate
-    if (m_watchEvalExpr.findRef(item) >= 0) {
-	m_watchEvalExpr.remove();
+    QStringList::iterator i = m_watchEvalExpr.find(item->getText());
+    if (i != m_watchEvalExpr.end()) {
+	m_watchEvalExpr.erase(i);
     }
     m_watchVariables.removeExpr(item);
     // item is invalid at this point!

@@ -337,7 +337,7 @@ protected:
     void stopDriver();
     void writeCommand();
     
-    QList<VarTree> m_watchEvalExpr;	/* exprs to evaluate for watch windows */
+    QStringList m_watchEvalExpr;	/* exprs to evaluate for watch window */
     QPtrVector<Breakpoint> m_brkpts;
     QString m_memoryExpression;		/* memory location to watch */
     unsigned m_memoryFormat;		/* how that output should look */
