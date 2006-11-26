@@ -52,7 +52,7 @@ class XsldbgDriver:public DebuggerDriver {
     /**
      * Parses the output as an array of QChars.
      */
-    virtual VarTree *parseQCharArray(const char *output,
+    virtual ExprValue *parseQCharArray(const char *output,
                                      bool wantErrorValue, bool qt3like);
 
     virtual void parseBackTrace(const char *output,
@@ -67,8 +67,8 @@ class XsldbgDriver:public DebuggerDriver {
     virtual bool parseBreakpoint(const char *output, int &id,
                                  QString & file, int &lineNo, QString& address);
     virtual void parseLocals(const char *output,
-                             QList < VarTree > &newVars);
-    virtual VarTree * parsePrintExpr(const char *output, bool wantErrorValue);
+                             QList < ExprValue > &newVars);
+    virtual ExprValue * parsePrintExpr(const char *output, bool wantErrorValue);
     virtual bool parseChangeWD(const char *output, QString & message);
     virtual bool parseChangeExecutable(const char *output,
                                        QString & message);

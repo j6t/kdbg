@@ -19,6 +19,7 @@
 
 class ExprWnd;
 class VarTree;
+struct ExprValue;
 class ProgramTypeTable;
 class KTreeViewItem;
 class KConfig;
@@ -350,7 +351,7 @@ protected:
     void updateProgEnvironment(const QString& args, const QString& wd,
 			       const QDict<EnvVar>& newVars,
 			       const QStringList& newOptions);
-    void parseLocals(const char* output, QList<VarTree>& newVars);
+    void parseLocals(const char* output, QList<ExprValue>& newVars);
     void handleLocals(const char* output);
     bool handlePrint(CmdQueueItem* cmd, const char* output);
     bool handlePrintDeref(CmdQueueItem* cmd, const char* output);

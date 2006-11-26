@@ -257,6 +257,48 @@ TypeInfo* VarTree::inferTypeFromBaseClass()
     return 0;
 }
 
+ExprValue::ExprValue(const QString& name, VarTree::NameKind aKind) :
+	m_name(name),
+	m_varKind(VarTree::VKsimple),
+	m_nameKind(aKind),
+	m_child(0),
+	m_next(0),
+	m_initiallyExpanded(false)
+{
+}
+
+ExprValue::~ExprValue()
+{
+    delete m_child;
+    delete m_next;
+}
+
+void ExprValue::appendChild(ExprValue* newChild)
+{
+    if (m_child == 0) {
+	m_child = newChild;
+    } else {
+	// walk chain of children to find the last one
+	ExprValue* last = m_child;
+	while (last->m_next != 0)
+	    last = last->m_next;
+	last->m_next = newChild;
+    }
+    newChild->m_next = 0;	// just to be sure
+}
+
+uint ExprValue::childCount() const
+{
+    uint i = 0;
+    ExprValue* c = m_child;
+    while (c) {
+	++i;
+	c = c->m_next;
+    }
+    return i;
+}
+
+
 
 ExprWnd::ExprWnd(QWidget* parent, const char* name) :
 	KTreeView(parent, name),
@@ -286,10 +328,10 @@ void ExprWnd::exprList(QStrList& exprs)
     }
 }
 
-VarTree* ExprWnd::insertExpr(VarTree* expr, ProgramTypeTable& typeTable)
+VarTree* ExprWnd::insertExpr(ExprValue* expr, ProgramTypeTable& typeTable)
 {
     // append a new dummy expression
-    VarTree* display = new VarTree(expr->getText(), VarTree::NKplain);
+    VarTree* display = new VarTree(expr->m_name, VarTree::NKplain);
     insertItem(display);
 
     // replace it right away
@@ -297,11 +339,11 @@ VarTree* ExprWnd::insertExpr(VarTree* expr, ProgramTypeTable& typeTable)
     return display;
 }
 
-void ExprWnd::updateExpr(VarTree* expr, ProgramTypeTable& typeTable)
+void ExprWnd::updateExpr(ExprValue* expr, ProgramTypeTable& typeTable)
 {
     // search the root variable
     VarTree* item = firstChild();
-    while (item != 0 && item->getText() != expr->getText())
+    while (item != 0 && item->getText() != expr->m_name)
 	item = item->nextSibling();
     if (item == 0) {
 	return;
@@ -315,7 +357,7 @@ void ExprWnd::updateExpr(VarTree* expr, ProgramTypeTable& typeTable)
     collectUnknownTypes(item);
 }
 
-void ExprWnd::updateExpr(VarTree* display, VarTree* newValues, ProgramTypeTable& typeTable)
+void ExprWnd::updateExpr(VarTree* display, ExprValue* newValues, ProgramTypeTable& typeTable)
 {
     if (updateExprRec(display, newValues, typeTable) &&
 	display->isVisible())
@@ -330,7 +372,7 @@ void ExprWnd::updateExpr(VarTree* display, VarTree* newValues, ProgramTypeTable&
 /*
  * returns true if there's a visible change
  */
-bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues, ProgramTypeTable& typeTable)
+bool ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeTable& typeTable)
 {
     bool isExpanded = display->isExpanded();
 
@@ -362,7 +404,7 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues, ProgramTypeTab
 	  * sub-tree for requiring an update.
 	  */
 	 (display->m_varKind != VarTree::VKpointer ||
-	  newValues->childCount() != 0)))
+	  newValues->m_child != 0)))
     {
 	if (isExpanded) {
 	    collapseSubTree(display, false);
@@ -405,7 +447,7 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues, ProgramTypeTab
 	 * If the visible sub-tree has children, but newValues doesn't, we
 	 * can stop here.
 	 */
-	if (newValues->childCount() == 0) {
+	if (newValues->m_child == 0) {
 	    return display->m_valueChanged;
 	}
     }
@@ -416,12 +458,12 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues, ProgramTypeTab
     bool childChanged = false;
 
     VarTree* vDisplay = display->firstChild();
-    VarTree* vNew = newValues->firstChild();
+    ExprValue* vNew = newValues->m_child;
     while (vDisplay != 0) {
 	// check whether the names are the same
-	if (strcmp(vDisplay->getText(), vNew->getText()) != 0) {
+	if (vDisplay->getText() != vNew->m_name) {
 	    // set new name
-	    vDisplay->setText(vNew->getText());
+	    vDisplay->setText(vNew->m_name);
 	    int i = itemRow(vDisplay);
 	    if (i >= 0) {
 		updateCell(i, 0, true);
@@ -433,14 +475,14 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues, ProgramTypeTab
 	    childChanged = true;
 	}
 	vDisplay = vDisplay->nextSibling();
-	vNew = vNew->nextSibling();
+	vNew = vNew->m_next;
     }
 
     // update of children propagates only if this node is expanded
     return display->m_valueChanged || (display->isExpanded() && childChanged);
 }
 
-void ExprWnd::updateSingleExpr(VarTree* display, VarTree* newValue)
+void ExprWnd::updateSingleExpr(VarTree* display, ExprValue* newValue)
 {
     /*
      * If newValues is a VKdummy, we are only interested in its children.
@@ -504,7 +546,7 @@ void ExprWnd::updateStructValue(VarTree* display)
     display->m_exprIndex = -1;
 }
 
-void ExprWnd::replaceChildren(VarTree* display, VarTree* newValues)
+void ExprWnd::replaceChildren(VarTree* display, ExprValue* newValues)
 {
     ASSERT(display->childCount() == 0 || display->m_varKind != VarTree::VKsimple);
 
@@ -515,14 +557,13 @@ void ExprWnd::replaceChildren(VarTree* display, VarTree* newValues)
 	delete c;
     }
     // insert copies of the newValues
-    for (VarTree* v = newValues->firstChild(); v != 0; v = v->nextSibling())
+    for (ExprValue* v = newValues->m_child; v != 0; v = v->m_next)
     {
-	VarTree* vNew = new VarTree(v->getText(), v->m_nameKind);
+	VarTree* vNew = new VarTree(v->m_name, v->m_nameKind);
 	vNew->m_varKind = v->m_varKind;
 	vNew->m_value = v->m_value;
-	vNew->m_type = v->m_type;
 	vNew->setDelayedExpanding(vNew->m_varKind == VarTree::VKpointer);
-	vNew->setExpanded(v->isExpanded());
+	vNew->setExpanded(v->m_initiallyExpanded);
 	display->appendChild(vNew);
 	// recurse
 	replaceChildren(vNew, v);

@@ -19,10 +19,10 @@
 #include "mydebug.h"
 
 
-static VarTree *parseVar(const char *&s);
+static ExprValue *parseVar(const char *&s);
 static bool parseName(const char *&s, QString & name,
                       VarTree::NameKind & kind);
-static bool parseValue(const char *&s, VarTree * variable);
+static bool parseValue(const char *&s, ExprValue * variable);
 static bool isErrorExpr(const char *output);
 
 #define TERM_IO_ALLOWED 1
@@ -698,16 +698,16 @@ isErrorExpr(const char *output)
 
 /**
  * Returns true if the output is an error message. If wantErrorValue is
- * true, a new VarTree object is created and filled with the error message.
+ * true, a new ExprValue object is created and filled with the error message.
  */
 static bool
 parseErrorMessage(const char *output,
-                  VarTree * &variable, bool wantErrorValue)
+                  ExprValue * &variable, bool wantErrorValue)
 {
     if (isErrorExpr(output)) {
         if (wantErrorValue) {
             // put the error message as value in the variable
-            variable = new VarTree(QString(), VarTree::NKplain);
+            variable = new ExprValue(QString(), VarTree::NKplain);
             const char *endMsg = strchr(output, '\n');
 
             if (endMsg == 0)
@@ -727,22 +727,22 @@ XsldbgDriver::setPrintQStringDataCmd(const char* /*cmd*/)
 {
 }
 
-VarTree *
+ExprValue *
 XsldbgDriver::parseQCharArray(const char */*output*/, bool /*wantErrorValue*/,
                               bool /*qt3like*/)
 {
-    VarTree *variable = 0;
+    ExprValue *variable = 0;
 
     TRACE("XsldbgDriver::parseQCharArray not implmented");
     return variable;
 }
 
-static VarTree *
+static ExprValue *
 parseVar(const char *&s)
 {
     const char *p = s;
     bool foundLocalVar = false;
-    VarTree *variable = 0L;
+    ExprValue *variable = 0L;
     QString name;
 
     VarTree::NameKind kind;
@@ -775,7 +775,7 @@ parseVar(const char *&s)
             name = QString::fromLatin1(p, nextLine - p);
             kind = VarTree::NKplain;
             p = nextLine + 1;
-            variable = new VarTree(name, kind);
+            variable = new ExprValue(name, kind);
             variable->m_varKind = VarTree::VKsimple;
             parseValue(p, variable);
             return variable;
@@ -793,7 +793,7 @@ parseVar(const char *&s)
       if (!parseName(p, name, kind)) {
         return 0;
       }
-      variable = new VarTree(name, kind);
+      variable = new ExprValue(name, kind);
       if (variable != 0L) {
 	  variable->m_varKind = VarTree::VKsimple;
       }
@@ -806,7 +806,7 @@ parseVar(const char *&s)
       if (!parseName(p, name, kind)) {
         return 0;
       }
-      variable = new VarTree(name, kind);
+      variable = new ExprValue(name, kind);
       if (variable != 0L) {
 	  variable->m_varKind = VarTree::VKsimple;
       }
@@ -863,10 +863,10 @@ parseName(const char *&s, QString & name, VarTree::NameKind & kind)
 }
 
 static bool
-parseValue(const char *&s, VarTree * variable)
+parseValue(const char *&s, ExprValue * variable)
 {
     const char *start = s, *end = s;
-    VarTree * childValue; 
+    ExprValue * childValue; 
     #define VALUE_END_MARKER_INDEX  0
 
     /* This mark the end of a value */
@@ -919,16 +919,16 @@ parseValue(const char *&s, VarTree * variable)
 	if ((variable->m_varKind == VarTree::VKsimple)) {
 	    if (!variable->m_value.isEmpty()){
 		variable->m_varKind = VarTree::VKarray;
-		childValue = new VarTree(variable->m_value, VarTree::NKplain);
+		childValue = new ExprValue(variable->m_value, VarTree::NKplain);
 		variable->appendChild(childValue);
-		childValue = new VarTree(valueBuffer, VarTree::NKplain);
+		childValue = new ExprValue(valueBuffer, VarTree::NKplain);
 		variable->appendChild(childValue);
 		variable->m_value = "";
 	    }else{
 		variable->m_value = valueBuffer;
 	    }
 	}else{
-	    childValue = new VarTree(valueBuffer, VarTree::NKplain);
+	    childValue = new ExprValue(valueBuffer, VarTree::NKplain);
 	    variable->appendChild(childValue);
 	}
 
@@ -1102,7 +1102,7 @@ XsldbgDriver::parseBackTrace(const char *output,
         frm->fileName = file;
         frm->lineNo = lineNo;
         frm->address = address;
-        frm->var = new VarTree(func, VarTree::NKplain);
+        frm->var = new ExprValue(func, VarTree::NKplain);
         stack.append(frm);
     }
 }
@@ -1308,19 +1308,19 @@ XsldbgDriver::parseBreakpoint(const char *output, int &id,
 }
 
 void
-XsldbgDriver::parseLocals(const char *output, QList < VarTree > &newVars)
+XsldbgDriver::parseLocals(const char *output, QList < ExprValue > &newVars)
 {
 
     /* keep going until error or xsldbg prompt is found */
     while (*output != '\0') {
-        VarTree *variable = parseVar(output);
+        ExprValue *variable = parseVar(output);
 
         if (variable == 0) {
             break;
         }
         // do not add duplicates
-        for (VarTree * o = newVars.first(); o != 0; o = newVars.next()) {
-            if (o->getText() == variable->getText()) {
+        for (ExprValue * o = newVars.first(); o != 0; o = newVars.next()) {
+            if (o->m_name == variable->m_name) {
                 delete variable;
 
                 goto skipDuplicate;
@@ -1332,10 +1332,10 @@ XsldbgDriver::parseLocals(const char *output, QList < VarTree > &newVars)
 }
 
 
-VarTree *
+ExprValue *
 XsldbgDriver::parsePrintExpr(const char *output, bool wantErrorValue)
 {
-    VarTree* var = 0;
+    ExprValue* var = 0;
     // check for error conditions
     if (!parseErrorMessage(output, var, wantErrorValue)) {
         // parse the variable

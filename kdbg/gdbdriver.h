@@ -50,7 +50,7 @@ public:
     virtual void detachAndTerminate();
     virtual void interruptInferior();
     virtual void setPrintQStringDataCmd(const char* cmd);
-    virtual VarTree* parseQCharArray(const char* output, bool wantErrorValue, bool qt3like);
+    virtual ExprValue* parseQCharArray(const char* output, bool wantErrorValue, bool qt3like);
     virtual void parseBackTrace(const char* output, QList<StackFrame>& stack);
     virtual bool parseFrameChange(const char* output, int& frameNo,
 				  QString& file, int& lineNo, DbgAddr& address);
@@ -58,8 +58,8 @@ public:
     virtual bool parseThreadList(const char* output, QList<ThreadInfo>& threads);
     virtual bool parseBreakpoint(const char* output, int& id,
 				 QString& file, int& lineNo, QString& address);
-    virtual void parseLocals(const char* output, QList<VarTree>& newVars);
-    virtual VarTree* parsePrintExpr(const char* output, bool wantErrorValue);
+    virtual void parseLocals(const char* output, QList<ExprValue>& newVars);
+    virtual ExprValue* parsePrintExpr(const char* output, bool wantErrorValue);
     virtual bool parseChangeWD(const char* output, QString& message);
     virtual bool parseChangeExecutable(const char* output, QString& message);
     virtual bool parseCoreFile(const char* output);

@@ -20,12 +20,12 @@
 
 static void skipString(const char*& p);
 static void skipNested(const char*& s, char opening, char closing);
-static VarTree* parseVar(const char*& s);
+static ExprValue* parseVar(const char*& s);
 static bool parseName(const char*& s, QString& name, VarTree::NameKind& kind);
-static bool parseValue(const char*& s, VarTree* variable);
-static bool parseNested(const char*& s, VarTree* variable);
-static bool parseVarSeq(const char*& s, VarTree* variable);
-static bool parseValueSeq(const char*& s, VarTree* variable);
+static bool parseValue(const char*& s, ExprValue* variable);
+static bool parseNested(const char*& s, ExprValue* variable);
+static bool parseVarSeq(const char*& s, ExprValue* variable);
+static bool parseValueSeq(const char*& s, ExprValue* variable);
 
 #define PROMPT "(kdbg)"
 #define PROMPT_LEN 6
@@ -654,12 +654,12 @@ static bool isErrorExpr(const char* output)
 
 /**
  * Returns true if the output is an error message. If wantErrorValue is
- * true, a new VarTree object is created and filled with the error message.
+ * true, a new ExprValue object is created and filled with the error message.
  * If there are warnings, they are skipped and output points past the warnings
  * on return (even if there \e are errors).
  */
 static bool parseErrorMessage(const char*& output,
-			      VarTree*& variable, bool wantErrorValue)
+			      ExprValue*& variable, bool wantErrorValue)
 {
     // skip warnings
     while (strncmp(output, "warning:", 8) == 0)
@@ -675,7 +675,7 @@ static bool parseErrorMessage(const char*& output,
     {
 	if (wantErrorValue) {
 	    // put the error message as value in the variable
-	    variable = new VarTree(QString(), VarTree::NKplain);
+	    variable = new ExprValue(QString(), VarTree::NKplain);
 	    const char* endMsg = strchr(output, '\n');
 	    if (endMsg == 0)
 		endMsg = output + strlen(output);
@@ -707,9 +707,9 @@ void GdbDriver::setPrintQStringDataCmd(const char* cmd)
     cmds[DCprintQStringStruct].fmt = cmd;
 }
 
-VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, bool qt3like)
+ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, bool qt3like)
 {
-    VarTree* variable = 0;
+    ExprValue* variable = 0;
 
     /*
      * Parse off white space. gdb sometimes prints white space first if the
@@ -721,7 +721,7 @@ VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, boo
     // special case: empty string (0 repetitions)
     if (strncmp(output, "Invalid number 0 of repetitions", 31) == 0)
     {
-	variable = new VarTree(QString(), VarTree::NKplain);
+	variable = new ExprValue(QString(), VarTree::NKplain);
 	variable->m_value = "\"\"";
 	return variable;
     }
@@ -839,17 +839,17 @@ VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, boo
 	    result += "\"";
 
 	// assign the value
-	variable = new VarTree(QString(), VarTree::NKplain);
+	variable = new ExprValue(QString(), VarTree::NKplain);
 	variable->m_value = result;
     }
     else if (strncmp(p, "true", 4) == 0)
     {
-	variable = new VarTree(QString(), VarTree::NKplain);
+	variable = new ExprValue(QString(), VarTree::NKplain);
 	variable->m_value = "QString::null";
     }
     else if (strncmp(p, "false", 5) == 0)
     {
-	variable = new VarTree(QString(), VarTree::NKplain);
+	variable = new ExprValue(QString(), VarTree::NKplain);
 	variable->m_value = "(null)";
     }
     else
@@ -858,13 +858,13 @@ VarTree* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, boo
 
 error:
     if (wantErrorValue) {
-	variable = new VarTree(QString(), VarTree::NKplain);
+	variable = new ExprValue(QString(), VarTree::NKplain);
 	variable->m_value = "internal parse error";
     }
     return variable;
 }
 
-static VarTree* parseVar(const char*& s)
+static ExprValue* parseVar(const char*& s)
 {
     const char* p = s;
     
@@ -890,7 +890,7 @@ static VarTree* parseVar(const char*& s)
     while (isspace(*p))
 	p++;
 
-    VarTree* variable = new VarTree(name, kind);
+    ExprValue* variable = new ExprValue(name, kind);
     
     if (!parseValue(p, variable)) {
 	delete variable;
@@ -1124,7 +1124,7 @@ static bool parseName(const char*& s, QString& name, VarTree::NameKind& kind)
     return true;
 }
 
-static bool parseValue(const char*& s, VarTree* variable)
+static bool parseValue(const char*& s, ExprValue* variable)
 {
     variable->m_value = "";
 
@@ -1154,7 +1154,7 @@ repeat:
 	    }
 	    // must be the closing brace
 	    if (*s != '}') {
-		TRACE("parse error: missing } of " +  variable->getText());
+		TRACE("parse error: missing } of " +  variable->m_name);
 		return false;
 	    }
 	    s++;
@@ -1331,7 +1331,7 @@ repeat:
 	}
 
 	if (variable->m_value.length() == 0) {
-	    TRACE("parse error: no value for " + variable->getText());
+	    TRACE("parse error: no value for " + variable->m_name);
 	    return false;
 	}
 
@@ -1347,16 +1347,12 @@ repeat:
 	if (reference) {
 	    goto repeat;
 	}
-
-	if (variable->m_varKind == VarTree::VKpointer) {
-	    variable->setDelayedExpanding(true);
-	}
     }
 
     return true;
 }
 
-static bool parseNested(const char*& s, VarTree* variable)
+static bool parseNested(const char*& s, ExprValue* variable)
 {
     // could be a structure or an array
     while (isspace(*s))
@@ -1397,10 +1393,10 @@ static bool parseNested(const char*& s, VarTree* variable)
     return true;
 }
 
-static bool parseVarSeq(const char*& s, VarTree* variable)
+static bool parseVarSeq(const char*& s, ExprValue* variable)
 {
     // parse a comma-separated sequence of variables
-    VarTree* var = variable;		/* var != 0 to indicate success if empty seq */
+    ExprValue* var = variable;		/* var != 0 to indicate success if empty seq */
     for (;;) {
 	if (*s == '}')
 	    break;
@@ -1424,7 +1420,7 @@ static bool parseVarSeq(const char*& s, VarTree* variable)
     return var != 0;
 }
 
-static bool parseValueSeq(const char*& s, VarTree* variable)
+static bool parseValueSeq(const char*& s, ExprValue* variable)
 {
     // parse a comma-separated sequence of variables
     int index = 0;
@@ -1432,7 +1428,7 @@ static bool parseValueSeq(const char*& s, VarTree* variable)
     for (;;) {
 	QString name;
 	name.sprintf("[%d]", index);
-	VarTree* var = new VarTree(name, VarTree::NKplain);
+	ExprValue* var = new ExprValue(name, VarTree::NKplain);
 	good = parseValue(s, var);
 	if (!good) {
 	    delete var;
@@ -1451,7 +1447,7 @@ static bool parseValueSeq(const char*& s, VarTree* variable)
 	    TRACE(QString().sprintf("found <repeats %d times> in array", l));
 	    // replace name and advance index
 	    name.sprintf("[%d .. %d]", index, index+l-1);
-	    var->setText(name);
+	    var->m_name = name;
 	    index += l;
 	    // skip " times>" and space
 	    s = end+7;
@@ -1465,7 +1461,7 @@ static bool parseValueSeq(const char*& s, VarTree* variable)
 	// long arrays may be terminated by '...'
 	if (strncmp(s, "...", 3) == 0) {
 	    s += 3;
-	    VarTree* var = new VarTree("...", VarTree::NKplain);
+	    ExprValue* var = new ExprValue("...", VarTree::NKplain);
 	    var->m_value = i18n("<additional entries of the array suppressed>");
 	    variable->appendChild(var);
 	    break;
@@ -1686,7 +1682,7 @@ void GdbDriver::parseBackTrace(const char* output, QList<StackFrame>& stack)
 	frm->fileName = file;
 	frm->lineNo = lineNo;
 	frm->address = address;
-	frm->var = new VarTree(func, VarTree::NKplain);
+	frm->var = new ExprValue(func, VarTree::NKplain);
 	stack.append(frm);
     }
 }
@@ -1990,7 +1986,7 @@ static bool parseNewWatchpoint(const char* o, int& id,
     return true;
 }
 
-void GdbDriver::parseLocals(const char* output, QList<VarTree>& newVars)
+void GdbDriver::parseLocals(const char* output, QList<ExprValue>& newVars)
 {
     // check for possible error conditions
     if (strncmp(output, "No symbol table", 15) == 0)
@@ -2014,13 +2010,13 @@ void GdbDriver::parseLocals(const char* output, QList<VarTree>& newVars)
 	    continue;
 	}
 
-	VarTree* variable = parseVar(output);
+	ExprValue* variable = parseVar(output);
 	if (variable == 0) {
 	    break;
 	}
 	// do not add duplicates
-	for (VarTree* o = newVars.first(); o != 0; o = newVars.next()) {
-	    if (o->getText() == variable->getText()) {
+	for (ExprValue* o = newVars.first(); o != 0; o = newVars.next()) {
+	    if (o->m_name == variable->m_name) {
 		delete variable;
 		goto skipDuplicate;
 	    }
@@ -2030,9 +2026,9 @@ void GdbDriver::parseLocals(const char* output, QList<VarTree>& newVars)
     }
 }
 
-VarTree* GdbDriver::parsePrintExpr(const char* output, bool wantErrorValue)
+ExprValue* GdbDriver::parsePrintExpr(const char* output, bool wantErrorValue)
 {
-    VarTree* var = 0;
+    ExprValue* var = 0;
     // check for error conditions
     if (!parseErrorMessage(output, var, wantErrorValue))
     {

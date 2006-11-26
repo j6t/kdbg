@@ -14,6 +14,7 @@
 
 
 class VarTree;
+class ExprValue;
 class ExprWnd;
 class KDebugger;
 class QStrList;
@@ -206,7 +207,7 @@ struct FrameInfo
 struct StackFrame : FrameInfo
 {
     int frameNo;
-    VarTree* var;			/* more information if non-zero */
+    ExprValue* var;			/* more information if non-zero */
     StackFrame() : var(0) { }
     ~StackFrame();
 };
@@ -377,7 +378,7 @@ public:
     /**
      * Parses the output as an array of QChars.
      */
-    virtual VarTree* parseQCharArray(const char* output, bool wantErrorValue, bool qt3like) = 0;
+    virtual ExprValue* parseQCharArray(const char* output, bool wantErrorValue, bool qt3like) = 0;
 
     /**
      * Parses a back-trace (the output of the DCbt command).
@@ -435,7 +436,7 @@ public:
      * @param newVars Receives the parsed variable values. The values are
      * simply append()ed to the supplied list.
      */
-    virtual void parseLocals(const char* output, QList<VarTree>& newVars) = 0;
+    virtual void parseLocals(const char* output, QList<ExprValue>& newVars) = 0;
 
     /**
      * Parses the output of a DCprint or DCprintStruct command.
@@ -447,7 +448,7 @@ public:
      * or if the output is an error message and #wantErrorValue
      * is \c false. The returned object's text() is undefined.
      */
-    virtual VarTree* parsePrintExpr(const char* output, bool wantErrorValue) = 0;
+    virtual ExprValue* parsePrintExpr(const char* output, bool wantErrorValue) = 0;
 
     /**
      * Parses the output of the DCcd command.

@@ -1294,7 +1294,7 @@ void KDebugger::handleLocals(const char* output)
     /*
      *  Get local variables.
      */
-    QList<VarTree> newVars;
+    QList<ExprValue> newVars;
     parseLocals(output, newVars);
 
     /*
@@ -1313,14 +1313,14 @@ void KDebugger::handleLocals(const char* output)
      */
     for (const char* n = oldVars.first(); n != 0; n = oldVars.next()) {
 	// lookup this variable in the list of new variables
-	VarTree* v = newVars.first();
-	while (v != 0 && strcmp(v->getText(), n) != 0) {
+	ExprValue* v = newVars.first();
+	while (v != 0 && v->m_name != n) {
 	    v = newVars.next();
 	}
 	if (v == 0) {
 	    // old variable not in the new variables
 	    TRACE(QString("old var deleted: ") + n);
-	    v = m_localVariables.topLevelExprByName(n);
+	    VarTree* v = m_localVariables.topLevelExprByName(n);
 	    if (v != 0) {
 		m_localVariables.removeExpr(v);
 		repaintNeeded = true;
@@ -1338,8 +1338,8 @@ void KDebugger::handleLocals(const char* output)
     // insert all remaining new variables
     while (!newVars.isEmpty())
     {
-	VarTree* v = newVars.take(0);
-	TRACE("new var: " + v->getText());
+	ExprValue* v = newVars.take(0);
+	TRACE("new var: " + v->m_name);
 	m_localVariables.insertExpr(v, *m_typeTable);
 	delete v;
 	repaintNeeded = true;
@@ -1351,15 +1351,15 @@ void KDebugger::handleLocals(const char* output)
 	m_localVariables.repaint();
 }
 
-void KDebugger::parseLocals(const char* output, QList<VarTree>& newVars)
+void KDebugger::parseLocals(const char* output, QList<ExprValue>& newVars)
 {
-    QList<VarTree> vars;
+    QList<ExprValue> vars;
     m_d->parseLocals(output, vars);
 
     QString origName;			/* used in renaming variables */
     while (vars.count() > 0)
     {
-	VarTree* variable = vars.take(0);
+	ExprValue* variable = vars.take(0);
 	/*
 	 * When gdb prints local variables, those from the innermost block
 	 * come first. We run through the list of already parsed variables
@@ -1370,13 +1370,13 @@ void KDebugger::parseLocals(const char* output, QList<VarTree>& newVars)
 	 * _visible_ changes the color!
 	 */
 	int block = 0;
-	origName = variable->getText();
-	for (VarTree* v = newVars.first(); v != 0; v = newVars.next()) {
-	    if (variable->getText() == v->getText()) {
+	origName = variable->m_name;
+	for (ExprValue* v = newVars.first(); v != 0; v = newVars.next()) {
+	    if (variable->m_name == v->m_name) {
 		// we found a duplicate, change name
 		block++;
 		QString newName = origName + " (" + QString().setNum(block) + ")";
-		variable->setText(newName);
+		variable->m_name = newName;
 	    }
 	}
 	newVars.append(variable);
@@ -1387,12 +1387,12 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
 {
     ASSERT(cmd->m_expr != 0);
 
-    VarTree* variable = m_d->parsePrintExpr(output, true);
+    ExprValue* variable = m_d->parsePrintExpr(output, true);
     if (variable == 0)
 	return false;
 
     // set expression "name"
-    variable->setText(cmd->m_expr->getText());
+    variable->m_name = cmd->m_expr->getText();
 
     {
 	TRACE("update expr: " + cmd->m_expr->getText());
@@ -1409,28 +1409,28 @@ bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 {
     ASSERT(cmd->m_expr != 0);
 
-    VarTree* variable = m_d->parsePrintExpr(output, true);
+    ExprValue* variable = m_d->parsePrintExpr(output, true);
     if (variable == 0)
 	return false;
 
     // set expression "name"
-    variable->setText(cmd->m_expr->getText());
+    variable->m_name = cmd->m_expr->getText();
 
     {
 	/*
 	 * We must insert a dummy parent, because otherwise variable's value
 	 * would overwrite cmd->m_expr's value.
 	 */
-	VarTree* dummyParent = new VarTree(variable->getText(), VarTree::NKplain);
+	ExprValue* dummyParent = new ExprValue(variable->m_name, VarTree::NKplain);
 	dummyParent->m_varKind = VarTree::VKdummy;
 	// the name of the parsed variable is the address of the pointer
 	QString addr = "*" + cmd->m_expr->m_value;
-	variable->setText(addr);
+	variable->m_name = addr;
 	variable->m_nameKind = VarTree::NKaddress;
 
-	dummyParent->appendChild(variable);
+	dummyParent->m_child = variable;
 	// expand the first level for convenience
-	variable->setExpanded(true);
+	variable->m_initiallyExpanded = true;
 	TRACE("update ptr: " + cmd->m_expr->getText());
 	cmd->m_exprWnd->updateExpr(cmd->m_expr, dummyParent, *m_typeTable);
 	delete dummyParent;
@@ -1461,7 +1461,7 @@ void KDebugger::handleBacktrace(const char* output)
 	do {
 	    QString func;
 	    if (frm->var != 0)
-		func = frm->var->getText();
+		func = frm->var->m_name;
 	    else
 		func = frm->fileName + ":" + QString().setNum(frm->lineNo+1);
 	    m_btWindow.insertItem(func);
@@ -1644,7 +1644,7 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
     ASSERT(var != 0);
     ASSERT(var->m_varKind == VarTree::VKstruct);
 
-    VarTree* partExpr;
+    ExprValue* partExpr;
     if (cmd->m_cmd == DCprintQStringStruct) {
 	partExpr = m_d->parseQCharArray(output, false, m_typeTable->qCharIsShort());
     } else if (cmd->m_cmd == DCprintWChar) {
@@ -1655,7 +1655,7 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
     bool errorValue =
 	partExpr == 0 ||
 	/* we only allow simple values at the moment */
-	partExpr->childCount() != 0;
+	partExpr->m_child != 0;
 
     QString partValue;
     if (errorValue)
@@ -1831,7 +1831,7 @@ void KDebugger::addWatch(const QString& t)
     // don't add a watched expression again
     if (expr.isEmpty() || m_watchVariables.topLevelExprByName(expr) != 0)
 	return;
-    VarTree e(expr, VarTree::NKplain);
+    ExprValue e(expr, VarTree::NKplain);
     m_watchVariables.insertExpr(&e, *m_typeTable);
 
     // if we are boring ourselves, send down the command

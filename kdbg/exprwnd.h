@@ -56,6 +56,26 @@ public:
     VarTree* nextSibling() const { return static_cast<VarTree*>(getSibling()); }
 };
 
+/**
+ * Represents the value tree that is parsed by the debugger drivers.
+ */
+struct ExprValue
+{
+    QString m_name;
+    QString m_value;
+    VarTree::VarKind m_varKind;
+    VarTree::NameKind m_nameKind;
+    ExprValue* m_child;			/* the first child expression */
+    ExprValue* m_next;			/* the next sibling expression */
+    bool m_initiallyExpanded;
+
+    ExprValue(const QString& name, VarTree::NameKind kind);
+    ~ExprValue();
+
+    void appendChild(ExprValue* newChild);
+    uint childCount() const;
+};
+
 
 class ExprWnd;
 
@@ -91,12 +111,12 @@ public:
     void exprList(QStrList& exprs);
     /** appends a copy of expr to the end of the tree at the topmost level;
      * returns a pointer to the inserted top-level item */
-    VarTree* insertExpr(VarTree* expr, ProgramTypeTable& typeTable);
+    VarTree* insertExpr(ExprValue* expr, ProgramTypeTable& typeTable);
     /** updates an existing expression */
-    void updateExpr(VarTree* expr, ProgramTypeTable& typeTable);
-    void updateExpr(VarTree* display, VarTree* newValues, ProgramTypeTable& typeTable);
+    void updateExpr(ExprValue* expr, ProgramTypeTable& typeTable);
+    void updateExpr(VarTree* display, ExprValue* newValues, ProgramTypeTable& typeTable);
     /** updates the value and repaints it for a single item (not the children) */
-    void updateSingleExpr(VarTree* display, VarTree* newValues);
+    void updateSingleExpr(VarTree* display, ExprValue* newValues);
     /** updates only the value of the node */
     void updateStructValue(VarTree* display);
     /** get a top-level expression by name */
@@ -121,8 +141,8 @@ public:
     VarTree* selectedItem() const { return static_cast<VarTree*>(getCurrentItem()); }
 
 protected:
-    bool updateExprRec(VarTree* display, VarTree* newValues, ProgramTypeTable& typeTable);
-    void replaceChildren(VarTree* display, VarTree* newValues);
+    bool updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeTable& typeTable);
+    void replaceChildren(VarTree* display, ExprValue* newValues);
     virtual void paintCell(QPainter* painter, int row, int col);
     virtual int cellWidth(int col) const;
     void updateValuesWidth();
