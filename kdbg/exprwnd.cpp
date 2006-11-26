@@ -153,10 +153,10 @@ void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
      */
 
     // first recurse children
-    VarTree* child = static_cast<VarTree*>(getChild());
+    VarTree* child = firstChild();
     while (child != 0) {
 	child->inferTypesOfChildren(typeTable);
-	child = static_cast<VarTree*>(child->getSibling());
+	child = child->nextSibling();
     }
 
     // if this is a pointer, get the type from the value (less the pointer)
@@ -240,7 +240,7 @@ bool VarTree::isWcharT() const
 TypeInfo* VarTree::inferTypeFromBaseClass()
 {
     if (m_varKind == VKstruct) {
-	VarTree* child = static_cast<VarTree*>(getChild());
+	VarTree* child = firstChild();
 	while (child != 0 &&
 	       // only check base class parts (i.e. type names)
 	       child->m_nameKind == NKtype)
@@ -251,7 +251,7 @@ TypeInfo* VarTree::inferTypeFromBaseClass()
 		// got a type!
 		return child->m_type;
 	    }
-	    child = static_cast<VarTree*>(child->getSibling());
+	    child = child->nextSibling();
 	}
     }
     return 0;
@@ -280,8 +280,8 @@ ExprWnd::~ExprWnd()
 void ExprWnd::exprList(QStrList& exprs)
 {
     // ASSERT(exprs does deep-copies)
-    KTreeViewItem* item;
-    for (item = itemAt(0); item != 0; item = item->getSibling()) {
+    VarTree* item;
+    for (item = firstChild(); item != 0; item = item->nextSibling()) {
 	exprs.append(item->getText());
     }
 }
@@ -300,19 +300,19 @@ VarTree* ExprWnd::insertExpr(VarTree* expr, ProgramTypeTable& typeTable)
 void ExprWnd::updateExpr(VarTree* expr, ProgramTypeTable& typeTable)
 {
     // search the root variable
-    KPath path;
-    path.push(expr->getText());
-    KTreeViewItem* item = itemAt(path);
+    VarTree* item = firstChild();
+    while (item != 0 && item->getText() != expr->getText())
+	item = item->nextSibling();
     if (item == 0) {
 	return;
     }
     // now update it
-    if (updateExprRec(static_cast<VarTree*>(item), expr, typeTable)) {
+    if (updateExprRec(item, expr, typeTable)) {
 	updateVisibleItems();
 	updateValuesWidth();
 	repaint();
     }
-    collectUnknownTypes(static_cast<VarTree*>(item));
+    collectUnknownTypes(item);
 }
 
 void ExprWnd::updateExpr(VarTree* display, VarTree* newValues, ProgramTypeTable& typeTable)
@@ -415,8 +415,8 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues, ProgramTypeTab
     // go for children
     bool childChanged = false;
 
-    VarTree* vDisplay = static_cast<VarTree*>(display->getChild());
-    VarTree* vNew = static_cast<VarTree*>(newValues->getChild());
+    VarTree* vDisplay = display->firstChild();
+    VarTree* vNew = newValues->firstChild();
     while (vDisplay != 0) {
 	// check whether the names are the same
 	if (strcmp(vDisplay->getText(), vNew->getText()) != 0) {
@@ -432,8 +432,8 @@ bool ExprWnd::updateExprRec(VarTree* display, VarTree* newValues, ProgramTypeTab
 	if (updateExprRec(vDisplay, vNew, typeTable)) {
 	    childChanged = true;
 	}
-	vDisplay = static_cast<VarTree*>(vDisplay->getSibling());
-	vNew = static_cast<VarTree*>(vNew->getSibling());
+	vDisplay = vDisplay->nextSibling();
+	vNew = vNew->nextSibling();
     }
 
     // update of children propagates only if this node is expanded
@@ -509,14 +509,14 @@ void ExprWnd::replaceChildren(VarTree* display, VarTree* newValues)
     ASSERT(display->childCount() == 0 || display->m_varKind != VarTree::VKsimple);
 
     // delete all children of display
-    while (VarTree* c = static_cast<VarTree*>(display->getChild())) {
+    while (VarTree* c = display->firstChild()) {
 	unhookSubtree(c);
 	display->removeChild(c);
 	delete c;
     }
     // insert copies of the newValues
-    for (KTreeViewItem* c = newValues->getChild(); c != 0; c = c->getSibling()) {
-	VarTree* v = static_cast<VarTree*>(c);
+    for (VarTree* v = newValues->firstChild(); v != 0; v = v->nextSibling())
+    {
 	VarTree* vNew = new VarTree(v->getText(), v->m_nameKind);
 	vNew->m_varKind = v->m_varKind;
 	vNew->m_value = v->m_value;
@@ -604,11 +604,11 @@ QString ExprWnd::formatWCharPointer(QString value)
 
 VarTree* ExprWnd::topLevelExprByName(const char* name)
 {
-    KPath path;
-    path.push(name);
-    KTreeViewItem* item = itemAt(path);
+    VarTree* item = firstChild();
+    while (item != 0 && item->getText() != name)
+	item = item->nextSibling();
 
-    return static_cast<VarTree*>(item);
+    return item;
 }
 
 VarTree* ExprWnd::ptrMemberByName(VarTree* v, const QString& name)
@@ -618,29 +618,29 @@ VarTree* ExprWnd::ptrMemberByName(VarTree* v, const QString& name)
 	return 0;
 
     // the only child of v is the pointer value that represents the struct
-    KTreeViewItem* item = v->getChild();
-    return memberByName(static_cast<VarTree*>(item), name);
+    VarTree* item = v->firstChild();
+    return memberByName(item, name);
 }
 
 VarTree* ExprWnd::memberByName(VarTree* v, const QString& name)
 {
     // search immediate children for name
-    KTreeViewItem* item = v->getChild();
+    VarTree* item = v->firstChild();
     while (item != 0 && item->getText() != name)
-	item = item->getSibling();
+	item = item->nextSibling();
 
     if (item != 0)
-	return static_cast<VarTree*>(item);
+	return item;
 
     // try in base classes
-    item = v->getChild();
+    item = v->firstChild();
     while (item != 0 &&
-	   static_cast<VarTree*>(item)->m_nameKind == VarTree::NKtype)
+	   item->m_nameKind == VarTree::NKtype)
     {
-	v = memberByName(static_cast<VarTree*>(item), name);
+	v = memberByName(item, name);
 	if (v != 0)
 	    return v;
-	item = item->getSibling();
+	item = item->nextSibling();
     }
     return 0;
 }

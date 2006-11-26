@@ -723,9 +723,9 @@ void KDebugger::saveProgramSettings()
     m_programConfig->deleteGroup(WatchGroup);
     // then start a new group
     m_programConfig->setGroup(WatchGroup);
-    KTreeViewItem* item = m_watchVariables.itemAt(0);
+    VarTree* item = m_watchVariables.firstChild();
     int watchNum = 0;
-    for (; item != 0; item = item->getSibling(), ++watchNum) {
+    for (; item != 0; item = item->nextSibling(), ++watchNum) {
 	varName.sprintf(ExprFmt, watchNum);
 	m_programConfig->writeEntry(varName, item->getText());
     }
@@ -1211,9 +1211,9 @@ void KDebugger::updateAllExprs()
     }
 
     // update watch expressions
-    KTreeViewItem* item = m_watchVariables.itemAt(0);
-    for (; item != 0; item = item->getSibling()) {
-	m_watchEvalExpr.push_back(static_cast<VarTree*>(item)->getText());
+    VarTree* item = m_watchVariables.firstChild();
+    for (; item != 0; item = item->nextSibling()) {
+	m_watchEvalExpr.push_back(item->getText());
     }
 }
 

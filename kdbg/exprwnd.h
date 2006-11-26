@@ -51,6 +51,9 @@ public:
     TypeInfo* inferTypeFromBaseClass();
     /** returns whether the pointer is a wchar_t */
     bool isWcharT() const;
+
+    VarTree* firstChild() const { return static_cast<VarTree*>(getChild()); }
+    VarTree* nextSibling() const { return static_cast<VarTree*>(getSibling()); }
 };
 
 
@@ -114,6 +117,7 @@ public:
     /** tells whether the a value is currently edited */
     bool isEditing() const;
 
+    VarTree* firstChild() const { return static_cast<VarTree*>(itemAt(0)); }
     VarTree* selectedItem() const { return static_cast<VarTree*>(getCurrentItem()); }
 
 protected:
