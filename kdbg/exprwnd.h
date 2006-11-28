@@ -13,6 +13,7 @@
 
 class ProgramTypeTable;
 class TypeInfo;
+struct ExprValue;
 
 /* a variable's value is the tree of sub-variables */
 
@@ -34,7 +35,8 @@ public:
     bool m_exprIndexUseGuard;		/* ditto; if guard expr should be used */
     QString m_partialValue;		/* while struct value update is in progress */
 
-    VarTree(const QString& name, NameKind kind);
+    VarTree(ExprValue* v);
+    VarTree(const QString& name);
     virtual ~VarTree();
 public:
     void paintValue(QPainter* painter);

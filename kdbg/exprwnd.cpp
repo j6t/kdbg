@@ -16,10 +16,24 @@
 #endif
 #include "mydebug.h"
 
-VarTree::VarTree(const QString& name, NameKind aKind) :
+VarTree::VarTree(ExprValue* v) :
+	KTreeViewItem(v->m_name),
+	m_varKind(v->m_varKind),
+	m_nameKind(v->m_nameKind),
+	m_value(v->m_value),
+	m_valueChanged(false),
+	m_type(0),
+	m_exprIndex(0),
+	m_exprIndexUseGuard(false)
+{
+    setDelayedExpanding(m_varKind == VKpointer);
+    setExpanded(v->m_initiallyExpanded);
+}
+
+VarTree::VarTree(const QString& name) :
 	KTreeViewItem(name),
 	m_varKind(VKsimple),
-	m_nameKind(aKind),
+	m_nameKind(VarTree::NKplain),
 	m_valueChanged(false),
 	m_type(0),
 	m_exprIndex(0),
@@ -331,7 +345,7 @@ void ExprWnd::exprList(QStrList& exprs)
 VarTree* ExprWnd::insertExpr(ExprValue* expr, ProgramTypeTable& typeTable)
 {
     // append a new dummy expression
-    VarTree* display = new VarTree(expr->m_name, VarTree::NKplain);
+    VarTree* display = new VarTree(expr->m_name);
     insertItem(display);
 
     // replace it right away
@@ -559,11 +573,7 @@ void ExprWnd::replaceChildren(VarTree* display, ExprValue* newValues)
     // insert copies of the newValues
     for (ExprValue* v = newValues->m_child; v != 0; v = v->m_next)
     {
-	VarTree* vNew = new VarTree(v->m_name, v->m_nameKind);
-	vNew->m_varKind = v->m_varKind;
-	vNew->m_value = v->m_value;
-	vNew->setDelayedExpanding(vNew->m_varKind == VarTree::VKpointer);
-	vNew->setExpanded(v->m_initiallyExpanded);
+	VarTree* vNew = new VarTree(v);
 	display->appendChild(vNew);
 	// recurse
 	replaceChildren(vNew, v);
