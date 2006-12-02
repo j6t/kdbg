@@ -163,7 +163,7 @@ protected:
     QList<VarTree> m_updateType;	/* structs whose type must be determined */
     QList<VarTree> m_updateStruct;	/* structs whose nested value needs update */
 
-    ValueEdit m_edit;
+    ValueEdit* m_edit;
 
     /** remove items that are in the subTree from the list */
     void unhookSubtree(VarTree* subTree);

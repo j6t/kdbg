@@ -317,7 +317,7 @@ uint ExprValue::childCount() const
 ExprWnd::ExprWnd(QWidget* parent, const char* name) :
 	KTreeView(parent, name),
 	maxValueWidth(0),
-	m_edit(this)
+	m_edit(0)
 {
     setNumCols(2);
     
@@ -827,6 +827,9 @@ void ExprWnd::slotExpandOrCollapse(int)
 
 void ExprWnd::editValue(int row, const QString& text)
 {
+    if (m_edit == 0)
+	m_edit = new ValueEdit(this);
+
     int x;
     colXPos(1, &x);
     int y;
@@ -841,7 +844,7 @@ void ExprWnd::editValue(int row, const QString& text)
      * the text, scroll this widget so that half of it shows the text (or
      * less than half of it if the text is shorter).
      */
-    QFontMetrics metr = m_edit.font();
+    QFontMetrics metr = m_edit->font();
     int wMin = metr.width("88888");
     if (w < wMin)
 	w = wMin;
@@ -864,19 +867,19 @@ void ExprWnd::editValue(int row, const QString& text)
 
     // make the edit box as wide as the visible column
     QRect rect(x,y, wThis-x,h);
-    m_edit.setText(text);
-    m_edit.selectAll();
+    m_edit->setText(text);
+    m_edit->selectAll();
 
-    m_edit.setGeometry(rect);
-    m_edit.m_finished = false;
-    m_edit.m_row = row;
-    m_edit.show();
-    m_edit.setFocus();
+    m_edit->setGeometry(rect);
+    m_edit->m_finished = false;
+    m_edit->m_row = row;
+    m_edit->show();
+    m_edit->setFocus();
 }
 
 bool ExprWnd::isEditing() const
 {
-    return m_edit.isVisible();
+    return m_edit != 0 && m_edit->isVisible();
 }
 
 
