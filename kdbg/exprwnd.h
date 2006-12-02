@@ -28,7 +28,6 @@ public:
 	NKaddress			/* a dereferenced pointer */
     };
     NameKind m_nameKind;
-    QString m_value;
     bool m_valueChanged;
     TypeInfo* m_type;			/* type of struct */
     int m_exprIndex;			/* used in struct value update */
@@ -54,8 +53,13 @@ public:
     /** returns whether the pointer is a wchar_t */
     bool isWcharT() const;
 
+    void setValue(const QString& v) { m_value = v; }
+    QString value() const { return m_value; }
     VarTree* firstChild() const { return static_cast<VarTree*>(getChild()); }
     VarTree* nextSibling() const { return static_cast<VarTree*>(getSibling()); }
+
+private:
+    QString m_value;
 };
 
 /**

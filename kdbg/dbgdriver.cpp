@@ -479,7 +479,7 @@ void DebuggerDriver::dequeueCmdByVar(VarTree* var)
 QString DebuggerDriver::editableValue(VarTree* value)
 {
     // by default, let the user edit what is visible
-    return value->m_value;
+    return value->value();
 }
 
 

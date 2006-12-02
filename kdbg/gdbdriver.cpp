@@ -2495,7 +2495,7 @@ QString GdbDriver::parseMemoryDump(const char* output, QList<MemoryDump>& memdum
 
 QString GdbDriver::editableValue(VarTree* value)
 {
-    const char* s = value->m_value.latin1();
+    const char* s = value->value().latin1();
 
     // if the variable is a pointer value that contains a cast,
     // remove the cast

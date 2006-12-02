@@ -20,11 +20,11 @@ VarTree::VarTree(ExprValue* v) :
 	KTreeViewItem(v->m_name),
 	m_varKind(v->m_varKind),
 	m_nameKind(v->m_nameKind),
-	m_value(v->m_value),
 	m_valueChanged(false),
 	m_type(0),
 	m_exprIndex(0),
-	m_exprIndexUseGuard(false)
+	m_exprIndexUseGuard(false),
+	m_value(v->m_value)
 {
     setDelayedExpanding(m_varKind == VKpointer);
     setExpanded(v->m_initiallyExpanded);
@@ -57,14 +57,14 @@ void VarTree::paintValue(QPainter* p)
 	p->setPen(red);
     }
 //    p->setBackgroundColor(cg.base());
-    p->drawText(textX, textY, m_value, m_value.length());
+    p->drawText(textX, textY, value(), value().length());
     p->restore();
 }
 
 int VarTree::valueWidth()
 {
     assert(owner != 0);
-    return owner->fontMetrics().width(m_value) + 4;
+    return owner->fontMetrics().width(value()) + 4;
 }
 
 QString VarTree::computeExpr() const
@@ -145,8 +145,8 @@ bool VarTree::updateValue(const QString& newValue)
     // check whether the value changed
     bool prevValueChanged = m_valueChanged;
     m_valueChanged = false;
-    if (m_value != newValue) {
-	m_value = newValue;
+    if (value() != newValue) {
+	setValue(newValue);
 	m_valueChanged = true;
     }
     /*
@@ -244,8 +244,8 @@ void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
 // the value contains the pointer type in parenthesis
 bool VarTree::isWcharT() const
 {
-    return m_value.startsWith("(const wchar_t *)") ||
-	    m_value.startsWith("(wchar_t *)");
+    return value().startsWith("(const wchar_t *)") ||
+	    value().startsWith("(wchar_t *)");
 }
 
 /*
@@ -600,8 +600,8 @@ void ExprWnd::collectUnknownTypes(VarTree* var)
 	{
 	    var->m_type = TypeInfo::wchartType();
 	    // see updateSingleExpr() why we move the value
-	    var->m_partialValue = formatWCharPointer(var->m_value);
-	    var->m_value.truncate(0);
+	    var->m_partialValue = formatWCharPointer(var->value());
+	    var->setValue(QString());
 	    m_updateStruct.append(var);
 	}
     }
@@ -632,8 +632,8 @@ bool ExprWnd::collectUnknownTypes(KTreeViewItem* item, void* user)
 	{
 	    var->m_type = TypeInfo::wchartType();
 	    // see updateSingleExpr() why we move the value
-	    var->m_partialValue = formatWCharPointer(var->m_value);
-	    var->m_value.truncate(0);
+	    var->m_partialValue = formatWCharPointer(var->value());
+	    var->setValue(QString());
 	    tree->m_updateStruct.append(var);
 	}
     }

@@ -1424,7 +1424,7 @@ bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 	ExprValue* dummyParent = new ExprValue(variable->m_name, VarTree::NKplain);
 	dummyParent->m_varKind = VarTree::VKdummy;
 	// the name of the parsed variable is the address of the pointer
-	QString addr = "*" + cmd->m_expr->m_value;
+	QString addr = "*" + cmd->m_expr->value();
 	variable->m_name = addr;
 	variable->m_nameKind = VarTree::NKaddress;
 
@@ -2098,9 +2098,9 @@ void KDebugger::slotValuePopup(const QString& expr)
 
     // construct the tip
     QString tip = v->getText() + " = ";
-    if (!v->m_value.isEmpty())
+    if (!v->value().isEmpty())
     {
-	tip += v->m_value;
+	tip += v->value();
     }
     else
     {
