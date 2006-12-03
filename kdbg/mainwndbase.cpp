@@ -41,7 +41,7 @@ WatchWindow::WatchWindow(QWidget* parent, const char* name, WFlags f) :
 	m_watchEdit(this, "watch_edit"),
 	m_watchAdd(i18n(" Add "), this, "watch_add"),
 	m_watchDelete(i18n(" Del "), this, "watch_delete"),
-	m_watchVariables(this, "watch_variables"),
+	m_watchVariables(this, i18n("Expression"), "watch_variables"),
 	m_watchV(this, 0),
 	m_watchH(0)
 {

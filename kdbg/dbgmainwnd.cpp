@@ -54,7 +54,7 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     m_btWindow = new QListBox(dw1, "backtrace");
     dw1->setWidget(m_btWindow);
     KDockWidget* dw2 = createDockWidget("Locals", p, 0, i18n("Locals"));
-    m_localVariables = new ExprWnd(dw2, "locals");
+    m_localVariables = new ExprWnd(dw2, i18n("Variable"), "locals");
     dw2->setWidget(m_localVariables);
     KDockWidget* dw3 = createDockWidget("Watches", p, 0, i18n("Watches"));
     m_watches = new WatchWindow(dw3, "watches");

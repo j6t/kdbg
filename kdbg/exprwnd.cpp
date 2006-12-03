@@ -275,11 +275,11 @@ int ExprValue::childCount() const
 
 
 
-ExprWnd::ExprWnd(QWidget* parent, const char* name) :
+ExprWnd::ExprWnd(QWidget* parent, const QString& colHeader, const char* name) :
 	QListView(parent, name),
 	m_edit(0)
 {
-    addColumn(i18n("Variable"));
+    addColumn(colHeader);
     addColumn(i18n("Value"));
     setSorting(-1);		// do not sort items
     setColumnWidthMode(0, Manual);

@@ -109,7 +109,7 @@ class ExprWnd : public QListView
 {
     Q_OBJECT
 public:
-    ExprWnd(QWidget* parent, const char* name);
+    ExprWnd(QWidget* parent, const QString& colHeader, const char* name);
     ~ExprWnd();
 
     /** fills the list with the expressions at the topmost level */
