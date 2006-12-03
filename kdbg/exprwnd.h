@@ -36,8 +36,8 @@ public:
     bool m_exprIndexUseGuard;		/* ditto; if guard expr should be used */
     QString m_partialValue;		/* while struct value update is in progress */
 
-    VarTree(VarTree* parent, ExprValue* v);
-    VarTree(ExprWnd* parent, const QString& name);
+    VarTree(VarTree* parent, QListViewItem* after, ExprValue* v);
+    VarTree(ExprWnd* parent, QListViewItem* after, const QString& name);
     virtual ~VarTree();
 public:
     virtual void paintCell(QPainter* p, const QColorGroup& cg, int column, int width, int align);

@@ -17,8 +17,8 @@
 #endif
 #include "mydebug.h"
 
-VarTree::VarTree(VarTree* parent, ExprValue* v) :
-	QListViewItem(parent),
+VarTree::VarTree(VarTree* parent, QListViewItem* after, ExprValue* v) :
+	QListViewItem(parent, after),
 	m_varKind(v->m_varKind),
 	m_nameKind(v->m_nameKind),
 	m_valueChanged(false),
@@ -32,8 +32,8 @@ VarTree::VarTree(VarTree* parent, ExprValue* v) :
     setOpen(v->m_initiallyExpanded);
 }
 
-VarTree::VarTree(ExprWnd* parent, const QString& name) :
-	QListViewItem(parent),
+VarTree::VarTree(ExprWnd* parent, QListViewItem* after, const QString& name) :
+	QListViewItem(parent, after),
 	m_varKind(VKsimple),
 	m_nameKind(VarTree::NKplain),
 	m_valueChanged(false),
@@ -307,7 +307,11 @@ void ExprWnd::exprList(QStrList& exprs)
 VarTree* ExprWnd::insertExpr(ExprValue* expr, ProgramTypeTable& typeTable)
 {
     // append a new dummy expression
-    VarTree* display = new VarTree(this, expr->m_name);
+    VarTree* last = 0;	// last top-level item
+    for (VarTree* i = firstChild(); i != 0; i = i->nextSibling()) {
+	last = i;
+    }
+    VarTree* display = new VarTree(this, last, expr->m_name);
 
     // replace it right away
     updateExpr(display, expr, typeTable);
@@ -518,9 +522,10 @@ void ExprWnd::replaceChildren(VarTree* display, ExprValue* newValues)
 	delete c;
     }
     // insert copies of the newValues
+    VarTree* vNew = 0;
     for (ExprValue* v = newValues->m_child; v != 0; v = v->m_next)
     {
-	VarTree* vNew = new VarTree(display, v);
+	vNew = new VarTree(display, vNew, v);
 	// recurse
 	replaceChildren(vNew, v);
     }
