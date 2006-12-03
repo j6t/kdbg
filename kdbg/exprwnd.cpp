@@ -825,7 +825,7 @@ void ExprWnd::slotExpandOrCollapse(int)
     updateValuesWidth();
 }
 
-void ExprWnd::editValue(int row, const QString& text)
+void ExprWnd::editValue(VarTree* item, const QString& text)
 {
     if (m_edit == 0)
 	m_edit = new ValueEdit(this);
@@ -833,6 +833,7 @@ void ExprWnd::editValue(int row, const QString& text)
     int x;
     colXPos(1, &x);
     int y;
+    int row = itemRow(item);
     rowYPos(row, &y);
     int w = cellWidth(1);
     int h = cellHeight(row);
@@ -872,7 +873,7 @@ void ExprWnd::editValue(int row, const QString& text)
 
     m_edit->setGeometry(rect);
     m_edit->m_finished = false;
-    m_edit->m_row = row;
+    m_edit->m_item = item;
     m_edit->show();
     m_edit->setFocus();
 }
@@ -892,8 +893,8 @@ ValueEdit::ValueEdit(ExprWnd* parent) :
     connect(parent, SIGNAL(selected(int)), SLOT(slotSelectionChanged()));
     connect(parent, SIGNAL(collapsed(int)), SLOT(slotSelectionChanged()));
     connect(parent, SIGNAL(expanded(int)), SLOT(slotSelectionChanged()));
-    connect(this, SIGNAL(done(int, const QString&)),
-	    parent, SIGNAL(editValueCommitted(int, const QString&)));
+    connect(this, SIGNAL(done(VarTree*, const QString&)),
+	    parent, SIGNAL(editValueCommitted(VarTree*, const QString&)));
 }
 
 ValueEdit::~ValueEdit()
@@ -908,7 +909,7 @@ void ValueEdit::terminate(bool commit)
 	m_finished = true;
 	hide();	// will call focusOutEvent, that's why we need m_finished
 	if (commit) {
-	    emit done(m_row, text());
+	    emit done(m_item, text());
 	}
     }
 }

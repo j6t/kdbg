@@ -93,7 +93,7 @@ public:
     ~ValueEdit();
 
     void terminate(bool commit);
-    int m_row;
+    VarTree* m_item;
     bool m_finished;
 protected:
     void keyPressEvent(QKeyEvent *e);
@@ -102,7 +102,7 @@ protected:
 public slots:
     void slotSelectionChanged();
 signals:
-    void done(int, const QString&);
+    void done(VarTree*, const QString&);
 };
 
 
@@ -139,7 +139,7 @@ public:
     VarTree* nextUpdatePtr();
     VarTree* nextUpdateType();
     VarTree* nextUpdateStruct();
-    void editValue(int row, const QString& text);
+    void editValue(VarTree* item, const QString& text);
     /** tells whether the a value is currently edited */
     bool isEditing() const;
 
@@ -174,7 +174,7 @@ protected slots:
 
 signals:
     void removingItem(VarTree*);
-    void editValueCommitted(int, const QString&);
+    void editValueCommitted(VarTree*, const QString&);
 };
 
 #endif // EXPRWND_H

@@ -52,10 +52,10 @@ KDebugger::KDebugger(QWidget* parent,
 	    SLOT(slotLocalsExpanding(KTreeViewItem*,bool&)));
     connect(&m_watchVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
 	    SLOT(slotWatchExpanding(KTreeViewItem*,bool&)));
-    connect(&m_localVariables, SIGNAL(editValueCommitted(int, const QString&)),
-	    SLOT(slotValueEdited(int, const QString&)));
-    connect(&m_watchVariables, SIGNAL(editValueCommitted(int, const QString&)),
-	    SLOT(slotValueEdited(int, const QString&)));
+    connect(&m_localVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
+	    SLOT(slotValueEdited(VarTree*, const QString&)));
+    connect(&m_watchVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
+	    SLOT(slotValueEdited(VarTree*, const QString&)));
 
     connect(&m_btWindow, SIGNAL(highlighted(int)), SLOT(gotoFrame(int)));
 
@@ -2223,18 +2223,17 @@ void KDebugger::handleSetPC(const char* /*output*/)
     gotoFrame(0);
 }
 
-void KDebugger::slotValueEdited(int row, const QString& text)
+void KDebugger::slotValueEdited(VarTree* expr, const QString& text)
 {
     if (text.simplifyWhiteSpace().isEmpty())
 	return;			       /* no text entered: ignore request */
 
     ASSERT(sender()->inherits("ExprWnd"));
     ExprWnd* wnd = const_cast<ExprWnd*>(static_cast<const ExprWnd*>(sender()));
-    TRACE(QString().sprintf("Changing %s at row %d to ",
-			    wnd->name(), row) + text);
+    TRACE(QString().sprintf("Changing %s to ",
+			    wnd->name()) + text);
 
     // determine the lvalue to edit
-    VarTree* expr = static_cast<VarTree*>(wnd->itemAt(row));
     QString lvalue = expr->computeExpr();
     CmdQueueItem* cmd = m_d->executeCmd(DCsetvariable, lvalue, text);
     cmd->m_expr = expr;

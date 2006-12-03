@@ -420,7 +420,7 @@ protected slots:
     void slotDeleteWatch();
     void slotValuePopup(const QString&);
     void slotDisassemble(const QString&, int);
-    void slotValueEdited(int, const QString&);
+    void slotValueEdited(VarTree*, const QString&);
 public slots:
     void setThread(int);
     void shutdown();

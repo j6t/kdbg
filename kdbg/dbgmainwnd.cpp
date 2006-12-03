@@ -809,7 +809,7 @@ void DebuggerMainWnd::slotEditValue()
 	// determine the text to edit
 	VarTree* expr = static_cast<VarTree*>(wnd->itemAt(idx));
 	QString text = m_debugger->driver()->editableValue(expr);
-	wnd->editValue(idx, text);
+	wnd->editValue(expr, text);
     }
 }
 
