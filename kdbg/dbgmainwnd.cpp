@@ -158,8 +158,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(dockManager, SIGNAL(change()), SLOT(updateUI()));
 
     // popup menu of the local variables window
-    connect(m_localVariables, SIGNAL(rightPressed(int, const QPoint&)),
-	    this, SLOT(slotLocalsPopup(int, const QPoint&)));
+    connect(m_localVariables, SIGNAL(contextMenuRequested(QListViewItem*, const QPoint&, int)),
+	    this, SLOT(slotLocalsPopup(QListViewItem*, const QPoint&)));
 
     restoreSettings(kapp->config());
 
@@ -753,7 +753,7 @@ QString DebuggerMainWnd::makeSourceFilter()
 /*
  * Pop up the context menu in the locals window
  */
-void DebuggerMainWnd::slotLocalsPopup(int, const QPoint& pt)
+void DebuggerMainWnd::slotLocalsPopup(QListViewItem*, const QPoint& pt)
 {
     QPopupMenu* popup =
 	static_cast<QPopupMenu*>(factory()->container("popup_locals", this));
@@ -763,7 +763,7 @@ void DebuggerMainWnd::slotLocalsPopup(int, const QPoint& pt)
     if (popup->isVisible()) {
 	popup->hide();
     } else {
-	popup->popup(m_localVariables->mapToGlobal(pt));
+	popup->popup(pt);
     }
 }
 
@@ -802,12 +802,11 @@ void DebuggerMainWnd::slotEditValue()
 	return;				/* don't edit twice */
     }
     
-    int idx = wnd->currentItem();
-    if (idx >= 0 && m_debugger != 0 && m_debugger->canSingleStep())
+    VarTree* expr = wnd->currentItem();
+    if (expr != 0 && m_debugger != 0 && m_debugger->canSingleStep())
     {
 	TRACE("edit value");
 	// determine the text to edit
-	VarTree* expr = static_cast<VarTree*>(wnd->itemAt(idx));
 	QString text = m_debugger->driver()->editableValue(expr);
 	wnd->editValue(expr, text);
     }

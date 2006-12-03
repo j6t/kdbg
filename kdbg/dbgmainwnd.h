@@ -96,7 +96,7 @@ public slots:
     void slotProgramStopped();
     void slotBackTimer();
     void slotRecentExec(const KURL& url);
-    void slotLocalsPopup(int item, const QPoint& pt);
+    void slotLocalsPopup(QListViewItem*, const QPoint& pt);
     void slotLocalsToWatch();
     void slotEditValue();
 

@@ -6,18 +6,20 @@
 #ifndef EXPRWND_H
 #define EXPRWND_H
 
-#include "ktreeview.h"
+#include "qlistview.h"
 #include <qlineedit.h>
+#include <qpixmap.h>
 #include <qptrlist.h>
 #include <qstrlist.h>
 
 class ProgramTypeTable;
 class TypeInfo;
 struct ExprValue;
+class ExprWnd;
 
 /* a variable's value is the tree of sub-variables */
 
-class VarTree : public KTreeViewItem
+class VarTree : public QListViewItem
 {
 public:
     enum VarKind { VKsimple, VKpointer, VKstruct, VKarray,
@@ -34,12 +36,11 @@ public:
     bool m_exprIndexUseGuard;		/* ditto; if guard expr should be used */
     QString m_partialValue;		/* while struct value update is in progress */
 
-    VarTree(ExprValue* v);
-    VarTree(const QString& name);
+    VarTree(VarTree* parent, ExprValue* v);
+    VarTree(ExprWnd* parent, const QString& name);
     virtual ~VarTree();
 public:
-    void paintValue(QPainter* painter);
-    int valueWidth();
+    virtual void paintCell(QPainter* p, const QColorGroup& cg, int column, int width, int align);
     QString computeExpr() const;
     bool isToplevelExpr() const;
     /** is this element an ancestor of (or equal to) child? */
@@ -53,13 +54,13 @@ public:
     /** returns whether the pointer is a wchar_t */
     bool isWcharT() const;
 
-    void setValue(const QString& v) { m_value = v; }
-    QString value() const { return m_value; }
-    VarTree* firstChild() const { return static_cast<VarTree*>(getChild()); }
-    VarTree* nextSibling() const { return static_cast<VarTree*>(getSibling()); }
-
-private:
-    QString m_value;
+    QString getText() const { return text(0); }
+    void setText(const QString& t) { QListViewItem::setText(0, t); }
+    void setPixmap(const QPixmap& p) { QListViewItem::setPixmap(0, p); }
+    void setValue(const QString& v) { QListViewItem::setText(1, v); }
+    QString value() const { return text(1); }
+    VarTree* firstChild() const { return static_cast<VarTree*>(QListViewItem::firstChild()); }
+    VarTree* nextSibling() const { return static_cast<VarTree*>(QListViewItem::nextSibling()); }
 };
 
 /**
@@ -79,11 +80,9 @@ struct ExprValue
     ~ExprValue();
 
     void appendChild(ExprValue* newChild);
-    uint childCount() const;
+    int childCount() const;
 };
 
-
-class ExprWnd;
 
 class ValueEdit : public QLineEdit
 {
@@ -106,7 +105,7 @@ signals:
 };
 
 
-class ExprWnd : public KTreeView
+class ExprWnd : public QListView
 {
     Q_OBJECT
 public:
@@ -143,20 +142,16 @@ public:
     /** tells whether the a value is currently edited */
     bool isEditing() const;
 
-    VarTree* firstChild() const { return static_cast<VarTree*>(itemAt(0)); }
-    VarTree* selectedItem() const { return static_cast<VarTree*>(getCurrentItem()); }
+    VarTree* firstChild() const { return static_cast<VarTree*>(QListView::firstChild()); }
+    VarTree* currentItem() const { return static_cast<VarTree*>(QListView::currentItem()); }
+    VarTree* selectedItem() const { return static_cast<VarTree*>(QListView::selectedItem()); }
 
 protected:
     bool updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeTable& typeTable);
     void replaceChildren(VarTree* display, ExprValue* newValues);
-    virtual void paintCell(QPainter* painter, int row, int col);
-    virtual int cellWidth(int col) const;
-    void updateValuesWidth();
-    static bool getMaxValueWidth(KTreeViewItem* item, void* user);
     void collectUnknownTypes(VarTree* item);
-    static bool collectUnknownTypes(KTreeViewItem* item, void* user);
+    void checkUnknownType(VarTree* item);
     static QString formatWCharPointer(QString value);
-    int maxValueWidth;
     QPixmap m_pixPointer;
 
     QList<VarTree> m_updatePtrs;	/* dereferenced pointers that need update */
@@ -168,9 +163,6 @@ protected:
     /** remove items that are in the subTree from the list */
     void unhookSubtree(VarTree* subTree);
     static void unhookSubtree(QList<VarTree>& list, VarTree* subTree);
-
-protected slots:
-    void slotExpandOrCollapse(int);
 
 signals:
     void removingItem(VarTree*);

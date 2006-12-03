@@ -17,7 +17,6 @@ kdbg_SOURCES = \
 	procattach.cpp \
 	procattachbase.ui \
 	tableview.cpp \
-	ktreeview.cpp \
 	textvw.cpp \
 	debugger.cpp \
 	programconfig.cpp \
@@ -64,7 +63,6 @@ noinst_HEADERS = \
 	regwnd.h \
 	memwindow.h \
 	threadlist.h \
-	ktreeview.h \
 	sourcewnd.h \
 	winstack.h \
 	ttywnd.h \

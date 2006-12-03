@@ -370,7 +370,7 @@ protected:
     void evalExpressions();
     void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
-    void exprExpandingHelper(ExprWnd* wnd, KTreeViewItem* item, bool& allow);
+    void exprExpandingHelper(ExprWnd* wnd, QListViewItem* item);
     void dereferencePointer(ExprWnd* wnd, VarTree* var, bool immediate);
     void determineType(ExprWnd* wnd, VarTree* var);
     void queueMemoryDump(bool immediate);
@@ -415,8 +415,8 @@ protected slots:
     void slotInferiorRunning();
     void backgroundUpdate();
     void gotoFrame(int);
-    void slotLocalsExpanding(KTreeViewItem*, bool&);
-    void slotWatchExpanding(KTreeViewItem*, bool&);
+    void slotLocalsExpanding(QListViewItem*);
+    void slotWatchExpanding(QListViewItem*);
     void slotDeleteWatch();
     void slotValuePopup(const QString&);
     void slotDisassemble(const QString&, int);

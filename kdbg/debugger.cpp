@@ -48,10 +48,10 @@ KDebugger::KDebugger(QWidget* parent,
     m_envVars.setAutoDelete(true);
     m_brkpts.setAutoDelete(true);
 
-    connect(&m_localVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
-	    SLOT(slotLocalsExpanding(KTreeViewItem*,bool&)));
-    connect(&m_watchVariables, SIGNAL(expanding(KTreeViewItem*,bool&)),
-	    SLOT(slotWatchExpanding(KTreeViewItem*,bool&)));
+    connect(&m_localVariables, SIGNAL(expanded(QListViewItem*)),
+	    SLOT(slotLocalsExpanding(QListViewItem*)));
+    connect(&m_watchVariables, SIGNAL(expanded(QListViewItem*)),
+	    SLOT(slotWatchExpanding(QListViewItem*)));
     connect(&m_localVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
 	    SLOT(slotValueEdited(VarTree*, const QString&)));
     connect(&m_watchVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
@@ -1303,11 +1303,6 @@ void KDebugger::handleLocals(const char* output)
      */
     m_localVariables.clearPendingUpdates();
 
-    // reduce flicker
-    bool autoU = m_localVariables.autoUpdate();
-    m_localVariables.setAutoUpdate(false);
-    bool repaintNeeded = false;
-
     /*
      * Match old variables against new ones.
      */
@@ -1323,7 +1318,6 @@ void KDebugger::handleLocals(const char* output)
 	    VarTree* v = m_localVariables.topLevelExprByName(n);
 	    if (v != 0) {
 		m_localVariables.removeExpr(v);
-		repaintNeeded = true;
 	    }
 	} else {
 	    // variable in both old and new lists: update
@@ -1332,7 +1326,6 @@ void KDebugger::handleLocals(const char* output)
 	    // remove the new variable from the list
 	    newVars.remove();
 	    delete v;
-	    repaintNeeded = true;
 	}
     }
     // insert all remaining new variables
@@ -1342,13 +1335,7 @@ void KDebugger::handleLocals(const char* output)
 	TRACE("new var: " + v->m_name);
 	m_localVariables.insertExpr(v, *m_typeTable);
 	delete v;
-	repaintNeeded = true;
     }
-
-    // repaint
-    m_localVariables.setAutoUpdate(autoU);
-    if (repaintNeeded && autoU && m_localVariables.isVisible())
-	m_localVariables.repaint();
 }
 
 void KDebugger::parseLocals(const char* output, QList<ExprValue>& newVars)
@@ -1805,17 +1792,17 @@ CmdQueueItem* KDebugger::loadCoreFile()
     return m_d->queueCmd(DCcorefile, m_corefile, DebuggerDriver::QMoverride);
 }
 
-void KDebugger::slotLocalsExpanding(KTreeViewItem* item, bool& allow)
+void KDebugger::slotLocalsExpanding(QListViewItem* item)
 {
-    exprExpandingHelper(&m_localVariables, item, allow);
+    exprExpandingHelper(&m_localVariables, item);
 }
 
-void KDebugger::slotWatchExpanding(KTreeViewItem* item, bool& allow)
+void KDebugger::slotWatchExpanding(QListViewItem* item)
 {
-    exprExpandingHelper(&m_watchVariables, item, allow);
+    exprExpandingHelper(&m_watchVariables, item);
 }
 
-void KDebugger::exprExpandingHelper(ExprWnd* wnd, KTreeViewItem* item, bool&)
+void KDebugger::exprExpandingHelper(ExprWnd* wnd, QListViewItem* item)
 {
     VarTree* exprItem = static_cast<VarTree*>(item);
     if (exprItem->m_varKind != VarTree::VKpointer) {
@@ -1851,12 +1838,8 @@ void KDebugger::slotDeleteWatch()
     if (!m_d->isIdle())
 	return;
 
-    int index = m_watchVariables.currentItem();
-    if (index < 0)
-	return;
-    
-    VarTree* item = static_cast<VarTree*>(m_watchVariables.itemAt(index));
-    if (!item->isToplevelExpr())
+    VarTree* item = m_watchVariables.currentItem();
+    if (item == 0 || !item->isToplevelExpr())
 	return;
 
     // remove the variable from the list to evaluate
@@ -2228,8 +2211,7 @@ void KDebugger::slotValueEdited(VarTree* expr, const QString& text)
     if (text.simplifyWhiteSpace().isEmpty())
 	return;			       /* no text entered: ignore request */
 
-    ASSERT(sender()->inherits("ExprWnd"));
-    ExprWnd* wnd = const_cast<ExprWnd*>(static_cast<const ExprWnd*>(sender()));
+    ExprWnd* wnd = static_cast<ExprWnd*>(expr->listView());
     TRACE(QString().sprintf("Changing %s to ",
 			    wnd->name()) + text);
 

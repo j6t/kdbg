@@ -57,9 +57,9 @@ WatchWindow::WatchWindow(QWidget* parent, const char* name, WFlags f) :
     connect(&m_watchEdit, SIGNAL(returnPressed()), SIGNAL(addWatch()));
     connect(&m_watchAdd, SIGNAL(clicked()), SIGNAL(addWatch()));
     connect(&m_watchDelete, SIGNAL(clicked()), SIGNAL(deleteWatch()));
-    connect(&m_watchVariables, SIGNAL(highlighted(int)), SLOT(slotWatchHighlighted()));
+    connect(&m_watchVariables, SIGNAL(currentChanged(QListViewItem*)),
+	    SLOT(slotWatchHighlighted()));
 
-    m_watchVariables.setMoveCurrentToSibling(true);
     m_watchVariables.installEventFilter(this);
 }
 
