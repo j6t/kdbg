@@ -49,9 +49,9 @@ KDebugger::KDebugger(QWidget* parent,
     m_brkpts.setAutoDelete(true);
 
     connect(&m_localVariables, SIGNAL(expanded(QListViewItem*)),
-	    SLOT(slotLocalsExpanding(QListViewItem*)));
+	    SLOT(slotExpanding(QListViewItem*)));
     connect(&m_watchVariables, SIGNAL(expanded(QListViewItem*)),
-	    SLOT(slotWatchExpanding(QListViewItem*)));
+	    SLOT(slotExpanding(QListViewItem*)));
     connect(&m_localVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
 	    SLOT(slotValueEdited(VarTree*, const QString&)));
     connect(&m_watchVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
@@ -1792,22 +1792,13 @@ CmdQueueItem* KDebugger::loadCoreFile()
     return m_d->queueCmd(DCcorefile, m_corefile, DebuggerDriver::QMoverride);
 }
 
-void KDebugger::slotLocalsExpanding(QListViewItem* item)
-{
-    exprExpandingHelper(&m_localVariables, item);
-}
-
-void KDebugger::slotWatchExpanding(QListViewItem* item)
-{
-    exprExpandingHelper(&m_watchVariables, item);
-}
-
-void KDebugger::exprExpandingHelper(ExprWnd* wnd, QListViewItem* item)
+void KDebugger::slotExpanding(QListViewItem* item)
 {
     VarTree* exprItem = static_cast<VarTree*>(item);
     if (exprItem->m_varKind != VarTree::VKpointer) {
 	return;
     }
+    ExprWnd* wnd = static_cast<ExprWnd*>(item->listView());
     dereferencePointer(wnd, exprItem, true);
 }
 
