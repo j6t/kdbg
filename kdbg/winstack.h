@@ -54,6 +54,7 @@ class ValueTip : public QToolTip
 {
 public:
     ValueTip(WinStack* parent);
+    virtual ~ValueTip() {}	// Qt3's QToolTip lacks virtual dtor!
     virtual void maybeTip(const QPoint& p);
     void tip(const QRect& r, const QString& s) { QToolTip::tip(r, s); }
 };

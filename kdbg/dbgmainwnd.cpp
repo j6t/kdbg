@@ -414,7 +414,7 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
 	{ i18n("Output"), m_ttyWindow },
 	{ i18n("Memory"), m_memoryWindow }
     };
-    for (int i = 0; i < sizeof(dw)/sizeof(dw[0]); i++)
+    for (int i = 0; i < int(sizeof(dw)/sizeof(dw[0])); i++)
     {
 	KDockWidget* w = dockParent(dw[i].w);
 	w->setTabPageLabel(dw[i].text);
