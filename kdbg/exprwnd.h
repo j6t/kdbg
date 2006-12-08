@@ -30,7 +30,6 @@ public:
 	NKaddress			/* a dereferenced pointer */
     };
     NameKind m_nameKind;
-    bool m_valueChanged;
     TypeInfo* m_type;			/* type of struct */
     int m_exprIndex;			/* used in struct value update */
     bool m_exprIndexUseGuard;		/* ditto; if guard expr should be used */
@@ -45,8 +44,10 @@ public:
     bool isToplevelExpr() const;
     /** is this element an ancestor of (or equal to) child? */
     bool isAncestorEq(const VarTree* child) const;
-    /** update the value; return if repaint is necessary */
+    /** update the regular value; returns whether a repaint is necessary */
     bool updateValue(const QString& newValue);
+    /** update the "quick member" value; returns whether repaint is necessary */
+    bool updateStructValue(const QString& newValue);
     /** find out the type of this value using the child values */
     void inferTypesOfChildren(ProgramTypeTable& typeTable);
     /** get the type from base class part */
@@ -57,10 +58,16 @@ public:
     QString getText() const { return text(0); }
     void setText(const QString& t) { QListViewItem::setText(0, t); }
     void setPixmap(const QPixmap& p) { QListViewItem::setPixmap(0, p); }
-    void setValue(const QString& v) { QListViewItem::setText(1, v); }
-    QString value() const { return text(1); }
+    QString value() const { return m_baseValue; }
     VarTree* firstChild() const { return static_cast<VarTree*>(QListViewItem::firstChild()); }
     VarTree* nextSibling() const { return static_cast<VarTree*>(QListViewItem::nextSibling()); }
+
+private:
+    void updateValueText();
+    QString m_baseValue;	//!< The "normal value" that the driver reported
+    QString m_structValue;	//!< The "quick member" value
+    bool m_baseChanged : 1;
+    bool m_structChanged : 1;
 };
 
 /**

@@ -21,10 +21,11 @@ VarTree::VarTree(VarTree* parent, QListViewItem* after, ExprValue* v) :
 	QListViewItem(parent, after),
 	m_varKind(v->m_varKind),
 	m_nameKind(v->m_nameKind),
-	m_valueChanged(false),
 	m_type(0),
 	m_exprIndex(0),
-	m_exprIndexUseGuard(false)
+	m_exprIndexUseGuard(false),
+	m_baseChanged(false),
+	m_structChanged(false)
 {
     QListViewItem::setText(0, v->m_name);
     QListViewItem::setText(1, v->m_value);
@@ -36,10 +37,11 @@ VarTree::VarTree(ExprWnd* parent, QListViewItem* after, const QString& name) :
 	QListViewItem(parent, after),
 	m_varKind(VKsimple),
 	m_nameKind(VarTree::NKplain),
-	m_valueChanged(false),
 	m_type(0),
 	m_exprIndex(0),
-	m_exprIndexUseGuard(false)
+	m_exprIndexUseGuard(false),
+	m_baseChanged(false),
+	m_structChanged(false)
 {
     QListViewItem::setText(0, name);
 }
@@ -50,7 +52,7 @@ VarTree::~VarTree()
 
 void VarTree::paintCell(QPainter* p, const QColorGroup& cg, int column, int width, int align)
 {
-    if (column == 1 && m_valueChanged) {
+    if (column == 1 && (m_baseChanged || m_structChanged)) {
 	QColorGroup cgChg = cg;
 	cgChg.setColor(QColorGroup::Text, Qt::red);
 	QListViewItem::paintCell(p, cgChg, column, width, align);
@@ -130,11 +132,10 @@ bool VarTree::isAncestorEq(const VarTree* child) const
 bool VarTree::updateValue(const QString& newValue)
 {
     // check whether the value changed
-    bool prevValueChanged = m_valueChanged;
-    m_valueChanged = false;
-    if (value() != newValue) {
-	setValue(newValue);
-	m_valueChanged = true;
+    bool prevValueChanged = m_baseChanged;
+    if ((m_baseChanged = m_baseValue != newValue)) {
+	m_baseValue = newValue;
+	updateValueText();
     }
     /*
      * We must repaint the cell if the value changed. If it did not change,
@@ -142,7 +143,35 @@ bool VarTree::updateValue(const QString& newValue)
      * because the color of the display must be changed (from red to
      * black).
      */
-    return m_valueChanged || prevValueChanged;
+    return m_baseChanged || prevValueChanged;
+}
+
+bool VarTree::updateStructValue(const QString& newValue)
+{
+    // check whether the value changed
+    bool prevValueChanged = m_structChanged;
+    if ((m_structChanged = m_structValue != newValue)) {
+	m_structValue = newValue;
+	updateValueText();
+    }
+    /*
+    * We must repaint the cell if the value changed. If it did not change,
+    * we still must repaint the cell if the value changed previously,
+    * because the color of the display must be changed (from red to
+    * black).
+    */
+    return m_structChanged || prevValueChanged;
+}
+
+void VarTree::updateValueText()
+{
+    if (m_baseValue.isEmpty()) {
+	QListViewItem::setText(1, m_structValue);
+    } else if (m_structValue.isEmpty()) {
+	QListViewItem::setText(1, m_baseValue);
+    } else {
+	QListViewItem::setText(1, m_baseValue + " " + m_structValue);
+    }
 }
 
 void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
@@ -402,7 +431,7 @@ bool ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	display->inferTypesOfChildren(typeTable);
 
 	// (note that the new value might not have a sub-tree at all)
-	return display->m_valueChanged || isExpanded;	/* no visible change if not expanded */
+	return isExpanded;	/* no visible change if not expanded */
     }
 
     // display the new value
@@ -423,7 +452,7 @@ bool ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	 * can stop here.
 	 */
 	if (newValues->m_child == 0) {
-	    return display->m_valueChanged;
+	    return false;
 	}
     }
 
@@ -452,7 +481,7 @@ bool ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
     }
 
     // update of children propagates only if this node is expanded
-    return display->m_valueChanged || (display->isOpen() && childChanged);
+    return display->isOpen() && childChanged;
 }
 
 void ExprWnd::updateSingleExpr(VarTree* display, ExprValue* newValue)
@@ -466,9 +495,8 @@ void ExprWnd::updateSingleExpr(VarTree* display, ExprValue* newValue)
     }
 
     /*
-     * If this node is a struct and we know its type then don't update its
-     * value now. This is a node for which we know how to find a nested
-     * value. So register the node for an update.
+     * If this node is a struct and we know its type then we know how to
+     * find a nested value. So register the node for an update.
      *
      * wchar_t types are also treated specially here: We consider them
      * as struct (has been set in inferTypesOfChildren()).
@@ -480,23 +508,15 @@ void ExprWnd::updateSingleExpr(VarTree* display, ExprValue* newValue)
 	ASSERT(newValue->m_varKind == VarTree::VKstruct);
 	if (display->m_type == TypeInfo::wchartType())
 	{
-	    /*
-	     * We do not copy the new pointer value to the destination right
-	     * away, but consider it as the first part of the nested value.
-	     * Then the display will change its color only when the new value
-	     * is completed.
-	     */
-	    display->m_partialValue = formatWCharPointer(newValue->m_value);
+	    display->m_partialValue = "L";
 	}
 	else
 	    display->m_partialValue = display->m_type->m_displayString[0];
 	m_updateStruct.append(display);
     }
-    else
-    {
-	if (display->updateValue(newValue->m_value)) {
-	    triggerUpdate();
-	}
+
+    if (display->updateValue(newValue->m_value)) {
+	triggerUpdate();
     }
 }
 
@@ -504,7 +524,7 @@ void ExprWnd::updateStructValue(VarTree* display)
 {
     ASSERT(display->m_varKind == VarTree::VKstruct);
 
-    if (display->updateValue(display->m_partialValue)) {
+    if (display->updateStructValue(display->m_partialValue)) {
 	triggerUpdate();
     }
     // reset the value
@@ -555,9 +575,7 @@ void ExprWnd::checkUnknownType(VarTree* var)
 	else
 	{
 	    var->m_type = TypeInfo::wchartType();
-	    // see updateSingleExpr() why we move the value
-	    var->m_partialValue = formatWCharPointer(var->value());
-	    var->setValue(QString());
+	    var->m_partialValue = "L";
 	    m_updateStruct.append(var);
 	}
     }
