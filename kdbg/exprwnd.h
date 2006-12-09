@@ -154,7 +154,7 @@ public:
     VarTree* selectedItem() const { return static_cast<VarTree*>(QListView::selectedItem()); }
 
 protected:
-    bool updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeTable& typeTable);
+    void updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeTable& typeTable);
     void replaceChildren(VarTree* display, ExprValue* newValues);
     void collectUnknownTypes(VarTree* item);
     void checkUnknownType(VarTree* item);

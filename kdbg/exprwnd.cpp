@@ -357,26 +357,20 @@ void ExprWnd::updateExpr(ExprValue* expr, ProgramTypeTable& typeTable)
 	return;
     }
     // now update it
-    if (updateExprRec(item, expr, typeTable)) {
-	triggerUpdate();
-    }
+    updateExprRec(item, expr, typeTable);
     collectUnknownTypes(item);
 }
 
 void ExprWnd::updateExpr(VarTree* display, ExprValue* newValues, ProgramTypeTable& typeTable)
 {
-    if (updateExprRec(display, newValues, typeTable) &&
-	display->isVisible())
-    {
-	triggerUpdate();
-    }
+    updateExprRec(display, newValues, typeTable);
     collectUnknownTypes(display);
 }
 
 /*
  * returns true if there's a visible change
  */
-bool ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeTable& typeTable)
+void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeTable& typeTable)
 {
     bool isExpanded = display->isOpen();
 
@@ -390,7 +384,7 @@ bool ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	newValues->m_varKind == VarTree::VKdummy)
     {
 	replaceChildren(display, newValues);
-	return isExpanded;		/* no visible change if not expanded */
+	return;
     }
 
     /*
@@ -431,7 +425,7 @@ bool ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	display->inferTypesOfChildren(typeTable);
 
 	// (note that the new value might not have a sub-tree at all)
-	return isExpanded;	/* no visible change if not expanded */
+	return;
     }
 
     // display the new value
@@ -452,15 +446,13 @@ bool ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	 * can stop here.
 	 */
 	if (newValues->m_child == 0) {
-	    return false;
+	    return;
 	}
     }
 
     ASSERT(display->childCount() == newValues->childCount());
 
     // go for children
-    bool childChanged = false;
-
     VarTree* vDisplay = display->firstChild();
     ExprValue* vNew = newValues->m_child;
     while (vDisplay != 0) {
@@ -468,20 +460,13 @@ bool ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	if (vDisplay->getText() != vNew->m_name) {
 	    // set new name
 	    vDisplay->setText(vNew->m_name);
-	    {
-		childChanged = true;
-	    }
 	}
 	// recurse
-	if (updateExprRec(vDisplay, vNew, typeTable)) {
-	    childChanged = true;
-	}
+	updateExprRec(vDisplay, vNew, typeTable);
+
 	vDisplay = vDisplay->nextSibling();
 	vNew = vNew->m_next;
     }
-
-    // update of children propagates only if this node is expanded
-    return display->isOpen() && childChanged;
 }
 
 void ExprWnd::updateSingleExpr(VarTree* display, ExprValue* newValue)
