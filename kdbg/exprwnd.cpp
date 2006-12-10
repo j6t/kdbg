@@ -24,11 +24,12 @@ VarTree::VarTree(VarTree* parent, QListViewItem* after, ExprValue* v) :
 	m_type(0),
 	m_exprIndex(0),
 	m_exprIndexUseGuard(false),
+	m_baseValue(v->m_value),
 	m_baseChanged(false),
 	m_structChanged(false)
 {
     QListViewItem::setText(0, v->m_name);
-    QListViewItem::setText(1, v->m_value);
+    updateValueText();
     setExpandable(m_varKind == VarTree::VKpointer);
     setOpen(v->m_initiallyExpanded);
 }
