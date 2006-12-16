@@ -315,6 +315,7 @@ ExprWnd::ExprWnd(QWidget* parent, const QString& colHeader, const char* name) :
     setColumnWidthMode(0, Manual);
     setColumnWidthMode(1, Maximum);
     setRootIsDecorated(true);
+    setAllColumnsShowFocus(true);
 
     m_pixPointer = UserIcon("pointer.xpm");
     if (m_pixPointer.isNull())
