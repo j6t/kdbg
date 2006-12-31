@@ -12,6 +12,10 @@ struct T {
 		int b;
 		long c;
 	};
+	int TestPopup()
+	{
+	    return a ? b : c;
+	}
 };
 
 int main()
@@ -23,5 +27,6 @@ int main()
 		int b;
 	};
 	a = 'X';
+	b = t.TestPopup();
 	std::fprintf(stderr, "%d, %d, a=%d, b=%d\n", sizeof(mutex), sizeof(t), a, b);
 }

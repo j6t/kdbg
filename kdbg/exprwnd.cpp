@@ -68,8 +68,8 @@ QString VarTree::computeExpr() const
     VarTree* par = static_cast<VarTree*>(getParent());
     QString parentExpr = par->computeExpr();
 
-    /* don't add this item's name if this is a base class sub-item */
-    if (m_nameKind == NKtype) {
+    // skip this item's name if it is a base class or anonymous struct or union
+    if (m_nameKind == NKtype || m_nameKind == NKanonymous) {
 	return parentExpr;
     }
     /* augment by this item's text */
@@ -501,7 +501,8 @@ void ExprWnd::collectUnknownTypes(VarTree* var)
     ASSERT(var->m_varKind != VarTree::VKpointer || var->m_nameKind != VarTree::NKtype);
     if (var->m_type == 0 &&
 	var->m_varKind == VarTree::VKstruct &&
-	var->m_nameKind != VarTree::NKtype)
+	var->m_nameKind != VarTree::NKtype &&
+	var->m_nameKind != VarTree::NKanonymous)
     {
 	/* this struct node doesn't have a type yet: register it */
 	m_updateType.append(var);
@@ -522,7 +523,8 @@ bool ExprWnd::collectUnknownTypes(KTreeViewItem* item, void* user)
     ASSERT(var->m_varKind != VarTree::VKpointer || var->m_nameKind != VarTree::NKtype);
     if (var->m_type == 0 &&
 	var->m_varKind == VarTree::VKstruct &&
-	var->m_nameKind != VarTree::NKtype)
+	var->m_nameKind != VarTree::NKtype &&
+	var->m_nameKind != VarTree::NKanonymous)
     {
 	/* this struct node doesn't have a type yet: register it */
 	tree->m_updateType.append(var);
@@ -565,14 +567,17 @@ VarTree* ExprWnd::memberByName(VarTree* v, const QString& name)
     if (item != 0)
 	return static_cast<VarTree*>(item);
 
-    // try in base classes
+    // try in base classes and members that are anonymous structs or unions
     item = v->getChild();
-    while (item != 0 &&
-	   static_cast<VarTree*>(item)->m_nameKind == VarTree::NKtype)
+    while (item != 0)
     {
-	v = memberByName(static_cast<VarTree*>(item), name);
-	if (v != 0)
-	    return v;
+	if (static_cast<VarTree*>(item)->m_nameKind == VarTree::NKtype ||
+	    static_cast<VarTree*>(item)->m_nameKind == VarTree::NKanonymous)
+	{
+	    v = memberByName(static_cast<VarTree*>(item), name);
+	    if (v != 0)
+		return v;
+	}
 	item = item->getSibling();
     }
     return 0;

@@ -887,7 +887,7 @@ static VarTree* parseVar(const char*& s)
     if (*p == '{')
     {
 	name = i18n("<anonymous struct or union>");
-	kind = VarTree::NKplain;;
+	kind = VarTree::NKanonymous;
     }
     else
     {
