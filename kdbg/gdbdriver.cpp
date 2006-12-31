@@ -874,21 +874,39 @@ static VarTree* parseVar(const char*& s)
 
     QString name;
     VarTree::NameKind kind;
-    if (!parseName(p, name, kind)) {
-	return 0;
+    /*
+     * Detect anonymouse struct values: The 'name =' part is missing:
+     *    s = { a = 1, { b = 2 }}
+     * Note that this detection works only inside structs when the anonymous
+     * struct is not the first member:
+     *    s = {{ a = 1 }, b = 2}
+     * This is misparsed (by parseNested()) because it is mistakenly
+     * interprets the second opening brace as the first element of an array
+     * of structs.
+     */
+    if (*p == '{')
+    {
+	name = i18n("<anonymous struct or union>");
+	kind = VarTree::NKplain;;
     }
-    
-    // go for '='
-    while (isspace(*p))
+    else
+    {
+	if (!parseName(p, name, kind)) {
+	    return 0;
+	}
+
+	// go for '='
+	while (isspace(*p))
+	    p++;
+	if (*p != '=') {
+	    TRACE(QString().sprintf("parse error: = not found after %s", (const char*)name));
+	    return 0;
+	}
+	// skip the '=' and more whitespace
 	p++;
-    if (*p != '=') {
-	TRACE(QString().sprintf("parse error: = not found after %s", (const char*)name));
-	return 0;
+	while (isspace(*p))
+	    p++;
     }
-    // skip the '=' and more whitespace
-    p++;
-    while (isspace(*p))
-	p++;
 
     VarTree* variable = new VarTree(name, kind);
     variable->setDeleteChildren(true);
