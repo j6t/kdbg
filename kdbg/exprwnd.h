@@ -27,6 +27,7 @@ public:
     };
     VarKind m_varKind;
     enum NameKind { NKplain, NKstatic, NKtype,
+	NKanonymous,			/* an anonymous struct or union */
 	NKaddress			/* a dereferenced pointer */
     };
     NameKind m_nameKind;

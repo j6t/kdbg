@@ -72,8 +72,8 @@ QString VarTree::computeExpr() const
     VarTree* par = static_cast<VarTree*>(parent());
     QString parentExpr = par->computeExpr();
 
-    /* don't add this item's name if this is a base class sub-item */
-    if (m_nameKind == NKtype) {
+    // skip this item's name if it is a base class or anonymous struct or union
+    if (m_nameKind == NKtype || m_nameKind == NKanonymous) {
 	return parentExpr;
     }
     /* augment by this item's text */
@@ -552,7 +552,8 @@ void ExprWnd::checkUnknownType(VarTree* var)
     ASSERT(var->m_varKind != VarTree::VKpointer || var->m_nameKind != VarTree::NKtype);
     if (var->m_type == 0 &&
 	var->m_varKind == VarTree::VKstruct &&
-	var->m_nameKind != VarTree::NKtype)
+	var->m_nameKind != VarTree::NKtype &&
+	var->m_nameKind != VarTree::NKanonymous)
     {
 	if (!var->isWcharT())
 	{
@@ -611,14 +612,17 @@ VarTree* ExprWnd::memberByName(VarTree* v, const QString& name)
     if (item != 0)
 	return item;
 
-    // try in base classes
+    // try in base classes and members that are anonymous structs or unions
     item = v->firstChild();
-    while (item != 0 &&
-	   item->m_nameKind == VarTree::NKtype)
+    while (item != 0)
     {
-	v = memberByName(item, name);
-	if (v != 0)
-	    return v;
+	if (item->m_nameKind == VarTree::NKtype ||
+	    item->m_nameKind == VarTree::NKanonymous)
+	{
+	    v = memberByName(item, name);
+	    if (v != 0)
+		return v;
+	}
 	item = item->nextSibling();
     }
     return 0;
