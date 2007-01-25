@@ -1542,7 +1542,8 @@ static void parseFrameInfo(const char*& s, QString& func,
     /*
      * Skip the function name. It is terminated by a left parenthesis
      * which does not delimit "(anonymous namespace)" and which is
-     * outside the angle brackets <> of template parameter lists.
+     * outside the angle brackets <> of template parameter lists
+     * and is preceded by a space.
      */
     while (*p != '\0')
     {
@@ -1560,9 +1561,14 @@ static void parseFrameInfo(const char*& s, QString& func,
 		skipNestedAngles(p);
 	    }
 	} else if (*p == '(') {
-	    if (strncmp(p, "(anonymous namespace)", 21) != 0)
-		break;	// parameter list found
-	    p += 21;
+	    // this skips "(anonymous namespace)" as well as the formal
+	    // parameter list of the containing function if this is a member
+	    // of a nested class
+	    skipNestedWithString(p, '(', ')');
+	} else if (*p == ' ') {
+	    ++p;
+	    if (*p == '(')
+		break; // parameter list found
 	} else {
 	    p++;
 	}

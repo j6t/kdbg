@@ -9,7 +9,7 @@ INCLUDES= $(all_includes)
 AM_CXXFLAGS = -g
 
 if BUILDTESTPROGS
-PROGS = testfile locals maths repeats std templates anonstruct
+PROGS = testfile locals maths repeats std templates anonstruct nestedclass
 else
 PROGS =
 endif
@@ -38,3 +38,6 @@ templates_LDFLAGS = -g
 
 anonstruct_SOURCES = anonstruct.cpp
 anonstruct_LDFLAGS = -g
+
+nestedclass_SOURCES = nestedclass.cpp
+nestedclass_LDFLAGS = -g
