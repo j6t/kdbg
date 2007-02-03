@@ -13,7 +13,7 @@ AM_CXXFLAGS = -g
 CXXFLAGS:=$(patsubst -O%,,$(CXXFLAGS))
 
 if BUILDTESTPROGS
-PROGS = testfile locals maths repeats std templates anonstruct widechar
+PROGS = testfile locals maths repeats std templates anonstruct nestedclass widechar
 else
 PROGS =
 endif
@@ -42,6 +42,9 @@ templates_LDFLAGS = -g
 
 anonstruct_SOURCES = anonstruct.cpp
 anonstruct_LDFLAGS = -g
+
+nestedclass_SOURCES = nestedclass.cpp
+nestedclass_LDFLAGS = -g
 
 widechar_SOURCES = widechar.cpp
 widechar_LDFLAGS = -g

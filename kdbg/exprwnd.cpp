@@ -818,9 +818,17 @@ void ValueEdit::focusOutEvent(QFocusEvent* ev)
 {
     TRACE("ValueEdit::focusOutEvent");
     QFocusEvent* focusEv = static_cast<QFocusEvent*>(ev);
+    if (focusEv->reason() == QFocusEvent::ActiveWindow)
+    {
+	// Switching to a different window should terminate the edit,
+	// because if the window with this variable display is floating
+	// then that different window could be the main window, where
+	// the user had clicked one of the Execute buttons. This in turn
+	// may pull the item away that we are editing here.
+	terminate(false);
+    }
     // Don't let a RMB close the editor
-    if (focusEv->reason() != QFocusEvent::Popup &&
-	focusEv->reason() != QFocusEvent::ActiveWindow)
+    else if (focusEv->reason() != QFocusEvent::Popup)
     {
 	terminate(true);
     }
