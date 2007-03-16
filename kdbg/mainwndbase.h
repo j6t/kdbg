@@ -30,6 +30,8 @@ public:
     ~WatchWindow();
     ExprWnd* watchVariables() { return &m_watchVariables; }
     QString watchText() const { return m_watchEdit.text(); }
+    int columnWidth(int i) const { return m_watchVariables.columnWidth(i); }
+    void setColumnWidth(int i, int w) { m_watchVariables.setColumnWidth(i, w); }
 
 protected:
     QLineEdit m_watchEdit;

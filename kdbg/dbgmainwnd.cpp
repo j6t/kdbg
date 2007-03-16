@@ -381,6 +381,7 @@ void DebuggerMainWnd::readProperties(KConfig* config)
 
 const char WindowGroup[] = "Windows";
 const char RecentExecutables[] = "RecentExecutables";
+const char LastSession[] = "LastSession";
 
 void DebuggerMainWnd::saveSettings(KConfig* config)
 {
@@ -390,6 +391,10 @@ void DebuggerMainWnd::saveSettings(KConfig* config)
     fixDockConfig(config, false);	// downgrade
 
     m_recentExecAction->saveEntries(config, RecentExecutables);
+
+    KConfigGroupSaver g2(config, LastSession);
+    config->writeEntry("Width0Locals", m_localVariables->columnWidth(0));
+    config->writeEntry("Width0Watches", m_watches->columnWidth(0));
 
     DebuggerMainWndBase::saveSettings(config);
 }
@@ -424,6 +429,15 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
     }
 
     m_recentExecAction->loadEntries(config, RecentExecutables);
+
+    KConfigGroupSaver g2(config, LastSession);
+    int w;
+    w = config->readNumEntry("Width0Locals", -1);
+    if (w >= 0 && w < 30000)
+	m_localVariables->setColumnWidth(0, w);
+    w = config->readNumEntry("Width0Watches", -1);
+    if (w >= 0 && w < 30000)
+	m_watches->setColumnWidth(0, w);
 
     DebuggerMainWndBase::restoreSettings(config);
 
