@@ -6,7 +6,7 @@
 #ifndef TTYWND_H
 #define TTYWND_H
 
-#include <textvw.h>
+#include <qtextedit.h>
 
 class QSocketNotifier;
 class QPopupMenu;
@@ -45,7 +45,7 @@ protected:
     bool findTTY();
 };
 
-class TTYWindow : public KTextView
+class TTYWindow : public QTextEdit
 {
     Q_OBJECT
 public:
@@ -57,12 +57,10 @@ public:
 
 protected:
     STTY* m_tty;
-    QPopupMenu* m_popmenu;
-    virtual void mousePressEvent(QMouseEvent* mouseEvent);
+    virtual QPopupMenu* createPopupMenu(const QPoint& pos);
 
 protected slots:
     void slotAppend(char* buffer, int count);
-    void clear();
 };
 
 #endif // TTYWND_H

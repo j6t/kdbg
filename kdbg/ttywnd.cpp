@@ -126,8 +126,6 @@ void STTY::outReceived(int f)
 	if (n < 0) {
 	    if (errno != EAGAIN) {	/* this is not an error */
 		// ugh! error! somebody disconnect this signal please!
-		int e = errno;
-		TRACE(QString().sprintf("error reading tty: %d", e));
 	    }
 	    break;
 	}
@@ -140,16 +138,14 @@ void STTY::outReceived(int f)
 
 
 TTYWindow::TTYWindow(QWidget* parent, const char* name) :
-	KTextView(parent, name),
+	QTextEdit(parent, name),
 	m_tty(0)
 {
     setFont(KGlobalSettings::fixedFont());
-    setFocusPolicy(WheelFocus);
-    clear();
-
-    // create a context menu
-    m_popmenu = new QPopupMenu;
-    m_popmenu->insertItem(i18n("&Clear"), this, SLOT(clear()));
+    setReadOnly(true);
+    setAutoFormatting(AutoNone);
+    setTextFormat(PlainText);
+    setWordWrap(NoWrap);
 }
 
 TTYWindow::~TTYWindow()
@@ -184,57 +180,17 @@ void TTYWindow::deactivate()
 
 void TTYWindow::slotAppend(char* buffer, int count)
 {
-    // is last line visible?
-    bool bottomVisible = lastRowVisible() == m_texts.size()-1;
-
-    // parse off lines
-    char* start = buffer;
-    while (count > 0) {
-	int len = 0;
-	while (count > 0 && start[len] != '\n') {
-	    --count;
-	    ++len;
-	}
-	if (len > 0) {
-	    QString str = QString::fromLatin1(start, len);
-	    // update last line
-	    str = m_texts[m_texts.size()-1] + str;
-	    replaceLine(m_texts.size()-1, str);
-	    start += len;
-	    len = 0;
-	}
-	if (count > 0 && *start == '\n') {
-	    insertLine(QString());
-	    ++start;
-	    --count;
-	}
-    }
-
-    // if last row was visible, scroll down to make it visible again
-    if (bottomVisible)
-	setTopCell(m_texts.size()-1);
+    // insert text at the cursor position
+    QString str = QString::fromLatin1(buffer, count);
+    insert(str);
 }
 
-void TTYWindow::clear()
+QPopupMenu* TTYWindow::createPopupMenu(const QPoint& pos)
 {
-    m_texts.setSize(0);
-    m_width = 300; m_height = 14;	/* Same as in KTextView::KTextView */
-    insertLine(QString());
-}
-
-void TTYWindow::mousePressEvent(QMouseEvent* mouseEvent)
-{
-    // Check if right button was clicked.
-    if (mouseEvent->button() == RightButton)
-    {
-	if (m_popmenu->isVisible()) {
-	    m_popmenu->hide();
-	} else {
-	    m_popmenu->popup(mapToGlobal(mouseEvent->pos()));
-	}
-    } else {
-	QWidget::mousePressEvent(mouseEvent);
-    }
+    QPopupMenu* menu = QTextEdit::createPopupMenu(pos);
+    menu->insertSeparator();
+    menu->insertItem(i18n("&Clear"), this, SLOT(clear()));
+    return menu;
 }
 
 #include "ttywnd.moc"
