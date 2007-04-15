@@ -7,6 +7,7 @@
 #define SOURCEWND_H
 
 #include <qpixmap.h>
+#include <vector>
 #include "textvw.h"
 #include "dbgdriver.h"
 
@@ -84,16 +85,16 @@ protected:
 
     struct SourceLine {
 	QString code;			/* a line of text */
-	ValArray<QString> disass;	/* its disassembled code */
-	ValArray<DbgAddr> disassAddr;	/* the addresses thereof */
+	std::vector<QString> disass;		/* its disassembled code */
+	std::vector<DbgAddr> disassAddr;	/* the addresses thereof */
 	bool canDisass;			/* if line can be disassembled */
 	SourceLine() : canDisass(true) { }
 	int findAddressRowOffset(const DbgAddr& address) const;
     };
-    ValArray<SourceLine> m_sourceCode;
+    std::vector<SourceLine> m_sourceCode;
 
-    ValArray<int> m_rowToLine;		/* source line number for each row */
-    ValArray<uchar> m_lineItems;
+    std::vector<int> m_rowToLine;	//!< The source line number for each row
+    std::vector<uchar> m_lineItems;	//!< Icons displayed on the line
     QPixmap m_pcinner;			/* PC at innermost frame */
     QPixmap m_pcup;			/* PC at frame up the stack */
     QPixmap m_brkena;			/* enabled breakpoint */

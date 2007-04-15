@@ -7,7 +7,7 @@
 #define TEXTVW_H
 
 #include "tableview.h"
-#include "valarray.h"
+#include <vector>
 
 class KTextView : public TableView
 {
@@ -47,7 +47,7 @@ protected:
     int m_height;			/* line height */
     int m_tabWidth;			/* in pixels */
 
-    ValArray<QString> m_texts;
+    std::vector<QString> m_texts;
     int m_curRow;			/* cursor position */
 };
 

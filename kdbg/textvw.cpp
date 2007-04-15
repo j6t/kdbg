@@ -59,7 +59,7 @@ bool KTextView::updateCellSize(const QString& text)
 
 void KTextView::insertLine(const QString& text)
 {
-    m_texts.append(text);
+    m_texts.push_back(text);
     setNumRows(m_texts.size());
 
     updateCellSize(text);

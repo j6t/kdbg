@@ -13,6 +13,7 @@
 #include <kapp.h>
 #include <kiconloader.h>
 #include <kglobalsettings.h>
+#include <iterator>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -65,14 +66,13 @@ bool SourceWindow::loadFile()
     }
 
     // then we copy it into our own m_sourceCode
-    m_sourceCode.setSize(m_texts.size());
-    m_rowToLine.setSize(m_texts.size());
-    m_lineItems.setSize(m_texts.size());
+    m_sourceCode.resize(m_texts.size());
+    m_rowToLine.resize(m_texts.size());
     for (int i = 0; i < m_texts.size(); i++) {
 	m_sourceCode[i].code = m_texts[i];
 	m_rowToLine[i] = i;
-	m_lineItems[i] = 0;
     }
+    m_lineItems.resize(m_texts.size(), 0);
 
     return true;
 }
@@ -86,13 +86,14 @@ void SourceWindow::reloadFile()
     }
 
     // read text into m_sourceCode
-    m_sourceCode.setSize(0);		/* clear old text */
+    m_sourceCode.clear();		/* clear old text */
 
     QTextStream t(&f);
+    std::back_insert_iterator<std::vector<SourceLine> > it(m_sourceCode);
     SourceLine s;
     while (!t.eof()) {
 	s.code = t.readLine();
-	m_sourceCode.append(s);
+	*it = s;
     }
     f.close();
 
@@ -109,23 +110,18 @@ void SourceWindow::reloadFile()
 	for (int i = lineNo; i < m_sourceCode.size(); i++) {
 	    insertLine(m_sourceCode[i].code);
 	}
-	// allocate line items
-	m_lineItems.setSize(m_texts.size());
-	for (int i = m_texts.size()-1; i >= lineNo; i--) {
-	    m_lineItems[i] = 0;
-	}
     } else {
 	// the new file has fewer lines
 	// here lineNo is the number of lines of the new file
 	// remove the excessive lines
-	m_texts.setSize(lineNo);
-	m_lineItems.setSize(lineNo);
+	m_texts.resize(lineNo);
     }
-    f.close();
+    // allocate line items
+    m_lineItems.resize(lineNo, 0);
 
     setNumRows(m_texts.size());
 
-    m_rowToLine.setSize(m_texts.size());
+    m_rowToLine.resize(m_texts.size());
     for (int i = 0; i < m_texts.size(); i++)
 	m_rowToLine[i] = i;
 
@@ -556,8 +552,8 @@ void SourceWindow::disassembled(int lineNo, const QList<DisassembledCode>& disas
     SourceLine& sl = m_sourceCode[lineNo];
 
     // copy disassembled code and its addresses
-    sl.disass.setSize(disass.count());
-    sl.disassAddr.setSize(disass.count());
+    sl.disass.resize(disass.count());
+    sl.disassAddr.resize(disass.count());
     sl.canDisass = disass.count() > 0;
     for (uint i = 0; i < disass.count(); i++) {
 	const DisassembledCode* c =
@@ -670,16 +666,16 @@ void SourceWindow::expandRow(int row)
     TRACE("expanding row " + QString().setNum(row));
     // get disassembled code
     int line = rowToLine(row);
-    const ValArray<QString>& disass = m_sourceCode[line].disass;
+    const std::vector<QString>& disass = m_sourceCode[line].disass;
 
     // remove PC (must be set again in slot of signal expanded())
     m_lineItems[row] &= ~(liPC|liPCup);
 
     // insert new lines
     ++row;
-    m_rowToLine.insertAt(row, line, disass.size());
-    m_lineItems.insertAt(row, 0, disass.size());
-    m_texts.insertAt(row, disass);
+    m_rowToLine.insert(m_rowToLine.begin()+row, disass.size(), line);
+    m_lineItems.insert(m_lineItems.begin()+row, disass.size(), 0);
+    m_texts.insert(m_texts.begin()+row, disass.begin(), disass.end());
 
     bool autoU = autoUpdate();
     setAutoUpdate(false);
@@ -711,9 +707,9 @@ void SourceWindow::collapseRow(int row)
 	end++;
     }
     ++row;
-    m_rowToLine.removeAt(row, end-row);
-    m_lineItems.removeAt(row, end-row);
-    m_texts.removeAt(row, end-row);
+    m_rowToLine.erase(m_rowToLine.begin()+row, m_rowToLine.begin()+end);
+    m_lineItems.erase(m_lineItems.begin()+row, m_lineItems.begin()+end);
+    m_texts.erase(m_texts.begin()+row, m_texts.begin()+end);
 
     bool autoU = autoUpdate();
     setAutoUpdate(false);
