@@ -58,9 +58,11 @@ public:
 protected:
     STTY* m_tty;
     virtual QPopupMenu* createPopupMenu(const QPoint& pos);
+    int m_hPos;		//!< tracks horizontal cursor position
 
 protected slots:
     void slotAppend(char* buffer, int count);
+    void slotClear();
 };
 
 #endif // TTYWND_H

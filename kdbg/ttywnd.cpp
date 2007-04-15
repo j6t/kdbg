@@ -139,7 +139,8 @@ void STTY::outReceived(int f)
 
 TTYWindow::TTYWindow(QWidget* parent, const char* name) :
 	QTextEdit(parent, name),
-	m_tty(0)
+	m_tty(0),
+	m_hPos(0)
 {
     setFont(KGlobalSettings::fixedFont());
     setReadOnly(true);
@@ -178,19 +179,60 @@ void TTYWindow::deactivate()
     m_tty = 0;
 }
 
+/**
+ * Note that it is necessary to track the horizontal position explicitly
+ * since if the user modifies the selected text in the window, the cursor
+ * position changes, too.
+ */
 void TTYWindow::slotAppend(char* buffer, int count)
 {
-    // insert text at the cursor position
-    QString str = QString::fromLatin1(buffer, count);
-    insert(str);
+    // parse off lines
+    char* start = buffer;
+    while (count > 0) {
+	int len = 0;
+	while (count > 0 && start[len] != '\n' && start[len] != '\r') {
+	    --count;
+	    ++len;
+	}
+	if (len > 0) {
+	    QString str = QString::fromLatin1(start, len);
+	    // replace text in the last line
+	    int para = paragraphs()-1;
+	    // this selection is non-empty only after a '\r' that was not
+	    // followed by a '\n'
+	    setSelection(para, m_hPos, para, m_hPos+len, 1);
+	    removeSelectedText(1);
+	    insertAt(str, para, m_hPos);
+	    m_hPos += len;
+	    start += len;
+	    len = 0;
+	}
+	if (count > 0 && *start == '\r') {
+	    ++start;
+	    --count;
+	    m_hPos = 0;
+	}
+	if (count > 0 && *start == '\n') {
+	    ++start;
+	    --count;
+	    append(QString());
+	    m_hPos = 0;
+	}
+    }
 }
 
 QPopupMenu* TTYWindow::createPopupMenu(const QPoint& pos)
 {
     QPopupMenu* menu = QTextEdit::createPopupMenu(pos);
     menu->insertSeparator();
-    menu->insertItem(i18n("&Clear"), this, SLOT(clear()));
+    menu->insertItem(i18n("&Clear"), this, SLOT(slotClear()));
     return menu;
+}
+
+void TTYWindow::slotClear()
+{
+    clear();
+    m_hPos = 0;
 }
 
 #include "ttywnd.moc"
