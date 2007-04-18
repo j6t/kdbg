@@ -558,7 +558,10 @@ void SourceWindow::disassembled(int lineNo, const QList<DisassembledCode>& disas
     for (uint i = 0; i < disass.count(); i++) {
 	const DisassembledCode* c =
 	    const_cast<QList<DisassembledCode>&>(disass).at(i);
-	sl.disass[i] = c->address.asString() + ' ' + c->code;
+	QString code = c->code;
+	while (code.endsWith("\n"))
+	    code.truncate(code.length()-1);
+	sl.disass[i] = c->address.asString() + ' ' + code;
 	sl.disassAddr[i] = c->address;
     }
 
