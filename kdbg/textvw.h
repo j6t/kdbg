@@ -19,6 +19,7 @@ public:
     void replaceLine(int line, const QString& text);
     virtual void setCursorPosition(int row, int col);
     virtual void cursorPosition(int* row, int* col);
+    int charAt(const QPoint& p, int* para);
 protected:
     virtual int cellWidth(int col) const;
     virtual int cellHeight(int row) const;

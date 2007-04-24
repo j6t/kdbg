@@ -447,72 +447,26 @@ static inline bool isident(QChar c)
 
 bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 {
-    if (findCol(p.x()) != textCol())
-	return false;
-    int row = findRow(p.y());
-    if (row < 0)
+    int row, col  = charAt(p, &row);
+    if (row < 0 || col < 0)
 	return false;
 
-    // find top-left corner of text cell
-    int top, left;
-    if (!colXPos(textCol(), &left))
-	return false;
-    if (!rowYPos(row, &top))
+    // isolate the word at row, col
+    QString line = m_texts[row];
+    if (!isident(line[col]))
 	return false;
 
-    // get the bounding rect of the text
-    QPainter painter(this);
-    setupPainter(&painter);
-    const QString& text = m_texts[row];
-    QRect bound =
-	painter.boundingRect(left+2, top, 0,0,
-			     AlignLeft | SingleLine | DontClip | ExpandTabs,
-			     text, text.length());
-    if (!bound.contains(p))
-	return false;			/* p is outside text */
+    int begin = col;
+    while (begin > 0 && isident(line[begin-1]))
+	--begin;
+    do
+	++col;
+    while (col < line.length() && isident(line[col]));
 
-    /*
-     * We split the line into words and check each whether it contains
-     * the point p. We must do it the hard way (measuring substrings)
-     * because we cannot rely on that the font is mono-spaced.
-     */
-    uint start = 0;
-    while (start < text.length()) {
-	while (start < text.length() && !isident(text[start]))
-	    start++;
-	if (start >= text.length())
-	    return false;
-	/*
-	 * If p is in the rectangle that ends at 'start', it is in the
-	 * last non-word part that we have just skipped.
-	 */
-	bound = 
-	    painter.boundingRect(left+2, top, 0,0,
-				 AlignLeft | SingleLine | DontClip | ExpandTabs,
-				 text, start);
-	if (bound.contains(p))
-	    return false;
-	// a word starts now
-	int startWidth = bound.width();
-	uint end = start;
-	while (end < text.length() && isident(text[end]))
-	    end++;
-	bound =
-	    painter.boundingRect(left+2, top, 0,0,
-				 AlignLeft | SingleLine | DontClip | ExpandTabs,
-				 text, end);
-	if (bound.contains(p)) {
-	    // we found a word!
-	    // extract the word
-	    word = text.mid(start, end-start);
-	    // and the rectangle
-	    r = QRect(bound.x()+startWidth,bound.y(),
-		      bound.width()-startWidth, bound.height());
-	    return true;
-	}
-	start = end;
-    }
-    return false;
+    r = QRect(p, p);
+    r.addCoords(-5,-5,5,5);
+    word = line.mid(begin, col-begin);
+    return true;
 }
 
 void SourceWindow::paletteChange(const QPalette& oldPal)

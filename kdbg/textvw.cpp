@@ -284,3 +284,46 @@ void KTextView::setupPainter(QPainter* p)
 {
     p->setTabStops(m_tabWidth);
 }
+
+int KTextView::charAt(const QPoint& p, int* para)
+{
+    if (findCol(p.x()) != textCol())
+	return *para = -1;
+    int row = findRow(p.y());
+    *para = row;
+    if (row < 0)
+	return -1;
+
+    // find top-left corner of text cell
+    int top, left;
+    if (!colXPos(textCol(), &left))
+	return -1;
+    if (!rowYPos(row, &top))
+	return -1;
+
+    // get the bounding rect of the text
+    QPainter painter(this);
+    setupPainter(&painter);
+    const QString& text = m_texts[row];
+    QRect bound =
+	painter.boundingRect(left+2, top, 0,0,
+			     AlignLeft | SingleLine | DontClip | ExpandTabs,
+			     text, text.length());
+    if (!bound.contains(p))
+	return -1;			/* p is outside text */
+
+    for (uint n = 0; n < text.length(); n++)
+    {
+	/*
+	 * If p is in the rectangle that has n+1 characters, than n
+	 * is the character we are looking for
+	 */
+	bound =
+	    painter.boundingRect(left+2, top, 0,0,
+				 AlignLeft | SingleLine | DontClip | ExpandTabs,
+				 text, n+1);
+	if (bound.contains(p))
+	    return n;
+    }
+    return -1;
+}
