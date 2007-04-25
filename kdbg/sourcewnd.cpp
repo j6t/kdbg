@@ -66,13 +66,14 @@ bool SourceWindow::loadFile()
     }
 
     // then we copy it into our own m_sourceCode
-    m_sourceCode.resize(m_texts.size());
-    m_rowToLine.resize(m_texts.size());
-    for (int i = 0; i < m_texts.size(); i++) {
+    int n = m_texts.size();
+    m_sourceCode.resize(n);
+    m_rowToLine.resize(n);
+    for (int i = 0; i < n; i++) {
 	m_sourceCode[i].code = m_texts[i];
 	m_rowToLine[i] = i;
     }
-    m_lineItems.resize(m_texts.size(), 0);
+    m_lineItems.resize(n, 0);
 
     return true;
 }
@@ -117,12 +118,12 @@ void SourceWindow::reloadFile()
 	m_texts.resize(lineNo);
     }
     // allocate line items
-    m_lineItems.resize(lineNo, 0);
+    m_lineItems.resize(m_sourceCode.size(), 0);
 
-    setNumRows(m_texts.size());
+    setNumRows(m_sourceCode.size());
 
-    m_rowToLine.resize(m_texts.size());
-    for (int i = 0; i < m_texts.size(); i++)
+    m_rowToLine.resize(m_sourceCode.size());
+    for (int i = 0; i < m_sourceCode.size(); i++)
 	m_rowToLine[i] = i;
 
     setAutoUpdate(autoU);
