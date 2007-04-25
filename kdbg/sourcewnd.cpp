@@ -108,7 +108,7 @@ void SourceWindow::reloadFile()
     if (m_sourceCode.size() > m_texts.size()) {
 	// the new file has more lines than the old one
 	// here lineNo is the number of lines of the old file
-	for (int i = lineNo; i < m_sourceCode.size(); i++) {
+	for (size_t i = lineNo; i < m_sourceCode.size(); i++) {
 	    insertLine(m_sourceCode[i].code);
 	}
     } else {
@@ -123,7 +123,7 @@ void SourceWindow::reloadFile()
     setNumRows(m_sourceCode.size());
 
     m_rowToLine.resize(m_sourceCode.size());
-    for (int i = 0; i < m_sourceCode.size(); i++)
+    for (size_t i = 0; i < m_sourceCode.size(); i++)
 	m_rowToLine[i] = i;
 
     setAutoUpdate(autoU);
@@ -133,7 +133,7 @@ void SourceWindow::reloadFile()
     }
 
     // if the cursor is in the deleted lines, move it to the last line
-    if (m_curRow >= m_texts.size()) {
+    if (m_curRow >= int(m_texts.size())) {
 	m_curRow = -1;			/* at this point don't have an active row */
 	activateLine(m_texts.size()-1);	/* now we have */
     }
@@ -141,7 +141,7 @@ void SourceWindow::reloadFile()
 
 void SourceWindow::scrollTo(int lineNo, const DbgAddr& address)
 {
-    if (lineNo < 0 || lineNo >= m_sourceCode.size())
+    if (lineNo < 0 || lineNo >= int(m_sourceCode.size()))
 	return;
 
     int row = lineToRow(lineNo, address);
@@ -294,7 +294,7 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
 	if (fileNameMatches(bp->fileName)) {
 	    TRACE(QString().sprintf("updating %s:%d", bp->fileName.data(), bp->lineNo));
 	    int i = bp->lineNo;
-	    if (i < 0 || i >= m_sourceCode.size())
+	    if (i < 0 || i >= int(m_sourceCode.size()))
 		continue;
 	    // compute new line item flags for breakpoint
 	    uchar flags = bp->enabled ? liBP : liBPdisabled;
@@ -462,7 +462,7 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 	--begin;
     do
 	++col;
-    while (col < line.length() && isident(line[col]));
+    while (col < int(line.length()) && isident(line[col]));
 
     r = QRect(p, p);
     r.addCoords(-5,-5,5,5);
@@ -501,7 +501,7 @@ bool SourceWindow::fileNameMatches(const QString& other)
 void SourceWindow::disassembled(int lineNo, const QList<DisassembledCode>& disass)
 {
     TRACE("disassembled line " + QString().setNum(lineNo));
-    if (lineNo < 0 || lineNo >= m_sourceCode.size())
+    if (lineNo < 0 || lineNo >= int(m_sourceCode.size()))
 	return;
 
     SourceLine& sl = m_sourceCode[lineNo];
@@ -556,7 +556,7 @@ int SourceWindow::lineToRow(int line)
 {
     // line is zero-based!
 
-    assert(line < m_rowToLine.size());
+    assert(line < int(m_rowToLine.size()));
 
     // quick test for common case
     if (line < 0 || m_rowToLine[line] == line)
@@ -573,7 +573,7 @@ int SourceWindow::lineToRow(int line)
     int h = m_rowToLine.size();
     while (l < h && m_rowToLine[l] != line)
     {
-	assert(h == m_rowToLine.size() || m_rowToLine[l] < m_rowToLine[h]);
+	assert(h == int(m_rowToLine.size()) || m_rowToLine[l] < m_rowToLine[h]);
 
 	/*
 	 * We want to round down the midpoint so that we find the
@@ -609,7 +609,7 @@ int SourceWindow::lineToRow(int line, const DbgAddr& address)
 bool SourceWindow::isRowExpanded(int row)
 {
     assert(row >= 0);
-    return row < m_rowToLine.size()-1 &&
+    return row < int(m_rowToLine.size())-1 &&
 	m_rowToLine[row] == m_rowToLine[row+1];
 }
 
@@ -639,7 +639,7 @@ void SourceWindow::expandRow(int row)
     setAutoUpdate(false);
 
     // update line widths
-    for (int i = 0; i < disass.size(); i++) {
+    for (size_t i = 0; i < disass.size(); i++) {
 	updateCellSize(disass[i]);
     }
 
@@ -661,7 +661,7 @@ void SourceWindow::collapseRow(int row)
 
     // find end of this block
     int end = row+1;
-    while (end < m_rowToLine.size() && m_rowToLine[end] == m_rowToLine[row]) {
+    while (end < int(m_rowToLine.size()) && m_rowToLine[end] == m_rowToLine[row]) {
 	end++;
     }
     ++row;
@@ -706,7 +706,7 @@ int SourceWindow::SourceLine::findAddressRowOffset(const DbgAddr& address) const
     if (address.isEmpty())
 	return 0;
 
-    for (int i = 0; i < disassAddr.size(); i++) {
+    for (size_t i = 0; i < disassAddr.size(); i++) {
 	if (disassAddr[i] == address) {
 	    // found exact address
 	    return i+1;
