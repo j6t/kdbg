@@ -13,7 +13,6 @@
 #include <kapp.h>
 #include <kiconloader.h>
 #include <kglobalsettings.h>
-#include <iterator>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -49,28 +48,16 @@ bool SourceWindow::loadFile()
 	return false;
     }
 
-    bool upd = autoUpdate();
-    setAutoUpdate(false);
-
     QTextStream t(&f);
-    QString s;
-    while (!t.eof()) {
-	s = t.readLine();
-	insertLine(s);
-    }
+    setText(t.read());
     f.close();
 
-    setAutoUpdate(upd);
-    if (upd) {
-	updateTableSize();
-    }
-
     // then we copy it into our own m_sourceCode
-    int n = m_texts.size();
+    int n = paragraphs();
     m_sourceCode.resize(n);
     m_rowToLine.resize(n);
     for (int i = 0; i < n; i++) {
-	m_sourceCode[i].code = m_texts[i];
+	m_sourceCode[i].code = text(i);
 	m_rowToLine[i] = i;
     }
     m_lineItems.resize(n, 0);
@@ -90,53 +77,19 @@ void SourceWindow::reloadFile()
     m_sourceCode.clear();		/* clear old text */
 
     QTextStream t(&f);
-    std::back_insert_iterator<std::vector<SourceLine> > it(m_sourceCode);
-    SourceLine s;
-    while (!t.eof()) {
-	s.code = t.readLine();
-	*it = s;
-    }
+    setText(t.read());
     f.close();
 
-    bool autoU = autoUpdate();
-    setAutoUpdate(false);
-
-    int lineNo = QMIN(m_texts.size(), m_sourceCode.size());
-    for (int i = 0; i < lineNo; i++) {
-	replaceLine(i, m_sourceCode[i].code);
-    }
-    if (m_sourceCode.size() > m_texts.size()) {
-	// the new file has more lines than the old one
-	// here lineNo is the number of lines of the old file
-	for (size_t i = lineNo; i < m_sourceCode.size(); i++) {
-	    insertLine(m_sourceCode[i].code);
-	}
-    } else {
-	// the new file has fewer lines
-	// here lineNo is the number of lines of the new file
-	// remove the excessive lines
-	m_texts.resize(lineNo);
+    m_sourceCode.resize(paragraphs());
+    for (size_t i = 0; i < m_sourceCode.size(); i++) {
+	m_sourceCode[i].code = text(i);
     }
     // allocate line items
     m_lineItems.resize(m_sourceCode.size(), 0);
 
-    setNumRows(m_sourceCode.size());
-
     m_rowToLine.resize(m_sourceCode.size());
     for (size_t i = 0; i < m_sourceCode.size(); i++)
 	m_rowToLine[i] = i;
-
-    setAutoUpdate(autoU);
-    if (autoU && isVisible()) {
-	updateTableSize();
-	repaint();
-    }
-
-    // if the cursor is in the deleted lines, move it to the last line
-    if (m_curRow >= int(m_texts.size())) {
-	m_curRow = -1;			/* at this point don't have an active row */
-	activateLine(m_texts.size()-1);	/* now we have */
-    }
 }
 
 void SourceWindow::scrollTo(int lineNo, const DbgAddr& address)
@@ -453,7 +406,7 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 	return false;
 
     // isolate the word at row, col
-    QString line = m_texts[row];
+    QString line = text(row);
     if (!isident(line[col]))
 	return false;
 
@@ -633,25 +586,12 @@ void SourceWindow::expandRow(int row)
     ++row;
     m_rowToLine.insert(m_rowToLine.begin()+row, disass.size(), line);
     m_lineItems.insert(m_lineItems.begin()+row, disass.size(), 0);
-    m_texts.insert(m_texts.begin()+row, disass.begin(), disass.end());
-
-    bool autoU = autoUpdate();
-    setAutoUpdate(false);
-
-    // update line widths
     for (size_t i = 0; i < disass.size(); i++) {
-	updateCellSize(disass[i]);
+	insertParagraph(disass[i], row++);
     }
-
-    setNumRows(m_texts.size());
+    update();		// line items
 
     emit expanded(line);		/* must set PC */
-
-    setAutoUpdate(autoU);
-    if (autoU && isVisible()) {
-	updateTableSize();
-	update();
-    }
 }
 
 void SourceWindow::collapseRow(int row)
@@ -667,20 +607,11 @@ void SourceWindow::collapseRow(int row)
     ++row;
     m_rowToLine.erase(m_rowToLine.begin()+row, m_rowToLine.begin()+end);
     m_lineItems.erase(m_lineItems.begin()+row, m_lineItems.begin()+end);
-    m_texts.erase(m_texts.begin()+row, m_texts.begin()+end);
-
-    bool autoU = autoUpdate();
-    setAutoUpdate(false);
-
-    setNumRows(m_texts.size());
+    while (--end >= row)
+	removeParagraph(end);
+    update();		// line items
 
     emit collapsed(line);
-
-    setAutoUpdate(autoU);
-    if (autoU && isVisible()) {
-	updateTableSize();
-	update();
-    }
 }
 
 void SourceWindow::activeLine(int& line, DbgAddr& address)

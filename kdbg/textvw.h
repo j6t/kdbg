@@ -19,6 +19,11 @@ public:
     void replaceLine(int line, const QString& text);
     virtual void setCursorPosition(int row, int col);
     virtual void cursorPosition(int* row, int* col);
+    void setText(const QString& t);
+    const QString& text(int i) const { return m_texts[i]; }
+    int paragraphs() const { return m_texts.size(); }
+    void insertParagraph(const QString& text, int row);
+    void removeParagraph(int row);
     int charAt(const QPoint& p, int* para);
 protected:
     virtual int cellWidth(int col) const;
@@ -48,8 +53,9 @@ protected:
     int m_height;			/* line height */
     int m_tabWidth;			/* in pixels */
 
-    std::vector<QString> m_texts;
     int m_curRow;			/* cursor position */
+private:
+    std::vector<QString> m_texts;
 };
 
 #endif // TEXTVW_H

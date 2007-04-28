@@ -11,6 +11,7 @@
 #include "config.h"
 #endif
 #include "mydebug.h"
+#include <iterator>
 
 #define DEFAULT_WIDTH 100
 #define DEFAULT_LINEHEIGHT 1
@@ -57,6 +58,44 @@ bool KTextView::updateCellSize(const QString& text)
     return update;
 }
 
+void KTextView::setText(const QString& text)
+{
+    QStringList l = QStringList::split('\n', text, true);
+
+    bool autoU = autoUpdate();
+    setAutoUpdate(false);
+
+    int lineNo = QMIN(m_texts.size(), l.size());
+    for (int i = 0; i < lineNo; i++) {
+	replaceLine(i, l[i]);
+    }
+    if (l.size() > m_texts.size()) {
+	// the new text has more lines than the old one
+	// here lineNo is the number of lines of the old text
+	for (size_t i = lineNo; i < l.size(); i++) {
+	    insertLine(l[i]);
+	}
+    } else {
+	// the new file has fewer lines
+	// here lineNo is the number of lines of the new file
+	// remove the excessive lines
+	m_texts.resize(lineNo);
+	setNumRows(lineNo);
+    }
+
+    setAutoUpdate(autoU);
+    if (autoU) {
+	updateTableSize();
+	update();
+    }
+
+    // if the cursor is in the deleted lines, move it to the last line
+    if (m_curRow >= int(m_texts.size())) {
+	m_curRow = -1;			/* at this point don't have an active row */
+	activateLine(m_texts.size()-1);	/* now we have */
+    }
+}
+
 void KTextView::insertLine(const QString& text)
 {
     m_texts.push_back(text);
@@ -91,6 +130,32 @@ void KTextView::replaceLine(int line, const QString& text)
     }
 }
 
+void KTextView::insertParagraph(const QString& text, int row)
+{
+    m_texts.insert(m_texts.begin()+row, text);
+
+    // update line widths
+    updateCellSize(text);
+
+    setNumRows(m_texts.size());
+
+    if (autoUpdate() && isVisible()) {
+	updateTableSize();
+	update();
+    }
+}
+
+void KTextView::removeParagraph(int row)
+{
+    m_texts.erase(m_texts.begin()+row);
+    setNumRows(m_texts.size());
+
+    if (autoUpdate() && isVisible()) {
+	updateTableSize();
+	update();
+    }
+}
+
 void KTextView::setCursorPosition(int row, int)
 {
     activateLine(row);
@@ -120,7 +185,7 @@ int KTextView::textCol() const
 
 void KTextView::paintCell(QPainter* p, int row, int /*col*/)
 {
-    if (row >= m_texts.size()) {
+    if (row >= int(m_texts.size())) {
 	return;
     }
     if (row == m_curRow) {
@@ -254,7 +319,7 @@ void KTextView::paletteChange(const QPalette& oldPal)
     // recompute window size
     m_width = DEFAULT_WIDTH;
     m_height = DEFAULT_LINEHEIGHT;
-    for (int i = 0; i < m_texts.size(); i++) {
+    for (size_t i = 0; i < m_texts.size(); i++) {
 	updateCellSize(m_texts[i]);
     }
     updateTableSize();
@@ -270,7 +335,7 @@ void KTextView::setTabWidth(int numChars)
 
     // recompute window width
     m_width = DEFAULT_WIDTH;
-    for (int i = 0; i < m_texts.size(); i++) {
+    for (size_t i = 0; i < m_texts.size(); i++) {
 	updateCellSize(m_texts[i]);
     }
 
