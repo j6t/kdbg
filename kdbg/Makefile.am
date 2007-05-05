@@ -16,8 +16,6 @@ kdbg_SOURCES = \
 	pgmargsbase.ui \
 	procattach.cpp \
 	procattachbase.ui \
-	tableview.cpp \
-	textvw.cpp \
 	debugger.cpp \
 	programconfig.cpp \
 	dbgdriver.cpp \
@@ -50,8 +48,6 @@ kdbg_LDADD = $(LIB_KIO)
 noinst_HEADERS = \
 	pgmargs.h \
 	procattach.h \
-	tableview.h \
-	textvw.h \
 	valarray.h \
 	debugger.h \
 	programconfig.h \
