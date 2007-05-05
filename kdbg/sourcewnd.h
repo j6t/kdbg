@@ -7,15 +7,15 @@
 #define SOURCEWND_H
 
 #include <qpixmap.h>
+#include <qtextedit.h>
 #include <vector>
-#include "textvw.h"
 #include "dbgdriver.h"
 
 // forward declarations
 class KDebugger;
 struct DbgAddr;
 
-class SourceWindow : public KTextView
+class SourceWindow : public QTextEdit
 {
     Q_OBJECT
 public:
@@ -51,13 +51,10 @@ public:
     void activeLine(int& lineNo, DbgAddr& address);
 
 protected:
-    virtual int textCol() const;
-    virtual int cellWidth(int col) const;
-    virtual void paintCell(QPainter* p, int row, int col);
+    virtual void drawFrame(QPainter* p);
     virtual void mousePressEvent(QMouseEvent* ev);
     virtual void keyPressEvent(QKeyEvent* ev);
     virtual void paletteChange(const QPalette&);
-    void updateLineItem(int i);
     void expandRow(int row);
     void collapseRow(int row);
     void scrollToRow(int row);
@@ -74,6 +71,8 @@ signals:
     void disassemble(const QString&, int);
     void expanded(int lineNo);		/* source lineNo has been expanded */
     void collapsed(int lineNo);		/* source lineNo has been collapsed */
+public slots:
+    void setTabWidth(int numChars);
 
 protected:
     QString m_fileName;
@@ -102,6 +101,8 @@ protected:
     QPixmap m_brktmp;			/* temporary breakpoint marker */
     QPixmap m_brkcond;			/* conditional breakpoint marker */
     QPixmap m_brkorph;			/* orphaned breakpoint marker */
+    int m_widthItems;			//!< The width of the item column
+    int m_widthPlus;			//!< The width of the expander column
 };
 
 #endif // SOURCEWND_H

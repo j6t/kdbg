@@ -20,11 +20,11 @@
 
 
 SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* name) :
-	KTextView(parent, name),
-	m_fileName(fileName)
+	QTextEdit(parent, name),
+	m_fileName(fileName),
+	m_widthItems(16),
+	m_widthPlus(12)
 {
-    setNumCols(3);
-
     // load pixmaps
     m_pcinner = UserIcon("pcinner");
     m_pcup = UserIcon("pcup");
@@ -34,6 +34,13 @@ SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* na
     m_brkcond = UserIcon("brkcond");
     m_brkorph = UserIcon("brkorph");
     setFont(KGlobalSettings::fixedFont());
+    setReadOnly(true);
+    setMargins(m_widthItems+m_widthPlus, 0, 0 ,0);
+    setAutoFormatting(AutoNone);
+    setTextFormat(PlainText);
+    setWordWrap(NoWrap);
+    connect(verticalScrollBar(), SIGNAL(valueChanged(int)),
+	    this, SLOT(update()));
 }
 
 SourceWindow::~SourceWindow()
@@ -42,7 +49,7 @@ SourceWindow::~SourceWindow()
 
 bool SourceWindow::loadFile()
 {
-    // first we load the code into KTextView::m_texts
+    // first we load the code into QTextEdit
     QFile f(m_fileName);
     if (!f.open(IO_ReadOnly)) {
 	return false;
@@ -103,59 +110,43 @@ void SourceWindow::scrollTo(int lineNo, const DbgAddr& address)
 
 void SourceWindow::scrollToRow(int row)
 {
-    if (row >= numRows())
-	row = numRows();
-
-    // scroll to lineNo
-    if (row >= topCell() && row <= lastRowVisible()) {
-	// line is already visible
-	setCursorPosition(row, 0);
-	return;
-    }
-
-    // setCursorPosition does only a half-hearted job of making the
-    // cursor line visible, so we do it by hand...
     setCursorPosition(row, 0);
-    row -= 5;
-    if (row < 0)
-	row = 0;
-
-    setTopCell(row);
+    ensureCursorVisible();
 }
 
-int SourceWindow::textCol() const
+void SourceWindow::drawFrame(QPainter* p)
 {
-    // text is in column 2
-    return 2;
-}
+    QTextEdit::drawFrame(p);
 
-int SourceWindow::cellWidth(int col) const
-{
-    if (col == 0) {
-	return 15;
-    } else if (col == 1) {
-	return 12;
-    } else {
-	return KTextView::cellWidth(col);
-    }
-}
+    // and paragraph at the top is...
+    int top = paragraphAt(QPoint(0,contentsY()));
+    int bot = paragraphAt(QPoint(0,contentsY()+visibleHeight()-1));
+    if (bot < 0)
+	bot = paragraphs()-1;
 
-void SourceWindow::paintCell(QPainter* p, int row, int col)
-{
-    if (col == textCol()) {
-	p->save();
-	if (isRowDisassCode(row)) {
-	    p->setPen(blue);
-	}
-	KTextView::paintCell(p, row, col);
-	p->restore();
-	return;
-    }
-    if (col == 0) {
+    p->save();
+
+    // set a clip rectangle
+    int fw = frameWidth();
+    QRect inside = rect();
+    inside.addCoords(fw,fw,-fw,-fw);
+    QRegion clip = p->clipRegion();
+    clip &= QRegion(inside);
+    p->setClipRegion(clip);
+
+    p->setPen(colorGroup().text());
+    p->eraseRect(inside);
+
+    for (int row = top; row <= bot; row++)
+    {
 	uchar item = m_lineItems[row];
-	if (item == 0)			/* shortcut out */
-	    return;
-	int h = cellHeight(row);
+	p->save();
+
+	QRect r = paragraphRect(row);
+	QPoint pt = contentsToViewport(r.topLeft());
+	int h = r.height();
+	p->translate(fw, pt.y()+viewport()->y());
+
 	if (item & liBP) {
 	    // enabled breakpoint
 	    int y = (h - m_brkena.height())/2;
@@ -198,12 +189,9 @@ void SourceWindow::paintCell(QPainter* p, int row, int col)
 	    if (y < 0) y = 0;
 	    p->drawPixmap(0,y,m_pcup);
 	}
-	return;
-    }
-    if (col == 1) {
 	if (!isRowDisassCode(row) && m_sourceCode[rowToLine(row)].canDisass) {
-	    int h = cellHeight(row);
-	    int w = cellWidth(col);
+	    int w = m_widthPlus;
+	    p->translate(m_widthItems, 0);
 	    int x = w/2;
 	    int y = h/2;
 	    p->drawLine(x-2, y, x+2, y);
@@ -211,7 +199,9 @@ void SourceWindow::paintCell(QPainter* p, int row, int col)
 		p->drawLine(x, y-2, x, y+2);
 	    }
 	}
+	p->restore();
     }
+    p->restore();
 }
 
 void SourceWindow::updateLineItems(const KDebugger* dbg)
@@ -236,7 +226,7 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
 	    if (j < 0) {
 		/* doesn't exist anymore, remove it */
 		m_lineItems[i] &= ~liBPany;
-		updateLineItem(i);
+		update();
 	    }
 	}
     }
@@ -262,15 +252,10 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
 	    if ((m_lineItems[row] & liBPany) != flags) {
 		m_lineItems[row] &= ~liBPany;
 		m_lineItems[row] |= flags;
-		updateLineItem(row);
+		update();
 	    }
 	}
     }
-}
-
-void SourceWindow::updateLineItem(int row)
-{
-    updateCell(row, 0);
 }
 
 void SourceWindow::setPC(bool set, int lineNo, const DbgAddr& address, int frameNo)
@@ -286,13 +271,13 @@ void SourceWindow::setPC(bool set, int lineNo, const DbgAddr& address, int frame
 	// set only if not already set
 	if ((m_lineItems[row] & flag) == 0) {
 	    m_lineItems[row] |= flag;
-	    updateLineItem(row);
+	    update();
 	}
     } else {
 	// clear only if not set
 	if ((m_lineItems[row] & flag) != 0) {
 	    m_lineItems[row] &= ~flag;
-	    updateLineItem(row);
+	    update();
 	}
     }
 }
@@ -333,20 +318,14 @@ void SourceWindow::mousePressEvent(QMouseEvent* ev)
 	return;
     }
 
-    int col = findCol(ev->x());
-
-    // check if event is in line item column
-    if (col == textCol()) {
-	KTextView::mousePressEvent(ev);
-	return;
-    }
-
     // get row
-    int row = findRow(ev->y());
-    if (row < 0 || col < 0)
+    QPoint p = viewportToContents(QPoint(0, ev->y() - viewport()->y()));
+    int row = paragraphAt(p);
+    if (row < 0)
 	return;
 
-    if (col == 1) {
+    if (ev->x() > m_widthItems+frameWidth())
+    {
 	if (isRowExpanded(row)) {
 	    actionCollapseRow(row);
 	} else {
@@ -382,16 +361,18 @@ void SourceWindow::mousePressEvent(QMouseEvent* ev)
 
 void SourceWindow::keyPressEvent(QKeyEvent* ev)
 {
+    int para, idx;
+    getCursorPosition(&para, &idx);
     switch (ev->key()) {
     case Key_Plus:
-	actionExpandRow(m_curRow);
+	actionExpandRow(para);
 	return;
     case Key_Minus:
-	actionCollapseRow(m_curRow);
+	actionCollapseRow(para);
 	return;
     }
 
-    KTextView::keyPressEvent(ev);
+    QTextEdit::keyPressEvent(ev);
 }
 
 static inline bool isident(QChar c)
@@ -401,7 +382,8 @@ static inline bool isident(QChar c)
 
 bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 {
-    int row, col  = charAt(p, &row);
+    QPoint pv = viewportToContents(p - viewport()->pos());
+    int row, col  = charAt(pv, &row);
     if (row < 0 || col < 0)
 	return false;
 
@@ -426,7 +408,7 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 void SourceWindow::paletteChange(const QPalette& oldPal)
 {
     setFont(KGlobalSettings::fixedFont());
-    KTextView::paletteChange(oldPal);
+    QTextEdit::paletteChange(oldPal);
 }
 
 /*
@@ -478,7 +460,7 @@ void SourceWindow::disassembled(int lineNo, const QList<DisassembledCode>& disas
 	expandRow(row);
     } else {
 	// clear expansion marker
-	updateCell(row, 1);
+	update();
     }
 }
 
@@ -617,7 +599,7 @@ void SourceWindow::collapseRow(int row)
 void SourceWindow::activeLine(int& line, DbgAddr& address)
 {
     int row, col;
-    cursorPosition(&row, &col);
+    getCursorPosition(&row, &col);
 
     int sourceRow;
     line = rowToLine(row, &sourceRow);
@@ -683,6 +665,16 @@ void SourceWindow::actionCollapseRow(int row)
     }
 
     collapseRow(row);
+}
+
+void SourceWindow::setTabWidth(int numChars)
+{
+    if (numChars <= 0)
+	numChars = 8;
+    QFontMetrics fm(currentFont());
+    QString s;
+    int w = fm.width(s.fill('x', numChars));
+    setTabStopWidth(w);
 }
 
 
