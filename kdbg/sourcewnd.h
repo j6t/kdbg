@@ -71,8 +71,10 @@ signals:
     void disassemble(const QString&, int);
     void expanded(int lineNo);		/* source lineNo has been expanded */
     void collapsed(int lineNo);		/* source lineNo has been collapsed */
+    void lineChanged();
 public slots:
     void setTabWidth(int numChars);
+    void cursorChanged(int row);
 
 protected:
     QString m_fileName;
@@ -101,6 +103,7 @@ protected:
     QPixmap m_brktmp;			/* temporary breakpoint marker */
     QPixmap m_brkcond;			/* conditional breakpoint marker */
     QPixmap m_brkorph;			/* orphaned breakpoint marker */
+    int m_curRow;			//!< The highlighted row
     int m_widthItems;			//!< The width of the item column
     int m_widthPlus;			//!< The width of the expander column
 };

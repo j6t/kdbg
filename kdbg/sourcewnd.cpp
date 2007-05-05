@@ -22,6 +22,7 @@
 SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* name) :
 	QTextEdit(parent, name),
 	m_fileName(fileName),
+	m_curRow(-1),
 	m_widthItems(16),
 	m_widthPlus(12)
 {
@@ -41,6 +42,7 @@ SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* na
     setWordWrap(NoWrap);
     connect(verticalScrollBar(), SIGNAL(valueChanged(int)),
 	    this, SLOT(update()));
+    connect(this, SIGNAL(cursorPositionChanged(int,int)), this, SLOT(cursorChanged(int)));
 }
 
 SourceWindow::~SourceWindow()
@@ -361,14 +363,12 @@ void SourceWindow::mousePressEvent(QMouseEvent* ev)
 
 void SourceWindow::keyPressEvent(QKeyEvent* ev)
 {
-    int para, idx;
-    getCursorPosition(&para, &idx);
     switch (ev->key()) {
     case Key_Plus:
-	actionExpandRow(para);
+	actionExpandRow(m_curRow);
 	return;
     case Key_Minus:
-	actionCollapseRow(para);
+	actionCollapseRow(m_curRow);
 	return;
     }
 
@@ -564,6 +564,12 @@ void SourceWindow::expandRow(int row)
     // remove PC (must be set again in slot of signal expanded())
     m_lineItems[row] &= ~(liPC|liPCup);
 
+    // adjust current row
+    if (m_curRow > row) {
+	m_curRow += disass.size();
+	// highlight is moved automatically
+    }
+
     // insert new lines
     ++row;
     m_rowToLine.insert(m_rowToLine.begin()+row, disass.size(), line);
@@ -587,6 +593,12 @@ void SourceWindow::collapseRow(int row)
 	end++;
     }
     ++row;
+    // adjust current row
+    if (m_curRow >= row) {
+	m_curRow -= end-row;
+	if (m_curRow < row)	// was m_curRow in disassembled code?
+	    m_curRow = -1;
+    }
     m_rowToLine.erase(m_rowToLine.begin()+row, m_rowToLine.begin()+end);
     m_lineItems.erase(m_lineItems.begin()+row, m_lineItems.begin()+end);
     while (--end >= row)
@@ -598,8 +610,7 @@ void SourceWindow::collapseRow(int row)
 
 void SourceWindow::activeLine(int& line, DbgAddr& address)
 {
-    int row, col;
-    getCursorPosition(&row, &col);
+    int row = m_curRow;
 
     int sourceRow;
     line = rowToLine(row, &sourceRow);
@@ -640,10 +651,8 @@ int SourceWindow::SourceLine::findAddressRowOffset(const DbgAddr& address) const
 
 void SourceWindow::actionExpandRow(int row)
 {
-    if (isRowExpanded(row) || isRowDisassCode(row)) {
-	// do nothing
+    if (row < 0 || isRowExpanded(row) || isRowDisassCode(row))
 	return;
-    }
 
     // disassemble
     int line = rowToLine(row);
@@ -659,10 +668,8 @@ void SourceWindow::actionExpandRow(int row)
 
 void SourceWindow::actionCollapseRow(int row)
 {
-    if (!isRowExpanded(row) || isRowDisassCode(row)) {
-	// do nothing
+    if (row < 0 || !isRowExpanded(row) || isRowDisassCode(row))
 	return;
-    }
 
     collapseRow(row);
 }
@@ -675,6 +682,19 @@ void SourceWindow::setTabWidth(int numChars)
     QString s;
     int w = fm.width(s.fill('x', numChars));
     setTabStopWidth(w);
+}
+
+void SourceWindow::cursorChanged(int row)
+{
+    if (row == m_curRow)
+	return;
+
+    if (m_curRow >= 0 && m_curRow < paragraphs())
+	clearParagraphBackground(m_curRow);
+    m_curRow = row;
+    setParagraphBackgroundColor(row, colorGroup().background());
+
+    emit lineChanged();
 }
 
 
