@@ -363,6 +363,8 @@ void SourceWindow::mousePressEvent(QMouseEvent* ev)
 
 void SourceWindow::keyPressEvent(QKeyEvent* ev)
 {
+    int top1, top2;
+    QPoint top;
     switch (ev->key()) {
     case Key_Plus:
 	actionExpandRow(m_curRow);
@@ -370,9 +372,37 @@ void SourceWindow::keyPressEvent(QKeyEvent* ev)
     case Key_Minus:
 	actionCollapseRow(m_curRow);
 	return;
+    case Key_Up:
+	if (m_curRow > 0) {
+	    setCursorPosition(m_curRow-1, 0);
+	}
+	return;
+    case Key_Down:
+	if (m_curRow < paragraphs()-1) {
+	    setCursorPosition(m_curRow+1, 0);
+	}
+	return;
+    case Key_Home:
+	setCursorPosition(0, 0);
+	return;
+    case Key_End:
+	setCursorPosition(paragraphs()-1, 0);
+	return;
+    case Key_Next:
+    case Key_Prior:
+	top = viewportToContents(QPoint(0,0));
+	top1 = paragraphAt(top);
     }
 
     QTextEdit::keyPressEvent(ev);
+
+    switch (ev->key()) {
+    case Key_Next:
+    case Key_Prior:
+	top = viewportToContents(QPoint(0,0));
+	top2 = paragraphAt(top);
+	setCursorPosition(m_curRow+(top2-top1), 0);
+    }
 }
 
 static inline bool isident(QChar c)
