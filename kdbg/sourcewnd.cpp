@@ -10,9 +10,11 @@
 #include <qbrush.h>
 #include <qfile.h>
 #include <qkeycode.h>
+#include <qpopupmenu.h>
 #include <kapp.h>
 #include <kiconloader.h>
 #include <kglobalsettings.h>
+#include <kmainwindow.h>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -43,6 +45,7 @@ SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* na
     connect(verticalScrollBar(), SIGNAL(valueChanged(int)),
 	    this, SLOT(update()));
     connect(this, SIGNAL(cursorPositionChanged(int,int)), this, SLOT(cursorChanged(int)));
+    viewport()->installEventFilter(this);
 }
 
 SourceWindow::~SourceWindow()
@@ -727,5 +730,33 @@ void SourceWindow::cursorChanged(int row)
     emit lineChanged();
 }
 
+/*
+ * We must override the context menu handling because QTextEdit's handling
+ * requires that it receives ownership of the popup menu; but the popup menu
+ * returned from the GUI factory is owned by the factory.
+ */
+
+void SourceWindow::contextMenuEvent(QContextMenuEvent* e)
+{
+    // get the context menu from the GUI factory
+    QWidget* top = this;
+    do
+	top = top->parentWidget();
+    while (!top->isTopLevel());
+    KMainWindow* mw = static_cast<KMainWindow*>(top);
+    QPopupMenu* m =
+	static_cast<QPopupMenu*>(mw->factory()->container("popup_files", mw));
+    m->exec(e->globalPos());
+}
+
+bool SourceWindow::eventFilter(QObject* watched, QEvent* e)
+{
+    if (e->type() == QEvent::ContextMenu && watched == viewport())
+    {
+	contextMenuEvent(static_cast<QContextMenuEvent*>(e));
+	return true;
+    }
+    return QTextEdit::eventFilter(watched, e);
+}
 
 #include "sourcewnd.moc"

@@ -52,6 +52,8 @@ public:
 
 protected:
     virtual void drawFrame(QPainter* p);
+    virtual bool eventFilter(QObject* watched, QEvent* e);
+    virtual void contextMenuEvent(QContextMenuEvent* e);
     virtual void mousePressEvent(QMouseEvent* ev);
     virtual void keyPressEvent(QKeyEvent* ev);
     virtual void paletteChange(const QPalette&);
