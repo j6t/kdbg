@@ -84,6 +84,7 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 
     connect(m_watches, SIGNAL(addWatch()), SLOT(slotAddWatch()));
     connect(m_watches, SIGNAL(deleteWatch()), m_debugger, SLOT(slotDeleteWatch()));
+    connect(m_watches, SIGNAL(textDropped(const QString&)), SLOT(slotAddWatch(const QString&)));
 
     KAction* windowMenu = actionCollection()->action("window");
     m_filesWindow->setWindowMenu(static_cast<KActionMenu*>(windowMenu)->popupMenu());
@@ -525,6 +526,13 @@ void DebuggerMainWnd::slotAddWatch()
     if (m_debugger != 0) {
 	QString t = m_watches->watchText();
 	m_debugger->addWatch(t);
+    }
+}
+
+void DebuggerMainWnd::slotAddWatch(const QString& text)
+{
+    if (m_debugger != 0) {
+	m_debugger->addWatch(text);
     }
 }
 

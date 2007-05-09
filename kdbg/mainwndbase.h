@@ -42,10 +42,13 @@ protected:
     QHBoxLayout m_watchH;
 
     virtual bool eventFilter(QObject* ob, QEvent* ev);
+    virtual void dragEnterEvent(QDragEnterEvent* event);
+    virtual void dropEvent(QDropEvent* event);
 
 signals:
     void addWatch();
     void deleteWatch();
+    void textDropped(const QString& text);
 
 protected slots:
     void slotWatchHighlighted();

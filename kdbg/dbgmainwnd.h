@@ -87,6 +87,7 @@ public slots:
     void slotFileChanged();
     void slotLineChanged();
     void slotAddWatch();
+    void slotAddWatch(const QString& text);
     void slotNewFileLoaded();
     void slotNewStatusMsg();
     void slotDebuggerStarting();

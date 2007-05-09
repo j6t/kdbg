@@ -11,6 +11,7 @@
 #include <kfiledialog.h>
 #include <qtabdialog.h>
 #include <qfile.h>
+#include <qdragobject.h>
 #include "mainwndbase.h"
 #include "debugger.h"
 #include "gdbdriver.h"
@@ -61,6 +62,7 @@ WatchWindow::WatchWindow(QWidget* parent, const char* name, WFlags f) :
 	    SLOT(slotWatchHighlighted()));
 
     m_watchVariables.installEventFilter(this);
+    setAcceptDrops(true);
 }
 
 WatchWindow::~WatchWindow()
@@ -78,6 +80,27 @@ bool WatchWindow::eventFilter(QObject*, QEvent* ev)
 	}
     }
     return false;
+}
+
+void WatchWindow::dragEnterEvent(QDragEnterEvent* event)
+{
+    event->accept(QTextDrag::canDecode(event));
+}
+
+void WatchWindow::dropEvent(QDropEvent* event)
+{
+    QString text;
+    if (QTextDrag::decode(event, text))
+    {
+	// pick only the first line
+	text = text.stripWhiteSpace();
+	int pos = text.find('\n');
+	if (pos > 0)
+	    text.truncate(pos);
+	text = text.stripWhiteSpace();
+	if (!text.isEmpty())
+	    emit textDropped(text);
+    }
 }
 
 
