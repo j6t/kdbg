@@ -69,7 +69,6 @@ protected:
 signals:
     void clickedLeft(const QString&, int, const DbgAddr& address, bool);
     void clickedMid(const QString&, int, const DbgAddr& address);
-    void clickedRight(const QPoint &);
     void disassemble(const QString&, int);
     void expanded(int lineNo);		/* source lineNo has been expanded */
     void collapsed(int lineNo);		/* source lineNo has been collapsed */

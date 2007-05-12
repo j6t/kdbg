@@ -316,10 +316,10 @@ void SourceWindow::find(const QString& text, bool caseSensitive, FindDirection d
 
 void SourceWindow::mousePressEvent(QMouseEvent* ev)
 {
-    // Check if right button was clicked.
-    if (ev->button() == RightButton)
+    // we handle left and middle button
+    if (ev->button() != LeftButton && ev->button() != MidButton)
     {
-	emit clickedRight(ev->pos());
+	QTextEdit::mousePressEvent(ev);
 	return;
     }
 

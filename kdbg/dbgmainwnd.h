@@ -113,9 +113,6 @@ public slots:
     void slotExecArgs();
     void intoBackground();
     void slotConfigureKeys();
-
-    void slotFileWndMenu(const QPoint& pos);
-    void slotFileWndEmptyMenu(const QPoint& pos);
 };
 
 #endif // DBGMAINWND_H

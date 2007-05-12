@@ -118,15 +118,6 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     // tab width
     connect(this, SIGNAL(setTabWidth(int)), m_filesWindow, SIGNAL(setTabWidth(int)));
 
-    // Establish communication when right clicked on file window.
-    connect(m_filesWindow, SIGNAL(filesRightClick(const QPoint &)),
-	    SLOT(slotFileWndMenu(const QPoint &)));
-
-    // Connection when right clicked on file window before any file is
-    // loaded.
-    connect(m_filesWindow, SIGNAL(clickedRight(const QPoint &)),
-	    SLOT(slotFileWndEmptyMenu(const QPoint &)));
-
     // file/line updates
     connect(m_filesWindow, SIGNAL(fileChanged()), SLOT(slotFileChanged()));
     connect(m_filesWindow, SIGNAL(lineChanged()), SLOT(slotLineChanged()));
@@ -823,40 +814,6 @@ void DebuggerMainWnd::slotEditValue()
 	// determine the text to edit
 	QString text = m_debugger->driver()->editableValue(expr);
 	wnd->editValue(expr, text);
-    }
-}
-
-// Pop up the context menu of the files window (for loaded files)
-void DebuggerMainWnd::slotFileWndMenu(const QPoint& pos)
-{
-    QPopupMenu* popup =
-	static_cast<QPopupMenu*>(factory()->container("popup_files", this));
-    if (popup == 0) {
-        return;
-    }
-    if (popup->isVisible()) {
-	popup->hide();
-    } else {
-	// pos is still in widget coordinates of the sender
-	const QWidget* w = static_cast<const QWidget*>(sender());
-	popup->popup(w->mapToGlobal(pos));
-    }
-}
-
-// Pop up the context menu of the files window (while no file is loaded)
-void DebuggerMainWnd::slotFileWndEmptyMenu(const QPoint& pos)
-{
-    QPopupMenu* popup =
-	static_cast<QPopupMenu*>(factory()->container("popup_files_empty", this));
-    if (popup == 0) {
-        return;
-    }
-    if (popup->isVisible()) {
-        popup->hide();
-    } else {
-	// pos is still in widget coordinates of the sender
-	const QWidget* w = static_cast<const QWidget*>(sender());
-	popup->popup(w->mapToGlobal(pos));
     }
 }
 
