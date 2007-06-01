@@ -46,10 +46,17 @@ SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* na
 	    this, SLOT(update()));
     connect(this, SIGNAL(cursorPositionChanged(int,int)), this, SLOT(cursorChanged(int)));
     viewport()->installEventFilter(this);
+
+    // add a syntax highlighter
+    if (QRegExp("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h)?|HH?)$").search(m_fileName))
+    {
+	new HighlightCpp(this);
+    }
 }
 
 SourceWindow::~SourceWindow()
 {
+    delete syntaxHighlighter();
 }
 
 bool SourceWindow::loadFile()
@@ -583,7 +590,7 @@ bool SourceWindow::isRowExpanded(int row)
 
 bool SourceWindow::isRowDisassCode(int row)
 {
-    return row > 0 &&
+    return row > 0 && row < int(m_rowToLine.size()) &&
 	m_rowToLine[row] == m_rowToLine[row-1];
 }
 
@@ -605,9 +612,9 @@ void SourceWindow::expandRow(int row)
 
     // insert new lines
     ++row;
-    m_rowToLine.insert(m_rowToLine.begin()+row, disass.size(), line);
-    m_lineItems.insert(m_lineItems.begin()+row, disass.size(), 0);
     for (size_t i = 0; i < disass.size(); i++) {
+	m_rowToLine.insert(m_rowToLine.begin()+row, line);
+	m_lineItems.insert(m_lineItems.begin()+row, 0);
 	insertParagraph(disass[i], row++);
     }
     update();		// line items
@@ -632,10 +639,11 @@ void SourceWindow::collapseRow(int row)
 	if (m_curRow < row)	// was m_curRow in disassembled code?
 	    m_curRow = -1;
     }
-    m_rowToLine.erase(m_rowToLine.begin()+row, m_rowToLine.begin()+end);
-    m_lineItems.erase(m_lineItems.begin()+row, m_lineItems.begin()+end);
-    while (--end >= row)
+    while (--end >= row) {
+	m_rowToLine.erase(m_rowToLine.begin()+end);
+	m_lineItems.erase(m_lineItems.begin()+end);
 	removeParagraph(end);
+    }
     update();		// line items
 
     emit collapsed(line);
@@ -757,6 +765,25 @@ bool SourceWindow::eventFilter(QObject* watched, QEvent* e)
 	return true;
     }
     return QTextEdit::eventFilter(watched, e);
+}
+
+HighlightCpp::HighlightCpp(SourceWindow* srcWnd) :
+	QSyntaxHighlighter(srcWnd),
+	m_srcWnd(srcWnd)
+{
+}
+
+int HighlightCpp::highlightParagraph(const QString& text, int endStateOfLastPara)
+{
+    int row = currentParagraph();
+    // highlight assembly lines
+    if (m_srcWnd->isRowDisassCode(row))
+    {
+	setFormat(0, text.length(), blue);
+	return endStateOfLastPara;
+    }
+    setFormat(0, text.length(), m_srcWnd->colorGroup().text());
+    return 0;
 }
 
 #include "sourcewnd.moc"

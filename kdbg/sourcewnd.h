@@ -8,6 +8,7 @@
 
 #include <qpixmap.h>
 #include <qtextedit.h>
+#include <qsyntaxhighlighter.h>
 #include <vector>
 #include "dbgdriver.h"
 
@@ -107,6 +108,15 @@ protected:
     int m_curRow;			//!< The highlighted row
     int m_widthItems;			//!< The width of the item column
     int m_widthPlus;			//!< The width of the expander column
+};
+
+class HighlightCpp : public QSyntaxHighlighter
+{
+    SourceWindow* m_srcWnd;
+
+public:
+    HighlightCpp(SourceWindow* srcWnd);
+    virtual int highlightParagraph(const QString& text, int endStateOfLastPara);
 };
 
 #endif // SOURCEWND_H
