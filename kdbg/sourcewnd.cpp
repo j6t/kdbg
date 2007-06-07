@@ -775,7 +775,8 @@ HighlightCpp::HighlightCpp(SourceWindow* srcWnd) :
 
 enum HLState {
     hlCommentLine = 1,
-    hlCommentBlock
+    hlCommentBlock,
+    hlString
 };
 
 int HighlightCpp::highlightParagraph(const QString& text, int state)
@@ -809,6 +810,19 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
 		end = text.length();
 	    setFormat(start, end-start, QColor("gray50"));
 	    break;
+	case hlString:
+	    for (end = start+1; end < int(text.length()); end++) {
+		if (text[end] == '\\') {
+		    if (end < int(text.length()))
+			++end;
+		} else if (text[end] == text[start]) {
+		    ++end;
+		    break;
+		}
+	    }
+	    state = 0;
+	    setFormat(start, end-start, QColor("dark red"));
+	    break;
 	default:
 	    for (end = start; end < int(text.length()); end++)
 	    {
@@ -823,6 +837,11 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
 			    break;
 			}
 		    }
+		}
+		else if (text[end] == '"' || text[end] == '\'')
+		{
+		    state = hlString;
+		    break;
 		}
 	    }
 	    setFormat(start, end-start, m_srcWnd->colorGroup().text());
