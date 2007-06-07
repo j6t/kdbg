@@ -15,6 +15,7 @@
 #include <kiconloader.h>
 #include <kglobalsettings.h>
 #include <kmainwindow.h>
+#include <algorithm>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -776,7 +777,86 @@ HighlightCpp::HighlightCpp(SourceWindow* srcWnd) :
 enum HLState {
     hlCommentLine = 1,
     hlCommentBlock,
+    hlIdent,
     hlString
+};
+
+static const QString ckw[] =
+{
+    "and",
+    "and_eq",
+    "asm",
+    "auto",
+    "bitand",
+    "bitor",
+    "bool",
+    "break",
+    "case",
+    "catch",
+    "char",
+    "class",
+    "compl",
+    "const",
+    "const_cast",
+    "continue",
+    "default",
+    "delete",
+    "do",
+    "double",
+    "dynamic_cast",
+    "else",
+    "enum",
+    "explicit",
+    "export",
+    "extern",
+    "false",
+    "float",
+    "for",
+    "friend",
+    "goto",
+    "if",
+    "inline",
+    "int",
+    "long",
+    "mutable",
+    "namespace",
+    "new",
+    "not",
+    "not_eq",
+    "operator",
+    "or",
+    "or_eq",
+    "private",
+    "protected",
+    "public",
+    "reinterpret_cast",
+    "register",
+    "return",
+    "short",
+    "signed",
+    "sizeof",
+    "static",
+    "static_cast",
+    "struct",
+    "switch",
+    "template",
+    "this",
+    "throw",
+    "true",
+    "try",
+    "typedef",
+    "typeid",
+    "typename",
+    "using",
+    "union",
+    "unsigned",
+    "virtual",
+    "void",
+    "volatile",
+    "wchar_t",
+    "while",
+    "xor",
+    "xor_eq"
 };
 
 int HighlightCpp::highlightParagraph(const QString& text, int state)
@@ -798,6 +878,10 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
 	setFormat(0, text.length(), QColor("dark green"));
 	return 0;
     }
+
+    // a font for keywords
+    QFont identFont = textEdit()->currentFont();
+    identFont.setBold(!identFont.bold());
 
     unsigned start = 0;
     while (start < text.length())
@@ -830,6 +914,20 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
 	    state = 0;
 	    setFormat(start, end-start, QColor("dark red"));
 	    break;
+	case hlIdent:
+	    for (end = start+1; end < int(text.length()); end++) {
+		if (!text[end].isLetterOrNumber() && text[end] != '_')
+		    break;
+	    }
+	    state = 0;
+	    if (std::binary_search(ckw, ckw + sizeof(ckw)/sizeof(ckw[0]),
+			text.mid(start, end-start)))
+	    {
+		setFormat(start, end-start, identFont);
+	    } else {
+		setFormat(start, end-start, m_srcWnd->colorGroup().text());
+	    }
+	    break;
 	default:
 	    for (end = start; end < int(text.length()); end++)
 	    {
@@ -848,6 +946,13 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
 		else if (text[end] == '"' || text[end] == '\'')
 		{
 		    state = hlString;
+		    break;
+		}
+		else if (text[end] >= 'A' && text[end] <= 'Z' ||
+			 text[end] >= 'a' && text[end] <= 'z' ||
+			 text[end] == '_')
+		{
+		    state = hlIdent;
 		    break;
 		}
 	    }
