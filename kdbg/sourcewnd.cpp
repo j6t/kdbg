@@ -773,17 +773,63 @@ HighlightCpp::HighlightCpp(SourceWindow* srcWnd) :
 {
 }
 
-int HighlightCpp::highlightParagraph(const QString& text, int endStateOfLastPara)
+enum HLState {
+    hlCommentLine = 1,
+    hlCommentBlock
+};
+
+int HighlightCpp::highlightParagraph(const QString& text, int state)
 {
     int row = currentParagraph();
     // highlight assembly lines
     if (m_srcWnd->isRowDisassCode(row))
     {
 	setFormat(0, text.length(), blue);
-	return endStateOfLastPara;
+	return state;
     }
-    setFormat(0, text.length(), m_srcWnd->colorGroup().text());
-    return 0;
+
+    if (state == -2)		// initial state
+	state = 0;
+
+    unsigned start = 0;
+    while (start < text.length())
+    {
+	int end;
+	switch (state) {
+	case hlCommentLine:
+	    end = text.length();
+	    state = 0;
+	    setFormat(start, end-start, QColor("gray50"));
+	    break;
+	case hlCommentBlock:
+	    end = text.find("*/", start);
+	    if (end >= 0)
+		end += 2, state = 0;
+	    else
+		end = text.length();
+	    setFormat(start, end-start, QColor("gray50"));
+	    break;
+	default:
+	    for (end = start; end < int(text.length()); end++)
+	    {
+		if (text[end] == '/')
+		{
+		    if (end+1 < int(text.length())) {
+			if (text[end+1] == '/') {
+			    state = hlCommentLine;
+			    break;
+			} else if (text[end+1] == '*') {
+			    state = hlCommentBlock;
+			    break;
+			}
+		    }
+		}
+	    }
+	    setFormat(start, end-start, m_srcWnd->colorGroup().text());
+	}
+	start = end;
+    }
+    return state;
 }
 
 #include "sourcewnd.moc"

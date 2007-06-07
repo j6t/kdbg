@@ -116,7 +116,7 @@ class HighlightCpp : public QSyntaxHighlighter
 
 public:
     HighlightCpp(SourceWindow* srcWnd);
-    virtual int highlightParagraph(const QString& text, int endStateOfLastPara);
+    virtual int highlightParagraph(const QString& text, int state);
 };
 
 #endif // SOURCEWND_H
