@@ -792,6 +792,13 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
     if (state == -2)		// initial state
 	state = 0;
 
+    // check for preprocessor line
+    if (state == 0 && text.stripWhiteSpace().startsWith("#"))
+    {
+	setFormat(0, text.length(), QColor("dark green"));
+	return 0;
+    }
+
     unsigned start = 0;
     while (start < text.length())
     {
