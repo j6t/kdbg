@@ -15,6 +15,7 @@
 #include <kiconloader.h>
 #include <kglobalsettings.h>
 #include <kmainwindow.h>
+#include <algorithm>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -46,10 +47,17 @@ SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* na
 	    this, SLOT(update()));
     connect(this, SIGNAL(cursorPositionChanged(int,int)), this, SLOT(cursorChanged(int)));
     viewport()->installEventFilter(this);
+
+    // add a syntax highlighter
+    if (QRegExp("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h)?|HH?)$").search(m_fileName))
+    {
+	new HighlightCpp(this);
+    }
 }
 
 SourceWindow::~SourceWindow()
 {
+    delete syntaxHighlighter();
 }
 
 bool SourceWindow::loadFile()
@@ -316,10 +324,10 @@ void SourceWindow::find(const QString& text, bool caseSensitive, FindDirection d
 
 void SourceWindow::mousePressEvent(QMouseEvent* ev)
 {
-    // Check if right button was clicked.
-    if (ev->button() == RightButton)
+    // we handle left and middle button
+    if (ev->button() != LeftButton && ev->button() != MidButton)
     {
-	emit clickedRight(ev->pos());
+	QTextEdit::mousePressEvent(ev);
 	return;
     }
 
@@ -583,7 +591,7 @@ bool SourceWindow::isRowExpanded(int row)
 
 bool SourceWindow::isRowDisassCode(int row)
 {
-    return row > 0 &&
+    return row > 0 && row < int(m_rowToLine.size()) &&
 	m_rowToLine[row] == m_rowToLine[row-1];
 }
 
@@ -605,9 +613,9 @@ void SourceWindow::expandRow(int row)
 
     // insert new lines
     ++row;
-    m_rowToLine.insert(m_rowToLine.begin()+row, disass.size(), line);
-    m_lineItems.insert(m_lineItems.begin()+row, disass.size(), 0);
     for (size_t i = 0; i < disass.size(); i++) {
+	m_rowToLine.insert(m_rowToLine.begin()+row, line);
+	m_lineItems.insert(m_lineItems.begin()+row, 0);
 	insertParagraph(disass[i], row++);
     }
     update();		// line items
@@ -632,10 +640,11 @@ void SourceWindow::collapseRow(int row)
 	if (m_curRow < row)	// was m_curRow in disassembled code?
 	    m_curRow = -1;
     }
-    m_rowToLine.erase(m_rowToLine.begin()+row, m_rowToLine.begin()+end);
-    m_lineItems.erase(m_lineItems.begin()+row, m_lineItems.begin()+end);
-    while (--end >= row)
+    while (--end >= row) {
+	m_rowToLine.erase(m_rowToLine.begin()+end);
+	m_lineItems.erase(m_lineItems.begin()+end);
 	removeParagraph(end);
+    }
     update();		// line items
 
     emit collapsed(line);
@@ -757,6 +766,201 @@ bool SourceWindow::eventFilter(QObject* watched, QEvent* e)
 	return true;
     }
     return QTextEdit::eventFilter(watched, e);
+}
+
+HighlightCpp::HighlightCpp(SourceWindow* srcWnd) :
+	QSyntaxHighlighter(srcWnd),
+	m_srcWnd(srcWnd)
+{
+}
+
+enum HLState {
+    hlCommentLine = 1,
+    hlCommentBlock,
+    hlIdent,
+    hlString
+};
+
+static const QString ckw[] =
+{
+    "and",
+    "and_eq",
+    "asm",
+    "auto",
+    "bitand",
+    "bitor",
+    "bool",
+    "break",
+    "case",
+    "catch",
+    "char",
+    "class",
+    "compl",
+    "const",
+    "const_cast",
+    "continue",
+    "default",
+    "delete",
+    "do",
+    "double",
+    "dynamic_cast",
+    "else",
+    "enum",
+    "explicit",
+    "export",
+    "extern",
+    "false",
+    "float",
+    "for",
+    "friend",
+    "goto",
+    "if",
+    "inline",
+    "int",
+    "long",
+    "mutable",
+    "namespace",
+    "new",
+    "not",
+    "not_eq",
+    "operator",
+    "or",
+    "or_eq",
+    "private",
+    "protected",
+    "public",
+    "reinterpret_cast",
+    "register",
+    "return",
+    "short",
+    "signed",
+    "sizeof",
+    "static",
+    "static_cast",
+    "struct",
+    "switch",
+    "template",
+    "this",
+    "throw",
+    "true",
+    "try",
+    "typedef",
+    "typeid",
+    "typename",
+    "using",
+    "union",
+    "unsigned",
+    "virtual",
+    "void",
+    "volatile",
+    "wchar_t",
+    "while",
+    "xor",
+    "xor_eq"
+};
+
+int HighlightCpp::highlightParagraph(const QString& text, int state)
+{
+    int row = currentParagraph();
+    // highlight assembly lines
+    if (m_srcWnd->isRowDisassCode(row))
+    {
+	setFormat(0, text.length(), blue);
+	return state;
+    }
+
+    if (state == -2)		// initial state
+	state = 0;
+
+    // check for preprocessor line
+    if (state == 0 && text.stripWhiteSpace().startsWith("#"))
+    {
+	setFormat(0, text.length(), QColor("dark green"));
+	return 0;
+    }
+
+    // a font for keywords
+    QFont identFont = textEdit()->currentFont();
+    identFont.setBold(!identFont.bold());
+
+    unsigned start = 0;
+    while (start < text.length())
+    {
+	int end;
+	switch (state) {
+	case hlCommentLine:
+	    end = text.length();
+	    state = 0;
+	    setFormat(start, end-start, QColor("gray50"));
+	    break;
+	case hlCommentBlock:
+	    end = text.find("*/", start);
+	    if (end >= 0)
+		end += 2, state = 0;
+	    else
+		end = text.length();
+	    setFormat(start, end-start, QColor("gray50"));
+	    break;
+	case hlString:
+	    for (end = start+1; end < int(text.length()); end++) {
+		if (text[end] == '\\') {
+		    if (end < int(text.length()))
+			++end;
+		} else if (text[end] == text[start]) {
+		    ++end;
+		    break;
+		}
+	    }
+	    state = 0;
+	    setFormat(start, end-start, QColor("dark red"));
+	    break;
+	case hlIdent:
+	    for (end = start+1; end < int(text.length()); end++) {
+		if (!text[end].isLetterOrNumber() && text[end] != '_')
+		    break;
+	    }
+	    state = 0;
+	    if (std::binary_search(ckw, ckw + sizeof(ckw)/sizeof(ckw[0]),
+			text.mid(start, end-start)))
+	    {
+		setFormat(start, end-start, identFont);
+	    } else {
+		setFormat(start, end-start, m_srcWnd->colorGroup().text());
+	    }
+	    break;
+	default:
+	    for (end = start; end < int(text.length()); end++)
+	    {
+		if (text[end] == '/')
+		{
+		    if (end+1 < int(text.length())) {
+			if (text[end+1] == '/') {
+			    state = hlCommentLine;
+			    break;
+			} else if (text[end+1] == '*') {
+			    state = hlCommentBlock;
+			    break;
+			}
+		    }
+		}
+		else if (text[end] == '"' || text[end] == '\'')
+		{
+		    state = hlString;
+		    break;
+		}
+		else if (text[end] >= 'A' && text[end] <= 'Z' ||
+			 text[end] >= 'a' && text[end] <= 'z' ||
+			 text[end] == '_')
+		{
+		    state = hlIdent;
+		    break;
+		}
+	    }
+	    setFormat(start, end-start, m_srcWnd->colorGroup().text());
+	}
+	start = end;
+    }
+    return state;
 }
 
 #include "sourcewnd.moc"

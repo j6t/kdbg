@@ -9,6 +9,7 @@
 #include <qfileinfo.h>
 #include <qlistbox.h>
 #include <kapp.h>
+#include <kmainwindow.h>
 #include <klocale.h>			/* i18n */
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -49,15 +50,17 @@ void WinStack::setWindowMenu(QPopupMenu* menu)
     connect(menu, SIGNAL(activated(int)), this, SLOT(selectWindow(int)));
 }
 
-void WinStack::mousePressEvent(QMouseEvent* mouseEvent)
+void WinStack::contextMenuEvent(QContextMenuEvent* e)
 {
-    // Check if right button was clicked.
-    if (mouseEvent->button() == RightButton)
-    {
-	emit clickedRight(mouseEvent->pos());
-    } else {
-	QWidget::mousePressEvent(mouseEvent);
-    }
+    // get the context menu from the GUI factory
+    QWidget* top = this;
+    do
+	top = top->parentWidget();
+    while (!top->isTopLevel());
+    KMainWindow* mw = static_cast<KMainWindow*>(top);
+    QPopupMenu* m =
+	static_cast<QPopupMenu*>(mw->factory()->container("popup_files_empty", mw));
+    m->exec(e->globalPos());
 }
 
 
@@ -127,10 +130,6 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 		SIGNAL(toggleBreak(const QString&,int,const DbgAddr&,bool)));
 	connect(fw, SIGNAL(clickedMid(const QString&,int,const DbgAddr&)),
 		SIGNAL(enadisBreak(const QString&,int,const DbgAddr&)));
-
-	// Comunication when right button is clicked.
-	connect(fw, SIGNAL(clickedRight(const QPoint &)),
-		SIGNAL(filesRightClick(const QPoint &)));
 
 	// disassemble code
 	connect(fw, SIGNAL(disassemble(const QString&, int)),

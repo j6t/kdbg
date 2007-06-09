@@ -96,8 +96,6 @@ signals:
     void lineChanged();
     void toggleBreak(const QString&, int, const DbgAddr&, bool);
     void enadisBreak(const QString&, int, const DbgAddr&);
-    void clickedRight(const QPoint&);
-    void filesRightClick(const QPoint&);
     void newFileLoaded();
     void initiateValuePopup(const QString&);
     void disassemble(const QString&, int);
@@ -135,7 +133,7 @@ protected:
     bool activatePath(QString pathname, int lineNo, const DbgAddr& address);
     virtual bool activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& address);	/* -1 doesnt change line */
     virtual void changeWindowMenu();
-    virtual void mousePressEvent(QMouseEvent*);
+    virtual void contextMenuEvent(QContextMenuEvent* e);
     void setPC(bool set, const QString& fileName, int lineNo,
 	       const DbgAddr& address, int frameNo);
     ValArray<SourceWindow*> m_fileList;

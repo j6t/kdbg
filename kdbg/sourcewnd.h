@@ -8,6 +8,7 @@
 
 #include <qpixmap.h>
 #include <qtextedit.h>
+#include <qsyntaxhighlighter.h>
 #include <vector>
 #include "dbgdriver.h"
 
@@ -69,7 +70,6 @@ protected:
 signals:
     void clickedLeft(const QString&, int, const DbgAddr& address, bool);
     void clickedMid(const QString&, int, const DbgAddr& address);
-    void clickedRight(const QPoint &);
     void disassemble(const QString&, int);
     void expanded(int lineNo);		/* source lineNo has been expanded */
     void collapsed(int lineNo);		/* source lineNo has been collapsed */
@@ -108,6 +108,15 @@ protected:
     int m_curRow;			//!< The highlighted row
     int m_widthItems;			//!< The width of the item column
     int m_widthPlus;			//!< The width of the expander column
+};
+
+class HighlightCpp : public QSyntaxHighlighter
+{
+    SourceWindow* m_srcWnd;
+
+public:
+    HighlightCpp(SourceWindow* srcWnd);
+    virtual int highlightParagraph(const QString& text, int state);
 };
 
 #endif // SOURCEWND_H
