@@ -1,13 +1,8 @@
-1. When, during single-stepping, the last displayed line is hit, it is often
-   only partially visible. Move the source window up in this case.
-
 7. Show a list of files for the executable.
 
 9. Use gnuclient to show source code in emacs.
 
 10. Provide formatting options in watch window via mouse, not /FMT.
-
-12. Syntax highlighting.
 
 13. Remember which subtrees have been expanded even when function is left and
     reentered.
@@ -19,8 +14,6 @@
     names.
 
 22. Allow to change whether signals are handled or ignored.
-
-23. Deactivate "Recent Executable" when list is empty.
 
 24. Allow to view fewer or more bytes in the memory dump. Beautify the display.
 
@@ -45,9 +38,6 @@
 
 33. Clear the status bar when the program is (re-)started (because if this takes
     some time, you don't know whether KDbg does something.)
-
-34. For values in popups, check also for members, i.e. try this->foo, otherwise
-    member values never appear in popups.
 
 35. Allow to copy variable values to the clipboard.
 
