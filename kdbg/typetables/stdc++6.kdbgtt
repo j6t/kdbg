@@ -1,0 +1,7 @@
+[Type Table]
+Types1=string
+LibDisplayName=libstdc++6
+ShlibRE=libstdc\+\+\.so\.6$
+[string]
+Display={ % }
+Expr1=(%s)._M_dataplus._M_p

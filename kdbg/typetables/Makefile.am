@@ -12,6 +12,7 @@ types_DATA = \
 	glib.kdbgtt \
 	gtk+.kdbgtt \
 	stdc++.kdbgtt \
+	stdc++6.kdbgtt \
 	X11.kdbgtt
 
 EXTRA_DIST = $(types_DATA)
