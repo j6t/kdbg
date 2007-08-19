@@ -612,12 +612,15 @@ void SourceWindow::expandRow(int row)
     }
 
     // insert new lines
+    setUpdatesEnabled(false);
     ++row;
     for (size_t i = 0; i < disass.size(); i++) {
 	m_rowToLine.insert(m_rowToLine.begin()+row, line);
 	m_lineItems.insert(m_lineItems.begin()+row, 0);
 	insertParagraph(disass[i], row++);
     }
+    setUpdatesEnabled(true);
+    viewport()->update();
     update();		// line items
 
     emit expanded(line);		/* must set PC */
@@ -640,11 +643,14 @@ void SourceWindow::collapseRow(int row)
 	if (m_curRow < row)	// was m_curRow in disassembled code?
 	    m_curRow = -1;
     }
+    setUpdatesEnabled(false);
     while (--end >= row) {
 	m_rowToLine.erase(m_rowToLine.begin()+end);
 	m_lineItems.erase(m_lineItems.begin()+end);
 	removeParagraph(end);
     }
+    setUpdatesEnabled(true);
+    viewport()->update();
     update();		// line items
 
     emit collapsed(line);
