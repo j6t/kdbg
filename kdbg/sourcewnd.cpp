@@ -298,28 +298,11 @@ void SourceWindow::setPC(bool set, int lineNo, const DbgAddr& address, int frame
 void SourceWindow::find(const QString& text, bool caseSensitive, FindDirection dir)
 {
     ASSERT(dir == 1 || dir == -1);
-    if (m_sourceCode.size() == 0 || text.isEmpty())
+    if (QTextEdit::find(text, caseSensitive, false, dir > 0))
 	return;
-
-    int line;
-    DbgAddr dummyAddr;
-    activeLine(line, dummyAddr);
-    if (line < 0)
-	line = 0;
-    int curLine = line;			/* remember where we started */
-    bool found = false;
-    do {
-	// advance and wrap around
-	line += dir;
-	if (line < 0)
-	    line = m_sourceCode.size()-1;
-	else if (line >= int(m_sourceCode.size()))
-	    line = 0;
-	// search text
-	found = m_sourceCode[line].code.find(text, 0, caseSensitive) >= 0;
-    } while (!found && line != curLine);
-
-    scrollTo(line, DbgAddr());
+    // not found; wrap around
+    int para = dir > 0 ? 0 : paragraphs(), index = 0;
+    QTextEdit::find(text, caseSensitive, false, dir > 0, &para, &index);
 }
 
 void SourceWindow::mousePressEvent(QMouseEvent* ev)
