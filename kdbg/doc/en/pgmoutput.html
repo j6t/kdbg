@@ -13,9 +13,9 @@ The Program Output Window</h1>
 window captures text that is written to stdout and stderr by the program
 being debugged.</p>
 <p>The output window does not allow to type input for the program and it
-features only minimal terminal emulation: <tt>\n</tt> (line-feed) is treated
-like a carriage-return-line-feed combination, and <tt>\r</tt> (carriage-return)
-is ignored. These capabilities are usually sufficient to debug GUI programs
+features only minimal terminal emulation: <tt>\n</tt> (line-feed),
+<tt>\t</tt> (horizontal tab), and <tt>\r</tt> (carriage-return)
+are treated. These capabilities are usually sufficient to debug GUI programs
 which only write debugging output to stdout and stderr.</p>
 <p>When a program is debugged with KDbg for the first time, the program
 output window is <em>not</em> used. The reason for this is that KDbg cannot
