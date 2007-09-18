@@ -302,7 +302,11 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
 	    }
 	    // use a feasible core-file command
 	    if (m_gdbMajor > 4 || (m_gdbMajor == 4 && m_gdbMinor >= 16)) {
+#ifdef __FreeBSD__
+		cmds[DCcorefile].fmt = "target FreeBSD-core %s\n";
+#else
 		cmds[DCcorefile].fmt = "target core %s\n";
+#endif
 	    } else {
 		cmds[DCcorefile].fmt = "core-file %s\n";
 	    }
