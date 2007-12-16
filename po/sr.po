@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2005-07-10 15:01+0200\n"
+"POT-Creation-Date: 2007-12-16 22:02+0100\n"
 "PO-Revision-Date: 2002-03-03 16:14MDT\n"
 "Last-Translator: Strahinja Radić <mr99164@alas.matf.bg.ac.yu>\n"
 "Language-Team: Serbian <LL@kde.org.yu>\n"
@@ -15,6 +15,11 @@ msgstr ""
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: ENCODING\n"
 "X-Generator: KBabel 0.9.5\n"
+
+#: exprwnd.cpp:313 rc.cpp:75 regwnd.cpp:428
+#, no-c-format
+msgid "Value"
+msgstr "Vrednost"
 
 #: memwindow.cpp:55 brkpt.cpp:334
 msgid "Address"
@@ -129,15 +134,19 @@ msgstr "&Uslov:"
 msgid "Ignore &next hits:"
 msgstr "Ignoriši sledeće prolaze:"
 
-#: gdbdriver.cpp:1364
+#: gdbdriver.cpp:893
+msgid "<anonymous struct or union>"
+msgstr ""
+
+#: gdbdriver.cpp:1487
 msgid "<additional entries of the array suppressed>"
 msgstr ""
 
-#: gdbdriver.cpp:1919 xsldbgdriver.cpp:1351
+#: gdbdriver.cpp:2074 xsldbgdriver.cpp:1356
 msgid "New working directory: "
 msgstr "Novi radni direktorijum: "
 
-#: debugger.cpp:630
+#: debugger.cpp:639
 msgid ""
 "%1 exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
@@ -145,48 +154,53 @@ msgstr ""
 "%1 je neočekivano izašao.\n"
 "Ponovo pokrenite seansu (npr. sa Fajl|Program)."
 
-#: debugger.cpp:806
+#: debugger.cpp:815
 msgid ""
 "The settings for this program specify the following debugger command:\n"
 "%1\n"
 "Shall this command be used?"
 msgstr ""
 
-#: mainwndbase.cpp:42
+#: mainwndbase.cpp:43
 msgid " Add "
 msgstr " Dodaj "
 
-#: mainwndbase.cpp:43
+#: mainwndbase.cpp:44
 msgid " Del "
 msgstr " Briši "
 
-#: mainwndbase.cpp:124
+#: mainwndbase.cpp:45
+#, fuzzy
+msgid "Expression"
+msgstr "I&zvršavanje"
+
+#: mainwndbase.cpp:148
 msgid "active"
 msgstr "aktivan"
 
-#: mainwndbase.cpp:285
+#: mainwndbase.cpp:309
 msgid "Don't know how to debug language `%1'"
 msgstr ""
 
-#: mainwndbase.cpp:298
+#: mainwndbase.cpp:322
 msgid ""
 "Could not start the debugger process.\n"
 "Please shut down KDbg and resolve the problem."
 msgstr ""
 
-#: mainwndbase.cpp:403
+#: mainwndbase.cpp:427
 msgid ": Global options"
 msgstr ": Globalna podešavanja"
 
-#: mainwndbase.cpp:420 pgmsettings.cpp:114
+#: mainwndbase.cpp:444 pgmsettings.cpp:114
 msgid "&Debugger"
 msgstr ""
 
-#: mainwndbase.cpp:421
+#: mainwndbase.cpp:445
 msgid "&Miscellaneous"
 msgstr ""
 
-#: mainwndbase.cpp:490
+#: mainwndbase.cpp:514
 msgid ": Program output"
 msgstr ": Izlaz programa"
 
@@ -257,11 +271,11 @@ msgstr ""
 msgid "&Terminal for program output:"
 msgstr "&Terminal za izlaz programa:"
 
-#: procattach.cpp:230
+#: procattach.cpp:270
 msgid ": Attach to process"
 msgstr ": Zakači za proces"
 
-#: procattach.cpp:234
+#: procattach.cpp:274
 msgid "Specify the process number to attach to:"
 msgstr "Unesite broj procesa za zakačinjanje:"
 
@@ -288,280 +302,512 @@ msgstr ""
 msgid "%s: Settings for %s"
 msgstr ""
 
-#: pgmsettings.cpp:115 dbgmainwnd.cpp:230
+#: pgmsettings.cpp:115 dbgmainwnd.cpp:223
 msgid "&Output"
 msgstr ""
 
-#: winstack.cpp:239
+#: winstack.cpp:243
 msgid "&More..."
 msgstr "&Više..."
 
-#: winstack.cpp:456
+#: winstack.cpp:468
 msgid ": Open Windows"
 msgstr ": Otvoreni prozori"
 
-#: winstack.cpp:464
+#: winstack.cpp:476
 msgid "Show"
 msgstr "Prikaži"
 
-#: winstack.cpp:535
+#: winstack.cpp:547
 msgid ": Search"
 msgstr ": Pretraga"
 
-#: winstack.cpp:541
+#: winstack.cpp:553
 msgid "&Case sensitive"
 msgstr "&Razlikuj velika i mala slova"
 
-#: winstack.cpp:543
+#: winstack.cpp:555
 msgid "&Forward"
 msgstr "&Napred"
 
-#: winstack.cpp:545
+#: winstack.cpp:557
 msgid "&Backward"
 msgstr "&Nazad"
 
-#: rc.cpp:3
+#: rc.cpp:9
+#, no-c-format
 msgid "E&xecution"
 msgstr "I&zvršavanje"
 
-#: rc.cpp:4
+#: rc.cpp:12
+#, no-c-format
 msgid "&Breakpoint"
 msgstr "&Prekid"
+
+#: rc.cpp:18
+#, fuzzy, no-c-format
+msgid "Program Arguments"
+msgstr ": Argumenti programa"
+
+#: rc.cpp:21
+#, fuzzy, no-c-format
+msgid "&Arguments"
+msgstr "&Argumenti..."
+
+#: rc.cpp:24
+#, fuzzy, no-c-format
+msgid "Run <i>%1</i> with these arguments:"
+msgstr "Pokreni %1 sa sledećim argumentima:"
+
+#: rc.cpp:27
+#, no-c-format
+msgid ""
+"Specify the arguments with which the program shall be invoked for this "
+"debugging session. You specify the arguments just as you would on the "
+"command line, that is, you can even use quotes and environment variables, "
+"for example:<p><tt>--message 'start in: ' $HOME</tt>"
+msgstr ""
+
+#: rc.cpp:30
+#, no-c-format
+msgid "Insert &file name..."
+msgstr ""
+
+#: rc.cpp:33
+#, no-c-format
+msgid "Alt+F"
+msgstr ""
+
+#: rc.cpp:36
+#, no-c-format
+msgid ""
+"Browse for a file; the full path name will be inserted at the current cursor "
+"location in the edit box above."
+msgstr ""
+
+#: rc.cpp:39
+#, no-c-format
+msgid "Insert &directory name..."
+msgstr ""
+
+#: rc.cpp:42 rc.cpp:93
+#, no-c-format
+msgid "Alt+D"
+msgstr ""
+
+#: rc.cpp:45
+#, no-c-format
+msgid ""
+"Browse for a directory; the full path name will be inserted at the current "
+"cursor location in the edit box above."
+msgstr ""
+
+#: rc.cpp:48
+#, fuzzy, no-c-format
+msgid "&Working Directory"
+msgstr "Radni direktorijum:"
+
+#: rc.cpp:51
+#, no-c-format
+msgid "Specify here the initial working directory where the program is run."
+msgstr ""
+
+#: rc.cpp:54
+#, fuzzy, no-c-format
+msgid "&Browse..."
+msgstr "&Više..."
+
+#: rc.cpp:57
+#, no-c-format
+msgid "Alt+B"
+msgstr ""
+
+#: rc.cpp:60
+#, no-c-format
+msgid "Browse for the initial working directory where the program is run."
+msgstr ""
+
+#: rc.cpp:63
+#, no-c-format
+msgid "&Environment"
+msgstr ""
+
+#: rc.cpp:66
+#, fuzzy, no-c-format
+msgid "Environment variables (<tt>NAME=value</tt>):"
+msgstr "Promenljive ljuske (IME=vrednost):"
+
+#: rc.cpp:69
+#, no-c-format
+msgid ""
+"To add a new environment variable or to modify one, specify it here in the "
+"form <tt>NAME=value</tt> and click <b>Modify</b>."
+msgstr ""
+
+#: rc.cpp:72
+#, no-c-format
+msgid "Name"
+msgstr "Ime"
+
+#: rc.cpp:78
+#, no-c-format
+msgid ""
+"Environment variables that are set <i>in addition</i> to those that are "
+"inherited are listed in this table. To add new environment variables, "
+"specify them as <tt>NAME=value</tt> in the edit box above and click "
+"<b>Modify</b>. To modify a value, select it in this list and click "
+"<b>Modify</b>. To delete an environment variable, select it in this list and "
+"click <b>Delete</b>."
+msgstr ""
+
+#: rc.cpp:84
+#, no-c-format
+msgid "Alt+M"
+msgstr ""
+
+#: rc.cpp:87
+#, no-c-format
+msgid ""
+"Enters the environment variable that is currently specified in the edit box "
+"into the list. If the named variable is already in the list, it receives a "
+"new value; otherwise, a new entry is created."
+msgstr ""
+
+#: rc.cpp:96
+#, no-c-format
+msgid ""
+"Deletes the selected environment variable from the list. This cannot be used "
+"to delete environment variables that are inherited."
+msgstr ""
+
+#: rc.cpp:99
+#, fuzzy, no-c-format
+msgid "&xsldbg Options"
+msgstr "&Globalna podešavanja..."
+
+#: rc.cpp:105
+#, no-c-format
+msgid "F1"
+msgstr ""
+
+#: rc.cpp:116
+#, fuzzy, no-c-format
+msgid "Attach to Process"
+msgstr ": Zakači za proces"
+
+#: rc.cpp:119
+#, no-c-format
+msgid "&Filter or PID:"
+msgstr ""
+
+#: rc.cpp:122
+#, no-c-format
+msgid ""
+"Type the name of the process or its process ID (PID) here to reduce the "
+"number of entries in the list."
+msgstr ""
+
+#: rc.cpp:125
+#, no-c-format
+msgid "..."
+msgstr ""
+
+#: rc.cpp:128
+#, no-c-format
+msgid "Clear filter"
+msgstr ""
+
+#: rc.cpp:131
+#, no-c-format
+msgid ""
+"Use this button to clear the filter text so that all processes are displayed."
+msgstr ""
+
+#: rc.cpp:134
+#, no-c-format
+msgid "Command"
+msgstr ""
+
+#: rc.cpp:137
+#, no-c-format
+msgid "PID"
+msgstr ""
+
+#: rc.cpp:140
+#, no-c-format
+msgid "PPID"
+msgstr ""
+
+#: rc.cpp:143
+#, no-c-format
+msgid ""
+"<p>This list displays all processes that are currently running. You must "
+"select the process that you want KDbg to attach to. Use the <b>Filter or "
+"PID</b> edit box to reduce the number of entries in this list.<p>The text in "
+"the <i>Command</i> column is usually, but not always, the command that was "
+"used to start the process. The <i>PID</i> column shows the process ID. The "
+"<i>PPID</i> column shows the process ID of the parent process. Additional "
+"columns show more information about the processes that is also available via "
+"the system's <i>ps</i> command.</p><p>The list is not updated automatically. "
+"Use the <b>Refresh</b> button to update it.</p>"
+msgstr ""
+
+#: rc.cpp:146
+#, no-c-format
+msgid "&Refresh"
+msgstr ""
+
+#: rc.cpp:149
+#, no-c-format
+msgid "This button updates the list of processes."
+msgstr ""
+
+#: rc.cpp:156
+#, no-c-format
+msgid ""
+"You must select a process from the list. Then click the <b>OK</b> button to "
+"attach to that process."
+msgstr ""
 
 #: threadlist.cpp:40
 msgid "Thread ID"
 msgstr ""
 
-#: dbgmainwnd.cpp:44
+#: dbgmainwnd.cpp:45
 #, fuzzy
 msgid "Source"
 msgstr "&Ponovo učitaj izvorni kod"
 
-#: dbgmainwnd.cpp:52
+#: dbgmainwnd.cpp:53 dbgmainwnd.cpp:405
 msgid "Stack"
 msgstr ""
 
-#: dbgmainwnd.cpp:55
+#: dbgmainwnd.cpp:56 dbgmainwnd.cpp:406
 msgid "Locals"
 msgstr ""
 
-#: dbgmainwnd.cpp:58
+#: dbgmainwnd.cpp:57
+#, fuzzy
+msgid "Variable"
+msgstr "Vrednost"
+
+#: dbgmainwnd.cpp:59 dbgmainwnd.cpp:407
 msgid "Watches"
 msgstr ""
 
-#: dbgmainwnd.cpp:61
+#: dbgmainwnd.cpp:62 dbgmainwnd.cpp:408
 #, fuzzy
 msgid "Registers"
 msgstr "Pokreni ponovo"
 
-#: dbgmainwnd.cpp:64
+#: dbgmainwnd.cpp:65 dbgmainwnd.cpp:409
 msgid "Breakpoints"
 msgstr "Prekidi"
 
-#: dbgmainwnd.cpp:67
+#: dbgmainwnd.cpp:68 dbgmainwnd.cpp:411
 msgid "Output"
 msgstr ""
 
-#: dbgmainwnd.cpp:70
+#: dbgmainwnd.cpp:71 dbgmainwnd.cpp:410
 msgid "Threads"
 msgstr ""
 
-#: dbgmainwnd.cpp:73
+#: dbgmainwnd.cpp:74 dbgmainwnd.cpp:412
 msgid "Memory"
 msgstr ""
 
-#: dbgmainwnd.cpp:193
+#: dbgmainwnd.cpp:186
 msgid "&Open Source..."
 msgstr "&Otvori izvorni kod..."
 
-#: dbgmainwnd.cpp:194
+#: dbgmainwnd.cpp:187
 msgid "&Reload Source"
 msgstr "&Ponovo učitaj izvorni kod"
 
-#: dbgmainwnd.cpp:197
+#: dbgmainwnd.cpp:190
 msgid "&Executable..."
 msgstr "&Program..."
 
-#: dbgmainwnd.cpp:200
+#: dbgmainwnd.cpp:193
 #, fuzzy
 msgid "Recent E&xecutables"
 msgstr "Program"
 
-#: dbgmainwnd.cpp:203
+#: dbgmainwnd.cpp:196
 msgid "&Core dump..."
 msgstr "&Core fajl..."
 
-#: dbgmainwnd.cpp:208
+#: dbgmainwnd.cpp:201
 msgid "This &Program..."
 msgstr ""
 
-#: dbgmainwnd.cpp:211
+#: dbgmainwnd.cpp:204
 msgid "&Global Options..."
 msgstr "&Globalna podešavanja..."
 
-#: dbgmainwnd.cpp:219
+#: dbgmainwnd.cpp:212
 #, fuzzy
 msgid "&Find"
 msgstr "Pr&ozor"
 
-#: dbgmainwnd.cpp:222
+#: dbgmainwnd.cpp:215
 msgid "Source &code"
 msgstr ""
 
-#: dbgmainwnd.cpp:224
+#: dbgmainwnd.cpp:217
 msgid "Stac&k"
 msgstr ""
 
-#: dbgmainwnd.cpp:225
+#: dbgmainwnd.cpp:218
 msgid "&Locals"
 msgstr ""
 
-#: dbgmainwnd.cpp:226
+#: dbgmainwnd.cpp:219
 msgid "&Watched expressions"
 msgstr ""
 
-#: dbgmainwnd.cpp:227
+#: dbgmainwnd.cpp:220
 msgid "&Registers"
 msgstr ""
 
-#: dbgmainwnd.cpp:228
+#: dbgmainwnd.cpp:221
 #, fuzzy
 msgid "&Breakpoints"
 msgstr "Prekidi"
 
-#: dbgmainwnd.cpp:229
+#: dbgmainwnd.cpp:222
 msgid "T&hreads"
 msgstr ""
 
-#: dbgmainwnd.cpp:231
+#: dbgmainwnd.cpp:224
 msgid "&Memory"
 msgstr ""
 
-#: dbgmainwnd.cpp:241
+#: dbgmainwnd.cpp:234
 msgid "&Run"
 msgstr "&Pokreni"
 
-#: dbgmainwnd.cpp:244
+#: dbgmainwnd.cpp:237
 msgid "Step &into"
 msgstr "Kroči &u"
 
-#: dbgmainwnd.cpp:248
+#: dbgmainwnd.cpp:241
 msgid "Step &over"
 msgstr "Kroči prek&o"
 
-#: dbgmainwnd.cpp:252
+#: dbgmainwnd.cpp:245
 msgid "Step o&ut"
 msgstr "Kroči &iz"
 
-#: dbgmainwnd.cpp:256
+#: dbgmainwnd.cpp:249
 msgid "Run to &cursor"
 msgstr "Izvrši do &kursora"
 
-#: dbgmainwnd.cpp:260
+#: dbgmainwnd.cpp:253
 msgid "Step i&nto by instruction"
 msgstr ""
 
-#: dbgmainwnd.cpp:264
+#: dbgmainwnd.cpp:257
 msgid "Step o&ver by instruction"
 msgstr ""
 
-#: dbgmainwnd.cpp:268
+#: dbgmainwnd.cpp:261
 msgid "&Program counter to current line"
 msgstr ""
 
-#: dbgmainwnd.cpp:271
+#: dbgmainwnd.cpp:264
 msgid "&Break"
 msgstr "P&rekid"
 
-#: dbgmainwnd.cpp:274
+#: dbgmainwnd.cpp:267
 msgid "&Kill"
 msgstr ""
 
-#: dbgmainwnd.cpp:277
+#: dbgmainwnd.cpp:270
 msgid "Re&start"
 msgstr "Po&novo pokreni"
 
-#: dbgmainwnd.cpp:280
+#: dbgmainwnd.cpp:273
 msgid "A&ttach..."
 msgstr "&Zakači..."
 
-#: dbgmainwnd.cpp:283
+#: dbgmainwnd.cpp:276
 msgid "&Arguments..."
 msgstr "&Argumenti..."
 
-#: dbgmainwnd.cpp:288
+#: dbgmainwnd.cpp:281
 msgid "Set/Clear &breakpoint"
 msgstr "Postavi/očisti p&rekid"
 
-#: dbgmainwnd.cpp:291
+#: dbgmainwnd.cpp:284
 msgid "Set &temporary breakpoint"
 msgstr "Pos&tavi privremeni prekid"
 
-#: dbgmainwnd.cpp:294
+#: dbgmainwnd.cpp:287
 msgid "&Enable/Disable breakpoint"
 msgstr "Omogući/on&emogući prekid"
 
-#: dbgmainwnd.cpp:299
+#: dbgmainwnd.cpp:292
 msgid "Watch Expression"
 msgstr ""
 
-#: dbgmainwnd.cpp:302
+#: dbgmainwnd.cpp:295
 #, fuzzy
 msgid "Edit Value"
 msgstr "Vrednost"
 
-#: dbgmainwnd.cpp:306
+#: dbgmainwnd.cpp:299
 msgid "&Window"
 msgstr "Pr&ozor"
 
-#: dbgmainwnd.cpp:333
+#: dbgmainwnd.cpp:326
 msgid "Line 00000"
 msgstr "Linija 00000"
 
-#: dbgmainwnd.cpp:337
+#: dbgmainwnd.cpp:330
 msgid "Restart"
 msgstr "Pokreni ponovo"
 
-#: dbgmainwnd.cpp:338
+#: dbgmainwnd.cpp:331
 msgid "Core dump"
 msgstr "Core fajl"
 
-#: dbgmainwnd.cpp:541
+#: dbgmainwnd.cpp:577
 #, c-format
 msgid "Line %d"
 msgstr "Linija %d"
 
-#: dbgmainwnd.cpp:613
+#: dbgmainwnd.cpp:649
 msgid "`%1' is not a file or does not exist"
 msgstr "`%1' nije fajl ili ne postoji"
 
-#: dbgmainwnd.cpp:723
+#: dbgmainwnd.cpp:759
 #, fuzzy
 msgid "|All source files\n"
 msgstr "Ponovo učitaj izvorni kod"
 
-#: dbgmainwnd.cpp:724
+#: dbgmainwnd.cpp:760
 #, fuzzy
 msgid "|Source files\n"
 msgstr "Otvori izvorni kod"
 
-#: dbgmainwnd.cpp:725
+#: dbgmainwnd.cpp:761
 msgid "|Header files\n"
 msgstr ""
 
-#: dbgmainwnd.cpp:726
+#: dbgmainwnd.cpp:762
 msgid "*|All files"
 msgstr ""
 
-#: dbgmainwnd.cpp:855
+#: dbgmainwnd.cpp:865
 msgid "Select the executable to debug"
 msgstr "Izaberite program za trebljenje"
 
-#: dbgmainwnd.cpp:868
+#: dbgmainwnd.cpp:878
 msgid "Select core dump"
 msgstr "Izaberite core fajl"
 
-#: xsldbgdriver.cpp:1460
+#: xsldbgdriver.cpp:1465
 msgid "No memory dump available"
 msgstr ""
 
@@ -586,40 +832,16 @@ msgstr "Ponovo učitaj izvorni kod"
 msgid "File filter for &header files:"
 msgstr ""
 
-#: ttywnd.cpp:152
+#: ttywnd.cpp:228
 msgid "&Clear"
 msgstr ""
 
-#: pgmargs.cpp:41
-msgid ": Program arguments"
-msgstr ": Argumenti programa"
-
-#: pgmargs.cpp:44
-msgid "Run %1 with these arguments:"
-msgstr "Pokreni %1 sa sledećim argumentima:"
-
-#: pgmargs.cpp:69
-msgid "Options:"
+#: pgmargs.cpp:215
+msgid "Select a file name to insert as program argument"
 msgstr ""
 
-#: pgmargs.cpp:91
-msgid "Working directory:"
-msgstr "Radni direktorijum:"
-
-#: pgmargs.cpp:106
-msgid "Environment variables (NAME=value):"
-msgstr "Promenljive ljuske (IME=vrednost):"
-
-#: pgmargs.cpp:115
-msgid "Name"
-msgstr "Ime"
-
-#: pgmargs.cpp:116 regwnd.cpp:428
-msgid "Value"
-msgstr "Vrednost"
-
-#: pgmargs.cpp:328
-msgid "Select a file name to insert as program argument"
+#: pgmargs.cpp:229
+msgid "Select a directory to insert as program argument"
 msgstr ""
 
 #: regwnd.cpp:75
