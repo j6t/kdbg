@@ -2,13 +2,13 @@
 # KDbg - Debugger GUI for gdb
 # Copyright (C) Johannes Sixt <Johannes.Sixt@telecom.at>, 1998-2005.
 #
-# Johannes Sixt <johannes.sixt@telecom.at>, 2005, 2006.
+# Johannes Sixt <johannes.sixt@telecom.at>, 2005, 2006, 2007.
 msgid ""
 msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2007-12-16 22:02+0100\n"
-"PO-Revision-Date: 2006-12-16 22:08+0100\n"
+"PO-Revision-Date: 2007-12-16 22:09+0100\n"
 "Last-Translator: Johannes Sixt <johannes.sixt@telecom.at>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -135,7 +135,7 @@ msgstr "Ignoriere &nächste Treffer:"
 
 #: gdbdriver.cpp:893
 msgid "<anonymous struct or union>"
-msgstr ""
+msgstr "<anonyme struct oder union>"
 
 #: gdbdriver.cpp:1487
 msgid "<additional entries of the array suppressed>"
@@ -553,8 +553,7 @@ msgstr "Filter löschen"
 
 #: rc.cpp:131
 #, no-c-format
-msgid ""
-"Use this button to clear the filter text so that all processes are displayed."
+msgid "Use this button to clear the filter text so that all processes are displayed."
 msgstr ""
 "Mit dieser Schaltfläche können Sie die Filtereingabe löschen, sodass alle "
 "Prozesse angezeigt werden."
@@ -924,3 +923,4 @@ msgstr "Schalter"
 #: regwnd.cpp:468
 msgid "GP and others"
 msgstr "Allgemein u.a."
+
