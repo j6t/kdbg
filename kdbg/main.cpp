@@ -55,6 +55,7 @@ int main(int argc, char** argv)
 	{ "r <device>", I18N_NOOP("remote debugging via <device>"), 0 },
 	{ "l <language>", I18N_NOOP("specify language: C, XSLT"), ""},
 	{ "x", I18N_NOOP("use language XSLT (deprecated)"), 0 },
+	{ "a <args>", I18N_NOOP("specify arguments of debugged executable"), 0},
 	{ "p <pid>", I18N_NOOP("specify PID of process to debug"), 0},
 	{ "+[program]", I18N_NOOP("path of executable to debug"), 0 },
 	{ "+[core]", I18N_NOOP("a core file to use"), 0},
@@ -108,6 +109,7 @@ int main(int argc, char** argv)
     debugger.setTranscript(transcript);
 
     QString pid = args->getOption("p");
+    QString programArgs = args->getOption("a");
 
     if (!restored && args->count() > 0) {
 	// attach to process?
@@ -126,6 +128,10 @@ int main(int argc, char** argv)
 
 	    debugger.setCoreFile(QString());
 	    debugger.setAttachPid(QString());
+	} else {
+	    if (!programArgs.isEmpty()) {
+		debugger.overrideProgramArguments(programArgs);
+	    }
 	}
     }
 

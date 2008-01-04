@@ -193,6 +193,12 @@ void DebuggerMainWndBase::setRemoteDevice(const QString& remoteDevice)
     }
 }
 
+void DebuggerMainWndBase::overrideProgramArguments(const QString& args)
+{
+    assert(m_debugger != 0);
+    m_debugger->overrideProgramArguments(args);
+}
+
 void DebuggerMainWndBase::setTranscript(const char* name)
 {
     m_transcriptFile = name;

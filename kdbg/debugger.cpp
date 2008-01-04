@@ -734,6 +734,13 @@ void KDebugger::saveProgramSettings()
     emit saveProgramSpecific(m_programConfig);
 }
 
+void KDebugger::overrideProgramArguments(const QString& args)
+{
+    ASSERT(m_programConfig != 0);
+    m_programConfig->setGroup(GeneralGroup);
+    m_programConfig->writeEntry(ProgramArgs, args);
+}
+
 void KDebugger::restoreProgramSettings()
 {
     ASSERT(m_programConfig != 0);

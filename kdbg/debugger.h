@@ -66,6 +66,13 @@ public:
     void useCoreFile(QString corefile, bool batch);
 
     /**
+     * Overrides the program argument in the per-program config
+     * with a new value.
+     */
+    void overrideProgramArguments(const QString& args);
+
+
+    /**
      * Uses the specified pid to attach to the active program.
      */
     void setAttachPid(const QString& pid);
