@@ -1833,7 +1833,7 @@ void KDebugger::slotDeleteWatch()
 {
     // delete only allowed while debugger is idle; or else we might delete
     // the very expression the debugger is currently working on...
-    if (!m_d->isIdle())
+    if (m_d == 0 || !m_d->isIdle())
 	return;
 
     VarTree* item = m_watchVariables.currentItem();
