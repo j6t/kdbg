@@ -685,9 +685,11 @@ isErrorExpr(const char *output)
     };
     
     for (wordIndex = 0; wordIndex < ERROR_WORD_COUNT; wordIndex++){
+      // ignore any warnings relating to local variables not being available
       if (strncmp(output, 
 		  errorWords[wordIndex], 
-		  errorWordLength[wordIndex]) == 0){
+		  errorWordLength[wordIndex]) == 0 && 
+		    (wordIndex == 0 && strstr(output, "try stepping past the xsl:param") == 0) )   {
 	result = true;
         TRACE(QString("Error/Warning/Information from xsldbg ") + output);
 	break;
