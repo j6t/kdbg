@@ -95,6 +95,7 @@ static XsldbgCmdInfo cmds[] = {
     {DCcondition, "print 'condition %d %s'\n", XsldbgCmdInfo::argNumString},
     {DCsetpc, "print 'set variable $pc=%s'\n", XsldbgCmdInfo::argString},
     {DCignore, "print 'ignore %d %d'\n", XsldbgCmdInfo::argNum2},
+    {DCprintWChar, "print 'ignore %s'\n", XsldbgCmdInfo::argString},
     {DCsetvariable, "set %s %s\n", XsldbgCmdInfo::argString2},
 };
 
