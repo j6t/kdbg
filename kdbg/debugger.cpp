@@ -2096,10 +2096,12 @@ void KDebugger::slotValuePopup(const QString& expr)
 
 void KDebugger::slotDisassemble(const QString& fileName, int lineNo)
 {
-    CmdQueueItem* cmd = m_d->queueCmd(DCinfoline, fileName, lineNo,
-				      DebuggerDriver::QMoverrideMoreEqual);
-    cmd->m_fileName = fileName;
-    cmd->m_lineNo = lineNo;
+    if (m_haveExecutable) {
+	CmdQueueItem* cmd = m_d->queueCmd(DCinfoline, fileName, lineNo,
+					  DebuggerDriver::QMoverrideMoreEqual);
+	cmd->m_fileName = fileName;
+	cmd->m_lineNo = lineNo;
+    }
 }
 
 void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
