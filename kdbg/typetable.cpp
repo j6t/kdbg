@@ -37,7 +37,8 @@ void TypeTable::loadTypeTables()
 {
     typeTablesInited = true;
 
-    const QStringList files = KGlobal::dirs()->findAllResources("types", "*.kdbgtt");
+    const QStringList files = KGlobal::dirs()->findAllResources("types", "*.kdbgtt",
+			false, true);
     
     if (files.isEmpty()) {
 	TRACE("no type tables found");

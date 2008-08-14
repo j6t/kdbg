@@ -9,14 +9,18 @@
 <p><a href="index.html">Contents</a></p>
 <h1>
 KDbg's Type Table</h1>
-<p>KDbg can display the contents of single members of structured types, so
+<p>KDbg can display a short description of structured types, so
 that it is not necessary to expand the variable in the <a href="localvars.html">local
 variables window</a> or <a href="watches.html">watched expressions window</a>.
 The information which member variable is displayed is stored in <em>type
 tables</em>. There is generally one type table per shared library.</p>
-<p>KDbg's type tables are located under <tt>$prefix/share/apps/kdbg/types</tt>.
+
+<p>KDbg's default type tables are located under <tt>$prefix/share/apps/kdbg/types</tt>.
+User defined type tables can be placed in <tt>${KDEHOME}/share/apps/kdbg/types</tt>, where
+<tt>${KDEHOME}</tt> is <tt>~/.kde</tt> if it is not a defined environment variable.
 The file names end with <tt>.kdbgtt</tt>. Example: The type table for <tt>libqt.so</tt>
-is named <tt>qt.kdbgtt</tt>.</p>
+is named <tt>qt.kdbgtt</tt>.
+User defined type tables override the type tables provided by the system.</p>
 <p>A type table file obeys the regular KDE configuration file syntax. The
 file has the following groups:</p>
 <ul>
