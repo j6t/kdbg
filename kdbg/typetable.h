@@ -36,13 +36,13 @@ struct TypeInfo
      */
     QString m_displayString[typeInfoMaxExpr+1];
     /**
-     * This is a list of partial expressions. Each contains exactly one %s,
+     * This is a list of partial expressions. Each contains exactly one \%s,
      * which will be replaced by the parent expression. The results are
      * substituted for the percent signs in m_displayString.
      */
     QString m_exprStrings[typeInfoMaxExpr];
     /**
-     * This is a list of guard expressions. Each contains exactly one %s,
+     * This is a list of guard expressions. Each contains exactly one \%s,
      * which will be replaced by the parent expression, or is empty. If the
      * evaluation of the resulting expression returns an error, the
      * corresponding expression from m_exprStrings is not evaluated. (This

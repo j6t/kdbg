@@ -15,14 +15,14 @@
 #include "typetable.h"
 #include "mydebug.h"
 
-// the TypeTables of all known libraries
+//! the TypeTables of all known libraries
 static QList<TypeTable> typeTables;
 bool typeTablesInited = false;
 
 
-// an indentifier for wchar_t
+//! an indentifier for wchar_t
 TypeInfo TypeInfo::m_wchartType("");
-// the unknown type
+//! the unknown type
 TypeInfo TypeInfo::m_unknownType("");
 
 

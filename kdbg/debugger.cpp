@@ -1729,7 +1729,7 @@ void KDebugger::evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool imm
     }
 }
 
-/* queues a printStruct command; var must have been initialized correctly */
+/** queues a printStruct command; var must have been initialized correctly */
 void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 {
     QString base = var->computeExpr();
