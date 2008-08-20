@@ -44,8 +44,12 @@ The <tt>[Type Table]</tt> group</h2>
 <p>This group contains the following entries:</p>
 <ul>
 <li>
-<tt>Types1</tt>, <tt>Types2</tt>, etc. These entries name the types. Each
-of them is a comma-separated list of type names. Each of the entries can
+<tt>Types1</tt>, <tt>Types2</tt>, etc. These entries name the types as reported by
+the <tt>whatis</tt> gdb command. Each
+of them is a comma-separated list of type names. 
+If the type contains a a comma in its name, it can be escaped with a backslash.
+But, note that the comma should not be escaped in the type's group, described below.
+Each of the entries can
 list any number of types. (The types names can be distributed to several
 lines just so that the lines don't get excessivly long.) No blank space
 is allowed in these lines. The entries must be numbered consecutively (KDbg
