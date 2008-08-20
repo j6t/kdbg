@@ -1738,8 +1738,8 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 	exprFmt = var->m_type->m_exprStrings[var->m_exprIndex];
     }
 
-    QString expr;
-    expr.sprintf(exprFmt, base.data());
+    QString expr = exprFmt;
+    expr.replace("%s", base);
 
     DbgCommand dbgCmd = DCprintStruct;
     // check if this is a QString::Data
