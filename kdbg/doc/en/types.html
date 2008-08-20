@@ -44,9 +44,10 @@ The <tt>[Type Table]</tt> group</h2>
 <p>This group contains the following entries:</p>
 <ul>
 <li>
-<tt>Types1</tt>, <tt>Types2</tt>, etc. These entries name the types as reported by
-the <tt>whatis</tt> gdb command. Each
-of them is a comma-separated list of type names. 
+<tt>Types1</tt>, <tt>Types2</tt>, etc. These entries name the types.  
+The naming should follow the output of the <tt>whatis</tt> gdb command in the
+case of gdb as a backend less any <tt>const</tt>, <i>spaces</i>, or trailing
+<tt>&</tt>. Each is a comma-separated list of type names.
 If the type contains a a comma in its name, it can be escaped with a backslash.
 But, note that the comma should not be escaped in the type's group, described below.
 Each of the entries can
@@ -103,6 +104,9 @@ whose value is investigate. The so constructed expression is submitted
 to gdb, and the result substituted back for the corresponding percent character
 in the <tt>Display</tt> string.</li>
 
+<li>
+An optional <tt>FunctionGuard</tt><i>x</i> that is associated with the corresponding <tt>Expr</tt><i>x</i>.
+If the evaluation of the resulting gdb expression returns an error, the corresponding expression from <tt>Expr</tt><i>x</i> is not evaluated. (This is used to guard function calls.)
 <li>
 <tt>Alias</tt> names an alias type. If this entry is present, the type
 is treated like the specified type. That alias type must appear before
