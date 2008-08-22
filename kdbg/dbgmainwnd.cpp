@@ -211,6 +211,9 @@ void DebuggerMainWnd::initKAction()
     (void)new KToggleAction(i18n("&Find"), "find", CTRL+Key_F, m_filesWindow,
 			    SLOT(slotViewFind()), actionCollection(),
 			    "view_find");
+    (void)KStdAction::findNext(m_filesWindow, SLOT(slotFindForward()), actionCollection(), "view_findnext");
+    (void)KStdAction::findPrev(m_filesWindow, SLOT(slotFindBackward()), actionCollection(), "view_findprev");
+
     i18n("Source &code");
     struct { QString text; QWidget* w; QString id; } dw[] = {
 	{ i18n("Stac&k"), m_btWindow, "view_stack"},

@@ -10,6 +10,8 @@
   </Menu>
   <Menu name="view"><text>&amp;View</text>
     <Action name="view_find"/>
+    <Action name="view_findnext"/>
+    <Action name="view_findprev"/>
     <Separator/>
     <Action name="view_stack"/>
     <Action name="view_locals"/>
