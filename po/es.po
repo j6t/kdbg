@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: es\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-12-16 22:02+0100\n"
+"POT-Creation-Date: 2008-11-06 21:44+0100\n"
 "PO-Revision-Date: 2007-12-30 12:45+0100\n"
 "Last-Translator: Borja Bergua Guerra <bbergua@arcos.inf.uc3m.es>\n"
 "Language-Team:  <es@li.org>\n"
@@ -375,8 +375,10 @@ msgid ""
 "command line, that is, you can even use quotes and environment variables, "
 "for example:<p><tt>--message 'start in: ' $HOME</tt>"
 msgstr ""
-"Especifique los argumentos con los que se debe invocar el programa para esta sesión de depuración. Especifique los argumentos como lo haría en línea de órdenes, es decir, puede incluso usar comillas y variables de entorno, "
-"por ejemplo: <p><tt>--message 'start in: ' $HOME</tt>"
+"Especifique los argumentos con los que se debe invocar el programa para esta "
+"sesión de depuración. Especifique los argumentos como lo haría en línea de "
+"órdenes, es decir, puede incluso usar comillas y variables de entorno, por "
+"ejemplo: <p><tt>--message 'start in: ' $HOME</tt>"
 
 #: rc.cpp:30
 #, no-c-format
@@ -393,7 +395,9 @@ msgstr ""
 msgid ""
 "Browse for a file; the full path name will be inserted at the current cursor "
 "location in the edit box above."
-msgstr "Busque un fichero; la ruta completa se insertará en la posición actual del cursor en la caja de edición de arriba."
+msgstr ""
+"Busque un fichero; la ruta completa se insertará en la posición actual del "
+"cursor en la caja de edición de arriba."
 
 #: rc.cpp:39
 #, no-c-format
@@ -410,7 +414,9 @@ msgstr ""
 msgid ""
 "Browse for a directory; the full path name will be inserted at the current "
 "cursor location in the edit box above."
-msgstr "Busque un directorio; la ruta completa se insertará en la posición actual del cursor en la caja de edición de arriba."
+msgstr ""
+"Busque un directorio; la ruta completa se insertará en la posición actual "
+"del cursor en la caja de edición de arriba."
 
 #: rc.cpp:48
 #, no-c-format
@@ -420,7 +426,9 @@ msgstr "&Directorio de trabajo"
 #: rc.cpp:51
 #, no-c-format
 msgid "Specify here the initial working directory where the program is run."
-msgstr "Especifique aquí el directorio de trabajo inicial donde se ejecuta el programa"
+msgstr ""
+"Especifique aquí el directorio de trabajo inicial donde se ejecuta el "
+"programa"
 
 #: rc.cpp:54
 #, fuzzy, no-c-format
@@ -452,7 +460,10 @@ msgstr "Variables de entorno (<tt>NOMBRE=valor</tt>):"
 msgid ""
 "To add a new environment variable or to modify one, specify it here in the "
 "form <tt>NAME=value</tt> and click <b>Modify</b>."
-msgstr "Para añadir una nueva variable de entorno o para modificar una, especifiquela aquí de la forma <tt>NOMBRE=valor</tt> y pulse <b>Modificar</b>."
+msgstr ""
+"Para añadir una nueva variable de entorno o para modificar una, "
+"especifiquela aquí de la forma <tt>NOMBRE=valor</tt> y pulse <b>Modificar</"
+"b>."
 
 #: rc.cpp:72
 #, no-c-format
@@ -468,7 +479,13 @@ msgid ""
 "<b>Modify</b>. To modify a value, select it in this list and click "
 "<b>Modify</b>. To delete an environment variable, select it in this list and "
 "click <b>Delete</b>."
-msgstr "Las variables de entorno que se especifiquen <i>además de</i> aquellas que se hereden se listan en esta tabla. Para añadir nuevas variables de entorno, especifiquelas de la forma <tt>NOMBRE=valor</tt> en la caja de edición de arriba y pulse <b>Modificar</b>. Para modificar un valor, selecciónelo en esta lista y pulse <b>Modificar</b>. Para eliminar una variable de entorno, selecciónela en esta lista y pulse <b>Eliminar</b>"
+msgstr ""
+"Las variables de entorno que se especifiquen <i>además de</i> aquellas que "
+"se hereden se listan en esta tabla. Para añadir nuevas variables de entorno, "
+"especifiquelas de la forma <tt>NOMBRE=valor</tt> en la caja de edición de "
+"arriba y pulse <b>Modificar</b>. Para modificar un valor, selecciónelo en "
+"esta lista y pulse <b>Modificar</b>. Para eliminar una variable de entorno, "
+"selecciónela en esta lista y pulse <b>Eliminar</b>"
 
 #: rc.cpp:84
 #, no-c-format
@@ -481,14 +498,19 @@ msgid ""
 "Enters the environment variable that is currently specified in the edit box "
 "into the list. If the named variable is already in the list, it receives a "
 "new value; otherwise, a new entry is created."
-msgstr "Introduce la variable de entorno que está especificada actualmente en la caja de edición dentro de la lista. Si la variable ya está en la lista, recibe un nuevo valor, en otro caso, se crea una nueva entrada."
+msgstr ""
+"Introduce la variable de entorno que está especificada actualmente en la "
+"caja de edición dentro de la lista. Si la variable ya está en la lista, "
+"recibe un nuevo valor, en otro caso, se crea una nueva entrada."
 
 #: rc.cpp:96
 #, no-c-format
 msgid ""
 "Deletes the selected environment variable from the list. This cannot be used "
 "to delete environment variables that are inherited."
-msgstr "Elimina la variables de entorno seleccionada de la lista. No puede usarse para eliminar variables de entorno heredadas."
+msgstr ""
+"Elimina la variables de entorno seleccionada de la lista. No puede usarse "
+"para eliminar variables de entorno heredadas."
 
 #: rc.cpp:99
 #, no-c-format
@@ -515,7 +537,9 @@ msgstr "&Filtro o PID"
 msgid ""
 "Type the name of the process or its process ID (PID) here to reduce the "
 "number of entries in the list."
-msgstr "Escriba el nombre del proceso o su identificador (PID) aquí para reducir el número de entradas en la lista."
+msgstr ""
+"Escriba el nombre del proceso o su identificador (PID) aquí para reducir el "
+"número de entradas en la lista."
 
 #: rc.cpp:125
 #, no-c-format
@@ -529,8 +553,11 @@ msgstr "Borrar filtro"
 
 #: rc.cpp:131
 #, no-c-format
-msgid "Use this button to clear the filter text so that all processes are displayed."
-msgstr "Use este botón para borrar el texto del filtro de forma que se muestren todos los procesos."
+msgid ""
+"Use this button to clear the filter text so that all processes are displayed."
+msgstr ""
+"Use este botón para borrar el texto del filtro de forma que se muestren "
+"todos los procesos."
 
 #: rc.cpp:134
 #, no-c-format
@@ -559,7 +586,17 @@ msgid ""
 "columns show more information about the processes that is also available via "
 "the system's <i>ps</i> command.</p><p>The list is not updated automatically. "
 "Use the <b>Refresh</b> button to update it.</p>"
-msgstr "<p>Esta lista muestra todos los procesos que se estań ejecutando actualmente. Debe seleccionar el proceso al que quiera que KDbg se ligue. Use la caja de edición <b>Filtro o PID</b> para reducir el número de entradas en esta lista.<p> El texto en la columna <i>Comando</i> es normalmente, pero no siempre, la orden que se usó para iniciar el proceso. La columna <i>PID</i> muestra el identificador del proceso. La columna <i>PPID</i> muestra el identificador del proceso padre. Las demás columnas muestran más información sobre los procesos que también esta disponible a través de la orden del sistema <i>ps</i>.</p><p>La lista no se actualiza automáticamente. Use el botón <b>Actualizar</b> para actualizarla.</p>"
+msgstr ""
+"<p>Esta lista muestra todos los procesos que se estań ejecutando "
+"actualmente. Debe seleccionar el proceso al que quiera que KDbg se ligue. "
+"Use la caja de edición <b>Filtro o PID</b> para reducir el número de "
+"entradas en esta lista.<p> El texto en la columna <i>Comando</i> es "
+"normalmente, pero no siempre, la orden que se usó para iniciar el proceso. "
+"La columna <i>PID</i> muestra el identificador del proceso. La columna "
+"<i>PPID</i> muestra el identificador del proceso padre. Las demás columnas "
+"muestran más información sobre los procesos que también esta disponible a "
+"través de la orden del sistema <i>ps</i>.</p><p>La lista no se actualiza "
+"automáticamente. Use el botón <b>Actualizar</b> para actualizarla.</p>"
 
 #: rc.cpp:146
 #, no-c-format
@@ -576,7 +613,9 @@ msgstr "Este botón actualiza la lista de procesos."
 msgid ""
 "You must select a process from the list. Then click the <b>OK</b> button to "
 "attach to that process."
-msgstr "Debe seleccionar un proceso de la lista. Después, pulse el botón <b>Aceptar</b> para ligar a ese proceso."
+msgstr ""
+"Debe seleccionar un proceso de la lista. Después, pulse el botón <b>Aceptar</"
+"b> para ligar a ese proceso."
 
 #: threadlist.cpp:40
 msgid "Thread ID"
@@ -883,4 +922,3 @@ msgstr "Banderas"
 #: regwnd.cpp:468
 msgid "GP and others"
 msgstr "GP y otros"
-

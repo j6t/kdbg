@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: zh_CN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-12-16 22:02+0100\n"
+"POT-Creation-Date: 2008-11-06 21:44+0100\n"
 "PO-Revision-Date: 2008-04-18 18:27+0800\n"
 "Last-Translator: Moligaloo <moligaloo@163.com>\n"
 "Language-Team:  <zh@li.org>\n"
@@ -161,8 +161,7 @@ msgid ""
 "Shall this command be used?"
 msgstr ""
 "这个程序的设置指定了下面的调试命令：\n"
-"%1 "
-"使用这个命令吗？"
+"%1 使用这个命令吗？"
 
 #: mainwndbase.cpp:43
 msgid " Add "
@@ -467,9 +466,9 @@ msgid ""
 "<b>Modify</b>. To delete an environment variable, select it in this list and "
 "click <b>Delete</b>."
 msgstr ""
-"环境变量设置：<i>添加</i>到表格中，以<tt>变量名=值</tt>指定 "
-"<b>修改</b>一个值，从列表中选择，然后点击<b>修改</b按钮 "
-"删除一个环境变量,从列表中选择，然后选择<b>删除</b>"
+"环境变量设置：<i>添加</i>到表格中，以<tt>变量名=值</tt>指定 <b>修改</b>一个"
+"值，从列表中选择，然后点击<b>修改</b按钮 删除一个环境变量,从列表中选择，然后"
+"选择<b>删除</b>"
 
 #: rc.cpp:84
 #, no-c-format
@@ -530,7 +529,8 @@ msgstr "清除过滤"
 
 #: rc.cpp:131
 #, no-c-format
-msgid "Use this button to clear the filter text so that all processes are displayed."
+msgid ""
+"Use this button to clear the filter text so that all processes are displayed."
 msgstr "用这个按钮来清除过滤文本，这样就可以显示所有的进程"
 
 #: rc.cpp:134
@@ -561,9 +561,11 @@ msgid ""
 "the system's <i>ps</i> command.</p><p>The list is not updated automatically. "
 "Use the <b>Refresh</b> button to update it.</p>"
 msgstr ""
-"<p>这个列表显示了所有当前运行的进程,你得从中选择一个以连接调试,使用<b>过滤名或进程ID</b>可以减少当前的条目<p> "
-"<p>在<i>命令</i>栏中的文字通常是（但并不总是）启动进程的命令。<i>PID</i>栏显示了进程ID"
-"<i>PPID</i>栏显示的父进程的PID. 额外栏显示了这个进程的更多信息。这个列表并不会自动更新，请用<b>刷新</b>按钮以更新。"
+"<p>这个列表显示了所有当前运行的进程,你得从中选择一个以连接调试,使用<b>过滤名"
+"或进程ID</b>可以减少当前的条目<p> <p>在<i>命令</i>栏中的文字通常是（但并不总"
+"是）启动进程的命令。<i>PID</i>栏显示了进程ID<i>PPID</i>栏显示的父进程的PID. "
+"额外栏显示了这个进程的更多信息。这个列表并不会自动更新，请用<b>刷新</b>按钮以"
+"更新。"
 
 #: rc.cpp:146
 #, no-c-format
@@ -886,4 +888,3 @@ msgstr "标志位"
 #: regwnd.cpp:468
 msgid "GP and others"
 msgstr "GP和其它"
-

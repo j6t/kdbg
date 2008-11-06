@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2007-12-16 22:02+0100\n"
+"POT-Creation-Date: 2008-11-06 21:44+0100\n"
 "PO-Revision-Date: 2007-12-16 22:09+0100\n"
 "Last-Translator: Johannes Sixt <johannes.sixt@telecom.at>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -553,7 +553,8 @@ msgstr "Filter löschen"
 
 #: rc.cpp:131
 #, no-c-format
-msgid "Use this button to clear the filter text so that all processes are displayed."
+msgid ""
+"Use this button to clear the filter text so that all processes are displayed."
 msgstr ""
 "Mit dieser Schaltfläche können Sie die Filtereingabe löschen, sodass alle "
 "Prozesse angezeigt werden."
@@ -923,4 +924,3 @@ msgstr "Schalter"
 #: regwnd.cpp:468
 msgid "GP and others"
 msgstr "Allgemein u.a."
-
