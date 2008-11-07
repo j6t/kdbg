@@ -1,6 +1,6 @@
 # KDbg - Debugger GUI for gdb
 # Copyright (C) 1998-2000 Johannes Sixt
-# Johannes Sixt <Johannes.Sixt@telecom.at>, 2000
+# Johannes Sixt <j6t@kdbg.org>, 2000
 # KDE TÜRKÇELEŞTİRME PROJESİ.
 # Adem GUNES <adem@alaeddin.cc.selcuk.edu.tr>, 2000.
 #

@@ -40,8 +40,8 @@ int main(int argc, char** argv)
 			 "(c) 1998-2008 Johannes Sixt",
 			 0,		/* any text */
 			 "http://www.kdbg.org/",
-			 "Johannes.Sixt@telecom.at");
-    aboutData.addAuthor("Johannes Sixt", 0, "Johannes.Sixt@telecom.at");
+			 "j6t@kdbg.org");
+    aboutData.addAuthor("Johannes Sixt", 0, "j6t@kdbg.org");
     aboutData.addCredit("Keith Isdale",
 			I18N_NOOP("XSLT debugging"),
 			"k_isdale@tpg.com.au");

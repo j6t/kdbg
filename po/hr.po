@@ -1,6 +1,6 @@
 # KDbg - Debugger GUI for gdb
 # Copyright (C) 1998,1999 Johannes Sixt
-# Johannes Sixt <Johannes.Sixt@telecom.at>, 1999
+# Johannes Sixt <j6t@kdbg.org>, 1999
 # Vladimir Vuksan <vuksan@veus.hr>, 1998.
 #
 msgid ""
