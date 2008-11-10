@@ -105,9 +105,11 @@ protected:
     QPixmap m_brktmp;			/* temporary breakpoint marker */
     QPixmap m_brkcond;			/* conditional breakpoint marker */
     QPixmap m_brkorph;			/* orphaned breakpoint marker */
+    QFont m_lineNoFont;			//!< The font used to draw line numbers
     int m_curRow;			//!< The highlighted row
     int m_widthItems;			//!< The width of the item column
     int m_widthPlus;			//!< The width of the expander column
+    int m_widthLineNo;			//!< The width of the line number columns
 };
 
 class HighlightCpp : public QSyntaxHighlighter

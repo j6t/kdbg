@@ -27,7 +27,8 @@ SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* na
 	m_fileName(fileName),
 	m_curRow(-1),
 	m_widthItems(16),
-	m_widthPlus(12)
+	m_widthPlus(12),
+	m_widthLineNo(30)
 {
     // load pixmaps
     m_pcinner = UserIcon("pcinner");
@@ -39,7 +40,7 @@ SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* na
     m_brkorph = UserIcon("brkorph");
     setFont(KGlobalSettings::fixedFont());
     setReadOnly(true);
-    setMargins(m_widthItems+m_widthPlus, 0, 0 ,0);
+    setMargins(m_widthItems+m_widthPlus+m_widthLineNo, 0, 0 ,0);
     setAutoFormatting(AutoNone);
     setTextFormat(PlainText);
     setWordWrap(NoWrap);
@@ -81,6 +82,10 @@ bool SourceWindow::loadFile()
 	m_rowToLine[i] = i;
     }
     m_lineItems.resize(n, 0);
+
+    // set a font for line numbers
+    m_lineNoFont = currentFont();
+    m_lineNoFont.setPixelSize(11);
 
     return true;
 }
@@ -147,6 +152,7 @@ void SourceWindow::drawFrame(QPainter* p)
     clip &= QRegion(inside);
     p->setClipRegion(clip);
 
+    p->setFont(m_lineNoFont);
     p->setPen(colorGroup().text());
     p->eraseRect(inside);
 
@@ -202,15 +208,20 @@ void SourceWindow::drawFrame(QPainter* p)
 	    if (y < 0) y = 0;
 	    p->drawPixmap(0,y,m_pcup);
 	}
+	p->translate(m_widthItems, 0);
 	if (!isRowDisassCode(row) && m_sourceCode[rowToLine(row)].canDisass) {
 	    int w = m_widthPlus;
-	    p->translate(m_widthItems, 0);
 	    int x = w/2;
 	    int y = h/2;
 	    p->drawLine(x-2, y, x+2, y);
 	    if (!isRowExpanded(row)) {
 		p->drawLine(x, y-2, x, y+2);
 	    }
+	}
+	p->translate(m_widthPlus, 0);
+	if (!isRowDisassCode(row)) {
+	    p->drawText(0, 0, m_widthLineNo, h, AlignRight|AlignVCenter,
+			QString().setNum(rowToLine(row)+1));
 	}
 	p->restore();
     }
