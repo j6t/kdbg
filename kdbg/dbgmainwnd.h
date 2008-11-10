@@ -38,9 +38,6 @@ protected:
     void saveSettings(KConfig*);
     void restoreSettings(KConfig*);
 
-    // statusbar texts
-    void updateLineStatus(int lineNo);	/* zero-based line number */
-
     void initToolbar();
     void initKAction();
 
@@ -85,7 +82,6 @@ public slots:
     virtual void updateUI();
     virtual void updateLineItems();
     void slotFileChanged();
-    void slotLineChanged();
     void slotAddWatch();
     void slotAddWatch(const QString& text);
     void slotNewFileLoaded();

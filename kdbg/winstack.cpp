@@ -125,7 +125,6 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 	}
 
 	m_fileList.insertAt(0, fw);
-	connect(fw, SIGNAL(lineChanged()),SIGNAL(lineChanged()));
 	connect(fw, SIGNAL(clickedLeft(const QString&,int,const DbgAddr&,bool)),
 		SIGNAL(toggleBreak(const QString&,int,const DbgAddr&,bool)));
 	connect(fw, SIGNAL(clickedMid(const QString&,int,const DbgAddr&)),

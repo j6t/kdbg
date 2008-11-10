@@ -121,7 +121,6 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 
     // file/line updates
     connect(m_filesWindow, SIGNAL(fileChanged()), SLOT(slotFileChanged()));
-    connect(m_filesWindow, SIGNAL(lineChanged()), SLOT(slotLineChanged()));
 
     // connect breakpoint table
     connect(m_bpTable, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
@@ -323,7 +322,6 @@ void DebuggerMainWnd::initToolbar()
     KStatusBar* statusbar = statusBar();
     statusbar->insertItem(m_statusActive, ID_STATUS_ACTIVE);
     m_lastActiveStatusText = m_statusActive;
-    statusbar->insertItem(i18n("Line 00000"), ID_STATUS_LINENO);
     statusbar->insertItem("", ID_STATUS_MSG);	/* message pane */
 
     // reserve some translations
@@ -495,7 +493,6 @@ void DebuggerMainWnd::updateUI()
 	statusBar()->changeItem(newStatus, ID_STATUS_ACTIVE);
 	m_lastActiveStatusText = newStatus;
     }
-    // line number is updated in slotLineChanged
 }
 
 void DebuggerMainWnd::dockUpdateHelper(QString action, QWidget* w)
@@ -544,7 +541,6 @@ void DebuggerMainWnd::slotFileChanged()
     QString file;
     int line;
     bool anyWindows = m_filesWindow->activeLine(file, line);
-    updateLineStatus(anyWindows ? line : -1);
     if (anyWindows) {
 	caption += " (";
 	caption += file;
@@ -553,30 +549,11 @@ void DebuggerMainWnd::slotFileChanged()
     setCaption(caption);
 }
 
-void DebuggerMainWnd::slotLineChanged()
-{
-    QString file;
-    int line;
-    bool anyWindows = m_filesWindow->activeLine(file, line);
-    updateLineStatus(anyWindows ? line : -1);
-}
-
 void DebuggerMainWnd::slotNewFileLoaded()
 {
     // updates program counter in the new file
     if (m_debugger != 0)
 	m_filesWindow->updateLineItems(m_debugger);
-}
-
-void DebuggerMainWnd::updateLineStatus(int lineNo)
-{
-    if (lineNo < 0) {
-	statusBar()->changeItem("", ID_STATUS_LINENO);
-    } else {
-	QString strLine;
-	strLine.sprintf(i18n("Line %d"), lineNo + 1);
-	statusBar()->changeItem(strLine, ID_STATUS_LINENO);
-    }
 }
 
 KDockWidget* DebuggerMainWnd::dockParent(QWidget* w)

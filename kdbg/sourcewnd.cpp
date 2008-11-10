@@ -735,8 +735,6 @@ void SourceWindow::cursorChanged(int row)
 	clearParagraphBackground(m_curRow);
     m_curRow = row;
     setParagraphBackgroundColor(row, colorGroup().background());
-
-    emit lineChanged();
 }
 
 /*

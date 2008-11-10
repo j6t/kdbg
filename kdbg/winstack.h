@@ -93,7 +93,6 @@ public:
 
 signals:
     void fileChanged();
-    void lineChanged();
     void toggleBreak(const QString&, int, const DbgAddr&, bool);
     void enadisBreak(const QString&, int, const DbgAddr&);
     void newFileLoaded();

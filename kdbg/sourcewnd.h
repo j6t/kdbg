@@ -73,7 +73,6 @@ signals:
     void disassemble(const QString&, int);
     void expanded(int lineNo);		/* source lineNo has been expanded */
     void collapsed(int lineNo);		/* source lineNo has been collapsed */
-    void lineChanged();
 public slots:
     void setTabWidth(int numChars);
     void cursorChanged(int row);
