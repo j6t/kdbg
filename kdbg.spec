@@ -13,7 +13,7 @@ Prefix: %{prefix}
 Group: X11/KDE/Development
 Copyright: GPL
 Distribution: RedHat 7.0
-Vendor: Johannes Sixt <johannes.sixt@telecom.at>
+Vendor: Johannes Sixt <j6t@kdbg.org>
 Packager: Ullrich von Bassewitz <uz@musoftware.de>
 Source: %{name}-%{version}.tar.gz
 URL: http://www.kdbg.org/

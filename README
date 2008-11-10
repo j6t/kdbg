@@ -3,16 +3,13 @@ KDE, the K Desktop Environment.
 
 To install:
 
-	./configure
+	./configure --prefix=/opt/kde3
 	make
 	make install
 
-To compile and install for KDE 2 and Qt 2.x:
-
-	./configure --with-kde-version=2
-	make
-	make install
-
+Choose the location of your KDE3 installation as prefix. In particular,
+do not choose /usr/local unless you have KDE3 installed there or you know
+what you are doing.
 
 Problem reports as well as success stories are welcome!
 
@@ -23,4 +20,4 @@ The homepage is at
 You'll find the most recent version of KDbg there as well as
 other useful information concerning debugging.
 
-Johannes.Sixt@telecom.at
+Johannes Sixt <j6t@kdbg.org>

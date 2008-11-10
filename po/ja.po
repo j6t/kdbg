@@ -1,6 +1,6 @@
 # KDbg - Debugger GUI for gdb
 # Copyright (C) 1998-2000 Johannes Sixt
-# Johannes Sixt <Johannes.Sixt@telecom.at>, 2000
+# Johannes Sixt <j6t@kdbg.org>, 2000
 #
 msgid ""
 msgstr ""
@@ -925,14 +925,6 @@ msgstr ""
 
 #~ msgid "&Modify"
 #~ msgstr "変更(&M)"
-
-#~ msgid ""
-#~ "A Debugger\n"
-#~ "by Johannes Sixt <Johannes.Sixt@telecom.at>\n"
-#~ "with the help of many others"
-#~ msgstr ""
-#~ "デバッガー\n"
-#~ "by Johannes Sixt <Johannes.Sixt@telecom.at>"
 
 #~ msgid "&Add"
 #~ msgstr "追加(&A)"
