@@ -79,6 +79,7 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     m_bpTable->setDebugger(m_debugger);
     m_memoryWindow->setDebugger(m_debugger);
 
+    setStandardToolBarMenuEnabled(true);
     initKAction();
     initToolbar(); // kind of obsolete?
 
@@ -204,7 +205,6 @@ void DebuggerMainWnd::initKAction()
                       SLOT(slotFileGlobalSettings()), actionCollection(),
                       "settings_global");
     KStdAction::keyBindings(this, SLOT(slotConfigureKeys()), actionCollection());
-    KStdAction::showToolbar(this, SLOT(slotViewToolbar()), actionCollection());
     KStdAction::showStatusbar(this, SLOT(slotViewStatusbar()), actionCollection());
 
     // view menu
@@ -310,9 +310,6 @@ void DebuggerMainWnd::initKAction()
 void DebuggerMainWnd::initToolbar()
 {
     KToolBar* toolbar = toolBar("mainToolBar");
-    toolbar->setBarPos(KToolBar::Top);
-    //moveToolBar(toolbar);
-    
     toolbar->insertAnimatedWidget(ID_STATUS_BUSY,
 	actionCollection()->action("exec_break"), SLOT(activate()),
 	"pulse", -1);
@@ -867,20 +864,13 @@ void DebuggerMainWnd::slotFileProgSettings()
     }
 }
 
-void DebuggerMainWnd::slotViewToolbar()
-{
-    if (toolBar()->isVisible())
-	toolBar()->hide();
-    else
-	toolBar()->show();
-}
-
 void DebuggerMainWnd::slotViewStatusbar()
 {
     if (statusBar()->isVisible())
 	statusBar()->hide();
     else
 	statusBar()->show();
+    setSettingsDirty();
 }
 
 void DebuggerMainWnd::slotExecUntil()

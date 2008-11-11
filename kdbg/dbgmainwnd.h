@@ -103,7 +103,6 @@ public slots:
     void slotFileCore();
     void slotFileGlobalSettings();
     void slotFileProgSettings();
-    void slotViewToolbar();
     void slotViewStatusbar();
     void slotExecUntil();
     void slotExecAttach();
