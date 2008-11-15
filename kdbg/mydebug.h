@@ -1,4 +1,8 @@
-// $Id$
+/*
+ * Copyright Johannes Sixt
+ * This file is licensed under the GNU General Public License Version 2.
+ * See the file COPYING in the toplevel directory of the source directory.
+ */
 
 #include <kdebug.h>
 #include <assert.h>

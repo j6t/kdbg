@@ -1,8 +1,8 @@
-// -*- Mode: C++; tab-width: 8; indent-tabs-mode: nil; c-basic-offset: 4 -*-
-// $Id$
-
-// Copyright by Judin Max, Johannes Sixt, Daniel Kristjansson
-// This file is under GPL, the GNU General Public Licence
+/*
+ * Copyright Max Judin, Johannes Sixt, Daniel Kristjansson
+ * This file is licensed under the GNU General Public License Version 2.
+ * See the file COPYING in the toplevel directory of the source directory.
+ */
 
 #include <qheader.h>
 #include <kglobalsettings.h>
