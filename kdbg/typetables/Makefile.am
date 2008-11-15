@@ -1,5 +1,3 @@
-## $Id$
-
 # types in libraries that we understand
 typesdir = $(kde_datadir)/kdbg/types
 types_DATA = \

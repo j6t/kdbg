@@ -1,5 +1,3 @@
-## $Id$
-
 # set the include path for X, qt and KDE
 INCLUDES= $(all_includes)
 

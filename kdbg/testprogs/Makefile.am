@@ -1,5 +1,3 @@
-## $Id$
-
 ## This is the example XSL and XML files for debugging with xsldbg 
 EXTRA_DIST = xsldoc.xsl xsldoc.xml
 
