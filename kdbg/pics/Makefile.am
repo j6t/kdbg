@@ -1,5 +1,3 @@
-## $Id$
-
 # toolbar icons
 
 kdbgiconsdir = $(kde_datadir)/kdbg/icons
