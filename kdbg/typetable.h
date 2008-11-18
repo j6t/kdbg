@@ -7,6 +7,7 @@
 #include <qdict.h>
 #include <qstring.h>
 #include <qregexp.h>
+#include <qstringlist.h>
 #include <qstrlist.h>
 
 class KConfigBase;
@@ -89,7 +90,7 @@ public:
     /**
      * Is the specified builtin feature enabled in this type library?
      */
-    bool isEnabledBuiltin(const char* feature);
+    bool isEnabledBuiltin(const QString& feature) const;
 
     /**
      * Returns the command to print the QString data.
@@ -102,12 +103,12 @@ protected:
      */
     static void loadTypeTables();
     void loadFromFile(const QString& fileName);
-    void readType(KConfigBase& cf, const char* type);
+    void readType(KConfigBase& cf, const QString& type);
     QDict<TypeInfo> m_typeDict;
     QDict<TypeInfo> m_aliasDict;
     QString m_displayName;
     QRegExp m_shlibNameRE;
-    QStrList m_enabledBuiltins;
+    QStringList m_enabledBuiltins;
     char* m_printQStringDataCmd;
 };
 
@@ -142,7 +143,7 @@ public:
      * 
      * If the type is unknown, 0 is returned.
      */
-    TypeInfo* lookup(const char* type);
+    TypeInfo* lookup(const QString& type);
 
     /**
      * Adds a new alias for a type name.

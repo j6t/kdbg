@@ -93,17 +93,12 @@ void TypeTable::loadFromFile(const QString& fileName)
     m_displayName = cf.readEntry(LibDisplayName);
     if (m_displayName.isEmpty()) {
 	// use file name instead
-	int slash = fileName.findRev('\\');
-	m_displayName =
-	    slash >= 0 ? fileName.mid(slash+1, fileName.length()) : fileName;
-	int dot = m_displayName.findRev('.');
-	if (dot > 0) {
-	    m_displayName.truncate(dot);
-	}
+	QFileInfo fi(fileName);
+	m_displayName = fi.baseName(true);
     }
 
     m_shlibNameRE = QRegExp(cf.readEntry(ShlibRE));
-    cf.readListEntry(EnableBuiltin, m_enabledBuiltins);
+    m_enabledBuiltins = cf.readListEntry(EnableBuiltin);
 
     QString printQString = cf.readEntry(PrintQStringCmd);
     const char* ascii = printQString.ascii();
@@ -117,7 +112,6 @@ void TypeTable::loadFromFile(const QString& fileName)
      * because a single entry Types could get rather long for large
      * libraries.
      */
-    QStrList typeNames;
     QString typesEntry;
     for (int i = 1; ; i++) {
 	// next bunch of types
@@ -125,41 +119,40 @@ void TypeTable::loadFromFile(const QString& fileName)
 	typesEntry.sprintf(TypesEntryFmt, i);
 	if (!cf.hasKey(typesEntry))
 	    break;
-	cf.readListEntry(typesEntry, typeNames, ',');
+
+	QStringList typeNames = cf.readListEntry(typesEntry, ',');
 
 	// now read them
 	QString alias;
-	for (QListIterator<char> it(typeNames); it != 0; ++it) {
-	    cf.setGroup(it.current());
+	for (QStringList::iterator it = typeNames.begin(); it != typeNames.end(); ++it)
+	{
+	    cf.setGroup(*it);
 	    // check if this is an alias
 	    alias = cf.readEntry(AliasEntry);
 	    if (alias.isEmpty()) {
-		readType(cf, it);
+		readType(cf, *it);
 	    } else {
 		// look up the alias type and insert it
 		TypeInfo* info = m_typeDict[alias];
 		if (info == 0) {
-		    TRACE(QString().sprintf("<%s>: alias %s not found",
-					    it.operator char*(), alias.data()));
+		    TRACE(*it + ": alias " + alias + " not found");
 		} else {
 		    m_aliasDict.insert(alias, info);
-		    TRACE(QString().sprintf("<%s>: alias <%s>",
-					    it.operator char*(), alias.data()));
+		    TRACE(*it + ": alias " + alias);
 		}
 	    }
 	}
     } // for all Types%d
 }
 
-void TypeTable::readType(KConfigBase& cf, const char* type)
+void TypeTable::readType(KConfigBase& cf, const QString& type)
 {
     // the display string
     QString expr = cf.readEntry(DisplayEntry);
 
     TypeInfo* info = new TypeInfo(expr);
     if (info->m_numExprs == 0) {
-	TRACE(QString().sprintf("bogus type %s: no %% in Display: '%s'",
-				type, expr.data()));
+	TRACE("bogus type " + type + ": no %% in Display: " + expr);
 	delete info;
 	return;
     }
@@ -179,8 +172,7 @@ void TypeTable::readType(KConfigBase& cf, const char* type)
 
     // add the new type
     m_typeDict.insert(type, info);
-    TRACE(QString().sprintf("<%s>: %d exprs", type,
-			    info->m_numExprs));
+    TRACE(type + QString().sprintf(": %d exprs", info->m_numExprs));
 }
 
 void TypeTable::copyTypes(QDict<TypeInfo>& dict)
@@ -193,15 +185,9 @@ void TypeTable::copyTypes(QDict<TypeInfo>& dict)
     }
 }
 
-bool TypeTable::isEnabledBuiltin(const char* feature)
+bool TypeTable::isEnabledBuiltin(const QString& feature) const
 {
-    char* f = m_enabledBuiltins.first();
-    while (f) {
-	if (strcmp(feature, f) == 0)
-	    return true;
-	f = m_enabledBuiltins.next();
-    }
-    return false;
+    return m_enabledBuiltins.find(feature) != m_enabledBuiltins.end();
 }
 
 TypeInfo::TypeInfo(const QString& displayString)
@@ -263,7 +249,7 @@ void ProgramTypeTable::loadTypeTable(TypeTable* table)
     }
 }
 
-TypeInfo* ProgramTypeTable::lookup(const char* type)
+TypeInfo* ProgramTypeTable::lookup(const QString& type)
 {
     TypeInfo* result = m_types[type];
     if (result == 0) {
