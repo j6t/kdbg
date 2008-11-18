@@ -140,15 +140,7 @@ public:
     /**
      * Lookup a structure type.
      * 
-     * A type is looked up in the following manner:
-     * 
-     * - If the type is unknown, 0 is returned.
-     * 
-     * - If the type is known and it belongs to a shared library and that
-     * shared library was loaded, the type is returned such that isNew()
-     * returns true.
-     * 
-     * - Otherwise the type is returned such that isNew() returns true.
+     * If the type is unknown, 0 is returned.
      */
     TypeInfo* lookup(const char* type);
 
