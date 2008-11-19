@@ -249,8 +249,13 @@ void ProgramTypeTable::loadTypeTable(TypeTable* table)
     }
 }
 
-TypeInfo* ProgramTypeTable::lookup(const QString& type)
+TypeInfo* ProgramTypeTable::lookup(QString type)
 {
+    // compress any template types to '<*>'
+    int templ = type.find('<');
+    if (templ > 0) {
+	type = type.left(templ) + "<*>";
+    }
     TypeInfo* result = m_types[type];
     if (result == 0) {
 	result = m_aliasDict[type];

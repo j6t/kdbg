@@ -1,7 +1,14 @@
 [Type Table]
 Types1=string
+Types2=std::vector<*>
 LibDisplayName=libstdc++6
 ShlibRE=libstdc\+\+\.so\.6$
+
 [string]
 Display={ % }
 Expr1=(%s)._M_dataplus._M_p
+
+[std::vector<*>]
+Display={ size=% capcity=% }
+Expr1=($vec=(%s)._M_impl)._M_finish-$vec._M_start
+Expr2=($vec=(%s)._M_impl)._M_end_of_storage-$vec._M_start

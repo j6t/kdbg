@@ -143,7 +143,7 @@ public:
      * 
      * If the type is unknown, 0 is returned.
      */
-    TypeInfo* lookup(const QString& type);
+    TypeInfo* lookup(QString type);
 
     /**
      * Adds a new alias for a type name.
