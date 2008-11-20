@@ -134,11 +134,6 @@ public:
     void loadTypeTable(TypeTable* table);
 
     /**
-     * Clears that types and starts over (e.g. for a new program).
-     */
-    void clear();
-
-    /**
      * Lookup a structure type.
      * 
      * If the type is unknown, 0 is returned.

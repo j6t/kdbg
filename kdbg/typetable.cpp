@@ -229,11 +229,6 @@ ProgramTypeTable::~ProgramTypeTable()
 {
 }
 
-void ProgramTypeTable::clear()
-{
-    m_types.clear();
-}
-
 void ProgramTypeTable::loadTypeTable(TypeTable* table)
 {
     table->copyTypes(m_types);
