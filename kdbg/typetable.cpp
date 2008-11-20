@@ -251,16 +251,19 @@ void ProgramTypeTable::loadTypeTable(TypeTable* table)
 
 TypeInfo* ProgramTypeTable::lookup(QString type)
 {
+    /*
+     * Registered aliases contain the complete template parameter list.
+     * Check for an alias first so that this case is out of the way.
+     */
+    if (TypeInfo* result = m_aliasDict[type])
+	return result;
+
     // compress any template types to '<*>'
     int templ = type.find('<');
     if (templ > 0) {
-	type = type.left(templ) + "<*>";
+	return m_types[type.left(templ) + "<*>"];
     }
-    TypeInfo* result = m_types[type];
-    if (result == 0) {
-	result = m_aliasDict[type];
-    }
-    return result;
+    return m_types[type];
 }
 
 void ProgramTypeTable::registerAlias(const QString& name, TypeInfo* type)
