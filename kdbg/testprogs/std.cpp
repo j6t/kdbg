@@ -1,6 +1,9 @@
 #include <string>
 #include <vector>
 #include <iostream>
+#include <sstream>
+#include <algorithm>
+#include <iterator>
 
 template<typename T>
 struct V : std::vector<T>
@@ -15,6 +18,11 @@ struct V : std::vector<T>
 void test_vector(std::vector<std::string>& v)
 {
 	v.push_back("xyz");
+};
+
+void test_sstream(std::basic_ostringstream<char>& str)
+{
+	str << "Example:\n ";
 }
 
 int main()
@@ -25,5 +33,8 @@ int main()
 	test_vector(v);
 	v.anotherone("ABC");
 
-	std::cout << s << std::endl;
+	std::ostringstream dump;
+	test_sstream(dump);
+	std::copy(v.begin(), v.end(), std::ostream_iterator<std::string>(dump, "\n "));
+	std::cout << dump.str() << std::endl;
 }
