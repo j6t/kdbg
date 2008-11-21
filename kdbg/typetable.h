@@ -8,6 +8,7 @@
 #include <qstring.h>
 #include <qregexp.h>
 #include <qstringlist.h>
+#include <map>
 #include <qstrlist.h>
 
 class KConfigBase;
@@ -51,6 +52,13 @@ struct TypeInfo
      */
     QString m_guardStrings[typeInfoMaxExpr];
     /**
+     * This is the type name including template arguments that contain a
+     * pattern: A single '*' as template parameter matches one template
+     * argument, except that a '*' as the last template parameter matches
+     * all remaining template argument.
+     */
+    QString m_templatePattern;
+    /**
      * Returns a pointer to a TypeInfo that identifies wchar_t
      */
     static TypeInfo* wchartType() { return &m_wchartType; }
@@ -70,6 +78,8 @@ public:
     TypeTable();
     ~TypeTable();
 
+    typedef std::map<QString,TypeInfo*> TypeMap;
+
     /**
      * Load all known type libraries.
      */
@@ -79,6 +89,11 @@ public:
      * Copy type infos to the specified dictionary.
      */
     void copyTypes(QDict<TypeInfo>& dict);
+
+    /**
+     * Returns the template types
+     */
+    const TypeMap& templates() const { return m_templates; }
 
     /**
      * Does the file name match this library?
@@ -106,6 +121,7 @@ protected:
     void readType(KConfigBase& cf, const QString& type);
     QDict<TypeInfo> m_typeDict;
     QDict<TypeInfo> m_aliasDict;
+    TypeMap m_templates;
     QString m_displayName;
     QRegExp m_shlibNameRE;
     QStringList m_enabledBuiltins;
@@ -163,6 +179,15 @@ public:
 protected:
     QDict<TypeInfo> m_types;
     QDict<TypeInfo> m_aliasDict;
+    struct TemplateInfo {
+	QStringList templateArgs;
+	TypeInfo* type;
+    };
+    typedef std::multimap<QString, TemplateInfo> TemplateMap;
+    TemplateMap m_templates;	//!< one or more template patterns per template name
+    static TemplateMap::value_type
+		template2Info(const TypeTable::TypeMap::value_type& tt);
+    static QStringList splitTemplateArgs(const QString& t);
     bool m_parseQt2QStrings;
     bool m_QCharIsShort;
     const char* m_printQStringDataCmd;

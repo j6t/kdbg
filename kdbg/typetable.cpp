@@ -66,6 +66,10 @@ TypeTable::TypeTable() :
 TypeTable::~TypeTable()
 {
     delete[] m_printQStringDataCmd;
+    while (!m_templates.empty()) {
+	delete m_templates.begin()->second;
+	m_templates.erase(m_templates.begin());
+    }
 }
 
 
@@ -77,6 +81,7 @@ static const char PrintQStringCmd[] = "PrintQStringCmd";
 static const char TypesEntryFmt[] = "Types%d";
 static const char DisplayEntry[] = "Display";
 static const char AliasEntry[] = "Alias";
+static const char TemplateEntry[] = "Template";
 static const char ExprEntryFmt[] = "Expr%d";
 static const char FunctionGuardEntryFmt[] = "FunctionGuard%d";
 
@@ -157,6 +162,8 @@ void TypeTable::readType(KConfigBase& cf, const QString& type)
 	return;
     }
 
+    info->m_templatePattern = cf.readEntry(TemplateEntry);
+
     // Expr1, Expr2, etc...
     QString exprEntry;
     QString funcGuardEntry;
@@ -171,7 +178,10 @@ void TypeTable::readType(KConfigBase& cf, const QString& type)
     }
 
     // add the new type
-    m_typeDict.insert(type, info);
+    if (info->m_templatePattern.find('<') < 0)
+	m_typeDict.insert(type, info);
+    else
+	m_templates[type] = info;
     TRACE(type + QString().sprintf(": %d exprs", info->m_numExprs));
 }
 
@@ -232,6 +242,13 @@ ProgramTypeTable::~ProgramTypeTable()
 void ProgramTypeTable::loadTypeTable(TypeTable* table)
 {
     table->copyTypes(m_types);
+
+    // add templates
+    const TypeTable::TypeMap& t = table->templates();
+    std::transform(t.begin(), t.end(),
+		std::inserter(m_templates, m_templates.begin()),
+		std::ptr_fun(template2Info));
+
     // check whether to enable builtin QString support
     if (!m_parseQt2QStrings) {
 	m_parseQt2QStrings = table->isEnabledBuiltin("QString::Data");
@@ -244,6 +261,58 @@ void ProgramTypeTable::loadTypeTable(TypeTable* table)
     }
 }
 
+ProgramTypeTable::TemplateMap::value_type
+	ProgramTypeTable::template2Info(const TypeTable::TypeMap::value_type& tt)
+{
+    QStringList args = splitTemplateArgs(tt.second->m_templatePattern);
+
+    TemplateMap::value_type result(args.front(), TemplateInfo());
+    result.second.type = tt.second;
+    args.pop_front();
+    result.second.templateArgs = args;
+    return result;
+}
+
+/**
+ * Splits the name \a t into the template name and its arguments.
+ * The first entry of the returned list is the template name, the remaining
+ * entries are the arguments.
+ */
+QStringList ProgramTypeTable::splitTemplateArgs(const QString& t)
+{
+    QStringList result;
+    result.push_back(t);
+
+    int i = t.find('<');
+    if (i < 0)
+	return result;
+
+    // split off the template name
+    result.front().truncate(i);
+
+    i++;	// skip '<'
+    // look for the next comma or the closing '>', skipping nested '<>'
+    int nest = 0;
+    int start = i;
+    for (; unsigned(i) < t.length() && nest >= 0; i++)
+    {
+	if (t[i] == '<')
+	    nest++;
+	else if (t[i] == '>')
+	    nest--;
+	else if (nest == 0 && t[i] == ',') {
+	    // found end of argument
+	    QString arg = t.mid(start, i-start);
+	    result.push_back(arg);
+	    start = i+1;	// skip ','
+	}
+    }
+    // last argument; could be incomplete
+    QString arg = t.mid(start, i-start-(nest<0));
+    result.push_back(arg);
+    return result;
+}
+
 TypeInfo* ProgramTypeTable::lookup(QString type)
 {
     /*
@@ -253,12 +322,45 @@ TypeInfo* ProgramTypeTable::lookup(QString type)
     if (TypeInfo* result = m_aliasDict[type])
 	return result;
 
-    // compress any template types to '<*>'
-    int templ = type.find('<');
-    if (templ > 0) {
-	return m_types[type.left(templ) + "<*>"];
+    /*
+     * Check for a normal type. Even if type is a template instance,
+     * it could have been registered as a normal type instead of a pattern.
+     */
+    if (TypeInfo* result = m_types[type])
+	return result;
+
+    /*
+     * The hard part: Look up a template.
+     */
+    QStringList parts = splitTemplateArgs(type);
+    if (parts.size() == 1)
+	return 0;	// not a template
+
+    // We can have several patterns for the same template name.
+    std::pair<TemplateMap::const_iterator, TemplateMap::const_iterator> range =
+	m_templates.equal_range(parts.front());
+    parts.pop_front();
+
+    for (TemplateMap::const_iterator i = range.first; i != range.second; ++i)
+    {
+	const QStringList& pat = i->second.templateArgs;
+	if (parts.size() < pat.size())
+	    continue;	// too few arguments
+
+	// a "*" in the last position of the pattern matches all arguments
+	// at the end of the template's arguments
+	if (parts.size() > pat.size() && pat.back() != "*")
+	    continue;	// too many arguments and no wildcard
+
+	QStringList::const_iterator t = parts.begin();
+	QStringList::const_iterator p = pat.begin();
+	bool equal = true;
+	for (; equal && p != pat.end(); ++p, ++t)
+	    equal = *p == "*" || *p == *t;
+	if (equal)
+	    return i->second.type;
     }
-    return m_types[type];
+    return 0;
 }
 
 void ProgramTypeTable::registerAlias(const QString& name, TypeInfo* type)
