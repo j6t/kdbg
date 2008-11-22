@@ -11,7 +11,17 @@ AM_CXXFLAGS = -g
 CXXFLAGS:=$(patsubst -O%,,$(CXXFLAGS))
 
 if BUILDTESTPROGS
-PROGS = testfile locals maths repeats std templates anonstruct nestedclass widechar
+PROGS = \
+	anonstruct \
+	locals \
+	maths \
+	nestedclass \
+	qt \
+	repeats \
+	std \
+	templates \
+	testfile \
+	widechar
 else
 PROGS =
 endif
@@ -27,6 +37,10 @@ locals_LDFLAGS = -g
 
 maths_SOURCES = maths.cpp
 maths_LDFLAGS = -g
+
+qt_SOURCES = qt.cpp
+qt_LDFLAGS = -g $(all_libraries) $(KDE_RPATH)
+qt_LDADD = $(LIB_QT)
 
 repeats_SOURCES = repeats.cpp
 repeats_LDFLAGS = -g $(all_libraries) $(KDE_RPATH)
