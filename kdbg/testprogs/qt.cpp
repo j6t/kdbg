@@ -2,6 +2,7 @@
 #include <qvaluelist.h>
 #include <qvaluevector.h>
 #include <qstring.h>
+#include <qrect.h>
 #include <iostream>
 
 template<typename T>
@@ -32,4 +33,9 @@ int main()
 	QValueVector<double> vals(6, 47.11);
 	vals.push_back(42);
 	test_sharing(vals);
+
+	QRect r(10,20, 130, 240);
+	QPoint p = r.topLeft();
+	QPoint q = r.bottomRight();
+	std::cout << r.width() << r.height() << p.x() << q.y() << std::endl;
 }

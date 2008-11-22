@@ -2,6 +2,7 @@
 Types1=QString,QCString,QDir,QFileInfo,QFile
 Types2=QObject
 Types3=QMap,QValueList,QValueVector
+Types4=QPoint,QRect
 LibDisplayName=libqt 3.x
 ShlibRE=libqt-mt\.so\.3$
 EnableBuiltin=QString::Data,QCharIsShort
@@ -50,3 +51,15 @@ Display={ size=% shared=% capacity=% }
 Expr1=($tmp=(%s).sh)->finish-$tmp->start
 Expr2=(%s).sh->count
 Expr3=($tmp=(%s).sh)->end-$tmp->start
+
+[QPoint]
+Display={ %,% }
+Expr1=(%s).xp
+Expr2=(%s).yp
+
+[QRect]
+Display={ tl=(%,%) br=(%,%) }
+Expr1=(%s).x1
+Expr2=(%s).y1
+Expr3=(%s).x2
+Expr4=(%s).y2
