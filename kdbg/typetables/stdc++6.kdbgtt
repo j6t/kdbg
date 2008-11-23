@@ -1,6 +1,6 @@
 [Type Table]
 Types1=string,basic_string<char>,ostringstream,basic_ostringstream<char>
-Types2=std::vector
+Types2=std::vector,std::list,std::map
 LibDisplayName=libstdc++6
 ShlibRE=libstdc\+\+\.so\.6$
 
@@ -27,3 +27,13 @@ Template=std::vector<*>
 Display={ size=% capcity=% }
 Expr1=($vec=(%s)._M_impl)._M_finish-$vec._M_start
 Expr2=($vec=(%s)._M_impl)._M_end_of_storage-$vec._M_start
+
+[std::list]
+Template=std::list<*>
+Display={ size=% }
+Expr1=(%s).size()
+
+[std::map]
+Template=std::map<*>
+Display={ size=% }
+Expr1=(%s)._M_t._M_impl._M_node_count

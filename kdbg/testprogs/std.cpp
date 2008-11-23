@@ -1,5 +1,7 @@
 #include <string>
 #include <vector>
+#include <list>
+#include <map>
 #include <iostream>
 #include <sstream>
 #include <algorithm>
@@ -15,9 +17,10 @@ struct V : std::vector<T>
 	}
 };
 
-void test_vector(std::vector<std::string>& v)
+template<typename C, typename T>
+void test_container(C& v, T x)
 {
-	v.push_back("xyz");
+	v.push_back(x);
 };
 
 void test_sstream(std::basic_ostringstream<char>& str)
@@ -29,9 +32,18 @@ int main()
 {
 	std::string s = "abc";
 	V<std::string> v(s);
-
-	test_vector(v);
+	test_container(v, "xyz");
 	v.anotherone("ABC");
+
+	std::list<int> l;
+	l.push_front(-88);
+	test_container(l, 42);
+	std::cout << l.size() << std::endl;
+
+	std::map<std::string,double> m;
+	m["example"] = 47.11;
+	m.insert(std::make_pair("kdbg", 3.14));
+	std::cout << m.size() << std::endl;
 
 	std::ostringstream dump;
 	test_sstream(dump);
