@@ -307,9 +307,14 @@ QStringList ProgramTypeTable::splitTemplateArgs(const QString& t)
 	    start = i+1;	// skip ','
 	}
     }
-    // last argument; could be incomplete
-    QString arg = t.mid(start, i-start-(nest<0));
-    result.push_back(arg);
+    // accept the template only if the closing '>' is the last character
+    if (nest < 0 && unsigned(i) == t.length()) {
+	QString arg = t.mid(start, i-start-1);
+	result.push_back(arg);
+    } else {
+	result.clear();
+	result.push_back(t);
+    }
     return result;
 }
 
