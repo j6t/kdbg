@@ -344,6 +344,9 @@ TypeInfo* ProgramTypeTable::lookup(QString type)
     // We can have several patterns for the same template name.
     std::pair<TemplateMap::const_iterator, TemplateMap::const_iterator> range =
 	m_templates.equal_range(parts.front());
+    // We pick the one that has the wildcards in the later parameters.
+    unsigned minPenalty = ~0U;
+    TypeInfo* result = 0;
     parts.pop_front();
 
     for (TemplateMap::const_iterator i = range.first; i != range.second; ++i)
@@ -359,13 +362,24 @@ TypeInfo* ProgramTypeTable::lookup(QString type)
 
 	QStringList::const_iterator t = parts.begin();
 	QStringList::const_iterator p = pat.begin();
+	unsigned penalty = 0;
 	bool equal = true;
-	for (; equal && p != pat.end(); ++p, ++t)
-	    equal = *p == "*" || *p == *t;
+	for (int j = 0; equal && p != pat.end(); ++p, ++t, ++j)
+	{
+	    if (*p == "*")
+		penalty += 1U << j;	// penalize wildcards
+	    else
+	    	equal = *p == *t;
+	}
 	if (equal)
-	    return i->second.type;
+	{
+	    if (penalty == 0)
+		return i->second.type;
+	    if (penalty < minPenalty)
+		result = i->second.type;
+	}
     }
-    return 0;
+    return result;
 }
 
 void ProgramTypeTable::registerAlias(const QString& name, TypeInfo* type)

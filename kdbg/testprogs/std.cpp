@@ -35,6 +35,12 @@ int main()
 	test_container(v, "xyz");
 	v.anotherone("ABC");
 
+	std::vector<bool> vb;
+	vb.push_back(true);
+	test_container(vb, false);
+	vb[0] = vb[1];
+	std::cout << vb.size() << std::endl;
+
 	std::list<int> l;
 	l.push_front(-88);
 	test_container(l, 42);
