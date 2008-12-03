@@ -44,18 +44,12 @@ The <tt>[Type Table]</tt> group</h2>
 <p>This group contains the following entries:</p>
 <ul>
 <li>
-<tt>Types1</tt>, <tt>Types2</tt>, etc. These entries name the types.  
-The naming should follow the output of the <tt>whatis</tt> gdb command in the
-case of gdb as a backend less any <tt>const</tt>, <i>spaces</i>, or trailing
-<tt>&</tt>. Each is a comma-separated list of type names.
-If the type contains a a comma in its name, it can be escaped with a backslash.
-But, note that the comma should not be escaped in the type's group, described below.
-Each of the entries can
-list any number of types. (The types names can be distributed to several
-lines just so that the lines don't get excessivly long.) No blank space
-is allowed in these lines. The entries must be numbered consecutively (KDbg
-stops reading at the first gap), although an entry may be empty (i.e. contain
-no type at all). Sometimes the order in which the names are listed is important
+<tt>Types1</tt>, <tt>Types2</tt>, etc. These entries name the types,
+separated by commas.
+Each of the entries can list any number of types. The entries must be numbered
+consecutively (KDbg stops reading at the first gap), although an entry may be
+empty (i.e. contain no type at all).
+Sometimes the order in which the names are listed is important
 (see <tt>Alias</tt> types below).</li>
 
 <li>
@@ -84,12 +78,29 @@ to specify that a unicode character is stored in an object of type <tt>short</tt
 See <tt>qt3.kdbgtt</tt> for examples.</li></ul></li>
 </ul>
 
+<p>In the case of regular types the names of types should follow the output of the
+<tt>whatis</tt> gdb command less any <tt>const</tt>, <i>spaces</i>, or trailing
+<tt>&</tt>.
+If the type contains a a comma in its name, it must be escaped with a backslash.
+But note that the comma should not be escaped in the type's group (which is described
+in the next section).
+</p>
+<p>In the case of template types the name can be arbitrary because the type's group
+will mention the template name and a type parameter list.</p>
+
 <h2>
 The type's group</h2>
 <p>There is one group for each type that is named exactly as the type. <font size=-1>At
 the moment C++ template classes are not supported.</font> Each group contains
 the following entries:</p>
 <ul>
+<li>An optional <tt>Template</tt> entry that specifies the exact template type
+name as it is reported by gdb's <tt>whatis</tt> command. However, it is
+possible to replace template parameter types at the top-most level by an
+asterisk&nbsp;<tt>*</tt>, which acts as a wildcard: It matches <b>one</b>
+template type argument that is reported by <tt>whatis</tt> (except that an
+asterisk in the last position matches all remaining template type arguments).
+</li>
 <li>
 <tt>Display</tt> determines how the value of the type is displayed by KDbg.
 The string must contain 1 to 5 percent characters '<tt>%</tt>'. These are
