@@ -141,24 +141,44 @@ entry to quickly specify that a type should be treated like a non-leftmost
 base class for a multiple-inheritance class.</p>
 <h2>
 An example</h2>
-<p>The example shows how <tt>QString</tt> and <tt>QObject</tt> are defined
-in <tt>qt.kdbgtt</tt>. Additionally, <tt>QTableView</tt> is defined as
-an alias of <tt>QObject</tt>. This example applies to Qt 1.x, which is
-located in shared library whose name ends in <tt>libqt.so.1</tt>.</p>
+<p>The example shows how <tt>QString</tt> and <tt>QRect</tt> are defined
+in <tt>qt3.kdbgtt</tt>. Furthermore, the template type <tt>QValueVector</tt>
+is defined. This example applies to Qt 3.x, which is located in shared library
+whose name ends in <tt>libqt-mt.so.3</tt>.</p>
 <pre>[Type Table]
-Types1=QString
-Types2=QObject,QTableView
-LibDisplayName=libqt 1.x
-ShlibRE=libqt\.so\.1$
+Types1=QString,QRect
+Types2=QValueVector
+LibDisplayName=libqt 3.x
+ShlibRE=libqt-mt\.so\.3$
+EnableBuiltin=QString::Data,QCharIsShort
+
 [QString]
 Display={ % }
-Expr1=(%s).shd->data
-[QObject]
-Display={ name=% #chld=% }
-Expr1=(%s).objname
-Expr2=(%s).childObjects->numNodes
-[QTableView]
-Alias=QObject</pre>
-<p>Note that it is safer to wrap the <tt>%s</tt> in parentheses.</p>
+Expr1=/QString::Data (%s).d
+
+[QValueVector]
+Template=QValueVector<*>
+Display={ size=% shared=% capacity=% }
+Expr1=($tmp=(%s).sh)->finish-$tmp->start
+Expr2=(%s).sh->count
+Expr3=($tmp=(%s).sh)->end-$tmp->start
+
+[QRect]
+Display={ tl=(%,%) br=(%,%) }
+Expr1=(%s).x1
+Expr2=(%s).y1
+Expr3=(%s).x2
+Expr4=(%s).y2</pre>
+<p>This example shows these features:</p>
+<ul>
+<li>The name of the template type, <tt>QValueVector</tt> is irrelevant.
+The exact type name is specified under the <tt>Template=</tt> entry.
+It specifies a single wildcard so that it applies to all specializations.
+</li>
+<li>In order to evaluate the expression that was supplied in the <tt>%s</tt>
+only once, the result is stored in a temporary gdb variable and reused later in
+the same expression.</li>
+<li>Note that it is safer to wrap the <tt>%s</tt> in parentheses.</li>
+</ul>
 </body>
 </html>
