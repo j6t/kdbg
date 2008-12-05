@@ -1726,24 +1726,23 @@ void KDebugger::evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool imm
 void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 {
     QString base = var->computeExpr();
-    QString exprFmt;
+    QString expr;
     if (var->m_exprIndexUseGuard) {
-	exprFmt = var->m_type->m_guardStrings[var->m_exprIndex];
-	if (exprFmt.isEmpty()) {
+	expr = var->m_type->m_guardStrings[var->m_exprIndex];
+	if (expr.isEmpty()) {
 	    // no guard, omit it and go to expression
 	    var->m_exprIndexUseGuard = false;
 	}
     }
     if (!var->m_exprIndexUseGuard) {
-	exprFmt = var->m_type->m_exprStrings[var->m_exprIndex];
+	expr = var->m_type->m_exprStrings[var->m_exprIndex];
     }
 
-    QString expr = exprFmt;
     expr.replace("%s", base);
 
     DbgCommand dbgCmd = DCprintStruct;
     // check if this is a QString::Data
-    if (strncmp(expr, "/QString::Data ", 15) == 0)
+    if (expr.left(15) == "/QString::Data ")
     {
 	if (m_typeTable->parseQt2QStrings())
 	{
@@ -1759,8 +1758,6 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 	    // TODO: remove this "print"; queue the next printStruct instead
 	    expr = "*0";
 	}
-    } else {
-	expr = expr;
     }
     TRACE("evalStruct: " + expr + (var->m_exprIndexUseGuard ? " // guard" : " // real"));
     CmdQueueItem* cmd = m_d->queueCmd(dbgCmd, expr,
