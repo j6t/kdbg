@@ -1,28 +1,65 @@
 [Type Table]
 Types1=QString,QCString,QDir,QFileInfo,QFile
 Types2=QObject
+Types3=QMap,QValueList,QValueVector
+Types4=QPoint,QRect
 LibDisplayName=libqt 3.x
 ShlibRE=libqt-mt\.so\.3$
 EnableBuiltin=QString::Data,QCharIsShort
 PrintQStringCmd=print ($qstrunicode=($qstrdata=(%s))->unicode)?(*(unsigned short*)$qstrunicode)@(($qstrlen=(unsigned int)($qstrdata->len))>100?100:$qstrlen):1==0\n
+
 [QString]
 Display={ % }
 Expr1=/QString::Data (%s).d
+
 [QCString]
 Display={ % }
 Expr1=(%s).shd->data
+
 [QObject]
 Display={ name=% }
 Expr1=(%s).objname
-[QTableView]
-Alias=QObject
+
 [QDir]
 Display={ path=% filter=% }
 Expr1=/QString::Data (%s).dPath.d
 Expr2=/QString::Data (%s).nameFilt.d
+
 [QFileInfo]
 Display={ name=% }
 Expr1=/QString::Data (%s).fn.d
+
 [QFile]
 Display={ name=% }
 Expr1=/QString::Data (%s).fn.d
+
+[QMap]
+Template=QMap<*>
+Display={ size=% shared=% }
+Expr1=(%s).sh->node_count
+Expr2=(%s).sh->count
+
+[QValueList]
+Template=QValueList<*>
+Display={ size=% shared=% }
+Expr1=*((unsigned int*)((%s).sh)+1+sizeof(char*)/sizeof(int))
+Expr2=((QShared*)((%s).sh))->count
+
+[QValueVector]
+Template=QValueVector<*>
+Display={ size=% shared=% capacity=% }
+Expr1=($tmp=(%s).sh)->finish-$tmp->start
+Expr2=(%s).sh->count
+Expr3=($tmp=(%s).sh)->end-$tmp->start
+
+[QPoint]
+Display={ %,% }
+Expr1=(%s).xp
+Expr2=(%s).yp
+
+[QRect]
+Display={ tl=(%,%) br=(%,%) }
+Expr1=(%s).x1
+Expr2=(%s).y1
+Expr3=(%s).x2
+Expr4=(%s).y2

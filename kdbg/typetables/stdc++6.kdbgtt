@@ -1,7 +1,45 @@
 [Type Table]
-Types1=string
+Types1=string,basic_string<char>,ostringstream,basic_ostringstream<char>
+Types2=std::vector,std::vector<bool>,std::list,std::map
 LibDisplayName=libstdc++6
 ShlibRE=libstdc\+\+\.so\.6$
+
 [string]
 Display={ % }
 Expr1=(%s)._M_dataplus._M_p
+
+[basic_string<char>]
+Template=std::basic_string<char,*>
+Display={ % }
+Expr1=(%s)._M_dataplus._M_p
+
+[ostringstream]
+Display={ % }
+Expr1=(%s)._M_stringbuf._M_string._M_dataplus._M_p
+
+[basic_ostringstream<char>]
+Template=std::basic_ostringstream<char,*>
+Display={ % }
+Expr1=(%s)._M_stringbuf._M_string._M_dataplus._M_p
+
+[std::vector]
+Template=std::vector<*>
+Display={ size=% capcity=% }
+Expr1=($vec=(%s)._M_impl)._M_finish-$vec._M_start
+Expr2=($vec=(%s)._M_impl)._M_end_of_storage-$vec._M_start
+
+[std::vector<bool>]
+Template=std::vector<bool,*>
+Display={ size=% capcity=% }
+Expr1=(($vec=(%s)._M_impl)._M_finish._M_p-$vec._M_start._M_p)*sizeof(*$vec._M_end_of_storage)*8+$vec._M_finish._M_offset
+Expr2=(($vec=(%s)._M_impl)._M_end_of_storage-$vec._M_start._M_p)*sizeof(*$vec._M_end_of_storage)*8
+
+[std::list]
+Template=std::list<*>
+Display={ size=% }
+Expr1=(%s).size()
+
+[std::map]
+Template=std::map<*>
+Display={ size=% }
+Expr1=(%s)._M_t._M_impl._M_node_count

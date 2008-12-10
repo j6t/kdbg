@@ -15,14 +15,14 @@
 #include "typetable.h"
 #include "mydebug.h"
 
-// the TypeTables of all known libraries
+//! the TypeTables of all known libraries
 static QList<TypeTable> typeTables;
 bool typeTablesInited = false;
 
 
-// an indentifier for wchar_t
+//! an indentifier for wchar_t
 TypeInfo TypeInfo::m_wchartType("");
-// the unknown type
+//! the unknown type
 TypeInfo TypeInfo::m_unknownType("");
 
 
@@ -37,7 +37,8 @@ void TypeTable::loadTypeTables()
 {
     typeTablesInited = true;
 
-    const QStringList files = KGlobal::dirs()->findAllResources("types", "*.kdbgtt");
+    const QStringList files = KGlobal::dirs()->findAllResources("types", "*.kdbgtt",
+			false, true);
     
     if (files.isEmpty()) {
 	TRACE("no type tables found");
@@ -65,6 +66,10 @@ TypeTable::TypeTable() :
 TypeTable::~TypeTable()
 {
     delete[] m_printQStringDataCmd;
+    while (!m_templates.empty()) {
+	delete m_templates.begin()->second;
+	m_templates.erase(m_templates.begin());
+    }
 }
 
 
@@ -76,6 +81,7 @@ static const char PrintQStringCmd[] = "PrintQStringCmd";
 static const char TypesEntryFmt[] = "Types%d";
 static const char DisplayEntry[] = "Display";
 static const char AliasEntry[] = "Alias";
+static const char TemplateEntry[] = "Template";
 static const char ExprEntryFmt[] = "Expr%d";
 static const char FunctionGuardEntryFmt[] = "FunctionGuard%d";
 
@@ -92,17 +98,12 @@ void TypeTable::loadFromFile(const QString& fileName)
     m_displayName = cf.readEntry(LibDisplayName);
     if (m_displayName.isEmpty()) {
 	// use file name instead
-	int slash = fileName.findRev('\\');
-	m_displayName =
-	    slash >= 0 ? fileName.mid(slash+1, fileName.length()) : fileName;
-	int dot = m_displayName.findRev('.');
-	if (dot > 0) {
-	    m_displayName.truncate(dot);
-	}
+	QFileInfo fi(fileName);
+	m_displayName = fi.baseName(true);
     }
 
     m_shlibNameRE = QRegExp(cf.readEntry(ShlibRE));
-    cf.readListEntry(EnableBuiltin, m_enabledBuiltins);
+    m_enabledBuiltins = cf.readListEntry(EnableBuiltin);
 
     QString printQString = cf.readEntry(PrintQStringCmd);
     const char* ascii = printQString.ascii();
@@ -116,7 +117,6 @@ void TypeTable::loadFromFile(const QString& fileName)
      * because a single entry Types could get rather long for large
      * libraries.
      */
-    QStrList typeNames;
     QString typesEntry;
     for (int i = 1; ; i++) {
 	// next bunch of types
@@ -124,44 +124,45 @@ void TypeTable::loadFromFile(const QString& fileName)
 	typesEntry.sprintf(TypesEntryFmt, i);
 	if (!cf.hasKey(typesEntry))
 	    break;
-	cf.readListEntry(typesEntry, typeNames, ',');
+
+	QStringList typeNames = cf.readListEntry(typesEntry, ',');
 
 	// now read them
 	QString alias;
-	for (QListIterator<char> it(typeNames); it != 0; ++it) {
-	    cf.setGroup(it.current());
+	for (QStringList::iterator it = typeNames.begin(); it != typeNames.end(); ++it)
+	{
+	    cf.setGroup(*it);
 	    // check if this is an alias
 	    alias = cf.readEntry(AliasEntry);
 	    if (alias.isEmpty()) {
-		readType(cf, it);
+		readType(cf, *it);
 	    } else {
 		// look up the alias type and insert it
 		TypeInfo* info = m_typeDict[alias];
 		if (info == 0) {
-		    TRACE(QString().sprintf("<%s>: alias %s not found",
-					    it.operator char*(), alias.data()));
+		    TRACE(*it + ": alias " + alias + " not found");
 		} else {
 		    m_aliasDict.insert(alias, info);
-		    TRACE(QString().sprintf("<%s>: alias <%s>",
-					    it.operator char*(), alias.data()));
+		    TRACE(*it + ": alias " + alias);
 		}
 	    }
 	}
     } // for all Types%d
 }
 
-void TypeTable::readType(KConfigBase& cf, const char* type)
+void TypeTable::readType(KConfigBase& cf, const QString& type)
 {
     // the display string
     QString expr = cf.readEntry(DisplayEntry);
 
     TypeInfo* info = new TypeInfo(expr);
     if (info->m_numExprs == 0) {
-	TRACE(QString().sprintf("bogus type %s: no %% in Display: '%s'",
-				type, expr.data()));
+	TRACE("bogus type " + type + ": no %% in Display: " + expr);
 	delete info;
 	return;
     }
+
+    info->m_templatePattern = cf.readEntry(TemplateEntry);
 
     // Expr1, Expr2, etc...
     QString exprEntry;
@@ -177,9 +178,11 @@ void TypeTable::readType(KConfigBase& cf, const char* type)
     }
 
     // add the new type
-    m_typeDict.insert(type, info);
-    TRACE(QString().sprintf("<%s>: %d exprs", type,
-			    info->m_numExprs));
+    if (info->m_templatePattern.find('<') < 0)
+	m_typeDict.insert(type, info);
+    else
+	m_templates[type] = info;
+    TRACE(type + QString().sprintf(": %d exprs", info->m_numExprs));
 }
 
 void TypeTable::copyTypes(QDict<TypeInfo>& dict)
@@ -192,15 +195,9 @@ void TypeTable::copyTypes(QDict<TypeInfo>& dict)
     }
 }
 
-bool TypeTable::isEnabledBuiltin(const char* feature)
+bool TypeTable::isEnabledBuiltin(const QString& feature) const
 {
-    char* f = m_enabledBuiltins.first();
-    while (f) {
-	if (strcmp(feature, f) == 0)
-	    return true;
-	f = m_enabledBuiltins.next();
-    }
-    return false;
+    return m_enabledBuiltins.find(feature) != m_enabledBuiltins.end();
 }
 
 TypeInfo::TypeInfo(const QString& displayString)
@@ -242,14 +239,16 @@ ProgramTypeTable::~ProgramTypeTable()
 {
 }
 
-void ProgramTypeTable::clear()
-{
-    m_types.clear();
-}
-
 void ProgramTypeTable::loadTypeTable(TypeTable* table)
 {
     table->copyTypes(m_types);
+
+    // add templates
+    const TypeTable::TypeMap& t = table->templates();
+    std::transform(t.begin(), t.end(),
+		std::inserter(m_templates, m_templates.begin()),
+		std::ptr_fun(template2Info));
+
     // check whether to enable builtin QString support
     if (!m_parseQt2QStrings) {
 	m_parseQt2QStrings = table->isEnabledBuiltin("QString::Data");
@@ -262,11 +261,123 @@ void ProgramTypeTable::loadTypeTable(TypeTable* table)
     }
 }
 
-TypeInfo* ProgramTypeTable::lookup(const char* type)
+ProgramTypeTable::TemplateMap::value_type
+	ProgramTypeTable::template2Info(const TypeTable::TypeMap::value_type& tt)
 {
-    TypeInfo* result = m_types[type];
-    if (result == 0) {
-	result = m_aliasDict[type];
+    QStringList args = splitTemplateArgs(tt.second->m_templatePattern);
+
+    TemplateMap::value_type result(args.front(), TemplateInfo());
+    result.second.type = tt.second;
+    args.pop_front();
+    result.second.templateArgs = args;
+    return result;
+}
+
+/**
+ * Splits the name \a t into the template name and its arguments.
+ * The first entry of the returned list is the template name, the remaining
+ * entries are the arguments.
+ */
+QStringList ProgramTypeTable::splitTemplateArgs(const QString& t)
+{
+    QStringList result;
+    result.push_back(t);
+
+    int i = t.find('<');
+    if (i < 0)
+	return result;
+
+    // split off the template name
+    result.front().truncate(i);
+
+    i++;	// skip '<'
+    // look for the next comma or the closing '>', skipping nested '<>'
+    int nest = 0;
+    int start = i;
+    for (; unsigned(i) < t.length() && nest >= 0; i++)
+    {
+	if (t[i] == '<')
+	    nest++;
+	else if (t[i] == '>')
+	    nest--;
+	else if (nest == 0 && t[i] == ',') {
+	    // found end of argument
+	    QString arg = t.mid(start, i-start);
+	    result.push_back(arg);
+	    start = i+1;	// skip ','
+	}
+    }
+    // accept the template only if the closing '>' is the last character
+    if (nest < 0 && unsigned(i) == t.length()) {
+	QString arg = t.mid(start, i-start-1);
+	result.push_back(arg);
+    } else {
+	result.clear();
+	result.push_back(t);
+    }
+    return result;
+}
+
+TypeInfo* ProgramTypeTable::lookup(QString type)
+{
+    /*
+     * Registered aliases contain the complete template parameter list.
+     * Check for an alias first so that this case is out of the way.
+     */
+    if (TypeInfo* result = m_aliasDict[type])
+	return result;
+
+    /*
+     * Check for a normal type. Even if type is a template instance,
+     * it could have been registered as a normal type instead of a pattern.
+     */
+    if (TypeInfo* result = m_types[type])
+	return result;
+
+    /*
+     * The hard part: Look up a template.
+     */
+    QStringList parts = splitTemplateArgs(type);
+    if (parts.size() == 1)
+	return 0;	// not a template
+
+    // We can have several patterns for the same template name.
+    std::pair<TemplateMap::const_iterator, TemplateMap::const_iterator> range =
+	m_templates.equal_range(parts.front());
+    // We pick the one that has the wildcards in the later parameters.
+    unsigned minPenalty = ~0U;
+    TypeInfo* result = 0;
+    parts.pop_front();
+
+    for (TemplateMap::const_iterator i = range.first; i != range.second; ++i)
+    {
+	const QStringList& pat = i->second.templateArgs;
+	if (parts.size() < pat.size())
+	    continue;	// too few arguments
+
+	// a "*" in the last position of the pattern matches all arguments
+	// at the end of the template's arguments
+	if (parts.size() > pat.size() && pat.back() != "*")
+	    continue;	// too many arguments and no wildcard
+
+	QStringList::const_iterator t = parts.begin();
+	QStringList::const_iterator p = pat.begin();
+	unsigned penalty = 0;
+	bool equal = true;
+	for (int j = 0; equal && p != pat.end(); ++p, ++t, ++j)
+	{
+	    if (*p == "*")
+		penalty += 1U << j;	// penalize wildcards
+	    else
+	    	equal = *p == *t;
+	}
+	if (equal)
+	{
+	    if (penalty == 0)
+		return i->second.type;
+	    if (penalty < minPenalty)
+		result = i->second.type;
+	}
     }
     return result;
 }

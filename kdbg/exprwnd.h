@@ -18,24 +18,23 @@ class TypeInfo;
 struct ExprValue;
 class ExprWnd;
 
-/* a variable's value is the tree of sub-variables */
-
+/*! \brief a variable's value is the tree of sub-variables */
 class VarTree : public QListViewItem
 {
 public:
     enum VarKind { VKsimple, VKpointer, VKstruct, VKarray,
-	VKdummy				/* used to update only children */
+	VKdummy				//!< used to update only children
     };
     VarKind m_varKind;
     enum NameKind { NKplain, NKstatic, NKtype,
-	NKanonymous,			/* an anonymous struct or union */
-	NKaddress			/* a dereferenced pointer */
+	NKanonymous,			//!< an anonymous struct or union
+	NKaddress			//!< a dereferenced pointer
     };
     NameKind m_nameKind;
-    TypeInfo* m_type;			/* type of struct */
-    int m_exprIndex;			/* used in struct value update */
-    bool m_exprIndexUseGuard;		/* ditto; if guard expr should be used */
-    QString m_partialValue;		/* while struct value update is in progress */
+    TypeInfo* m_type;			//!< the type of struct if it could be derived
+    int m_exprIndex;			//!< used in struct value update
+    bool m_exprIndexUseGuard;		//!< ditto; if guard expr should be used
+    QString m_partialValue;		//!< while struct value update is in progress
 
     VarTree(VarTree* parent, QListViewItem* after, ExprValue* v);
     VarTree(ExprWnd* parent, QListViewItem* after, const QString& name);
@@ -163,9 +162,9 @@ protected:
     static QString formatWCharPointer(QString value);
     QPixmap m_pixPointer;
 
-    QList<VarTree> m_updatePtrs;	/* dereferenced pointers that need update */
-    QList<VarTree> m_updateType;	/* structs whose type must be determined */
-    QList<VarTree> m_updateStruct;	/* structs whose nested value needs update */
+    QList<VarTree> m_updatePtrs;	//!< dereferenced pointers that need update
+    QList<VarTree> m_updateType;	//!< structs whose type must be determined
+    QList<VarTree> m_updateStruct;	//!< structs whose nested value needs update
 
     ValueEdit* m_edit;
 

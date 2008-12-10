@@ -9,14 +9,18 @@
 <p><a href="index.html">Contents</a></p>
 <h1>
 KDbg's Type Table</h1>
-<p>KDbg can display the contents of single members of structured types, so
+<p>KDbg can display a short description of structured types, so
 that it is not necessary to expand the variable in the <a href="localvars.html">local
 variables window</a> or <a href="watches.html">watched expressions window</a>.
 The information which member variable is displayed is stored in <em>type
 tables</em>. There is generally one type table per shared library.</p>
-<p>KDbg's type tables are located under <tt>$prefix/share/apps/kdbg/types</tt>.
+
+<p>KDbg's default type tables are located under <tt>$prefix/share/apps/kdbg/types</tt>.
+User defined type tables can be placed in <tt>${KDEHOME}/share/apps/kdbg/types</tt>, where
+<tt>${KDEHOME}</tt> is <tt>~/.kde</tt> if it is not a defined environment variable.
 The file names end with <tt>.kdbgtt</tt>. Example: The type table for <tt>libqt.so</tt>
-is named <tt>qt.kdbgtt</tt>.</p>
+is named <tt>qt.kdbgtt</tt>.
+User defined type tables override the type tables provided by the system.</p>
 <p>A type table file obeys the regular KDE configuration file syntax. The
 file has the following groups:</p>
 <ul>
@@ -40,13 +44,12 @@ The <tt>[Type Table]</tt> group</h2>
 <p>This group contains the following entries:</p>
 <ul>
 <li>
-<tt>Types1</tt>, <tt>Types2</tt>, etc. These entries name the types. Each
-of them is a comma-separated list of type names. Each of the entries can
-list any number of types. (The types names can be distributed to several
-lines just so that the lines don't get excessivly long.) No blank space
-is allowed in these lines. The entries must be numbered consecutively (KDbg
-stops reading at the first gap), although an entry may be empty (i.e. contain
-no type at all). Sometimes the order in which the names are listed is important
+<tt>Types1</tt>, <tt>Types2</tt>, etc. These entries name the types,
+separated by commas.
+Each of the entries can list any number of types. The entries must be numbered
+consecutively (KDbg stops reading at the first gap), although an entry may be
+empty (i.e. contain no type at all).
+Sometimes the order in which the names are listed is important
 (see <tt>Alias</tt> types below).</li>
 
 <li>
@@ -75,12 +78,29 @@ to specify that a unicode character is stored in an object of type <tt>short</tt
 See <tt>qt3.kdbgtt</tt> for examples.</li></ul></li>
 </ul>
 
+<p>In the case of regular types the names of types should follow the output of the
+<tt>whatis</tt> gdb command less any <tt>const</tt>, <i>spaces</i>, or trailing
+<tt>&</tt>.
+If the type contains a a comma in its name, it must be escaped with a backslash.
+But note that the comma should not be escaped in the type's group (which is described
+in the next section).
+</p>
+<p>In the case of template types the name can be arbitrary because the type's group
+will mention the template name and a type parameter list.</p>
+
 <h2>
 The type's group</h2>
 <p>There is one group for each type that is named exactly as the type. <font size=-1>At
 the moment C++ template classes are not supported.</font> Each group contains
 the following entries:</p>
 <ul>
+<li>An optional <tt>Template</tt> entry that specifies the exact template type
+name as it is reported by gdb's <tt>whatis</tt> command. However, it is
+possible to replace template parameter types at the top-most level by an
+asterisk&nbsp;<tt>*</tt>, which acts as a wildcard: It matches <b>one</b>
+template type argument that is reported by <tt>whatis</tt> (except that an
+asterisk in the last position matches all remaining template type arguments).
+</li>
 <li>
 <tt>Display</tt> determines how the value of the type is displayed by KDbg.
 The string must contain 1 to 5 percent characters '<tt>%</tt>'. These are
@@ -94,6 +114,9 @@ whose value is investigated. The so constructed expression is submitted
 to gdb, and the result substituted back for the corresponding percent character
 in the <tt>Display</tt> string.</li>
 
+<li>
+An optional <tt>FunctionGuard</tt><i>x</i> that is associated with the corresponding <tt>Expr</tt><i>x</i>.
+If the evaluation of the resulting gdb expression returns an error, the corresponding expression from <tt>Expr</tt><i>x</i> is not evaluated. (This is used to guard function calls.)
 <li>
 <tt>Alias</tt> names an alias type. If this entry is present, the type
 is treated like the specified type. That alias type must appear before
@@ -117,24 +140,44 @@ entry to quickly specify that a type should be treated like a non-leftmost
 base class for a multiple-inheritance class.</p>
 <h2>
 An example</h2>
-<p>The example shows how <tt>QString</tt> and <tt>QObject</tt> are defined
-in <tt>qt.kdbgtt</tt>. Additionally, <tt>QTableView</tt> is defined as
-an alias of <tt>QObject</tt>. This example applies to Qt 1.x, which is
-located in shared library whose name ends in <tt>libqt.so.1</tt>.</p>
+<p>The example shows how <tt>QString</tt> and <tt>QRect</tt> are defined
+in <tt>qt3.kdbgtt</tt>. Furthermore, the template type <tt>QValueVector</tt>
+is defined. This example applies to Qt 3.x, which is located in shared library
+whose name ends in <tt>libqt-mt.so.3</tt>.</p>
 <pre>[Type Table]
-Types1=QString
-Types2=QObject,QTableView
-LibDisplayName=libqt 1.x
-ShlibRE=libqt\.so\.1$
+Types1=QString,QRect
+Types2=QValueVector
+LibDisplayName=libqt 3.x
+ShlibRE=libqt-mt\.so\.3$
+EnableBuiltin=QString::Data,QCharIsShort
+
 [QString]
 Display={ % }
-Expr1=(%s).shd->data
-[QObject]
-Display={ name=% #chld=% }
-Expr1=(%s).objname
-Expr2=(%s).childObjects->numNodes
-[QTableView]
-Alias=QObject</pre>
-<p>Note that it is safer to wrap the <tt>%s</tt> in parentheses.</p>
+Expr1=/QString::Data (%s).d
+
+[QValueVector]
+Template=QValueVector<*>
+Display={ size=% shared=% capacity=% }
+Expr1=($tmp=(%s).sh)->finish-$tmp->start
+Expr2=(%s).sh->count
+Expr3=($tmp=(%s).sh)->end-$tmp->start
+
+[QRect]
+Display={ tl=(%,%) br=(%,%) }
+Expr1=(%s).x1
+Expr2=(%s).y1
+Expr3=(%s).x2
+Expr4=(%s).y2</pre>
+<p>This example shows these features:</p>
+<ul>
+<li>The name of the template type, <tt>QValueVector</tt> is irrelevant.
+The exact type name is specified under the <tt>Template=</tt> entry.
+It specifies a single wildcard so that it applies to all specializations.
+</li>
+<li>In order to evaluate the expression that was supplied in the <tt>%s</tt>
+only once, the result is stored in a temporary gdb variable and reused later in
+the same expression.</li>
+<li>Note that it is safer to wrap the <tt>%s</tt> in parentheses.</li>
+</ul>
 </body>
 </html>
