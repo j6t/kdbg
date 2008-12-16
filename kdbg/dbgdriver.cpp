@@ -6,7 +6,7 @@
 
 #include "dbgdriver.h"
 #include "exprwnd.h"
-#include "valarray.h"
+#include <qstringlist.h>
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
 #ifdef HAVE_CONFIG_H
@@ -59,18 +59,6 @@ int DebuggerDriver::commSetupDoneC()
     return dup2(STDOUT_FILENO, STDERR_FILENO) != -1;
 }
 
-static void splitCmdStr(const QString& cmd, ValArray<QString>& parts)
-{
-    QString str = cmd.simplifyWhiteSpace();
-    int start = 0;
-    int end;
-    while ((end = str.find(' ', start)) >= 0) {
-	parts.append(str.mid(start, end-start));
-	start = end+1;
-    }
-    parts.append(str.mid(start, str.length()-start));
-}
-
 
 bool DebuggerDriver::startup(QString cmdStr)
 {
@@ -88,11 +76,10 @@ bool DebuggerDriver::startup(QString cmdStr)
     if (cmdStr.isEmpty())
 	cmdStr = defaultInvocation();
 
-    ValArray<QString> cmd;
-    splitCmdStr(cmdStr, cmd);
+    QStringList cmd = QStringList::split(' ', cmdStr);
     clearArguments();
-    for (int i = 0; i < cmd.size(); i++) {
-	*this << cmd[i];
+    for (QStringList::iterator i = cmd.begin(); i != cmd.end(); ++i) {
+	*this << *i;
     }
 
     if (!start(KProcess::NotifyOnExit,

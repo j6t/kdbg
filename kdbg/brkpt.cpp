@@ -356,7 +356,7 @@ void BreakpointTable::initListAndIcons()
      * overlaid brkcond icon, plus an optional overlaid brkorph icon. Then
      * the same sequence for watchpoints.
      */
-    m_icons.setSize(32);
+    m_icons.resize(32);
     QPixmap canvas(16,16);
 
     for (int i = 0; i < 32; i++) {

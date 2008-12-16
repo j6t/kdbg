@@ -21,7 +21,6 @@
 #include "prefmisc.h"
 #include "ttywnd.h"
 #include "commandids.h"
-#include "valarray.h"
 #ifdef HAVE_CONFIG
 #include "config.h"
 #endif
@@ -111,19 +110,6 @@ void WatchWindow::slotWatchHighlighted()
     VarTree* expr = m_watchVariables.selectedItem();
     QString text = expr ? expr->computeExpr() : QString();
     m_watchEdit.setText(text);
-}
-
-
-static void splitCmdStr(const QString& cmd, ValArray<QString>& parts)
-{
-    QString str = cmd.simplifyWhiteSpace();
-    int start = 0;
-    int end;
-    while ((end = str.find(' ', start)) >= 0) {
-	parts.append(str.mid(start, end-start));
-	start = end+1;
-    }
-    parts.append(str.mid(start, str.length()-start));
 }
 
 
@@ -521,8 +507,7 @@ QString DebuggerMainWndBase::createOutputWindow()
 	title += i18n(": Program output");
 
 	// parse the command line specified in the preferences
-	ValArray<QString> cmdParts;
-	splitCmdStr(m_outputTermCmdStr, cmdParts);
+	QStringList cmdParts = QStringList::split(' ', m_outputTermCmdStr);
 
 	/*
 	 * Build the argv array. Thereby substitute special sequences:
@@ -535,8 +520,9 @@ QString DebuggerMainWndBase::createOutputWindow()
 	    { "%C", shellScript }
 	};
 
-	for (int i = 0; i < cmdParts.size(); i++) {
-	    QString& str = cmdParts[i];
+	for (QStringList::iterator i = cmdParts.begin(); i != cmdParts.end(); ++i)
+	{
+	    QString& str = *i;
 	    for (int j = sizeof(substitute)/sizeof(substitute[0])-1; j >= 0; j--) {
 		int pos = str.find(substitute[j].seq);
 		if (pos >= 0) {

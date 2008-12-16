@@ -15,7 +15,7 @@
 #include <qpushbutton.h>
 #include <qpopupmenu.h>
 #include <qtooltip.h>
-#include "valarray.h"
+#include <qvaluevector.h>
 
 // forward declarations
 class KDebugger;
@@ -136,7 +136,8 @@ protected:
     virtual void contextMenuEvent(QContextMenuEvent* e);
     void setPC(bool set, const QString& fileName, int lineNo,
 	       const DbgAddr& address, int frameNo);
-    ValArray<SourceWindow*> m_fileList;
+    typedef QValueVector<SourceWindow*> SourceWindowList;
+    SourceWindowList m_fileList;
     SourceWindow* m_activeWindow;
     QString m_lastOpenDir;		/* where user opened last file */
     QPopupMenu* m_windowMenu;

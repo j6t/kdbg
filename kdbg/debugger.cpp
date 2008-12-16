@@ -11,7 +11,6 @@
 #include "exprwnd.h"
 #include "pgmsettings.h"
 #include "programconfig.h"
-#include "valarray.h"
 #include <qregexp.h>
 #include <qfileinfo.h>
 #include <qlistbox.h>
