@@ -35,11 +35,11 @@ picsdir = $(kde_datadir)/kdbg/pics
 # application icon
 KDE_ICON = kdbg
 
-animation = hi22-action-pulse0000*.png
+animation = $(shell cd "$(srcdir)" && echo hi22-action-pulse0000*.png)
 
 # this requires ImageMagick
 hi22-action-pulse.png: hi22-action-pulse.pngseq
-	list="`echo $(animation)`" ; \
+	list="$(animation)" ; \
 	montage +frame +shadow +label -background black \
 		-geometry 22x22 \
 		-tile 1x`echo $$list | wc -w` \
