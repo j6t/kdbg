@@ -15,10 +15,7 @@
 #include <kmenubar.h>
 #include "dbgmainwnd.h"
 #include "typetable.h"
-#include "config.h"
-#ifndef VERSION
-#define VERSION ""
-#endif
+#include "version.h"
 #include <stdlib.h>			/* getenv(3) */
 #include "mydebug.h"
 
@@ -26,7 +23,7 @@
 int main(int argc, char** argv)
 {
     KAboutData aboutData("kdbg", "KDbg",
-			 VERSION,
+			 KDBG_VERSION,
 			 I18N_NOOP("A Debugger"),
 			 KAboutData::License_GPL, 
 			 "(c) 1998-2009 Johannes Sixt",
