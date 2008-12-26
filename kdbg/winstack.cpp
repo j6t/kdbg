@@ -12,6 +12,7 @@
 #include <kapp.h>
 #include <kmainwindow.h>
 #include <klocale.h>			/* i18n */
+#include <algorithm>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
