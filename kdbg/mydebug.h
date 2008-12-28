@@ -6,9 +6,7 @@
 
 #include <kdebug.h>
 #include <assert.h>
-#ifdef HAVE_CONFIG
 #include "config.h"
-#endif
 
 #ifdef ASSERT
 #undef ASSERT

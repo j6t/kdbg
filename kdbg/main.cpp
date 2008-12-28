@@ -15,9 +15,7 @@
 #include <kmenubar.h>
 #include "dbgmainwnd.h"
 #include "typetable.h"
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 #ifndef VERSION
 #define VERSION ""
 #endif

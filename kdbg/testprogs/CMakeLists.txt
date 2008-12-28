@@ -1,0 +1,22 @@
+include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
+	${KDE3_INCLUDE_DIR} ${QT_INCLUDE_DIR})
+
+add_executable(anonstruct anonstruct.cpp)
+add_executable(locals locals.cpp)
+add_executable(maths maths.cpp)
+add_executable(nestedclass nestedclass.cpp)
+add_executable(repeats repeats.cpp)
+add_executable(std std.cpp)
+add_executable(templates templates.cpp)
+add_executable(testfile testfile.cpp)
+add_executable(widechar widechar.cpp)
+
+target_link_libraries(anonstruct ${QT_LIBS})
+target_link_libraries(locals ${QT_LIBS})
+target_link_libraries(maths ${QT_LIBS})
+target_link_libraries(nestedclass ${QT_LIBS})
+target_link_libraries(repeats ${QT_LIBS})
+target_link_libraries(std ${QT_LIBS})
+target_link_libraries(templates ${QT_LIBS})
+target_link_libraries(testfile ${QT_LIBS})
+target_link_libraries(widechar ${QT_LIBS})

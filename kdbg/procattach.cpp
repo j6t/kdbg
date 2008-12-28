@@ -13,9 +13,7 @@
 #include <kapplication.h>
 #include <kiconloader.h>
 #include <klocale.h>			/* i18n */
-#ifdef HAVE_CONFIG_H
 #include "config.h"
-#endif
 
 
 ProcAttachPS::ProcAttachPS(QWidget* parent) :
@@ -306,3 +304,6 @@ ProcAttach::ProcAttach(QWidget* parent) :
 ProcAttach::~ProcAttach()
 {
 }
+
+
+#include "procattach.moc"
