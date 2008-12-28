@@ -13,10 +13,6 @@
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
 
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-
 class ExprWnd;
 class VarTree;
 struct ExprValue;

@@ -14,9 +14,6 @@
 #include <string.h>			/* strcpy */
 
 #include "assert.h"
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "mydebug.h"
 
 static void skipString(const char*& p);

@@ -38,15 +38,8 @@
 #include "gdbdriver.h"
 #include "xsldbgdriver.h"
 #include "mydebug.h"
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>			/* mknod(2) */
-#endif
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>			/* getpid */
-#endif
 
 
 static const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";

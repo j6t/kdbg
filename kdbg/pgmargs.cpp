@@ -12,7 +12,6 @@
 #include <qtabwidget.h>
 #include <kfiledialog.h>
 #include <klocale.h>			/* i18n */
-#include "config.h"
 #include "mydebug.h"
 
 PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars,

@@ -21,9 +21,7 @@
 #include <kmessagebox.h>
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>			/* sleep(3) */
-#endif
 #include "mydebug.h"
 
 

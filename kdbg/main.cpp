@@ -21,12 +21,6 @@
 #ifndef VERSION
 #define VERSION ""
 #endif
-#ifdef HAVE_FCNTL_H
-#include <fcntl.h>			/* open(2) */
-#endif
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>			/* getopt(3) */
-#endif
 #include <stdlib.h>			/* getenv(3) */
 #include "mydebug.h"
 

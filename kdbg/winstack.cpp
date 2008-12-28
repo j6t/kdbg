@@ -12,9 +12,6 @@
 #include <kapplication.h>
 #include <kmainwindow.h>
 #include <klocale.h>			/* i18n */
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "mydebug.h"
 
 

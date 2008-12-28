@@ -18,9 +18,6 @@
 #include <kglobalsettings.h>
 #include <kmainwindow.h>
 #include <algorithm>
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "mydebug.h"
 
 

@@ -10,9 +10,6 @@
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
 #include <algorithm>
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "mydebug.h"
 #include <assert.h>
 

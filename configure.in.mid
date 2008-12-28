@@ -2,11 +2,7 @@ dnl Checks for header files.
 AC_LANG_C dnl switch to C
 AC_HEADER_DIRENT dnl check for dirent.h
 AC_HEADER_STDC dnl check for other stdc headers. More traditional ;)
-dnl check for some more header files. You can remove some of
-dnl them, if you want to. But it doesn't hurt
-AC_CHECK_HEADERS(fcntl.h sys/time.h unistd.h sys/cdefs.h)
-AC_CHECK_HEADERS(fnmatch.h sysent.h strings.h sys/stat.h)
-AC_CHECK_HEADERS(sys/ioctl.h pty.h libutil.h util.h)
+AC_CHECK_HEADERS(pty.h libutil.h util.h)
 
 dnl Checks for libraries.
 AC_CHECK_LIB(socket, socket, [LIBSOCKET="-lsocket -lnsl"]) dnl for Solaris' X11

@@ -18,9 +18,6 @@
 #include "dbgdriver.h"
 #include <ctype.h>
 #include <list>
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "mydebug.h"
 
 

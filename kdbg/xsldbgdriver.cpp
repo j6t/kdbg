@@ -14,9 +14,6 @@
 #include <kmessagebox.h>
 
 #include "assert.h"
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "mydebug.h"
 
 

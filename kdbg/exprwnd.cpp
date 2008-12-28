@@ -13,9 +13,6 @@
 #include <kapplication.h>
 #include <kiconloader.h>		/* icons */
 #include <klocale.h>			/* i18n */
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "mydebug.h"
 
 VarTree::VarTree(VarTree* parent, QListViewItem* after, ExprValue* v) :

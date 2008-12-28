@@ -12,9 +12,6 @@
 #include <list>
 #include <algorithm>
 #include <iterator>
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "typetable.h"
 #include "mydebug.h"
 

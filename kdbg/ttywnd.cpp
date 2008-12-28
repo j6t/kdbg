@@ -10,19 +10,13 @@
 #include <kglobalsettings.h>
 #include <klocale.h>
 
+#ifdef HAVE_CONFIG_H
 #include "config.h"
-#ifdef HAVE_FCNTL_H
+#endif
 #include <fcntl.h>
-#endif
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>			/* open, close, etc. */
-#endif
-#ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
-#endif
-#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
-#endif
 #ifdef HAVE_PTY_H
 #include <pty.h>			/* openpty on Linux */
 #endif
