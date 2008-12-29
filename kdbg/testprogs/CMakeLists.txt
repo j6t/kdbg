@@ -1,5 +1,4 @@
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR}
-	${KDE3_INCLUDE_DIR} ${QT_INCLUDE_DIR})
+include_directories(${KDE4_INCLUDES} ${KDE4_INCLUDE_DIR} ${QT_INCLUDES} )
 
 add_executable(anonstruct anonstruct.cpp)
 add_executable(locals locals.cpp)

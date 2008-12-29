@@ -17,4 +17,4 @@ install(FILES
 	watches.html
 	xslt.html
 	index.html
-	DESTINATION /share/doc/HTML/en/kdbg)
+	DESTINATION ${HTML_INSTALL_DIR}/en/kdbg)

@@ -2,7 +2,7 @@ add_subdirectory(doc)
 add_subdirectory(pics)
 add_subdirectory(typetables)
 
-include_directories(${CMAKE_CURRENT_SOURCE_DIR} ${CMAKE_CURRENT_BINARY_DIR} ${KDE3_INCLUDE_DIR} ${QT_INCLUDE_DIR} )
+include_directories(${KDE4_INCLUDES} ${KDE4_INCLUDE_DIR} ${QT_INCLUDES} )
 
 CHECK_INCLUDE_FILES(pty.h HAVE_PTY_H)
 CHECK_INCLUDE_FILES(libutil.h HAVE_LIBUTIL_H)
@@ -65,24 +65,22 @@ set(kdbg_SRCS
     main.cpp
 )
 
-kde3_automoc(${kdbg_SRCS})
-
 set(kdbg_UI
     pgmargsbase.ui
     procattachbase.ui
 )
 
-kde3_add_ui_files(kdbg_SRCS ${kdbg_UI})
+kde4_add_ui_files(kdbg_SRCS ${kdbg_UI})
 
-kde3_add_executable(kdbg ${kdbg_SRCS})
+kde4_add_executable(kdbg ${kdbg_SRCS})
 
 IF (HAVE_LIB_UTIL)
     set(LIB_UTIL util)
 ENDIF (HAVE_LIB_UTIL)
 
-target_link_libraries(kdbg ${QT_AND_KDECORE_LIBS} kio ${LIB_UTIL})
+target_link_libraries(kdbg ${KDE4_KDECORE_LIBS} ${KDE4_KIO_LIBS} ${LIB_UTIL})
 
-install(TARGETS kdbg DESTINATION bin)
-install(FILES kdbg.desktop DESTINATION /share/applications/kde)
-install(FILES kdbgrc DESTINATION /share/config)
-install(FILES kdbgui.rc DESTINATION /share/apps/kdbg)
+install(TARGETS kdbg ${INSTALL_TARGETS_DEFAULT_ARGS})
+install(FILES kdbg.desktop DESTINATION ${XDG_APPS_INSTALL_DIR})
+install(FILES kdbgrc DESTINATION ${CONFIG_INSTALL_DIR})
+install(FILES kdbgui.rc DESTINATION ${DATA_INSTALL_DIR}/kdbg)

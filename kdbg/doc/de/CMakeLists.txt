@@ -14,4 +14,4 @@ install(FILES
 	tips.html
 	watches.html
 	index.html
-	DESTINATION /share/doc/HTML/de/kdbg)
+	DESTINATION ${HTML_INSTALL_DIR}/de/kdbg)

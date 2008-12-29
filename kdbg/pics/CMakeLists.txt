@@ -14,7 +14,7 @@ set(PICTOGRAMS
 	watchdis.xpm
 	pointer.xpm)
 
-install(FILES $(PICTOGRAMS) DESTINATION /share/apps/kdbg/pics)
-install(FILES DESTINATION /share/apps/kdbg/icons)
+install(FILES $(PICTOGRAMS) DESTINATION ${DATA_INSTALL_DIR}/kdbg/pics)
+install(FILES DESTINATION ${DATA_INSTALL_DIR}/kdbg/icons)
 
-kde3_install_icons(hicolor)
+kde4_install_icons(${ICON_INSTALL_DIR})

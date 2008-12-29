@@ -10,4 +10,4 @@ install(FILES
 	stdc++.kdbgtt
 	stdc++6.kdbgtt
 	X11.kdbgtt
-	DESTINATION /share/apps/kdbg/types)
+	DESTINATION ${DATA_INSTALL_DIR}/kdbg/types)
