@@ -7,7 +7,7 @@
 #ifndef ProcAttach_included
 #define ProcAttach_included
 
-#include "procattachbase.h"
+#include "ui_procattachbase.h"
 #include <qvaluevector.h>
 #include <qdialog.h>
 #include <qlabel.h>

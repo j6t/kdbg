@@ -7,7 +7,7 @@
 #ifndef PgmArgs_included
 #define PgmArgs_included
 
-#include "pgmargsbase.h"
+#include "ui_pgmargsbase.h"
 #include <qlineedit.h>
 #include <qdict.h>
 #include "envvar.h"
