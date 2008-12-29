@@ -10,7 +10,7 @@
 #include "qlistview.h"
 #include <qlineedit.h>
 #include <qpixmap.h>
-#include <qptrlist.h>
+#include <list>
 
 class ProgramTypeTable;
 class TypeInfo;
@@ -162,15 +162,15 @@ protected:
     static QString formatWCharPointer(QString value);
     QPixmap m_pixPointer;
 
-    QList<VarTree> m_updatePtrs;	//!< dereferenced pointers that need update
-    QList<VarTree> m_updateType;	//!< structs whose type must be determined
-    QList<VarTree> m_updateStruct;	//!< structs whose nested value needs update
+    std::list<VarTree*> m_updatePtrs;	//!< dereferenced pointers that need update
+    std::list<VarTree*> m_updateType;	//!< structs whose type must be determined
+    std::list<VarTree*> m_updateStruct;	//!< structs whose nested value needs update
 
     ValueEdit* m_edit;
 
     /** remove items that are in the subTree from the list */
     void unhookSubtree(VarTree* subTree);
-    static void unhookSubtree(QList<VarTree>& list, VarTree* subTree);
+    static void unhookSubtree(std::list<VarTree*>& list, VarTree* subTree);
 
 signals:
     void removingItem(VarTree*);
