@@ -7,7 +7,7 @@
 #include <qdir.h>
 #include <qptrlist.h>
 #include <kglobal.h>
-#include <kstddirs.h>
+#include <kstandarddirs.h>
 #include <ksimpleconfig.h>
 #include <algorithm>
 #include <iterator>

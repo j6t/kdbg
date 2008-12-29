@@ -8,7 +8,7 @@
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
 #include <kglobal.h>
-#include <kstddirs.h>
+#include <kstandarddirs.h>
 #include <kcmdlineargs.h> 
 #include <kaboutdata.h>
 #include <kpopupmenu.h>
