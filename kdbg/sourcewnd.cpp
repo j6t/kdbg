@@ -12,7 +12,7 @@
 #include <qfile.h>
 #include <qkeycode.h>
 #include <qpopupmenu.h>
-#include <kapp.h>
+#include <kapplication.h>
 #include <kiconloader.h>
 #include <kglobalsettings.h>
 #include <kmainwindow.h>

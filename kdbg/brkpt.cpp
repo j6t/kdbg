@@ -4,7 +4,7 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <kapp.h>			/* i18n */
+#include <kapplication.h>
 #include <klocale.h>			/* i18n */
 #include <kiconloader.h>
 #include <ksimpleconfig.h>

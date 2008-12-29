@@ -9,7 +9,7 @@
 #include <qbrush.h>
 #include <qfileinfo.h>
 #include <qlistbox.h>
-#include <kapp.h>
+#include <kapplication.h>
 #include <kmainwindow.h>
 #include <klocale.h>			/* i18n */
 #include <algorithm>

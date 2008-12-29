@@ -10,7 +10,7 @@
 #include <qlineedit.h>
 #include <kprocess.h>
 #include <ctype.h>
-#include <kapp.h>
+#include <kapplication.h>
 #include <kiconloader.h>
 #include <klocale.h>			/* i18n */
 #ifdef HAVE_CONFIG_H

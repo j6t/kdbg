@@ -10,7 +10,7 @@
 #include <qlistview.h>
 #include <qlistbox.h>
 #include <qtabwidget.h>
-#include <kapp.h>
+#include <kapplication.h>
 #include <kfiledialog.h>
 #include <klocale.h>			/* i18n */
 #include "config.h"

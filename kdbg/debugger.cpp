@@ -16,7 +16,7 @@
 #include <qfileinfo.h>
 #include <qlistbox.h>
 #include <qstringlist.h>
-#include <kapp.h>
+#include <kapplication.h>
 #include <kconfig.h>
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>

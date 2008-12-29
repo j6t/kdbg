@@ -6,7 +6,7 @@
 
 #include "pgmsettings.h"
 #include <klocale.h>			/* i18n */
-#include <kapp.h>
+#include <kapplication.h>
 #include <qlayout.h>
 #include <qlineedit.h>
 #include <qlabel.h>

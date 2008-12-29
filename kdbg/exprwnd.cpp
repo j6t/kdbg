@@ -10,7 +10,7 @@
 #include <qstrlist.h>
 #include <qpainter.h>
 #include <qscrollbar.h>
-#include <kapp.h>
+#include <kapplication.h>
 #include <kiconloader.h>		/* icons */
 #include <klocale.h>			/* i18n */
 #ifdef HAVE_CONFIG_H
