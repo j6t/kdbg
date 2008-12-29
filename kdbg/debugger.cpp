@@ -1295,8 +1295,7 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
 void KDebugger::handleLocals(const char* output)
 {
     // retrieve old list of local variables
-    QStrList oldVars;
-    m_localVariables.exprList(oldVars);
+    QStringList oldVars = m_localVariables.exprList();
 
     /*
      *  Get local variables.
@@ -1313,22 +1312,22 @@ void KDebugger::handleLocals(const char* output)
     /*
      * Match old variables against new ones.
      */
-    for (const char* n = oldVars.first(); n != 0; n = oldVars.next()) {
+    for (QStringList::ConstIterator n = oldVars.begin(); n != oldVars.end(); ++n) {
 	// lookup this variable in the list of new variables
 	ExprValue* v = newVars.first();
-	while (v != 0 && v->m_name != n) {
+	while (v != 0 && v->m_name != *n) {
 	    v = newVars.next();
 	}
 	if (v == 0) {
 	    // old variable not in the new variables
-	    TRACE(QString("old var deleted: ") + n);
-	    VarTree* v = m_localVariables.topLevelExprByName(n);
+	    TRACE("old var deleted: " + *n);
+	    VarTree* v = m_localVariables.topLevelExprByName(*n);
 	    if (v != 0) {
 		m_localVariables.removeExpr(v);
 	    }
 	} else {
 	    // variable in both old and new lists: update
-	    TRACE(QString("update var: ") + n);
+	    TRACE("update var: " + *n);
 	    m_localVariables.updateExpr(newVars.current(), *m_typeTable);
 	    // remove the new variable from the list
 	    newVars.remove();

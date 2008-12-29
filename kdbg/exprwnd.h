@@ -11,12 +11,12 @@
 #include <qlineedit.h>
 #include <qpixmap.h>
 #include <qptrlist.h>
-#include <qstrlist.h>
 
 class ProgramTypeTable;
 class TypeInfo;
 struct ExprValue;
 class ExprWnd;
+class QStringList;
 
 /*! \brief a variable's value is the tree of sub-variables */
 class VarTree : public QListViewItem
@@ -120,8 +120,8 @@ public:
     ExprWnd(QWidget* parent, const QString& colHeader, const char* name);
     ~ExprWnd();
 
-    /** fills the list with the expressions at the topmost level */
-    void exprList(QStrList& exprs);
+    /** returns the list with the expressions at the topmost level */
+    QStringList exprList() const;
     /** appends a copy of expr to the end of the tree at the topmost level;
      * returns a pointer to the inserted top-level item */
     VarTree* insertExpr(ExprValue* expr, ProgramTypeTable& typeTable);

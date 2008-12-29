@@ -7,7 +7,7 @@
 #include "exprwnd.h"
 #include "exprwnd.moc"
 #include "typetable.h"
-#include <qstrlist.h>
+#include <qstringlist.h>
 #include <qpainter.h>
 #include <qscrollbar.h>
 #include <kapplication.h>
@@ -327,13 +327,14 @@ ExprWnd::~ExprWnd()
 {
 }
 
-void ExprWnd::exprList(QStrList& exprs)
+QStringList ExprWnd::exprList() const
 {
-    // ASSERT(exprs does deep-copies)
+    QStringList exprs;
     VarTree* item;
     for (item = firstChild(); item != 0; item = item->nextSibling()) {
 	exprs.append(item->getText());
     }
+    return exprs;
 }
 
 VarTree* ExprWnd::insertExpr(ExprValue* expr, ProgramTypeTable& typeTable)
