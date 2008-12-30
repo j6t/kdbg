@@ -9,6 +9,7 @@
 #include <qstringlist.h>
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
+#include <algorithm>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -45,6 +46,7 @@ DebuggerDriver::~DebuggerDriver()
 {
     delete[] m_output;
     flushHiPriQueue();
+    flushLoPriQueue();
 }
 
 int DebuggerDriver::commSetupDoneC()
@@ -65,10 +67,7 @@ bool DebuggerDriver::startup(QString cmdStr)
     delete m_activeCmd;
     m_activeCmd = 0;
     flushHiPriQueue();
-    bool autodel = m_lopriCmdQueue.autoDelete();
-    m_lopriCmdQueue.setAutoDelete(true);
-    m_lopriCmdQueue.clear();
-    m_lopriCmdQueue.setAutoDelete(autodel);
+    flushLoPriQueue();
     m_state = DSidle;
 
     // debugger executable
@@ -147,10 +146,16 @@ CmdQueueItem* DebuggerDriver::executeCmdString(DbgCommand cmd,
     return cmdItem;
 }
 
+bool CmdQueueItem::IsEqualCmd::operator()(CmdQueueItem* cmd) const
+{
+    return cmd->m_cmd == m_cmd && cmd->m_cmdString == m_str;
+}
+
 CmdQueueItem* DebuggerDriver::queueCmdString(DbgCommand cmd,
 					     QString cmdString, QueueMode mode)
 {
     // place a new command into the low-priority queue
+    std::list<CmdQueueItem*>::iterator i;
     CmdQueueItem* cmdItem = 0;
     switch (mode) {
     case QMoverrideMoreEqual:
@@ -162,24 +167,22 @@ CmdQueueItem* DebuggerDriver::queueCmdString(DbgCommand cmd,
 	    return m_activeCmd;
 	}
 	// check whether there is already the same command in the queue
-	for (cmdItem = m_lopriCmdQueue.first(); cmdItem != 0; cmdItem = m_lopriCmdQueue.next()) {
-	    if (cmdItem->m_cmd == cmd && cmdItem->m_cmdString == cmdString)
-		break;
-	}
-	if (cmdItem != 0) {
+	i = find_if(m_lopriCmdQueue.begin(), m_lopriCmdQueue.end(), CmdQueueItem::IsEqualCmd(cmd, cmdString));
+	if (i != m_lopriCmdQueue.end()) {
 	    // found one
+	    cmdItem = *i;
 	    if (mode == QMoverrideMoreEqual) {
 		// All commands are equal, but some are more equal than others...
 		// put this command in front of all others
-		m_lopriCmdQueue.take();
-		m_lopriCmdQueue.insert(0, cmdItem);
+		m_lopriCmdQueue.erase(i);
+		m_lopriCmdQueue.push_front(cmdItem);
 	    }
 	    break;
 	} // else none found, so add it
 	// drop through
     case QMnormal:
 	cmdItem = new CmdQueueItem(cmd, cmdString);
-	m_lopriCmdQueue.append(cmdItem);
+	m_lopriCmdQueue.push_back(cmdItem);
     }
 
     // if gdb is idle, send it the command
@@ -199,17 +202,16 @@ void DebuggerDriver::writeCommand()
 
     // first check the high-priority queue - only if it is empty
     // use a low-priority command.
-    CmdQueueItem* cmd = 0;
+    CmdQueueItem* cmd;
     DebuggerState newState = DScommandSent;
     if (!m_hipriCmdQueue.empty()) {
 	cmd = m_hipriCmdQueue.front();
 	m_hipriCmdQueue.pop();
-    } else {
-	cmd = m_lopriCmdQueue.first();
-	m_lopriCmdQueue.removeFirst();
+    } else if (!m_lopriCmdQueue.empty()) {
+	cmd = m_lopriCmdQueue.front();
+	m_lopriCmdQueue.pop_front();
 	newState = DScommandSentLow;
-    }
-    if (cmd == 0) {
+    } else {
 	// nothing to do
 	m_state = DSidle;		/* is necessary if command was interrupted earlier */
 	return;
@@ -232,8 +234,9 @@ void DebuggerDriver::writeCommand()
 
 void DebuggerDriver::flushLoPriQueue()
 {
-    while (!m_lopriCmdQueue.isEmpty()) {
-	delete m_lopriCmdQueue.take(0);
+    while (!m_lopriCmdQueue.empty()) {
+	delete m_lopriCmdQueue.back();
+	m_lopriCmdQueue.pop_back();
     }
 }
 
@@ -419,7 +422,7 @@ void DebuggerDriver::slotReceiveOutput(KProcess*, char* buffer, int buflen)
 	 * command.
 	 */
 	if (m_delayedOutput.empty()) {
-	    if (m_hipriCmdQueue.empty() && m_lopriCmdQueue.isEmpty()) {
+	    if (m_hipriCmdQueue.empty() && m_lopriCmdQueue.empty()) {
 		// no pending commands
 		m_state = DSidle;
 		emit enterIdleState();
@@ -435,27 +438,15 @@ void DebuggerDriver::dequeueCmdByVar(VarTree* var)
     if (var == 0)
 	return;
 
-    /*
-     * Check the low-priority queue: We start at the back end, but skip the
-     * last element for now. The reason is that if we delete an element the
-     * current element is stepped to the next one - except if it's on the
-     * last: then it's stepped to the previous element. By checking the
-     * last element separately we avoid that special case.
-     */
-    CmdQueueItem* cmd = m_lopriCmdQueue.last();
-    while ((cmd = m_lopriCmdQueue.prev()) != 0) {
-	if (cmd->m_expr != 0 && var->isAncestorEq(cmd->m_expr)) {
+    std::list<CmdQueueItem*>::iterator i = m_lopriCmdQueue.begin();
+    while (i != m_lopriCmdQueue.end()) {
+	if ((*i)->m_expr != 0 && var->isAncestorEq((*i)->m_expr)) {
 	    // this is indeed a critical command; delete it
-	    TRACE("removing critical lopri-cmd: " + cmd->m_cmdString);
-	    m_lopriCmdQueue.remove();	/* steps to next element */
-	}
-    }
-    cmd = m_lopriCmdQueue.last();
-    if (cmd != 0) {
-	if (cmd->m_expr != 0 && var->isAncestorEq(cmd->m_expr)) {
-	    TRACE("removing critical lopri-cmd: " + cmd->m_cmdString);
-	    m_lopriCmdQueue.remove();	/* steps to next element */
-	}
+	    TRACE("removing critical lopri-cmd: " + (*i)->m_cmdString);
+	    delete *i;
+	    m_lopriCmdQueue.erase(i++);
+	} else
+	    ++i;
     }
 }
 

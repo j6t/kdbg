@@ -7,12 +7,12 @@
 #ifndef DBGDRIVER_H
 #define DBGDRIVER_H
 
-#include <qptrlist.h>
 #include <qfile.h>
 #include <qregexp.h>
 #include <qcstring.h>
 #include <kprocess.h>
 #include <queue>
+#include <list>
 
 
 class VarTree;
@@ -166,6 +166,14 @@ struct CmdQueueItem
 	m_brkpt(0),
 	m_byUser(false)
     { }
+
+    struct IsEqualCmd
+    {
+	IsEqualCmd(DbgCommand cmd, const QString& str) : m_cmd(cmd), m_str(str) { }
+	bool operator()(CmdQueueItem*) const;
+	DbgCommand m_cmd;
+	const QString& m_str;
+    };
 };
 
 /**
@@ -534,7 +542,7 @@ protected:
     void flushHiPriQueue();
 
     std::queue<CmdQueueItem*> m_hipriCmdQueue;
-    QList<CmdQueueItem> m_lopriCmdQueue;
+    std::list<CmdQueueItem*> m_lopriCmdQueue;
     /**
      * The active command is kept separately from other pending commands.
      */
