@@ -7,11 +7,12 @@
 #ifndef DBGDRIVER_H
 #define DBGDRIVER_H
 
-#include <qptrqueue.h>
 #include <qptrlist.h>
 #include <qfile.h>
 #include <qregexp.h>
+#include <qcstring.h>
 #include <kprocess.h>
+#include <queue>
 
 
 class VarTree;
@@ -299,14 +300,13 @@ public:
     /**
      * Tells whether a high prority command would be executed immediately.
      */
-    bool canExecuteImmediately() const { return m_hipriCmdQueue.isEmpty(); }
+    bool canExecuteImmediately() const { return m_hipriCmdQueue.empty(); }
 
 protected:
     char* m_output;			/* normal gdb output */
     size_t m_outputLen;			/* amount of data so far accumulated in m_output */
     size_t m_outputAlloc;		/* space available in m_output */
-    typedef QCString DelayedStr;
-    QQueue<DelayedStr> m_delayedOutput;	/* output colleced while we have receivedOutput */
+    std::queue<QByteArray> m_delayedOutput;	/* output colleced while we have receivedOutput */
 					/* but before signal wroteStdin arrived */
 
 public:
@@ -533,7 +533,7 @@ protected:
     /** Removes all commands from  the high-priority queue. */
     void flushHiPriQueue();
 
-    QQueue<CmdQueueItem> m_hipriCmdQueue;
+    std::queue<CmdQueueItem*> m_hipriCmdQueue;
     QList<CmdQueueItem> m_lopriCmdQueue;
     /**
      * The active command is kept separately from other pending commands.

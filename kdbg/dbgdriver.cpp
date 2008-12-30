@@ -34,8 +34,6 @@ DebuggerDriver::DebuggerDriver() :
     // If m_promptRE is set, it must include the '$' at the end.
     // m_promptLastChar and m_promptMinLen must also be set.
 
-    m_hipriCmdQueue.setAutoDelete(true);
-
     // debugger process
     connect(this, SIGNAL(receivedStdout(KProcess*,char*,int)),
 	    SLOT(slotReceiveOutput(KProcess*,char*,int)));
@@ -46,6 +44,7 @@ DebuggerDriver::DebuggerDriver() :
 DebuggerDriver::~DebuggerDriver()
 {
     delete[] m_output;
+    flushHiPriQueue();
 }
 
 int DebuggerDriver::commSetupDoneC()
@@ -65,7 +64,7 @@ bool DebuggerDriver::startup(QString cmdStr)
     // clear command queues
     delete m_activeCmd;
     m_activeCmd = 0;
-    m_hipriCmdQueue.clear();
+    flushHiPriQueue();
     bool autodel = m_lopriCmdQueue.autoDelete();
     m_lopriCmdQueue.setAutoDelete(true);
     m_lopriCmdQueue.clear();
@@ -124,7 +123,7 @@ CmdQueueItem* DebuggerDriver::executeCmdString(DbgCommand cmd,
 {
     // place a new command into the high-priority queue
     CmdQueueItem* cmdItem = new CmdQueueItem(cmd, cmdString);
-    m_hipriCmdQueue.enqueue(cmdItem);
+    m_hipriCmdQueue.push(cmdItem);
 
     if (clearLow) {
 	if (m_state == DSrunningLow) {
@@ -200,9 +199,12 @@ void DebuggerDriver::writeCommand()
 
     // first check the high-priority queue - only if it is empty
     // use a low-priority command.
-    CmdQueueItem* cmd = m_hipriCmdQueue.dequeue();
+    CmdQueueItem* cmd = 0;
     DebuggerState newState = DScommandSent;
-    if (cmd == 0) {
+    if (!m_hipriCmdQueue.empty()) {
+	cmd = m_hipriCmdQueue.front();
+	m_hipriCmdQueue.pop();
+    } else {
 	cmd = m_lopriCmdQueue.first();
 	m_lopriCmdQueue.removeFirst();
 	newState = DScommandSentLow;
@@ -237,9 +239,9 @@ void DebuggerDriver::flushLoPriQueue()
 
 void DebuggerDriver::flushHiPriQueue()
 {
-    CmdQueueItem* cmd;
-    while ((cmd = m_hipriCmdQueue.dequeue()) != 0) {
-	delete cmd;
+    while (!m_hipriCmdQueue.empty()) {
+	delete m_hipriCmdQueue.front();
+	m_hipriCmdQueue.pop();
     }
 }
 
@@ -276,13 +278,10 @@ void DebuggerDriver::slotCommandRead(KProcess*)
     }
 
     // re-receive delayed output
-    if (m_delayedOutput.current() != 0) {
-	DelayedStr* delayed;
-	while ((delayed = m_delayedOutput.dequeue()) != 0) {
-	    const char* str = delayed->data();
-	    slotReceiveOutput(0, const_cast<char*>(str), delayed->length());
-	    delete delayed;
-	}
+    while (!m_delayedOutput.empty()) {
+	QByteArray delayed = m_delayedOutput.front();
+	m_delayedOutput.pop();
+	slotReceiveOutput(0, const_cast<char*>(delayed.data()), delayed.size());
     }
 }
 
@@ -302,7 +301,7 @@ void DebuggerDriver::slotReceiveOutput(KProcess*, char* buffer, int buflen)
 	 * output, it will be re-sent by commandRead when it gets the
 	 * acknowledgment for the uncommitted command.
 	 */
-	m_delayedOutput.enqueue(new DelayedStr(buffer, buflen+1));
+	m_delayedOutput.push(QByteArray().duplicate(buffer, buflen));
 	return;
     }
     // write to log file (do not log delayed output - it would appear twice)
@@ -319,7 +318,7 @@ void DebuggerDriver::slotReceiveOutput(KProcess*, char* buffer, int buflen)
      */
     if (m_activeCmd == 0 && m_state != DSinterrupted) {
 	// ignore the output
-	TRACE("ignoring stray output: " + DelayedStr(buffer, buflen+1));
+	TRACE("ignoring stray output: " + QString::fromLatin1(buffer, buflen));
 	return;
     }
     ASSERT(m_state == DSrunning || m_state == DSrunningLow || m_state == DSinterrupted);
@@ -411,10 +410,7 @@ void DebuggerDriver::slotReceiveOutput(KProcess*, char* buffer, int buflen)
 	*m_output = '\0';
 	// also clear delayed output if interrupted
 	if (m_state == DSinterrupted) {
-	    DelayedStr* delayed;
-	    while ((delayed = m_delayedOutput.dequeue()) != 0) {
-		delete delayed;
-	    }
+	    m_delayedOutput = std::queue<QByteArray>();
 	}
 
 	/*
@@ -422,8 +418,8 @@ void DebuggerDriver::slotReceiveOutput(KProcess*, char* buffer, int buflen)
 	 * output, the debugger must be idle now, so send down the next
 	 * command.
 	 */
-	if (m_delayedOutput.current() == 0) {
-	    if (m_hipriCmdQueue.isEmpty() && m_lopriCmdQueue.isEmpty()) {
+	if (m_delayedOutput.empty()) {
+	    if (m_hipriCmdQueue.empty() && m_lopriCmdQueue.isEmpty()) {
 		// no pending commands
 		m_state = DSidle;
 		emit enterIdleState();
