@@ -57,7 +57,7 @@ class XsldbgDriver:public DebuggerDriver {
                                      bool wantErrorValue, bool qt3like);
 
     virtual void parseBackTrace(const char *output,
-                                QList < StackFrame > &stack);
+                                std::list < StackFrame > &stack);
     virtual bool parseFrameChange(const char *output, int &frameNo,
                                   QString & file, int &lineNo,
                                   DbgAddr & address);

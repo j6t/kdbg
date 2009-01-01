@@ -1442,16 +1442,16 @@ void KDebugger::handleBacktrace(const char* output)
 
     m_btWindow.clear();
 
-    QList<StackFrame> stack;
+    std::list<StackFrame> stack;
     m_d->parseBackTrace(output, stack);
 
-    if (stack.count() > 0) {
-	StackFrame* frm = stack.take(0);
+    if (!stack.empty()) {
+	std::list<StackFrame>::iterator frm = stack.begin();
 	// first frame must set PC
 	// note: frm->lineNo is zero-based
 	emit updatePC(frm->fileName, frm->lineNo, frm->address, frm->frameNo);
 
-	do {
+	for (; frm != stack.end(); ++frm) {
 	    QString func;
 	    if (frm->var != 0)
 		func = frm->var->m_name;
@@ -1460,9 +1460,7 @@ void KDebugger::handleBacktrace(const char* output)
 	    m_btWindow.insertItem(func);
 	    TRACE("frame " + func + " (" + frm->fileName + ":" +
 		  QString().setNum(frm->lineNo+1) + ")");
-	    delete frm;
 	}
-	while ((frm = stack.take()) != 0);
     }
 
     m_btWindow.setAutoUpdate(true);

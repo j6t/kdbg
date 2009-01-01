@@ -1093,21 +1093,21 @@ parseFrame(const char *&s, int &frameNo, QString & func,
 
 void
 XsldbgDriver::parseBackTrace(const char *output,
-                             QList < StackFrame > &stack)
+                             std::list < StackFrame > &stack)
 {
     QString func, file;
     int lineNo, frameNo;
     DbgAddr address;
 
     while (::parseFrame(output, frameNo, func, file, lineNo, address)) {
-        StackFrame *frm = new StackFrame;
+        stack.push_back(StackFrame());
+        StackFrame* frm = &stack.back();
 
         frm->frameNo = frameNo;
         frm->fileName = file;
         frm->lineNo = lineNo;
         frm->address = address;
         frm->var = new ExprValue(func, VarTree::NKplain);
-        stack.append(frm);
     }
 }
 

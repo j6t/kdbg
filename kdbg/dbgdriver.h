@@ -392,7 +392,7 @@ public:
     /**
      * Parses a back-trace (the output of the DCbt command).
      */
-    virtual void parseBackTrace(const char* output, QList<StackFrame>& stack) = 0;
+    virtual void parseBackTrace(const char* output, std::list<StackFrame>& stack) = 0;
 
     /**
      * Parses the output of the DCframe command;
