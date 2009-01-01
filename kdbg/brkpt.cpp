@@ -192,13 +192,9 @@ void BreakpointTable::addWP()
 void BreakpointTable::removeBP()
 {
     BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
-    if (bp == 0)
-	return;
-
-    Breakpoint* brk = m_debugger->breakpointById(bp->id);
-    if (brk != 0) {
-	m_debugger->deleteBreakpoint(brk);
-	// note that both brk and bp may be deleted by now
+    if (bp != 0) {
+	m_debugger->deleteBreakpoint(bp->id);
+	// note that bp may be deleted by now
 	// (if bp was an orphaned breakpoint)
     }
 }
@@ -206,12 +202,8 @@ void BreakpointTable::removeBP()
 void BreakpointTable::enadisBP()
 {
     BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
-    if (bp == 0)
-	return;
-
-    Breakpoint* brk = m_debugger->breakpointById(bp->id);
-    if (brk != 0) {
-	m_debugger->enableDisableBreakpoint(brk);
+    if (bp != 0) {
+	m_debugger->enableDisableBreakpoint(bp->id);
     }
 }
 
@@ -258,10 +250,7 @@ bool BreakpointTable::eventFilter(QObject* ob, QEvent* ev)
 		static_cast<BreakpointItem*>(m_list.itemAt(mev->pos()));
 	    if (bp != 0)
 	    {
-		Breakpoint* brk = m_debugger->breakpointById(bp->id);
-		if (brk != 0) {
-		    m_debugger->enableDisableBreakpoint(brk);
-		}
+		m_debugger->enableDisableBreakpoint(bp->id);
 	    }
 	    return true;
 	}
@@ -315,17 +304,7 @@ void BreakpointTable::conditionalBP()
 
     QString conditionInput = dlg.condition();
     int ignoreCount = dlg.ignoreCount();
-    updateBreakpointCondition(id, conditionInput, ignoreCount);
-}
-
-void BreakpointTable::updateBreakpointCondition(int id,
-						const QString& condition,
-						int ignoreCount)
-{
-    Breakpoint* brk = m_debugger->breakpointById(id);
-    if (brk != 0) {
-	m_debugger->conditionalBreakpoint(brk, condition, ignoreCount);
-    }
+    m_debugger->conditionalBreakpoint(id, conditionInput, ignoreCount);
 }
 
 

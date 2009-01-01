@@ -431,11 +431,14 @@ bool KDebugger::enableDisableBreakpoint(QString file, int lineNo,
 					const DbgAddr& address)
 {
     Breakpoint* bp = breakpointByFilePos(file, lineNo, address);
-    return bp == 0 || enableDisableBreakpoint(bp);
+    return enableDisableBreakpoint(bp);
 }
 
 bool KDebugger::enableDisableBreakpoint(Breakpoint* bp)
 {
+    if (bp == 0)
+	return false;
+
     /*
      * Toggle enabled/disabled state.
      * 
@@ -458,6 +461,9 @@ bool KDebugger::conditionalBreakpoint(Breakpoint* bp,
 				      const QString& condition,
 				      int ignoreCount)
 {
+    if (bp == 0)
+	return false;
+
     /*
      * Change the condition and ignore count.
      *
@@ -496,6 +502,9 @@ bool KDebugger::conditionalBreakpoint(Breakpoint* bp,
 
 bool KDebugger::deleteBreakpoint(Breakpoint* bp)
 {
+    if (bp == 0)
+	return false;
+
     /*
      * Remove the breakpoint.
      *

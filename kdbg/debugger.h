@@ -215,7 +215,8 @@ public:
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.
      */
-    bool enableDisableBreakpoint(Breakpoint* bp);
+    bool enableDisableBreakpoint(int id)
+    { return enableDisableBreakpoint(breakpointById(id)); }
 
     /**
      * Removes the specified breakpoint. Note that if bp is an orphaned
@@ -225,7 +226,8 @@ public:
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.
      */
-    bool deleteBreakpoint(Breakpoint* bp);
+    bool deleteBreakpoint(int id)
+    { return deleteBreakpoint(breakpointById(id)); }
 
     /**
      * Changes the specified breakpoint's condition and ignore count.
@@ -233,9 +235,10 @@ public:
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.
      */
-    bool conditionalBreakpoint(Breakpoint* bp,
+    bool conditionalBreakpoint(int id,
 			       const QString& condition,
-			       int ignoreCount);
+			       int ignoreCount)
+    { return conditionalBreakpoint(breakpointById(id), condition, ignoreCount); }
 
     /**
      * Tells whether one of the single stepping commands can be invoked
@@ -291,11 +294,6 @@ public:
     /** The list of breakpoints. */
     int numBreakpoints() const { return m_brkpts.size(); }
     const Breakpoint* breakpoint(int i) const { return m_brkpts[i]; }
-
-    /**
-     * Returns the breakpoint with the specified \a id.
-     */
-    Breakpoint* breakpointById(int id);
 
     const QString& executable() const { return m_executable; }
 
@@ -386,11 +384,17 @@ protected:
 
     Breakpoint* breakpointByFilePos(QString file, int lineNo,
 				    const DbgAddr& address);
+    Breakpoint* breakpointById(int id);
     void newBreakpoint(CmdQueueItem* cmd, const char* output);
     void updateBreakList(const char* output);
     bool stopMayChangeBreakList() const;
     void saveBreakpoints(ProgramConfig* config);
     void restoreBreakpoints(ProgramConfig* config);
+    bool enableDisableBreakpoint(Breakpoint* bp);
+    bool deleteBreakpoint(Breakpoint* bp);
+    bool conditionalBreakpoint(Breakpoint* bp,
+			       const QString& condition,
+			       int ignoreCount);
 
     bool m_haveExecutable;		/* has an executable been specified */
     bool m_programActive;		/* is the program active (possibly halting in a brkpt)? */
@@ -545,8 +549,6 @@ protected:
     // implementation helpers
 protected:
     QWidget* parentWidget() { return static_cast<QWidget*>(parent()); }
-
-    friend class BreakpointTable;
 };
 
 #endif // DEBUGGER_H
