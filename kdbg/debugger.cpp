@@ -385,6 +385,12 @@ bool KDebugger::setBreakpoint(QString file, int lineNo,
 
 void KDebugger::setBreakpoint(Breakpoint* bp, bool queueOnly)
 {
+    CmdQueueItem* cmd = executeBreakpoint(bp, queueOnly);
+    cmd->m_brkpt = bp;	// used in newBreakpoint()
+}
+
+CmdQueueItem* KDebugger::executeBreakpoint(const Breakpoint* bp, bool queueOnly)
+{
     CmdQueueItem* cmd;
     if (!bp->text.isEmpty())
     {
@@ -424,7 +430,7 @@ void KDebugger::setBreakpoint(Breakpoint* bp, bool queueOnly)
 				  bp->address.asString());
 	}
     }
-    cmd->m_brkpt = bp;	// used in newBreakpoint()
+    return cmd;
 }
 
 bool KDebugger::enableDisableBreakpoint(QString file, int lineNo,
@@ -1160,7 +1166,8 @@ void KDebugger::handleRunCommands(const char* output)
 	    TRACE("re-trying brkpt loc: "+m_brkpts[i]->location+
 		  " file: "+m_brkpts[i]->fileName+
 		  QString().sprintf(" line: %d", m_brkpts[i]->lineNo));
-	    setBreakpoint(m_brkpts[i], true);
+	    CmdQueueItem* cmd = executeBreakpoint(m_brkpts[i], true);
+	    cmd->m_existingBrkpt = m_brkpts[i]->id;	// used in newBreakpoint()
 	    flags |= DebuggerDriver::SFrefreshBreak;
 	}
     }
@@ -1875,6 +1882,8 @@ void KDebugger::handleRegisters(const char* output)
 void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 {
     Breakpoint* bp = cmd->m_brkpt;
+    if (bp == 0 && cmd->m_existingBrkpt != 0)
+	bp = breakpointById(cmd->m_existingBrkpt);
     assert(bp != 0);
     if (bp == 0)
 	return;
@@ -1920,11 +1929,11 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
     {
 	// this is a new or orphaned breakpoint:
 	// set the remaining properties
-	if (!cmd->m_brkpt->enabled) {
+	if (!bp->enabled) {
 	    m_d->executeCmd(DCdisable, id);
 	}
-	if (!cmd->m_brkpt->condition.isEmpty()) {
-	    m_d->executeCmd(DCcondition, cmd->m_brkpt->condition, id);
+	if (!bp->condition.isEmpty()) {
+	    m_d->executeCmd(DCcondition, bp->condition, id);
 	}
     }
 

@@ -153,6 +153,7 @@ struct CmdQueueItem
     int m_lineNo;
     // the breakpoint info
     Breakpoint* m_brkpt;
+    int m_existingBrkpt;
     // whether command was emitted due to direct user request (only set when relevant)
     bool m_byUser;
 
@@ -164,6 +165,7 @@ struct CmdQueueItem
 	m_exprWnd(0),
 	m_lineNo(0),
 	m_brkpt(0),
+	m_existingBrkpt(0),
 	m_byUser(false)
     { }
 

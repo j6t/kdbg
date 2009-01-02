@@ -385,6 +385,7 @@ protected:
     Breakpoint* breakpointByFilePos(QString file, int lineNo,
 				    const DbgAddr& address);
     Breakpoint* breakpointById(int id);
+    CmdQueueItem* executeBreakpoint(const Breakpoint* bp, bool queueOnly);
     void newBreakpoint(CmdQueueItem* cmd, const char* output);
     void updateBreakList(const char* output);
     bool stopMayChangeBreakList() const;
