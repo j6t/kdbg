@@ -1881,20 +1881,20 @@ void KDebugger::handleRegisters(const char* output)
  */
 void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 {
-    Breakpoint* bp = cmd->m_brkpt;
-    if (bp == 0 && cmd->m_existingBrkpt != 0)
-	bp = breakpointById(cmd->m_existingBrkpt);
-    assert(bp != 0);
-    if (bp == 0)
-	return;
-
-    // if this is a new breakpoint, put it in the list
-    bool isNew = !m_brkpts.contains(bp);
-    if (isNew) {
+    Breakpoint* bp;
+    if (cmd->m_brkpt != 0) {
+	// a new breakpoint, put it in the list
+	bp = cmd->m_brkpt;
 	assert(bp->id == 0);
 	int n = m_brkpts.size();
 	m_brkpts.resize(n+1);
 	m_brkpts.insert(n, bp);
+    } else {
+	// an existing breakpoint was retried
+	assert(cmd->m_existingBrkpt != 0);
+	bp = breakpointById(cmd->m_existingBrkpt);
+	if (bp == 0)
+	    return;
     }
 
     // parse the output to determine success or failure
@@ -1910,13 +1910,11 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 	 * of all breakpoints (that are already in the list) to get the new
 	 * id.
 	 */
-	if (isNew)
+	if (bp->id == 0)
 	{
-	    assert(bp->id == 0);
 	    for (int i = m_brkpts.size()-2; i >= 0; i--) {
 		if (m_brkpts[i]->id < bp->id) {
 		    bp->id = m_brkpts[i]->id;
-		    break;
 		}
 	    }
 	    --bp->id;
