@@ -1724,7 +1724,7 @@ bool GdbDriver::parseFrameChange(const char* output, int& frameNo,
 }
 
 
-bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
+bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 {
     // skip first line, which is the headline
     const char* p = strchr(output, '\n');
@@ -1735,28 +1735,23 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	return false;
 
     // split up a line
-    QString location;
-    QString address;
-    int hits = 0;
-    uint ignoreCount = 0;
-    QString condition;
     const char* end;
     char* dummy;
     while (*p != '\0') {
+	Breakpoint bp;
 	// get Num
-	long bpNum = strtol(p, &dummy, 10);	/* don't care about overflows */
+	bp.id = strtol(p, &dummy, 10);	/* don't care about overflows */
 	p = dummy;
 	// get Type
 	while (isspace(*p))
 	    p++;
-	Breakpoint::Type bpType = Breakpoint::breakpoint;
 	if (strncmp(p, "breakpoint", 10) == 0) {
 	    p += 10;
 	} else if (strncmp(p, "hw watchpoint", 13) == 0) {
-	    bpType = Breakpoint::watchpoint;
+	    bp.type = Breakpoint::watchpoint;
 	    p += 13;
 	} else if (strncmp(p, "watchpoint", 10) == 0) {
-	    bpType = Breakpoint::watchpoint;
+	    bp.type = Breakpoint::watchpoint;
 	    p += 10;
 	}
 	while (isspace(*p))
@@ -1764,7 +1759,7 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	if (*p == '\0')
 	    break;
 	// get Disp
-	char disp = *p++;
+	bp.temporary = *p++ == 'd';
 	while (*p != '\0' && !isspace(*p))	/* "keep" or "del" */
 	    p++;
 	while (isspace(*p))
@@ -1772,7 +1767,7 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	if (*p == '\0')
 	    break;
 	// get Enb
-	char enable = *p++;
+	bp.enabled = *p++ == 'y';
 	while (*p != '\0' && !isspace(*p))	/* "y" or "n" */
 	    p++;
 	while (isspace(*p))
@@ -1780,30 +1775,25 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	if (*p == '\0')
 	    break;
 	// the address, if present
-	if (bpType == Breakpoint::breakpoint &&
+	if (bp.type == Breakpoint::breakpoint &&
 	    strncmp(p, "0x", 2) == 0)
 	{
 	    const char* start = p;
 	    while (*p != '\0' && !isspace(*p))
 		p++;
-	    address = QString::fromLatin1(start, p-start);
+	    bp.address = QString::fromLatin1(start, p-start);
 	    while (isspace(*p) && *p != '\n')
 		p++;
 	    if (*p == '\0')
 		break;
-	} else {
-	    address = QString();
 	}
 	// remainder is location, hit and ignore count, condition
-	hits = 0;
-	ignoreCount = 0;
-	condition = QString();
 	end = strchr(p, '\n');
 	if (end == 0) {
-	    location = p;
-	    p += location.length();
+	    bp.location = p;
+	    p += bp.location.length();
 	} else {
-	    location = QString::fromLatin1(p, end-p).stripWhiteSpace();
+	    bp.location = QString::fromLatin1(p, end-p).stripWhiteSpace();
 	    p = end+1;			/* skip over \n */
 	}
 
@@ -1821,37 +1811,27 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	    if (strncmp(p, "breakpoint already hit", 22) == 0) {
 		// extract the hit count
 		p += 22;
-		hits = strtol(p, &dummy, 10);
-		TRACE(QString().sprintf("hit count %d", hits));
+		bp.hitCount = strtol(p, &dummy, 10);
+		TRACE(QString("hit count %1").arg(bp.hitCount));
 	    } else if (strncmp(p, "stop only if ", 13) == 0) {
 		// extract condition
 		p += 13;
-		condition = QString::fromLatin1(p, end-p).stripWhiteSpace();
-		TRACE("condition: "+condition);
+		bp.condition = QString::fromLatin1(p, end-p).stripWhiteSpace();
+		TRACE("condition: "+bp.condition);
 	    } else if (strncmp(p, "ignore next ", 12) == 0) {
 		// extract ignore count
 		p += 12;
-		ignoreCount = strtol(p, &dummy, 10);
-		TRACE(QString().sprintf("ignore count %d", ignoreCount));
+		bp.ignoreCount = strtol(p, &dummy, 10);
+		TRACE(QString("ignore count %1").arg(bp.ignoreCount));
 	    } else {
 		// indeed a continuation
-		location += " " + QString::fromLatin1(p, end-p).stripWhiteSpace();
+		bp.location += " " + QString::fromLatin1(p, end-p).stripWhiteSpace();
 	    }
 	    p = end;
 	    if (*p != '\0')
 		p++;			/* skip '\n' */
 	}
-	Breakpoint* bp = new Breakpoint;
-	bp->id = bpNum;
-	bp->type = bpType;
-	bp->temporary = disp == 'd';
-	bp->enabled = enable == 'y';
-	bp->location = location;
-	bp->address = address;
-	bp->hitCount = hits;
-	bp->ignoreCount = ignoreCount;
-	bp->condition = condition;
-	brks.append(bp);
+	brks.push_back(bp);
     }
     return true;
 }

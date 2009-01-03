@@ -55,7 +55,7 @@ public:
     virtual void parseBackTrace(const char* output, std::list<StackFrame>& stack);
     virtual bool parseFrameChange(const char* output, int& frameNo,
 				  QString& file, int& lineNo, DbgAddr& address);
-    virtual bool parseBreakList(const char* output, QList<Breakpoint>& brks);
+    virtual bool parseBreakList(const char* output, std::list<Breakpoint>& brks);
     virtual bool parseThreadList(const char* output, QList<ThreadInfo>& threads);
     virtual bool parseBreakpoint(const char* output, int& id,
 				 QString& file, int& lineNo, QString& address);

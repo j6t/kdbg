@@ -1124,28 +1124,21 @@ XsldbgDriver::parseFrameChange(const char *output, int &frameNo,
 
 bool
 XsldbgDriver::parseBreakList(const char *output,
-                             QList < Breakpoint > &brks)
+                             std::list < Breakpoint > &brks)
 {
    TRACE("parseBreakList");
     /* skip the first blank line */
    const char *p;
    
     // split up a line
-    QString location, file, lineNo;
-    QString address;
-    QString templateName;	 
-    int hits = 0;
-    int enabled = 0;
-    uint ignoreCount = 0;
-    QString condition;
+    Breakpoint bp;
     char *dummy;
     p =  strchr(output, '\n');/* skip the first blank line*/
 
     while ((p != 0) && (*p != '\0')) {
 	if (*p == '\n')
 	    p++;
-        templateName = QString();
-        Breakpoint::Type bpType = Breakpoint::breakpoint;
+        QString templateName;
         //qDebug("Looking at :%s", p);
         if (strncmp(p, " Breakpoint", 11) != 0)
             break;
@@ -1155,7 +1148,7 @@ XsldbgDriver::parseBreakList(const char *output,
 
         //TRACE(p);
         // get Num
-        long bpNum = strtol(p, &dummy, 10);     /* don't care about overflows */
+        bp.id = strtol(p, &dummy, 10);     /* don't care about overflows */
 
         p = dummy;
         if ((p == 0) || (p[1] == '\0'))
@@ -1165,12 +1158,12 @@ XsldbgDriver::parseBreakList(const char *output,
         //TRACE(p);    
         // Get breakpoint state ie enabled/disabled
         if (strncmp(p, "enabled", 7) == 0) {
-            enabled = true;
+            bp.enabled = true;
             p = p + 7;
         } else {
             if (strncmp(p, "disabled", 8) == 0) {
                 p = p + 8;
-                enabled = false;
+                bp.enabled = false;
             } else{
 	      TRACE("Parse error in breakpoint list");
 	      TRACE(p);
@@ -1221,6 +1214,7 @@ XsldbgDriver::parseBreakList(const char *output,
 	if (*p == '\"')
 	    p++;
         /* grab file name */
+        QString file;
         while ((*p != '\"') && !isspace(*p)) {
             file.append(*p);
             p++;
@@ -1236,36 +1230,17 @@ XsldbgDriver::parseBreakList(const char *output,
             p++;
         }
         //TRACE(p);    
+        QString lineNo;
         while (isdigit(*p)) {
             lineNo.append(*p);
             p++;
         }
 
-
-
-        Breakpoint *bp = new Breakpoint;
-        if (bp != 0) {
-            // take 1 of line number
-            lineNo.setNum(lineNo.toInt() -1);
-            bp->id = bpNum;
-            bp->type = bpType;
-            bp->temporary = false;
-            bp->enabled = enabled;
-            location.append("in ").append(templateName).append(" at ");
-	    location.append(file).append(":").append(lineNo);
-            bp->location = location;
-            bp->fileName = file;
-            bp->lineNo = lineNo.toInt();
-            bp->address = address;
-            bp->hitCount = hits;
-            bp->ignoreCount = ignoreCount;
-            bp->condition = condition;
-            brks.append(bp);
-            location = "";
-            lineNo = "";
-            file = "";
-        } else
-            TRACE("Outof memory, breakpoint not created");
+        // bp.lineNo is zero-based
+        bp.lineNo = lineNo.toInt() - 1;
+        bp.location = QString("in %1 at %2:%3").arg(templateName, file, lineNo);
+        bp.fileName = file;
+        brks.push_back(bp);
 
         if (p != 0) {
             p = strchr(p, '\n');

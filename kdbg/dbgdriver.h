@@ -416,7 +416,7 @@ public:
      * @return False if there was an error before the first breakpoint
      * was found. Even if true is returned, #brks may be empty.
      */
-    virtual bool parseBreakList(const char* output, QList<Breakpoint>& brks) = 0;
+    virtual bool parseBreakList(const char* output, std::list<Breakpoint>& brks) = 0;
 
     /**
      * Parses a list of threads.

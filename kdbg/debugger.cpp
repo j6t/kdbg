@@ -1945,8 +1945,7 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 void KDebugger::updateBreakList(const char* output)
 {
     // get the new list
-    QList<Breakpoint> brks;
-    brks.setAutoDelete(false);
+    std::list<Breakpoint> brks;
     m_d->parseBreakList(output, brks);
 
     // merge new information into existing breakpoints
@@ -1957,7 +1956,7 @@ void KDebugger::updateBreakList(const char* output)
 	if (m_brkpts[i]->id < 0)
 	    continue;
 
-	for (Breakpoint* bp = brks.first(); bp != 0; bp = brks.next())
+	for (std::list<Breakpoint>::iterator bp = brks.begin(); bp != brks.end(); ++bp)
 	{
 	    if (bp->id == m_brkpts[i]->id) {
 		// keep accurate location
@@ -1968,7 +1967,7 @@ void KDebugger::updateBreakList(const char* output)
 		    bp->fileName = m_brkpts[i]->fileName;
 		    bp->lineNo = m_brkpts[i]->lineNo;
 		}
-		m_brkpts.insert(i, bp); // old object is deleted
+		m_brkpts.insert(i, new Breakpoint(*bp)); // old object is deleted
 		goto stillAlive;
 	    }
 	}
@@ -1987,19 +1986,12 @@ void KDebugger::updateBreakList(const char* output)
     }
 
     // brks may contain new breakpoints not already in m_brkpts
-    for (const Breakpoint* bp = brks.first(); bp != 0; bp = brks.next())
+    for (std::list<Breakpoint>::iterator bp = brks.begin(); bp != brks.end(); ++bp)
     {
-	bool found = false;
-	for (uint i = 0; i < m_brkpts.size(); i++)      {
-	    if (bp->id == m_brkpts[i]->id) {
-		found = true;
-		break;
-	    }
-	}
-	if (!found){
+	if (!breakpointById(bp->id)) {
 	    int n = m_brkpts.size();
 	    m_brkpts.resize(n+1);
-	    m_brkpts.insert(n, bp);
+	    m_brkpts.insert(n, new Breakpoint(*bp));
 	}
     }
 

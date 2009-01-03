@@ -62,7 +62,7 @@ class XsldbgDriver:public DebuggerDriver {
                                   QString & file, int &lineNo,
                                   DbgAddr & address);
     virtual bool parseBreakList(const char *output,
-                                QList < Breakpoint > &brks);
+                                std::list < Breakpoint > &brks);
     virtual bool parseThreadList(const char *output,
                                  QList < ThreadInfo > &threads);
     virtual bool parseBreakpoint(const char *output, int &id,
