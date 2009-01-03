@@ -506,7 +506,7 @@ signals:
     /**
      * Indicates that the list of threads has possibly changed.
      */
-    void threadsChanged(QList<ThreadInfo>&);
+    void threadsChanged(const std::list<ThreadInfo>&);
 
     /**
      * Indicates that the value for a value popup is ready.

@@ -56,7 +56,7 @@ public:
     virtual bool parseFrameChange(const char* output, int& frameNo,
 				  QString& file, int& lineNo, DbgAddr& address);
     virtual bool parseBreakList(const char* output, std::list<Breakpoint>& brks);
-    virtual bool parseThreadList(const char* output, QList<ThreadInfo>& threads);
+    virtual std::list<ThreadInfo> parseThreadList(const char* output);
     virtual bool parseBreakpoint(const char* output, int& id,
 				 QString& file, int& lineNo, QString& address);
     virtual void parseLocals(const char* output, QList<ExprValue>& newVars);

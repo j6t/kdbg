@@ -15,15 +15,15 @@
 class ThreadEntry : public QListViewItem, public ThreadInfo
 {
 public:
-    ThreadEntry(QListView* parent, ThreadInfo* thread);
+    ThreadEntry(QListView* parent, const ThreadInfo& thread);
     void setFunction(const QString& func);
 
     bool m_delete;			/* used for updating the list */
 };
 
-ThreadEntry::ThreadEntry(QListView* parent, ThreadInfo* thread) :
-	QListViewItem(parent, thread->threadName, thread->function),
-	ThreadInfo(*thread),
+ThreadEntry::ThreadEntry(QListView* parent, const ThreadInfo& thread) :
+	QListViewItem(parent, thread.threadName, thread.function),
+	ThreadInfo(thread),
 	m_delete(false)
 {
 }
@@ -53,18 +53,19 @@ ThreadList::~ThreadList()
 {
 }
 
-void ThreadList::updateThreads(QList<ThreadInfo>& threads)
+void ThreadList::updateThreads(const std::list<ThreadInfo>& threads)
 {
     // reset flag in all items
     for (QListViewItem* e = firstChild(); e != 0; e = e->nextSibling()) {
 	static_cast<ThreadEntry*>(e)->m_delete = true;
     }
 
-    for (ThreadInfo* i = threads.first(); i != 0; i = threads.next()) {
+    for (std::list<ThreadInfo>::const_iterator i = threads.begin(); i != threads.end(); ++i)
+    {
 	// look up this thread by id
 	ThreadEntry* te = threadById(i->id);
 	if (te == 0) {
-	    te = new ThreadEntry(this, i);
+	    te = new ThreadEntry(this, *i);
 	} else {
 	    te->m_delete = false;
 	    te->setFunction(i->function);

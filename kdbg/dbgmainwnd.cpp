@@ -142,8 +142,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	    m_memoryWindow, SLOT(restoreProgramSpecific(KConfigBase*)));
 
     // thread window
-    connect(m_debugger, SIGNAL(threadsChanged(QList<ThreadInfo>&)),
-	    m_threads, SLOT(updateThreads(QList<ThreadInfo>&)));
+    connect(m_debugger, SIGNAL(threadsChanged(const std::list<ThreadInfo>&)),
+	    m_threads, SLOT(updateThreads(const std::list<ThreadInfo>&)));
     connect(m_threads, SIGNAL(setThread(int)),
 	    m_debugger, SLOT(setThread(int)));
 

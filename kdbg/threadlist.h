@@ -8,8 +8,8 @@
 #define THREADLIST_H
 
 #include <qlistview.h>
-#include <qptrlist.h>
 #include <qpixmap.h>
+#include <list>
 
 class ThreadInfo;
 class ThreadEntry;
@@ -22,7 +22,7 @@ public:
     ~ThreadList();
 
 public slots:
-    void updateThreads(QList<ThreadInfo>&);
+    void updateThreads(const std::list<ThreadInfo>&);
     void slotCurrentChanged(QListViewItem*);
 
 signals:

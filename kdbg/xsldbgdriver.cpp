@@ -1251,11 +1251,10 @@ XsldbgDriver::parseBreakList(const char *output,
     return true;
 }
 
-bool
-XsldbgDriver::parseThreadList(const char */*output*/,
-                              QList < ThreadInfo > &/*threads*/)
+std::list<ThreadInfo>
+XsldbgDriver::parseThreadList(const char */*output*/)
 {
-    return true;
+    return std::list<ThreadInfo>();
 }
 
 bool

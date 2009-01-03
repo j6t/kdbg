@@ -421,12 +421,10 @@ public:
     /**
      * Parses a list of threads.
      * @param output The output of the debugger.
-     * @param threads The list of new #ThreadInfo objects. The list
-     * must initially be empty.
-     * @return False if there was an error before the first thread entry
-     * was found. Even if true is returned, #threads may be empty.
+     * @return The new thread list. There is no indication if there was
+     * a parse error.
      */
-    virtual bool parseThreadList(const char* output, QList<ThreadInfo>& threads) = 0;
+    virtual std::list<ThreadInfo> parseThreadList(const char* output) = 0;
 
     /**
      * Parses the output when the program stops to see whether this it

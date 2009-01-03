@@ -1836,35 +1836,31 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
     return true;
 }
 
-bool GdbDriver::parseThreadList(const char* output, QList<ThreadInfo>& threads)
+std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 {
+    std::list<ThreadInfo> threads;
     if (strcmp(output, "\n") == 0 || strncmp(output, "No stack.", 9) == 0) {
 	// no threads
-	return true;
+	return threads;
     }
-
-    int id;
-    QString systag;
-    QString func, file;
-    int lineNo;
-    DbgAddr address;
 
     const char* p = output;
     while (*p != '\0') {
+	ThreadInfo thr;
 	// seach look for thread id, watching out for  the focus indicator
-	bool hasFocus = false;
+	thr.hasFocus = false;
 	while (isspace(*p))		/* may be \n from prev line: see "No stack" below */
 	    p++;
 	if (*p == '*') {
-	    hasFocus = true;
+	    thr.hasFocus = true;
 	    p++;
 	    // there follows only whitespace
 	}
 	char* end;
-	id = strtol(p, &end, 10);
+	thr.id = strtol(p, &end, 10);
 	if (p == end) {
 	    // syntax error: no number found; bail out
-	    return true;
+	    return threads;
 	}
 	p = end;
 
@@ -1878,9 +1874,9 @@ bool GdbDriver::parseThreadList(const char* output, QList<ThreadInfo>& threads)
 	end = strstr(p, "  ");
 	if (end == 0) {
 	    // syntax error; bail out
-	    return true;
+	    return threads;
 	}
-	systag = QString::fromLatin1(p, end-p);
+	thr.threadName = QString::fromLatin1(p, end-p);
 	p = end+2;
 
 	/*
@@ -1888,26 +1884,16 @@ bool GdbDriver::parseThreadList(const char* output, QList<ThreadInfo>& threads)
 	 * catches a thread at an instant where it doesn't have a stack.
 	 */
 	if (strncmp(p, "[No stack.]", 11) != 0) {
-	    ::parseFrameInfo(p, func, file, lineNo, address);
+	    ::parseFrameInfo(p, thr.function, thr.fileName, thr.lineNo, thr.address);
 	} else {
-	    func = "[No stack]";
-	    file = QString();
-	    lineNo = -1;
-	    address = QString();
+	    thr.function = "[No stack]";
+	    thr.lineNo = -1;
 	    p += 11;			/* \n is skipped above */
 	}
 
-	ThreadInfo* thr = new ThreadInfo;
-	thr->id = id;
-	thr->threadName = systag;
-	thr->hasFocus = hasFocus;
-	thr->function = func;
-	thr->fileName = file;
-	thr->lineNo = lineNo;
-	thr->address = address;
-	threads.append(thr);
+	threads.push_back(thr);
     }
-    return true;
+    return threads;
 }
 
 static bool parseNewBreakpoint(const char* o, int& id,

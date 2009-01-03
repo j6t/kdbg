@@ -2126,10 +2126,7 @@ void KDebugger::handleDisassemble(CmdQueueItem* cmd, const char* output)
 
 void KDebugger::handleThreadList(const char* output)
 {
-    QList<ThreadInfo> threads;
-    threads.setAutoDelete(true);
-    m_d->parseThreadList(output, threads);
-    emit threadsChanged(threads);
+    emit threadsChanged(m_d->parseThreadList(output));
 }
 
 void KDebugger::setThread(int id)
