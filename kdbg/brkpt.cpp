@@ -127,8 +127,8 @@ void BreakpointTable::updateBreakList()
     }
 
     // get the new list
-    for (int i = m_debugger->numBreakpoints()-1; i >= 0; i--) {
-	const Breakpoint* bp = m_debugger->breakpoint(i);
+    for (KDebugger::BrkptROIterator bp = m_debugger->breakpointsBegin(); bp != m_debugger->breakpointsEnd(); ++bp)
+    {
 	// look up this item
 	for (BreakpointItem* oldbp = deletedItems.first(); oldbp != 0;
 	     oldbp = deletedItems.next())

@@ -9,7 +9,6 @@
 
 #include <qtimer.h>
 #include <qdict.h>
-#include <qptrvector.h>
 #include <qstringlist.h>
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
@@ -291,9 +290,10 @@ public:
      */
     bool isIdle() const;
 
-    /** The list of breakpoints. */
-    int numBreakpoints() const { return m_brkpts.size(); }
-    const Breakpoint* breakpoint(int i) const { return m_brkpts[i]; }
+    /* The list of breakpoints. */
+    typedef std::list<Breakpoint>::const_iterator BrkptROIterator;
+    BrkptROIterator breakpointsBegin() const { return m_brkpts.begin(); }
+    BrkptROIterator breakpointsEnd() const { return m_brkpts.end(); }
 
     const QString& executable() const { return m_executable; }
 
@@ -345,7 +345,7 @@ protected:
     void writeCommand();
     
     QStringList m_watchEvalExpr;	/* exprs to evaluate for watch window */
-    QPtrVector<Breakpoint> m_brkpts;
+    std::list<Breakpoint> m_brkpts;
     QString m_memoryExpression;		/* memory location to watch */
     unsigned m_memoryFormat;		/* how that output should look */
 
@@ -382,18 +382,19 @@ protected:
     CmdQueueItem* loadCoreFile();
     void openProgramConfig(const QString& name);
 
-    Breakpoint* breakpointByFilePos(QString file, int lineNo,
+    typedef std::list<Breakpoint>::iterator BrkptIterator;
+    BrkptIterator breakpointByFilePos(QString file, int lineNo,
 				    const DbgAddr& address);
-    Breakpoint* breakpointById(int id);
+    BrkptIterator breakpointById(int id);
     CmdQueueItem* executeBreakpoint(const Breakpoint* bp, bool queueOnly);
     void newBreakpoint(CmdQueueItem* cmd, const char* output);
     void updateBreakList(const char* output);
     bool stopMayChangeBreakList() const;
     void saveBreakpoints(ProgramConfig* config);
     void restoreBreakpoints(ProgramConfig* config);
-    bool enableDisableBreakpoint(Breakpoint* bp);
-    bool deleteBreakpoint(Breakpoint* bp);
-    bool conditionalBreakpoint(Breakpoint* bp,
+    bool enableDisableBreakpoint(BrkptIterator bp);
+    bool deleteBreakpoint(BrkptIterator bp);
+    bool conditionalBreakpoint(BrkptIterator bp,
 			       const QString& condition,
 			       int ignoreCount);
 

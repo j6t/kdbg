@@ -237,9 +237,9 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
 	    // check if this breakpoint still exists
 	    int line = rowToLine(i);
 	    TRACE(QString().sprintf("checking for bp at %d", line));
-	    int j;
-	    for (j = dbg->numBreakpoints()-1; j >= 0; j--) {
-		const Breakpoint* bp = dbg->breakpoint(j);
+	    KDebugger::BrkptROIterator bp = dbg->breakpointsBegin();
+	    for (; bp != dbg->breakpointsEnd(); ++bp)
+	    {
 		if (bp->lineNo == line &&
 		    fileNameMatches(bp->fileName) &&
 		    lineToRow(line, bp->address) == i)
@@ -248,7 +248,7 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
 		    break;
 		}
 	    }
-	    if (j < 0) {
+	    if (bp == dbg->breakpointsEnd()) {
 		/* doesn't exist anymore, remove it */
 		m_lineItems[i] &= ~liBPany;
 		update();
@@ -257,8 +257,8 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
     }
 
     // add new breakpoints
-    for (int j = dbg->numBreakpoints()-1; j >= 0; j--) {
-	const Breakpoint* bp = dbg->breakpoint(j);
+    for (KDebugger::BrkptROIterator bp = dbg->breakpointsBegin(); bp != dbg->breakpointsEnd(); ++bp)
+    {
 	if (fileNameMatches(bp->fileName)) {
 	    TRACE(QString().sprintf("updating %s:%d", bp->fileName.data(), bp->lineNo));
 	    int i = bp->lineNo;
