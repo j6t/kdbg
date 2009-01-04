@@ -501,7 +501,7 @@ signals:
     /**
      * Indicates that the register values have possibly changed.
      */
-    void registersChanged(QList<RegisterInfo>&);
+    void registersChanged(const std::list<RegisterInfo>&);
 
     /**
      * Indicates that the list of threads has possibly changed.

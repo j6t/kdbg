@@ -77,8 +77,7 @@ class XsldbgDriver:public DebuggerDriver {
                                      QString & message);
     virtual void parseSharedLibs(const char *output, QStrList & shlibs);
     virtual bool parseFindType(const char *output, QString & type);
-    virtual void parseRegisters(const char *output,
-                                QList < RegisterInfo > &regs);
+    virtual std::list<RegisterInfo> parseRegisters(const char *output);
     virtual bool parseInfoLine(const char *output, QString & addrFrom,
                                QString & addrTo);
     virtual void parseDisassemble(const char *output,

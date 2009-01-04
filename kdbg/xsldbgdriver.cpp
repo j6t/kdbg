@@ -1415,11 +1415,10 @@ XsldbgDriver::parseFindType(const char */*output*/, QString & /*type*/)
     return true;
 }
 
-void
-XsldbgDriver::parseRegisters(const char */*output*/,
-                             QList < RegisterInfo > &/*regs*/)
+std::list<RegisterInfo> 
+XsldbgDriver::parseRegisters(const char */*output*/)
 {
-
+    return std::list<RegisterInfo>();
 }
 
 bool

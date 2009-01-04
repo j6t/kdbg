@@ -503,7 +503,7 @@ public:
     /**
      * Parses the output of the DCinforegisters command.
      */
-    virtual void parseRegisters(const char* output, QList<RegisterInfo>& regs) = 0;
+    virtual std::list<RegisterInfo> parseRegisters(const char* output) = 0;
 
     /**
      * Parses the output of the DCinfoline command. Returns false if the

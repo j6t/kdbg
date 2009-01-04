@@ -1858,13 +1858,7 @@ void KDebugger::slotDeleteWatch()
 
 void KDebugger::handleRegisters(const char* output)
 {
-    QList<RegisterInfo> regs;
-    m_d->parseRegisters(output, regs);
-
-    emit registersChanged(regs);
-
-    // delete them all
-    regs.setAutoDelete(true);
+    emit registersChanged(m_d->parseRegisters(output));
 }
 
 /*

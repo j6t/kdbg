@@ -131,8 +131,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(m_debugger, SIGNAL(breakpointsChanged()), m_bpTable, SLOT(updateBreakList()));
     connect(m_debugger, SIGNAL(breakpointsChanged()), m_bpTable, SLOT(updateUI()));
 
-    connect(m_debugger, SIGNAL(registersChanged(QList<RegisterInfo>&)),
-	    m_registers, SLOT(updateRegisters(QList<RegisterInfo>&)));
+    connect(m_debugger, SIGNAL(registersChanged(const std::list<RegisterInfo>&)),
+	    m_registers, SLOT(updateRegisters(const std::list<RegisterInfo>&)));
 
     connect(m_debugger, SIGNAL(memoryDumpChanged(const QString&, QList<MemoryDump>&)),
 	    m_memoryWindow, SLOT(slotNewMemoryDump(const QString&, QList<MemoryDump>&)));

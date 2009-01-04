@@ -2199,18 +2199,19 @@ bool GdbDriver::parseFindType(const char* output, QString& type)
     return true;
 }
 
-void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
+std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 {
+    std::list<RegisterInfo> regs;
     if (strncmp(output, "The program has no registers now", 32) == 0) {
-	return;
+	return regs;
     }
 
-    QString regName;
     QString value;
 
     // parse register values
     while (*output != '\0')
     {
+	RegisterInfo reg;
 	// skip space at the start of the line
 	while (isspace(*output))
 	    output++;
@@ -2221,14 +2222,11 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 	    output++;
 	if (*output == '\0')
 	    break;
-	regName = QString::fromLatin1(start, output-start);
+	reg.regName = QString::fromLatin1(start, output-start);
 
 	// skip space
 	while (isspace(*output))
 	    output++;
-
-	RegisterInfo* reg = new RegisterInfo;
-	reg->regName = regName;
 
 	/*
 	 * If we find a brace now, this is a vector register. We look for
@@ -2251,7 +2249,7 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 	    if (*output == '{') {
 		// another set of vector follows
 		// what we have so far is the raw value
-		reg->rawValue = value;
+		reg.rawValue = value;
 
 		start = output;
 		skipNested(output, '{', '}');
@@ -2273,7 +2271,7 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 			while (*end && (*end!='}') && (*end!=',') && (*end!='\n'))
 			    end++;
 			QString rawValue = QString::fromLatin1(cur, end-cur).simplifyWhiteSpace();
-			reg->rawValue = rawValue;
+			reg.rawValue = rawValue;
 
 			if (rawValue.left(2)=="0x") {
 			    // ok we have a raw value, now get it's type
@@ -2284,7 +2282,7 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 			    while (*cur!='{' && *cur!=' ')
 				cur--;
 			    cur++;
-			    reg->type=QString::fromLatin1(cur, end-cur);
+			    reg.type = QString::fromLatin1(cur, end-cur);
 			}
 
 			// end while loop 
@@ -2297,10 +2295,10 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 		// get rid of the braces at the begining and the end
 		value.remove(0, 1);
 		if (value[value.length()-1] == '}') {
-		    value = value.left(value.length()-1);
+		    value.truncate(value.length()-1);
 		}
 	    }
-	    reg->cookedValue = value;
+	    reg.cookedValue = value;
 	}
 	else
 	{
@@ -2320,10 +2318,10 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 	    int pos = value.find(" (raw ");
 	    if (pos >= 0)
 	    {
-		reg->cookedValue = value.left(pos);
-		reg->rawValue = value.mid(pos+6);
-		if (reg->rawValue.right(1) == ")")	// remove closing bracket
-		    reg->rawValue.truncate(reg->rawValue.length()-1);
+		reg.cookedValue = value.left(pos);
+		reg.rawValue = value.mid(pos+6);
+		if (reg.rawValue.right(1) == ")")	// remove closing bracket
+		    reg.rawValue.truncate(reg.rawValue.length()-1);
 	    }
 	    else
 	    {
@@ -2334,19 +2332,20 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 		*/
 		int pos = value.find(' ');
 		if (pos < 0) {
-		    reg->rawValue = value;
-		    reg->cookedValue = QString();
+		    reg.rawValue = value;
+		    reg.cookedValue = QString();
 		} else {
-		    reg->rawValue = value.left(pos);
-		    reg->cookedValue = value.mid(pos+1);
+		    reg.rawValue = value.left(pos);
+		    reg.cookedValue = value.mid(pos+1);
 		}
 	    }
 	}
 	if (*output != '\0')
 	    output++;			/* skip '\n' */
 
-	regs.append(reg);
+	regs.push_back(reg);
     }
+    return regs;
 }
 
 bool GdbDriver::parseInfoLine(const char* output, QString& addrFrom, QString& addrTo)
