@@ -335,7 +335,7 @@ void WinStack::slotShowValueTip(const QString& tipText)
 }
 
 void WinStack::slotDisassembled(const QString& fileName, int lineNo,
-				const QList<DisassembledCode>& disass)
+				const std::list<DisassembledCode>& disass)
 {
     // lookup the file
     SourceWindow* fw = 0;

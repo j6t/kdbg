@@ -1428,11 +1428,10 @@ XsldbgDriver::parseInfoLine(const char */*output*/, QString & /*addrFrom*/,
     return false;
 }
 
-void
-XsldbgDriver::parseDisassemble(const char */*output*/,
-                               QList < DisassembledCode > &/*code*/)
+std::list<DisassembledCode>
+XsldbgDriver::parseDisassemble(const char */*output*/)
 {
-    /* empty */
+    return std::list<DisassembledCode>();
 }
 
 QString

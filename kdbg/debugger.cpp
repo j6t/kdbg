@@ -2099,8 +2099,7 @@ void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 	    c->m_lineNo = cmd->m_lineNo;
 	} else {
 	    // no code
-	    QList<DisassembledCode> empty;
-	    emit disassembled(cmd->m_fileName, cmd->m_lineNo, empty);
+	    emit disassembled(cmd->m_fileName, cmd->m_lineNo, std::list<DisassembledCode>());
 	}
     } else {
 	// set program counter
@@ -2113,10 +2112,8 @@ void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 
 void KDebugger::handleDisassemble(CmdQueueItem* cmd, const char* output)
 {
-    QList<DisassembledCode> code;
-    code.setAutoDelete(true);
-    m_d->parseDisassemble(output, code);
-    emit disassembled(cmd->m_fileName, cmd->m_lineNo, code);
+    emit disassembled(cmd->m_fileName, cmd->m_lineNo,
+		      m_d->parseDisassemble(output));
 }
 
 void KDebugger::handleThreadList(const char* output)

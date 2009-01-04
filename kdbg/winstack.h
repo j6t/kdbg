@@ -7,7 +7,6 @@
 #ifndef WINSTACK_H
 #define WINSTACK_H
 
-#include <qptrlist.h>
 #include <qdialog.h>
 #include <qlineedit.h>
 #include <qlayout.h>
@@ -16,6 +15,7 @@
 #include <qpopupmenu.h>
 #include <qtooltip.h>
 #include <qvaluevector.h>
+#include <list>
 
 // forward declarations
 class KDebugger;
@@ -124,7 +124,7 @@ public slots:
 
     // Shows the disassembled code at the location given by file and lineNo
     void slotDisassembled(const QString& fileName, int lineNo,
-			  const QList<DisassembledCode>& disass);
+			  const std::list<DisassembledCode>& disass);
 
     // Updates line items after expanding/collapsing disassembled code
     void slotExpandCollapse(int lineNo);

@@ -70,7 +70,7 @@ public:
     virtual std::list<RegisterInfo> parseRegisters(const char* output);
     virtual bool parseInfoLine(const char* output,
 			       QString& addrFrom, QString& addrTo);
-    virtual void parseDisassemble(const char* output, QList<DisassembledCode>& code);
+    virtual std::list<DisassembledCode> parseDisassemble(const char* output);
     virtual QString parseMemoryDump(const char* output, QList<MemoryDump>& memdump);
     virtual QString parseSetVariable(const char* output);
     virtual QString editableValue(VarTree* value);

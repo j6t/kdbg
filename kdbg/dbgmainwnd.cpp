@@ -111,8 +111,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     // disassembling
     connect(m_filesWindow, SIGNAL(disassemble(const QString&, int)),
 	    m_debugger, SLOT(slotDisassemble(const QString&, int)));
-    connect(m_debugger, SIGNAL(disassembled(const QString&,int,const QList<DisassembledCode>&)),
-	    m_filesWindow, SLOT(slotDisassembled(const QString&,int,const QList<DisassembledCode>&)));
+    connect(m_debugger, SIGNAL(disassembled(const QString&,int,const std::list<DisassembledCode>&)),
+	    m_filesWindow, SLOT(slotDisassembled(const QString&,int,const std::list<DisassembledCode>&)));
     connect(m_filesWindow, SIGNAL(moveProgramCounter(const QString&,int,const DbgAddr&)),
 	    m_debugger, SLOT(setProgramCounter(const QString&,int,const DbgAddr&)));
     // program stopped

@@ -517,7 +517,7 @@ signals:
      * Provides the disassembled code of the location given by file and
      * line number (zero-based).
      */
-    void disassembled(const QString& file, int line, const QList<DisassembledCode>& code);
+    void disassembled(const QString& file, int line, const std::list<DisassembledCode>& code);
 
     /**
      * Indicates that the program has stopped for any reason: by a

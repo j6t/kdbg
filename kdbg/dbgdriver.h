@@ -515,7 +515,7 @@ public:
     /**
      * Parses the ouput of the DCdisassemble command.
      */
-    virtual void parseDisassemble(const char* output, QList<DisassembledCode>& code) = 0;
+    virtual std::list<DisassembledCode> parseDisassemble(const char* output) = 0;
 
     /**
      * Parses a memory dump. Returns an empty string if no error was found;
