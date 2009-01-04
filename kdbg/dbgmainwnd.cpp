@@ -134,8 +134,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(m_debugger, SIGNAL(registersChanged(const std::list<RegisterInfo>&)),
 	    m_registers, SLOT(updateRegisters(const std::list<RegisterInfo>&)));
 
-    connect(m_debugger, SIGNAL(memoryDumpChanged(const QString&, QList<MemoryDump>&)),
-	    m_memoryWindow, SLOT(slotNewMemoryDump(const QString&, QList<MemoryDump>&)));
+    connect(m_debugger, SIGNAL(memoryDumpChanged(const QString&, const std::list<MemoryDump>&)),
+	    m_memoryWindow, SLOT(slotNewMemoryDump(const QString&, const std::list<MemoryDump>&)));
     connect(m_debugger, SIGNAL(saveProgramSpecific(KConfigBase*)),
 	    m_memoryWindow, SLOT(saveProgramSpecific(KConfigBase*)));
     connect(m_debugger, SIGNAL(restoreProgramSpecific(KConfigBase*)),

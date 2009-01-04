@@ -1436,7 +1436,7 @@ XsldbgDriver::parseDisassemble(const char */*output*/)
 
 QString
 XsldbgDriver::parseMemoryDump(const char */*output*/,
-                              QList < MemoryDump > &/*memdump*/)
+                              std::list < MemoryDump > &/*memdump*/)
 {
     return i18n("No memory dump available");
 }

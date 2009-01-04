@@ -71,7 +71,7 @@ public:
     virtual bool parseInfoLine(const char* output,
 			       QString& addrFrom, QString& addrTo);
     virtual std::list<DisassembledCode> parseDisassemble(const char* output);
-    virtual QString parseMemoryDump(const char* output, QList<MemoryDump>& memdump);
+    virtual QString parseMemoryDump(const char* output, std::list<MemoryDump>& memdump);
     virtual QString parseSetVariable(const char* output);
     virtual QString editableValue(VarTree* value);
 protected:

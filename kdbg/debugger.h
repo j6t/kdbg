@@ -531,7 +531,7 @@ signals:
      * @param msg is an error message or empty
      * @param memdump is the memory dump
      */
-    void memoryDumpChanged(const QString&, QList<MemoryDump>&);
+    void memoryDumpChanged(const QString&, const std::list<MemoryDump>&);
 
     /**
      * Gives other objects a chance to save program specific settings.

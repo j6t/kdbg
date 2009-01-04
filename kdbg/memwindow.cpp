@@ -9,7 +9,6 @@
 #include <klocale.h>
 #include <kconfigbase.h>
 #include "debugger.h"
-#include "dbgdriver.h"			/* memory dump formats */
 
 
 class MemoryViewItem : public QListViewItem
@@ -191,7 +190,7 @@ void MemoryWindow::slotTypeChange(int id)
     displayNewExpression(expr);
 }
 
-void MemoryWindow::slotNewMemoryDump(const QString& msg, QList<MemoryDump>& memdump)
+void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryDump>& memdump)
 {
     m_memory.clear();
     if (!msg.isEmpty()) {
@@ -200,7 +199,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, QList<MemoryDump>& memd
     }
 
     MemoryViewItem* after = 0;
-    MemoryDump* md = memdump.first();
+    std::list<MemoryDump>::const_iterator md = memdump.begin();
 
     // remove all columns, except the address column
     for(int k = m_memory.columns() - 1; k > 0; k--)
@@ -213,7 +212,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, QList<MemoryDump>& memd
 
     QMap<QString,QString> tmpMap;
 
-    for (; md != 0; md = memdump.next())
+    for (; md != memdump.end(); ++md)
     {
 	QString addr = md->address.asString() + " " + md->address.fnoffs;
 	QStringList sl = QStringList::split( "\t", md->dump );

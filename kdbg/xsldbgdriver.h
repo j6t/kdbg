@@ -82,7 +82,7 @@ class XsldbgDriver:public DebuggerDriver {
                                QString & addrTo);
     virtual std::list<DisassembledCode> parseDisassemble(const char *output);
     virtual QString parseMemoryDump(const char *output,
-                                    QList < MemoryDump > &memdump);
+                                    std::list < MemoryDump > &memdump);
     virtual QString parseSetVariable(const char* output);
 
   protected:

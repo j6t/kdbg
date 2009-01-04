@@ -2148,8 +2148,7 @@ void KDebugger::queueMemoryDump(bool immediate)
 
 void KDebugger::handleMemoryDump(const char* output)
 {
-    QList<MemoryDump> memdump;
-    memdump.setAutoDelete(true);
+    std::list<MemoryDump> memdump;
     QString msg = m_d->parseMemoryDump(output, memdump);
     emit memoryDumpChanged(msg, memdump);
 }
