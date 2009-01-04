@@ -59,7 +59,7 @@ public:
     virtual std::list<ThreadInfo> parseThreadList(const char* output);
     virtual bool parseBreakpoint(const char* output, int& id,
 				 QString& file, int& lineNo, QString& address);
-    virtual void parseLocals(const char* output, QList<ExprValue>& newVars);
+    virtual void parseLocals(const char* output, std::list<ExprValue*>& newVars);
     virtual ExprValue* parsePrintExpr(const char* output, bool wantErrorValue);
     virtual bool parseChangeWD(const char* output, QString& message);
     virtual bool parseChangeExecutable(const char* output, QString& message);

@@ -1981,7 +1981,7 @@ static bool parseNewWatchpoint(const char* o, int& id,
     return true;
 }
 
-void GdbDriver::parseLocals(const char* output, QList<ExprValue>& newVars)
+void GdbDriver::parseLocals(const char* output, std::list<ExprValue*>& newVars)
 {
     // check for possible error conditions
     if (strncmp(output, "No symbol table", 15) == 0)
@@ -2010,13 +2010,13 @@ void GdbDriver::parseLocals(const char* output, QList<ExprValue>& newVars)
 	    break;
 	}
 	// do not add duplicates
-	for (ExprValue* o = newVars.first(); o != 0; o = newVars.next()) {
-	    if (o->m_name == variable->m_name) {
+	for (std::list<ExprValue*>::iterator o = newVars.begin(); o != newVars.end(); ++o) {
+	    if ((*o)->m_name == variable->m_name) {
 		delete variable;
 		goto skipDuplicate;
 	    }
 	}
-	newVars.append(variable);
+	newVars.push_back(variable);
     skipDuplicate:;
     }
 }

@@ -445,7 +445,7 @@ public:
      * @param newVars Receives the parsed variable values. The values are
      * simply append()ed to the supplied list.
      */
-    virtual void parseLocals(const char* output, QList<ExprValue>& newVars) = 0;
+    virtual void parseLocals(const char* output, std::list<ExprValue*>& newVars) = 0;
 
     /**
      * Parses the output of a DCprint or DCprintStruct command.

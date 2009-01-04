@@ -1286,7 +1286,7 @@ XsldbgDriver::parseBreakpoint(const char *output, int &id,
 }
 
 void
-XsldbgDriver::parseLocals(const char *output, QList < ExprValue > &newVars)
+XsldbgDriver::parseLocals(const char *output, std::list < ExprValue* > &newVars)
 {
 
     /* keep going until error or xsldbg prompt is found */
@@ -1297,14 +1297,14 @@ XsldbgDriver::parseLocals(const char *output, QList < ExprValue > &newVars)
             break;
         }
         // do not add duplicates
-        for (ExprValue * o = newVars.first(); o != 0; o = newVars.next()) {
-            if (o->m_name == variable->m_name) {
+        for (std::list<ExprValue*>::iterator o = newVars.begin(); o != newVars.end(); ++o) {
+            if ((*o)->m_name == variable->m_name) {
                 delete variable;
 
                 goto skipDuplicate;
             }
         }
-        newVars.append(variable);
+        newVars.push_back(variable);
       skipDuplicate:;
     }
 }

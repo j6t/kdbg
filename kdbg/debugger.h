@@ -357,7 +357,7 @@ protected:
     void updateProgEnvironment(const QString& args, const QString& wd,
 			       const QDict<EnvVar>& newVars,
 			       const QStringList& newOptions);
-    void parseLocals(const char* output, QList<ExprValue>& newVars);
+    void parseLocals(const char* output, std::list<ExprValue*>& newVars);
     void handleLocals(const char* output);
     bool handlePrint(CmdQueueItem* cmd, const char* output);
     bool handlePrintDeref(CmdQueueItem* cmd, const char* output);

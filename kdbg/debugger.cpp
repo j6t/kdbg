@@ -1312,7 +1312,7 @@ void KDebugger::handleLocals(const char* output)
     /*
      *  Get local variables.
      */
-    QList<ExprValue> newVars;
+    std::list<ExprValue*> newVars;
     parseLocals(output, newVars);
 
     /*
@@ -1326,11 +1326,10 @@ void KDebugger::handleLocals(const char* output)
      */
     for (QStringList::ConstIterator n = oldVars.begin(); n != oldVars.end(); ++n) {
 	// lookup this variable in the list of new variables
-	ExprValue* v = newVars.first();
-	while (v != 0 && v->m_name != *n) {
-	    v = newVars.next();
-	}
-	if (v == 0) {
+	std::list<ExprValue*>::iterator v = newVars.begin();
+	while (v != newVars.end() && (*v)->m_name != *n)
+	    ++v;
+	if (v == newVars.end()) {
 	    // old variable not in the new variables
 	    TRACE("old var deleted: " + *n);
 	    VarTree* v = m_localVariables.topLevelExprByName(*n);
@@ -1340,31 +1339,33 @@ void KDebugger::handleLocals(const char* output)
 	} else {
 	    // variable in both old and new lists: update
 	    TRACE("update var: " + *n);
-	    m_localVariables.updateExpr(newVars.current(), *m_typeTable);
+	    m_localVariables.updateExpr(*v, *m_typeTable);
 	    // remove the new variable from the list
-	    newVars.remove();
-	    delete v;
+	    delete *v;
+	    newVars.erase(v);
 	}
     }
     // insert all remaining new variables
-    while (!newVars.isEmpty())
+    while (!newVars.empty())
     {
-	ExprValue* v = newVars.take(0);
+	ExprValue* v = newVars.front();
 	TRACE("new var: " + v->m_name);
 	m_localVariables.insertExpr(v, *m_typeTable);
 	delete v;
+	newVars.pop_front();
     }
 }
 
-void KDebugger::parseLocals(const char* output, QList<ExprValue>& newVars)
+void KDebugger::parseLocals(const char* output, std::list<ExprValue*>& newVars)
 {
-    QList<ExprValue> vars;
+    std::list<ExprValue*> vars;
     m_d->parseLocals(output, vars);
 
     QString origName;			/* used in renaming variables */
-    while (vars.count() > 0)
+    while (!vars.empty())
     {
-	ExprValue* variable = vars.take(0);
+	ExprValue* variable = vars.front();
+	vars.pop_front();
 	/*
 	 * When gdb prints local variables, those from the innermost block
 	 * come first. We run through the list of already parsed variables
@@ -1376,15 +1377,15 @@ void KDebugger::parseLocals(const char* output, QList<ExprValue>& newVars)
 	 */
 	int block = 0;
 	origName = variable->m_name;
-	for (ExprValue* v = newVars.first(); v != 0; v = newVars.next()) {
-	    if (variable->m_name == v->m_name) {
+	for (std::list<ExprValue*>::iterator v = newVars.begin(); v != newVars.end(); ++v) {
+	    if (variable->m_name == (*v)->m_name) {
 		// we found a duplicate, change name
 		block++;
 		QString newName = origName + " (" + QString().setNum(block) + ")";
 		variable->m_name = newName;
 	    }
 	}
-	newVars.append(variable);
+	newVars.push_back(variable);
     }
 }
 
