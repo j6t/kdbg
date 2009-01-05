@@ -410,7 +410,7 @@ protected:
     QString m_programWD;		/* working directory of gdb */
     QDict<EnvVar> m_envVars;		/* environment variables set by user */
     QStringList m_boolOptions;		/* boolean options */
-    QStrList m_sharedLibs;		/* shared libraries used by program */
+    QStringList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
     ProgramConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
     void saveProgramSettings();

@@ -65,7 +65,7 @@ public:
     virtual bool parseChangeExecutable(const char* output, QString& message);
     virtual bool parseCoreFile(const char* output);
     virtual uint parseProgramStopped(const char* output, QString& message);
-    virtual void parseSharedLibs(const char* output, QStrList& shlibs);
+    virtual QStringList parseSharedLibs(const char* output);
     virtual bool parseFindType(const char* output, QString& type);
     virtual std::list<RegisterInfo> parseRegisters(const char* output);
     virtual bool parseInfoLine(const char* output,

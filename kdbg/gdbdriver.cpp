@@ -2140,17 +2140,18 @@ uint GdbDriver::parseProgramStopped(const char* output, QString& message)
     return flags;
 }
 
-void GdbDriver::parseSharedLibs(const char* output, QStrList& shlibs)
+QStringList GdbDriver::parseSharedLibs(const char* output)
 {
+    QStringList shlibs;
     if (strncmp(output, "No shared libraries loaded", 26) == 0)
-	return;
+	return shlibs;
 
     // parse the table of shared libraries
 
     // strip off head line
     output = strchr(output, '\n');
     if (output == 0)
-	return;
+	return shlibs;
     output++;				/* skip '\n' */
     QString shlibName;
     while (*output != '\0') {
@@ -2166,7 +2167,7 @@ void GdbDriver::parseSharedLibs(const char* output, QStrList& shlibs)
 	    }
 	}
 	if (*output == '\0')
-	    return;
+	    return shlibs;
 	const char* start = output;
 	output = strchr(output, '\n');
 	if (output == 0)
@@ -2177,6 +2178,7 @@ void GdbDriver::parseSharedLibs(const char* output, QStrList& shlibs)
 	shlibs.append(shlibName);
 	TRACE("found shared lib " + shlibName);
     }
+    return shlibs;
 }
 
 bool GdbDriver::parseFindType(const char* output, QString& type)

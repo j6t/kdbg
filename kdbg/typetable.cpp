@@ -388,18 +388,16 @@ void ProgramTypeTable::registerAlias(const QString& name, TypeInfo* type)
     m_aliasDict.insert(name, type);
 }
 
-void ProgramTypeTable::loadLibTypes(const QStrList& libs)
+void ProgramTypeTable::loadLibTypes(const QStringList& libs)
 {
-    QStrListIterator it = libs;
-
-    for (; it; ++it)
+    for (QStringList::const_iterator it = libs.begin(); it != libs.end(); ++it)
     {
 	// look up the library
 	for (std::list<TypeTable>::iterator t = typeTables.begin(); t != typeTables.end(); ++t)
 	{
-	    if (t->matchFileName(it))
+	    if (t->matchFileName(*it))
 	    {
-		TRACE("adding types for " + QString(it));
+		TRACE("adding types for " + *it);
 		loadTypeTable(&*t);
 	    }
 	}

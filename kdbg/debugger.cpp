@@ -1787,11 +1787,8 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 
 void KDebugger::handleSharedLibs(const char* output)
 {
-    // delete all known libraries
-    m_sharedLibs.clear();
-
     // parse the table of shared libraries
-    m_d->parseSharedLibs(output, m_sharedLibs);
+    m_sharedLibs = m_d->parseSharedLibs(output);
     m_sharedLibsListed = true;
 
     // get type libraries

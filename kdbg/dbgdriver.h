@@ -19,7 +19,6 @@ class VarTree;
 class ExprValue;
 class ExprWnd;
 class KDebugger;
-class QStrList;
 class QStringList;
 
 
@@ -492,7 +491,7 @@ public:
     /**
      * Parses the output of the DCsharedlibs command.
      */
-    virtual void parseSharedLibs(const char* output, QStrList& shlibs) = 0;
+    virtual QStringList parseSharedLibs(const char* output) = 0;
 
     /**
      * Parses the output of the DCfindType command.

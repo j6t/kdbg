@@ -1403,10 +1403,10 @@ XsldbgDriver::parseProgramStopped(const char *output, QString & message)
     return flags;
 }
 
-void
-XsldbgDriver::parseSharedLibs(const char */*output*/, QStrList & /*shlibs*/)
+QStringList
+XsldbgDriver::parseSharedLibs(const char */*output*/)
 {
-    /* empty */
+    return QStringList();
 }
 
 bool
