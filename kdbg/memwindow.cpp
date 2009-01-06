@@ -15,7 +15,7 @@ class MemoryViewItem : public QListViewItem
 {
 public:
     MemoryViewItem(QListView* parent, QListViewItem* insertAfter, QString raw, QString cooked)
-        : QListViewItem(parent, insertAfter, raw, cooked), m_changed(8) {}
+        : QListViewItem(parent, insertAfter, raw, cooked) {}
 
     void setChanged(uint pos, bool b) { m_changed[pos] = b; }
 
@@ -23,7 +23,7 @@ protected:
     virtual void paintCell(QPainter* p, const QColorGroup& cg,
 			   int column, int width, int alignment);
 
-    QArray<bool> m_changed;
+    bool m_changed[8];
 };
 
 void MemoryViewItem::paintCell(QPainter* p, const QColorGroup& cg,
