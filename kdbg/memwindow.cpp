@@ -146,11 +146,10 @@ void MemoryWindow::slotNewExpression(const QString& newText)
     }
     m_expression.insertItem(text, 0);
 
-    if (text.isEmpty()) {
+    if (!text.isEmpty()) {
 	// if format was not in the cache, insert it
 	if (m_formatCache[text] == 0) {
 	    m_formatCache.insert(text, new unsigned(m_format));
-	    
 	}
     }
 
