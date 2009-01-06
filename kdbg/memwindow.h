@@ -11,7 +11,6 @@
 #include <qlistview.h>
 #include <qcombobox.h>
 #include <qlayout.h>
-#include <qdict.h>
 #include <qmap.h>
 #include "dbgdriver.h"
 
@@ -37,7 +36,7 @@ protected:
     QVBoxLayout m_layout;
 
     unsigned m_format;
-    QDict<unsigned> m_formatCache;
+    QMap<QString,unsigned> m_formatCache;
 
     QPopupMenu m_popup;
 

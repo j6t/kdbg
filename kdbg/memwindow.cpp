@@ -89,8 +89,6 @@ MemoryWindow::MemoryWindow(QWidget* parent, const char* name) :
      * used, because it works only over items, not over the blank window.
      */
     m_memory.viewport()->installEventFilter(this);
-
-    m_formatCache.setAutoDelete(true);
 }
 
 MemoryWindow::~MemoryWindow()
@@ -134,8 +132,8 @@ void MemoryWindow::slotNewExpression(const QString& newText)
 	if (m_expression.text(i) == text) {
 	    // yes it is!
 	    // look up the format that was used last time for this expr
-	    unsigned* pFormat = m_formatCache[text];
-	    if (pFormat != 0) {
+	    QMap<QString,unsigned>::iterator pFormat = m_formatCache.find(text);
+	    if (pFormat != m_formatCache.end()) {
 		m_format = *pFormat;
 		m_debugger->setMemoryFormat(m_format);
 	    }
@@ -146,11 +144,7 @@ void MemoryWindow::slotNewExpression(const QString& newText)
     m_expression.insertItem(text, 0);
 
     if (text.isEmpty()) {
-	// if format was not in the cache, insert it
-	if (m_formatCache[text] == 0) {
-	    m_formatCache.insert(text, new unsigned(m_format));
-	    
-	}
+	m_formatCache[text] = m_format;
     }
 
     displayNewExpression(text);
@@ -181,10 +175,7 @@ void MemoryWindow::slotTypeChange(int id)
 
     // change the format in the cache
     QString expr = m_expression.currentText();
-    expr = expr.simplifyWhiteSpace();
-    unsigned* pFormat = m_formatCache[expr];
-    if (pFormat != 0)
-	*pFormat = m_format;
+    m_formatCache[expr.simplifyWhiteSpace()] = m_format;
 
     // force redisplay
     displayNewExpression(expr);
@@ -263,8 +254,8 @@ void MemoryWindow::saveProgramSpecific(KConfigBase* config)
 	exprEntry.sprintf(ExpressionFmt, i);
 	fmtEntry.sprintf(FormatFmt, i);
 	config->writeEntry(exprEntry, text);
-	unsigned* pFormat = m_formatCache[text];
-	unsigned fmt = pFormat != 0  ?  *pFormat  :  MDTword | MDThex;
+	QMap<QString,unsigned>::iterator pFormat = m_formatCache.find(text);
+	unsigned fmt = pFormat != m_formatCache.end()  ?  *pFormat  :  MDTword | MDThex;
 	config->writeEntry(fmtEntry, fmt);
     }
 
@@ -295,14 +286,14 @@ void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
 	QString expr = config->readEntry(exprEntry);
 	unsigned fmt = config->readNumEntry(fmtEntry, MDTword | MDThex);
 	m_expression.insertItem(expr);
-	m_formatCache.replace(expr, new unsigned(fmt & (MDTsizemask | MDTformatmask)));
+	m_formatCache[expr] = fmt & (MDTsizemask | MDTformatmask);
     }
 
     // initialize with top expression
     if (numEntries > 0) {
 	m_expression.setCurrentItem(0);
 	QString expr = m_expression.text(0);
-	m_format = *m_formatCache[expr];
+	m_format = m_formatCache[expr];
 	m_debugger->setMemoryFormat(m_format);
 	displayNewExpression(expr);
     }
