@@ -20,7 +20,7 @@ class ProgramTypeTable;
 class KTreeViewItem;
 class KConfig;
 class KConfigBase;
-class ProgramConfig;
+class KConfig;
 class QListBox;
 class RegisterInfo;
 class ThreadInfo;
@@ -399,8 +399,8 @@ protected:
     void newBreakpoint(CmdQueueItem* cmd, const char* output);
     void updateBreakList(const char* output);
     bool stopMayChangeBreakList() const;
-    void saveBreakpoints(ProgramConfig* config);
-    void restoreBreakpoints(ProgramConfig* config);
+    void saveBreakpoints(KConfig* config);
+    void restoreBreakpoints(KConfig* config);
     bool enableDisableBreakpoint(BrkptIterator bp);
     bool deleteBreakpoint(BrkptIterator bp);
     bool conditionalBreakpoint(BrkptIterator bp,
@@ -421,7 +421,7 @@ protected:
     QStringList m_boolOptions;		/* boolean options */
     QStringList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
-    ProgramConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
+    KConfig* m_programConfig;		/* program-specific settings (brkpts etc) */
     void saveProgramSettings();
     void restoreProgramSettings();
     QString readDebuggerCmd();

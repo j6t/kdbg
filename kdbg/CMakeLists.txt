@@ -45,7 +45,6 @@ set(kdbg_SRCS
     pgmargs.cpp
     procattach.cpp
     debugger.cpp
-    programconfig.cpp
     dbgdriver.cpp
     gdbdriver.cpp
     xsldbgdriver.cpp

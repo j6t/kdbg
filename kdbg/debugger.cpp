@@ -10,7 +10,6 @@
 #include "typetable.h"
 #include "exprwnd.h"
 #include "pgmsettings.h"
-#include "programconfig.h"
 #include <qregexp.h>
 #include <qfileinfo.h>
 #include <qlistbox.h>
@@ -19,6 +18,7 @@
 #include <kconfig.h>
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
+#include <kconfig.h>
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
 #include <unistd.h>			/* sleep(3) */
@@ -694,7 +694,7 @@ void KDebugger::openProgramConfig(const QString& name)
 
     QString pgmConfigFile = getConfigForExe(name);
 
-    m_programConfig = new ProgramConfig(pgmConfigFile);
+    m_programConfig = new KConfig(pgmConfigFile);
 }
 
 const char EnvironmentGroup[] = "Environment";
@@ -865,7 +865,7 @@ const char Temporary[] = "Temporary";
 const char Enabled[] = "Enabled";
 const char Condition[] = "Condition";
 
-void KDebugger::saveBreakpoints(ProgramConfig* config)
+void KDebugger::saveBreakpoints(KConfig* config)
 {
     QString groupName;
     int i = 0;
@@ -916,7 +916,7 @@ void KDebugger::saveBreakpoints(ProgramConfig* config)
     }
 }
 
-void KDebugger::restoreBreakpoints(ProgramConfig* config)
+void KDebugger::restoreBreakpoints(KConfig* config)
 {
     QString groupName;
     /*
