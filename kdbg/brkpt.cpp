@@ -17,6 +17,7 @@
 #include "brkpt.h"
 #include "dbgdriver.h"
 #include <ctype.h>
+#include <list>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -120,22 +121,21 @@ BreakpointTable::~BreakpointTable()
 
 void BreakpointTable::updateBreakList()
 {
-    QList<BreakpointItem> deletedItems;
+    std::list<BreakpointItem*> deletedItems;
 
     for (QListViewItem* it = m_list.firstChild(); it != 0; it = it->nextSibling()) {
-	deletedItems.append(static_cast<BreakpointItem*>(it));
+	deletedItems.push_back(static_cast<BreakpointItem*>(it));
     }
 
     // get the new list
     for (KDebugger::BrkptROIterator bp = m_debugger->breakpointsBegin(); bp != m_debugger->breakpointsEnd(); ++bp)
     {
 	// look up this item
-	for (BreakpointItem* oldbp = deletedItems.first(); oldbp != 0;
-	     oldbp = deletedItems.next())
+	for (std::list<BreakpointItem*>::iterator o = deletedItems.begin(); o != deletedItems.end(); ++o)
 	{
-	    if (oldbp->id == bp->id) {
-		oldbp->updateFrom(*bp);
-		deletedItems.take();	/* don't delete */
+	    if ((*o)->id == bp->id) {
+		(*o)->updateFrom(*bp);
+		deletedItems.erase(o);	/* don't delete */
 		goto nextItem;
 	    }
 	}
@@ -145,7 +145,10 @@ nextItem:;
     }
 
     // delete all untouched breakpoints
-    deletedItems.setAutoDelete(true);
+    while (!deletedItems.empty()) {
+	delete deletedItems.front();
+	deletedItems.pop_front();
+    }
 }
 
 BreakpointItem::BreakpointItem(QListView* list, const Breakpoint& bp) :
