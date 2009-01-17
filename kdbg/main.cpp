@@ -93,7 +93,7 @@ int main(int argc, char** argv)
     if (!remote.isEmpty())
 	debugger.setRemoteDevice(remote);
 
-    QCString lang = args->getOption("l");
+    QString lang = args->getOption("l");
 
     // deprecated option; overrides -l
     if (args->isSet("x")){

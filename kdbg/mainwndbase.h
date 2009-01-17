@@ -79,7 +79,7 @@ public:
      * Starts to debug the specified program using the specified language
      * driver.
      */
-    bool debugProgram(const QString& executable, QCString lang, QWidget* parent);
+    bool debugProgram(const QString& executable, QString lang, QWidget* parent);
     /**
      * Specifies the process to attach to after the program is loaded.
      */
@@ -132,12 +132,12 @@ protected:
 		       ExprWnd* localVars,
 		       ExprWnd* watchVars,
 		       QListBox* backtrace);
-    DebuggerDriver* driverFromLang(QCString lang);
+    DebuggerDriver* driverFromLang(QString lang);
     /**
      * This function derives a driver name from the contents of the named
      * file.
      */
-    QCString driverNameFromFile(const QString& exe);
+    QString driverNameFromFile(const QString& exe);
 
 public:
     /*

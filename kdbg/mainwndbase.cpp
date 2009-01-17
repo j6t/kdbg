@@ -274,11 +274,11 @@ void DebuggerMainWndBase::setAttachPid(const QString& pid)
 }
 
 bool DebuggerMainWndBase::debugProgram(const QString& executable,
-				       QCString lang, QWidget* parent)
+				       QString lang, QWidget* parent)
 {
     assert(m_debugger != 0);
 
-    TRACE(QString().sprintf("trying language '%s'...", lang.data()));
+    TRACE(QString("trying language '%1'...").arg(lang));
     DebuggerDriver* driver = driverFromLang(lang);
 
     if (driver == 0)
@@ -294,20 +294,19 @@ bool DebuggerMainWndBase::debugProgram(const QString& executable,
 	    // The config file exists but doesn't have an entry,
 	    // so it must have been created by an old version of KDbg
 	    // that had only the GDB driver.
-	    lang = c.readEntry(KDebugger::DriverNameEntry, "GDB").latin1();
+	    lang = c.readEntry(KDebugger::DriverNameEntry, "GDB");
 
-	    TRACE(QString().sprintf("...bad, trying config driver %s...",
-			  lang.data()));
+	    TRACE(QString("...bad, trying config driver %1...").arg(lang));
 	    driver = driverFromLang(lang);
 	}
 
     }
     if (driver == 0)
     {
-	QCString name = driverNameFromFile(executable);
+	QString name = driverNameFromFile(executable);
 
-	TRACE(QString().sprintf("...no luck, trying %s derived"
-				" from file contents", name.data()));
+	TRACE(QString("...no luck, trying %1 derived"
+		" from file contents").arg(name));
 	driver = driverFromLang(name);
     }
     if (driver == 0)
@@ -335,7 +334,7 @@ bool DebuggerMainWndBase::debugProgram(const QString& executable,
 }
 
 // derive driver from language
-DebuggerDriver* DebuggerMainWndBase::driverFromLang(QCString lang)
+DebuggerDriver* DebuggerMainWndBase::driverFromLang(QString lang)
 {
     // lang is needed in all lowercase
     lang = lang.lower();
@@ -363,12 +362,11 @@ DebuggerDriver* DebuggerMainWndBase::driverFromLang(QCString lang)
 	const L& l = langs[i];
 
 	// shortest must match
-	if (strncmp(l.shortest, lang, strlen(l.shortest)) != 0)
+	if (!lang.startsWith(l.shortest))
 	    continue;
 
 	// lang must not be longer than the full name, and it must match
-	if (lang.length() <= strlen(l.full) &&
-	    strncmp(l.full, lang, lang.length()) == 0)
+	if (QString(l.full).startsWith(lang))
 	{
 	    driverID = l.driver;
 	    break;
@@ -396,7 +394,7 @@ DebuggerDriver* DebuggerMainWndBase::driverFromLang(QCString lang)
 /**
  * Try to guess the language to use from the contents of the file.
  */
-QCString DebuggerMainWndBase::driverNameFromFile(const QString& exe)
+QString DebuggerMainWndBase::driverNameFromFile(const QString& exe)
 {
     /* Inprecise but simple test to see if file is in XSLT language */
     if (exe.right(4).lower() == ".xsl")

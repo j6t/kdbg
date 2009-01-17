@@ -616,7 +616,7 @@ TTYWindow* DebuggerMainWnd::ttyWindow()
     return m_ttyWindow;
 }
 
-bool DebuggerMainWnd::debugProgram(const QString& exe, QCString lang)
+bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
 {
     // check the file name
     QFileInfo fi(exe);

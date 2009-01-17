@@ -29,7 +29,7 @@ public:
     DebuggerMainWnd(const char* name);
     ~DebuggerMainWnd();
 
-    bool debugProgram(const QString& exe, QCString lang);
+    bool debugProgram(const QString& exe, const QString& lang);
 
 protected:
     // session properties
