@@ -88,8 +88,7 @@ int main(int argc, char** argv)
     // handle options
 
     KCmdLineArgs *args = KCmdLineArgs::parsedArgs();
-    QCString t = args->getOption("t");
-    const char* transcript = t.data();
+    QString transcript = args->getOption("t");
     QString remote = args->getOption("r");
     if (!remote.isEmpty())
 	debugger.setRemoteDevice(remote);
@@ -103,7 +102,7 @@ int main(int argc, char** argv)
     }
 
     // check environment variable for transcript file name
-    if (transcript == 0) {
+    if (transcript.isEmpty()) {
 	transcript = getenv("KDBG_TRANSCRIPT");
     }
     debugger.setTranscript(transcript);

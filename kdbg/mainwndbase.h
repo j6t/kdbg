@@ -74,7 +74,7 @@ public:
     /**
      * Specifies the file where to write the transcript.
      */
-    void setTranscript(const char* name);
+    void setTranscript(const QString& name);
     /**
      * Starts to debug the specified program using the specified language
      * driver.

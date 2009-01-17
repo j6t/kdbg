@@ -200,7 +200,7 @@ void DebuggerMainWndBase::overrideProgramArguments(const QString& args)
     m_debugger->overrideProgramArguments(args);
 }
 
-void DebuggerMainWndBase::setTranscript(const char* name)
+void DebuggerMainWndBase::setTranscript(const QString& name)
 {
     m_transcriptFile = name;
     if (m_debugger != 0 && m_debugger->driver() != 0)
