@@ -478,15 +478,15 @@ QString DebuggerMainWndBase::createOutputWindow()
     fifoName.sprintf(fifoNameBase, ::getpid());
 
     // create a fifo that will pass in the tty name
-    ::unlink(fifoName);			/* remove remnants */
+    QFile::remove(fifoName);		// remove remnants
 #ifdef HAVE_MKFIFO
-    if (::mkfifo(fifoName, S_IRUSR|S_IWUSR) < 0) {
+    if (::mkfifo(fifoName.local8Bit(), S_IRUSR|S_IWUSR) < 0) {
 	// failed
 	TRACE("mkfifo " + fifoName + " failed");
 	return QString();
     }
 #else
-    if (::mknod(fifoName, S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
+    if (::mknod(fifoName.local8Bit(), S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
 	// failed
 	TRACE("mknod " + fifoName + " failed");
 	return QString();
@@ -549,28 +549,20 @@ QString DebuggerMainWndBase::createOutputWindow()
 
     if (m_outputTermProc->start())
     {
+	QString tty;
+
 	// read the ttyname from the fifo
-	int f = ::open(fifoName, O_RDONLY);
-	if (f < 0) {
-	    // error
-	    ::unlink(fifoName);
-	    return QString();
+	QFile f(fifoName);
+	if (f.open(IO_ReadOnly))
+	{
+	    QByteArray t = f.readAll();
+	    tty = QString::fromLocal8Bit(t, t.size());
+	    f.close();
 	}
-
-	char ttyname[50];
-	int n = ::read(f, ttyname, sizeof(ttyname)-sizeof(char));   /* leave space for '\0' */
-
-	::close(f);
-	::unlink(fifoName);
-
-	if (n < 0) {
-	    // error
-	    return QString();
-	}
+	f.remove();
 
 	// remove whitespace
-	ttyname[n] = '\0';
-	QString tty = QString(ttyname).stripWhiteSpace();
+	tty = tty.stripWhiteSpace();
 	TRACE("tty=" + tty);
 	return tty;
     }
@@ -578,7 +570,7 @@ QString DebuggerMainWndBase::createOutputWindow()
     {
 	// error, could not start xterm
 	TRACE("fork failed for fifo " + fifoName);
-	::unlink(fifoName);
+	QFile::remove(fifoName);
 	shutdownTermWindow();
 	return QString();
     }
