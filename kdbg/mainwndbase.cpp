@@ -502,13 +502,14 @@ QString DebuggerMainWndBase::createOutputWindow()
 	    "exec<&-;exec>&-;"		/* close stdin and stdout */
 	    "while :;do sleep 3600;done";
 	// let config file override this script
-	const char* fmt = shellScriptFmt;
-	if (m_outputTermKeepScript.length() != 0) {
-	    fmt = m_outputTermKeepScript.data();
+	QString shellScript;
+	if (!m_outputTermKeepScript.isEmpty()) {
+	    shellScript = m_outputTermKeepScript;
+	} else {
+	    shellScript = shellScriptFmt;
 	}
 
-	QString shellScript;
-	shellScript.sprintf(fmt, fifoName.data());
+	shellScript.replace("%s", fifoName);
 	TRACE("output window script is " + shellScript);
 
 	QString title = kapp->caption();
