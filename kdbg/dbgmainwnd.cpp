@@ -532,12 +532,8 @@ void DebuggerMainWnd::slotFileChanged()
 
     if (m_debugger->haveExecutable()) {
 	// basename part of executable
-	QString executable = m_debugger->executable();
-	const char* execBase = executable.data();
-	int lastSlash = executable.findRev('/');
-	if (lastSlash >= 0)
-	    execBase += lastSlash + 1;
-	caption += execBase;
+	QFileInfo executable = m_debugger->executable();
+	caption += executable.fileName();
     }
     QString file;
     int line;
