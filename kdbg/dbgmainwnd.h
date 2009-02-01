@@ -59,7 +59,7 @@ protected:
     KRecentFilesAction* m_recentExecAction;
 
 protected:
-    virtual void closeEvent(QCloseEvent* e);
+    virtual bool queryClose();
     virtual TTYWindow* ttyWindow();
     virtual QString createOutputWindow();
 
@@ -99,7 +99,6 @@ public slots:
     void slotEditValue();
 
     void slotFileOpen();
-    void slotFileQuit();
     void slotFileExe();
     void slotFileCore();
     void slotFileGlobalSettings();

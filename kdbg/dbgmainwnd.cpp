@@ -196,7 +196,7 @@ void DebuggerMainWnd::initKAction()
 		      actionCollection(), "file_executable_recent");
     (void)new KAction(i18n("&Core dump..."), 0, this, SLOT(slotFileCore()),
                       actionCollection(), "file_core_dump");
-    KStdAction::quit(this, SLOT(slotFileQuit()), actionCollection());
+    KStdAction::quit(kapp, SLOT(closeAllWindows()), actionCollection());
 
     // settings menu
     (void)new KAction(i18n("This &Program..."), 0, this,
@@ -330,21 +330,12 @@ void DebuggerMainWnd::initToolbar()
     i18n("Core dump");
 }
 
-/*
- * We must override KTMainWindow's handling of close events since we have
- * only one toplevel window, which lives on the stack (which KTMainWindow
- * can't live with :-( )
- */
-void DebuggerMainWnd::closeEvent(QCloseEvent* e)
+bool DebuggerMainWnd::queryClose()
 {
-    clearWFlags(WDestructiveClose);
-
     if (m_debugger != 0) {
 	m_debugger->shutdown();
     }
-
-    e->accept();
-    kapp->quit();
+    return true;
 }
 
 
@@ -821,14 +812,6 @@ void DebuggerMainWnd::slotFileOpen()
 	m_filesWindow->setExtraDirectory(m_lastDirectory);
 	m_filesWindow->activateFile(fileName);
     }
-}
-
-void DebuggerMainWnd::slotFileQuit()
-{
-    if (m_debugger != 0) {
-	m_debugger->shutdown();
-    }
-    kapp->quit();
 }
 
 void DebuggerMainWnd::slotFileExe()

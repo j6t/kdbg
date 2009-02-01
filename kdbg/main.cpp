@@ -67,7 +67,7 @@ int main(int argc, char** argv)
 
     KGlobal::dirs()->addResourceType("types", "share/apps/kdbg/types");
 
-    DebuggerMainWnd debugger("kdbg_main");
+    DebuggerMainWnd* debugger = new DebuggerMainWnd("kdbg_main");
 
     /* type libraries */
     TypeTable::initTypeLibraries();
@@ -76,14 +76,14 @@ int main(int argc, char** argv)
     bool restored = false;
     if (app.isRestored()) {
 	if (KMainWindow::canBeRestored(1)) {
-	    debugger.restore(1);
+	    debugger->restore(1);
 	    restored = true;
 	}
     }
 
-    app.setMainWidget(&debugger);
+    app.setMainWidget(debugger);
 
-    debugger.show();
+    debugger->show();
 
     // handle options
 
@@ -91,7 +91,7 @@ int main(int argc, char** argv)
     QString transcript = args->getOption("t");
     QString remote = args->getOption("r");
     if (!remote.isEmpty())
-	debugger.setRemoteDevice(remote);
+	debugger->setRemoteDevice(remote);
 
     QString lang = args->getOption("l");
 
@@ -105,7 +105,7 @@ int main(int argc, char** argv)
     if (transcript.isEmpty()) {
 	transcript = getenv("KDBG_TRANSCRIPT");
     }
-    debugger.setTranscript(transcript);
+    debugger->setTranscript(transcript);
 
     QString pid = args->getOption("p");
     QString programArgs = args->getOption("a");
@@ -114,22 +114,22 @@ int main(int argc, char** argv)
 	// attach to process?
 	if (!pid.isEmpty()) {
 	    TRACE("pid: " + pid);
-	    debugger.setAttachPid(pid);
+	    debugger->setAttachPid(pid);
 	}
 	// check for core file; use it only if we're not attaching to a process
 	else if (args->count() > 1 && pid.isEmpty()) {
-	    debugger.setCoreFile(args->arg(1));
+	    debugger->setCoreFile(args->arg(1));
 	}
-	if (!debugger.debugProgram(args->arg(0), lang)) {
+	if (!debugger->debugProgram(args->arg(0), lang)) {
 	    // failed
 	    TRACE("cannot start debugger");
-	    KMessageBox::error(&debugger, i18n("Cannot start debugger."));
+	    KMessageBox::error(debugger, i18n("Cannot start debugger."));
 
-	    debugger.setCoreFile(QString());
-	    debugger.setAttachPid(QString());
+	    debugger->setCoreFile(QString());
+	    debugger->setAttachPid(QString());
 	} else {
 	    if (!programArgs.isEmpty()) {
-		debugger.overrideProgramArguments(programArgs);
+		debugger->overrideProgramArguments(programArgs);
 	    }
 	}
     }
