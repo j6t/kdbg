@@ -275,8 +275,8 @@ public:
     ConditionalDlg(QWidget* parent);
     ~ConditionalDlg();
 
-    void setCondition(const char* text) { m_condition.setText(text); }
-    const char* condition() { return m_condition.text(); }
+    void setCondition(const QString& text) { m_condition.setText(text); }
+    QString condition() { return m_condition.text(); }
     void setIgnoreCount(uint count);
     uint ignoreCount();
 

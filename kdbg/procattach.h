@@ -66,8 +66,8 @@ public:
     ProcAttach(QWidget* parent);
     virtual ~ProcAttach();
 
-    void setText(const char* text) { m_processId.setText(text); }
-    const char* text() const { return m_processId.text(); }
+    void setText(const QString& text) { m_processId.setText(text); }
+    QString text() const { return m_processId.text(); }
 
 protected:
     QLabel m_label;
