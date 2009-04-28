@@ -206,12 +206,12 @@ bool WinStack::activeLine(QString& fileName, int& lineNo)
 
 bool WinStack::activeLine(QString& fileName, int& lineNo, DbgAddr& address)
 {
-    if (m_activeWindow == 0) {
+    if (activeWindow() == 0) {
 	return false;
     }
     
-    fileName = m_activeWindow->fileName();
-    m_activeWindow->activeLine(lineNo, address);
+    fileName = activeFileName();
+    activeWindow()->activeLine(lineNo, address);
     return true;
 }
 
@@ -282,42 +282,47 @@ void WinStack::setPC(bool set, const QString& fileName, int lineNo,
 
 void WinStack::resizeEvent(QResizeEvent*)
 {
-    if (m_activeWindow != 0) {
-	m_activeWindow->resize(width(), height());
+    if (activeWindow() != 0) {
+	activeWindow()->resize(width(), height());
     }
+}
+
+SourceWindow* WinStack::activeWindow() const
+{
+    return m_activeWindow;
 }
 
 QString WinStack::activeFileName() const
 {
     QString f;
-    if (m_activeWindow != 0)
-	f = m_activeWindow->fileName();
+    if (activeWindow() != 0)
+	f = activeWindow()->fileName();
     return f;
 }
 
 void WinStack::slotFindForward()
 {
-    if (m_activeWindow != 0)
-	m_activeWindow->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
+    if (activeWindow() != 0)
+	activeWindow()->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
 			     SourceWindow::findForward);
 }
 
 void WinStack::slotFindBackward()
 {
-    if (m_activeWindow != 0)
-	m_activeWindow->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
+    if (activeWindow() != 0)
+	activeWindow()->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
 			     SourceWindow::findBackward);
 }
 
 void WinStack::maybeTip(const QPoint& p)
 {
-    if (m_activeWindow == 0)
+    if (activeWindow() == 0)
 	return;
 
     // get the word at the point
     QString word;
     QRect r;
-    if (!m_activeWindow->wordAtPoint(p, word, r))
+    if (!activeWindow()->wordAtPoint(p, word, r))
 	return;
 
     // must be valid
@@ -375,9 +380,9 @@ void WinStack::slotSetTabWidth(int numChars)
 
 void WinStack::slotFileReload()
 {
-    if (m_activeWindow != 0) {
+    if (activeWindow() != 0) {
 	TRACE("reloading one file");
-	m_activeWindow->reloadFile();
+	activeWindow()->reloadFile();
     }
 }
 
@@ -516,7 +521,7 @@ void WinStack::selectWindow(int id)
 	for (int i = 0; i < m_fileList.size(); i++)
 	{
 	    dlg.insertString(m_fileList[i]->fileName());
-	    if (m_activeWindow == m_fileList[i]) {
+	    if (activeWindow() == m_fileList[i]) {
 		index = i;
 	    }
 	}
