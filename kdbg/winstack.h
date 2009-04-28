@@ -14,6 +14,7 @@
 #include <qcheckbox.h>
 #include <qpushbutton.h>
 #include <qtooltip.h>
+#include <ktabwidget.h>
 #include "valarray.h"
 
 // forward declarations
@@ -60,7 +61,7 @@ public:
 };
 
 
-class WinStack : public QWidget
+class WinStack : public KTabWidget
 {
     Q_OBJECT
 public:
@@ -81,7 +82,6 @@ public:
     SourceWindow* activeWindow() const;
 
     virtual QSize sizeHint() const;
-    virtual void resizeEvent(QResizeEvent*);
 
 signals:
     void fileChanged();
@@ -126,7 +126,6 @@ protected:
     void setPC(bool set, const QString& fileName, int lineNo,
 	       const DbgAddr& address, int frameNo);
     ValArray<SourceWindow*> m_fileList;
-    SourceWindow* m_activeWindow;
     QString m_lastOpenDir;		/* where user opened last file */
     
     // program counter

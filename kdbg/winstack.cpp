@@ -20,8 +20,7 @@
 
 
 WinStack::WinStack(QWidget* parent, const char* name) :
-	QWidget(parent, name),
-	m_activeWindow(0),
+	KTabWidget(parent, name),
 	m_pcLine(-1),
 	m_valueTip(this),
 	m_tipLocation(1,1,10,10),
@@ -113,6 +112,7 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 	    return false;
 	}
 
+	addTab(fw, QFileInfo(pathName).fileName());
 	m_fileList.insertAt(0, fw);
 	connect(fw, SIGNAL(clickedLeft(const QString&,int,const DbgAddr&,bool)),
 		SIGNAL(toggleBreak(const QString&,int,const DbgAddr&,bool)));
@@ -128,8 +128,8 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 	// tab width
 	connect(this, SIGNAL(setTabWidth(int)), fw, SLOT(setTabWidth(int)));
 	fw->setTabWidth(m_tabWidth);
+	fw->setFocusPolicy(QWidget::WheelFocus);
 
-	
 	// set PC if there is one
 	emit newFileLoaded();
 	if (m_pcLine >= 0) {
@@ -163,19 +163,7 @@ bool WinStack::activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& addre
 	fw->scrollTo(lineNo, address);
     }
 
-    // first resize the window, then lift it to the top
-    fw->setGeometry(0,0, width(),height());
-    fw->raise();
-    fw->show();
-
-    // set the focus to the new active window
-    QWidget* oldActive = m_activeWindow;
-    fw->setFocusPolicy(QWidget::WheelFocus);
-    m_activeWindow = fw;
-    if (oldActive != 0 && oldActive != fw) {
-	// disable focus on non-active windows
-	oldActive->setFocusPolicy(QWidget::NoFocus);
-    }
+    showPage(fw);
     fw->setFocus();
 
     emit fileChanged();
@@ -235,16 +223,9 @@ void WinStack::setPC(bool set, const QString& fileName, int lineNo,
     }
 }
 
-void WinStack::resizeEvent(QResizeEvent*)
-{
-    if (activeWindow() != 0) {
-	activeWindow()->resize(width(), height());
-    }
-}
-
 SourceWindow* WinStack::activeWindow() const
 {
-    return m_activeWindow;
+    return static_cast<SourceWindow*>(currentPage());
 }
 
 QString WinStack::activeFileName() const
