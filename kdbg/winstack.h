@@ -13,7 +13,6 @@
 #include <qlayout.h>
 #include <qcheckbox.h>
 #include <qpushbutton.h>
-#include <qpopupmenu.h>
 #include <qtooltip.h>
 #include "valarray.h"
 
@@ -68,15 +67,6 @@ public:
     WinStack(QWidget* parent, const char* name);
     virtual ~WinStack();
 
-    enum { WindowMore=0x100, WindowMask=0xf };
-
-    /**
-     * The menu set with setWindowMenu will be modified by this widget to
-     * list the available windows. The specified popup menu must be set up
-     * to contain an entry with ID WindowMore. The windows will be inserted
-     * before this entry.
-     */
-    void setWindowMenu(QPopupMenu* menu);
     /**
      * Slot activate also looks in this directory when the specified file is
      * a relative path.
@@ -104,7 +94,6 @@ signals:
     void moveProgramCounter(const QString&, int, const DbgAddr&);
 
 public slots:
-    void selectWindow(int id);		/* 1-based index, 0 means dialog More... */
     virtual void slotFindForward();
     virtual void slotFindBackward();
     virtual void activate(const QString& filename, int lineNo, const DbgAddr& address);
@@ -133,14 +122,12 @@ public slots:
 protected:
     bool activatePath(QString pathname, int lineNo, const DbgAddr& address);
     virtual bool activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& address);	/* -1 doesnt change line */
-    virtual void changeWindowMenu();
     virtual void contextMenuEvent(QContextMenuEvent* e);
     void setPC(bool set, const QString& fileName, int lineNo,
 	       const DbgAddr& address, int frameNo);
     ValArray<SourceWindow*> m_fileList;
     SourceWindow* m_activeWindow;
     QString m_lastOpenDir;		/* where user opened last file */
-    QPopupMenu* m_windowMenu;
     
     // program counter
     QString m_pcFile;

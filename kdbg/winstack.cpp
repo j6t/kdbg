@@ -8,11 +8,10 @@
 #include "sourcewnd.h"
 #include <qbrush.h>
 #include <qfileinfo.h>
-#include <qlistbox.h>
+#include <qpopupmenu.h>
 #include <kapplication.h>
 #include <kmainwindow.h>
 #include <klocale.h>			/* i18n */
-#include <algorithm>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -23,7 +22,6 @@
 WinStack::WinStack(QWidget* parent, const char* name) :
 	QWidget(parent, name),
 	m_activeWindow(0),
-	m_windowMenu(0),
 	m_pcLine(-1),
 	m_valueTip(this),
 	m_tipLocation(1,1,10,10),
@@ -39,17 +37,6 @@ WinStack::WinStack(QWidget* parent, const char* name) :
 
 WinStack::~WinStack()
 {
-}
-
-void WinStack::setWindowMenu(QPopupMenu* menu)
-{
-    m_windowMenu = menu;
-    if (menu == 0) {
-	return;
-    }
-    
-    // hook up for menu activations
-    connect(menu, SIGNAL(activated(int)), this, SLOT(selectWindow(int)));
 }
 
 void WinStack::contextMenuEvent(QContextMenuEvent* e)
@@ -142,7 +129,6 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 	connect(this, SIGNAL(setTabWidth(int)), fw, SLOT(setTabWidth(int)));
 	fw->setTabWidth(m_tabWidth);
 
-	changeWindowMenu();
 	
 	// set PC if there is one
 	emit newFileLoaded();
@@ -170,7 +156,6 @@ bool WinStack::activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& addre
     if (index >= 9) {
 	m_fileList.removeAt(index);
 	m_fileList.insertAt(0, fw);
-	changeWindowMenu();
     }
 
     // make the line visible
@@ -213,36 +198,6 @@ bool WinStack::activeLine(QString& fileName, int& lineNo, DbgAddr& address)
     fileName = activeFileName();
     activeWindow()->activeLine(lineNo, address);
     return true;
-}
-
-void WinStack::changeWindowMenu()
-{
-    if (m_windowMenu == 0) {
-	return;
-    }
-
-    const int N = 9;
-    // Delete entries at most the N window entries that we insert below.
-    // When we get here if the More entry was selected, we must make sure
-    // that we don't delete it (or we crash).
-    bool haveMore = m_windowMenu->count() > uint(N);
-    int k = haveMore ? N : m_windowMenu->count();
-
-    for (int i = 0; i < k; i++) {
-	m_windowMenu->removeItemAt(0);
-    }
-
-    // insert current windows
-    QString text;
-    for (int i = 0; i < m_fileList.size() && i < N; i++) {
-	text.sprintf("&%d ", i+1);
-	text += m_fileList[i]->fileName();
-	m_windowMenu->insertItem(text, WindowMore+i+1, i);
-    }
-    // add More entry if we have none yet
-    if (!haveMore && m_fileList.size() > N) {
-	m_windowMenu->insertItem(i18n("&More..."), WindowMore, N);
-    }
 }
 
 void WinStack::updateLineItems(const KDebugger* dbg)
@@ -441,102 +396,6 @@ void ValueTip::maybeTip(const QPoint& p)
 {
     WinStack* w = static_cast<WinStack*>(parentWidget());
     w->maybeTip(p);
-}
-
-
-class MoreWindowsDialog : public QDialog
-{
-public:
-    MoreWindowsDialog(QWidget* parent);
-    virtual ~MoreWindowsDialog();
-
-    void insertString(const char* text) { m_list.insertItem(text); }
-    void setListIndex(int i) { m_list.setCurrentItem(i); }
-    int listIndex() const { return m_list.currentItem(); }
-
-protected:
-    QListBox m_list;
-    QPushButton m_buttonOK;
-    QPushButton m_buttonCancel;
-    QVBoxLayout m_layout;
-    QHBoxLayout m_buttons;
-};
-
-MoreWindowsDialog::MoreWindowsDialog(QWidget* parent) :
-	QDialog(parent, "morewindows", true),
-	m_list(this, "windows"),
-	m_buttonOK(this, "show"),
-	m_buttonCancel(this, "cancel"),
-	m_layout(this, 8),
-	m_buttons(4)
-{
-    QString title = kapp->caption();
-    title += i18n(": Open Windows");
-    setCaption(title);
-
-    m_list.setMinimumSize(250, 100);
-    connect(&m_list, SIGNAL(selected(int)), SLOT(accept()));
-
-    m_buttonOK.setMinimumSize(100, 30);
-    connect(&m_buttonOK, SIGNAL(clicked()), SLOT(accept()));
-    m_buttonOK.setText(i18n("Show"));
-    m_buttonOK.setDefault(true);
-
-    m_buttonCancel.setMinimumSize(100, 30);
-    connect(&m_buttonCancel, SIGNAL(clicked()), SLOT(reject()));
-    m_buttonCancel.setText(i18n("Cancel"));
-
-    m_layout.addWidget(&m_list, 10);
-    m_layout.addLayout(&m_buttons);
-    m_buttons.addStretch(10);
-    m_buttons.addWidget(&m_buttonOK);
-    m_buttons.addSpacing(40);
-    m_buttons.addWidget(&m_buttonCancel);
-    m_buttons.addStretch(10);
-
-    m_layout.activate();
-
-    m_list.setFocus();
-    resize(320, 320);
-}
-
-MoreWindowsDialog::~MoreWindowsDialog()
-{
-}
-
-void WinStack::selectWindow(int id)
-{
-    // react only on menu entries concerning windows
-    if ((id & ~WindowMask) != WindowMore) {
-	return;
-    }
-
-    id &= WindowMask;
-
-    int index = 0;
-
-    if (id == 0) {
-	// more windows selected: show windows in a list
-	MoreWindowsDialog dlg(this);
-	for (int i = 0; i < m_fileList.size(); i++)
-	{
-	    dlg.insertString(m_fileList[i]->fileName());
-	    if (activeWindow() == m_fileList[i]) {
-		index = i;
-	    }
-	}
-	dlg.setListIndex(index);
-	if (dlg.exec() == QDialog::Rejected)
-	    return;
-	index = dlg.listIndex();
-    } else {
-	index = (id & WindowMask)-1;
-    }
-
-    SourceWindow* fw = m_fileList[index];
-    ASSERT(fw != 0);
-	
-    activateWindow(fw, -1, DbgAddr());
 }
 
 

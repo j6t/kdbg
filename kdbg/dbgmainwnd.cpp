@@ -88,8 +88,6 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(m_watches, SIGNAL(deleteWatch()), m_debugger, SLOT(slotDeleteWatch()));
     connect(m_watches, SIGNAL(textDropped(const QString&)), SLOT(slotAddWatch(const QString&)));
 
-    KAction* windowMenu = actionCollection()->action("window");
-    m_filesWindow->setWindowMenu(static_cast<KActionMenu*>(windowMenu)->popupMenu());
     connect(&m_filesWindow->m_findDlg, SIGNAL(closed()), SLOT(updateUI()));
     connect(m_filesWindow, SIGNAL(newFileLoaded()),
 	    SLOT(slotNewFileLoaded()));
@@ -298,8 +296,6 @@ void DebuggerMainWnd::initKAction()
     (void)new KAction(i18n("Edit Value"), Key_F2, this,
 		      SLOT(slotEditValue()), actionCollection(),
 		      "edit_value");
-
-    (void)new KActionMenu(i18n("&Window"), actionCollection(), "window");
 
     // all actions force an UI update
     QValueList<KAction*> actions = actionCollection()->actions();
