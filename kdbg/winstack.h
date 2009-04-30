@@ -125,6 +125,7 @@ protected:
     virtual void contextMenuEvent(QContextMenuEvent* e);
     void setPC(bool set, const QString& fileName, int lineNo,
 	       const DbgAddr& address, int frameNo);
+    SourceWindow* findByFileName(const QString& fileName) const;
     ValArray<SourceWindow*> m_fileList;
     QString m_lastOpenDir;		/* where user opened last file */
     

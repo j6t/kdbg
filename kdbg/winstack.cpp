@@ -209,18 +209,24 @@ void WinStack::updatePC(const QString& fileName, int lineNo, const DbgAddr& addr
     }
 }
 
+SourceWindow* WinStack::findByFileName(const QString& fileName) const
+{
+    for (int i = 0; i < m_fileList.size(); i++) {
+	if (m_fileList[i]->fileNameMatches(fileName)) {
+	    return m_fileList[i];
+	}
+    }
+    return 0;
+}
+
 void WinStack::setPC(bool set, const QString& fileName, int lineNo,
 		     const DbgAddr& address, int frameNo)
 {
     TRACE((set ? "set PC: " : "clear PC: ") + fileName +
 	  QString().sprintf(":%d#%d ", lineNo, frameNo) + address.asString());
-    // find file
-    for (int i = 0; i < m_fileList.size(); i++) {
-	if (m_fileList[i]->fileNameMatches(fileName)) {
-	    m_fileList[i]->setPC(set, lineNo, address, frameNo);
-	    break;
-	}
-    }
+    SourceWindow* fw = findByFileName(fileName);
+    if (fw)
+	fw->setPC(set, lineNo, address, frameNo);
 }
 
 SourceWindow* WinStack::activeWindow() const
@@ -279,14 +285,7 @@ void WinStack::slotShowValueTip(const QString& tipText)
 void WinStack::slotDisassembled(const QString& fileName, int lineNo,
 				const QList<DisassembledCode>& disass)
 {
-    // lookup the file
-    SourceWindow* fw = 0;
-    for (int i = 0; i < m_fileList.size(); i++) {
-	if (m_fileList[i]->fileNameMatches(fileName)) {
-	    fw = m_fileList[i];
-	    break;
-	}
-    }
+    SourceWindow* fw = findByFileName(fileName);
     if (fw == 0) {
 	// not found: ignore
 	return;
