@@ -15,7 +15,6 @@
 #include <qpushbutton.h>
 #include <qtooltip.h>
 #include <ktabwidget.h>
-#include "valarray.h"
 
 // forward declarations
 class KDebugger;
@@ -77,9 +76,10 @@ public:
     bool activeLine(QString& filename, int& lineNo);
     bool activeLine(QString& filename, int& lineNo, DbgAddr& address);
     void maybeTip(const QPoint& p);
-    bool hasWindows() const { return m_fileList.size() > 0; }
+    bool hasWindows() const { return count() > 0; }
     QString activeFileName() const;
     SourceWindow* activeWindow() const;
+    SourceWindow* windowAt(int i) const;
 
     virtual QSize sizeHint() const;
 
@@ -126,7 +126,6 @@ protected:
     void setPC(bool set, const QString& fileName, int lineNo,
 	       const DbgAddr& address, int frameNo);
     SourceWindow* findByFileName(const QString& fileName) const;
-    ValArray<SourceWindow*> m_fileList;
     QString m_lastOpenDir;		/* where user opened last file */
     
     // program counter

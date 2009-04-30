@@ -54,8 +54,8 @@ void WinStack::contextMenuEvent(QContextMenuEvent* e)
 
 void WinStack::reloadAllFiles()
 {
-    for (int i = 0; i < m_fileList.size(); i++) {
-	m_fileList[i]->reloadFile();
+    for (int i = count()-1; i >= 0; i--) {
+	windowAt(i)->reloadFile();
     }
 }
 
@@ -95,9 +95,9 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 {
     // check whether the file is already open
     SourceWindow* fw = 0;
-    for (int i = 0; i < m_fileList.size(); i++) {
-	if (m_fileList[i]->fileName() == pathName) {
-	    fw = m_fileList[i];
+    for (int i = count()-1; i >= 0; i--) {
+	if (windowAt(i)->fileName() == pathName) {
+	    fw = windowAt(i);
 	    break;
 	}
     }
@@ -113,7 +113,6 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 	}
 
 	addTab(fw, QFileInfo(pathName).fileName());
-	m_fileList.insertAt(0, fw);
 	connect(fw, SIGNAL(clickedLeft(const QString&,int,const DbgAddr&,bool)),
 		SIGNAL(toggleBreak(const QString&,int,const DbgAddr&,bool)));
 	connect(fw, SIGNAL(clickedMid(const QString&,int,const DbgAddr&)),
@@ -141,23 +140,6 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 
 bool WinStack::activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& address)
 {
-    // lookup fw
-    int index = m_fileList.size()-1;
-    while (index >= 0 && m_fileList[index] != fw)
-	--index;
-    ASSERT(index >= 0);
-    if (index < 0) {
-	return false;
-    }
-    /*
-     * If the file is not in the list of those that would appear in the
-     * window menu, move it to the first position.
-     */
-    if (index >= 9) {
-	m_fileList.removeAt(index);
-	m_fileList.insertAt(0, fw);
-    }
-
     // make the line visible
     if (lineNo >= 0) {
 	fw->scrollTo(lineNo, address);
@@ -190,8 +172,8 @@ bool WinStack::activeLine(QString& fileName, int& lineNo, DbgAddr& address)
 
 void WinStack::updateLineItems(const KDebugger* dbg)
 {
-    for (int i = 0; i < m_fileList.size(); i++) {
-	m_fileList[i]->updateLineItems(dbg);
+    for (int i = count()-1; i >= 0; i--) {
+	windowAt(i)->updateLineItems(dbg);
     }
 }
 
@@ -211,9 +193,9 @@ void WinStack::updatePC(const QString& fileName, int lineNo, const DbgAddr& addr
 
 SourceWindow* WinStack::findByFileName(const QString& fileName) const
 {
-    for (int i = 0; i < m_fileList.size(); i++) {
-	if (m_fileList[i]->fileNameMatches(fileName)) {
-	    return m_fileList[i];
+    for (int i = count()-1; i >= 0; i--) {
+	if (windowAt(i)->fileNameMatches(fileName)) {
+	    return windowAt(i);
 	}
     }
     return 0;
@@ -227,6 +209,11 @@ void WinStack::setPC(bool set, const QString& fileName, int lineNo,
     SourceWindow* fw = findByFileName(fileName);
     if (fw)
 	fw->setPC(set, lineNo, address, frameNo);
+}
+
+SourceWindow* WinStack::windowAt(int i) const
+{
+    return static_cast<SourceWindow*>(page(i));
 }
 
 SourceWindow* WinStack::activeWindow() const
