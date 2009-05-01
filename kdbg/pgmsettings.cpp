@@ -104,10 +104,8 @@ ProgramSettings::ProgramSettings(QWidget* parent, QString exeName, bool modal) :
 	exeName.remove(0, slash+1);
     }
     QString cap = kapp->caption();
-    QString fmt = i18n("%s: Settings for %s");
-    QString title;
-    title.sprintf(fmt, cap.data(), exeName.data());
-    setCaption(title);
+    QString title = i18n("%1: Settings for %2");
+    setCaption(title.arg(cap, exeName));
 
     setCancelButton(i18n("Cancel"));
     setOKButton(i18n("OK"));

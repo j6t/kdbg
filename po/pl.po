@@ -296,8 +296,8 @@ msgid "&Full terminal emulation"
 msgstr ""
 
 #: pgmsettings.cpp:106
-#, c-format
-msgid "%s: Settings for %s"
+#, no-c-format
+msgid "%1: Settings for %2"
 msgstr ""
 
 #: pgmsettings.cpp:115 dbgmainwnd.cpp:223

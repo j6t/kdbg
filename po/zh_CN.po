@@ -300,9 +300,9 @@ msgid "&Full terminal emulation"
 msgstr "全终端模拟"
 
 #: pgmsettings.cpp:106
-#, c-format
-msgid "%s: Settings for %s"
-msgstr "%s：%s的设置"
+#, no-c-format
+msgid "%1: Settings for %2"
+msgstr "%1：%2的设置"
 
 #: pgmsettings.cpp:115 dbgmainwnd.cpp:223
 msgid "&Output"

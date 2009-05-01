@@ -298,9 +298,9 @@ msgid "&Full terminal emulation"
 msgstr "Plná emulace &terminálu"
 
 #: pgmsettings.cpp:106
-#, c-format
-msgid "%s: Settings for %s"
-msgstr "%s: Nastavení pro %s"
+#, no-c-format
+msgid "%1: Settings for %2"
+msgstr "%1: Nastavení pro %2"
 
 #: pgmsettings.cpp:115 dbgmainwnd.cpp:223
 msgid "&Output"
