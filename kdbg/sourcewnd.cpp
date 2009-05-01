@@ -10,6 +10,7 @@
 #include <qpainter.h>
 #include <qbrush.h>
 #include <qfile.h>
+#include <qfileinfo.h>
 #include <qkeycode.h>
 #include <qpopupmenu.h>
 #include <kapplication.h>
@@ -453,20 +454,7 @@ void SourceWindow::paletteChange(const QPalette& oldPal)
  */
 bool SourceWindow::fileNameMatches(const QString& other)
 {
-    const QString& me = fileName();
-
-    // check for null file names first
-    if (me.isNull() || other.isNull()) {
-	return me.isNull() && other.isNull();
-    }
-
-    /*
-     * Get file names.  Note: Either there is a slash, then skip it, or
-     * there is no slash, then -1 + 1 = 0!
-     */
-    int sme = me.findRev('/') + 1;
-    int sother = other.findRev('/') + 1;
-    return strcmp(me.data() + sme, other.data() + sother) == 0;
+    return QFileInfo(other).fileName() == QFileInfo(m_fileName).fileName();
 }
 
 void SourceWindow::disassembled(int lineNo, const std::list<DisassembledCode>& disass)

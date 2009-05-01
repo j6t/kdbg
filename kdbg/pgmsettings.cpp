@@ -7,6 +7,7 @@
 #include "pgmsettings.h"
 #include <klocale.h>			/* i18n */
 #include <kapplication.h>
+#include <qfileinfo.h>
 #include <qlayout.h>
 #include <qlineedit.h>
 #include <qlabel.h>
@@ -99,13 +100,10 @@ ProgramSettings::ProgramSettings(QWidget* parent, QString exeName, bool modal) :
 	m_output(this)
 {
     // construct title
-    int slash = exeName.findRev('/');
-    if (slash >= 0) {
-	exeName.remove(0, slash+1);
-    }
+    QFileInfo fi(exeName);
     QString cap = kapp->caption();
     QString title = i18n("%1: Settings for %2");
-    setCaption(title.arg(cap, exeName));
+    setCaption(title.arg(cap, fi.fileName()));
 
     setCancelButton(i18n("Cancel"));
     setOKButton(i18n("OK"));
