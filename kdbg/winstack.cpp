@@ -113,6 +113,8 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 	}
 
 	addTab(fw, QFileInfo(pathName).fileName());
+	setTabToolTip(fw, pathName);
+
 	connect(fw, SIGNAL(clickedLeft(const QString&,int,const DbgAddr&,bool)),
 		SIGNAL(toggleBreak(const QString&,int,const DbgAddr&,bool)));
 	connect(fw, SIGNAL(clickedMid(const QString&,int,const DbgAddr&)),
@@ -147,8 +149,6 @@ bool WinStack::activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& addre
 
     showPage(fw);
     fw->setFocus();
-
-    emit fileChanged();
 
     return true;
 }

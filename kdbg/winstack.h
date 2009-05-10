@@ -84,7 +84,6 @@ public:
     virtual QSize sizeHint() const;
 
 signals:
-    void fileChanged();
     void toggleBreak(const QString&, int, const DbgAddr&, bool);
     void enadisBreak(const QString&, int, const DbgAddr&);
     void newFileLoaded();

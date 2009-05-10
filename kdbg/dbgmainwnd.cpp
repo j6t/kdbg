@@ -119,9 +119,6 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     // tab width
     connect(this, SIGNAL(setTabWidth(int)), m_filesWindow, SIGNAL(setTabWidth(int)));
 
-    // file/line updates
-    connect(m_filesWindow, SIGNAL(fileChanged()), SLOT(slotFileChanged()));
-
     // connect breakpoint table
     connect(m_bpTable, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
 	    m_filesWindow, SLOT(activate(const QString&,int,const DbgAddr&)));
@@ -156,7 +153,6 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 
     updateUI();
     m_bpTable->updateUI();
-    slotFileChanged();
 }
 
 DebuggerMainWnd::~DebuggerMainWnd()
@@ -512,27 +508,6 @@ void DebuggerMainWnd::slotAddWatch(const QString& text)
     }
 }
 
-void DebuggerMainWnd::slotFileChanged()
-{
-    // set caption
-    QString caption;
-
-    if (m_debugger->haveExecutable()) {
-	// basename part of executable
-	QFileInfo executable = m_debugger->executable();
-	caption += executable.fileName();
-    }
-    QString file;
-    int line;
-    bool anyWindows = m_filesWindow->activeLine(file, line);
-    if (anyWindows) {
-	caption += " (";
-	caption += file;
-	caption += ")";
-    }
-    setCaption(caption);
-}
-
 void DebuggerMainWnd::slotNewFileLoaded()
 {
     // updates program counter in the new file
@@ -622,6 +597,10 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
 	// keep the directory
 	m_lastDirectory = fi.dirPath(true);
 	m_filesWindow->setExtraDirectory(m_lastDirectory);
+
+	// set caption to basename part of executable
+	QString caption = fi.fileName();
+	setCaption(caption);
     }
     else
     {
