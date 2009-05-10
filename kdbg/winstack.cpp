@@ -245,13 +245,14 @@ void WinStack::slotFindBackward()
 
 void WinStack::maybeTip(const QPoint& p)
 {
-    if (activeWindow() == 0)
+    SourceWindow* w = activeWindow();
+    if (w == 0)
 	return;
 
     // get the word at the point
     QString word;
     QRect r;
-    if (!activeWindow()->wordAtPoint(p, word, r))
+    if (!w->wordAtPoint(w->mapFrom(this, p), word, r))
 	return;
 
     // must be valid
@@ -259,7 +260,7 @@ void WinStack::maybeTip(const QPoint& p)
     assert(r.isValid());
 
     // remember the location
-    m_tipLocation = r;
+    m_tipLocation = QRect(w->mapTo(this, r.topLeft()), r.size());
 
     emit initiateValuePopup(word);
 }
