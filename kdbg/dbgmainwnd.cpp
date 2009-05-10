@@ -179,6 +179,7 @@ void DebuggerMainWnd::initKAction()
     KAction* open = KStdAction::open(this, SLOT(slotFileOpen()), 
                       actionCollection());
     open->setText(i18n("&Open Source..."));
+    KStdAction::close(m_filesWindow, SLOT(slotClose()), actionCollection());
     (void)new KAction(i18n("&Reload Source"), "reload", 0, m_filesWindow, 
                       SLOT(slotFileReload()), actionCollection(), 
                       "file_reload");
@@ -440,6 +441,8 @@ void DebuggerMainWnd::updateUI()
     actionCollection()->action("file_executable")->setEnabled(m_debugger->isIdle());
     actionCollection()->action("settings_program")->setEnabled(m_debugger->haveExecutable());
     actionCollection()->action("file_core_dump")->setEnabled(m_debugger->canStart());
+    actionCollection()->action("file_close")->setEnabled(m_filesWindow->hasWindows());
+    actionCollection()->action("file_reload")->setEnabled(m_filesWindow->hasWindows());
     actionCollection()->action("exec_step_into")->setEnabled(m_debugger->canSingleStep());
     actionCollection()->action("exec_step_into_by_insn")->setEnabled(m_debugger->canSingleStep());
     actionCollection()->action("exec_step_over")->setEnabled(m_debugger->canSingleStep());

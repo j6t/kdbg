@@ -353,6 +353,16 @@ void WinStack::slotMoveProgramCounter()
 	emit moveProgramCounter(file, lineNo, address);
 }
 
+void WinStack::slotClose()
+{
+    QWidget* w = activeWindow();
+    if (!w)
+	return;
+
+    removePage(w);
+    delete w;
+}
+
 
 ValueTip::ValueTip(WinStack* parent) :
 	QToolTip(parent)

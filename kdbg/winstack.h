@@ -107,6 +107,7 @@ public slots:
     void slotBrkptSetTemp();
     void slotBrkptEnable();
     void slotMoveProgramCounter();
+    void slotClose();
 
     // Displays the value tip at m_tipLocation
     void slotShowValueTip(const QString& tipText);
