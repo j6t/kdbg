@@ -94,6 +94,12 @@ protected:
     virtual bool queryClose();
     virtual TTYWindow* ttyWindow();
     virtual QString createOutputWindow();
+    KAction* createAction(const QString& text, const char* icon,
+			int shortcut, const QObject* receiver,
+			const char* slot, const char* name);
+    KAction* createAction(const QString& text,
+			int shortcut, const QObject* receiver,
+			const char* slot, const char* name);
 
     KDockWidget* dockParent(QWidget* w);
     bool isDockVisible(QWidget* w);

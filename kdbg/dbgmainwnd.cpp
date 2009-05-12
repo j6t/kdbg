@@ -173,6 +173,25 @@ DebuggerMainWnd::~DebuggerMainWnd()
     delete m_filesWindow;
 }
 
+KAction* DebuggerMainWnd::createAction(const QString& text, const char* icon,
+			int shortcut, const QObject* receiver,
+			const char* slot, const char* name)
+{
+    KAction* a = new KAction(text, icon, shortcut, receiver, slot,
+			actionCollection(), name);
+    return a;
+}
+
+KAction* DebuggerMainWnd::createAction(const QString& text,
+			int shortcut, const QObject* receiver,
+			const char* slot, const char* name)
+{
+    KAction* a = new KAction(text, shortcut, receiver, slot,
+			actionCollection(), name);
+    return a;
+}
+
+
 void DebuggerMainWnd::initKAction()
 {
     // file menu
@@ -180,26 +199,22 @@ void DebuggerMainWnd::initKAction()
                       actionCollection());
     open->setText(i18n("&Open Source..."));
     m_closeAction = KStdAction::close(m_filesWindow, SLOT(slotClose()), actionCollection());
-    m_reloadAction = new KAction(i18n("&Reload Source"), "reload", 0, m_filesWindow,
-                      SLOT(slotFileReload()), actionCollection(), 
-                      "file_reload");
-    m_fileExecAction = new KAction(i18n("&Executable..."), "execopen", 0, this,
-                      SLOT(slotFileExe()), actionCollection(), 
-                      "file_executable");
+    m_reloadAction = createAction(i18n("&Reload Source"), "reload", 0,
+			m_filesWindow, SLOT(slotFileReload()), "file_reload");
+    m_fileExecAction = createAction(i18n("&Executable..."), "execopen", 0,
+			this, SLOT(slotFileExe()), "file_executable");
     m_recentExecAction = new KRecentFilesAction(i18n("Recent E&xecutables"), 0,
 		      this, SLOT(slotRecentExec(const KURL&)),
 		      actionCollection(), "file_executable_recent");
-    m_coreDumpAction = new KAction(i18n("&Core dump..."), 0, this, SLOT(slotFileCore()),
-                      actionCollection(), "file_core_dump");
+    m_coreDumpAction = createAction(i18n("&Core dump..."), 0,
+			this, SLOT(slotFileCore()), "file_core_dump");
     KStdAction::quit(kapp, SLOT(closeAllWindows()), actionCollection());
 
     // settings menu
-    m_settingsAction = new KAction(i18n("This &Program..."), 0, this,
-		      SLOT(slotFileProgSettings()), actionCollection(),
-		      "settings_program");
-    (void)new KAction(i18n("&Global Options..."), 0, this, 
-                      SLOT(slotFileGlobalSettings()), actionCollection(),
-                      "settings_global");
+    m_settingsAction = createAction(i18n("This &Program..."), 0,
+			this, SLOT(slotFileProgSettings()), "settings_program");
+    createAction(i18n("&Global Options..."), 0,
+			this, SLOT(slotFileGlobalSettings()), "settings_global");
     KStdAction::keyBindings(this, SLOT(slotConfigureKeys()), actionCollection());
     KStdAction::showStatusbar(this, SLOT(slotViewStatusbar()), actionCollection());
 
@@ -228,70 +243,53 @@ void DebuggerMainWnd::initKAction()
     }
 
     // execution menu
-    m_runAction = new KAction(i18n("&Run"), "pgmrun", Key_F5, m_debugger,
-		      SLOT(programRun()), actionCollection(), "exec_run");
+    m_runAction = createAction(i18n("&Run"), "pgmrun", Key_F5,
+			m_debugger, SLOT(programRun()), "exec_run");
     connect(m_runAction, SIGNAL(activated()), this, SLOT(intoBackground()));
-    m_stepIntoAction = new KAction(i18n("Step &into"), "pgmstep", Key_F8, m_debugger,
-                      SLOT(programStep()), actionCollection(), 
-                      "exec_step_into");
+    m_stepIntoAction = createAction(i18n("Step &into"), "pgmstep", Key_F8,
+			m_debugger, SLOT(programStep()), "exec_step_into");
     connect(m_stepIntoAction, SIGNAL(activated()), this, SLOT(intoBackground()));
-    m_stepOverAction = new KAction(i18n("Step &over"), "pgmnext", Key_F10, m_debugger,
-                      SLOT(programNext()), actionCollection(), 
-                      "exec_step_over");
+    m_stepOverAction = createAction(i18n("Step &over"), "pgmnext", Key_F10,
+			m_debugger, SLOT(programNext()), "exec_step_over");
     connect(m_stepOverAction, SIGNAL(activated()), this, SLOT(intoBackground()));
-    m_stepOutAction = new KAction(i18n("Step o&ut"), "pgmfinish", Key_F6, m_debugger,
-                      SLOT(programFinish()), actionCollection(), 
-                      "exec_step_out");
+    m_stepOutAction = createAction(i18n("Step o&ut"), "pgmfinish", Key_F6,
+			m_debugger, SLOT(programFinish()), "exec_step_out");
     connect(m_stepOutAction, SIGNAL(activated()), this, SLOT(intoBackground()));
-    m_toCursorAction = new KAction(i18n("Run to &cursor"), Key_F7, this,
-                      SLOT(slotExecUntil()), actionCollection(), 
-                      "exec_run_to_cursor");
+    m_toCursorAction = createAction(i18n("Run to &cursor"), Key_F7,
+			this, SLOT(slotExecUntil()), "exec_run_to_cursor");
     connect(m_toCursorAction, SIGNAL(activated()), this, SLOT(intoBackground()));
-    m_stepIntoIAction = new KAction(i18n("Step i&nto by instruction"), "pgmstepi",
-		      SHIFT+Key_F8, m_debugger, SLOT(programStepi()), 
-		      actionCollection(), "exec_step_into_by_insn");
+    m_stepIntoIAction = createAction(i18n("Step i&nto by instruction"), "pgmstepi", SHIFT+Key_F8,
+			m_debugger, SLOT(programStepi()), "exec_step_into_by_insn");
     connect(m_stepIntoIAction, SIGNAL(activated()), this, SLOT(intoBackground()));
-    m_stepOverIAction = new KAction(i18n("Step o&ver by instruction"), "pgmnexti",
-		      SHIFT+Key_F10, m_debugger, SLOT(programNexti()), 
-		      actionCollection(), "exec_step_over_by_insn");
+    m_stepOverIAction = createAction(i18n("Step o&ver by instruction"), "pgmnexti", SHIFT+Key_F10,
+			m_debugger, SLOT(programNexti()), "exec_step_over_by_insn");
     connect(m_stepOverIAction, SIGNAL(activated()), this, SLOT(intoBackground()));
-    m_execMovePCAction = new KAction(i18n("&Program counter to current line"), 0,
-		      m_filesWindow, SLOT(slotMoveProgramCounter()),
-		      actionCollection(), "exec_movepc");
-    m_breakAction = new KAction(i18n("&Break"), 0, m_debugger,
-                      SLOT(programBreak()), actionCollection(),
-                      "exec_break");
-    m_killAction = new KAction(i18n("&Kill"), 0, m_debugger,
-                      SLOT(programKill()), actionCollection(),
-                      "exec_kill");
-    m_restartAction = new KAction(i18n("Re&start"), 0, m_debugger,
-                      SLOT(programRunAgain()), actionCollection(),
-                      "exec_restart");
-    m_attachAction = new KAction(i18n("A&ttach..."), 0, this,
-                      SLOT(slotExecAttach()), actionCollection(),
-                      "exec_attach");
-    m_argumentsAction = new KAction(i18n("&Arguments..."), 0, this,
-                      SLOT(slotExecArgs()), actionCollection(),
-                      "exec_arguments");
+    m_execMovePCAction = createAction(i18n("&Program counter to current line"), 0,
+			m_filesWindow, SLOT(slotMoveProgramCounter()), "exec_movepc");
+    m_breakAction = createAction(i18n("&Break"), 0,
+			m_debugger, SLOT(programBreak()), "exec_break");
+    m_killAction = createAction(i18n("&Kill"), 0,
+			m_debugger, SLOT(programKill()), "exec_kill");
+    m_restartAction = createAction(i18n("Re&start"), 0,
+			m_debugger, SLOT(programRunAgain()), "exec_restart");
+    m_attachAction = createAction(i18n("A&ttach..."), 0,
+			this, SLOT(slotExecAttach()), "exec_attach");
+    m_argumentsAction = createAction(i18n("&Arguments..."), 0,
+			this, SLOT(slotExecArgs()), "exec_arguments");
 
     // breakpoint menu
-    m_bpSetAction = new KAction(i18n("Set/Clear &breakpoint"), "brkpt", Key_F9,
-                      m_filesWindow, SLOT(slotBrkptSet()), actionCollection(),
-                      "breakpoint_set");
-    m_bpSetTempAction = new KAction(i18n("Set &temporary breakpoint"), SHIFT+Key_F9,
-                      m_filesWindow, SLOT(slotBrkptSetTemp()), actionCollection(),
-                      "breakpoint_set_temporary");
-    m_bpEnableAction = new KAction(i18n("&Enable/Disable breakpoint"), CTRL+Key_F9,
-                      m_filesWindow, SLOT(slotBrkptEnable()), actionCollection(),
-                      "breakpoint_enable");
+    m_bpSetAction = createAction(i18n("Set/Clear &breakpoint"), "brkpt", Key_F9,
+			m_filesWindow, SLOT(slotBrkptSet()), "breakpoint_set");
+    m_bpSetTempAction = createAction(i18n("Set &temporary breakpoint"), SHIFT+Key_F9,
+			m_filesWindow, SLOT(slotBrkptSetTemp()), "breakpoint_set_temporary");
+    m_bpEnableAction = createAction(i18n("&Enable/Disable breakpoint"), CTRL+Key_F9,
+			m_filesWindow, SLOT(slotBrkptEnable()), "breakpoint_enable");
 
     // only in popup menus
-    (void)new KAction(i18n("Watch Expression"), 0, this,
-                      SLOT(slotLocalsToWatch()), actionCollection(),
-                      "watch_expression");
-    m_editValueAction = new KAction(i18n("Edit Value"), Key_F2, this,
-		      SLOT(slotEditValue()), actionCollection(),
-		      "edit_value");
+    createAction(i18n("Watch Expression"), 0,
+			this, SLOT(slotLocalsToWatch()), "watch_expression");
+    m_editValueAction = createAction(i18n("Edit Value"), Key_F2,
+			this, SLOT(slotEditValue()), "edit_value");
 
     // all actions force an UI update
     QValueList<KAction*> actions = actionCollection()->actions();
