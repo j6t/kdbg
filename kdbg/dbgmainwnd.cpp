@@ -243,25 +243,25 @@ void DebuggerMainWnd::initKAction()
     }
 
     // execution menu
-    m_runAction = createAction(i18n("&Run"), "pgmrun", Key_F5,
+    m_runAction = createAction(i18n("&Run"), "pgmrun", Qt::Key_F5,
 			m_debugger, SLOT(programRun()), "exec_run");
     connect(m_runAction, SIGNAL(activated()), this, SLOT(intoBackground()));
-    m_stepIntoAction = createAction(i18n("Step &into"), "pgmstep", Key_F8,
+    m_stepIntoAction = createAction(i18n("Step &into"), "pgmstep", Qt::Key_F8,
 			m_debugger, SLOT(programStep()), "exec_step_into");
     connect(m_stepIntoAction, SIGNAL(activated()), this, SLOT(intoBackground()));
-    m_stepOverAction = createAction(i18n("Step &over"), "pgmnext", Key_F10,
+    m_stepOverAction = createAction(i18n("Step &over"), "pgmnext", Qt::Key_F10,
 			m_debugger, SLOT(programNext()), "exec_step_over");
     connect(m_stepOverAction, SIGNAL(activated()), this, SLOT(intoBackground()));
-    m_stepOutAction = createAction(i18n("Step o&ut"), "pgmfinish", Key_F6,
+    m_stepOutAction = createAction(i18n("Step o&ut"), "pgmfinish", Qt::Key_F6,
 			m_debugger, SLOT(programFinish()), "exec_step_out");
     connect(m_stepOutAction, SIGNAL(activated()), this, SLOT(intoBackground()));
-    m_toCursorAction = createAction(i18n("Run to &cursor"), Key_F7,
+    m_toCursorAction = createAction(i18n("Run to &cursor"), Qt::Key_F7,
 			this, SLOT(slotExecUntil()), "exec_run_to_cursor");
     connect(m_toCursorAction, SIGNAL(activated()), this, SLOT(intoBackground()));
-    m_stepIntoIAction = createAction(i18n("Step i&nto by instruction"), "pgmstepi", SHIFT+Key_F8,
+    m_stepIntoIAction = createAction(i18n("Step i&nto by instruction"), "pgmstepi", Qt::SHIFT+Qt::Key_F8,
 			m_debugger, SLOT(programStepi()), "exec_step_into_by_insn");
     connect(m_stepIntoIAction, SIGNAL(activated()), this, SLOT(intoBackground()));
-    m_stepOverIAction = createAction(i18n("Step o&ver by instruction"), "pgmnexti", SHIFT+Key_F10,
+    m_stepOverIAction = createAction(i18n("Step o&ver by instruction"), "pgmnexti", Qt::SHIFT+Qt::Key_F10,
 			m_debugger, SLOT(programNexti()), "exec_step_over_by_insn");
     connect(m_stepOverIAction, SIGNAL(activated()), this, SLOT(intoBackground()));
     m_execMovePCAction = createAction(i18n("&Program counter to current line"), 0,
@@ -278,17 +278,17 @@ void DebuggerMainWnd::initKAction()
 			this, SLOT(slotExecArgs()), "exec_arguments");
 
     // breakpoint menu
-    m_bpSetAction = createAction(i18n("Set/Clear &breakpoint"), "brkpt", Key_F9,
+    m_bpSetAction = createAction(i18n("Set/Clear &breakpoint"), "brkpt", Qt::Key_F9,
 			m_filesWindow, SLOT(slotBrkptSet()), "breakpoint_set");
-    m_bpSetTempAction = createAction(i18n("Set &temporary breakpoint"), SHIFT+Key_F9,
+    m_bpSetTempAction = createAction(i18n("Set &temporary breakpoint"), Qt::SHIFT+Qt::Key_F9,
 			m_filesWindow, SLOT(slotBrkptSetTemp()), "breakpoint_set_temporary");
-    m_bpEnableAction = createAction(i18n("&Enable/Disable breakpoint"), CTRL+Key_F9,
+    m_bpEnableAction = createAction(i18n("&Enable/Disable breakpoint"), Qt::CTRL+Qt::Key_F9,
 			m_filesWindow, SLOT(slotBrkptEnable()), "breakpoint_enable");
 
     // only in popup menus
     createAction(i18n("Watch Expression"), 0,
 			this, SLOT(slotLocalsToWatch()), "watch_expression");
-    m_editValueAction = createAction(i18n("Edit Value"), Key_F2,
+    m_editValueAction = createAction(i18n("Edit Value"), Qt::Key_F2,
 			this, SLOT(slotEditValue()), "edit_value");
 
     // all actions force an UI update

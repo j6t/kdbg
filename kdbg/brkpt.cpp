@@ -247,7 +247,7 @@ bool BreakpointTable::eventFilter(QObject* ob, QEvent* ev)
     if (ev->type() == QEvent::MouseButtonPress)
     {
 	QMouseEvent* mev = static_cast<QMouseEvent*>(ev);
-	if (mev->button() == MidButton) {
+	if (mev->button() == Qt::MidButton) {
 	    // enable or disable the clicked-on item
 	    BreakpointItem* bp =
 		static_cast<BreakpointItem*>(m_list.itemAt(mev->pos()));
@@ -345,7 +345,7 @@ void BreakpointTable::initListAndIcons()
 	{
 	    QPainter p(&canvas);
 	    // clear canvas
-	    p.fillRect(0,0, canvas.width(),canvas.height(), cyan);
+	    p.fillRect(0,0, canvas.width(),canvas.height(), Qt::cyan);
 	    // basic icon
 	    if (i & 1) {
 		p.drawPixmap(1,1, (i & 8) ? watchena : brkena);

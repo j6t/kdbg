@@ -146,7 +146,7 @@ TTYWindow::TTYWindow(QWidget* parent, const char* name) :
     setFont(KGlobalSettings::fixedFont());
     setReadOnly(true);
     setAutoFormatting(AutoNone);
-    setTextFormat(PlainText);
+    setTextFormat(Qt::PlainText);
     setWordWrap(NoWrap);
 }
 

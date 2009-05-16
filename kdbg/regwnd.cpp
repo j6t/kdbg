@@ -406,7 +406,7 @@ void RegisterViewItem::paintCell(QPainter* p, const QColorGroup& cg,
 {
     if (m_changes) {
 	QColorGroup newcg = cg;
-	newcg.setColor(QColorGroup::Text, red);
+	newcg.setColor(QColorGroup::Text, Qt::red);
 	QListViewItem::paintCell(p, newcg, column, width, alignment);
     } else {
 	QListViewItem::paintCell(p, cg, column, width, alignment);
@@ -428,9 +428,9 @@ RegisterView::RegisterView(QWidget* parent, const char* name) :
     addColumn(QIconSet(iconWatchcoded), i18n("Value"));
     addColumn(QIconSet(iconWatch), i18n("Decoded value"));
 
-    setColumnAlignment(0,AlignLeft);
-    setColumnAlignment(1,AlignLeft);
-    setColumnAlignment(2,AlignLeft);
+    setColumnAlignment(0, Qt::AlignLeft);
+    setColumnAlignment(1, Qt::AlignLeft);
+    setColumnAlignment(2, Qt::AlignLeft);
 
     setAllColumnsShowFocus( true );
     header()->setClickEnabled(false);

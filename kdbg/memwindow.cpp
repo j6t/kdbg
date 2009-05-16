@@ -31,7 +31,7 @@ void MemoryViewItem::paintCell(QPainter* p, const QColorGroup& cg,
 {
     if( column > 0 && m_changed[column - 1] ) {
 	QColorGroup newcg = cg;
-	newcg.setColor(QColorGroup::Text, red);
+	newcg.setColor(QColorGroup::Text, Qt::red);
 	QListViewItem::paintCell(p, newcg, column, width, alignment);
     } else {
 	QListViewItem::paintCell(p, cg, column, width, alignment);
@@ -106,7 +106,7 @@ bool MemoryWindow::eventFilter(QObject*, QEvent* ev)
 
 void MemoryWindow::handlePopup(QMouseEvent* ev)
 {
-    if (ev->button() == RightButton)
+    if (ev->button() == Qt::RightButton)
     {
 	// show popup menu
 	if (m_popup.isVisible())
