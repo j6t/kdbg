@@ -82,7 +82,6 @@ signals:
 public slots:
     virtual void updateUI();
     virtual void updateLineItems();
-    void slotFileChanged();
     void slotAddWatch();
     void slotAddWatch(const QString& text);
     void slotNewFileLoaded();

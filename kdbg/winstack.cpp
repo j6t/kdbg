@@ -8,11 +8,10 @@
 #include "sourcewnd.h"
 #include <qbrush.h>
 #include <qfileinfo.h>
-#include <qlistbox.h>
+#include <qpopupmenu.h>
 #include <kapplication.h>
 #include <kmainwindow.h>
 #include <klocale.h>			/* i18n */
-#include <algorithm>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -21,9 +20,7 @@
 
 
 WinStack::WinStack(QWidget* parent, const char* name) :
-	QWidget(parent, name),
-	m_activeWindow(0),
-	m_windowMenu(0),
+	KTabWidget(parent, name),
 	m_pcLine(-1),
 	m_valueTip(this),
 	m_tipLocation(1,1,10,10),
@@ -39,17 +36,6 @@ WinStack::WinStack(QWidget* parent, const char* name) :
 
 WinStack::~WinStack()
 {
-}
-
-void WinStack::setWindowMenu(QPopupMenu* menu)
-{
-    m_windowMenu = menu;
-    if (menu == 0) {
-	return;
-    }
-    
-    // hook up for menu activations
-    connect(menu, SIGNAL(activated(int)), this, SLOT(selectWindow(int)));
 }
 
 void WinStack::contextMenuEvent(QContextMenuEvent* e)
@@ -68,8 +54,8 @@ void WinStack::contextMenuEvent(QContextMenuEvent* e)
 
 void WinStack::reloadAllFiles()
 {
-    for (SourceWindowList::iterator i = m_fileList.begin(); i != m_fileList.end(); ++i) {
-	(*i)->reloadFile();
+    for (int i = count()-1; i >= 0; i--) {
+	windowAt(i)->reloadFile();
     }
 }
 
@@ -109,9 +95,9 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 {
     // check whether the file is already open
     SourceWindow* fw = 0;
-    for (SourceWindowList::iterator i = m_fileList.begin(); i != m_fileList.end(); ++i) {
-	if ((*i)->fileName() == pathName) {
-	    fw = *i;
+    for (int i = count()-1; i >= 0; i--) {
+	if (windowAt(i)->fileName() == pathName) {
+	    fw = windowAt(i);
 	    break;
 	}
     }
@@ -126,7 +112,9 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 	    return false;
 	}
 
-	m_fileList.insert(m_fileList.begin(), fw);
+	addTab(fw, QFileInfo(pathName).fileName());
+	setTabToolTip(fw, pathName);
+
 	connect(fw, SIGNAL(clickedLeft(const QString&,int,const DbgAddr&,bool)),
 		SIGNAL(toggleBreak(const QString&,int,const DbgAddr&,bool)));
 	connect(fw, SIGNAL(clickedMid(const QString&,int,const DbgAddr&)),
@@ -141,9 +129,8 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 	// tab width
 	connect(this, SIGNAL(setTabWidth(int)), fw, SLOT(setTabWidth(int)));
 	fw->setTabWidth(m_tabWidth);
+	fw->setFocusPolicy(QWidget::WheelFocus);
 
-	changeWindowMenu();
-	
 	// set PC if there is one
 	emit newFileLoaded();
 	if (m_pcLine >= 0) {
@@ -155,43 +142,13 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 
 bool WinStack::activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& address)
 {
-    // lookup fw
-    SourceWindowList::iterator it = std::find(m_fileList.begin(), m_fileList.end(), fw);
-    ASSERT(it != m_fileList.end());
-    if (it == m_fileList.end()) {
-	return false;
-    }
-    /*
-     * If the file is not in the list of those that would appear in the
-     * window menu, move it to the first position.
-     */
-    if (std::distance(m_fileList.begin(), it) >= 9) {
-	m_fileList.erase(it);
-	m_fileList.insert(m_fileList.begin(), fw);
-	changeWindowMenu();
-    }
-
     // make the line visible
     if (lineNo >= 0) {
 	fw->scrollTo(lineNo, address);
     }
 
-    // first resize the window, then lift it to the top
-    fw->setGeometry(0,0, width(),height());
-    fw->raise();
-    fw->show();
-
-    // set the focus to the new active window
-    QWidget* oldActive = m_activeWindow;
-    fw->setFocusPolicy(QWidget::WheelFocus);
-    m_activeWindow = fw;
-    if (oldActive != 0 && oldActive != fw) {
-	// disable focus on non-active windows
-	oldActive->setFocusPolicy(QWidget::NoFocus);
-    }
+    showPage(fw);
     fw->setFocus();
-
-    emit fileChanged();
 
     return true;
 }
@@ -204,49 +161,19 @@ bool WinStack::activeLine(QString& fileName, int& lineNo)
 
 bool WinStack::activeLine(QString& fileName, int& lineNo, DbgAddr& address)
 {
-    if (m_activeWindow == 0) {
+    if (activeWindow() == 0) {
 	return false;
     }
     
-    fileName = m_activeWindow->fileName();
-    m_activeWindow->activeLine(lineNo, address);
+    fileName = activeFileName();
+    activeWindow()->activeLine(lineNo, address);
     return true;
-}
-
-void WinStack::changeWindowMenu()
-{
-    if (m_windowMenu == 0) {
-	return;
-    }
-
-    const uint N = 9;
-    // Delete entries at most the N window entries that we insert below.
-    // When we get here if the More entry was selected, we must make sure
-    // that we don't delete it (or we crash).
-    bool haveMore = m_windowMenu->count() > uint(N);
-    int k = haveMore ? N : m_windowMenu->count();
-
-    for (int i = 0; i < k; i++) {
-	m_windowMenu->removeItemAt(0);
-    }
-
-    // insert current windows
-    QString text;
-    for (uint i = 0; i < m_fileList.size() && i < N; i++) {
-	text.sprintf("&%d ", i+1);
-	text += m_fileList[i]->fileName();
-	m_windowMenu->insertItem(text, WindowMore+i+1, i);
-    }
-    // add More entry if we have none yet
-    if (!haveMore && m_fileList.size() > N) {
-	m_windowMenu->insertItem(i18n("&More..."), WindowMore, N);
-    }
 }
 
 void WinStack::updateLineItems(const KDebugger* dbg)
 {
-    for (SourceWindowList::iterator i = m_fileList.begin(); i != m_fileList.end(); ++i) {
-	(*i)->updateLineItems(dbg);
+    for (int i = count()-1; i >= 0; i--) {
+	windowAt(i)->updateLineItems(dbg);
     }
 }
 
@@ -264,59 +191,68 @@ void WinStack::updatePC(const QString& fileName, int lineNo, const DbgAddr& addr
     }
 }
 
+SourceWindow* WinStack::findByFileName(const QString& fileName) const
+{
+    for (int i = count()-1; i >= 0; i--) {
+	if (windowAt(i)->fileNameMatches(fileName)) {
+	    return windowAt(i);
+	}
+    }
+    return 0;
+}
+
 void WinStack::setPC(bool set, const QString& fileName, int lineNo,
 		     const DbgAddr& address, int frameNo)
 {
     TRACE((set ? "set PC: " : "clear PC: ") + fileName +
 	  QString().sprintf(":%d#%d ", lineNo, frameNo) + address.asString());
-    // find file
-    for (SourceWindowList::iterator i = m_fileList.begin(); i != m_fileList.end(); ++i)
-    {
-	if ((*i)->fileNameMatches(fileName)) {
-	    (*i)->setPC(set, lineNo, address, frameNo);
-	    break;
-	}
-    }
+    SourceWindow* fw = findByFileName(fileName);
+    if (fw)
+	fw->setPC(set, lineNo, address, frameNo);
 }
 
-void WinStack::resizeEvent(QResizeEvent*)
+SourceWindow* WinStack::windowAt(int i) const
 {
-    if (m_activeWindow != 0) {
-	m_activeWindow->resize(width(), height());
-    }
+    return static_cast<SourceWindow*>(page(i));
+}
+
+SourceWindow* WinStack::activeWindow() const
+{
+    return static_cast<SourceWindow*>(currentPage());
 }
 
 QString WinStack::activeFileName() const
 {
     QString f;
-    if (m_activeWindow != 0)
-	f = m_activeWindow->fileName();
+    if (activeWindow() != 0)
+	f = activeWindow()->fileName();
     return f;
 }
 
 void WinStack::slotFindForward()
 {
-    if (m_activeWindow != 0)
-	m_activeWindow->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
+    if (activeWindow() != 0)
+	activeWindow()->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
 			     SourceWindow::findForward);
 }
 
 void WinStack::slotFindBackward()
 {
-    if (m_activeWindow != 0)
-	m_activeWindow->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
+    if (activeWindow() != 0)
+	activeWindow()->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
 			     SourceWindow::findBackward);
 }
 
 void WinStack::maybeTip(const QPoint& p)
 {
-    if (m_activeWindow == 0)
+    SourceWindow* w = activeWindow();
+    if (w == 0)
 	return;
 
     // get the word at the point
     QString word;
     QRect r;
-    if (!m_activeWindow->wordAtPoint(p, word, r))
+    if (!w->wordAtPoint(w->mapFrom(this, p), word, r))
 	return;
 
     // must be valid
@@ -324,7 +260,7 @@ void WinStack::maybeTip(const QPoint& p)
     assert(r.isValid());
 
     // remember the location
-    m_tipLocation = r;
+    m_tipLocation = QRect(w->mapTo(this, r.topLeft()), r.size());
 
     emit initiateValuePopup(word);
 }
@@ -337,15 +273,7 @@ void WinStack::slotShowValueTip(const QString& tipText)
 void WinStack::slotDisassembled(const QString& fileName, int lineNo,
 				const std::list<DisassembledCode>& disass)
 {
-    // lookup the file
-    SourceWindow* fw = 0;
-    for (SourceWindowList::iterator i = m_fileList.begin(); i != m_fileList.end(); ++i)
-    {
-	if ((*i)->fileNameMatches(fileName)) {
-	    fw = (*i);
-	    break;
-	}
-    }
+    SourceWindow* fw = findByFileName(fileName);
     if (fw == 0) {
 	// not found: ignore
 	return;
@@ -375,9 +303,9 @@ void WinStack::slotSetTabWidth(int numChars)
 
 void WinStack::slotFileReload()
 {
-    if (m_activeWindow != 0) {
+    if (activeWindow() != 0) {
 	TRACE("reloading one file");
-	m_activeWindow->reloadFile();
+	activeWindow()->reloadFile();
     }
 }
 
@@ -426,6 +354,16 @@ void WinStack::slotMoveProgramCounter()
 	emit moveProgramCounter(file, lineNo, address);
 }
 
+void WinStack::slotClose()
+{
+    QWidget* w = activeWindow();
+    if (!w)
+	return;
+
+    removePage(w);
+    delete w;
+}
+
 
 ValueTip::ValueTip(WinStack* parent) :
 	QToolTip(parent)
@@ -436,102 +374,6 @@ void ValueTip::maybeTip(const QPoint& p)
 {
     WinStack* w = static_cast<WinStack*>(parentWidget());
     w->maybeTip(p);
-}
-
-
-class MoreWindowsDialog : public QDialog
-{
-public:
-    MoreWindowsDialog(QWidget* parent);
-    virtual ~MoreWindowsDialog();
-
-    void insertString(const char* text) { m_list.insertItem(text); }
-    void setListIndex(int i) { m_list.setCurrentItem(i); }
-    int listIndex() const { return m_list.currentItem(); }
-
-protected:
-    QListBox m_list;
-    QPushButton m_buttonOK;
-    QPushButton m_buttonCancel;
-    QVBoxLayout m_layout;
-    QHBoxLayout m_buttons;
-};
-
-MoreWindowsDialog::MoreWindowsDialog(QWidget* parent) :
-	QDialog(parent, "morewindows", true),
-	m_list(this, "windows"),
-	m_buttonOK(this, "show"),
-	m_buttonCancel(this, "cancel"),
-	m_layout(this, 8),
-	m_buttons(4)
-{
-    QString title = kapp->caption();
-    title += i18n(": Open Windows");
-    setCaption(title);
-
-    m_list.setMinimumSize(250, 100);
-    connect(&m_list, SIGNAL(selected(int)), SLOT(accept()));
-
-    m_buttonOK.setMinimumSize(100, 30);
-    connect(&m_buttonOK, SIGNAL(clicked()), SLOT(accept()));
-    m_buttonOK.setText(i18n("Show"));
-    m_buttonOK.setDefault(true);
-
-    m_buttonCancel.setMinimumSize(100, 30);
-    connect(&m_buttonCancel, SIGNAL(clicked()), SLOT(reject()));
-    m_buttonCancel.setText(i18n("Cancel"));
-
-    m_layout.addWidget(&m_list, 10);
-    m_layout.addLayout(&m_buttons);
-    m_buttons.addStretch(10);
-    m_buttons.addWidget(&m_buttonOK);
-    m_buttons.addSpacing(40);
-    m_buttons.addWidget(&m_buttonCancel);
-    m_buttons.addStretch(10);
-
-    m_layout.activate();
-
-    m_list.setFocus();
-    resize(320, 320);
-}
-
-MoreWindowsDialog::~MoreWindowsDialog()
-{
-}
-
-void WinStack::selectWindow(int id)
-{
-    // react only on menu entries concerning windows
-    if ((id & ~WindowMask) != WindowMore) {
-	return;
-    }
-
-    id &= WindowMask;
-
-    int index = 0;
-
-    if (id == 0) {
-	// more windows selected: show windows in a list
-	MoreWindowsDialog dlg(this);
-	for (SourceWindowList::iterator i = m_fileList.begin(); i != m_fileList.end(); ++i)
-	{
-	    dlg.insertString((*i)->fileName());
-	    if (m_activeWindow == *i) {
-		index = std::distance(m_fileList.begin(), i);
-	    }
-	}
-	dlg.setListIndex(index);
-	if (dlg.exec() == QDialog::Rejected)
-	    return;
-	index = dlg.listIndex();
-    } else {
-	index = (id & WindowMask)-1;
-    }
-
-    SourceWindow* fw = m_fileList[index];
-    ASSERT(fw != 0);
-	
-    activateWindow(fw, -1, DbgAddr());
 }
 
 

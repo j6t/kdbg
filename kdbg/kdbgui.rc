@@ -1,11 +1,11 @@
 <!DOCTYPE kpartgui>
-<kpartgui name="kdbg" version="1">
+<kpartgui name="kdbg" version="2">
 <MenuBar>
   <Menu name="file"><text>&amp;File</text>
-    <Action name="file_reload" append="new_merge"/>
-    <Action name="file_executable"/>
+    <Action name="file_executable" append="open_merge"/>
     <Action name="file_executable_recent"/>
     <Action name="file_core_dump"/>
+    <Action name="file_reload" append="close_merge"/>
 
   </Menu>
   <Menu name="view"><text>&amp;View</text>
@@ -48,7 +48,6 @@
     <Action name="settings_program"/>
     <Action name="settings_global"/>
   </Menu>
-  <Action name="window"/>
 </MenuBar>
 <Menu name="popup_files">
   <Action name="file_open"/>

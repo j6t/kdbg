@@ -88,8 +88,6 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(m_watches, SIGNAL(deleteWatch()), m_debugger, SLOT(slotDeleteWatch()));
     connect(m_watches, SIGNAL(textDropped(const QString&)), SLOT(slotAddWatch(const QString&)));
 
-    KAction* windowMenu = actionCollection()->action("window");
-    m_filesWindow->setWindowMenu(static_cast<KActionMenu*>(windowMenu)->popupMenu());
     connect(&m_filesWindow->m_findDlg, SIGNAL(closed()), SLOT(updateUI()));
     connect(m_filesWindow, SIGNAL(newFileLoaded()),
 	    SLOT(slotNewFileLoaded()));
@@ -120,9 +118,6 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(&m_backTimer, SIGNAL(timeout()), SLOT(slotBackTimer()));
     // tab width
     connect(this, SIGNAL(setTabWidth(int)), m_filesWindow, SIGNAL(setTabWidth(int)));
-
-    // file/line updates
-    connect(m_filesWindow, SIGNAL(fileChanged()), SLOT(slotFileChanged()));
 
     // connect breakpoint table
     connect(m_bpTable, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
@@ -158,7 +153,6 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 
     updateUI();
     m_bpTable->updateUI();
-    slotFileChanged();
 }
 
 DebuggerMainWnd::~DebuggerMainWnd()
@@ -185,6 +179,7 @@ void DebuggerMainWnd::initKAction()
     KAction* open = KStdAction::open(this, SLOT(slotFileOpen()), 
                       actionCollection());
     open->setText(i18n("&Open Source..."));
+    KStdAction::close(m_filesWindow, SLOT(slotClose()), actionCollection());
     (void)new KAction(i18n("&Reload Source"), "reload", 0, m_filesWindow, 
                       SLOT(slotFileReload()), actionCollection(), 
                       "file_reload");
@@ -298,8 +293,6 @@ void DebuggerMainWnd::initKAction()
     (void)new KAction(i18n("Edit Value"), Key_F2, this,
 		      SLOT(slotEditValue()), actionCollection(),
 		      "edit_value");
-
-    (void)new KActionMenu(i18n("&Window"), actionCollection(), "window");
 
     // all actions force an UI update
     QValueList<KAction*> actions = actionCollection()->actions();
@@ -448,6 +441,8 @@ void DebuggerMainWnd::updateUI()
     actionCollection()->action("file_executable")->setEnabled(m_debugger->isIdle());
     actionCollection()->action("settings_program")->setEnabled(m_debugger->haveExecutable());
     actionCollection()->action("file_core_dump")->setEnabled(m_debugger->canStart());
+    actionCollection()->action("file_close")->setEnabled(m_filesWindow->hasWindows());
+    actionCollection()->action("file_reload")->setEnabled(m_filesWindow->hasWindows());
     actionCollection()->action("exec_step_into")->setEnabled(m_debugger->canSingleStep());
     actionCollection()->action("exec_step_into_by_insn")->setEnabled(m_debugger->canSingleStep());
     actionCollection()->action("exec_step_over")->setEnabled(m_debugger->canSingleStep());
@@ -514,27 +509,6 @@ void DebuggerMainWnd::slotAddWatch(const QString& text)
     if (m_debugger != 0) {
 	m_debugger->addWatch(text);
     }
-}
-
-void DebuggerMainWnd::slotFileChanged()
-{
-    // set caption
-    QString caption;
-
-    if (m_debugger->haveExecutable()) {
-	// basename part of executable
-	QFileInfo executable = m_debugger->executable();
-	caption += executable.fileName();
-    }
-    QString file;
-    int line;
-    bool anyWindows = m_filesWindow->activeLine(file, line);
-    if (anyWindows) {
-	caption += " (";
-	caption += file;
-	caption += ")";
-    }
-    setCaption(caption);
 }
 
 void DebuggerMainWnd::slotNewFileLoaded()
@@ -626,6 +600,10 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
 	// keep the directory
 	m_lastDirectory = fi.dirPath(true);
 	m_filesWindow->setExtraDirectory(m_lastDirectory);
+
+	// set caption to basename part of executable
+	QString caption = fi.fileName();
+	setCaption(caption);
     }
     else
     {
