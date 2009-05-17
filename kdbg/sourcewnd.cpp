@@ -237,9 +237,9 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
 	    // check if this breakpoint still exists
 	    int line = rowToLine(i);
 	    TRACE(QString().sprintf("checking for bp at %d", line));
-	    int j;
-	    for (j = dbg->numBreakpoints()-1; j >= 0; j--) {
-		const Breakpoint* bp = dbg->breakpoint(j);
+	    KDebugger::BrkptROIterator bp = dbg->breakpointsBegin();
+	    for (; bp != dbg->breakpointsEnd(); ++bp)
+	    {
 		if (bp->lineNo == line &&
 		    fileNameMatches(bp->fileName) &&
 		    lineToRow(line, bp->address) == i)
@@ -248,7 +248,7 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
 		    break;
 		}
 	    }
-	    if (j < 0) {
+	    if (bp == dbg->breakpointsEnd()) {
 		/* doesn't exist anymore, remove it */
 		m_lineItems[i] &= ~liBPany;
 		update();
@@ -257,8 +257,8 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
     }
 
     // add new breakpoints
-    for (int j = dbg->numBreakpoints()-1; j >= 0; j--) {
-	const Breakpoint* bp = dbg->breakpoint(j);
+    for (KDebugger::BrkptROIterator bp = dbg->breakpointsBegin(); bp != dbg->breakpointsEnd(); ++bp)
+    {
 	if (fileNameMatches(bp->fileName)) {
 	    TRACE(QString().sprintf("updating %s:%d", bp->fileName.data(), bp->lineNo));
 	    int i = bp->lineNo;
@@ -469,7 +469,7 @@ bool SourceWindow::fileNameMatches(const QString& other)
     return strcmp(me.data() + sme, other.data() + sother) == 0;
 }
 
-void SourceWindow::disassembled(int lineNo, const QList<DisassembledCode>& disass)
+void SourceWindow::disassembled(int lineNo, const std::list<DisassembledCode>& disass)
 {
     TRACE("disassembled line " + QString().setNum(lineNo));
     if (lineNo < 0 || lineNo >= int(m_sourceCode.size()))
@@ -478,12 +478,12 @@ void SourceWindow::disassembled(int lineNo, const QList<DisassembledCode>& disas
     SourceLine& sl = m_sourceCode[lineNo];
 
     // copy disassembled code and its addresses
-    sl.disass.resize(disass.count());
-    sl.disassAddr.resize(disass.count());
-    sl.canDisass = disass.count() > 0;
-    for (uint i = 0; i < disass.count(); i++) {
-	const DisassembledCode* c =
-	    const_cast<QList<DisassembledCode>&>(disass).at(i);
+    sl.disass.resize(disass.size());
+    sl.disassAddr.resize(disass.size());
+    sl.canDisass = !disass.empty();
+    int i = 0;
+    for (std::list<DisassembledCode>::const_iterator c = disass.begin(); c != disass.end(); ++c, ++i)
+    {
 	QString code = c->code;
 	while (code.endsWith("\n"))
 	    code.truncate(code.length()-1);

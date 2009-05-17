@@ -6,9 +6,10 @@
 
 #include "dbgdriver.h"
 #include "exprwnd.h"
-#include "valarray.h"
+#include <qstringlist.h>
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
+#include <algorithm>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -34,8 +35,6 @@ DebuggerDriver::DebuggerDriver() :
     // If m_promptRE is set, it must include the '$' at the end.
     // m_promptLastChar and m_promptMinLen must also be set.
 
-    m_hipriCmdQueue.setAutoDelete(true);
-
     // debugger process
     connect(this, SIGNAL(receivedStdout(KProcess*,char*,int)),
 	    SLOT(slotReceiveOutput(KProcess*,char*,int)));
@@ -46,6 +45,8 @@ DebuggerDriver::DebuggerDriver() :
 DebuggerDriver::~DebuggerDriver()
 {
     delete[] m_output;
+    flushHiPriQueue();
+    flushLoPriQueue();
 }
 
 int DebuggerDriver::commSetupDoneC()
@@ -59,40 +60,24 @@ int DebuggerDriver::commSetupDoneC()
     return dup2(STDOUT_FILENO, STDERR_FILENO) != -1;
 }
 
-static void splitCmdStr(const QString& cmd, ValArray<QString>& parts)
-{
-    QString str = cmd.simplifyWhiteSpace();
-    int start = 0;
-    int end;
-    while ((end = str.find(' ', start)) >= 0) {
-	parts.append(str.mid(start, end-start));
-	start = end+1;
-    }
-    parts.append(str.mid(start, str.length()-start));
-}
-
 
 bool DebuggerDriver::startup(QString cmdStr)
 {
     // clear command queues
     delete m_activeCmd;
     m_activeCmd = 0;
-    m_hipriCmdQueue.clear();
-    bool autodel = m_lopriCmdQueue.autoDelete();
-    m_lopriCmdQueue.setAutoDelete(true);
-    m_lopriCmdQueue.clear();
-    m_lopriCmdQueue.setAutoDelete(autodel);
+    flushHiPriQueue();
+    flushLoPriQueue();
     m_state = DSidle;
 
     // debugger executable
     if (cmdStr.isEmpty())
 	cmdStr = defaultInvocation();
 
-    ValArray<QString> cmd;
-    splitCmdStr(cmdStr, cmd);
+    QStringList cmd = QStringList::split(' ', cmdStr);
     clearArguments();
-    for (int i = 0; i < cmd.size(); i++) {
-	*this << cmd[i];
+    for (QStringList::iterator i = cmd.begin(); i != cmd.end(); ++i) {
+	*this << *i;
     }
 
     if (!start(KProcess::NotifyOnExit,
@@ -137,7 +122,7 @@ CmdQueueItem* DebuggerDriver::executeCmdString(DbgCommand cmd,
 {
     // place a new command into the high-priority queue
     CmdQueueItem* cmdItem = new CmdQueueItem(cmd, cmdString);
-    m_hipriCmdQueue.enqueue(cmdItem);
+    m_hipriCmdQueue.push(cmdItem);
 
     if (clearLow) {
 	if (m_state == DSrunningLow) {
@@ -161,10 +146,16 @@ CmdQueueItem* DebuggerDriver::executeCmdString(DbgCommand cmd,
     return cmdItem;
 }
 
+bool CmdQueueItem::IsEqualCmd::operator()(CmdQueueItem* cmd) const
+{
+    return cmd->m_cmd == m_cmd && cmd->m_cmdString == m_str;
+}
+
 CmdQueueItem* DebuggerDriver::queueCmdString(DbgCommand cmd,
 					     QString cmdString, QueueMode mode)
 {
     // place a new command into the low-priority queue
+    std::list<CmdQueueItem*>::iterator i;
     CmdQueueItem* cmdItem = 0;
     switch (mode) {
     case QMoverrideMoreEqual:
@@ -176,24 +167,22 @@ CmdQueueItem* DebuggerDriver::queueCmdString(DbgCommand cmd,
 	    return m_activeCmd;
 	}
 	// check whether there is already the same command in the queue
-	for (cmdItem = m_lopriCmdQueue.first(); cmdItem != 0; cmdItem = m_lopriCmdQueue.next()) {
-	    if (cmdItem->m_cmd == cmd && cmdItem->m_cmdString == cmdString)
-		break;
-	}
-	if (cmdItem != 0) {
+	i = find_if(m_lopriCmdQueue.begin(), m_lopriCmdQueue.end(), CmdQueueItem::IsEqualCmd(cmd, cmdString));
+	if (i != m_lopriCmdQueue.end()) {
 	    // found one
+	    cmdItem = *i;
 	    if (mode == QMoverrideMoreEqual) {
 		// All commands are equal, but some are more equal than others...
 		// put this command in front of all others
-		m_lopriCmdQueue.take();
-		m_lopriCmdQueue.insert(0, cmdItem);
+		m_lopriCmdQueue.erase(i);
+		m_lopriCmdQueue.push_front(cmdItem);
 	    }
 	    break;
 	} // else none found, so add it
 	// drop through
     case QMnormal:
 	cmdItem = new CmdQueueItem(cmd, cmdString);
-	m_lopriCmdQueue.append(cmdItem);
+	m_lopriCmdQueue.push_back(cmdItem);
     }
 
     // if gdb is idle, send it the command
@@ -213,14 +202,16 @@ void DebuggerDriver::writeCommand()
 
     // first check the high-priority queue - only if it is empty
     // use a low-priority command.
-    CmdQueueItem* cmd = m_hipriCmdQueue.dequeue();
+    CmdQueueItem* cmd;
     DebuggerState newState = DScommandSent;
-    if (cmd == 0) {
-	cmd = m_lopriCmdQueue.first();
-	m_lopriCmdQueue.removeFirst();
+    if (!m_hipriCmdQueue.empty()) {
+	cmd = m_hipriCmdQueue.front();
+	m_hipriCmdQueue.pop();
+    } else if (!m_lopriCmdQueue.empty()) {
+	cmd = m_lopriCmdQueue.front();
+	m_lopriCmdQueue.pop_front();
 	newState = DScommandSentLow;
-    }
-    if (cmd == 0) {
+    } else {
 	// nothing to do
 	m_state = DSidle;		/* is necessary if command was interrupted earlier */
 	return;
@@ -243,16 +234,17 @@ void DebuggerDriver::writeCommand()
 
 void DebuggerDriver::flushLoPriQueue()
 {
-    while (!m_lopriCmdQueue.isEmpty()) {
-	delete m_lopriCmdQueue.take(0);
+    while (!m_lopriCmdQueue.empty()) {
+	delete m_lopriCmdQueue.back();
+	m_lopriCmdQueue.pop_back();
     }
 }
 
 void DebuggerDriver::flushHiPriQueue()
 {
-    CmdQueueItem* cmd;
-    while ((cmd = m_hipriCmdQueue.dequeue()) != 0) {
-	delete cmd;
+    while (!m_hipriCmdQueue.empty()) {
+	delete m_hipriCmdQueue.front();
+	m_hipriCmdQueue.pop();
     }
 }
 
@@ -289,13 +281,10 @@ void DebuggerDriver::slotCommandRead(KProcess*)
     }
 
     // re-receive delayed output
-    if (m_delayedOutput.current() != 0) {
-	DelayedStr* delayed;
-	while ((delayed = m_delayedOutput.dequeue()) != 0) {
-	    const char* str = delayed->data();
-	    slotReceiveOutput(0, const_cast<char*>(str), delayed->length());
-	    delete delayed;
-	}
+    while (!m_delayedOutput.empty()) {
+	QByteArray delayed = m_delayedOutput.front();
+	m_delayedOutput.pop();
+	slotReceiveOutput(0, const_cast<char*>(delayed.data()), delayed.size());
     }
 }
 
@@ -315,7 +304,7 @@ void DebuggerDriver::slotReceiveOutput(KProcess*, char* buffer, int buflen)
 	 * output, it will be re-sent by commandRead when it gets the
 	 * acknowledgment for the uncommitted command.
 	 */
-	m_delayedOutput.enqueue(new DelayedStr(buffer, buflen+1));
+	m_delayedOutput.push(QByteArray().duplicate(buffer, buflen));
 	return;
     }
     // write to log file (do not log delayed output - it would appear twice)
@@ -332,7 +321,7 @@ void DebuggerDriver::slotReceiveOutput(KProcess*, char* buffer, int buflen)
      */
     if (m_activeCmd == 0 && m_state != DSinterrupted) {
 	// ignore the output
-	TRACE("ignoring stray output: " + DelayedStr(buffer, buflen+1));
+	TRACE("ignoring stray output: " + QString::fromLatin1(buffer, buflen));
 	return;
     }
     ASSERT(m_state == DSrunning || m_state == DSrunningLow || m_state == DSinterrupted);
@@ -424,10 +413,7 @@ void DebuggerDriver::slotReceiveOutput(KProcess*, char* buffer, int buflen)
 	*m_output = '\0';
 	// also clear delayed output if interrupted
 	if (m_state == DSinterrupted) {
-	    DelayedStr* delayed;
-	    while ((delayed = m_delayedOutput.dequeue()) != 0) {
-		delete delayed;
-	    }
+	    m_delayedOutput = std::queue<QByteArray>();
 	}
 
 	/*
@@ -435,8 +421,8 @@ void DebuggerDriver::slotReceiveOutput(KProcess*, char* buffer, int buflen)
 	 * output, the debugger must be idle now, so send down the next
 	 * command.
 	 */
-	if (m_delayedOutput.current() == 0) {
-	    if (m_hipriCmdQueue.isEmpty() && m_lopriCmdQueue.isEmpty()) {
+	if (m_delayedOutput.empty()) {
+	    if (m_hipriCmdQueue.empty() && m_lopriCmdQueue.empty()) {
 		// no pending commands
 		m_state = DSidle;
 		emit enterIdleState();
@@ -452,27 +438,15 @@ void DebuggerDriver::dequeueCmdByVar(VarTree* var)
     if (var == 0)
 	return;
 
-    /*
-     * Check the low-priority queue: We start at the back end, but skip the
-     * last element for now. The reason is that if we delete an element the
-     * current element is stepped to the next one - except if it's on the
-     * last: then it's stepped to the previous element. By checking the
-     * last element separately we avoid that special case.
-     */
-    CmdQueueItem* cmd = m_lopriCmdQueue.last();
-    while ((cmd = m_lopriCmdQueue.prev()) != 0) {
-	if (cmd->m_expr != 0 && var->isAncestorEq(cmd->m_expr)) {
+    std::list<CmdQueueItem*>::iterator i = m_lopriCmdQueue.begin();
+    while (i != m_lopriCmdQueue.end()) {
+	if ((*i)->m_expr != 0 && var->isAncestorEq((*i)->m_expr)) {
 	    // this is indeed a critical command; delete it
-	    TRACE("removing critical lopri-cmd: " + cmd->m_cmdString);
-	    m_lopriCmdQueue.remove();	/* steps to next element */
-	}
-    }
-    cmd = m_lopriCmdQueue.last();
-    if (cmd != 0) {
-	if (cmd->m_expr != 0 && var->isAncestorEq(cmd->m_expr)) {
-	    TRACE("removing critical lopri-cmd: " + cmd->m_cmdString);
-	    m_lopriCmdQueue.remove();	/* steps to next element */
-	}
+	    TRACE("removing critical lopri-cmd: " + (*i)->m_cmdString);
+	    delete *i;
+	    m_lopriCmdQueue.erase(i++);
+	} else
+	    ++i;
     }
 }
 

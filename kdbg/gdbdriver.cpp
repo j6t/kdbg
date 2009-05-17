@@ -1699,20 +1699,20 @@ static bool parseFrame(const char*& s, int& frameNo, QString& func,
     return true;
 }
 
-void GdbDriver::parseBackTrace(const char* output, QList<StackFrame>& stack)
+void GdbDriver::parseBackTrace(const char* output, std::list<StackFrame>& stack)
 {
     QString func, file;
     int lineNo, frameNo;
     DbgAddr address;
 
     while (::parseFrame(output, frameNo, func, file, lineNo, address)) {
-	StackFrame* frm = new StackFrame;
+	stack.push_back(StackFrame());
+	StackFrame* frm = &stack.back();
 	frm->frameNo = frameNo;
 	frm->fileName = file;
 	frm->lineNo = lineNo;
 	frm->address = address;
 	frm->var = new ExprValue(func, VarTree::NKplain);
-	stack.append(frm);
     }
 }
 
@@ -1724,7 +1724,7 @@ bool GdbDriver::parseFrameChange(const char* output, int& frameNo,
 }
 
 
-bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
+bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 {
     // skip first line, which is the headline
     const char* p = strchr(output, '\n');
@@ -1735,28 +1735,23 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	return false;
 
     // split up a line
-    QString location;
-    QString address;
-    int hits = 0;
-    uint ignoreCount = 0;
-    QString condition;
     const char* end;
     char* dummy;
     while (*p != '\0') {
+	Breakpoint bp;
 	// get Num
-	long bpNum = strtol(p, &dummy, 10);	/* don't care about overflows */
+	bp.id = strtol(p, &dummy, 10);	/* don't care about overflows */
 	p = dummy;
 	// get Type
 	while (isspace(*p))
 	    p++;
-	Breakpoint::Type bpType = Breakpoint::breakpoint;
 	if (strncmp(p, "breakpoint", 10) == 0) {
 	    p += 10;
 	} else if (strncmp(p, "hw watchpoint", 13) == 0) {
-	    bpType = Breakpoint::watchpoint;
+	    bp.type = Breakpoint::watchpoint;
 	    p += 13;
 	} else if (strncmp(p, "watchpoint", 10) == 0) {
-	    bpType = Breakpoint::watchpoint;
+	    bp.type = Breakpoint::watchpoint;
 	    p += 10;
 	}
 	while (isspace(*p))
@@ -1764,7 +1759,7 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	if (*p == '\0')
 	    break;
 	// get Disp
-	char disp = *p++;
+	bp.temporary = *p++ == 'd';
 	while (*p != '\0' && !isspace(*p))	/* "keep" or "del" */
 	    p++;
 	while (isspace(*p))
@@ -1772,7 +1767,7 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	if (*p == '\0')
 	    break;
 	// get Enb
-	char enable = *p++;
+	bp.enabled = *p++ == 'y';
 	while (*p != '\0' && !isspace(*p))	/* "y" or "n" */
 	    p++;
 	while (isspace(*p))
@@ -1780,30 +1775,25 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	if (*p == '\0')
 	    break;
 	// the address, if present
-	if (bpType == Breakpoint::breakpoint &&
+	if (bp.type == Breakpoint::breakpoint &&
 	    strncmp(p, "0x", 2) == 0)
 	{
 	    const char* start = p;
 	    while (*p != '\0' && !isspace(*p))
 		p++;
-	    address = QString::fromLatin1(start, p-start);
+	    bp.address = QString::fromLatin1(start, p-start);
 	    while (isspace(*p) && *p != '\n')
 		p++;
 	    if (*p == '\0')
 		break;
-	} else {
-	    address = QString();
 	}
 	// remainder is location, hit and ignore count, condition
-	hits = 0;
-	ignoreCount = 0;
-	condition = QString();
 	end = strchr(p, '\n');
 	if (end == 0) {
-	    location = p;
-	    p += location.length();
+	    bp.location = p;
+	    p += bp.location.length();
 	} else {
-	    location = QString::fromLatin1(p, end-p).stripWhiteSpace();
+	    bp.location = QString::fromLatin1(p, end-p).stripWhiteSpace();
 	    p = end+1;			/* skip over \n */
 	}
 
@@ -1821,70 +1811,56 @@ bool GdbDriver::parseBreakList(const char* output, QList<Breakpoint>& brks)
 	    if (strncmp(p, "breakpoint already hit", 22) == 0) {
 		// extract the hit count
 		p += 22;
-		hits = strtol(p, &dummy, 10);
-		TRACE(QString().sprintf("hit count %d", hits));
+		bp.hitCount = strtol(p, &dummy, 10);
+		TRACE(QString("hit count %1").arg(bp.hitCount));
 	    } else if (strncmp(p, "stop only if ", 13) == 0) {
 		// extract condition
 		p += 13;
-		condition = QString::fromLatin1(p, end-p).stripWhiteSpace();
-		TRACE("condition: "+condition);
+		bp.condition = QString::fromLatin1(p, end-p).stripWhiteSpace();
+		TRACE("condition: "+bp.condition);
 	    } else if (strncmp(p, "ignore next ", 12) == 0) {
 		// extract ignore count
 		p += 12;
-		ignoreCount = strtol(p, &dummy, 10);
-		TRACE(QString().sprintf("ignore count %d", ignoreCount));
+		bp.ignoreCount = strtol(p, &dummy, 10);
+		TRACE(QString("ignore count %1").arg(bp.ignoreCount));
 	    } else {
 		// indeed a continuation
-		location += " " + QString::fromLatin1(p, end-p).stripWhiteSpace();
+		bp.location += " " + QString::fromLatin1(p, end-p).stripWhiteSpace();
 	    }
 	    p = end;
 	    if (*p != '\0')
 		p++;			/* skip '\n' */
 	}
-	Breakpoint* bp = new Breakpoint;
-	bp->id = bpNum;
-	bp->type = bpType;
-	bp->temporary = disp == 'd';
-	bp->enabled = enable == 'y';
-	bp->location = location;
-	bp->address = address;
-	bp->hitCount = hits;
-	bp->ignoreCount = ignoreCount;
-	bp->condition = condition;
-	brks.append(bp);
+	brks.push_back(bp);
     }
     return true;
 }
 
-bool GdbDriver::parseThreadList(const char* output, QList<ThreadInfo>& threads)
+std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 {
+    std::list<ThreadInfo> threads;
     if (strcmp(output, "\n") == 0 || strncmp(output, "No stack.", 9) == 0) {
 	// no threads
-	return true;
+	return threads;
     }
-
-    int id;
-    QString systag;
-    QString func, file;
-    int lineNo;
-    DbgAddr address;
 
     const char* p = output;
     while (*p != '\0') {
+	ThreadInfo thr;
 	// seach look for thread id, watching out for  the focus indicator
-	bool hasFocus = false;
+	thr.hasFocus = false;
 	while (isspace(*p))		/* may be \n from prev line: see "No stack" below */
 	    p++;
 	if (*p == '*') {
-	    hasFocus = true;
+	    thr.hasFocus = true;
 	    p++;
 	    // there follows only whitespace
 	}
 	char* end;
-	id = strtol(p, &end, 10);
+	thr.id = strtol(p, &end, 10);
 	if (p == end) {
 	    // syntax error: no number found; bail out
-	    return true;
+	    return threads;
 	}
 	p = end;
 
@@ -1898,9 +1874,9 @@ bool GdbDriver::parseThreadList(const char* output, QList<ThreadInfo>& threads)
 	end = strstr(p, "  ");
 	if (end == 0) {
 	    // syntax error; bail out
-	    return true;
+	    return threads;
 	}
-	systag = QString::fromLatin1(p, end-p);
+	thr.threadName = QString::fromLatin1(p, end-p);
 	p = end+2;
 
 	/*
@@ -1908,26 +1884,16 @@ bool GdbDriver::parseThreadList(const char* output, QList<ThreadInfo>& threads)
 	 * catches a thread at an instant where it doesn't have a stack.
 	 */
 	if (strncmp(p, "[No stack.]", 11) != 0) {
-	    ::parseFrameInfo(p, func, file, lineNo, address);
+	    ::parseFrameInfo(p, thr.function, thr.fileName, thr.lineNo, thr.address);
 	} else {
-	    func = "[No stack]";
-	    file = QString();
-	    lineNo = -1;
-	    address = QString();
+	    thr.function = "[No stack]";
+	    thr.lineNo = -1;
 	    p += 11;			/* \n is skipped above */
 	}
 
-	ThreadInfo* thr = new ThreadInfo;
-	thr->id = id;
-	thr->threadName = systag;
-	thr->hasFocus = hasFocus;
-	thr->function = func;
-	thr->fileName = file;
-	thr->lineNo = lineNo;
-	thr->address = address;
-	threads.append(thr);
+	threads.push_back(thr);
     }
-    return true;
+    return threads;
 }
 
 static bool parseNewBreakpoint(const char* o, int& id,
@@ -2015,7 +1981,7 @@ static bool parseNewWatchpoint(const char* o, int& id,
     return true;
 }
 
-void GdbDriver::parseLocals(const char* output, QList<ExprValue>& newVars)
+void GdbDriver::parseLocals(const char* output, std::list<ExprValue*>& newVars)
 {
     // check for possible error conditions
     if (strncmp(output, "No symbol table", 15) == 0)
@@ -2044,13 +2010,13 @@ void GdbDriver::parseLocals(const char* output, QList<ExprValue>& newVars)
 	    break;
 	}
 	// do not add duplicates
-	for (ExprValue* o = newVars.first(); o != 0; o = newVars.next()) {
-	    if (o->m_name == variable->m_name) {
+	for (std::list<ExprValue*>::iterator o = newVars.begin(); o != newVars.end(); ++o) {
+	    if ((*o)->m_name == variable->m_name) {
 		delete variable;
 		goto skipDuplicate;
 	    }
 	}
-	newVars.append(variable);
+	newVars.push_back(variable);
     skipDuplicate:;
     }
 }
@@ -2174,17 +2140,18 @@ uint GdbDriver::parseProgramStopped(const char* output, QString& message)
     return flags;
 }
 
-void GdbDriver::parseSharedLibs(const char* output, QStrList& shlibs)
+QStringList GdbDriver::parseSharedLibs(const char* output)
 {
+    QStringList shlibs;
     if (strncmp(output, "No shared libraries loaded", 26) == 0)
-	return;
+	return shlibs;
 
     // parse the table of shared libraries
 
     // strip off head line
     output = strchr(output, '\n');
     if (output == 0)
-	return;
+	return shlibs;
     output++;				/* skip '\n' */
     QString shlibName;
     while (*output != '\0') {
@@ -2200,7 +2167,7 @@ void GdbDriver::parseSharedLibs(const char* output, QStrList& shlibs)
 	    }
 	}
 	if (*output == '\0')
-	    return;
+	    return shlibs;
 	const char* start = output;
 	output = strchr(output, '\n');
 	if (output == 0)
@@ -2211,6 +2178,7 @@ void GdbDriver::parseSharedLibs(const char* output, QStrList& shlibs)
 	shlibs.append(shlibName);
 	TRACE("found shared lib " + shlibName);
     }
+    return shlibs;
 }
 
 bool GdbDriver::parseFindType(const char* output, QString& type)
@@ -2233,18 +2201,19 @@ bool GdbDriver::parseFindType(const char* output, QString& type)
     return true;
 }
 
-void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
+std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 {
+    std::list<RegisterInfo> regs;
     if (strncmp(output, "The program has no registers now", 32) == 0) {
-	return;
+	return regs;
     }
 
-    QString regName;
     QString value;
 
     // parse register values
     while (*output != '\0')
     {
+	RegisterInfo reg;
 	// skip space at the start of the line
 	while (isspace(*output))
 	    output++;
@@ -2255,14 +2224,11 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 	    output++;
 	if (*output == '\0')
 	    break;
-	regName = QString::fromLatin1(start, output-start);
+	reg.regName = QString::fromLatin1(start, output-start);
 
 	// skip space
 	while (isspace(*output))
 	    output++;
-
-	RegisterInfo* reg = new RegisterInfo;
-	reg->regName = regName;
 
 	/*
 	 * If we find a brace now, this is a vector register. We look for
@@ -2285,7 +2251,7 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 	    if (*output == '{') {
 		// another set of vector follows
 		// what we have so far is the raw value
-		reg->rawValue = value;
+		reg.rawValue = value;
 
 		start = output;
 		skipNested(output, '{', '}');
@@ -2307,7 +2273,7 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 			while (*end && (*end!='}') && (*end!=',') && (*end!='\n'))
 			    end++;
 			QString rawValue = QString::fromLatin1(cur, end-cur).simplifyWhiteSpace();
-			reg->rawValue = rawValue;
+			reg.rawValue = rawValue;
 
 			if (rawValue.left(2)=="0x") {
 			    // ok we have a raw value, now get it's type
@@ -2318,7 +2284,7 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 			    while (*cur!='{' && *cur!=' ')
 				cur--;
 			    cur++;
-			    reg->type=QString::fromLatin1(cur, end-cur);
+			    reg.type = QString::fromLatin1(cur, end-cur);
 			}
 
 			// end while loop 
@@ -2331,10 +2297,10 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 		// get rid of the braces at the begining and the end
 		value.remove(0, 1);
 		if (value[value.length()-1] == '}') {
-		    value = value.left(value.length()-1);
+		    value.truncate(value.length()-1);
 		}
 	    }
-	    reg->cookedValue = value;
+	    reg.cookedValue = value;
 	}
 	else
 	{
@@ -2354,10 +2320,10 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 	    int pos = value.find(" (raw ");
 	    if (pos >= 0)
 	    {
-		reg->cookedValue = value.left(pos);
-		reg->rawValue = value.mid(pos+6);
-		if (reg->rawValue.right(1) == ")")	// remove closing bracket
-		    reg->rawValue.truncate(reg->rawValue.length()-1);
+		reg.cookedValue = value.left(pos);
+		reg.rawValue = value.mid(pos+6);
+		if (reg.rawValue.right(1) == ")")	// remove closing bracket
+		    reg.rawValue.truncate(reg.rawValue.length()-1);
 	    }
 	    else
 	    {
@@ -2368,19 +2334,20 @@ void GdbDriver::parseRegisters(const char* output, QList<RegisterInfo>& regs)
 		*/
 		int pos = value.find(' ');
 		if (pos < 0) {
-		    reg->rawValue = value;
-		    reg->cookedValue = QString();
+		    reg.rawValue = value;
+		    reg.cookedValue = QString();
 		} else {
-		    reg->rawValue = value.left(pos);
-		    reg->cookedValue = value.mid(pos+1);
+		    reg.rawValue = value.left(pos);
+		    reg.cookedValue = value.mid(pos+1);
 		}
 	    }
 	}
 	if (*output != '\0')
 	    output++;			/* skip '\n' */
 
-	regs.append(reg);
+	regs.push_back(reg);
     }
+    return regs;
 }
 
 bool GdbDriver::parseInfoLine(const char* output, QString& addrFrom, QString& addrTo)
@@ -2411,22 +2378,22 @@ bool GdbDriver::parseInfoLine(const char* output, QString& addrFrom, QString& ad
     return true;
 }
 
-void GdbDriver::parseDisassemble(const char* output, QList<DisassembledCode>& code)
+std::list<DisassembledCode> GdbDriver::parseDisassemble(const char* output)
 {
-    code.clear();
+    std::list<DisassembledCode> code;
 
     if (strncmp(output, "Dump of assembler", 17) != 0) {
 	// error message?
 	DisassembledCode c;
 	c.code = output;
-	code.append(new DisassembledCode(c));
-	return;
+	code.push_back(c);
+	return code;
     }
 
     // remove first line
     const char* p = strchr(output, '\n');
     if (p == 0)
-	return;				/* not a regular output */
+	return code;			/* not a regular output */
 
     p++;
 
@@ -2435,16 +2402,15 @@ void GdbDriver::parseDisassemble(const char* output, QList<DisassembledCode>& co
     if (end == 0)
 	end = p + strlen(p);
 
-    DbgAddr address;
-
     // remove function offsets from the lines
     while (p != end)
     {
+	DisassembledCode c;
 	const char* start = p;
 	// address
 	while (p != end && !isspace(*p))
 	    p++;
-	address = QString::fromLatin1(start, p-start);
+	c.address = QString::fromLatin1(start, p-start);
 
 	// function name (enclosed in '<>', followed by ':')
 	while (p != end && *p != '<')
@@ -2465,14 +2431,13 @@ void GdbDriver::parseDisassemble(const char* output, QList<DisassembledCode>& co
 	if (p != end)			/* include '\n' */
 	    p++;
 
-	DisassembledCode* c = new DisassembledCode;
-	c->address = address;
-	c->code = QString::fromLatin1(start, p-start);
-	code.append(c);
+	c.code = QString::fromLatin1(start, p-start);
+	code.push_back(c);
     }
+    return code;
 }
 
-QString GdbDriver::parseMemoryDump(const char* output, QList<MemoryDump>& memdump)
+QString GdbDriver::parseMemoryDump(const char* output, std::list<MemoryDump>& memdump)
 {
     if (isErrorExpr(output)) {
 	// error; strip space
@@ -2481,15 +2446,15 @@ QString GdbDriver::parseMemoryDump(const char* output, QList<MemoryDump>& memdum
     }
 
     const char* p = output;		/* save typing */
-    DbgAddr addr;
-    QString dump;
 
     // the address
     while (*p != 0) {
+	MemoryDump md;
+
 	const char* start = p;
 	while (*p != '\0' && *p != ':' && !isspace(*p))
 	    p++;
-	addr = QString::fromLatin1(start, p-start);
+	md.address = QString::fromLatin1(start, p-start);
 	if (*p != ':') {
 	    // parse function offset
 	    while (isspace(*p))
@@ -2497,7 +2462,7 @@ QString GdbDriver::parseMemoryDump(const char* output, QList<MemoryDump>& memdum
 	    start = p;
 	    while (*p != '\0' && !(*p == ':' && isspace(p[1])))
 		p++;
-	    addr.fnoffs = QString::fromLatin1(start, p-start);
+	    md.address.fnoffs = QString::fromLatin1(start, p-start);
 	}
 	if (*p == ':')
 	    p++;
@@ -2507,16 +2472,13 @@ QString GdbDriver::parseMemoryDump(const char* output, QList<MemoryDump>& memdum
 	// everything to the end of the line is the memory dump
 	const char* end = strchr(p, '\n');
 	if (end != 0) {
-	    dump = QString::fromLatin1(p, end-p);
+	    md.dump = QString::fromLatin1(p, end-p);
 	    p = end+1;
 	} else {
-	    dump = QString::fromLatin1(p, strlen(p));
+	    md.dump = QString::fromLatin1(p, strlen(p));
 	    p += strlen(p);
 	}
-	MemoryDump* md = new MemoryDump;
-	md->address = addr;
-	md->dump = dump;
-	memdump.append(md);
+	memdump.push_back(md);
     }
     
     return QString();

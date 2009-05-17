@@ -52,26 +52,26 @@ public:
     virtual void interruptInferior();
     virtual void setPrintQStringDataCmd(const char* cmd);
     virtual ExprValue* parseQCharArray(const char* output, bool wantErrorValue, bool qt3like);
-    virtual void parseBackTrace(const char* output, QList<StackFrame>& stack);
+    virtual void parseBackTrace(const char* output, std::list<StackFrame>& stack);
     virtual bool parseFrameChange(const char* output, int& frameNo,
 				  QString& file, int& lineNo, DbgAddr& address);
-    virtual bool parseBreakList(const char* output, QList<Breakpoint>& brks);
-    virtual bool parseThreadList(const char* output, QList<ThreadInfo>& threads);
+    virtual bool parseBreakList(const char* output, std::list<Breakpoint>& brks);
+    virtual std::list<ThreadInfo> parseThreadList(const char* output);
     virtual bool parseBreakpoint(const char* output, int& id,
 				 QString& file, int& lineNo, QString& address);
-    virtual void parseLocals(const char* output, QList<ExprValue>& newVars);
+    virtual void parseLocals(const char* output, std::list<ExprValue*>& newVars);
     virtual ExprValue* parsePrintExpr(const char* output, bool wantErrorValue);
     virtual bool parseChangeWD(const char* output, QString& message);
     virtual bool parseChangeExecutable(const char* output, QString& message);
     virtual bool parseCoreFile(const char* output);
     virtual uint parseProgramStopped(const char* output, QString& message);
-    virtual void parseSharedLibs(const char* output, QStrList& shlibs);
+    virtual QStringList parseSharedLibs(const char* output);
     virtual bool parseFindType(const char* output, QString& type);
-    virtual void parseRegisters(const char* output, QList<RegisterInfo>& regs);
+    virtual std::list<RegisterInfo> parseRegisters(const char* output);
     virtual bool parseInfoLine(const char* output,
 			       QString& addrFrom, QString& addrTo);
-    virtual void parseDisassemble(const char* output, QList<DisassembledCode>& code);
-    virtual QString parseMemoryDump(const char* output, QList<MemoryDump>& memdump);
+    virtual std::list<DisassembledCode> parseDisassemble(const char* output);
+    virtual QString parseMemoryDump(const char* output, std::list<MemoryDump>& memdump);
     virtual QString parseSetVariable(const char* output);
     virtual QString editableValue(VarTree* value);
 protected:

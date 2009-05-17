@@ -48,7 +48,7 @@ public:
     bool isRowDisassCode(int row);
 
     /** lineNo is zero-based */
-    void disassembled(int lineNo, const QList<DisassembledCode>& disass);
+    void disassembled(int lineNo, const std::list<DisassembledCode>& disass);
 
     void activeLine(int& lineNo, DbgAddr& address);
 

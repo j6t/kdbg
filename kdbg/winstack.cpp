@@ -68,8 +68,8 @@ void WinStack::contextMenuEvent(QContextMenuEvent* e)
 
 void WinStack::reloadAllFiles()
 {
-    for (int i = 0; i < m_fileList.size(); i++) {
-	m_fileList[i]->reloadFile();
+    for (SourceWindowList::iterator i = m_fileList.begin(); i != m_fileList.end(); ++i) {
+	(*i)->reloadFile();
     }
 }
 
@@ -109,9 +109,9 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 {
     // check whether the file is already open
     SourceWindow* fw = 0;
-    for (int i = 0; i < m_fileList.size(); i++) {
-	if (m_fileList[i]->fileName() == pathName) {
-	    fw = m_fileList[i];
+    for (SourceWindowList::iterator i = m_fileList.begin(); i != m_fileList.end(); ++i) {
+	if ((*i)->fileName() == pathName) {
+	    fw = *i;
 	    break;
 	}
     }
@@ -126,7 +126,7 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 	    return false;
 	}
 
-	m_fileList.insertAt(0, fw);
+	m_fileList.insert(m_fileList.begin(), fw);
 	connect(fw, SIGNAL(clickedLeft(const QString&,int,const DbgAddr&,bool)),
 		SIGNAL(toggleBreak(const QString&,int,const DbgAddr&,bool)));
 	connect(fw, SIGNAL(clickedMid(const QString&,int,const DbgAddr&)),
@@ -156,20 +156,18 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 bool WinStack::activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& address)
 {
     // lookup fw
-    int index = m_fileList.size()-1;
-    while (index >= 0 && m_fileList[index] != fw)
-	--index;
-    ASSERT(index >= 0);
-    if (index < 0) {
+    SourceWindowList::iterator it = std::find(m_fileList.begin(), m_fileList.end(), fw);
+    ASSERT(it != m_fileList.end());
+    if (it == m_fileList.end()) {
 	return false;
     }
     /*
      * If the file is not in the list of those that would appear in the
      * window menu, move it to the first position.
      */
-    if (index >= 9) {
-	m_fileList.removeAt(index);
-	m_fileList.insertAt(0, fw);
+    if (std::distance(m_fileList.begin(), it) >= 9) {
+	m_fileList.erase(it);
+	m_fileList.insert(m_fileList.begin(), fw);
 	changeWindowMenu();
     }
 
@@ -221,7 +219,7 @@ void WinStack::changeWindowMenu()
 	return;
     }
 
-    const int N = 9;
+    const uint N = 9;
     // Delete entries at most the N window entries that we insert below.
     // When we get here if the More entry was selected, we must make sure
     // that we don't delete it (or we crash).
@@ -234,7 +232,7 @@ void WinStack::changeWindowMenu()
 
     // insert current windows
     QString text;
-    for (int i = 0; i < m_fileList.size() && i < N; i++) {
+    for (uint i = 0; i < m_fileList.size() && i < N; i++) {
 	text.sprintf("&%d ", i+1);
 	text += m_fileList[i]->fileName();
 	m_windowMenu->insertItem(text, WindowMore+i+1, i);
@@ -247,8 +245,8 @@ void WinStack::changeWindowMenu()
 
 void WinStack::updateLineItems(const KDebugger* dbg)
 {
-    for (int i = 0; i < m_fileList.size(); i++) {
-	m_fileList[i]->updateLineItems(dbg);
+    for (SourceWindowList::iterator i = m_fileList.begin(); i != m_fileList.end(); ++i) {
+	(*i)->updateLineItems(dbg);
     }
 }
 
@@ -272,9 +270,10 @@ void WinStack::setPC(bool set, const QString& fileName, int lineNo,
     TRACE((set ? "set PC: " : "clear PC: ") + fileName +
 	  QString().sprintf(":%d#%d ", lineNo, frameNo) + address.asString());
     // find file
-    for (int i = 0; i < m_fileList.size(); i++) {
-	if (m_fileList[i]->fileNameMatches(fileName)) {
-	    m_fileList[i]->setPC(set, lineNo, address, frameNo);
+    for (SourceWindowList::iterator i = m_fileList.begin(); i != m_fileList.end(); ++i)
+    {
+	if ((*i)->fileNameMatches(fileName)) {
+	    (*i)->setPC(set, lineNo, address, frameNo);
 	    break;
 	}
     }
@@ -336,13 +335,14 @@ void WinStack::slotShowValueTip(const QString& tipText)
 }
 
 void WinStack::slotDisassembled(const QString& fileName, int lineNo,
-				const QList<DisassembledCode>& disass)
+				const std::list<DisassembledCode>& disass)
 {
     // lookup the file
     SourceWindow* fw = 0;
-    for (int i = 0; i < m_fileList.size(); i++) {
-	if (m_fileList[i]->fileNameMatches(fileName)) {
-	    fw = m_fileList[i];
+    for (SourceWindowList::iterator i = m_fileList.begin(); i != m_fileList.end(); ++i)
+    {
+	if ((*i)->fileNameMatches(fileName)) {
+	    fw = (*i);
 	    break;
 	}
     }
@@ -513,11 +513,11 @@ void WinStack::selectWindow(int id)
     if (id == 0) {
 	// more windows selected: show windows in a list
 	MoreWindowsDialog dlg(this);
-	for (int i = 0; i < m_fileList.size(); i++)
+	for (SourceWindowList::iterator i = m_fileList.begin(); i != m_fileList.end(); ++i)
 	{
-	    dlg.insertString(m_fileList[i]->fileName());
-	    if (m_activeWindow == m_fileList[i]) {
-		index = i;
+	    dlg.insertString((*i)->fileName());
+	    if (m_activeWindow == *i) {
+		index = std::distance(m_fileList.begin(), i);
 	    }
 	}
 	dlg.setListIndex(index);

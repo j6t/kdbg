@@ -9,6 +9,7 @@
 #include <kglobal.h>
 #include <kstandarddirs.h>
 #include <ksimpleconfig.h>
+#include <list>
 #include <algorithm>
 #include <iterator>
 #ifdef HAVE_CONFIG_H
@@ -18,7 +19,7 @@
 #include "mydebug.h"
 
 //! the TypeTables of all known libraries
-static QList<TypeTable> typeTables;
+static std::list<TypeTable> typeTables;
 bool typeTablesInited = false;
 
 
@@ -47,12 +48,9 @@ void TypeTable::loadTypeTables()
 	return;
     }
 
-    QString fileName;
     for (QValueListConstIterator<QString> p = files.begin(); p != files.end(); ++p) {
-	fileName = *p;
-	TypeTable* newTable = new TypeTable;
-	newTable->loadFromFile(fileName);
-	typeTables.append(newTable);
+	typeTables.push_back(TypeTable());
+	typeTables.back().loadFromFile(*p);
     }
 }
 
@@ -390,36 +388,17 @@ void ProgramTypeTable::registerAlias(const QString& name, TypeInfo* type)
     m_aliasDict.insert(name, type);
 }
 
-void ProgramTypeTable::loadLibTypes(const QStrList& libs)
+void ProgramTypeTable::loadLibTypes(const QStringList& libs)
 {
-    QStrListIterator it = libs;
-
-    /*
-     * We use a copy of the list of known libraries, from which we delete
-     * those libs that we already have added. This way we avoid to load a
-     * library twice.
-     */
-    QList<TypeTable> allTables = typeTables;	/* shallow copy! */
-    allTables.setAutoDelete(false);	/* important! */
-
-    for (; it && allTables.count() > 0; ++it)
+    for (QStringList::const_iterator it = libs.begin(); it != libs.end(); ++it)
     {
 	// look up the library
-    repeatLookup:;
-	for (TypeTable* t = allTables.first(); t != 0; t = allTables.next())
+	for (std::list<TypeTable>::iterator t = typeTables.begin(); t != typeTables.end(); ++t)
 	{
-	    if (t->matchFileName(it))
+	    if (t->matchFileName(*it))
 	    {
-		TRACE("adding types for " + QString(it));
-		loadTypeTable(t);
-		// remove the table
-		allTables.remove();
-		/*
-		 * continue the search (due to remove's unpredictable
-		 * behavior of setting the current item we simply go
-		 * through the whole list again)
-		 */
-		goto repeatLookup;
+		TRACE("adding types for " + *it);
+		loadTypeTable(&*t);
 	    }
 	}
     }

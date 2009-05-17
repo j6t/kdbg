@@ -111,8 +111,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     // disassembling
     connect(m_filesWindow, SIGNAL(disassemble(const QString&, int)),
 	    m_debugger, SLOT(slotDisassemble(const QString&, int)));
-    connect(m_debugger, SIGNAL(disassembled(const QString&,int,const QList<DisassembledCode>&)),
-	    m_filesWindow, SLOT(slotDisassembled(const QString&,int,const QList<DisassembledCode>&)));
+    connect(m_debugger, SIGNAL(disassembled(const QString&,int,const std::list<DisassembledCode>&)),
+	    m_filesWindow, SLOT(slotDisassembled(const QString&,int,const std::list<DisassembledCode>&)));
     connect(m_filesWindow, SIGNAL(moveProgramCounter(const QString&,int,const DbgAddr&)),
 	    m_debugger, SLOT(setProgramCounter(const QString&,int,const DbgAddr&)));
     // program stopped
@@ -131,19 +131,19 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(m_debugger, SIGNAL(breakpointsChanged()), m_bpTable, SLOT(updateBreakList()));
     connect(m_debugger, SIGNAL(breakpointsChanged()), m_bpTable, SLOT(updateUI()));
 
-    connect(m_debugger, SIGNAL(registersChanged(QList<RegisterInfo>&)),
-	    m_registers, SLOT(updateRegisters(QList<RegisterInfo>&)));
+    connect(m_debugger, SIGNAL(registersChanged(const std::list<RegisterInfo>&)),
+	    m_registers, SLOT(updateRegisters(const std::list<RegisterInfo>&)));
 
-    connect(m_debugger, SIGNAL(memoryDumpChanged(const QString&, QList<MemoryDump>&)),
-	    m_memoryWindow, SLOT(slotNewMemoryDump(const QString&, QList<MemoryDump>&)));
+    connect(m_debugger, SIGNAL(memoryDumpChanged(const QString&, const std::list<MemoryDump>&)),
+	    m_memoryWindow, SLOT(slotNewMemoryDump(const QString&, const std::list<MemoryDump>&)));
     connect(m_debugger, SIGNAL(saveProgramSpecific(KConfigBase*)),
 	    m_memoryWindow, SLOT(saveProgramSpecific(KConfigBase*)));
     connect(m_debugger, SIGNAL(restoreProgramSpecific(KConfigBase*)),
 	    m_memoryWindow, SLOT(restoreProgramSpecific(KConfigBase*)));
 
     // thread window
-    connect(m_debugger, SIGNAL(threadsChanged(QList<ThreadInfo>&)),
-	    m_threads, SLOT(updateThreads(QList<ThreadInfo>&)));
+    connect(m_debugger, SIGNAL(threadsChanged(const std::list<ThreadInfo>&)),
+	    m_threads, SLOT(updateThreads(const std::list<ThreadInfo>&)));
     connect(m_threads, SIGNAL(setThread(int)),
 	    m_debugger, SLOT(setThread(int)));
 

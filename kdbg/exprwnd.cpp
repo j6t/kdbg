@@ -7,7 +7,7 @@
 #include "exprwnd.h"
 #include "exprwnd.moc"
 #include "typetable.h"
-#include <qstrlist.h>
+#include <qstringlist.h>
 #include <qpainter.h>
 #include <qscrollbar.h>
 #include <kapplication.h>
@@ -327,13 +327,14 @@ ExprWnd::~ExprWnd()
 {
 }
 
-void ExprWnd::exprList(QStrList& exprs)
+QStringList ExprWnd::exprList() const
 {
-    // ASSERT(exprs does deep-copies)
+    QStringList exprs;
     VarTree* item;
     for (item = firstChild(); item != 0; item = item->nextSibling()) {
 	exprs.append(item->getText());
     }
+    return exprs;
 }
 
 VarTree* ExprWnd::insertExpr(ExprValue* expr, ProgramTypeTable& typeTable)
@@ -442,7 +443,7 @@ void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	    // if newValues is a dummy, we have already updated this pointer
 	    newValues->m_varKind != VarTree::VKdummy)
 	{
-	    m_updatePtrs.append(display);
+	    m_updatePtrs.push_back(display);
 	}
 	/*
 	 * If the visible sub-tree has children, but newValues doesn't, we
@@ -500,7 +501,7 @@ void ExprWnd::updateSingleExpr(VarTree* display, ExprValue* newValue)
 	}
 	else
 	    display->m_partialValue = display->m_type->m_displayString[0];
-	m_updateStruct.append(display);
+	m_updateStruct.push_back(display);
     }
 
     if (display->updateValue(newValue->m_value)) {
@@ -559,13 +560,13 @@ void ExprWnd::checkUnknownType(VarTree* var)
 	if (!var->isWcharT())
 	{
 	    /* this struct node doesn't have a type yet: register it */
-	    m_updateType.append(var);
+	    m_updateType.push_back(var);
 	}
 	else
 	{
 	    var->m_type = TypeInfo::wchartType();
 	    var->m_partialValue = "L";
-	    m_updateStruct.append(var);
+	    m_updateStruct.push_back(var);
 	}
     }
     // add pointer pixmap to pointers
@@ -645,33 +646,18 @@ void ExprWnd::unhookSubtree(VarTree* subTree)
     emit removingItem(subTree);
 }
 
-void ExprWnd::unhookSubtree(QList<VarTree>& list, VarTree* subTree)
+void ExprWnd::unhookSubtree(std::list<VarTree*>& list, VarTree* subTree)
 {
     if (subTree == 0)
 	return;
 
-    VarTree* checkItem = list.first();
-    while (checkItem != 0) {
-	if (!subTree->isAncestorEq(checkItem)) {
-	    // checkItem is not an item from subTree
-	    // advance
-	    checkItem = list.next();
-	} else {
+    std::list<VarTree*>::iterator i = list.begin();
+    while (i != list.end()) {
+	VarTree* checkItem = *i;
+	++i;
+	if (subTree->isAncestorEq(checkItem)) {
 	    // checkItem is an item from subTree
-	    /* 
-	     * If checkItem is the last item in the list, we need a special
-	     * treatment, because remove()ing it steps the current item of
-	     * the list in the "wrong" direction.
-	     */
-	    if (checkItem == list.getLast()) { // does not set current item
-		list.remove();
-		/* we deleted the last element, so we've finished */
-		checkItem = 0;
-	    } else {
-		list.remove();
-		/* remove() advanced already */
-		checkItem = list.current();
-	    }
+	    list.erase(i);
 	}
     }
 }
@@ -685,27 +671,30 @@ void ExprWnd::clearPendingUpdates()
 
 VarTree* ExprWnd::nextUpdatePtr()
 {
-    VarTree* ptr = m_updatePtrs.first();
-    if (ptr != 0) {
-	m_updatePtrs.remove();
+    VarTree* ptr = 0;
+    if (!m_updatePtrs.empty()) {
+	ptr = m_updatePtrs.front();
+	m_updatePtrs.pop_front();
     }
     return ptr;
 }
 
 VarTree* ExprWnd::nextUpdateType()
 {
-    VarTree* ptr = m_updateType.first();
-    if (ptr != 0) {
-	m_updateType.remove();
+    VarTree* ptr = 0;
+    if (!m_updateType.empty()) {
+	ptr = m_updateType.front();
+	m_updateType.pop_front();
     }
     return ptr;
 }
 
 VarTree* ExprWnd::nextUpdateStruct()
 {
-    VarTree* ptr = m_updateStruct.first();
-    if (ptr != 0) {
-	m_updateStruct.remove();
+    VarTree* ptr = 0;
+    if (!m_updateStruct.empty()) {
+	ptr = m_updateStruct.front();
+	m_updateStruct.pop_front();
     }
     return ptr;
 }

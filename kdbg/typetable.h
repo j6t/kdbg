@@ -9,7 +9,6 @@
 #include <qregexp.h>
 #include <qstringlist.h>
 #include <map>
-#include <qstrlist.h>
 
 class KConfigBase;
 
@@ -142,7 +141,7 @@ public:
     /**
      * Load types belonging to the specified libraries.
      */
-    void loadLibTypes(const QStrList& libs);
+    void loadLibTypes(const QStringList& libs);
 
     /**
      * Load types belonging to the specified type table

@@ -11,7 +11,6 @@
 #include "exprwnd.h"
 #include "pgmsettings.h"
 #include "programconfig.h"
-#include "valarray.h"
 #include <qregexp.h>
 #include <qfileinfo.h>
 #include <qlistbox.h>
@@ -47,7 +46,6 @@ KDebugger::KDebugger(QWidget* parent,
 	m_btWindow(*backtrace)
 {
     m_envVars.setAutoDelete(true);
-    m_brkpts.setAutoDelete(true);
 
     connect(&m_localVariables, SIGNAL(expanded(QListViewItem*)),
 	    SLOT(slotExpanding(QListViewItem*)));
@@ -347,8 +345,8 @@ bool KDebugger::setBreakpoint(QString file, int lineNo,
 	return false;
     }
 
-    Breakpoint* bp = breakpointByFilePos(file, lineNo, address);
-    if (bp == 0)
+    BrkptIterator bp = breakpointByFilePos(file, lineNo, address);
+    if (bp == m_brkpts.end())
     {
 	/*
 	 * No such breakpoint, so set a new one. If we have an address, we
@@ -385,6 +383,12 @@ bool KDebugger::setBreakpoint(QString file, int lineNo,
 }
 
 void KDebugger::setBreakpoint(Breakpoint* bp, bool queueOnly)
+{
+    CmdQueueItem* cmd = executeBreakpoint(bp, queueOnly);
+    cmd->m_brkpt = bp;	// used in newBreakpoint()
+}
+
+CmdQueueItem* KDebugger::executeBreakpoint(const Breakpoint* bp, bool queueOnly)
 {
     CmdQueueItem* cmd;
     if (!bp->text.isEmpty())
@@ -425,18 +429,21 @@ void KDebugger::setBreakpoint(Breakpoint* bp, bool queueOnly)
 				  bp->address.asString());
 	}
     }
-    cmd->m_brkpt = bp;	// used in newBreakpoint()
+    return cmd;
 }
 
 bool KDebugger::enableDisableBreakpoint(QString file, int lineNo,
 					const DbgAddr& address)
 {
-    Breakpoint* bp = breakpointByFilePos(file, lineNo, address);
-    return bp == 0 || enableDisableBreakpoint(bp);
+    BrkptIterator bp = breakpointByFilePos(file, lineNo, address);
+    return enableDisableBreakpoint(bp);
 }
 
-bool KDebugger::enableDisableBreakpoint(Breakpoint* bp)
+bool KDebugger::enableDisableBreakpoint(BrkptIterator bp)
 {
+    if (bp == m_brkpts.end())
+	return false;
+
     /*
      * Toggle enabled/disabled state.
      * 
@@ -455,10 +462,13 @@ bool KDebugger::enableDisableBreakpoint(Breakpoint* bp)
     return true;
 }
 
-bool KDebugger::conditionalBreakpoint(Breakpoint* bp,
+bool KDebugger::conditionalBreakpoint(BrkptIterator bp,
 				      const QString& condition,
 				      int ignoreCount)
 {
+    if (bp == m_brkpts.end())
+	return false;
+
     /*
      * Change the condition and ignore count.
      *
@@ -495,8 +505,11 @@ bool KDebugger::conditionalBreakpoint(Breakpoint* bp,
     return true;
 }
 
-bool KDebugger::deleteBreakpoint(Breakpoint* bp)
+bool KDebugger::deleteBreakpoint(BrkptIterator bp)
 {
+    if (bp == m_brkpts.end())
+	return false;
+
     /*
      * Remove the breakpoint.
      *
@@ -509,10 +522,7 @@ bool KDebugger::deleteBreakpoint(Breakpoint* bp)
 	}
 	m_d->executeCmd(DCdelete, bp->id);
     } else {
-	// move the last entry to bp's slot and shorten the list
-	int i = m_brkpts.findRef(bp);
-	m_brkpts.insert(i, m_brkpts.take(m_brkpts.size()-1));
-	m_brkpts.resize(m_brkpts.size()-1);
+	m_brkpts.erase(bp);
 	emit breakpointsChanged();
     }
     return false;
@@ -850,8 +860,8 @@ void KDebugger::saveBreakpoints(ProgramConfig* config)
 {
     QString groupName;
     int i = 0;
-    for (uint j = 0; j < m_brkpts.size(); j++) {
-	Breakpoint* bp = m_brkpts[j];
+    for (BrkptIterator bp = m_brkpts.begin(); bp != m_brkpts.end(); ++bp)
+    {
 	if (bp->type == Breakpoint::watchpoint)
 	    continue;			/* don't save watchpoints */
 	groupName.sprintf(BPGroup, i++);
@@ -1147,12 +1157,13 @@ void KDebugger::handleRunCommands(const char* output)
     /* 
      * Try to set any orphaned breakpoints now.
      */
-    for (int i = m_brkpts.size()-1; i >= 0; i--) {
-	if (m_brkpts[i]->isOrphaned()) {
-	    TRACE("re-trying brkpt loc: "+m_brkpts[i]->location+
-		  " file: "+m_brkpts[i]->fileName+
-		  QString().sprintf(" line: %d", m_brkpts[i]->lineNo));
-	    setBreakpoint(m_brkpts[i], true);
+    for (BrkptIterator bp = m_brkpts.begin(); bp != m_brkpts.end(); ++bp)
+    {
+	if (bp->isOrphaned()) {
+	    TRACE(QString("re-trying brkpt loc: %2 file: %3 line: %1")
+		    .arg(bp->lineNo).arg(bp->location, bp->fileName));
+	    CmdQueueItem* cmd = executeBreakpoint(&*bp, true);
+	    cmd->m_existingBrkpt = bp->id;	// used in newBreakpoint()
 	    flags |= DebuggerDriver::SFrefreshBreak;
 	}
     }
@@ -1296,13 +1307,12 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
 void KDebugger::handleLocals(const char* output)
 {
     // retrieve old list of local variables
-    QStrList oldVars;
-    m_localVariables.exprList(oldVars);
+    QStringList oldVars = m_localVariables.exprList();
 
     /*
      *  Get local variables.
      */
-    QList<ExprValue> newVars;
+    std::list<ExprValue*> newVars;
     parseLocals(output, newVars);
 
     /*
@@ -1314,47 +1324,48 @@ void KDebugger::handleLocals(const char* output)
     /*
      * Match old variables against new ones.
      */
-    for (const char* n = oldVars.first(); n != 0; n = oldVars.next()) {
+    for (QStringList::ConstIterator n = oldVars.begin(); n != oldVars.end(); ++n) {
 	// lookup this variable in the list of new variables
-	ExprValue* v = newVars.first();
-	while (v != 0 && v->m_name != n) {
-	    v = newVars.next();
-	}
-	if (v == 0) {
+	std::list<ExprValue*>::iterator v = newVars.begin();
+	while (v != newVars.end() && (*v)->m_name != *n)
+	    ++v;
+	if (v == newVars.end()) {
 	    // old variable not in the new variables
-	    TRACE(QString("old var deleted: ") + n);
-	    VarTree* v = m_localVariables.topLevelExprByName(n);
+	    TRACE("old var deleted: " + *n);
+	    VarTree* v = m_localVariables.topLevelExprByName(*n);
 	    if (v != 0) {
 		m_localVariables.removeExpr(v);
 	    }
 	} else {
 	    // variable in both old and new lists: update
-	    TRACE(QString("update var: ") + n);
-	    m_localVariables.updateExpr(newVars.current(), *m_typeTable);
+	    TRACE("update var: " + *n);
+	    m_localVariables.updateExpr(*v, *m_typeTable);
 	    // remove the new variable from the list
-	    newVars.remove();
-	    delete v;
+	    delete *v;
+	    newVars.erase(v);
 	}
     }
     // insert all remaining new variables
-    while (!newVars.isEmpty())
+    while (!newVars.empty())
     {
-	ExprValue* v = newVars.take(0);
+	ExprValue* v = newVars.front();
 	TRACE("new var: " + v->m_name);
 	m_localVariables.insertExpr(v, *m_typeTable);
 	delete v;
+	newVars.pop_front();
     }
 }
 
-void KDebugger::parseLocals(const char* output, QList<ExprValue>& newVars)
+void KDebugger::parseLocals(const char* output, std::list<ExprValue*>& newVars)
 {
-    QList<ExprValue> vars;
+    std::list<ExprValue*> vars;
     m_d->parseLocals(output, vars);
 
     QString origName;			/* used in renaming variables */
-    while (vars.count() > 0)
+    while (!vars.empty())
     {
-	ExprValue* variable = vars.take(0);
+	ExprValue* variable = vars.front();
+	vars.pop_front();
 	/*
 	 * When gdb prints local variables, those from the innermost block
 	 * come first. We run through the list of already parsed variables
@@ -1366,15 +1377,15 @@ void KDebugger::parseLocals(const char* output, QList<ExprValue>& newVars)
 	 */
 	int block = 0;
 	origName = variable->m_name;
-	for (ExprValue* v = newVars.first(); v != 0; v = newVars.next()) {
-	    if (variable->m_name == v->m_name) {
+	for (std::list<ExprValue*>::iterator v = newVars.begin(); v != newVars.end(); ++v) {
+	    if (variable->m_name == (*v)->m_name) {
 		// we found a duplicate, change name
 		block++;
 		QString newName = origName + " (" + QString().setNum(block) + ")";
 		variable->m_name = newName;
 	    }
 	}
-	newVars.append(variable);
+	newVars.push_back(variable);
     }
 }
 
@@ -1444,16 +1455,16 @@ void KDebugger::handleBacktrace(const char* output)
 
     m_btWindow.clear();
 
-    QList<StackFrame> stack;
+    std::list<StackFrame> stack;
     m_d->parseBackTrace(output, stack);
 
-    if (stack.count() > 0) {
-	StackFrame* frm = stack.take(0);
+    if (!stack.empty()) {
+	std::list<StackFrame>::iterator frm = stack.begin();
 	// first frame must set PC
 	// note: frm->lineNo is zero-based
 	emit updatePC(frm->fileName, frm->lineNo, frm->address, frm->frameNo);
 
-	do {
+	for (; frm != stack.end(); ++frm) {
 	    QString func;
 	    if (frm->var != 0)
 		func = frm->var->m_name;
@@ -1462,9 +1473,7 @@ void KDebugger::handleBacktrace(const char* output)
 	    m_btWindow.insertItem(func);
 	    TRACE("frame " + func + " (" + frm->fileName + ":" +
 		  QString().setNum(frm->lineNo+1) + ")");
-	    delete frm;
 	}
-	while ((frm = stack.take()) != 0);
     }
 
     m_btWindow.setAutoUpdate(true);
@@ -1778,11 +1787,8 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 
 void KDebugger::handleSharedLibs(const char* output)
 {
-    // delete all known libraries
-    m_sharedLibs.clear();
-
     // parse the table of shared libraries
-    m_d->parseSharedLibs(output, m_sharedLibs);
+    m_sharedLibs = m_d->parseSharedLibs(output);
     m_sharedLibsListed = true;
 
     // get type libraries
@@ -1849,13 +1855,7 @@ void KDebugger::slotDeleteWatch()
 
 void KDebugger::handleRegisters(const char* output)
 {
-    QList<RegisterInfo> regs;
-    m_d->parseRegisters(output, regs);
-
-    emit registersChanged(regs);
-
-    // delete them all
-    regs.setAutoDelete(true);
+    emit registersChanged(m_d->parseRegisters(output));
 }
 
 /*
@@ -1869,18 +1869,20 @@ void KDebugger::handleRegisters(const char* output)
  */
 void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 {
-    Breakpoint* bp = cmd->m_brkpt;
-    assert(bp != 0);
-    if (bp == 0)
-	return;
-
-    // if this is a new breakpoint, put it in the list
-    bool isNew = !m_brkpts.contains(bp);
-    if (isNew) {
-	assert(bp->id == 0);
-	int n = m_brkpts.size();
-	m_brkpts.resize(n+1);
-	m_brkpts.insert(n, bp);
+    BrkptIterator bp;
+    if (cmd->m_brkpt != 0) {
+	// a new breakpoint, put it in the list
+	assert(cmd->m_brkpt->id == 0);
+	m_brkpts.push_back(*cmd->m_brkpt);
+	delete cmd->m_brkpt;
+	bp = m_brkpts.end();
+	--bp;
+    } else {
+	// an existing breakpoint was retried
+	assert(cmd->m_existingBrkpt != 0);
+	bp = breakpointById(cmd->m_existingBrkpt);
+	if (bp == m_brkpts.end())
+	    return;
     }
 
     // parse the output to determine success or failure
@@ -1896,16 +1898,14 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 	 * of all breakpoints (that are already in the list) to get the new
 	 * id.
 	 */
-	if (isNew)
+	if (bp->id == 0)
 	{
-	    assert(bp->id == 0);
-	    for (int i = m_brkpts.size()-2; i >= 0; i--) {
-		if (m_brkpts[i]->id < bp->id) {
-		    bp->id = m_brkpts[i]->id;
-		    break;
-		}
+	    int minId = 0;
+	    for (BrkptIterator i = m_brkpts.begin(); i != m_brkpts.end(); ++i) {
+		if (i->id < minId)
+		    minId = i->id;
 	    }
-	    --bp->id;
+	    bp->id = minId-1;
 	}
 	return;
     }
@@ -1915,11 +1915,11 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
     {
 	// this is a new or orphaned breakpoint:
 	// set the remaining properties
-	if (!cmd->m_brkpt->enabled) {
+	if (!bp->enabled) {
 	    m_d->executeCmd(DCdisable, id);
 	}
-	if (!cmd->m_brkpt->condition.isEmpty()) {
-	    m_d->executeCmd(DCcondition, cmd->m_brkpt->condition, id);
+	if (!bp->condition.isEmpty()) {
+	    m_d->executeCmd(DCcondition, bp->condition, id);
 	}
     }
 
@@ -1933,64 +1933,37 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 void KDebugger::updateBreakList(const char* output)
 {
     // get the new list
-    QList<Breakpoint> brks;
-    brks.setAutoDelete(false);
+    std::list<Breakpoint> brks;
     m_d->parseBreakList(output, brks);
 
-    // merge new information into existing breakpoints
+    // merge existing information into the new list
+    // then swap the old and new lists
 
-    for (int i = m_brkpts.size()-1; i >= 0; i--)	// decrement!
+    for (BrkptIterator bp = brks.begin(); bp != brks.end(); ++bp)
     {
-	// skip orphaned breakpoints
-	if (m_brkpts[i]->id < 0)
-	    continue;
-
-	for (Breakpoint* bp = brks.first(); bp != 0; bp = brks.next())
+	BrkptIterator i = breakpointById(bp->id);
+	if (i != m_brkpts.end())
 	{
-	    if (bp->id == m_brkpts[i]->id) {
-		// keep accurate location
-		// except that xsldbg doesn't have a location in
-		// the old breakpoint if it's just been set
-		bp->text = m_brkpts[i]->text;
-		if (!m_brkpts[i]->fileName.isEmpty()) {
-		    bp->fileName = m_brkpts[i]->fileName;
-		    bp->lineNo = m_brkpts[i]->lineNo;
-		}
-		m_brkpts.insert(i, bp); // old object is deleted
-		goto stillAlive;
+	    // preserve accurate location information
+	    // note that xsldbg doesn't have a location in
+	    // the listed breakpoint if it has just been set
+	    // therefore, we copy it as well if necessary
+	    bp->text = i->text;
+	    if (!i->fileName.isEmpty()) {
+		bp->fileName = i->fileName;
+		bp->lineNo = i->lineNo;
 	    }
 	}
-	/*
-	 * If we get here, this breakpoint is no longer present.
-	 * 
-	 * To delete the breakpoint at i, we place the last breakpoint in
-	 * the list into the slot i. This will delete the old object at i.
-	 * Then we shorten the list by one.
-	 */
-	m_brkpts.insert(i, m_brkpts.take(m_brkpts.size()-1));
-	m_brkpts.resize(m_brkpts.size()-1);
-	TRACE(QString().sprintf("deleted brkpt %d, have now %d brkpts", i, m_brkpts.size()));
-
-	stillAlive:;
     }
 
-    // brks may contain new breakpoints not already in m_brkpts
-    for (const Breakpoint* bp = brks.first(); bp != 0; bp = brks.next())
+    // orphaned breakpoints must be copied
+    for (BrkptIterator bp = m_brkpts.begin(); bp != m_brkpts.end(); ++bp)
     {
-	bool found = false;
-	for (uint i = 0; i < m_brkpts.size(); i++)      {
-	    if (bp->id == m_brkpts[i]->id) {
-		found = true;
-		break;
-	    }
-	}
-	if (!found){
-	    int n = m_brkpts.size();
-	    m_brkpts.resize(n+1);
-	    m_brkpts.insert(n, bp);
-	}
+	if (bp->isOrphaned())
+	    brks.push_back(*bp);
     }
 
+    m_brkpts.swap(brks);
     emit breakpointsChanged();
 }
 
@@ -1998,25 +1971,25 @@ void KDebugger::updateBreakList(const char* output)
 // or a watchpoint
 bool KDebugger::stopMayChangeBreakList() const
 {
-    for (int i = m_brkpts.size()-1; i >= 0; i--) {
-	Breakpoint* bp = m_brkpts[i];
+    for (BrkptROIterator bp = m_brkpts.begin(); bp != m_brkpts.end(); ++bp)
+    {
 	if (bp->temporary || bp->type == Breakpoint::watchpoint)
 	    return true;
     }
     return false;
 }
 
-Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo,
+KDebugger::BrkptIterator KDebugger::breakpointByFilePos(QString file, int lineNo,
 					   const DbgAddr& address)
 {
     // look for exact file name match
-    int i;
-    for (i = m_brkpts.size()-1; i >= 0; i--) {
-	if (m_brkpts[i]->lineNo == lineNo &&
-	    m_brkpts[i]->fileName == file &&
-	    (address.isEmpty() || m_brkpts[i]->address == address))
+    for (BrkptIterator bp = m_brkpts.begin(); bp != m_brkpts.end(); ++bp)
+    {
+	if (bp->lineNo == lineNo &&
+	    bp->fileName == file &&
+	    (address.isEmpty() || bp->address == address))
 	{
-	    return m_brkpts[i];
+	    return bp;
 	}
     }
     // not found, so try basename
@@ -2024,36 +1997,37 @@ Breakpoint* KDebugger::breakpointByFilePos(QString file, int lineNo,
     int offset = file.findRev("/");
     file.remove(0, offset+1);
 
-    for (i = m_brkpts.size()-1; i >= 0; i--) {
+    for (BrkptIterator bp = m_brkpts.begin(); bp != m_brkpts.end(); ++bp)
+    {
 	// get base name of breakpoint's file
-	QString basename = m_brkpts[i]->fileName;
+	QString basename = bp->fileName;
 	int offset = basename.findRev("/");
 	if (offset >= 0) {
 	    basename.remove(0, offset+1);
 	}
 
-	if (m_brkpts[i]->lineNo == lineNo &&
+	if (bp->lineNo == lineNo &&
 	    basename == file &&
-	    (address.isEmpty() || m_brkpts[i]->address == address))
+	    (address.isEmpty() || bp->address == address))
 	{
-	    return m_brkpts[i];
+	    return bp;
 	}
     }
 
     // not found
-    return 0;
+    return m_brkpts.end();
 }
 
-Breakpoint* KDebugger::breakpointById(int id)
+KDebugger::BrkptIterator KDebugger::breakpointById(int id)
 {
-    for (int i = m_brkpts.size()-1; i >= 0; i--)
+    for (BrkptIterator bp = m_brkpts.begin(); bp != m_brkpts.end(); ++bp)
     {
-	if (m_brkpts[i]->id == id) {
-	    return m_brkpts[i];
+	if (bp->id == id) {
+	    return bp;
 	}
     }
     // not found
-    return 0;
+    return m_brkpts.end();
 }
 
 void KDebugger::slotValuePopup(const QString& expr)
@@ -2122,8 +2096,7 @@ void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 	    c->m_lineNo = cmd->m_lineNo;
 	} else {
 	    // no code
-	    QList<DisassembledCode> empty;
-	    emit disassembled(cmd->m_fileName, cmd->m_lineNo, empty);
+	    emit disassembled(cmd->m_fileName, cmd->m_lineNo, std::list<DisassembledCode>());
 	}
     } else {
 	// set program counter
@@ -2136,18 +2109,13 @@ void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 
 void KDebugger::handleDisassemble(CmdQueueItem* cmd, const char* output)
 {
-    QList<DisassembledCode> code;
-    code.setAutoDelete(true);
-    m_d->parseDisassemble(output, code);
-    emit disassembled(cmd->m_fileName, cmd->m_lineNo, code);
+    emit disassembled(cmd->m_fileName, cmd->m_lineNo,
+		      m_d->parseDisassemble(output));
 }
 
 void KDebugger::handleThreadList(const char* output)
 {
-    QList<ThreadInfo> threads;
-    threads.setAutoDelete(true);
-    m_d->parseThreadList(output, threads);
-    emit threadsChanged(threads);
+    emit threadsChanged(m_d->parseThreadList(output));
 }
 
 void KDebugger::setThread(int id)
@@ -2177,8 +2145,7 @@ void KDebugger::queueMemoryDump(bool immediate)
 
 void KDebugger::handleMemoryDump(const char* output)
 {
-    QList<MemoryDump> memdump;
-    memdump.setAutoDelete(true);
+    std::list<MemoryDump> memdump;
     QString msg = m_d->parseMemoryDump(output, memdump);
     emit memoryDumpChanged(msg, memdump);
 }

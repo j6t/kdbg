@@ -11,7 +11,7 @@
 #include <qlayout.h>
 #include <qpushbutton.h>
 #include <qlineedit.h>
-#include "valarray.h"
+#include <qvaluevector.h>
 
 class KDebugger;
 class BreakpointItem;
@@ -38,15 +38,13 @@ protected:
     QHBoxLayout m_layout;
     QVBoxLayout m_listandedit;
     QVBoxLayout m_buttons;
-    ValArray<QPixmap> m_icons;
+    QValueVector<QPixmap> m_icons;
 
     void insertBreakpoint(int num, bool temp, bool enabled, QString location,
 			  QString fileName = 0, int lineNo = -1,
 			  int hits = 0, uint ignoreCount = 0,
 			  QString condition = QString());
     void initListAndIcons();
-    void updateBreakpointCondition(int id, const QString& condition,
-				   int ignoreCount);
     virtual bool eventFilter(QObject* ob, QEvent* ev);
 
     friend class BreakpointItem;

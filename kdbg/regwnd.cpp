@@ -508,7 +508,7 @@ void RegisterView::updateGroupVisibility()
     }
 }
 
-void RegisterView::updateRegisters(QList<RegisterInfo>& regs)
+void RegisterView::updateRegisters(const std::list<RegisterInfo>& regs)
 {
     setUpdatesEnabled(false);
 
@@ -520,7 +520,7 @@ void RegisterView::updateRegisters(QList<RegisterInfo>& regs)
 
     // parse register values
     // must iterate last to first, since QListView inserts at the top
-    for (RegisterInfo* reg = regs.last(); reg != 0; reg = regs.prev())
+    for (std::list<RegisterInfo>::const_reverse_iterator reg = regs.rbegin(); reg != regs.rend(); ++reg)
     {
 	// check if this is a new register
 	RegMap::iterator i = m_registers.find(reg->regName);

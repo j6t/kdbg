@@ -9,7 +9,6 @@
 
 #include <qtimer.h>
 #include <qdict.h>
-#include <qptrvector.h>
 #include <qstringlist.h>
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
@@ -215,7 +214,8 @@ public:
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.
      */
-    bool enableDisableBreakpoint(Breakpoint* bp);
+    bool enableDisableBreakpoint(int id)
+    { return enableDisableBreakpoint(breakpointById(id)); }
 
     /**
      * Removes the specified breakpoint. Note that if bp is an orphaned
@@ -225,7 +225,8 @@ public:
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.
      */
-    bool deleteBreakpoint(Breakpoint* bp);
+    bool deleteBreakpoint(int id)
+    { return deleteBreakpoint(breakpointById(id)); }
 
     /**
      * Changes the specified breakpoint's condition and ignore count.
@@ -233,9 +234,10 @@ public:
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.
      */
-    bool conditionalBreakpoint(Breakpoint* bp,
+    bool conditionalBreakpoint(int id,
 			       const QString& condition,
-			       int ignoreCount);
+			       int ignoreCount)
+    { return conditionalBreakpoint(breakpointById(id), condition, ignoreCount); }
 
     /**
      * Tells whether one of the single stepping commands can be invoked
@@ -288,14 +290,10 @@ public:
      */
     bool isIdle() const;
 
-    /** The list of breakpoints. */
-    int numBreakpoints() const { return m_brkpts.size(); }
-    const Breakpoint* breakpoint(int i) const { return m_brkpts[i]; }
-
-    /**
-     * Returns the breakpoint with the specified \a id.
-     */
-    Breakpoint* breakpointById(int id);
+    /* The list of breakpoints. */
+    typedef std::list<Breakpoint>::const_iterator BrkptROIterator;
+    BrkptROIterator breakpointsBegin() const { return m_brkpts.begin(); }
+    BrkptROIterator breakpointsEnd() const { return m_brkpts.end(); }
 
     const QString& executable() const { return m_executable; }
 
@@ -347,7 +345,7 @@ protected:
     void writeCommand();
     
     QStringList m_watchEvalExpr;	/* exprs to evaluate for watch window */
-    QPtrVector<Breakpoint> m_brkpts;
+    std::list<Breakpoint> m_brkpts;
     QString m_memoryExpression;		/* memory location to watch */
     unsigned m_memoryFormat;		/* how that output should look */
 
@@ -359,7 +357,7 @@ protected:
     void updateProgEnvironment(const QString& args, const QString& wd,
 			       const QDict<EnvVar>& newVars,
 			       const QStringList& newOptions);
-    void parseLocals(const char* output, QList<ExprValue>& newVars);
+    void parseLocals(const char* output, std::list<ExprValue*>& newVars);
     void handleLocals(const char* output);
     bool handlePrint(CmdQueueItem* cmd, const char* output);
     bool handlePrintDeref(CmdQueueItem* cmd, const char* output);
@@ -384,13 +382,21 @@ protected:
     CmdQueueItem* loadCoreFile();
     void openProgramConfig(const QString& name);
 
-    Breakpoint* breakpointByFilePos(QString file, int lineNo,
+    typedef std::list<Breakpoint>::iterator BrkptIterator;
+    BrkptIterator breakpointByFilePos(QString file, int lineNo,
 				    const DbgAddr& address);
+    BrkptIterator breakpointById(int id);
+    CmdQueueItem* executeBreakpoint(const Breakpoint* bp, bool queueOnly);
     void newBreakpoint(CmdQueueItem* cmd, const char* output);
     void updateBreakList(const char* output);
     bool stopMayChangeBreakList() const;
     void saveBreakpoints(ProgramConfig* config);
     void restoreBreakpoints(ProgramConfig* config);
+    bool enableDisableBreakpoint(BrkptIterator bp);
+    bool deleteBreakpoint(BrkptIterator bp);
+    bool conditionalBreakpoint(BrkptIterator bp,
+			       const QString& condition,
+			       int ignoreCount);
 
     bool m_haveExecutable;		/* has an executable been specified */
     bool m_programActive;		/* is the program active (possibly halting in a brkpt)? */
@@ -404,7 +410,7 @@ protected:
     QString m_programWD;		/* working directory of gdb */
     QDict<EnvVar> m_envVars;		/* environment variables set by user */
     QStringList m_boolOptions;		/* boolean options */
-    QStrList m_sharedLibs;		/* shared libraries used by program */
+    QStringList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
     ProgramConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
     void saveProgramSettings();
@@ -495,12 +501,12 @@ signals:
     /**
      * Indicates that the register values have possibly changed.
      */
-    void registersChanged(QList<RegisterInfo>&);
+    void registersChanged(const std::list<RegisterInfo>&);
 
     /**
      * Indicates that the list of threads has possibly changed.
      */
-    void threadsChanged(QList<ThreadInfo>&);
+    void threadsChanged(const std::list<ThreadInfo>&);
 
     /**
      * Indicates that the value for a value popup is ready.
@@ -511,7 +517,7 @@ signals:
      * Provides the disassembled code of the location given by file and
      * line number (zero-based).
      */
-    void disassembled(const QString& file, int line, const QList<DisassembledCode>& code);
+    void disassembled(const QString& file, int line, const std::list<DisassembledCode>& code);
 
     /**
      * Indicates that the program has stopped for any reason: by a
@@ -525,7 +531,7 @@ signals:
      * @param msg is an error message or empty
      * @param memdump is the memory dump
      */
-    void memoryDumpChanged(const QString&, QList<MemoryDump>&);
+    void memoryDumpChanged(const QString&, const std::list<MemoryDump>&);
 
     /**
      * Gives other objects a chance to save program specific settings.
@@ -545,8 +551,6 @@ protected:
     // implementation helpers
 protected:
     QWidget* parentWidget() { return static_cast<QWidget*>(parent()); }
-
-    friend class BreakpointTable;
 };
 
 #endif // DEBUGGER_H

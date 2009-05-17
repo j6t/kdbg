@@ -8,6 +8,7 @@
 #define REGWND_H
 
 #include <qlistview.h>
+#include <list>
 #include <map>
 
 class QPopupMenu;
@@ -26,7 +27,7 @@ public:
 protected slots:
     void rightButtonClicked(QListViewItem*, const QPoint&, int);
     void slotModeChange(int);
-    void updateRegisters(QList<RegisterInfo>&);
+    void updateRegisters(const std::list<RegisterInfo>&);
 
 private:
     void paletteChange(const QPalette& oldPal);

@@ -46,7 +46,6 @@ kdbg_LDADD = $(LIB_KIO)
 noinst_HEADERS = \
 	pgmargs.h \
 	procattach.h \
-	valarray.h \
 	debugger.h \
 	programconfig.h \
 	dbgdriver.h \

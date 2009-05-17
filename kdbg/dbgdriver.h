@@ -7,18 +7,18 @@
 #ifndef DBGDRIVER_H
 #define DBGDRIVER_H
 
-#include <qptrqueue.h>
-#include <qptrlist.h>
 #include <qfile.h>
 #include <qregexp.h>
+#include <qcstring.h>
 #include <kprocess.h>
+#include <queue>
+#include <list>
 
 
 class VarTree;
 class ExprValue;
 class ExprWnd;
 class KDebugger;
-class QStrList;
 class QStringList;
 
 
@@ -152,6 +152,7 @@ struct CmdQueueItem
     int m_lineNo;
     // the breakpoint info
     Breakpoint* m_brkpt;
+    int m_existingBrkpt;
     // whether command was emitted due to direct user request (only set when relevant)
     bool m_byUser;
 
@@ -163,8 +164,17 @@ struct CmdQueueItem
 	m_exprWnd(0),
 	m_lineNo(0),
 	m_brkpt(0),
+	m_existingBrkpt(0),
 	m_byUser(false)
     { }
+
+    struct IsEqualCmd
+    {
+	IsEqualCmd(DbgCommand cmd, const QString& str) : m_cmd(cmd), m_str(str) { }
+	bool operator()(CmdQueueItem*) const;
+	DbgCommand m_cmd;
+	const QString& m_str;
+    };
 };
 
 /**
@@ -299,14 +309,13 @@ public:
     /**
      * Tells whether a high prority command would be executed immediately.
      */
-    bool canExecuteImmediately() const { return m_hipriCmdQueue.isEmpty(); }
+    bool canExecuteImmediately() const { return m_hipriCmdQueue.empty(); }
 
 protected:
     char* m_output;			/* normal gdb output */
     size_t m_outputLen;			/* amount of data so far accumulated in m_output */
     size_t m_outputAlloc;		/* space available in m_output */
-    typedef QCString DelayedStr;
-    QQueue<DelayedStr> m_delayedOutput;	/* output colleced while we have receivedOutput */
+    std::queue<QByteArray> m_delayedOutput;	/* output colleced while we have receivedOutput */
 					/* but before signal wroteStdin arrived */
 
 public:
@@ -384,7 +393,7 @@ public:
     /**
      * Parses a back-trace (the output of the DCbt command).
      */
-    virtual void parseBackTrace(const char* output, QList<StackFrame>& stack) = 0;
+    virtual void parseBackTrace(const char* output, std::list<StackFrame>& stack) = 0;
 
     /**
      * Parses the output of the DCframe command;
@@ -406,17 +415,15 @@ public:
      * @return False if there was an error before the first breakpoint
      * was found. Even if true is returned, #brks may be empty.
      */
-    virtual bool parseBreakList(const char* output, QList<Breakpoint>& brks) = 0;
+    virtual bool parseBreakList(const char* output, std::list<Breakpoint>& brks) = 0;
 
     /**
      * Parses a list of threads.
      * @param output The output of the debugger.
-     * @param threads The list of new #ThreadInfo objects. The list
-     * must initially be empty.
-     * @return False if there was an error before the first thread entry
-     * was found. Even if true is returned, #threads may be empty.
+     * @return The new thread list. There is no indication if there was
+     * a parse error.
      */
-    virtual bool parseThreadList(const char* output, QList<ThreadInfo>& threads) = 0;
+    virtual std::list<ThreadInfo> parseThreadList(const char* output) = 0;
 
     /**
      * Parses the output when the program stops to see whether this it
@@ -437,7 +444,7 @@ public:
      * @param newVars Receives the parsed variable values. The values are
      * simply append()ed to the supplied list.
      */
-    virtual void parseLocals(const char* output, QList<ExprValue>& newVars) = 0;
+    virtual void parseLocals(const char* output, std::list<ExprValue*>& newVars) = 0;
 
     /**
      * Parses the output of a DCprint or DCprintStruct command.
@@ -484,7 +491,7 @@ public:
     /**
      * Parses the output of the DCsharedlibs command.
      */
-    virtual void parseSharedLibs(const char* output, QStrList& shlibs) = 0;
+    virtual QStringList parseSharedLibs(const char* output) = 0;
 
     /**
      * Parses the output of the DCfindType command.
@@ -495,7 +502,7 @@ public:
     /**
      * Parses the output of the DCinforegisters command.
      */
-    virtual void parseRegisters(const char* output, QList<RegisterInfo>& regs) = 0;
+    virtual std::list<RegisterInfo> parseRegisters(const char* output) = 0;
 
     /**
      * Parses the output of the DCinfoline command. Returns false if the
@@ -507,13 +514,13 @@ public:
     /**
      * Parses the ouput of the DCdisassemble command.
      */
-    virtual void parseDisassemble(const char* output, QList<DisassembledCode>& code) = 0;
+    virtual std::list<DisassembledCode> parseDisassemble(const char* output) = 0;
 
     /**
      * Parses a memory dump. Returns an empty string if no error was found;
      * otherwise it contains an error message.
      */
-    virtual QString parseMemoryDump(const char* output, QList<MemoryDump>& memdump) = 0;
+    virtual QString parseMemoryDump(const char* output, std::list<MemoryDump>& memdump) = 0;
 
     /**
      * Parses the output of the DCsetvariable command. Returns an empty
@@ -533,8 +540,8 @@ protected:
     /** Removes all commands from  the high-priority queue. */
     void flushHiPriQueue();
 
-    QQueue<CmdQueueItem> m_hipriCmdQueue;
-    QList<CmdQueueItem> m_lopriCmdQueue;
+    std::queue<CmdQueueItem*> m_hipriCmdQueue;
+    std::list<CmdQueueItem*> m_lopriCmdQueue;
     /**
      * The active command is kept separately from other pending commands.
      */

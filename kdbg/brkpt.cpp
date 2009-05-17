@@ -17,6 +17,7 @@
 #include "brkpt.h"
 #include "dbgdriver.h"
 #include <ctype.h>
+#include <list>
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
@@ -120,22 +121,21 @@ BreakpointTable::~BreakpointTable()
 
 void BreakpointTable::updateBreakList()
 {
-    QList<BreakpointItem> deletedItems;
+    std::list<BreakpointItem*> deletedItems;
 
     for (QListViewItem* it = m_list.firstChild(); it != 0; it = it->nextSibling()) {
-	deletedItems.append(static_cast<BreakpointItem*>(it));
+	deletedItems.push_back(static_cast<BreakpointItem*>(it));
     }
 
     // get the new list
-    for (int i = m_debugger->numBreakpoints()-1; i >= 0; i--) {
-	const Breakpoint* bp = m_debugger->breakpoint(i);
+    for (KDebugger::BrkptROIterator bp = m_debugger->breakpointsBegin(); bp != m_debugger->breakpointsEnd(); ++bp)
+    {
 	// look up this item
-	for (BreakpointItem* oldbp = deletedItems.first(); oldbp != 0;
-	     oldbp = deletedItems.next())
+	for (std::list<BreakpointItem*>::iterator o = deletedItems.begin(); o != deletedItems.end(); ++o)
 	{
-	    if (oldbp->id == bp->id) {
-		oldbp->updateFrom(*bp);
-		deletedItems.take();	/* don't delete */
+	    if ((*o)->id == bp->id) {
+		(*o)->updateFrom(*bp);
+		deletedItems.erase(o);	/* don't delete */
 		goto nextItem;
 	    }
 	}
@@ -145,7 +145,10 @@ nextItem:;
     }
 
     // delete all untouched breakpoints
-    deletedItems.setAutoDelete(true);
+    while (!deletedItems.empty()) {
+	delete deletedItems.front();
+	deletedItems.pop_front();
+    }
 }
 
 BreakpointItem::BreakpointItem(QListView* list, const Breakpoint& bp) :
@@ -192,13 +195,9 @@ void BreakpointTable::addWP()
 void BreakpointTable::removeBP()
 {
     BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
-    if (bp == 0)
-	return;
-
-    Breakpoint* brk = m_debugger->breakpointById(bp->id);
-    if (brk != 0) {
-	m_debugger->deleteBreakpoint(brk);
-	// note that both brk and bp may be deleted by now
+    if (bp != 0) {
+	m_debugger->deleteBreakpoint(bp->id);
+	// note that bp may be deleted by now
 	// (if bp was an orphaned breakpoint)
     }
 }
@@ -206,12 +205,8 @@ void BreakpointTable::removeBP()
 void BreakpointTable::enadisBP()
 {
     BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
-    if (bp == 0)
-	return;
-
-    Breakpoint* brk = m_debugger->breakpointById(bp->id);
-    if (brk != 0) {
-	m_debugger->enableDisableBreakpoint(brk);
+    if (bp != 0) {
+	m_debugger->enableDisableBreakpoint(bp->id);
     }
 }
 
@@ -258,10 +253,7 @@ bool BreakpointTable::eventFilter(QObject* ob, QEvent* ev)
 		static_cast<BreakpointItem*>(m_list.itemAt(mev->pos()));
 	    if (bp != 0)
 	    {
-		Breakpoint* brk = m_debugger->breakpointById(bp->id);
-		if (brk != 0) {
-		    m_debugger->enableDisableBreakpoint(brk);
-		}
+		m_debugger->enableDisableBreakpoint(bp->id);
 	    }
 	    return true;
 	}
@@ -315,17 +307,7 @@ void BreakpointTable::conditionalBP()
 
     QString conditionInput = dlg.condition();
     int ignoreCount = dlg.ignoreCount();
-    updateBreakpointCondition(id, conditionInput, ignoreCount);
-}
-
-void BreakpointTable::updateBreakpointCondition(int id,
-						const QString& condition,
-						int ignoreCount)
-{
-    Breakpoint* brk = m_debugger->breakpointById(id);
-    if (brk != 0) {
-	m_debugger->conditionalBreakpoint(brk, condition, ignoreCount);
-    }
+    m_debugger->conditionalBreakpoint(id, conditionInput, ignoreCount);
 }
 
 
@@ -356,7 +338,7 @@ void BreakpointTable::initListAndIcons()
      * overlaid brkcond icon, plus an optional overlaid brkorph icon. Then
      * the same sequence for watchpoints.
      */
-    m_icons.setSize(32);
+    m_icons.resize(32);
     QPixmap canvas(16,16);
 
     for (int i = 0; i < 32; i++) {

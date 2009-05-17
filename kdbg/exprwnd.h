@@ -10,13 +10,13 @@
 #include "qlistview.h"
 #include <qlineedit.h>
 #include <qpixmap.h>
-#include <qptrlist.h>
-#include <qstrlist.h>
+#include <list>
 
 class ProgramTypeTable;
 class TypeInfo;
 struct ExprValue;
 class ExprWnd;
+class QStringList;
 
 /*! \brief a variable's value is the tree of sub-variables */
 class VarTree : public QListViewItem
@@ -120,8 +120,8 @@ public:
     ExprWnd(QWidget* parent, const QString& colHeader, const char* name);
     ~ExprWnd();
 
-    /** fills the list with the expressions at the topmost level */
-    void exprList(QStrList& exprs);
+    /** returns the list with the expressions at the topmost level */
+    QStringList exprList() const;
     /** appends a copy of expr to the end of the tree at the topmost level;
      * returns a pointer to the inserted top-level item */
     VarTree* insertExpr(ExprValue* expr, ProgramTypeTable& typeTable);
@@ -162,15 +162,15 @@ protected:
     static QString formatWCharPointer(QString value);
     QPixmap m_pixPointer;
 
-    QList<VarTree> m_updatePtrs;	//!< dereferenced pointers that need update
-    QList<VarTree> m_updateType;	//!< structs whose type must be determined
-    QList<VarTree> m_updateStruct;	//!< structs whose nested value needs update
+    std::list<VarTree*> m_updatePtrs;	//!< dereferenced pointers that need update
+    std::list<VarTree*> m_updateType;	//!< structs whose type must be determined
+    std::list<VarTree*> m_updateStruct;	//!< structs whose nested value needs update
 
     ValueEdit* m_edit;
 
     /** remove items that are in the subTree from the list */
     void unhookSubtree(VarTree* subTree);
-    static void unhookSubtree(QList<VarTree>& list, VarTree* subTree);
+    static void unhookSubtree(std::list<VarTree*>& list, VarTree* subTree);
 
 signals:
     void removingItem(VarTree*);
