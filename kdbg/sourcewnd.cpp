@@ -23,7 +23,7 @@
 #include "mydebug.h"
 
 
-SourceWindow::SourceWindow(const char* fileName, QWidget* parent, const char* name) :
+SourceWindow::SourceWindow(const QString& fileName, QWidget* parent, const char* name) :
 	QTextEdit(parent, name),
 	m_fileName(fileName),
 	m_curRow(-1),

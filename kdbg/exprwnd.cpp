@@ -584,7 +584,7 @@ QString ExprWnd::formatWCharPointer(QString value)
 }
 
 
-VarTree* ExprWnd::topLevelExprByName(const char* name)
+VarTree* ExprWnd::topLevelExprByName(const QString& name) const
 {
     VarTree* item = firstChild();
     while (item != 0 && item->getText() != name)

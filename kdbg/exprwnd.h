@@ -133,7 +133,7 @@ public:
     /** updates only the value of the node */
     void updateStructValue(VarTree* display);
     /** get a top-level expression by name */
-    VarTree* topLevelExprByName(const char* name);
+    VarTree* topLevelExprByName(const QString& name) const;
     /** return a member of the struct that pointer \a v refers to */
     static VarTree* ptrMemberByName(VarTree* v, const QString& name);
     /** return a member of the struct \a v */
