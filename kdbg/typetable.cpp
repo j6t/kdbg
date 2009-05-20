@@ -362,21 +362,25 @@ TypeInfo* ProgramTypeTable::lookup(QString type)
 
 	QStringList::const_iterator t = parts.begin();
 	QStringList::const_iterator p = pat.begin();
-	unsigned penalty = 0;
+	unsigned accumPenalty = 0;
 	bool equal = true;
-	for (int j = 0; equal && p != pat.end(); ++p, ++t, ++j)
+	unsigned penalty = ~(~0U>>1);	// 1 in the leading bit
+	while (equal && p != pat.end())
 	{
 	    if (*p == "*")
-		penalty += 1U << j;	// penalize wildcards
+		accumPenalty |= penalty;	// penalize wildcards
 	    else
 	    	equal = *p == *t;
+	    ++p, ++t, penalty >>= 1;
 	}
 	if (equal)
 	{
-	    if (penalty == 0)
+	    if (accumPenalty == 0)
 		return i->second.type;
-	    if (penalty < minPenalty)
+	    if (accumPenalty < minPenalty) {
 		result = i->second.type;
+		minPenalty = accumPenalty;
+	    }
 	}
     }
     return result;
