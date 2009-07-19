@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: zh_CN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2008-11-06 21:44+0100\n"
+"POT-Creation-Date: 2009-07-19 22:57+0200\n"
 "PO-Revision-Date: 2008-04-18 18:27+0800\n"
 "Last-Translator: Moligaloo <moligaloo@163.com>\n"
 "Language-Team:  <zh@li.org>\n"
@@ -17,12 +17,12 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: exprwnd.cpp:313 rc.cpp:75 regwnd.cpp:428
+#: exprwnd.cpp:314 rc.cpp:75 regwnd.cpp:428
 #, no-c-format
 msgid "Value"
 msgstr "值"
 
-#: memwindow.cpp:55 brkpt.cpp:334
+#: memwindow.cpp:55 brkpt.cpp:317
 msgid "Address"
 msgstr "地址"
 
@@ -82,71 +82,71 @@ msgstr "字符串"
 msgid "&Instructions"
 msgstr "指令"
 
-#: brkpt.cpp:61
+#: brkpt.cpp:63
 msgid "Add &Breakpoint"
 msgstr "添加断点"
 
-#: brkpt.cpp:65
+#: brkpt.cpp:67
 msgid "Add &Watchpoint"
 msgstr "添加监视点"
 
-#: brkpt.cpp:74 brkpt.cpp:239
+#: brkpt.cpp:76 brkpt.cpp:235
 msgid "&Disable"
 msgstr "启用"
 
-#: brkpt.cpp:79 brkpt.cpp:241
+#: brkpt.cpp:81 brkpt.cpp:237
 msgid "&Enable"
 msgstr "禁用"
 
-#: brkpt.cpp:89
+#: brkpt.cpp:91
 msgid "&View Code"
 msgstr "查看代码"
 
-#: brkpt.cpp:93
+#: brkpt.cpp:95
 msgid "&Conditional..."
 msgstr "条件..."
 
-#: brkpt.cpp:333 threadlist.cpp:41
+#: brkpt.cpp:316 threadlist.cpp:42
 msgid "Location"
 msgstr "位置"
 
-#: brkpt.cpp:335
+#: brkpt.cpp:318
 msgid "Hits"
 msgstr "提示"
 
-#: brkpt.cpp:336
+#: brkpt.cpp:319
 msgid "Ignore"
 msgstr "忽略"
 
-#: brkpt.cpp:337
+#: brkpt.cpp:320
 msgid "Condition"
 msgstr "状态"
 
-#: brkpt.cpp:460
+#: brkpt.cpp:443
 msgid ": Conditional breakpoint"
 msgstr ":条件断点"
 
-#: brkpt.cpp:463
+#: brkpt.cpp:446
 msgid "&Condition:"
 msgstr "条件:"
 
-#: brkpt.cpp:465
+#: brkpt.cpp:448
 msgid "Ignore &next hits:"
 msgstr "忽略下一个提示"
 
-#: gdbdriver.cpp:893
+#: gdbdriver.cpp:894
 msgid "<anonymous struct or union>"
 msgstr "<匿名结构体或共用体>"
 
-#: gdbdriver.cpp:1487
+#: gdbdriver.cpp:1488
 msgid "<additional entries of the array suppressed>"
 msgstr "<被抑制数组的额外条目>"
 
-#: gdbdriver.cpp:2074 xsldbgdriver.cpp:1356
+#: gdbdriver.cpp:2041 xsldbgdriver.cpp:1334
 msgid "New working directory: "
 msgstr "新的工作目录："
 
-#: debugger.cpp:639
+#: debugger.cpp:650
 msgid ""
 "%1 exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
@@ -154,7 +154,7 @@ msgstr ""
 "gdb非预期中止\n"
 "请重启会话，返回代码为%1"
 
-#: debugger.cpp:815
+#: debugger.cpp:833
 msgid ""
 "The settings for this program specify the following debugger command:\n"
 "%1\n"
@@ -175,33 +175,33 @@ msgstr "删除"
 msgid "Expression"
 msgstr "表达式"
 
-#: mainwndbase.cpp:148
+#: mainwndbase.cpp:135
 msgid "active"
 msgstr "激活"
 
-#: mainwndbase.cpp:309
+#: mainwndbase.cpp:301
 msgid "Don't know how to debug language `%1'"
 msgstr "不能调试的语言:%1"
 
-#: mainwndbase.cpp:322
+#: mainwndbase.cpp:314
 msgid ""
 "Could not start the debugger process.\n"
 "Please shut down KDbg and resolve the problem."
 msgstr "无法启动调试器进程"
 
-#: mainwndbase.cpp:427
+#: mainwndbase.cpp:418
 msgid ": Global options"
 msgstr ":全局选项"
 
-#: mainwndbase.cpp:444 pgmsettings.cpp:114
+#: mainwndbase.cpp:435 pgmsettings.cpp:111
 msgid "&Debugger"
 msgstr "调试器"
 
-#: mainwndbase.cpp:445
+#: mainwndbase.cpp:436
 msgid "&Miscellaneous"
 msgstr "杂项"
 
-#: mainwndbase.cpp:514
+#: mainwndbase.cpp:506
 msgid ": Program output"
 msgstr ":程序输出"
 
@@ -234,30 +234,34 @@ msgid "use language XSLT (deprecated)"
 msgstr "使用语言XSLT(过时)"
 
 #: main.cpp:58
+msgid "specify arguments of debugged executable"
+msgstr ""
+
+#: main.cpp:59
 msgid "specify PID of process to debug"
 msgstr "指定要调试进程的PID"
 
-#: main.cpp:59
+#: main.cpp:60
 msgid "path of executable to debug"
 msgstr "可执行程序的路径"
 
-#: main.cpp:60
+#: main.cpp:61
 msgid "a core file to use"
 msgstr "要使用的核心转储"
 
-#: main.cpp:125
+#: main.cpp:126
 msgid "Cannot start debugger."
 msgstr "不能启动调试器"
 
-#: prefdebugger.cpp:20
+#: prefdebugger.cpp:21
 msgid "To revert to the default settings, clear the entries."
 msgstr "恢复默认设置清除条目"
 
-#: prefdebugger.cpp:24
+#: prefdebugger.cpp:25
 msgid "How to invoke &GDB:"
 msgstr "怎样调用GDB"
 
-#: prefdebugger.cpp:31
+#: prefdebugger.cpp:32
 msgid ""
 "%T will be replaced with a title string,\n"
 "%C will be replaced by a Bourne shell script that\n"
@@ -267,19 +271,19 @@ msgstr ""
 "%C会替换为了一个Bourne shell脚本\n"
 "以保持终端窗口打开"
 
-#: prefdebugger.cpp:37
+#: prefdebugger.cpp:38
 msgid "&Terminal for program output:"
 msgstr "程序输出的终端"
 
-#: procattach.cpp:270
+#: procattach.cpp:271
 msgid ": Attach to process"
 msgstr ":连接到进程"
 
-#: procattach.cpp:274
+#: procattach.cpp:275
 msgid "Specify the process number to attach to:"
 msgstr "指定要连接的进程号"
 
-#: pgmsettings.cpp:24
+#: pgmsettings.cpp:26
 msgid ""
 "How to invoke &GDB - leave empty to use\n"
 "the default from the global options:"
@@ -287,52 +291,39 @@ msgstr ""
 "怎样启动GDB\n"
 "默认与全局选项相同。"
 
-#: pgmsettings.cpp:59
+#: pgmsettings.cpp:61
 msgid "&No input and output"
 msgstr "没有输入和输出"
 
-#: pgmsettings.cpp:64
+#: pgmsettings.cpp:66
 msgid "&Only output, simple terminal emulation"
 msgstr "只有输出，简单终端的模拟"
 
-#: pgmsettings.cpp:69
+#: pgmsettings.cpp:71
 msgid "&Full terminal emulation"
 msgstr "全终端模拟"
 
-#: pgmsettings.cpp:106
-#, no-c-format
+#: pgmsettings.cpp:105
 msgid "%1: Settings for %2"
 msgstr "%1：%2的设置"
 
-#: pgmsettings.cpp:115 dbgmainwnd.cpp:223
+#: pgmsettings.cpp:112 dbgmainwnd.cpp:221
 msgid "&Output"
 msgstr "输出"
 
-#: winstack.cpp:243
-msgid "&More..."
-msgstr "更多"
-
-#: winstack.cpp:468
-msgid ": Open Windows"
-msgstr ":打开窗口"
-
-#: winstack.cpp:476
-msgid "Show"
-msgstr "显示"
-
-#: winstack.cpp:547
+#: winstack.cpp:390
 msgid ": Search"
 msgstr ":搜索"
 
-#: winstack.cpp:553
+#: winstack.cpp:396
 msgid "&Case sensitive"
 msgstr "区分大小写"
 
-#: winstack.cpp:555
+#: winstack.cpp:398
 msgid "&Forward"
 msgstr "前进"
 
-#: winstack.cpp:557
+#: winstack.cpp:400
 msgid "&Backward"
 msgstr "后退"
 
@@ -584,268 +575,255 @@ msgid ""
 "attach to that process."
 msgstr "你必须从下面的列表中选择一个进程,然后点击<b>确定</b>按钮连接那个进程"
 
-#: threadlist.cpp:40
+#: threadlist.cpp:41
 msgid "Thread ID"
 msgstr "线程ID"
 
-#: dbgmainwnd.cpp:45
+#: dbgmainwnd.cpp:46
 msgid "Source"
 msgstr "源文件"
 
-#: dbgmainwnd.cpp:53 dbgmainwnd.cpp:405
+#: dbgmainwnd.cpp:54 dbgmainwnd.cpp:388
 msgid "Stack"
 msgstr "堆栈"
 
-#: dbgmainwnd.cpp:56 dbgmainwnd.cpp:406
+#: dbgmainwnd.cpp:57 dbgmainwnd.cpp:389
 msgid "Locals"
 msgstr "局部变量"
 
-#: dbgmainwnd.cpp:57
+#: dbgmainwnd.cpp:58
 msgid "Variable"
 msgstr "变量"
 
-#: dbgmainwnd.cpp:59 dbgmainwnd.cpp:407
+#: dbgmainwnd.cpp:60 dbgmainwnd.cpp:390
 msgid "Watches"
 msgstr "监视点"
 
-#: dbgmainwnd.cpp:62 dbgmainwnd.cpp:408
+#: dbgmainwnd.cpp:63 dbgmainwnd.cpp:391
 msgid "Registers"
 msgstr "寄存器"
 
-#: dbgmainwnd.cpp:65 dbgmainwnd.cpp:409
+#: dbgmainwnd.cpp:66 dbgmainwnd.cpp:392
 msgid "Breakpoints"
 msgstr "断点"
 
-#: dbgmainwnd.cpp:68 dbgmainwnd.cpp:411
+#: dbgmainwnd.cpp:69 dbgmainwnd.cpp:394
 msgid "Output"
 msgstr "输出"
 
-#: dbgmainwnd.cpp:71 dbgmainwnd.cpp:410
+#: dbgmainwnd.cpp:72 dbgmainwnd.cpp:393
 msgid "Threads"
 msgstr "线程"
 
-#: dbgmainwnd.cpp:74 dbgmainwnd.cpp:412
+#: dbgmainwnd.cpp:75 dbgmainwnd.cpp:395
 msgid "Memory"
 msgstr "内存"
 
-#: dbgmainwnd.cpp:186
+#: dbgmainwnd.cpp:181
 msgid "&Open Source..."
 msgstr "打开源文件..."
 
-#: dbgmainwnd.cpp:187
+#: dbgmainwnd.cpp:183
 msgid "&Reload Source"
 msgstr "再载入源程序"
 
-#: dbgmainwnd.cpp:190
+#: dbgmainwnd.cpp:186
 msgid "&Executable..."
 msgstr "可执行程序..."
 
-#: dbgmainwnd.cpp:193
+#: dbgmainwnd.cpp:189
 msgid "Recent E&xecutables"
 msgstr "最近的可执行程序"
 
-#: dbgmainwnd.cpp:196
+#: dbgmainwnd.cpp:192
 msgid "&Core dump..."
 msgstr "核心转储"
 
-#: dbgmainwnd.cpp:201
+#: dbgmainwnd.cpp:197
 msgid "This &Program..."
 msgstr "这个程序..."
 
-#: dbgmainwnd.cpp:204
+#: dbgmainwnd.cpp:200
 msgid "&Global Options..."
 msgstr "全局选项"
 
-#: dbgmainwnd.cpp:212
+#: dbgmainwnd.cpp:207
 msgid "&Find"
 msgstr "查找"
 
-#: dbgmainwnd.cpp:215
+#: dbgmainwnd.cpp:213
 msgid "Source &code"
 msgstr "源代码"
 
-#: dbgmainwnd.cpp:217
+#: dbgmainwnd.cpp:215
 msgid "Stac&k"
 msgstr "堆栈"
 
-#: dbgmainwnd.cpp:218
+#: dbgmainwnd.cpp:216
 msgid "&Locals"
 msgstr "局部变量"
 
-#: dbgmainwnd.cpp:219
+#: dbgmainwnd.cpp:217
 msgid "&Watched expressions"
 msgstr "被监视的表达式"
 
-#: dbgmainwnd.cpp:220
+#: dbgmainwnd.cpp:218
 msgid "&Registers"
 msgstr "寄存器"
 
-#: dbgmainwnd.cpp:221
+#: dbgmainwnd.cpp:219
 msgid "&Breakpoints"
 msgstr "断点"
 
-#: dbgmainwnd.cpp:222
+#: dbgmainwnd.cpp:220
 msgid "T&hreads"
 msgstr "线程"
 
-#: dbgmainwnd.cpp:224
+#: dbgmainwnd.cpp:222
 msgid "&Memory"
 msgstr "内存"
 
-#: dbgmainwnd.cpp:234
+#: dbgmainwnd.cpp:232
 msgid "&Run"
 msgstr "执行"
 
-#: dbgmainwnd.cpp:237
+#: dbgmainwnd.cpp:235
 msgid "Step &into"
 msgstr "跳入"
 
-#: dbgmainwnd.cpp:241
+#: dbgmainwnd.cpp:239
 msgid "Step &over"
 msgstr "跳过"
 
-#: dbgmainwnd.cpp:245
+#: dbgmainwnd.cpp:243
 msgid "Step o&ut"
 msgstr "跳出"
 
-#: dbgmainwnd.cpp:249
+#: dbgmainwnd.cpp:247
 msgid "Run to &cursor"
 msgstr "运行到光标"
 
-#: dbgmainwnd.cpp:253
+#: dbgmainwnd.cpp:251
 msgid "Step i&nto by instruction"
 msgstr "跳入到汇编指令"
 
-#: dbgmainwnd.cpp:257
+#: dbgmainwnd.cpp:255
 msgid "Step o&ver by instruction"
 msgstr "从汇编指令中跳出"
 
-#: dbgmainwnd.cpp:261
+#: dbgmainwnd.cpp:259
 msgid "&Program counter to current line"
 msgstr "到当前行的程序计数"
 
-#: dbgmainwnd.cpp:264
+#: dbgmainwnd.cpp:262
 msgid "&Break"
 msgstr "断开"
 
-#: dbgmainwnd.cpp:267
+#: dbgmainwnd.cpp:265
 msgid "&Kill"
 msgstr "杀死"
 
-#: dbgmainwnd.cpp:270
+#: dbgmainwnd.cpp:268
 msgid "Re&start"
 msgstr "重启"
 
-#: dbgmainwnd.cpp:273
+#: dbgmainwnd.cpp:271
 msgid "A&ttach..."
 msgstr "连接"
 
-#: dbgmainwnd.cpp:276
+#: dbgmainwnd.cpp:274
 msgid "&Arguments..."
 msgstr "参数"
 
-#: dbgmainwnd.cpp:281
+#: dbgmainwnd.cpp:279
 msgid "Set/Clear &breakpoint"
 msgstr "设置/清除断点"
 
-#: dbgmainwnd.cpp:284
+#: dbgmainwnd.cpp:282
 msgid "Set &temporary breakpoint"
 msgstr "设置临时断点"
 
-#: dbgmainwnd.cpp:287
+#: dbgmainwnd.cpp:285
 msgid "&Enable/Disable breakpoint"
 msgstr "启用/禁用断点"
 
-#: dbgmainwnd.cpp:292
+#: dbgmainwnd.cpp:290
 msgid "Watch Expression"
 msgstr "监视表达式"
 
-#: dbgmainwnd.cpp:295
+#: dbgmainwnd.cpp:293
 msgid "Edit Value"
 msgstr "编辑值"
 
-#: dbgmainwnd.cpp:299
-msgid "&Window"
-msgstr "窗口"
-
-#: dbgmainwnd.cpp:326
-msgid "Line 00000"
-msgstr "00000 行"
-
-#: dbgmainwnd.cpp:330
+#: dbgmainwnd.cpp:322
 msgid "Restart"
 msgstr "重启"
 
-#: dbgmainwnd.cpp:331
+#: dbgmainwnd.cpp:323
 msgid "Core dump"
 msgstr "核心转储"
 
-#: dbgmainwnd.cpp:577
-#, c-format
-msgid "Line %d"
-msgstr "%d 行"
-
-#: dbgmainwnd.cpp:649
+#: dbgmainwnd.cpp:588
 msgid "`%1' is not a file or does not exist"
 msgstr "`%1'不是一个文件或者文件不存在"
 
-#: dbgmainwnd.cpp:759
+#: dbgmainwnd.cpp:702
 msgid "|All source files\n"
 msgstr "|所有源文件\n"
 
-#: dbgmainwnd.cpp:760
+#: dbgmainwnd.cpp:703
 msgid "|Source files\n"
 msgstr "|源文件\n"
 
-#: dbgmainwnd.cpp:761
+#: dbgmainwnd.cpp:704
 msgid "|Header files\n"
 msgstr "|头文件\n"
 
-#: dbgmainwnd.cpp:762
+#: dbgmainwnd.cpp:705
 msgid "*|All files"
 msgstr "*|所有文件"
 
-#: dbgmainwnd.cpp:865
+#: dbgmainwnd.cpp:800
 msgid "Select the executable to debug"
 msgstr "选择要调试的可执行程序"
 
-#: dbgmainwnd.cpp:878
+#: dbgmainwnd.cpp:813
 msgid "Select core dump"
 msgstr "选择核心转储"
 
-#: xsldbgdriver.cpp:1465
+#: xsldbgdriver.cpp:1441
 msgid "No memory dump available"
 msgstr "没有可用的内存映像"
 
-#: prefmisc.cpp:22
+#: prefmisc.cpp:23
 msgid "&Pop into foreground when program stops"
 msgstr "当程序停止时弹入前台"
 
-#: prefmisc.cpp:27
+#: prefmisc.cpp:28
 msgid "Time until window goes &back (in milliseconds):"
 msgstr "计时（毫秒）直到窗口到后台"
 
-#: prefmisc.cpp:34
+#: prefmisc.cpp:35
 msgid "&Tabstop every (characters):"
 msgstr "每个字符之间的间隔"
 
-#: prefmisc.cpp:36
+#: prefmisc.cpp:37
 msgid "File filter for &source files:"
 msgstr "源文件过滤"
 
-#: prefmisc.cpp:38
+#: prefmisc.cpp:39
 msgid "File filter for &header files:"
 msgstr "头文件过滤"
 
-#: ttywnd.cpp:228
+#: ttywnd.cpp:229
 msgid "&Clear"
 msgstr "清除"
 
-#: pgmargs.cpp:215
+#: pgmargs.cpp:216
 msgid "Select a file name to insert as program argument"
 msgstr "选择一个文件名作为程序参数"
 
-#: pgmargs.cpp:229
+#: pgmargs.cpp:230
 msgid "Select a directory to insert as program argument"
 msgstr "选择一个目录作为程序参数"
 
