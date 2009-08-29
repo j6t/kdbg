@@ -1,0 +1,36 @@
+KDbg Release Notes for version 2.2.0
+====================================
+
+The 2.2.x series is still based on Qt 3 and KDE 3.
+
+Changes since 2.1.1
+-------------------
+
+Features:
+
+- Source code windows have now a tab attached, which makes switching
+  source files much easier.
+
+- Source code windows now show line numbers at the left.
+
+- There are now "Find Next" and "Find Previous" commands with shortcuts
+  F3 and Shift+F3.
+
+- Improved support of template types in the type tables (which are used
+  to show structure members next to a structure variable). Notably, the
+  number of elements in STL and Qt collection classes are shown.
+
+- Arguments for the debugged program can be passed on KDbg's command line.
+
+Bug fixes
+
+- An incorrect terminal command string setting could crash KDbg if it
+  contained format specifiers other than exactly one '%s'.
+
+- The format specifier in the memory dump window was not correctly
+  preserved when the expression is changed.
+
+- Setting a conditional breakpoint could crash KDbg.
+
+- Using Attach on systems that use the simplified Attach to Process dialog
+  could crash KDbg.

@@ -4,7 +4,8 @@ SUBDIRS = kdbg po
 # have all needed files, that a GNU package needs
 AUTOMAKE_OPTIONS = foreign 
 
-EXTRA_DIST = BUGS ChangeLog-pre-2.2.0 COPYING TODO admin
+EXTRA_DIST = BUGS ChangeLog-pre-2.2.0 COPYING TODO admin \
+	ReleaseNotes-2.2.0
 
 $(top_srcdir)/configure.in: configure.in.in $(top_srcdir)/subdirs
 	cd $(top_srcdir) && $(MAKE) -f admin/Makefile.common configure.in ;
