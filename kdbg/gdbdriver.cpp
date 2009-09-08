@@ -322,6 +322,7 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
     switch (cmd->m_cmd) {
     case DCcorefile:
     case DCinfolinemain:
+    case DCinfoline:
     case DCframe:
     case DCattach:
     case DCrun:

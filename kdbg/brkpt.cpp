@@ -217,6 +217,7 @@ void BreakpointTable::viewBP()
 	return;
 
     emit activateFileLine(bp->fileName, bp->lineNo, bp->address);
+    m_debugger->infoLine(bp->fileName, bp->lineNo);
 }
 
 void BreakpointTable::updateUI()

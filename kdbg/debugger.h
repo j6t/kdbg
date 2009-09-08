@@ -176,6 +176,15 @@ public:
     bool runUntil(const QString& fileName, int lineNo);
 
     /**
+     * Ask debugger for information about the specified line in the specified file.
+     *
+     * @param fileName The source file in which to set the breakpoint.
+     * @param lineNo The zero-based line number.
+     * @return false if the command was not executed, e.g. because the
+     * debuggee is running at the moment.
+     */
+    bool infoLine(QString fileName, int lineNo);
+    /**
      * Set a breakpoint.
      *
      * @param fileName The source file in which to set the breakpoint.
