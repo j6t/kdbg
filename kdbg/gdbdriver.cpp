@@ -133,7 +133,7 @@ GdbDriver::GdbDriver() :
 
 #ifndef NDEBUG
     // check command info array
-    char* perc;
+    const char* perc;
     for (int i = 0; i < NUM_CMDS; i++) {
 	// must be indexable by DbgCommand values, i.e. sorted by DbgCommand values
 	assert(i == cmds[i].cmd);
@@ -669,7 +669,7 @@ static bool parseErrorMessage(const char*& output,
     // skip warnings
     while (strncmp(output, "warning:", 8) == 0)
     {
-	char* end = strchr(output+8, '\n');
+	const char* end = strchr(output+8, '\n');
 	if (end == 0)
 	    output += strlen(output);
 	else
@@ -1856,8 +1856,10 @@ std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 	    p++;
 	    // there follows only whitespace
 	}
-	char* end;
-	thr.id = strtol(p, &end, 10);
+	const char* end;
+	char *temp_end = NULL; /* we need a non-const 'end' for strtol to use...*/
+	thr.id = strtol(p, &temp_end, 10);
+	end = temp_end;
 	if (p == end) {
 	    // syntax error: no number found; bail out
 	    return threads;
