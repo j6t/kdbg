@@ -653,11 +653,11 @@ void ExprWnd::unhookSubtree(std::list<VarTree*>& list, VarTree* subTree)
 
     std::list<VarTree*>::iterator i = list.begin();
     while (i != list.end()) {
-	VarTree* checkItem = *i;
+	std::list<VarTree*>::iterator checkItem = i;
 	++i;
-	if (subTree->isAncestorEq(checkItem)) {
+	if (subTree->isAncestorEq(*checkItem)) {
 	    // checkItem is an item from subTree
-	    list.erase(i);
+	    list.erase(checkItem);
 	}
     }
 }
