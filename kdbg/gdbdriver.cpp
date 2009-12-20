@@ -333,7 +333,7 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
     case DCnexti:
     case DCfinish:
     case DCuntil:
-	parseMarker();
+	parseMarker(cmd);
     default:;
     }
 }
@@ -343,7 +343,7 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
  * each time the program stops and at some other points. The sequence has
  * the form "\032\032filename:lineno:charoffset:(beg|middle):address".
  */
-void GdbDriver::parseMarker()
+void GdbDriver::parseMarker(CmdQueueItem* cmd)
 {
     char* startMarker = strstr(m_output, "\032\032");
     if (startMarker == 0)
@@ -366,9 +366,12 @@ void GdbDriver::parseMarker()
     if (lineNoStart >= 0) {
 	int lineNo = atoi(startMarker + lineNoStart+1);
 
-	// get address
-	const char* addrStart = startMarker + lineNoStart + len - 2;
-	DbgAddr address = QString(addrStart).stripWhiteSpace();
+	// get address unless there is one in cmd
+	DbgAddr address = cmd->m_addr;
+	if (address.isEmpty()) {
+	    const char* addrStart = startMarker + lineNoStart + len - 2;
+	    address = QString(addrStart).stripWhiteSpace();
+	}
 
 	// now show the window
 	startMarker[lineNoStart] = '\0';   /* split off file name */

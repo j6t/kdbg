@@ -150,6 +150,7 @@ struct CmdQueueItem
     // remember file position
     QString m_fileName;
     int m_lineNo;
+    DbgAddr m_addr;
     // the breakpoint info
     Breakpoint* m_brkpt;
     int m_existingBrkpt;

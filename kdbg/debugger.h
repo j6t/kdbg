@@ -178,12 +178,16 @@ public:
     /**
      * Ask debugger for information about the specified line in the specified file.
      *
+     * If \a addr is given, then it is used as a hint to position
+     * to position the cursor in the source window at that address
+     * if it belongs to the specified line.
      * @param fileName The source file in which to set the breakpoint.
      * @param lineNo The zero-based line number.
+     * @param addr An address that belongs to the name; can be empty.
      * @return false if the command was not executed, e.g. because the
      * debuggee is running at the moment.
      */
-    bool infoLine(QString fileName, int lineNo);
+    bool infoLine(QString fileName, int lineNo, const DbgAddr& addr);
     /**
      * Set a breakpoint.
      *

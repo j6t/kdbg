@@ -432,10 +432,15 @@ CmdQueueItem* KDebugger::executeBreakpoint(const Breakpoint* bp, bool queueOnly)
     return cmd;
 }
 
-bool KDebugger::infoLine(QString file, int lineNo)
+bool KDebugger::infoLine(QString file, int lineNo, const DbgAddr& addr)
 {
-    m_d->executeCmd(DCinfoline, file, lineNo);
-    return true;
+    if (isReady() && !m_programRunning) {
+	CmdQueueItem* cmd = m_d->executeCmd(DCinfoline, file, lineNo);
+	cmd->m_addr = addr;
+	return true;
+    } else {
+	return false;
+    }
 }
 
 bool KDebugger::enableDisableBreakpoint(QString file, int lineNo,

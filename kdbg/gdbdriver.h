@@ -86,7 +86,7 @@ protected:
     QString makeCmdString(DbgCommand cmd, QString strArg, int intArg);
     QString makeCmdString(DbgCommand cmd, QString strArg1, QString strArg2);
     QString makeCmdString(DbgCommand cmd, int intArg1, int intArg2);
-    void parseMarker();
+    void parseMarker(CmdQueueItem* cmd);
 };
 
 #endif // GDBDRIVER_H
