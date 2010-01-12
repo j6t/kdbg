@@ -610,7 +610,7 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
 	m_recentExecAction->removeURL(KURL(fi.absFilePath()));
     }
 
-    return true;
+    return success;
 }
 
 void DebuggerMainWnd::slotNewStatusMsg()
