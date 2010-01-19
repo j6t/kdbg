@@ -4,7 +4,7 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <qdict.h>
+#include <q3dict.h>
 #include <qstring.h>
 #include <qregexp.h>
 #include <qstringlist.h>
@@ -87,7 +87,7 @@ public:
     /**
      * Copy type infos to the specified dictionary.
      */
-    void copyTypes(QDict<TypeInfo>& dict);
+    void copyTypes(Q3Dict<TypeInfo>& dict);
 
     /**
      * Returns the template types
@@ -118,8 +118,8 @@ protected:
     static void loadTypeTables();
     void loadFromFile(const QString& fileName);
     void readType(KConfigBase& cf, const QString& type);
-    QDict<TypeInfo> m_typeDict;
-    QDict<TypeInfo> m_aliasDict;
+    Q3Dict<TypeInfo> m_typeDict;
+    Q3Dict<TypeInfo> m_aliasDict;
     TypeMap m_templates;
     QString m_displayName;
     QRegExp m_shlibNameRE;
@@ -176,8 +176,8 @@ public:
     const char* printQStringDataCmd() const { return m_printQStringDataCmd; }
 
 protected:
-    QDict<TypeInfo> m_types;
-    QDict<TypeInfo> m_aliasDict;
+    Q3Dict<TypeInfo> m_types;
+    Q3Dict<TypeInfo> m_aliasDict;
     struct TemplateInfo {
 	QStringList templateArgs;
 	TypeInfo* type;

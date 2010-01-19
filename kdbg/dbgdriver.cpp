@@ -78,7 +78,7 @@ bool DebuggerDriver::startup(QString cmdStr)
     // open log file
     if (!m_logFile.isOpen() && !m_logFileName.isEmpty()) {
 	m_logFile.setName(m_logFileName);
-	m_logFile.open(IO_WriteOnly);
+	m_logFile.open(QIODevice::WriteOnly);
     }
 
     return true;

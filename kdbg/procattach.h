@@ -8,12 +8,15 @@
 #define ProcAttach_included
 
 #include "ui_procattachbase.h"
-#include <qvaluevector.h>
+#include <q3valuevector.h>
 #include <qdialog.h>
 #include <qlabel.h>
 #include <qlineedit.h>
 #include <qpushbutton.h>
 #include <qlayout.h>
+#include <Q3VBoxLayout>
+#include <Q3CString>
+#include <Q3HBoxLayout>
 
 
 class KProcess;
@@ -44,14 +47,14 @@ protected slots:
 
 protected:
     void pushLine();
-    bool setVisibility(QListViewItem* i, const QString& text);
+    bool setVisibility(Q3ListViewItem* i, const QString& text);
 
     KProcess* m_ps;
     // parse state
     int m_pidCol;	//!< The PID column in the ps output
     int m_ppidCol;	//!< The parent-PID column in the ps output
-    QCString m_token;
-    QValueVector<QString> m_line;
+    Q3CString m_token;
+    Q3ValueVector<QString> m_line;
 };
 
 
@@ -74,8 +77,8 @@ protected:
     QLineEdit m_processId;
     QPushButton m_buttonOK;
     QPushButton m_buttonCancel;
-    QVBoxLayout m_layout;
-    QHBoxLayout m_buttons;
+    Q3VBoxLayout m_layout;
+    Q3HBoxLayout m_buttons;
 };
 
 #endif // ProcAttach_included

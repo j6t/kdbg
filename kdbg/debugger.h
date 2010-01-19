@@ -8,7 +8,7 @@
 #define DEBUGGER_H
 
 #include <qtimer.h>
-#include <qdict.h>
+#include <q3dict.h>
 #include <qstringlist.h>
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
@@ -21,7 +21,7 @@ class KTreeViewItem;
 class KConfig;
 class KConfigBase;
 class KConfig;
-class QListBox;
+class Q3ListBox;
 class RegisterInfo;
 class ThreadInfo;
 class DebuggerDriver;
@@ -40,7 +40,7 @@ public:
     KDebugger(QWidget* parent,		/* will be used as the parent for dialogs */
 	      ExprWnd* localVars,
 	      ExprWnd* watchVars,
-	      QListBox* backtrace);
+	      Q3ListBox* backtrace);
     ~KDebugger();
 
     /**
@@ -364,7 +364,7 @@ protected:
     void handleRunCommands(const char* output);
     void updateAllExprs();
     void updateProgEnvironment(const QString& args, const QString& wd,
-			       const QDict<EnvVar>& newVars,
+			       const Q3Dict<EnvVar>& newVars,
 			       const QStringList& newOptions);
     void parseLocals(const char* output, std::list<ExprValue*>& newVars);
     void handleLocals(const char* output);
@@ -417,7 +417,7 @@ protected:
     QString m_programArgs;
     QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
-    QDict<EnvVar> m_envVars;		/* environment variables set by user */
+    Q3Dict<EnvVar> m_envVars;		/* environment variables set by user */
     QStringList m_boolOptions;		/* boolean options */
     QStringList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
@@ -437,7 +437,7 @@ protected slots:
     void slotInferiorRunning();
     void backgroundUpdate();
     void gotoFrame(int);
-    void slotExpanding(QListViewItem*);
+    void slotExpanding(Q3ListViewItem*);
     void slotDeleteWatch();
     void slotValuePopup(const QString&);
     void slotDisassemble(const QString&, int);
@@ -555,7 +555,7 @@ signals:
 protected:
     ExprWnd& m_localVariables;
     ExprWnd& m_watchVariables;
-    QListBox& m_btWindow;
+    Q3ListBox& m_btWindow;
 
     // implementation helpers
 protected:

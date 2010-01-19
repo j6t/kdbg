@@ -8,7 +8,9 @@
 #include "sourcewnd.h"
 #include <qbrush.h>
 #include <qfileinfo.h>
-#include <qpopupmenu.h>
+#include <q3popupmenu.h>
+#include <QContextMenuEvent>
+#include <QCloseEvent>
 #include <kapplication.h>
 #include <kmainwindow.h>
 #include <klocale.h>			/* i18n */
@@ -43,8 +45,8 @@ void WinStack::contextMenuEvent(QContextMenuEvent* e)
 	top = top->parentWidget();
     while (!top->isTopLevel());
     KMainWindow* mw = static_cast<KMainWindow*>(top);
-    QPopupMenu* m =
-	static_cast<QPopupMenu*>(mw->factory()->container("popup_files_empty", mw));
+    Q3PopupMenu* m =
+	static_cast<Q3PopupMenu*>(mw->factory()->container("popup_files_empty", mw));
     m->exec(e->globalPos());
 }
 

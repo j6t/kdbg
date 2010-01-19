@@ -19,11 +19,13 @@
 #include <kkeydialog.h>
 #include <kanimwidget.h>
 #include <kwin.h>
-#include <qlistbox.h>
+#include <q3listbox.h>
 #include <qfile.h>
 #include <qfileinfo.h>
-#include <qtabdialog.h>
-#include <qtextstream.h>
+#include <q3tabdialog.h>
+#include <q3textstream.h>
+#include <Q3ValueList>
+#include <Q3PopupMenu>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "commandids.h"
@@ -67,7 +69,7 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     setCentralWidget(m_filesWindow);
 
     QDockWidget* dw1 = createDockWidget("Stack", i18n("Stack"));
-    m_btWindow = new QListBox(dw1);
+    m_btWindow = new Q3ListBox(dw1);
     dw1->setWidget(m_btWindow);
     QDockWidget* dw2 = createDockWidget("Locals", i18n("Locals"));
     m_localVariables = new ExprWnd(dw2, i18n("Variable"));
@@ -163,8 +165,8 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	    m_debugger, SLOT(setThread(int)));
 
     // popup menu of the local variables window
-    connect(m_localVariables, SIGNAL(contextMenuRequested(QListViewItem*, const QPoint&, int)),
-	    this, SLOT(slotLocalsPopup(QListViewItem*, const QPoint&)));
+    connect(m_localVariables, SIGNAL(contextMenuRequested(Q3ListViewItem*, const QPoint&, int)),
+	    this, SLOT(slotLocalsPopup(Q3ListViewItem*, const QPoint&)));
 
     restoreSettings(kapp->config());
 
@@ -325,8 +327,8 @@ void DebuggerMainWnd::initKAction()
 			this, SLOT(slotEditValue()), "edit_value");
 
     // all actions force an UI update
-    QValueList<KAction*> actions = actionCollection()->actions();
-    QValueList<KAction*>::Iterator it = actions.begin();
+    Q3ValueList<KAction*> actions = actionCollection()->actions();
+    Q3ValueList<KAction*>::Iterator it = actions.begin();
     for (; it != actions.end(); ++it) {
 	connect(*it, SIGNAL(activated()), this, SLOT(updateUI()));
     }
@@ -404,7 +406,7 @@ void DebuggerMainWnd::saveSettings(KConfig* config)
 
     QString layout;
     {
-	QTextStream stream(&layout, IO_WriteOnly);
+	Q3TextStream stream(&layout, QIODevice::WriteOnly);
 	stream << *this;
     }
     config->writeEntry("Layout", layout);
@@ -439,7 +441,7 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
 
     QString layout = config->readEntry("Layout");
     {
-	QTextStream stream(&layout, IO_ReadOnly);
+	Q3TextStream stream(&layout, QIODevice::ReadOnly);
 	stream >> *this;
     }
 
@@ -791,7 +793,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 {
     int oldTabWidth = m_tabWidth;
 
-    QTabDialog dlg(this, "global_options", true);
+    Q3TabDialog dlg(this, "global_options", true);
     QString title = kapp->caption();
     title += i18n(": Global options");
     dlg.setCaption(title);
@@ -991,7 +993,7 @@ QString DebuggerMainWnd::createOutputWindow()
     {
 	// read the ttyname from the fifo
 	QFile f(fifoName);
-	if (f.open(IO_ReadOnly))
+	if (f.open(QIODevice::ReadOnly))
 	{
 	    QByteArray t = f.readAll();
 	    tty = QString::fromLocal8Bit(t, t.size());
@@ -1070,10 +1072,10 @@ QString DebuggerMainWnd::makeSourceFilter()
 /*
  * Pop up the context menu in the locals window
  */
-void DebuggerMainWnd::slotLocalsPopup(QListViewItem*, const QPoint& pt)
+void DebuggerMainWnd::slotLocalsPopup(Q3ListViewItem*, const QPoint& pt)
 {
-    QPopupMenu* popup =
-	static_cast<QPopupMenu*>(factory()->container("popup_locals", this));
+    Q3PopupMenu* popup =
+	static_cast<Q3PopupMenu*>(factory()->container("popup_locals", this));
     if (popup == 0) {
         return;
     }

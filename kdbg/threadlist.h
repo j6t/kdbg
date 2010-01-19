@@ -7,14 +7,14 @@
 #ifndef THREADLIST_H
 #define THREADLIST_H
 
-#include <qlistview.h>
+#include <q3listview.h>
 #include <qpixmap.h>
 #include <list>
 
 class ThreadInfo;
 class ThreadEntry;
 
-class ThreadList : public QListView
+class ThreadList : public Q3ListView
 {
     Q_OBJECT
 public:
@@ -23,7 +23,7 @@ public:
 
 public slots:
     void updateThreads(const std::list<ThreadInfo>&);
-    void slotCurrentChanged(QListViewItem*);
+    void slotCurrentChanged(Q3ListViewItem*);
 
 signals:
     void setThread(int);

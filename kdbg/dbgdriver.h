@@ -9,7 +9,7 @@
 
 #include <qfile.h>
 #include <qregexp.h>
-#include <qcstring.h>
+#include <q3cstring.h>
 #include <kprocess.h>
 #include <queue>
 #include <list>

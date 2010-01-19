@@ -7,9 +7,9 @@
 #ifndef PGMSETTINGS_H
 #define PGMSETTINGS_H
 
-#include <qtabdialog.h>
+#include <q3tabdialog.h>
 
-class QButtonGroup;
+class Q3ButtonGroup;
 class QLineEdit;
 
 
@@ -33,13 +33,13 @@ public:
     int ttyLevel() const { return m_ttyLevel; }
 protected:
     int m_ttyLevel;
-    QButtonGroup* m_group;
+    Q3ButtonGroup* m_group;
 protected slots:
     void slotLevelChanged(int);
 };
 
 
-class ProgramSettings : public QTabDialog
+class ProgramSettings : public Q3TabDialog
 {
     Q_OBJECT
 public:

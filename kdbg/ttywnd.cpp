@@ -5,7 +5,7 @@
  */
 
 #include <qsocketnotifier.h>
-#include <qpopupmenu.h>
+#include <q3popupmenu.h>
 #include "ttywnd.h"
 #include <kglobalsettings.h>
 #include <klocale.h>
@@ -131,7 +131,7 @@ void STTY::outReceived(int f)
 
 
 TTYWindow::TTYWindow(QWidget* parent) :
-	QTextEdit(parent),
+	Q3TextEdit(parent),
 	m_tty(0),
 	m_hPos(0)
 {
@@ -214,9 +214,9 @@ void TTYWindow::slotAppend(char* buffer, int count)
     }
 }
 
-QPopupMenu* TTYWindow::createPopupMenu(const QPoint& pos)
+Q3PopupMenu* TTYWindow::createPopupMenu(const QPoint& pos)
 {
-    QPopupMenu* menu = QTextEdit::createPopupMenu(pos);
+    Q3PopupMenu* menu = Q3TextEdit::createPopupMenu(pos);
     menu->insertSeparator();
     menu->insertItem(i18n("&Clear"), this, SLOT(slotClear()));
     return menu;

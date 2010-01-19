@@ -8,17 +8,18 @@
 #define DBGMAINWND_H
 
 #include <qtimer.h>
-#include <qdockwindow.h>
+#include <q3dockwindow.h>
+#include <Q3CString>
 #include <kmainwindow.h>
 #include "regwnd.h"
 
-typedef QDockWindow QDockWidget;
+typedef Q3DockWindow QDockWidget;
 class KProcess;
 class KRecentFilesAction;
 class KToggleAction;
 class WinStack;
-class QListBox;
-class QCString;
+class Q3ListBox;
+class Q3CString;
 class ExprWnd;
 class BreakpointTable;
 class ThreadList;
@@ -65,7 +66,7 @@ protected:
 
     // view windows
     WinStack* m_filesWindow;
-    QListBox* m_btWindow;
+    Q3ListBox* m_btWindow;
     ExprWnd* m_localVariables;
     WatchWindow* m_watches;
     RegisterView* m_registers;
@@ -184,7 +185,7 @@ public slots:
     void slotProgramStopped();
     void slotBackTimer();
     void slotRecentExec(const KURL& url);
-    void slotLocalsPopup(QListViewItem*, const QPoint& pt);
+    void slotLocalsPopup(Q3ListViewItem*, const QPoint& pt);
     void slotLocalsToWatch();
     void slotEditValue();
 

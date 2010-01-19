@@ -4,13 +4,14 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <qheader.h>
+#include <q3header.h>
+#include <QPixmap>
 #include <kglobalsettings.h>
 #include <klocale.h>			/* i18n */
 #include <kiconloader.h>
 #include <qfontdialog.h>
 #include <qmessagebox.h>
-#include <qpopupmenu.h>
+#include <q3popupmenu.h>
 #include <qregexp.h>
 #include <qstringlist.h>
 #include <stdlib.h>			/* strtoul */
@@ -94,11 +95,11 @@ uint RegisterDisplay::bitMap[] = {
   64, 80, 128, /*default*/32,
 };
 
-class ModeItem : public QListViewItem 
+class ModeItem : public Q3ListViewItem 
 {
 public:
-    ModeItem(QListView* parent, const QString& name) : QListViewItem(parent, name) {}
-    ModeItem(QListViewItem* parent) : QListViewItem(parent) {}
+    ModeItem(Q3ListView* parent, const QString& name) : Q3ListViewItem(parent, name) {}
+    ModeItem(Q3ListViewItem* parent) : Q3ListViewItem(parent) {}
 
     virtual void setMode(RegisterDisplay mode) = 0;
     virtual RegisterDisplay mode() = 0;
@@ -122,7 +123,7 @@ public:
     virtual void setMode(RegisterDisplay mode)
     {
 	gmode=mode; 
-	QListViewItem *it=firstChild();
+	Q3ListViewItem *it=firstChild();
 	for (; 0!=it; it=it->nextSibling()) {
 	    (static_cast<ModeItem*>(it))->setMode(gmode);
 	}
@@ -407,15 +408,15 @@ void RegisterViewItem::paintCell(QPainter* p, const QColorGroup& cg,
     if (m_changes) {
 	QColorGroup newcg = cg;
 	newcg.setColor(QColorGroup::Text, Qt::red);
-	QListViewItem::paintCell(p, newcg, column, width, alignment);
+	Q3ListViewItem::paintCell(p, newcg, column, width, alignment);
     } else {
-	QListViewItem::paintCell(p, cg, column, width, alignment);
+	Q3ListViewItem::paintCell(p, cg, column, width, alignment);
     }
 }
 
 
 RegisterView::RegisterView(QWidget* parent) :
-	QListView(parent)
+	Q3ListView(parent)
 {
     setSorting(-1);
     setFont(KGlobalSettings::fixedFont());
@@ -424,9 +425,9 @@ RegisterView::RegisterView(QWidget* parent) :
     QPixmap iconWatchcoded = UserIcon("watchcoded.xpm");
     QPixmap iconWatch = UserIcon("watch.xpm");
 
-    addColumn(QIconSet(iconRegs), i18n("Register"));
-    addColumn(QIconSet(iconWatchcoded), i18n("Value"));
-    addColumn(QIconSet(iconWatch), i18n("Decoded value"));
+    addColumn(QIcon(iconRegs), i18n("Register"));
+    addColumn(QIcon(iconWatchcoded), i18n("Value"));
+    addColumn(QIcon(iconWatch), i18n("Decoded value"));
 
     setColumnAlignment(0, Qt::AlignLeft);
     setColumnAlignment(1, Qt::AlignLeft);
@@ -435,10 +436,10 @@ RegisterView::RegisterView(QWidget* parent) :
     setAllColumnsShowFocus( true );
     header()->setClickEnabled(false);
 
-    connect(this, SIGNAL(contextMenuRequested(QListViewItem*, const QPoint&, int)),
-	    SLOT(rightButtonClicked(QListViewItem*,const QPoint&,int)));
+    connect(this, SIGNAL(contextMenuRequested(Q3ListViewItem*, const QPoint&, int)),
+	    SLOT(rightButtonClicked(Q3ListViewItem*,const QPoint&,int)));
 
-    m_modemenu = new QPopupMenu(this, "ERROR");
+    m_modemenu = new Q3PopupMenu(this, "ERROR");
     for (uint i=0; i<sizeof(menuitems)/sizeof(MenuPair); i++) {
 	if (menuitems[i].isSeparator())
 	    m_modemenu->insertSeparator();
@@ -480,7 +481,7 @@ RegisterView::~RegisterView()
 
 GroupingViewItem* RegisterView::findMatchingGroup(const QString& regName)
 {
-    for (QListViewItem* it = firstChild(); it != 0; it = it->nextSibling())
+    for (Q3ListViewItem* it = firstChild(); it != 0; it = it->nextSibling())
     {
 	GroupingViewItem* i = static_cast<GroupingViewItem*>(it);
 	if (i->matchName(regName))
@@ -492,7 +493,7 @@ GroupingViewItem* RegisterView::findMatchingGroup(const QString& regName)
 
 GroupingViewItem* RegisterView::findGroup(const QString& groupName)
 {
-    for (QListViewItem* it = firstChild(); it != 0; it = it->nextSibling())
+    for (Q3ListViewItem* it = firstChild(); it != 0; it = it->nextSibling())
     {
 	if (it->text(0) == groupName)
 	    return static_cast<GroupingViewItem*>(it);
@@ -502,7 +503,7 @@ GroupingViewItem* RegisterView::findGroup(const QString& groupName)
 
 void RegisterView::updateGroupVisibility()
 {
-    for (QListViewItem* it = firstChild(); it != 0; it = it->nextSibling())
+    for (Q3ListViewItem* it = firstChild(); it != 0; it = it->nextSibling())
     {
 	it->setVisible(it->childCount() > 0);
     }
@@ -575,7 +576,7 @@ void RegisterView::updateRegisters(const std::list<RegisterInfo>& regs)
 }
   
 
-void RegisterView::rightButtonClicked(QListViewItem* item, const QPoint& p, int)
+void RegisterView::rightButtonClicked(Q3ListViewItem* item, const QPoint& p, int)
 {
     if (item) {
         RegisterDisplay mode=static_cast<ModeItem*>(item)->mode();        
@@ -607,7 +608,7 @@ void RegisterView::slotModeChange(int pcode)
 void RegisterView::paletteChange(const QPalette& oldPal)
 {
     setFont(KGlobalSettings::fixedFont());
-    QListView::paletteChange(oldPal);
+    Q3ListView::paletteChange(oldPal);
 }
 
 #include "regwnd.moc"

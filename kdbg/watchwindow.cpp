@@ -5,7 +5,11 @@
  */
 
 #include <klocale.h>			/* i18n */
-#include <qdragobject.h>
+#include <q3dragobject.h>
+#include <QEvent>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QKeyEvent>
 #include "watchwindow.h"
 
 WatchWindow::WatchWindow(QWidget* parent) :
@@ -29,7 +33,7 @@ WatchWindow::WatchWindow(QWidget* parent) :
     connect(&m_watchEdit, SIGNAL(returnPressed()), SIGNAL(addWatch()));
     connect(&m_watchAdd, SIGNAL(clicked()), SIGNAL(addWatch()));
     connect(&m_watchDelete, SIGNAL(clicked()), SIGNAL(deleteWatch()));
-    connect(&m_watchVariables, SIGNAL(currentChanged(QListViewItem*)),
+    connect(&m_watchVariables, SIGNAL(currentChanged(Q3ListViewItem*)),
 	    SLOT(slotWatchHighlighted()));
 
     m_watchVariables.installEventFilter(this);
@@ -45,7 +49,7 @@ bool WatchWindow::eventFilter(QObject*, QEvent* ev)
     if (ev->type() == QEvent::KeyPress)
     {
 	QKeyEvent* kev = static_cast<QKeyEvent*>(ev);
-	if (kev->key() == Key_Delete) {
+	if (kev->key() == Qt::Key_Delete) {
 	    emit deleteWatch();
 	    return true;
 	}
@@ -55,13 +59,13 @@ bool WatchWindow::eventFilter(QObject*, QEvent* ev)
 
 void WatchWindow::dragEnterEvent(QDragEnterEvent* event)
 {
-    event->accept(QTextDrag::canDecode(event));
+    event->accept(Q3TextDrag::canDecode(event));
 }
 
 void WatchWindow::dropEvent(QDropEvent* event)
 {
     QString text;
-    if (QTextDrag::decode(event, text))
+    if (Q3TextDrag::decode(event, text))
     {
 	// pick only the first line
 	text = text.stripWhiteSpace();

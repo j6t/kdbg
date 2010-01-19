@@ -6,13 +6,17 @@
 
 #include "debugger.h"
 #include "sourcewnd.h"
-#include <qtextstream.h>
+#include <q3textstream.h>
 #include <qpainter.h>
 #include <qbrush.h>
 #include <qfile.h>
 #include <qfileinfo.h>
-#include <qkeycode.h>
-#include <qpopupmenu.h>
+#include <qnamespace.h>
+#include <q3popupmenu.h>
+#include <QContextMenuEvent>
+#include <QKeyEvent>
+#include <QMouseEvent>
+#include <QEvent>
 #include <kapplication.h>
 #include <kiconloader.h>
 #include <kglobalsettings.h>
@@ -22,7 +26,7 @@
 
 
 SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
-	QTextEdit(parent),
+	Q3TextEdit(parent),
 	m_fileName(fileName),
 	m_curRow(-1),
 	m_widthItems(16),
@@ -64,11 +68,11 @@ bool SourceWindow::loadFile()
 {
     // first we load the code into QTextEdit
     QFile f(m_fileName);
-    if (!f.open(IO_ReadOnly)) {
+    if (!f.open(QIODevice::ReadOnly)) {
 	return false;
     }
 
-    QTextStream t(&f);
+    Q3TextStream t(&f);
     setText(t.read());
     f.close();
 
@@ -92,7 +96,7 @@ bool SourceWindow::loadFile()
 void SourceWindow::reloadFile()
 {
     QFile f(m_fileName);
-    if (!f.open(IO_ReadOnly)) {
+    if (!f.open(QIODevice::ReadOnly)) {
 	// open failed; leave alone
 	return;
     }
@@ -100,7 +104,7 @@ void SourceWindow::reloadFile()
     // read text into m_sourceCode
     m_sourceCode.clear();		/* clear old text */
 
-    QTextStream t(&f);
+    Q3TextStream t(&f);
     setText(t.read());
     f.close();
 
@@ -147,7 +151,7 @@ void SourceWindow::scrollToRow(int row)
 
 void SourceWindow::drawFrame(QPainter* p)
 {
-    QTextEdit::drawFrame(p);
+    Q3TextEdit::drawFrame(p);
 
     // and paragraph at the top is...
     int top = paragraphAt(QPoint(0,contentsY()));
@@ -322,11 +326,11 @@ void SourceWindow::setPC(bool set, int lineNo, const DbgAddr& address, int frame
 void SourceWindow::find(const QString& text, bool caseSensitive, FindDirection dir)
 {
     ASSERT(dir == 1 || dir == -1);
-    if (QTextEdit::find(text, caseSensitive, false, dir > 0))
+    if (Q3TextEdit::find(text, caseSensitive, false, dir > 0))
 	return;
     // not found; wrap around
     int para = dir > 0 ? 0 : paragraphs(), index = 0;
-    QTextEdit::find(text, caseSensitive, false, dir > 0, &para, &index);
+    Q3TextEdit::find(text, caseSensitive, false, dir > 0, &para, &index);
 }
 
 void SourceWindow::mousePressEvent(QMouseEvent* ev)
@@ -334,7 +338,7 @@ void SourceWindow::mousePressEvent(QMouseEvent* ev)
     // we handle left and middle button
     if (ev->button() != Qt::LeftButton && ev->button() != Qt::MidButton)
     {
-	QTextEdit::mousePressEvent(ev);
+	Q3TextEdit::mousePressEvent(ev);
 	return;
     }
 
@@ -412,7 +416,7 @@ void SourceWindow::keyPressEvent(QKeyEvent* ev)
 	top1 = paragraphAt(top);
     }
 
-    QTextEdit::keyPressEvent(ev);
+    Q3TextEdit::keyPressEvent(ev);
 
     switch (ev->key()) {
     case Qt::Key_Next:
@@ -456,7 +460,7 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 void SourceWindow::paletteChange(const QPalette& oldPal)
 {
     setFont(KGlobalSettings::fixedFont());
-    QTextEdit::paletteChange(oldPal);
+    Q3TextEdit::paletteChange(oldPal);
 }
 
 /*
@@ -751,8 +755,8 @@ void SourceWindow::contextMenuEvent(QContextMenuEvent* e)
 	top = top->parentWidget();
     while (!top->isTopLevel());
     KMainWindow* mw = static_cast<KMainWindow*>(top);
-    QPopupMenu* m =
-	static_cast<QPopupMenu*>(mw->factory()->container("popup_files", mw));
+    Q3PopupMenu* m =
+	static_cast<Q3PopupMenu*>(mw->factory()->container("popup_files", mw));
     m->exec(e->globalPos());
 }
 
@@ -763,11 +767,11 @@ bool SourceWindow::eventFilter(QObject* watched, QEvent* e)
 	contextMenuEvent(static_cast<QContextMenuEvent*>(e));
 	return true;
     }
-    return QTextEdit::eventFilter(watched, e);
+    return Q3TextEdit::eventFilter(watched, e);
 }
 
 HighlightCpp::HighlightCpp(SourceWindow* srcWnd) :
-	QSyntaxHighlighter(srcWnd),
+	Q3SyntaxHighlighter(srcWnd),
 	m_srcWnd(srcWnd)
 {
 }

@@ -7,14 +7,14 @@
 #include "pgmargs.h"
 #include <qlabel.h>
 #include <qpushbutton.h>
-#include <qlistview.h>
-#include <qlistbox.h>
+#include <q3listview.h>
+#include <q3listbox.h>
 #include <qtabwidget.h>
 #include <kfiledialog.h>
 #include <klocale.h>			/* i18n */
 #include "mydebug.h"
 
-PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars,
+PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, Q3Dict<EnvVar>& envVars,
 		 const QStringList& allOptions) :
 	PgmArgsBase(parent, "pgmargs", true),
 	m_envVars(envVars)
@@ -96,7 +96,7 @@ void PgmArgs::modifyVar(bool resurrect)
 	    {
 		val->value = value;
 		val->status = EnvVar::EVdirty;
-		val->item = new QListViewItem(envList, name, value);	// inserts itself
+		val->item = new Q3ListViewItem(envList, name, value);	// inserts itself
 		m_envVars.insert(name, val);
 	    }
 	} else if (value != val->value) {
@@ -110,7 +110,7 @@ void PgmArgs::modifyVar(bool resurrect)
 	val = new EnvVar;
 	val->value = value;
 	val->status = EnvVar::EVnew;
-	val->item = new QListViewItem(envList, name, value);	// inserts itself
+	val->item = new Q3ListViewItem(envList, name, value);	// inserts itself
 	m_envVars.insert(name, val);
     }
     envList->setSelected(val->item, true);
@@ -120,7 +120,7 @@ void PgmArgs::modifyVar(bool resurrect)
 // delete the selected item
 void PgmArgs::deleteVar()
 {
-    QListViewItem* item = envList->selectedItem();
+    Q3ListViewItem* item = envList->selectedItem();
     if (item == 0)
 	return;
     QString name = item->text(0);
@@ -161,13 +161,13 @@ void PgmArgs::parseEnvInput(QString& name, QString& value)
 
 void PgmArgs::initEnvList()
 {
-    QDictIterator<EnvVar> it = m_envVars;
+    Q3DictIterator<EnvVar> it = m_envVars;
     EnvVar* val;
     QString name;
     for (; (val = it) != 0; ++it) {
 	val->status = EnvVar::EVclean;
 	name = it.currentKey();
-	val->item = new QListViewItem(envList, name, val->value);	// inserts itself
+	val->item = new Q3ListViewItem(envList, name, val->value);	// inserts itself
     }
 
     envList->setAllColumnsShowFocus(true);
@@ -176,7 +176,7 @@ void PgmArgs::initEnvList()
 
 void PgmArgs::envListCurrentChanged()
 {
-    QListViewItem* item = envList->selectedItem();
+    Q3ListViewItem* item = envList->selectedItem();
     buttonDelete->setEnabled(item != 0);
     if (item == 0)
 	return;

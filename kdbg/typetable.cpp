@@ -5,7 +5,7 @@
  */
 
 #include <qdir.h>
-#include <qptrlist.h>
+#include <q3ptrlist.h>
 #include <kglobal.h>
 #include <kstandarddirs.h>
 #include <ksimpleconfig.h>
@@ -45,7 +45,7 @@ void TypeTable::loadTypeTables()
 	return;
     }
 
-    for (QValueListConstIterator<QString> p = files.begin(); p != files.end(); ++p) {
+    for (Q3ValueListConstIterator<QString> p = files.begin(); p != files.end(); ++p) {
 	typeTables.push_back(TypeTable());
 	typeTables.back().loadFromFile(*p);
     }
@@ -182,12 +182,12 @@ void TypeTable::readType(KConfigBase& cf, const QString& type)
     TRACE(type + QString().sprintf(": %d exprs", info->m_numExprs));
 }
 
-void TypeTable::copyTypes(QDict<TypeInfo>& dict)
+void TypeTable::copyTypes(Q3Dict<TypeInfo>& dict)
 {
-    for (QDictIterator<TypeInfo> it = m_typeDict; it != 0; ++it) {
+    for (Q3DictIterator<TypeInfo> it = m_typeDict; it != 0; ++it) {
 	dict.insert(it.currentKey(), it);
     }
-    for (QDictIterator<TypeInfo> it = m_aliasDict; it != 0; ++it) {
+    for (Q3DictIterator<TypeInfo> it = m_aliasDict; it != 0; ++it) {
 	dict.insert(it.currentKey(), it);
     }
 }

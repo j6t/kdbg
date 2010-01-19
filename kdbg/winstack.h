@@ -13,6 +13,10 @@
 #include <qcheckbox.h>
 #include <qpushbutton.h>
 #include <qtooltip.h>
+#include <Q3HBoxLayout>
+#include <Q3VBoxLayout>
+#include <QContextMenuEvent>
+#include <QCloseEvent>
 #include <ktabwidget.h>
 #include <list>
 
@@ -45,8 +49,8 @@ signals:
 
 protected:
     virtual void closeEvent(QCloseEvent* ev);
-    QVBoxLayout m_layout;
-    QHBoxLayout m_buttons;
+    Q3VBoxLayout m_layout;
+    Q3HBoxLayout m_buttons;
 };
 
 

@@ -12,14 +12,15 @@
 #include <qlineedit.h>
 #include <qlabel.h>
 #include <qradiobutton.h>
-#include <qbuttongroup.h>
+#include <q3buttongroup.h>
+#include <Q3VBoxLayout>
 #include "mydebug.h"
 
 
 ChooseDriver::ChooseDriver(QWidget* parent) :
 	QWidget(parent, "driver")
 {
-    QVBoxLayout* layout = new QVBoxLayout(this, 10);
+    Q3VBoxLayout* layout = new Q3VBoxLayout(this, 10);
 
     QLabel* label = new QLabel(this);
     label->setText(i18n("How to invoke &GDB - leave empty to use\n"
@@ -50,10 +51,10 @@ OutputSettings::OutputSettings(QWidget* parent) :
 	QWidget(parent, "output")
 {
     // the group is invisible
-    m_group = new QButtonGroup(this);
+    m_group = new Q3ButtonGroup(this);
     m_group->hide();
 
-    QVBoxLayout* layout = new QVBoxLayout(this, 10);
+    Q3VBoxLayout* layout = new Q3VBoxLayout(this, 10);
 
     QRadioButton* btn;
 
@@ -94,7 +95,7 @@ void OutputSettings::slotLevelChanged(int id)
 
 
 ProgramSettings::ProgramSettings(QWidget* parent, QString exeName, bool modal) :
-	QTabDialog(parent, "program_settings", modal),
+	Q3TabDialog(parent, "program_settings", modal),
 	m_chooseDriver(this),
 	m_output(this)
 {

@@ -5,9 +5,10 @@
  */
 
 #include "procattach.h"
-#include <qlistview.h>
+#include <q3listview.h>
 #include <qtoolbutton.h>
 #include <qlineedit.h>
+#include <Q3CString>
 #include <kprocess.h>
 #include <ctype.h>
 #include <kapplication.h>
@@ -27,11 +28,11 @@ ProcAttachPS::ProcAttachPS(QWidget* parent) :
     connect(m_ps, SIGNAL(processExited(KProcess*)),
 	    this, SLOT(slotPSDone()));
 
-    QIconSet icon = SmallIconSet("clear_left");
+    QIcon icon = SmallIconSet("clear_left");
     filterClear->setIconSet(icon);
 
     processList->setColumnWidth(0, 300);
-    processList->setColumnWidthMode(0, QListView::Manual);
+    processList->setColumnWidthMode(0, Q3ListView::Manual);
     processList->setColumnAlignment(1, Qt::AlignRight);
     processList->setColumnAlignment(2, Qt::AlignRight);
 
@@ -106,7 +107,7 @@ void ProcAttachPS::slotTextReceived(KProcess*, char* buffer, int buflen)
 		++buffer;
 	    } while (buffer < end && !isspace(*buffer));
 	    // append to the current token
-	    m_token += QCString(start, buffer-start+1);	// must count the '\0'
+	    m_token += Q3CString(start, buffer-start+1);	// must count the '\0'
 	}
     }
 }
@@ -143,17 +144,17 @@ void ProcAttachPS::pushLine()
     {
 	// insert a line
 	// find the parent process
-	QListViewItem* parent = 0;
+	Q3ListViewItem* parent = 0;
 	if (m_ppidCol >= 0 && m_ppidCol < int(m_line.size())) {
 	    parent = processList->findItem(m_line[m_ppidCol], 1);
 	}
 
 	// we assume that the last column is the command
-	QListViewItem* item;
+	Q3ListViewItem* item;
 	if (parent == 0) {
-	    item = new QListViewItem(processList, m_line.back());
+	    item = new Q3ListViewItem(processList, m_line.back());
 	} else {
-	    item = new QListViewItem(parent, m_line.back());
+	    item = new Q3ListViewItem(parent, m_line.back());
 	}
 	item->setOpen(true);
 	m_line.pop_back();
@@ -176,11 +177,11 @@ void ProcAttachPS::pushLine()
 	     * were placed at the root. Here we go through all root items
 	     * and check whether we must reparent them.
 	     */
-	    QListViewItem* i = processList->firstChild();
+	    Q3ListViewItem* i = processList->firstChild();
 	    while (i != 0)
 	    {
 		// advance before we reparent the item
-		QListViewItem* it = i;
+		Q3ListViewItem* it = i;
 		i = i->nextSibling();
 		if (it->text(2) == m_line[m_pidCol]) {
 		    processList->takeItem(it);
@@ -198,7 +199,7 @@ void ProcAttachPS::slotPSDone()
 
 QString ProcAttachPS::text() const
 {
-    QListViewItem* item = processList->selectedItem();
+    Q3ListViewItem* item = processList->selectedItem();
 
     if (item == 0)
 	return QString();
@@ -218,7 +219,7 @@ void ProcAttachPS::refresh()
 
 void ProcAttachPS::filterEdited(const QString& text)
 {
-    QListViewItem* i = processList->firstChild();
+    Q3ListViewItem* i = processList->firstChild();
     if (i) {
 	setVisibility(i, text);
     }
@@ -228,10 +229,10 @@ void ProcAttachPS::filterEdited(const QString& text)
  * Sets the visibility of \a i and
  * returns whether it was made visible.
  */
-bool ProcAttachPS::setVisibility(QListViewItem* i, const QString& text)
+bool ProcAttachPS::setVisibility(Q3ListViewItem* i, const QString& text)
 {
     bool visible = false;
-    for (QListViewItem* j = i->firstChild(); j; j = j->nextSibling())
+    for (Q3ListViewItem* j = i->firstChild(); j; j = j->nextSibling())
     {
 	if (setVisibility(j, text))
 	    visible = true;

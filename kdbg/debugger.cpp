@@ -12,7 +12,7 @@
 #include "pgmsettings.h"
 #include <qregexp.h>
 #include <qfileinfo.h>
-#include <qlistbox.h>
+#include <q3listbox.h>
 #include <qstringlist.h>
 #include <kapplication.h>
 #include <kconfig.h>
@@ -28,7 +28,7 @@
 KDebugger::KDebugger(QWidget* parent,
 		     ExprWnd* localVars,
 		     ExprWnd* watchVars,
-		     QListBox* backtrace) :
+		     Q3ListBox* backtrace) :
 	QObject(parent, "debugger"),
 	m_ttyLevel(ttyFull),
 	m_memoryFormat(MDTword | MDThex),
@@ -45,10 +45,10 @@ KDebugger::KDebugger(QWidget* parent,
 {
     m_envVars.setAutoDelete(true);
 
-    connect(&m_localVariables, SIGNAL(expanded(QListViewItem*)),
-	    SLOT(slotExpanding(QListViewItem*)));
-    connect(&m_watchVariables, SIGNAL(expanded(QListViewItem*)),
-	    SLOT(slotExpanding(QListViewItem*)));
+    connect(&m_localVariables, SIGNAL(expanded(Q3ListViewItem*)),
+	    SLOT(slotExpanding(Q3ListViewItem*)));
+    connect(&m_watchVariables, SIGNAL(expanded(Q3ListViewItem*)),
+	    SLOT(slotExpanding(Q3ListViewItem*)));
     connect(&m_localVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
 	    SLOT(slotValueEdited(VarTree*, const QString&)));
     connect(&m_watchVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
@@ -725,7 +725,7 @@ void KDebugger::saveProgramSettings()
     // write environment variables
     m_programConfig->deleteGroup(EnvironmentGroup);
     m_programConfig->setGroup(EnvironmentGroup);
-    QDictIterator<EnvVar> it = m_envVars;
+    Q3DictIterator<EnvVar> it = m_envVars;
     EnvVar* var;
     QString varName;
     QString varValue;
@@ -779,7 +779,7 @@ void KDebugger::restoreProgramSettings()
     // read environment variables
     m_programConfig->setGroup(EnvironmentGroup);
     m_envVars.clear();
-    QDict<EnvVar> pgmVars;
+    Q3Dict<EnvVar> pgmVars;
     EnvVar* var;
     QString varName;
     QString varValue;
@@ -1246,7 +1246,7 @@ void KDebugger::updateAllExprs()
 }
 
 void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
-				      const QDict<EnvVar>& newVars,
+				      const Q3Dict<EnvVar>& newVars,
 				      const QStringList& newOptions)
 {
     m_programArgs = args;
@@ -1260,7 +1260,7 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
     }
 
     // update environment variables
-    QDictIterator<EnvVar> it = newVars;
+    Q3DictIterator<EnvVar> it = newVars;
     EnvVar* val;
     for (; (val = it) != 0; ++it) {
 	QString var = it.currentKey();
@@ -1812,7 +1812,7 @@ CmdQueueItem* KDebugger::loadCoreFile()
     return m_d->queueCmd(DCcorefile, m_corefile, DebuggerDriver::QMoverride);
 }
 
-void KDebugger::slotExpanding(QListViewItem* item)
+void KDebugger::slotExpanding(Q3ListViewItem* item)
 {
     VarTree* exprItem = static_cast<VarTree*>(item);
     if (exprItem->m_varKind != VarTree::VKpointer) {

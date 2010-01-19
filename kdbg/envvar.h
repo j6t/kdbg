@@ -12,13 +12,13 @@
  * is given as the key in the QDict, so we don't repeat it here.
  */
 
-class QListViewItem;
+class Q3ListViewItem;
 
 struct EnvVar {
     QString value;
     enum EnvVarStatus { EVclean, EVdirty, EVnew, EVdeleted };
     EnvVarStatus status;
-    QListViewItem* item;
+    Q3ListViewItem* item;
 };
 
 #endif // ENVVAR_H

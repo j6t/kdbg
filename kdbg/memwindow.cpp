@@ -5,17 +5,20 @@
  */
 
 #include "memwindow.h"
-#include <qheader.h>
+#include <q3header.h>
+#include <QMouseEvent>
+#include <Q3StrList>
+#include <QEvent>
 #include <klocale.h>
 #include <kconfigbase.h>
 #include "debugger.h"
 
 
-class MemoryViewItem : public QListViewItem
+class MemoryViewItem : public Q3ListViewItem
 {
 public:
-    MemoryViewItem(QListView* parent, QListViewItem* insertAfter, QString raw, QString cooked)
-        : QListViewItem(parent, insertAfter, raw, cooked) {}
+    MemoryViewItem(Q3ListView* parent, Q3ListViewItem* insertAfter, QString raw, QString cooked)
+        : Q3ListViewItem(parent, insertAfter, raw, cooked) {}
 
     void setChanged(uint pos, bool b) { m_changed[pos] = b; }
 
@@ -32,9 +35,9 @@ void MemoryViewItem::paintCell(QPainter* p, const QColorGroup& cg,
     if( column > 0 && m_changed[column - 1] ) {
 	QColorGroup newcg = cg;
 	newcg.setColor(QColorGroup::Text, Qt::red);
-	QListViewItem::paintCell(p, newcg, column, width, alignment);
+	Q3ListViewItem::paintCell(p, newcg, column, width, alignment);
     } else {
-	QListViewItem::paintCell(p, cg, column, width, alignment);
+	Q3ListViewItem::paintCell(p, cg, column, width, alignment);
     }
 }
 
@@ -185,7 +188,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 {
     m_memory.clear();
     if (!msg.isEmpty()) {
-	new QListViewItem(&m_memory, QString(), msg);
+	new Q3ListViewItem(&m_memory, QString(), msg);
 	return;
     }
 
@@ -260,7 +263,7 @@ void MemoryWindow::saveProgramSpecific(KConfigBase* config)
     }
 
     // column widths
-    QStrList widths;
+    Q3StrList widths;
     QString wStr;
     for (int i = 0; i < 2; i++) {
 	int w = m_memory.columnWidth(i);
@@ -299,7 +302,7 @@ void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
     }
 
     // column widths
-    QStrList widths;
+    Q3StrList widths;
     int n = config->readListEntry(ColumnWidths, widths);
     if (n > 2)
 	n = 2;

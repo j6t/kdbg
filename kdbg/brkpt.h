@@ -7,11 +7,15 @@
 #ifndef BRKPT_H
 #define BRKPT_H
 
-#include <qlistview.h>
+#include <q3listview.h>
 #include <qlayout.h>
 #include <qpushbutton.h>
 #include <qlineedit.h>
-#include <qvaluevector.h>
+#include <q3valuevector.h>
+#include <QPixmap>
+#include <QEvent>
+#include <Q3HBoxLayout>
+#include <Q3VBoxLayout>
 
 class KDebugger;
 class BreakpointItem;
@@ -28,17 +32,17 @@ public:
 protected:
     KDebugger* m_debugger;
     QLineEdit m_bpEdit;
-    QListView m_list;
+    Q3ListView m_list;
     QPushButton m_btAddBP;
     QPushButton m_btAddWP;
     QPushButton m_btRemove;
     QPushButton m_btEnaDis;
     QPushButton m_btViewCode;
     QPushButton m_btConditional;
-    QHBoxLayout m_layout;
-    QVBoxLayout m_listandedit;
-    QVBoxLayout m_buttons;
-    QValueVector<QPixmap> m_icons;
+    Q3HBoxLayout m_layout;
+    Q3VBoxLayout m_listandedit;
+    Q3VBoxLayout m_buttons;
+    Q3ValueVector<QPixmap> m_icons;
 
     void insertBreakpoint(int num, bool temp, bool enabled, QString location,
 			  QString fileName = 0, int lineNo = -1,

@@ -9,10 +9,16 @@
 #include <kiconloader.h>
 #include <ksimpleconfig.h>
 #include <qdialog.h>
-#include <qkeycode.h>
+#include <qnamespace.h>
 #include <qpainter.h>
 #include <qlabel.h>
 #include <qbitmap.h>
+#include <Q3HBoxLayout>
+#include <Q3GridLayout>
+#include <QPixmap>
+#include <QMouseEvent>
+#include <QEvent>
+#include <Q3VBoxLayout>
 #include "debugger.h"
 #include "brkpt.h"
 #include "dbgdriver.h"
@@ -21,10 +27,10 @@
 #include "mydebug.h"
 
 
-class BreakpointItem : public QListViewItem, public Breakpoint
+class BreakpointItem : public Q3ListViewItem, public Breakpoint
 {
 public:
-    BreakpointItem(QListView* list, const Breakpoint& bp);
+    BreakpointItem(Q3ListView* list, const Breakpoint& bp);
     void updateFrom(const Breakpoint& bp);
     void display();			/* sets icon and visible texts */
     bool enabled() const { return Breakpoint::enabled; }
@@ -50,9 +56,9 @@ BreakpointTable::BreakpointTable(QWidget* parent) :
     connect(&m_bpEdit, SIGNAL(returnPressed()), this, SLOT(addBP()));
 
     initListAndIcons();
-    connect(&m_list, SIGNAL(currentChanged(QListViewItem*)), SLOT(updateUI()));
+    connect(&m_list, SIGNAL(currentChanged(Q3ListViewItem*)), SLOT(updateUI()));
     // double click on item is same as View code
-    connect(&m_list, SIGNAL(doubleClicked(QListViewItem*)), this, SLOT(viewBP()));
+    connect(&m_list, SIGNAL(doubleClicked(Q3ListViewItem*)), this, SLOT(viewBP()));
 
     // need mouse button events
     m_list.viewport()->installEventFilter(this);
@@ -120,7 +126,7 @@ void BreakpointTable::updateBreakList()
 {
     std::list<BreakpointItem*> deletedItems;
 
-    for (QListViewItem* it = m_list.firstChild(); it != 0; it = it->nextSibling()) {
+    for (Q3ListViewItem* it = m_list.firstChild(); it != 0; it = it->nextSibling()) {
 	deletedItems.push_back(static_cast<BreakpointItem*>(it));
     }
 
@@ -148,8 +154,8 @@ nextItem:;
     }
 }
 
-BreakpointItem::BreakpointItem(QListView* list, const Breakpoint& bp) :
-	QListViewItem(list),
+BreakpointItem::BreakpointItem(Q3ListView* list, const Breakpoint& bp) :
+	Q3ListViewItem(list),
 	Breakpoint(bp)
 {
     display();
@@ -277,9 +283,9 @@ protected:
     QLineEdit m_ignoreCount;
     QPushButton m_buttonOK;
     QPushButton m_buttonCancel;
-    QVBoxLayout m_layout;
-    QGridLayout m_inputs;
-    QHBoxLayout m_buttons;
+    Q3VBoxLayout m_layout;
+    Q3GridLayout m_inputs;
+    Q3HBoxLayout m_buttons;
 };
 
 void BreakpointTable::conditionalBP()
