@@ -23,6 +23,7 @@
 #include <qfile.h>
 #include <qfileinfo.h>
 #include <qtabdialog.h>
+#include <qtextstream.h>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "commandids.h"
@@ -47,7 +48,7 @@ static const char defaultSourceFilter[] = "*.c *.cc *.cpp *.c++ *.C *.CC";
 static const char defaultHeaderFilter[] = "*.h *.hh *.hpp *.h++";
 
 DebuggerMainWnd::DebuggerMainWnd(const char* name) :
-	KDockMainWindow(0, name),
+	KMainWindow(0, name),
 	m_debugger(0),
 #ifdef GDB_TRANSCRIPT
 	m_transcriptFile(GDB_TRANSCRIPT),
@@ -62,38 +63,31 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	m_headerFilter(defaultHeaderFilter),
 	m_statusActive(i18n("active"))
 {
-    QPixmap p;
+    m_filesWindow = new WinStack(this, "files");
+    setCentralWidget(m_filesWindow);
 
-    KDockWidget* dw0 = createDockWidget("Source", p, 0, i18n("Source"));
-    m_filesWindow = new WinStack(dw0, "files");
-    dw0->setWidget(m_filesWindow);
-    dw0->setDockSite(KDockWidget::DockCorner);
-    dw0->setEnableDocking(KDockWidget::DockNone);
-    setView(dw0);
-    setMainDockWidget(dw0);
-
-    KDockWidget* dw1 = createDockWidget("Stack", p, 0, i18n("Stack"));
+    QDockWidget* dw1 = createDockWidget("Stack", i18n("Stack"));
     m_btWindow = new QListBox(dw1, "backtrace");
     dw1->setWidget(m_btWindow);
-    KDockWidget* dw2 = createDockWidget("Locals", p, 0, i18n("Locals"));
+    QDockWidget* dw2 = createDockWidget("Locals", i18n("Locals"));
     m_localVariables = new ExprWnd(dw2, i18n("Variable"), "locals");
     dw2->setWidget(m_localVariables);
-    KDockWidget* dw3 = createDockWidget("Watches", p, 0, i18n("Watches"));
+    QDockWidget* dw3 = createDockWidget("Watches", i18n("Watches"));
     m_watches = new WatchWindow(dw3, "watches");
     dw3->setWidget(m_watches);
-    KDockWidget* dw4 = createDockWidget("Registers", p, 0, i18n("Registers"));
+    QDockWidget* dw4 = createDockWidget("Registers", i18n("Registers"));
     m_registers = new RegisterView(dw4, "registers");
     dw4->setWidget(m_registers);
-    KDockWidget* dw5 = createDockWidget("Breakpoints", p, 0, i18n("Breakpoints"));
+    QDockWidget* dw5 = createDockWidget("Breakpoints", i18n("Breakpoints"));
     m_bpTable = new BreakpointTable(dw5, "breakpoints");
     dw5->setWidget(m_bpTable);
-    KDockWidget* dw6 = createDockWidget("Output", p, 0, i18n("Output"));
+    QDockWidget* dw6 = createDockWidget("Output", i18n("Output"));
     m_ttyWindow = new TTYWindow(dw6, "output");
     dw6->setWidget(m_ttyWindow);
-    KDockWidget* dw7 = createDockWidget("Threads", p, 0, i18n("Threads"));
+    QDockWidget* dw7 = createDockWidget("Threads", i18n("Threads"));
     m_threads = new ThreadList(dw7, "threads");
     dw7->setWidget(m_threads);
-    KDockWidget* dw8 = createDockWidget("Memory", p, 0, i18n("Memory"));
+    QDockWidget* dw8 = createDockWidget("Memory", i18n("Memory"));
     m_memoryWindow = new MemoryWindow(dw8, "memory");
     dw8->setWidget(m_memoryWindow);
 
@@ -168,9 +162,6 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(m_threads, SIGNAL(setThread(int)),
 	    m_debugger, SLOT(setThread(int)));
 
-    // view menu changes when docking state changes
-    connect(dockManager, SIGNAL(change()), SLOT(updateUI()));
-
     // popup menu of the local variables window
     connect(m_localVariables, SIGNAL(contextMenuRequested(QListViewItem*, const QPoint&, int)),
 	    this, SLOT(slotLocalsPopup(QListViewItem*, const QPoint&)));
@@ -204,6 +195,15 @@ DebuggerMainWnd::~DebuggerMainWnd()
 	m_outputTermProc->kill();
 	shutdownTermWindow();
     }
+}
+
+QDockWidget* DebuggerMainWnd::createDockWidget(const char* name, const QString& title)
+{
+    QDockWidget* w = new QDockWidget(this, name);
+    w->setCaption(title);
+    // view menu changes when docking state changes
+    connect(w, SIGNAL(visibilityChanged(bool)), SLOT(updateUI()));
+    return w;
 }
 
 KAction* DebuggerMainWnd::createAction(const QString& text, const char* icon,
@@ -270,8 +270,8 @@ void DebuggerMainWnd::initKAction()
 	{ i18n("&Memory"), m_memoryWindow, "view_memory", &m_memoryWindowAction }
     };
     for (unsigned i = 0; i < sizeof(dw)/sizeof(dw[0]); i++) {
-	KDockWidget* d = dockParent(dw[i].w);
-	*dw[i].act = new KToggleAction(dw[i].text, 0, d, SLOT(changeHideShowState()),
+	QDockWidget* d = dockParent(dw[i].w);
+	*dw[i].act = new KToggleAction(dw[i].text, 0, d, SLOT(show()),
 			  actionCollection(), dw[i].id);
     }
 
@@ -402,8 +402,12 @@ void DebuggerMainWnd::saveSettings(KConfig* config)
 {
     KConfigGroupSaver g(config, WindowGroup);
 
-    writeDockConfig(config);
-    fixDockConfig(config, false);	// downgrade
+    QString layout;
+    {
+	QTextStream stream(&layout, IO_WriteOnly);
+	stream << *this;
+    }
+    config->writeEntry("Layout", layout);
 
     m_recentExecAction->saveEntries(config, RecentExecutables);
 
@@ -433,29 +437,10 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
 {
     KConfigGroupSaver g(config, WindowGroup);
 
-    fixDockConfig(config, true);	// upgrade
-    readDockConfig(config);
-
-    // Workaround bug #87787: KDockManager stores the titles of the KDockWidgets
-    // in the config files, although they are localized:
-    // If the user changes the language, the titles remain in the previous language.
-    struct { QString text; QWidget* w; } dw[] = {
-	{ i18n("Stack"), m_btWindow },
-	{ i18n("Locals"), m_localVariables },
-	{ i18n("Watches"), m_watches },
-	{ i18n("Registers"), m_registers },
-	{ i18n("Breakpoints"), m_bpTable },
-	{ i18n("Threads"), m_threads },
-	{ i18n("Output"), m_ttyWindow },
-	{ i18n("Memory"), m_memoryWindow }
-    };
-    for (int i = 0; i < int(sizeof(dw)/sizeof(dw[0])); i++)
+    QString layout = config->readEntry("Layout");
     {
-	KDockWidget* w = dockParent(dw[i].w);
-	w->setTabPageLabel(dw[i].text);
-	// this actually changes the captions in the tabs:
-	QEvent ev(QEvent::CaptionChange);
-	w->event(&ev);
+	QTextStream stream(&layout, IO_ReadOnly);
+	stream >> *this;
     }
 
     m_recentExecAction->loadEntries(config, RecentExecutables);
@@ -502,14 +487,14 @@ void DebuggerMainWnd::updateUI()
     m_bpSetAction->setEnabled(m_debugger->canChangeBreakpoints());
     m_bpSetTempAction->setEnabled(m_debugger->canChangeBreakpoints());
     m_bpEnableAction->setEnabled(m_debugger->canChangeBreakpoints());
-    dockUpdateHelper(m_bpTableAction, m_bpTable);
-    dockUpdateHelper(m_btWindowAction, m_btWindow);
-    dockUpdateHelper(m_localVariablesAction, m_localVariables);
-    dockUpdateHelper(m_watchesAction, m_watches);
-    dockUpdateHelper(m_registersAction, m_registers);
-    dockUpdateHelper(m_threadsAction, m_threads);
-    dockUpdateHelper(m_memoryWindowAction, m_memoryWindow);
-    dockUpdateHelper(m_ttyWindowAction, m_ttyWindow);
+    m_bpTableAction->setChecked(isDockVisible(m_bpTable));
+    m_btWindowAction->setChecked(isDockVisible(m_btWindow));
+    m_localVariablesAction->setChecked(isDockVisible(m_localVariables));
+    m_watchesAction->setChecked(isDockVisible(m_watches));
+    m_registersAction->setChecked(isDockVisible(m_registers));
+    m_threadsAction->setChecked(isDockVisible(m_threads));
+    m_memoryWindowAction->setChecked(isDockVisible(m_memoryWindow));
+    m_ttyWindowAction->setChecked(isDockVisible(m_ttyWindow));
 
     m_fileExecAction->setEnabled(m_debugger->isIdle());
     m_settingsAction->setEnabled(m_debugger->haveExecutable());
@@ -555,13 +540,6 @@ void DebuggerMainWnd::updateUI()
     }
 }
 
-void DebuggerMainWnd::dockUpdateHelper(KToggleAction* action, QWidget* w)
-{
-    bool canChange = canChangeDockVisibility(w);
-    action->setEnabled(canChange);
-    action->setChecked(canChange && isDockVisible(w));
-}
-
 void DebuggerMainWnd::updateLineItems()
 {
     m_filesWindow->updateLineItems(m_debugger);
@@ -589,58 +567,19 @@ void DebuggerMainWnd::slotNewFileLoaded()
 	m_filesWindow->updateLineItems(m_debugger);
 }
 
-KDockWidget* DebuggerMainWnd::dockParent(QWidget* w)
+QDockWidget* DebuggerMainWnd::dockParent(QWidget* w)
 {
     while ((w = w->parentWidget()) != 0) {
-	if (w->isA("KDockWidget"))
-	    return static_cast<KDockWidget*>(w);
+	if (w->isA("QDockWindow"))
+	    return static_cast<QDockWidget*>(w);
     }
     return 0;
 }
 
 bool DebuggerMainWnd::isDockVisible(QWidget* w)
 {
-    KDockWidget* d = dockParent(w);
-    return d != 0 && d->mayBeHide();
-}
-
-bool DebuggerMainWnd::canChangeDockVisibility(QWidget* w)
-{
-    KDockWidget* d = dockParent(w);
-    return d != 0 && (d->mayBeHide() || d->mayBeShow());
-}
-
-// upgrades the entries from version 0.0.4 to 0.0.5 and back
-void DebuggerMainWnd::fixDockConfig(KConfig* c, bool upgrade)
-{
-    static const char dockGroup[] = "dock_setting_default";
-    if (!c->hasGroup(dockGroup))
-	return;
-
-    static const char oldVersion[] = "0.0.4";
-    static const char newVersion[] = "0.0.5";
-    const char* from = upgrade ? oldVersion : newVersion;
-    const char* to   = upgrade ? newVersion : oldVersion;
-    QMap<QString,QString> e = c->entryMap(dockGroup);
-    if (e["Version"] != from)
-	return;
-
-    KConfigGroupSaver g(c, dockGroup);
-    c->writeEntry("Version", to);
-    TRACE(upgrade ? "upgrading dockconfig" : "downgrading dockconfig");
-
-    // turn all orientation entries from 0 to 1 and from 1 to 0
-    QMap<QString,QString>::Iterator i;
-    for (i = e.begin(); i != e.end(); ++i)
-    {
-	if (i.key().right(12) == ":orientation") {
-	    TRACE("upgrading " + i.key() + " old value: " + *i);
-	    int orientation = c->readNumEntry(i.key(), -1);
-	    if (orientation >= 0) {	// paranoia
-		c->writeEntry(i.key(), 1 - orientation);
-	    }
-	}
-    }
+    QDockWidget* d = dockParent(w);
+    return d != 0 && d->isVisible();
 }
 
 bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)

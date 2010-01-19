@@ -8,9 +8,11 @@
 #define DBGMAINWND_H
 
 #include <qtimer.h>
-#include <kdockwidget.h>
+#include <qdockwindow.h>
+#include <kmainwindow.h>
 #include "regwnd.h"
 
+typedef QDockWindow QDockWidget;
 class KProcess;
 class KRecentFilesAction;
 class KToggleAction;
@@ -27,7 +29,7 @@ class KDebugger;
 class DebuggerDriver;
 struct DbgAddr;
 
-class DebuggerMainWnd : public KDockMainWindow
+class DebuggerMainWnd : public KMainWindow
 {
     Q_OBJECT
 public:
@@ -151,11 +153,9 @@ protected:
     void setTerminalCmd(const QString& cmd);
     void setDebuggerCmdStr(const QString& cmd);
 
-    KDockWidget* dockParent(QWidget* w);
+    QDockWidget* createDockWidget(const char* name, const QString& title);
+    QDockWidget* dockParent(QWidget* w);
     bool isDockVisible(QWidget* w);
-    bool canChangeDockVisibility(QWidget* w);
-    void dockUpdateHelper(KToggleAction* action, QWidget* w);
-    void fixDockConfig(KConfig* c, bool upgrade);
 
     QString makeSourceFilter();
 
