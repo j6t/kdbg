@@ -106,10 +106,6 @@ static XsldbgCmdInfo cmds[] = {
 XsldbgDriver::XsldbgDriver():
 DebuggerDriver(), m_gdbMajor(2), m_gdbMinor(0)
 {
-    m_promptRE.setPattern("\\(xsldbg\\) .*> ");
-    m_promptMinLen = 11;
-    m_promptLastChar = ' ';
-  
     m_markerRE.setPattern("^Breakpoint for file ");
     m_haveDataFile = FALSE;
 
@@ -319,6 +315,24 @@ XsldbgDriver::commandFinished(CmdQueueItem * cmd)
 
         default:;
     }
+}
+
+int
+XsldbgDriver::findPrompt(const char* output, size_t len) const
+{
+    /*
+     * If there's a prompt string in the collected output, it must be at
+     * the very end. We do a quick check whether the last characters of
+     * output are suitable and do the full search only if they are.
+     */
+    if (len < 11 || output[len-1] != ' ' || output[len-2] != '>')
+	return -1;
+
+    // There can be text between "(xsldbg) " and the "> " at the end
+    // since we do not know what that text is, we accept the former
+    // anywhere in the output.
+    const char* prompt = strstr(output, "(xsldbg) ");
+    return prompt ? prompt-output : 0;
 }
 
 void

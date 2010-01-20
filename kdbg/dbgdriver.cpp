@@ -23,17 +23,10 @@ DebuggerDriver::DebuggerDriver() :
 	m_output(0),
 	m_outputLen(0),
 	m_outputAlloc(0),
-	m_activeCmd(0),
-	m_promptMinLen(0),
-	m_promptLastChar('\0')
+	m_activeCmd(0)
 {
     m_outputAlloc = 4000;
     m_output = new char[m_outputAlloc];
-
-    m_prompt[0] = '\0';
-    // Derived classes can set either m_prompt or m_promptRE.
-    // If m_promptRE is set, it must include the '$' at the end.
-    // m_promptLastChar and m_promptMinLen must also be set.
 
     // debugger process
     connect(this, SIGNAL(receivedStdout(KProcess*,char*,int)),
@@ -90,14 +83,6 @@ bool DebuggerDriver::startup(QString cmdStr)
 	m_logFile.setName(m_logFileName);
 	m_logFile.open(IO_WriteOnly);
     }
-
-    // these must be set by derived classes in their constructor
-    assert(m_promptMinLen > 0);		// _must_ have a prompt
-    assert(m_promptLastChar != '\0');	// last char _must_ be fixed
-    assert(m_prompt[0] == '\0' || strlen(m_prompt) == m_promptMinLen);
-    // either a prompt or a regexp
-    assert(m_prompt[0] != '\0' && m_promptMinLen < sizeof(m_prompt) ||
-	   !m_promptRE.isEmpty() && m_promptRE.isValid());
 
     return true;
 }
@@ -346,44 +331,8 @@ void DebuggerDriver::slotReceiveOutput(KProcess*, char* buffer, int buflen)
     m_outputLen += buflen;
     m_output[m_outputLen] = '\0';
 
-    /*
-     * If there's a prompt string in the collected output, it must be at
-     * the very end. In order to quickly find out whether there is a prompt
-     * string, we check whether the last character of m_output is identical
-     * to the last character of the prompt string. Only if it is, we check
-     * for the full prompt string.
-     * 
-     * Note: Using the regular expression here is most expensive, because
-     * it translates m_output to a QString each time.
-     * 
-     * Note: It could nevertheless happen that a character sequence that is
-     * equal to the prompt string appears at the end of the output,
-     * although it is very, very unlikely (namely as part of a string that
-     * lingered in gdb's output buffer due to some timing/heavy load
-     * conditions for a very long time such that that buffer overflowed
-     * exactly at the end of the prompt string look-a-like).
-     */
-    int promptStart = -1;
-    if (m_output[m_outputLen-1] == m_promptLastChar &&
-	m_outputLen >= m_promptMinLen)
-    {
-	// this is a candidate for a prompt at the end,
-	// now see if there really is
-	if (m_prompt[0] != '\0') {
-	    if (strncmp(m_output+m_outputLen-m_promptMinLen,
-			m_prompt, m_promptMinLen) == 0)
-	    {
-		promptStart = m_outputLen-m_promptMinLen;
-	    }
-	} else {
-	    QString output = QString::fromLatin1(m_output, m_outputLen);
-#if QT_VERSION >= 300
-	    promptStart = m_promptRE.search(output);
-#else
-	    promptStart = m_promptRE.match(output);
-#endif
-	}
-    }
+    // check for a prompt
+    int promptStart = findPrompt(m_output, m_outputLen);
     if (promptStart >= 0)
     {
 	// found prompt!

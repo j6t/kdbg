@@ -30,8 +30,6 @@ static bool parseValueSeq(const char*& s, ExprValue* variable);
 
 #define PROMPT "(kdbg)"
 #define PROMPT_LEN 6
-#define PROMPT_LAST_CHAR ')'		/* needed when searching for prompt string */
-
 
 // TODO: make this cmd info stuff non-static to allow multiple
 // simultaneous gdbs to run!
@@ -127,10 +125,6 @@ GdbDriver::GdbDriver() :
 	DebuggerDriver(),
 	m_gdbMajor(4), m_gdbMinor(16)
 {
-    strcpy(m_prompt, PROMPT);
-    m_promptMinLen = PROMPT_LEN;
-    m_promptLastChar = PROMPT_LAST_CHAR;
-
 #ifndef NDEBUG
     // check command info array
     char* perc;
@@ -335,6 +329,27 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
 	parseMarker();
     default:;
     }
+}
+
+int GdbDriver::findPrompt(const char* output, size_t len) const
+{
+    /*
+     * If there's a prompt string in the collected output, it must be at
+     * the very end.
+     * 
+     * Note: It could nevertheless happen that a character sequence that is
+     * equal to the prompt string appears at the end of the output,
+     * although it is very, very unlikely (namely as part of a string that
+     * lingered in gdb's output buffer due to some timing/heavy load
+     * conditions for a very long time such that that buffer overflowed
+     * exactly at the end of the prompt string look-a-like).
+     */
+    if (len >= PROMPT_LEN &&
+	strncmp(output+len-PROMPT_LEN, PROMPT, PROMPT_LEN) == 0)
+    {
+	return len-PROMPT_LEN;
+    }
+    return -1;
 }
 
 /*

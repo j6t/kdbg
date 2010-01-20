@@ -86,6 +86,7 @@ protected:
     QString makeCmdString(DbgCommand cmd, QString strArg, int intArg);
     QString makeCmdString(DbgCommand cmd, QString strArg1, QString strArg2);
     QString makeCmdString(DbgCommand cmd, int intArg1, int intArg2);
+    virtual int findPrompt(const char* output, size_t len) const;
     void parseMarker();
 };
 
