@@ -52,7 +52,7 @@ SourceWindow::SourceWindow(const QString& fileName, QWidget* parent, const char*
     viewport()->installEventFilter(this);
 
     // add a syntax highlighter
-    if (QRegExp("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h)?|HH?)$").search(m_fileName))
+    if (QRegExp("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h)?|HH?)$").search(m_fileName) >= 0)
     {
 	new HighlightCpp(this);
     }
