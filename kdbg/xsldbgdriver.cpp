@@ -104,7 +104,7 @@ static XsldbgCmdInfo cmds[] = {
 #define MAX_FMTLEN 200
 
 XsldbgDriver::XsldbgDriver():
-DebuggerDriver(), m_gdbMajor(2), m_gdbMinor(0)
+	DebuggerDriver()
 {
     m_markerRE.setPattern("^Breakpoint for file ");
     m_haveDataFile = FALSE;
@@ -254,39 +254,6 @@ XsldbgDriver::commandFinished(CmdQueueItem * cmd)
         return;
     }
 
-    switch (cmd->m_cmd) {
-        case DCinitialize:
-            // get version number from preamble
-            {
-                int len;
-                QRegExp xsldbgVersion("^XSLDBG [0-9]+\\.[0-9]+\\.[0-9]+");
-                int offset = xsldbgVersion.match(m_output, 0, &len);
-
-                if (offset >= 0) {
-                    char *start = m_output + offset + 7;        // skip "^XSLDBG "
-                    char *end;
-
-                    TRACE("Reading version");
-                    TRACE(start);
-                    m_gdbMajor = strtol(start, &end, 10);
-                    m_gdbMinor = strtol(end + 1, 0, 10);        // skip "."
-                    if (start == end) {
-                        // nothing was parsed
-                        m_gdbMajor = 0;
-                        m_gdbMinor = 7;
-                    }
-                } else {
-                    // assume some default version (what would make sense?)
-                    m_gdbMajor = 0;
-                    m_gdbMinor = 7;
-                }
-                TRACE(QString("Got version ") +
-                      QString::number(m_gdbMajor) + "." +
-                      QString::number(m_gdbMinor));
-                break;
-            }
-        default:;
-    }
     /* ok, the command is ready */
     emit commandReceived(cmd, m_output);
 

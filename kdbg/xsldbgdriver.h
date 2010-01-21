@@ -86,7 +86,6 @@ class XsldbgDriver:public DebuggerDriver {
     virtual QString parseSetVariable(const char* output);
 
   protected:
-    int m_gdbMajor, m_gdbMinor;
     QString m_programWD;        /* just an intermediate storage */
     QString m_xslFile;		/* needed to display it initially */
     bool m_haveDataFile;       /* have we set the XML data file to use? */ 

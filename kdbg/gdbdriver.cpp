@@ -69,7 +69,11 @@ static GdbCmdInfo cmds[] = {
     { DCtty, "tty %s\n", GdbCmdInfo::argString },
     { DCexecutable, "file \"%s\"\n", GdbCmdInfo::argString },
     { DCtargetremote, "target remote %s\n", GdbCmdInfo::argString },
-    { DCcorefile, "core-file %s\n", GdbCmdInfo::argString },
+#ifdef __FreeBSD__
+    { DCcorefile, "target FreeBSD-core %s\n", GdbCmdInfo::argString },
+#else
+    { DCcorefile, "target core %s\n", GdbCmdInfo::argString },
+#endif
     { DCattach, "attach %s\n", GdbCmdInfo::argString },
     { DCinfolinemain, "kdbg_infolinemain\n", GdbCmdInfo::argNone },
     { DCinfolocals, "kdbg__alllocals\n", GdbCmdInfo::argNone },
@@ -122,8 +126,7 @@ static GdbCmdInfo cmds[] = {
 #define MAX_FMTLEN 200
 
 GdbDriver::GdbDriver() :
-	DebuggerDriver(),
-	m_gdbMajor(4), m_gdbMinor(16)
+	DebuggerDriver()
 {
 #ifndef NDEBUG
     // check command info array
@@ -271,43 +274,6 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
 	TRACE("calling " + (__PRETTY_FUNCTION__ + (" with uncommited command:\n\t" +
 	      cmd->m_cmdString)));
 	return;
-    }
-
-    switch (cmd->m_cmd) {
-    case DCinitialize:
-	// get version number from preamble
-	{
-	    int len;
-	    QRegExp GDBVersion("\\nGDB [0-9]+\\.[0-9]+");
-	    int offset = GDBVersion.match(m_output, 0, &len);
-	    if (offset >= 0) {
-		char* start = m_output + offset + 5;	// skip "\nGDB "
-		char* end;
-		m_gdbMajor = strtol(start, &end, 10);
-		m_gdbMinor = strtol(end + 1, 0, 10);	// skip "."
-		if (start == end) {
-		    // nothing was parsed
-		    m_gdbMajor = 4;
-		    m_gdbMinor = 16;
-		}
-	    } else {
-		// assume some default version (what would make sense?)
-		m_gdbMajor = 4;
-		m_gdbMinor = 16;
-	    }
-	    // use a feasible core-file command
-	    if (m_gdbMajor > 4 || (m_gdbMajor == 4 && m_gdbMinor >= 16)) {
-#ifdef __FreeBSD__
-		cmds[DCcorefile].fmt = "target FreeBSD-core %s\n";
-#else
-		cmds[DCcorefile].fmt = "target core %s\n";
-#endif
-	    } else {
-		cmds[DCcorefile].fmt = "core-file %s\n";
-	    }
-	}
-	break;
-    default:;
     }
 
     /* ok, the command is ready */
