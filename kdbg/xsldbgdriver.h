@@ -91,7 +91,6 @@ class XsldbgDriver:public DebuggerDriver {
     bool m_haveDataFile;       /* have we set the XML data file to use? */ 
     QString m_redirect;         /* redirection to /dev/null */
     bool m_haveCoreFile;
-    QRegExp m_markerRE;
 
     QString makeCmdString(DbgCommand cmd, QString strArg);
     QString makeCmdString(DbgCommand cmd, int intArg);

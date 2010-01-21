@@ -106,7 +106,6 @@ static XsldbgCmdInfo cmds[] = {
 XsldbgDriver::XsldbgDriver():
 	DebuggerDriver()
 {
-    m_markerRE.setPattern("^Breakpoint for file ");
     m_haveDataFile = FALSE;
 
 #ifndef NDEBUG
@@ -305,30 +304,24 @@ XsldbgDriver::findPrompt(const char* output, size_t len) const
 void
 XsldbgDriver::parseMarker()
 {
-
-    // TRACE("parseMarker : xsldbg");
-    //  TRACE(m_output);
-    int len, markerStart = -1;
     char *p = m_output;
 
-    while (markerStart == -1) {
+    for (;;) {
         if ((p == 0) || (*p == '\0')) {
             m_output[0] = '\0';
             return;
         }
-        //TRACE(QString("parseMarker is looking at :") + p);
-        markerStart = m_markerRE.match(p, 0, &len);
-        if (markerStart == -1) {
-            // try to marker on next line !
-            p = strchr(p, '\n');
-            if ((p != 0) && (*p != '\0'))
-                p++;
-        }
+        if (strncmp(p, "Breakpoint for file ", 20) == 0)
+	    break;
+	// try to marker on next line !
+	p = strchr(p, '\n');
+	if ((p != 0) && (*p != '\0'))
+	    p++;
     }
 
 
     // extract the marker
-    char *startMarker = p + markerStart + len;
+    char *startMarker = p + 20;
 
     //TRACE(QString("found marker:") + startMarker);
     char *endMarker = strchr(startMarker, '\n');
@@ -341,6 +334,7 @@ XsldbgDriver::parseMarker()
     // extract filename and line number
     static QRegExp MarkerRE(" at line [0-9]+");
 
+    int len;
     int lineNoStart = MarkerRE.match(startMarker, 0, &len);
 
     if (lineNoStart >= 0) {
@@ -1326,18 +1320,11 @@ XsldbgDriver::parseChangeExecutable(const char *output, QString & message)
     TRACE(QString("XsldbgDriver::parseChangeExecutable :") + output);
     m_haveCoreFile = false;
 
-    /*
-     * The command is successful if there is no output or the single
-     * message (no debugging symbols found)...
-     */
-    QRegExp exp(".*Load of source deferred. Use the run command.*");
-    int len, index = exp.match(output, 0, &len);
-
-    if (index != -1) {
+    if (strstr(output, "Load of source deferred. Use the run command") != 0) {
         TRACE("Parsed stylesheet executable");
-        message = "";
+        message = QString();
     }
-    return (output[0] == '\0') || (index != -1);
+    return message.isEmpty();
 }
 
 bool
@@ -1345,10 +1332,8 @@ XsldbgDriver::parseCoreFile(const char *output)
 {
     TRACE("XsldbgDriver::parseCoreFile");
     TRACE(output);
-    QRegExp exp(".*Load of data file deferred. Use the run command.*");
-    int len, index = exp.match(output, 0, &len);
 
-    if (index != -1) {
+    if (strstr(output, "Load of data file deferred. Use the run command") != 0) {
         m_haveCoreFile = true;
         TRACE("Parsed data file name");
     }
