@@ -332,13 +332,12 @@ XsldbgDriver::parseMarker()
     *endMarker = '\0';
 
     // extract filename and line number
-    static QRegExp MarkerRE(" at line [0-9]+");
+    static QRegExp MarkerRE(" at line (\\d+)");
 
-    int len;
-    int lineNoStart = MarkerRE.match(startMarker, 0, &len);
+    int lineNoStart = MarkerRE.search(startMarker);
 
     if (lineNoStart >= 0) {
-        int lineNo = atoi(startMarker + lineNoStart + 8);
+        int lineNo = MarkerRE.cap(1).toInt();
 
         DbgAddr address;
 

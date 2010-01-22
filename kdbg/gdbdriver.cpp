@@ -339,15 +339,15 @@ void GdbDriver::parseMarker()
     *endMarker = '\0';
 
     // extract filename and line number
-    static QRegExp MarkerRE(":[0-9]+:[0-9]+:[begmidl]+:0x");
+    static QRegExp MarkerRE(":(\\d+):\\d+:[begmidl]+:0x");
 
-    int len;
-    int lineNoStart = MarkerRE.match(startMarker, 0, &len);
+    int lineNoStart = MarkerRE.search(startMarker);
     if (lineNoStart >= 0) {
-	int lineNo = atoi(startMarker + lineNoStart+1);
+	int lineNo = MarkerRE.cap(1).toInt();
 
 	// get address
-	const char* addrStart = startMarker + lineNoStart + len - 2;
+	const char* addrStart = startMarker + lineNoStart +
+		 		MarkerRE.matchedLength() - 2;
 	DbgAddr address = QString(addrStart).stripWhiteSpace();
 
 	// now show the window
