@@ -115,7 +115,7 @@ DebuggerDriver(), m_gdbMajor(2), m_gdbMinor(0)
 
 #ifndef NDEBUG
     // check command info array
-    char *perc;
+    const char *perc;
 
     for (int i = 0; i < NUM_CMDS; i++) {
         // must be indexable by DbgCommand values, i.e. sorted by DbgCommand values
@@ -771,7 +771,7 @@ parseVar(const char *&s)
     } else if (strncmp(p, "= ", 2) == 0) {
         /* we're processing the result of a "print command" */
         /* find next line */
-        char *nextLine = strchr(p, '\n');
+        const char *nextLine = strchr(p, '\n');
 
 	TRACE("Found print expr");
         if (nextLine) {

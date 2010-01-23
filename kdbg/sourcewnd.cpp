@@ -52,7 +52,7 @@ SourceWindow::SourceWindow(const QString& fileName, QWidget* parent, const char*
     viewport()->installEventFilter(this);
 
     // add a syntax highlighter
-    if (QRegExp("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h)?|HH?)$").search(m_fileName))
+    if (QRegExp("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h)?|HH?)$").search(m_fileName) >= 0)
     {
 	new HighlightCpp(this);
     }
@@ -111,12 +111,26 @@ void SourceWindow::reloadFile()
     for (size_t i = 0; i < m_sourceCode.size(); i++) {
 	m_sourceCode[i].code = text(i);
     }
+    // expanded lines are collapsed: move existing line items up
+    for (size_t i = 0; i < m_lineItems.size(); i++) {
+	if (m_rowToLine[i] != i) {
+	    m_lineItems[m_rowToLine[i]] |= m_lineItems[i];
+	    m_lineItems[i] = 0;
+	}
+    }
     // allocate line items
     m_lineItems.resize(m_sourceCode.size(), 0);
 
     m_rowToLine.resize(m_sourceCode.size());
     for (size_t i = 0; i < m_sourceCode.size(); i++)
 	m_rowToLine[i] = i;
+
+    // Highlighting was applied above when the text was inserted into widget,
+    // but at that time m_rowToLine was not corrected, yet, so that lines
+    // that previously were assembly were painted incorrectly.
+    if (syntaxHighlighter())
+	syntaxHighlighter()->rehighlight();
+    update();	// line numbers
 }
 
 void SourceWindow::scrollTo(int lineNo, const DbgAddr& address)
