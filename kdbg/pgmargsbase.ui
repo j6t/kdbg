@@ -524,18 +524,19 @@
     </connection>
 </connections>
 <tabstops>
-    <tabstop>envVar</tabstop>
-    <tabstop>envList</tabstop>
-    <tabstop>buttonModify</tabstop>
-    <tabstop>buttonDelete</tabstop>
+    <tabstop>tabWidget</tabstop>
     <tabstop>programArgs</tabstop>
     <tabstop>insertFile</tabstop>
     <tabstop>insertDir</tabstop>
-    <tabstop>buttonOk</tabstop>
-    <tabstop>buttonCancel</tabstop>
-    <tabstop>tabWidget</tabstop>
     <tabstop>wdEdit</tabstop>
     <tabstop>wdBrowse</tabstop>
+    <tabstop>envVar</tabstop>
+    <tabstop>buttonModify</tabstop>
+    <tabstop>buttonDelete</tabstop>
+    <tabstop>envList</tabstop>
+    <tabstop>xsldbgOptions</tabstop>
+    <tabstop>buttonOk</tabstop>
+    <tabstop>buttonCancel</tabstop>
 </tabstops>
 <slots>
     <slot specifier="pure virtual">browseArgFile()</slot>
