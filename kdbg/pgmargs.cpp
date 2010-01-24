@@ -10,7 +10,6 @@
 #include <qlistview.h>
 #include <qlistbox.h>
 #include <qtabwidget.h>
-#include <kapplication.h>
 #include <kfiledialog.h>
 #include <klocale.h>			/* i18n */
 #include "config.h"
@@ -236,11 +235,6 @@ void PgmArgs::browseArgDir()
     if (!f.isEmpty()) {
 	programArgs->insert(f);
     }
-}
-
-void PgmArgs::invokeHelp()
-{
-    kapp->invokeHTMLHelp("kdbg/argspwdenv.html");
 }
 
 #include "pgmargs.moc"
