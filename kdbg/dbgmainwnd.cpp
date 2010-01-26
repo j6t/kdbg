@@ -573,11 +573,6 @@ void DebuggerMainWnd::fixDockConfig(KConfig* c, bool upgrade)
     }
 }
 
-TTYWindow* DebuggerMainWnd::ttyWindow()
-{
-    return m_ttyWindow;
-}
-
 bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
 {
     // check the file name
@@ -633,7 +628,45 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 
 void DebuggerMainWnd::slotDebuggerStarting()
 {
-    DebuggerMainWndBase::slotDebuggerStarting();
+    if (m_debugger == 0)		/* paranoia check */
+	return;
+
+    if (m_ttyLevel == m_debugger->ttyLevel())
+	return;
+
+    // shut down terminal emulations we will not need
+    switch (m_ttyLevel) {
+    case KDebugger::ttySimpleOutputOnly:
+	m_ttyWindow->deactivate();
+	break;
+    case KDebugger::ttyFull:
+	if (m_outputTermProc != 0) {
+	    m_outputTermProc->kill();
+	    // will be deleted in slot
+	}
+	break;
+    default: break;
+    }
+
+    m_ttyLevel = m_debugger->ttyLevel();
+
+    QString ttyName;
+    switch (m_ttyLevel) {
+    case KDebugger::ttySimpleOutputOnly:
+	ttyName = m_ttyWindow->activate();
+	break;
+    case KDebugger::ttyFull:
+	if (m_outputTermProc == 0) {
+	    // create an output window
+	    ttyName = createOutputWindow();
+	    TRACE(ttyName.isEmpty() ?
+		  "createOuputWindow failed" : "successfully created output window");
+	}
+	break;
+    default: break;
+    }
+
+    m_debugger->setTerminal(ttyName);
 }
 
 void DebuggerMainWnd::slotToggleBreak(const QString& fileName, int lineNo,

@@ -20,6 +20,7 @@ class ExprWnd;
 class BreakpointTable;
 class ThreadList;
 class MemoryWindow;
+class TTYWindow;
 struct DbgAddr;
 
 class DebuggerMainWnd : public KDockMainWindow, public DebuggerMainWndBase
@@ -61,7 +62,6 @@ protected:
 
 protected:
     virtual bool queryClose();
-    virtual TTYWindow* ttyWindow();
     virtual QString createOutputWindow();
 
     KDockWidget* dockParent(QWidget* w);

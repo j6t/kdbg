@@ -12,7 +12,6 @@
 
 // forward declarations
 class KDebugger;
-class TTYWindow;
 class KProcess;
 class DebuggerDriver;
 class QListBox;
@@ -58,9 +57,6 @@ protected:
     virtual void saveSettings(KConfig*);
     virtual void restoreSettings(KConfig*);
 
-    // override must return the integrated output window
-    virtual TTYWindow* ttyWindow() = 0;
-
     // output window
     QString m_outputTermCmdStr;
     QString m_outputTermKeepScript;
@@ -90,15 +86,6 @@ protected:
      * file.
      */
     QString driverNameFromFile(const QString& exe);
-
-public:
-    /*
-     * Important! The following functions must be overridden in derived
-     * classes and be declared as slots! Note: These must not be declared
-     * virtual here since Qt signal mechanism fails miserably (because this
-     * class will not be the left-most base class!).
-     */
-    void slotDebuggerStarting();
 };
 
 #endif // MAINWNDBASE_H
