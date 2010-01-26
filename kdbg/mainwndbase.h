@@ -10,15 +10,11 @@
 #include <qlineedit.h>
 #include <qlayout.h>
 #include <qpushbutton.h>
-#include <qcstring.h>
 #include "exprwnd.h"
-#include "sys/types.h"			/* pid_t */
 
 // forward declarations
 class KDebugger;
 class TTYWindow;
-class UpdateUI;
-class KToolBar;
 class KStatusBar;
 class KProcess;
 class DebuggerDriver;

@@ -28,14 +28,9 @@
 #ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>			/* mknod(2) */
 #endif
-#ifdef HAVE_FCNTL_H
-#include <fcntl.h>			/* open(2) */
-#endif
 #ifdef HAVE_UNISTD_H
 #include <unistd.h>			/* getpid, unlink etc. */
 #endif
-
-#define MAX_RECENT_FILES 4
 
 WatchWindow::WatchWindow(QWidget* parent, const char* name, WFlags f) :
 	QWidget(parent, name, f),
@@ -202,7 +197,6 @@ const char PreferencesGroup[] = "Preferences";
 const char PopForeground[] = "PopForeground";
 const char BackTimeout[] = "BackTimeout";
 const char TabWidth[] = "TabWidth";
-const char FilesGroup[] = "Files";
 const char SourceFileFilter[] = "SourceFileFilter";
 const char HeaderFileFilter[] = "HeaderFileFilter";
 const char GeneralGroup[] = "General";
