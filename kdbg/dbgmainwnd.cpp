@@ -21,6 +21,7 @@
 #include <kwin.h>
 #include <qlistbox.h>
 #include <qfileinfo.h>
+#include <qtabdialog.h>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "commandids.h"
@@ -30,7 +31,9 @@
 #include "memwindow.h"
 #include "ttywnd.h"
 #include "procattach.h"
-#include "dbgdriver.h"
+#include "prefdebugger.h"
+#include "prefmisc.h"
+#include "gdbdriver.h"
 #include "mydebug.h"
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -44,12 +47,20 @@
 
 
 static const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
+static const char defaultSourceFilter[] = "*.c *.cc *.cpp *.c++ *.C *.CC";
+static const char defaultHeaderFilter[] = "*.h *.hh *.hpp *.h++";
 
 DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	KDockMainWindow(0, name),
 	DebuggerMainWndBase(),
+	m_outputTermCmdStr(defaultTermCmdStr),
 	m_outputTermProc(0),
 	m_ttyLevel(-1),			/* no tty yet */
+	m_popForeground(false),
+	m_backTimeout(1000),
+	m_tabWidth(0),
+	m_sourceFilter(defaultSourceFilter),
+	m_headerFilter(defaultHeaderFilter),
 	m_statusActive(i18n("active"))
 {
     QPixmap p;
@@ -683,10 +694,62 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 {
     int oldTabWidth = m_tabWidth;
 
-    doGlobalOptions(this);
+    QTabDialog dlg(this, "global_options", true);
+    QString title = kapp->caption();
+    title += i18n(": Global options");
+    dlg.setCaption(title);
+    dlg.setCancelButton(i18n("Cancel"));
+    dlg.setOKButton(i18n("OK"));
+
+    PrefDebugger prefDebugger(&dlg);
+    prefDebugger.setDebuggerCmd(m_debuggerCmdStr.isEmpty()  ?
+				GdbDriver::defaultGdb()  :  m_debuggerCmdStr);
+    prefDebugger.setTerminal(m_outputTermCmdStr);
+
+    PrefMisc prefMisc(&dlg);
+    prefMisc.setPopIntoForeground(m_popForeground);
+    prefMisc.setBackTimeout(m_backTimeout);
+    prefMisc.setTabWidth(m_tabWidth);
+    prefMisc.setSourceFilter(m_sourceFilter);
+    prefMisc.setHeaderFilter(m_headerFilter);
+
+    dlg.addTab(&prefDebugger, i18n("&Debugger"));
+    dlg.addTab(&prefMisc, i18n("&Miscellaneous"));
+    if (dlg.exec() == QDialog::Accepted)
+    {
+	setDebuggerCmdStr(prefDebugger.debuggerCmd());
+	setTerminalCmd(prefDebugger.terminal());
+	m_popForeground = prefMisc.popIntoForeground();
+	m_backTimeout = prefMisc.backTimeout();
+	m_tabWidth = prefMisc.tabWidth();
+	m_sourceFilter = prefMisc.sourceFilter();
+	if (m_sourceFilter.isEmpty())
+	    m_sourceFilter = defaultSourceFilter;
+	m_headerFilter = prefMisc.headerFilter();
+	if (m_headerFilter.isEmpty())
+	    m_headerFilter = defaultHeaderFilter;
+    }
 
     if (m_tabWidth != oldTabWidth) {
 	emit setTabWidth(m_tabWidth);
+    }
+}
+
+void DebuggerMainWnd::setTerminalCmd(const QString& cmd)
+{
+    m_outputTermCmdStr = cmd;
+    // revert to default if empty
+    if (m_outputTermCmdStr.isEmpty()) {
+	m_outputTermCmdStr = defaultTermCmdStr;
+    }
+}
+
+void DebuggerMainWnd::setDebuggerCmdStr(const QString& cmd)
+{
+    m_debuggerCmdStr = cmd;
+    // make empty if it is the default
+    if (m_debuggerCmdStr == GdbDriver::defaultGdb()) {
+	m_debuggerCmdStr = QString();
     }
 }
 

@@ -23,15 +23,6 @@ public:
     virtual ~DebuggerMainWndBase();
 
     /**
-     * Sets the command to invoke the terminal that displays the program
-     * output. If cmd is the empty string, the default is substituted.
-     */
-    void setTerminalCmd(const QString& cmd);
-    /**
-     * Sets the command to invoke the debugger.
-     */
-    void setDebuggerCmdStr(const QString& cmd);
-    /**
      * Specifies the file where to write the transcript.
      */
     void setTranscript(const QString& name);
@@ -49,20 +40,9 @@ public:
     void setCoreFile(const QString& corefile);
     void setRemoteDevice(const QString &remoteDevice);
     void overrideProgramArguments(const QString& args);
-    /** invokes the global options dialog */
-    virtual void doGlobalOptions(QWidget* parent);
 
 protected:
-    // output window
-    QString m_outputTermCmdStr;
-
     QString m_transcriptFile;		/* where gdb dialog is logged */
-
-    bool m_popForeground;		/* whether main wnd raises when prog stops */
-    int m_backTimeout;			/* when wnd goes back */
-    int m_tabWidth;			/* tab width in characters (can be 0) */
-    QString m_sourceFilter;
-    QString m_headerFilter;
 
     // the debugger proper
     QString m_debuggerCmdStr;

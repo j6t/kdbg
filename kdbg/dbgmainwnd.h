@@ -64,12 +64,21 @@ protected:
     virtual bool queryClose();
 
     // output window
+    QString m_outputTermCmdStr;
     QString m_outputTermKeepScript;
     KProcess* m_outputTermProc;
     int m_ttyLevel;
 
     QString createOutputWindow();
     void shutdownTermWindow();
+
+    bool m_popForeground;		/* whether main wnd raises when prog stops */
+    int m_backTimeout;			/* when wnd goes back */
+    int m_tabWidth;			/* tab width in characters (can be 0) */
+    QString m_sourceFilter;
+    QString m_headerFilter;
+    void setTerminalCmd(const QString& cmd);
+    void setDebuggerCmdStr(const QString& cmd);
 
     KDockWidget* dockParent(QWidget* w);
     bool isDockVisible(QWidget* w);

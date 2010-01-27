@@ -4,39 +4,24 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <kapplication.h>
 #include <klocale.h>			/* i18n */
 #include <ksimpleconfig.h>
 #include <kmessagebox.h>
-#include <qtabdialog.h>
 #include <qfile.h>
 #include "mainwndbase.h"
 #include "debugger.h"
 #include "gdbdriver.h"
 #include "xsldbgdriver.h"
-#include "prefdebugger.h"
-#include "prefmisc.h"
 #ifdef HAVE_CONFIG
 #include "config.h"
 #endif
 #include "mydebug.h"
 
 
-const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
-const char defaultSourceFilter[] = "*.c *.cc *.cpp *.c++ *.C *.CC";
-const char defaultHeaderFilter[] = "*.h *.hh *.hpp *.h++";
-
-
 DebuggerMainWndBase::DebuggerMainWndBase() :
-	m_outputTermCmdStr(defaultTermCmdStr),
 #ifdef GDB_TRANSCRIPT
 	m_transcriptFile(GDB_TRANSCRIPT),
 #endif
-	m_popForeground(false),
-	m_backTimeout(1000),
-	m_tabWidth(0),
-	m_sourceFilter(defaultSourceFilter),
-	m_headerFilter(defaultHeaderFilter),
 	m_debugger(0)
 {
 }
@@ -228,61 +213,4 @@ QString DebuggerMainWndBase::driverNameFromFile(const QString& exe)
 	return "XSLT";
 
     return "GDB";
-}
-
-void DebuggerMainWndBase::doGlobalOptions(QWidget* parent)
-{
-    QTabDialog dlg(parent, "global_options", true);
-    QString title = kapp->caption();
-    title += i18n(": Global options");
-    dlg.setCaption(title);
-    dlg.setCancelButton(i18n("Cancel"));
-    dlg.setOKButton(i18n("OK"));
-
-    PrefDebugger prefDebugger(&dlg);
-    prefDebugger.setDebuggerCmd(m_debuggerCmdStr.isEmpty()  ?
-				GdbDriver::defaultGdb()  :  m_debuggerCmdStr);
-    prefDebugger.setTerminal(m_outputTermCmdStr);
-
-    PrefMisc prefMisc(&dlg);
-    prefMisc.setPopIntoForeground(m_popForeground);
-    prefMisc.setBackTimeout(m_backTimeout);
-    prefMisc.setTabWidth(m_tabWidth);
-    prefMisc.setSourceFilter(m_sourceFilter);
-    prefMisc.setHeaderFilter(m_headerFilter);
-
-    dlg.addTab(&prefDebugger, i18n("&Debugger"));
-    dlg.addTab(&prefMisc, i18n("&Miscellaneous"));
-    if (dlg.exec() == QDialog::Accepted)
-    {
-	setDebuggerCmdStr(prefDebugger.debuggerCmd());
-	setTerminalCmd(prefDebugger.terminal());
-	m_popForeground = prefMisc.popIntoForeground();
-	m_backTimeout = prefMisc.backTimeout();
-	m_tabWidth = prefMisc.tabWidth();
-	m_sourceFilter = prefMisc.sourceFilter();
-	if (m_sourceFilter.isEmpty())
-	    m_sourceFilter = defaultSourceFilter;
-	m_headerFilter = prefMisc.headerFilter();
-	if (m_headerFilter.isEmpty())
-	    m_headerFilter = defaultHeaderFilter;
-    }
-}
-
-void DebuggerMainWndBase::setTerminalCmd(const QString& cmd)
-{
-    m_outputTermCmdStr = cmd;
-    // revert to default if empty
-    if (m_outputTermCmdStr.isEmpty()) {
-	m_outputTermCmdStr = defaultTermCmdStr;
-    }
-}
-
-void DebuggerMainWndBase::setDebuggerCmdStr(const QString& cmd)
-{
-    m_debuggerCmdStr = cmd;
-    // make empty if it is the default
-    if (m_debuggerCmdStr == GdbDriver::defaultGdb()) {
-	m_debuggerCmdStr = QString();
-    }
 }
