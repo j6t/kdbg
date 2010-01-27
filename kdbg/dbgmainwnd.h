@@ -62,7 +62,14 @@ protected:
 
 protected:
     virtual bool queryClose();
-    virtual QString createOutputWindow();
+
+    // output window
+    QString m_outputTermKeepScript;
+    KProcess* m_outputTermProc;
+    int m_ttyLevel;
+
+    QString createOutputWindow();
+    void shutdownTermWindow();
 
     KDockWidget* dockParent(QWidget* w);
     bool isDockVisible(QWidget* w);

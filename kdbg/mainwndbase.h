@@ -55,11 +55,6 @@ public:
 protected:
     // output window
     QString m_outputTermCmdStr;
-    QString m_outputTermKeepScript;
-    KProcess* m_outputTermProc;
-    int m_ttyLevel;
-    virtual QString createOutputWindow();	/* returns terminal name */
-    void shutdownTermWindow();
 
     QString m_transcriptFile;		/* where gdb dialog is logged */
 

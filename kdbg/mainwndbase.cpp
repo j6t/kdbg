@@ -20,12 +20,6 @@
 #include "config.h"
 #endif
 #include "mydebug.h"
-#ifdef HAVE_SYS_STAT_H
-#include <sys/stat.h>			/* mknod(2) */
-#endif
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>			/* getpid, unlink etc. */
-#endif
 
 
 const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
@@ -35,8 +29,6 @@ const char defaultHeaderFilter[] = "*.h *.hh *.hpp *.h++";
 
 DebuggerMainWndBase::DebuggerMainWndBase() :
 	m_outputTermCmdStr(defaultTermCmdStr),
-	m_outputTermProc(0),
-	m_ttyLevel(-1),			/* no tty yet */
 #ifdef GDB_TRANSCRIPT
 	m_transcriptFile(GDB_TRANSCRIPT),
 #endif
@@ -52,13 +44,6 @@ DebuggerMainWndBase::DebuggerMainWndBase() :
 DebuggerMainWndBase::~DebuggerMainWndBase()
 {
     delete m_debugger;
-
-    // if the output window is open, close it
-    if (m_outputTermProc != 0) {
-	m_outputTermProc->disconnect();	/* ignore signals */
-	m_outputTermProc->kill();
-	shutdownTermWindow();
-    }
 }
 
 void DebuggerMainWndBase::setupDebugger(QWidget* parent,
@@ -282,125 +267,6 @@ void DebuggerMainWndBase::doGlobalOptions(QWidget* parent)
 	if (m_headerFilter.isEmpty())
 	    m_headerFilter = defaultHeaderFilter;
     }
-}
-
-const char fifoNameBase[] = "/tmp/kdbgttywin%05d";
-
-/*
- * We use the scope operator :: in this function, so that we don't
- * accidentally use the wrong close() function (I've been bitten ;-),
- * outch!) (We use it for all the libc functions, to be consistent...)
- */
-QString DebuggerMainWndBase::createOutputWindow()
-{
-    // create a name for a fifo
-    QString fifoName;
-    fifoName.sprintf(fifoNameBase, ::getpid());
-
-    // create a fifo that will pass in the tty name
-    QFile::remove(fifoName);		// remove remnants
-#ifdef HAVE_MKFIFO
-    if (::mkfifo(fifoName.local8Bit(), S_IRUSR|S_IWUSR) < 0) {
-	// failed
-	TRACE("mkfifo " + fifoName + " failed");
-	return QString();
-    }
-#else
-    if (::mknod(fifoName.local8Bit(), S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
-	// failed
-	TRACE("mknod " + fifoName + " failed");
-	return QString();
-    }
-#endif
-
-    m_outputTermProc = new KProcess;
-
-    {
-	/*
-	 * Spawn an xterm that in turn runs a shell script that passes us
-	 * back the terminal name and then only sits and waits.
-	 */
-	static const char shellScriptFmt[] =
-	    "tty>%s;"
-	    "trap \"\" INT QUIT TSTP;"	/* ignore various signals */
-	    "exec<&-;exec>&-;"		/* close stdin and stdout */
-	    "while :;do sleep 3600;done";
-	// let config file override this script
-	QString shellScript;
-	if (!m_outputTermKeepScript.isEmpty()) {
-	    shellScript = m_outputTermKeepScript;
-	} else {
-	    shellScript = shellScriptFmt;
-	}
-
-	shellScript.replace("%s", fifoName);
-	TRACE("output window script is " + shellScript);
-
-	QString title = kapp->caption();
-	title += i18n(": Program output");
-
-	// parse the command line specified in the preferences
-	QStringList cmdParts = QStringList::split(' ', m_outputTermCmdStr);
-
-	/*
-	 * Build the argv array. Thereby substitute special sequences:
-	 */
-	struct {
-	    char seq[4];
-	    QString replace;
-	} substitute[] = {
-	    { "%T", title },
-	    { "%C", shellScript }
-	};
-
-	for (QStringList::iterator i = cmdParts.begin(); i != cmdParts.end(); ++i)
-	{
-	    QString& str = *i;
-	    for (int j = sizeof(substitute)/sizeof(substitute[0])-1; j >= 0; j--) {
-		int pos = str.find(substitute[j].seq);
-		if (pos >= 0) {
-		    str.replace(pos, 2, substitute[j].replace);
-		    break;		/* substitute only one sequence */
-		}
-	    }
-	    *m_outputTermProc << str;
-	}
-
-    }
-
-    if (m_outputTermProc->start())
-    {
-	QString tty;
-
-	// read the ttyname from the fifo
-	QFile f(fifoName);
-	if (f.open(IO_ReadOnly))
-	{
-	    QByteArray t = f.readAll();
-	    tty = QString::fromLocal8Bit(t, t.size());
-	    f.close();
-	}
-	f.remove();
-
-	// remove whitespace
-	tty = tty.stripWhiteSpace();
-	TRACE("tty=" + tty);
-	return tty;
-    }
-    else
-    {
-	// error, could not start xterm
-	TRACE("fork failed for fifo " + fifoName);
-	QFile::remove(fifoName);
-	shutdownTermWindow();
-	return QString();
-    }
-}
-
-void DebuggerMainWndBase::shutdownTermWindow()
-{
-    delete m_outputTermProc;
-    m_outputTermProc = 0;
 }
 
 void DebuggerMainWndBase::setTerminalCmd(const QString& cmd)
