@@ -53,10 +53,6 @@ public:
     virtual void doGlobalOptions(QWidget* parent);
 
 protected:
-    // settings
-    virtual void saveSettings(KConfig*);
-    virtual void restoreSettings(KConfig*);
-
     // output window
     QString m_outputTermCmdStr;
     QString m_outputTermKeepScript;

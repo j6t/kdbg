@@ -107,64 +107,7 @@ void DebuggerMainWndBase::setTranscript(const QString& name)
 	m_debugger->driver()->setLogFileName(m_transcriptFile);
 }
 
-const char OutputWindowGroup[] = "OutputWindow";
-const char TermCmdStr[] = "TermCmdStr";
-const char KeepScript[] = "KeepScript";
-const char DebuggerGroup[] = "Debugger";
-const char DebuggerCmdStr[] = "DebuggerCmdStr";
-const char PreferencesGroup[] = "Preferences";
-const char PopForeground[] = "PopForeground";
-const char BackTimeout[] = "BackTimeout";
-const char TabWidth[] = "TabWidth";
-const char SourceFileFilter[] = "SourceFileFilter";
-const char HeaderFileFilter[] = "HeaderFileFilter";
 const char GeneralGroup[] = "General";
-
-void DebuggerMainWndBase::saveSettings(KConfig* config)
-{
-    if (m_debugger != 0) {
-	m_debugger->saveSettings(config);
-    }
-
-    KConfigGroupSaver g(config, OutputWindowGroup);
-    config->writeEntry(TermCmdStr, m_outputTermCmdStr);
-
-    config->setGroup(DebuggerGroup);
-    config->writeEntry(DebuggerCmdStr, m_debuggerCmdStr);
-
-    config->setGroup(PreferencesGroup);
-    config->writeEntry(PopForeground, m_popForeground);
-    config->writeEntry(BackTimeout, m_backTimeout);
-    config->writeEntry(TabWidth, m_tabWidth);
-    config->writeEntry(SourceFileFilter, m_sourceFilter);
-    config->writeEntry(HeaderFileFilter, m_headerFilter);
-}
-
-void DebuggerMainWndBase::restoreSettings(KConfig* config)
-{
-    if (m_debugger != 0) {
-	m_debugger->restoreSettings(config);
-    }
-
-    KConfigGroupSaver g(config, OutputWindowGroup);
-    /*
-     * For debugging and emergency purposes, let the config file override
-     * the shell script that is used to keep the output window open. This
-     * string must have EXACTLY 1 %s sequence in it.
-     */
-    setTerminalCmd(config->readEntry(TermCmdStr, defaultTermCmdStr));
-    m_outputTermKeepScript = config->readEntry(KeepScript);
-
-    config->setGroup(DebuggerGroup);
-    setDebuggerCmdStr(config->readEntry(DebuggerCmdStr));
-
-    config->setGroup(PreferencesGroup);
-    m_popForeground = config->readBoolEntry(PopForeground, false);
-    m_backTimeout = config->readNumEntry(BackTimeout, 1000);
-    m_tabWidth = config->readNumEntry(TabWidth, 0);
-    m_sourceFilter = config->readEntry(SourceFileFilter, m_sourceFilter);
-    m_headerFilter = config->readEntry(HeaderFileFilter, m_headerFilter);
-}
 
 void DebuggerMainWndBase::setAttachPid(const QString& pid)
 {

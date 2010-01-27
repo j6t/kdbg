@@ -37,6 +37,8 @@
 #endif
 
 
+static const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
+
 DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	KDockMainWindow(0, name),
 	DebuggerMainWndBase(),
@@ -355,9 +357,20 @@ void DebuggerMainWnd::readProperties(KConfig* config)
     }
 }
 
-const char WindowGroup[] = "Windows";
-const char RecentExecutables[] = "RecentExecutables";
-const char LastSession[] = "LastSession";
+static const char WindowGroup[] = "Windows";
+static const char RecentExecutables[] = "RecentExecutables";
+static const char LastSession[] = "LastSession";
+static const char OutputWindowGroup[] = "OutputWindow";
+static const char TermCmdStr[] = "TermCmdStr";
+static const char KeepScript[] = "KeepScript";
+static const char DebuggerGroup[] = "Debugger";
+static const char DebuggerCmdStr[] = "DebuggerCmdStr";
+static const char PreferencesGroup[] = "Preferences";
+static const char PopForeground[] = "PopForeground";
+static const char BackTimeout[] = "BackTimeout";
+static const char TabWidth[] = "TabWidth";
+static const char SourceFileFilter[] = "SourceFileFilter";
+static const char HeaderFileFilter[] = "HeaderFileFilter";
 
 void DebuggerMainWnd::saveSettings(KConfig* config)
 {
@@ -372,7 +385,22 @@ void DebuggerMainWnd::saveSettings(KConfig* config)
     config->writeEntry("Width0Locals", m_localVariables->columnWidth(0));
     config->writeEntry("Width0Watches", m_watches->columnWidth(0));
 
-    DebuggerMainWndBase::saveSettings(config);
+    if (m_debugger != 0) {
+	m_debugger->saveSettings(config);
+    }
+
+    KConfigGroupSaver g3(config, OutputWindowGroup);
+    config->writeEntry(TermCmdStr, m_outputTermCmdStr);
+
+    config->setGroup(DebuggerGroup);
+    config->writeEntry(DebuggerCmdStr, m_debuggerCmdStr);
+
+    config->setGroup(PreferencesGroup);
+    config->writeEntry(PopForeground, m_popForeground);
+    config->writeEntry(BackTimeout, m_backTimeout);
+    config->writeEntry(TabWidth, m_tabWidth);
+    config->writeEntry(SourceFileFilter, m_sourceFilter);
+    config->writeEntry(HeaderFileFilter, m_headerFilter);
 }
 
 void DebuggerMainWnd::restoreSettings(KConfig* config)
@@ -415,7 +443,28 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
     if (w >= 0 && w < 30000)
 	m_watches->setColumnWidth(0, w);
 
-    DebuggerMainWndBase::restoreSettings(config);
+    if (m_debugger != 0) {
+	m_debugger->restoreSettings(config);
+    }
+
+    KConfigGroupSaver g3(config, OutputWindowGroup);
+    /*
+     * For debugging and emergency purposes, let the config file override
+     * the shell script that is used to keep the output window open. This
+     * string must have EXACTLY 1 %s sequence in it.
+     */
+    setTerminalCmd(config->readEntry(TermCmdStr, defaultTermCmdStr));
+    m_outputTermKeepScript = config->readEntry(KeepScript);
+
+    config->setGroup(DebuggerGroup);
+    setDebuggerCmdStr(config->readEntry(DebuggerCmdStr));
+
+    config->setGroup(PreferencesGroup);
+    m_popForeground = config->readBoolEntry(PopForeground, false);
+    m_backTimeout = config->readNumEntry(BackTimeout, 1000);
+    m_tabWidth = config->readNumEntry(TabWidth, 0);
+    m_sourceFilter = config->readEntry(SourceFileFilter, m_sourceFilter);
+    m_headerFilter = config->readEntry(HeaderFileFilter, m_headerFilter);
 
     emit setTabWidth(m_tabWidth);
 }
