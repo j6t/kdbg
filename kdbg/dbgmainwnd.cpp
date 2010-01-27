@@ -39,7 +39,8 @@
 
 DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	KDockMainWindow(0, name),
-	DebuggerMainWndBase()
+	DebuggerMainWndBase(),
+	m_statusActive(i18n("active"))
 {
     QPixmap p;
 

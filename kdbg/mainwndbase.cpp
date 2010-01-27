@@ -51,7 +51,6 @@ DebuggerMainWndBase::DebuggerMainWndBase() :
 	m_headerFilter(defaultHeaderFilter),
 	m_debugger(0)
 {
-    m_statusActive = i18n("active");
 }
 
 DebuggerMainWndBase::~DebuggerMainWndBase()

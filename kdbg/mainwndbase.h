@@ -65,9 +65,6 @@ protected:
     // override must return the integrated output window
     virtual TTYWindow* ttyWindow() = 0;
 
-    // statusbar texts
-    QString m_statusActive;
-
     // output window
     QString m_outputTermCmdStr;
     QString m_outputTermKeepScript;
@@ -75,8 +72,6 @@ protected:
     int m_ttyLevel;
     virtual QString createOutputWindow();	/* returns terminal name */
     void shutdownTermWindow();
-
-    QString m_lastDirectory;		/* the dir of the most recently opened file */
 
     QString m_transcriptFile;		/* where gdb dialog is logged */
 

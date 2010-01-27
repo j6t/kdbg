@@ -57,6 +57,7 @@ protected:
 
     // recent execs in File menu
     KRecentFilesAction* m_recentExecAction;
+    QString m_lastDirectory;		/* the dir of the most recently opened file */
 
 protected:
     virtual bool queryClose();
@@ -75,6 +76,9 @@ protected:
     // we store the last string that we put there
     QString m_lastActiveStatusText;
     bool m_animRunning;
+
+    // statusbar texts
+    QString m_statusActive;
 
 signals:
     void setTabWidth(int tabWidth);
