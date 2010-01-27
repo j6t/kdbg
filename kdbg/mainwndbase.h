@@ -15,6 +15,7 @@ class KDebugger;
 class TTYWindow;
 class KProcess;
 class DebuggerDriver;
+class QListBox;
 
 class DebuggerMainWndBase
 {
@@ -49,10 +50,6 @@ public:
     void setCoreFile(const QString& corefile);
     void setRemoteDevice(const QString &remoteDevice);
     void overrideProgramArguments(const QString& args);
-    /** helper around KFileDialog */
-    static QString myGetFileName(QString caption,
-				 QString dir, QString filter,
-				 QWidget* parent);
     /** invokes the global options dialog */
     virtual void doGlobalOptions(QWidget* parent);
 

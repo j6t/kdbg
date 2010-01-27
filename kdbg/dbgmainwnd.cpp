@@ -770,6 +770,22 @@ void DebuggerMainWnd::slotEditValue()
     }
 }
 
+// helper that gets a file name (it only differs in the caption of the dialog)
+static QString myGetFileName(QString caption,
+			     QString dir, QString filter,
+	 		     QWidget* parent)
+{
+    QString filename;
+    KFileDialog dlg(dir, filter, parent, "filedialog", true);
+
+    dlg.setCaption(caption);
+
+    if (dlg.exec() == QDialog::Accepted)
+	filename = dlg.selectedFile();
+
+    return filename;
+}
+
 void DebuggerMainWnd::slotFileOpen()
 {
     // start browsing in the active file's directory

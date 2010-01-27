@@ -6,9 +6,8 @@
 
 #include <kapplication.h>
 #include <klocale.h>			/* i18n */
-#include <kconfig.h>
+#include <ksimpleconfig.h>
 #include <kmessagebox.h>
-#include <kfiledialog.h>
 #include <qtabdialog.h>
 #include <qfile.h>
 #include "mainwndbase.h"
@@ -302,22 +301,6 @@ QString DebuggerMainWndBase::driverNameFromFile(const QString& exe)
 	return "XSLT";
 
     return "GDB";
-}
-
-// helper that gets a file name (it only differs in the caption of the dialog)
-QString DebuggerMainWndBase::myGetFileName(QString caption,
-			   QString dir, QString filter,
-			   QWidget* parent)
-{
-    QString filename;
-    KFileDialog dlg(dir, filter, parent, "filedialog", true);
-
-    dlg.setCaption(caption);
-
-    if (dlg.exec() == QDialog::Accepted)
-	filename = dlg.selectedFile();
-
-    return filename;
 }
 
 void DebuggerMainWndBase::doGlobalOptions(QWidget* parent)
