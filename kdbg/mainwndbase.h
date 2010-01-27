@@ -13,7 +13,6 @@
 // forward declarations
 class KDebugger;
 class TTYWindow;
-class KStatusBar;
 class KProcess;
 class DebuggerDriver;
 
@@ -102,7 +101,6 @@ public:
      * virtual here since Qt signal mechanism fails miserably (because this
      * class will not be the left-most base class!).
      */
-    void newStatusMsg(KStatusBar* statusbar);
     void slotDebuggerStarting();
 };
 

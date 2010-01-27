@@ -8,7 +8,6 @@
 #include <klocale.h>			/* i18n */
 #include <kconfig.h>
 #include <kmessagebox.h>
-#include <kstatusbar.h>
 #include <kfiledialog.h>
 #include <qtabdialog.h>
 #include <qfile.h>
@@ -19,7 +18,6 @@
 #include "prefdebugger.h"
 #include "prefmisc.h"
 #include "ttywnd.h"
-#include "commandids.h"
 #ifdef HAVE_CONFIG
 #include "config.h"
 #endif
@@ -320,12 +318,6 @@ QString DebuggerMainWndBase::myGetFileName(QString caption,
 	filename = dlg.selectedFile();
 
     return filename;
-}
-
-void DebuggerMainWndBase::newStatusMsg(KStatusBar* statusbar)
-{
-    QString msg = m_debugger->statusMessage();
-    statusbar->changeItem(msg, ID_STATUS_MSG);
 }
 
 void DebuggerMainWndBase::doGlobalOptions(QWidget* parent)

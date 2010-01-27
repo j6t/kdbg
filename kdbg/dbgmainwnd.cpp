@@ -616,7 +616,8 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
 
 void DebuggerMainWnd::slotNewStatusMsg()
 {
-    newStatusMsg(statusBar());
+    QString msg = m_debugger->statusMessage();
+    statusBar()->changeItem(msg, ID_STATUS_MSG);
 }
 
 void DebuggerMainWnd::slotFileGlobalSettings()
