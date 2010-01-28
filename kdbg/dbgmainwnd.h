@@ -9,9 +9,9 @@
 
 #include <qtimer.h>
 #include <kdockwidget.h>
-#include "mainwndbase.h"
 #include "regwnd.h"
 
+class KProcess;
 class KRecentFilesAction;
 class WinStack;
 class QListBox;
@@ -21,9 +21,12 @@ class BreakpointTable;
 class ThreadList;
 class MemoryWindow;
 class TTYWindow;
+class WatchWindow;
+class KDebugger;
+class DebuggerDriver;
 struct DbgAddr;
 
-class DebuggerMainWnd : public KDockMainWindow, public DebuggerMainWndBase
+class DebuggerMainWnd : public KDockMainWindow
 {
     Q_OBJECT
 public:
@@ -31,6 +34,20 @@ public:
     ~DebuggerMainWnd();
 
     bool debugProgram(const QString& exe, const QString& lang);
+
+    /**
+     * Specifies the file where to write the transcript.
+     */
+    void setTranscript(const QString& name);
+    /**
+     * Specifies the process to attach to after the program is loaded.
+     */
+    void setAttachPid(const QString& pid);
+
+    // the following are needed to handle program arguments
+    void setCoreFile(const QString& corefile);
+    void setRemoteDevice(const QString &remoteDevice);
+    void overrideProgramArguments(const QString& args);
 
 protected:
     // session properties
@@ -62,6 +79,22 @@ protected:
 
 protected:
     virtual bool queryClose();
+
+    // the debugger proper
+    QString m_debuggerCmdStr;
+    KDebugger* m_debugger;
+    QString m_transcriptFile;		/* where gdb dialog is logged */
+
+    /**
+     * Starts to debug the specified program using the specified language
+     * driver.
+     */
+    bool startDriver(const QString& executable, QString lang);
+    DebuggerDriver* driverFromLang(QString lang);
+    /**
+     * Derives a driver name from the contents of the named file.
+     */
+    QString driverNameFromFile(const QString& exe);
 
     // output window
     QString m_outputTermCmdStr;

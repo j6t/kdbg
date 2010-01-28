@@ -20,6 +20,7 @@
 #include <kanimwidget.h>
 #include <kwin.h>
 #include <qlistbox.h>
+#include <qfile.h>
 #include <qfileinfo.h>
 #include <qtabdialog.h>
 #include "dbgmainwnd.h"
@@ -30,10 +31,12 @@
 #include "threadlist.h"
 #include "memwindow.h"
 #include "ttywnd.h"
+#include "watchwindow.h"
 #include "procattach.h"
 #include "prefdebugger.h"
 #include "prefmisc.h"
 #include "gdbdriver.h"
+#include "xsldbgdriver.h"
 #include "mydebug.h"
 #ifdef HAVE_CONFIG_H
 #include "config.h"
@@ -52,7 +55,10 @@ static const char defaultHeaderFilter[] = "*.h *.hh *.hpp *.h++";
 
 DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	KDockMainWindow(0, name),
-	DebuggerMainWndBase(),
+	m_debugger(0),
+#ifdef GDB_TRANSCRIPT
+	m_transcriptFile(GDB_TRANSCRIPT),
+#endif
 	m_outputTermCmdStr(defaultTermCmdStr),
 	m_outputTermProc(0),
 	m_ttyLevel(-1),			/* no tty yet */
@@ -98,7 +104,12 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     m_memoryWindow = new MemoryWindow(dw8, "memory");
     dw8->setWidget(m_memoryWindow);
 
-    setupDebugger(this, m_localVariables, m_watches->watchVariables(), m_btWindow);
+    m_debugger = new KDebugger(this, m_localVariables, m_watches->watchVariables(), m_btWindow);
+
+    connect(m_debugger, SIGNAL(updateStatusMessage()), SLOT(slotNewStatusMsg()));
+    connect(m_debugger, SIGNAL(updateUI()), SLOT(updateUI()));
+    connect(m_debugger, SIGNAL(breakpointsChanged()), SLOT(updateLineItems()));
+    connect(m_debugger, SIGNAL(debuggerStarting()), SLOT(slotDebuggerStarting()));
     m_bpTable->setDebugger(m_debugger);
     m_memoryWindow->setDebugger(m_debugger);
 
@@ -661,7 +672,7 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
     }
     else
     {
-	success = DebuggerMainWndBase::debugProgram(fi.absFilePath(), lang, this);
+	success = startDriver(fi.absFilePath(), lang);
     }
 
     if (success)
@@ -682,6 +693,169 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
     }
 
     return success;
+}
+
+static const char GeneralGroup[] = "General";
+
+bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
+{
+    assert(m_debugger != 0);
+
+    TRACE(QString("trying language '%1'...").arg(lang));
+    DebuggerDriver* driver = driverFromLang(lang);
+
+    if (driver == 0)
+    {
+	// see if there is a language in the per-program config file
+	QString configName = m_debugger->getConfigForExe(executable);
+	if (QFile::exists(configName))
+	{
+	    KSimpleConfig c(configName, true);	// read-only
+	    c.setGroup(GeneralGroup);
+
+	    // Using "GDB" as default here is for backwards compatibility:
+	    // The config file exists but doesn't have an entry,
+	    // so it must have been created by an old version of KDbg
+	    // that had only the GDB driver.
+	    lang = c.readEntry(KDebugger::DriverNameEntry, "GDB");
+
+	    TRACE(QString("...bad, trying config driver %1...").arg(lang));
+	    driver = driverFromLang(lang);
+	}
+
+    }
+    if (driver == 0)
+    {
+	QString name = driverNameFromFile(executable);
+
+	TRACE(QString("...no luck, trying %1 derived"
+		" from file contents").arg(name));
+	driver = driverFromLang(name);
+    }
+    if (driver == 0)
+    {
+	// oops
+	QString msg = i18n("Don't know how to debug language `%1'");
+	KMessageBox::sorry(this, msg.arg(lang));
+	return false;
+    }
+
+    driver->setLogFileName(m_transcriptFile);
+
+    bool success = m_debugger->debugProgram(executable, driver);
+
+    if (!success)
+    {
+	delete driver;
+
+	QString msg = i18n("Could not start the debugger process.\n"
+			   "Please shut down KDbg and resolve the problem.");
+	KMessageBox::sorry(this, msg);
+    }
+
+    return success;
+}
+
+// derive driver from language
+DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
+{
+    // lang is needed in all lowercase
+    lang = lang.lower();
+
+    // The following table relates languages and debugger drivers
+    static const struct L {
+	const char* shortest;	// abbreviated to this is still unique
+	const char* full;	// full name of language
+	int driver;
+    } langs[] = {
+	{ "c",       "c++",     1 },
+	{ "f",       "fortran", 1 },
+	{ "p",       "python",  3 },
+	{ "x",       "xslt",    2 },
+	// the following are actually driver names
+	{ "gdb",     "gdb",     1 },
+	{ "xsldbg",  "xsldbg",  2 },
+    };
+    const int N = sizeof(langs)/sizeof(langs[0]);
+
+    // lookup the language name
+    int driverID = 0;
+    for (int i = 0; i < N; i++)
+    {
+	const L& l = langs[i];
+
+	// shortest must match
+	if (!lang.startsWith(l.shortest))
+	    continue;
+
+	// lang must not be longer than the full name, and it must match
+	if (QString(l.full).startsWith(lang))
+	{
+	    driverID = l.driver;
+	    break;
+	}
+    }
+    DebuggerDriver* driver = 0;
+    switch (driverID) {
+    case 1:
+	{
+	    GdbDriver* gdb = new GdbDriver;
+	    gdb->setDefaultInvocation(m_debuggerCmdStr);
+	    driver = gdb;
+	}
+	break;
+    case 2:
+	driver = new XsldbgDriver;
+	break;
+    default:
+	// unknown language
+	break;
+    }
+    return driver;
+}
+
+/**
+ * Try to guess the language to use from the contents of the file.
+ */
+QString DebuggerMainWnd::driverNameFromFile(const QString& exe)
+{
+    /* Inprecise but simple test to see if file is in XSLT language */
+    if (exe.right(4).lower() == ".xsl")
+	return "XSLT";
+
+    return "GDB";
+}
+
+void DebuggerMainWnd::setCoreFile(const QString& corefile)
+{
+    assert(m_debugger != 0);
+    m_debugger->useCoreFile(corefile, true);
+}
+
+void DebuggerMainWnd::setRemoteDevice(const QString& remoteDevice)
+{
+    if (m_debugger != 0) {
+	m_debugger->setRemoteDevice(remoteDevice);
+    }
+}
+
+void DebuggerMainWnd::overrideProgramArguments(const QString& args)
+{
+    assert(m_debugger != 0);
+    m_debugger->overrideProgramArguments(args);
+}
+
+void DebuggerMainWnd::setTranscript(const QString& name)
+{
+    m_transcriptFile = name;
+    if (m_debugger != 0 && m_debugger->driver() != 0)
+	m_debugger->driver()->setLogFileName(m_transcriptFile);
+}
+
+void DebuggerMainWnd::setAttachPid(const QString& pid)
+{
+    assert(m_debugger != 0);
+    m_debugger->setAttachPid(pid);
 }
 
 void DebuggerMainWnd::slotNewStatusMsg()
