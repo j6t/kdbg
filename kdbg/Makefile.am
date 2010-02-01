@@ -31,7 +31,7 @@ kdbg_SOURCES = \
 	prefdebugger.cpp \
 	prefmisc.cpp \
 	pgmsettings.cpp \
-	mainwndbase.cpp \
+	watchwindow.cpp \
 	dbgmainwnd.cpp \
 	main.cpp
 
@@ -63,7 +63,7 @@ noinst_HEADERS = \
 	prefdebugger.h \
 	prefmisc.h \
 	pgmsettings.h \
-	mainwndbase.h \
+	watchwindow.h \
 	dbgmainwnd.h \
 	envvar.h \
 	commandids.h \

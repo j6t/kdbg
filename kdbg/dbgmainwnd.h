@@ -9,9 +9,9 @@
 
 #include <qtimer.h>
 #include <kdockwidget.h>
-#include "mainwndbase.h"
 #include "regwnd.h"
 
+class KProcess;
 class KRecentFilesAction;
 class KToggleAction;
 class WinStack;
@@ -21,9 +21,13 @@ class ExprWnd;
 class BreakpointTable;
 class ThreadList;
 class MemoryWindow;
+class TTYWindow;
+class WatchWindow;
+class KDebugger;
+class DebuggerDriver;
 struct DbgAddr;
 
-class DebuggerMainWnd : public KDockMainWindow, public DebuggerMainWndBase
+class DebuggerMainWnd : public KDockMainWindow
 {
     Q_OBJECT
 public:
@@ -31,6 +35,20 @@ public:
     ~DebuggerMainWnd();
 
     bool debugProgram(const QString& exe, const QString& lang);
+
+    /**
+     * Specifies the file where to write the transcript.
+     */
+    void setTranscript(const QString& name);
+    /**
+     * Specifies the process to attach to after the program is loaded.
+     */
+    void setAttachPid(const QString& pid);
+
+    // the following are needed to handle program arguments
+    void setCoreFile(const QString& corefile);
+    void setRemoteDevice(const QString &remoteDevice);
+    void overrideProgramArguments(const QString& args);
 
 protected:
     // session properties
@@ -89,17 +107,49 @@ protected:
     KAction* m_bpSetTempAction;
     KAction* m_bpEnableAction;
     KAction* m_editValueAction;
+    QString m_lastDirectory;		/* the dir of the most recently opened file */
 
 protected:
     virtual bool queryClose();
-    virtual TTYWindow* ttyWindow();
-    virtual QString createOutputWindow();
     KAction* createAction(const QString& text, const char* icon,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name);
     KAction* createAction(const QString& text,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name);
+
+    // the debugger proper
+    QString m_debuggerCmdStr;
+    KDebugger* m_debugger;
+    QString m_transcriptFile;		/* where gdb dialog is logged */
+
+    /**
+     * Starts to debug the specified program using the specified language
+     * driver.
+     */
+    bool startDriver(const QString& executable, QString lang);
+    DebuggerDriver* driverFromLang(QString lang);
+    /**
+     * Derives a driver name from the contents of the named file.
+     */
+    QString driverNameFromFile(const QString& exe);
+
+    // output window
+    QString m_outputTermCmdStr;
+    QString m_outputTermKeepScript;
+    KProcess* m_outputTermProc;
+    int m_ttyLevel;
+
+    QString createOutputWindow();
+    void shutdownTermWindow();
+
+    bool m_popForeground;		/* whether main wnd raises when prog stops */
+    int m_backTimeout;			/* when wnd goes back */
+    int m_tabWidth;			/* tab width in characters (can be 0) */
+    QString m_sourceFilter;
+    QString m_headerFilter;
+    void setTerminalCmd(const QString& cmd);
+    void setDebuggerCmdStr(const QString& cmd);
 
     KDockWidget* dockParent(QWidget* w);
     bool isDockVisible(QWidget* w);
@@ -113,6 +163,9 @@ protected:
     // we store the last string that we put there
     QString m_lastActiveStatusText;
     bool m_animRunning;
+
+    // statusbar texts
+    QString m_statusActive;
 
 signals:
     void setTabWidth(int tabWidth);

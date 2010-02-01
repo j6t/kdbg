@@ -20,7 +20,9 @@
 #include <kanimwidget.h>
 #include <kwin.h>
 #include <qlistbox.h>
+#include <qfile.h>
 #include <qfileinfo.h>
+#include <qtabdialog.h>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "commandids.h"
@@ -29,17 +31,43 @@
 #include "threadlist.h"
 #include "memwindow.h"
 #include "ttywnd.h"
+#include "watchwindow.h"
 #include "procattach.h"
-#include "dbgdriver.h"
+#include "prefdebugger.h"
+#include "prefmisc.h"
+#include "gdbdriver.h"
+#include "xsldbgdriver.h"
 #include "mydebug.h"
 #ifdef HAVE_CONFIG_H
 #include "config.h"
 #endif
+#ifdef HAVE_SYS_STAT_H
+#include <sys/stat.h>			/* mknod(2) */
+#endif
+#ifdef HAVE_UNISTD_H
+#include <unistd.h>			/* getpid */
+#endif
 
+
+static const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
+static const char defaultSourceFilter[] = "*.c *.cc *.cpp *.c++ *.C *.CC";
+static const char defaultHeaderFilter[] = "*.h *.hh *.hpp *.h++";
 
 DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	KDockMainWindow(0, name),
-	DebuggerMainWndBase()
+	m_debugger(0),
+#ifdef GDB_TRANSCRIPT
+	m_transcriptFile(GDB_TRANSCRIPT),
+#endif
+	m_outputTermCmdStr(defaultTermCmdStr),
+	m_outputTermProc(0),
+	m_ttyLevel(-1),			/* no tty yet */
+	m_popForeground(false),
+	m_backTimeout(1000),
+	m_tabWidth(0),
+	m_sourceFilter(defaultSourceFilter),
+	m_headerFilter(defaultHeaderFilter),
+	m_statusActive(i18n("active"))
 {
     QPixmap p;
 
@@ -76,7 +104,12 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     m_memoryWindow = new MemoryWindow(dw8, "memory");
     dw8->setWidget(m_memoryWindow);
 
-    setupDebugger(this, m_localVariables, m_watches->watchVariables(), m_btWindow);
+    m_debugger = new KDebugger(this, m_localVariables, m_watches->watchVariables(), m_btWindow);
+
+    connect(m_debugger, SIGNAL(updateStatusMessage()), SLOT(slotNewStatusMsg()));
+    connect(m_debugger, SIGNAL(updateUI()), SLOT(updateUI()));
+    connect(m_debugger, SIGNAL(breakpointsChanged()), SLOT(updateLineItems()));
+    connect(m_debugger, SIGNAL(debuggerStarting()), SLOT(slotDebuggerStarting()));
     m_bpTable->setDebugger(m_debugger);
     m_memoryWindow->setDebugger(m_debugger);
 
@@ -171,6 +204,13 @@ DebuggerMainWnd::~DebuggerMainWnd()
     delete m_localVariables;
     delete m_btWindow;
     delete m_filesWindow;
+
+    // if the output window is open, close it
+    if (m_outputTermProc != 0) {
+	m_outputTermProc->disconnect();	/* ignore signals */
+	m_outputTermProc->kill();
+	shutdownTermWindow();
+    }
 }
 
 KAction* DebuggerMainWnd::createAction(const QString& text, const char* icon,
@@ -350,9 +390,20 @@ void DebuggerMainWnd::readProperties(KConfig* config)
     }
 }
 
-const char WindowGroup[] = "Windows";
-const char RecentExecutables[] = "RecentExecutables";
-const char LastSession[] = "LastSession";
+static const char WindowGroup[] = "Windows";
+static const char RecentExecutables[] = "RecentExecutables";
+static const char LastSession[] = "LastSession";
+static const char OutputWindowGroup[] = "OutputWindow";
+static const char TermCmdStr[] = "TermCmdStr";
+static const char KeepScript[] = "KeepScript";
+static const char DebuggerGroup[] = "Debugger";
+static const char DebuggerCmdStr[] = "DebuggerCmdStr";
+static const char PreferencesGroup[] = "Preferences";
+static const char PopForeground[] = "PopForeground";
+static const char BackTimeout[] = "BackTimeout";
+static const char TabWidth[] = "TabWidth";
+static const char SourceFileFilter[] = "SourceFileFilter";
+static const char HeaderFileFilter[] = "HeaderFileFilter";
 
 void DebuggerMainWnd::saveSettings(KConfig* config)
 {
@@ -367,7 +418,22 @@ void DebuggerMainWnd::saveSettings(KConfig* config)
     config->writeEntry("Width0Locals", m_localVariables->columnWidth(0));
     config->writeEntry("Width0Watches", m_watches->columnWidth(0));
 
-    DebuggerMainWndBase::saveSettings(config);
+    if (m_debugger != 0) {
+	m_debugger->saveSettings(config);
+    }
+
+    KConfigGroupSaver g3(config, OutputWindowGroup);
+    config->writeEntry(TermCmdStr, m_outputTermCmdStr);
+
+    config->setGroup(DebuggerGroup);
+    config->writeEntry(DebuggerCmdStr, m_debuggerCmdStr);
+
+    config->setGroup(PreferencesGroup);
+    config->writeEntry(PopForeground, m_popForeground);
+    config->writeEntry(BackTimeout, m_backTimeout);
+    config->writeEntry(TabWidth, m_tabWidth);
+    config->writeEntry(SourceFileFilter, m_sourceFilter);
+    config->writeEntry(HeaderFileFilter, m_headerFilter);
 }
 
 void DebuggerMainWnd::restoreSettings(KConfig* config)
@@ -410,7 +476,28 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
     if (w >= 0 && w < 30000)
 	m_watches->setColumnWidth(0, w);
 
-    DebuggerMainWndBase::restoreSettings(config);
+    if (m_debugger != 0) {
+	m_debugger->restoreSettings(config);
+    }
+
+    KConfigGroupSaver g3(config, OutputWindowGroup);
+    /*
+     * For debugging and emergency purposes, let the config file override
+     * the shell script that is used to keep the output window open. This
+     * string must have EXACTLY 1 %s sequence in it.
+     */
+    setTerminalCmd(config->readEntry(TermCmdStr, defaultTermCmdStr));
+    m_outputTermKeepScript = config->readEntry(KeepScript);
+
+    config->setGroup(DebuggerGroup);
+    setDebuggerCmdStr(config->readEntry(DebuggerCmdStr));
+
+    config->setGroup(PreferencesGroup);
+    m_popForeground = config->readBoolEntry(PopForeground, false);
+    m_backTimeout = config->readNumEntry(BackTimeout, 1000);
+    m_tabWidth = config->readNumEntry(TabWidth, 0);
+    m_sourceFilter = config->readEntry(SourceFileFilter, m_sourceFilter);
+    m_headerFilter = config->readEntry(HeaderFileFilter, m_headerFilter);
 
     emit setTabWidth(m_tabWidth);
 }
@@ -563,11 +650,6 @@ void DebuggerMainWnd::fixDockConfig(KConfig* c, bool upgrade)
     }
 }
 
-TTYWindow* DebuggerMainWnd::ttyWindow()
-{
-    return m_ttyWindow;
-}
-
 bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
 {
     // check the file name
@@ -581,7 +663,7 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
     }
     else
     {
-	success = DebuggerMainWndBase::debugProgram(fi.absFilePath(), lang, this);
+	success = startDriver(fi.absFilePath(), lang);
     }
 
     if (success)
@@ -604,25 +686,279 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
     return success;
 }
 
+static const char GeneralGroup[] = "General";
+
+bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
+{
+    assert(m_debugger != 0);
+
+    TRACE(QString("trying language '%1'...").arg(lang));
+    DebuggerDriver* driver = driverFromLang(lang);
+
+    if (driver == 0)
+    {
+	// see if there is a language in the per-program config file
+	QString configName = m_debugger->getConfigForExe(executable);
+	if (QFile::exists(configName))
+	{
+	    KSimpleConfig c(configName, true);	// read-only
+	    c.setGroup(GeneralGroup);
+
+	    // Using "GDB" as default here is for backwards compatibility:
+	    // The config file exists but doesn't have an entry,
+	    // so it must have been created by an old version of KDbg
+	    // that had only the GDB driver.
+	    lang = c.readEntry(KDebugger::DriverNameEntry, "GDB");
+
+	    TRACE(QString("...bad, trying config driver %1...").arg(lang));
+	    driver = driverFromLang(lang);
+	}
+
+    }
+    if (driver == 0)
+    {
+	QString name = driverNameFromFile(executable);
+
+	TRACE(QString("...no luck, trying %1 derived"
+		" from file contents").arg(name));
+	driver = driverFromLang(name);
+    }
+    if (driver == 0)
+    {
+	// oops
+	QString msg = i18n("Don't know how to debug language `%1'");
+	KMessageBox::sorry(this, msg.arg(lang));
+	return false;
+    }
+
+    driver->setLogFileName(m_transcriptFile);
+
+    bool success = m_debugger->debugProgram(executable, driver);
+
+    if (!success)
+    {
+	delete driver;
+
+	QString msg = i18n("Could not start the debugger process.\n"
+			   "Please shut down KDbg and resolve the problem.");
+	KMessageBox::sorry(this, msg);
+    }
+
+    return success;
+}
+
+// derive driver from language
+DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
+{
+    // lang is needed in all lowercase
+    lang = lang.lower();
+
+    // The following table relates languages and debugger drivers
+    static const struct L {
+	const char* shortest;	// abbreviated to this is still unique
+	const char* full;	// full name of language
+	int driver;
+    } langs[] = {
+	{ "c",       "c++",     1 },
+	{ "f",       "fortran", 1 },
+	{ "p",       "python",  3 },
+	{ "x",       "xslt",    2 },
+	// the following are actually driver names
+	{ "gdb",     "gdb",     1 },
+	{ "xsldbg",  "xsldbg",  2 },
+    };
+    const int N = sizeof(langs)/sizeof(langs[0]);
+
+    // lookup the language name
+    int driverID = 0;
+    for (int i = 0; i < N; i++)
+    {
+	const L& l = langs[i];
+
+	// shortest must match
+	if (!lang.startsWith(l.shortest))
+	    continue;
+
+	// lang must not be longer than the full name, and it must match
+	if (QString(l.full).startsWith(lang))
+	{
+	    driverID = l.driver;
+	    break;
+	}
+    }
+    DebuggerDriver* driver = 0;
+    switch (driverID) {
+    case 1:
+	{
+	    GdbDriver* gdb = new GdbDriver;
+	    gdb->setDefaultInvocation(m_debuggerCmdStr);
+	    driver = gdb;
+	}
+	break;
+    case 2:
+	driver = new XsldbgDriver;
+	break;
+    default:
+	// unknown language
+	break;
+    }
+    return driver;
+}
+
+/**
+ * Try to guess the language to use from the contents of the file.
+ */
+QString DebuggerMainWnd::driverNameFromFile(const QString& exe)
+{
+    /* Inprecise but simple test to see if file is in XSLT language */
+    if (exe.right(4).lower() == ".xsl")
+	return "XSLT";
+
+    return "GDB";
+}
+
+void DebuggerMainWnd::setCoreFile(const QString& corefile)
+{
+    assert(m_debugger != 0);
+    m_debugger->useCoreFile(corefile, true);
+}
+
+void DebuggerMainWnd::setRemoteDevice(const QString& remoteDevice)
+{
+    if (m_debugger != 0) {
+	m_debugger->setRemoteDevice(remoteDevice);
+    }
+}
+
+void DebuggerMainWnd::overrideProgramArguments(const QString& args)
+{
+    assert(m_debugger != 0);
+    m_debugger->overrideProgramArguments(args);
+}
+
+void DebuggerMainWnd::setTranscript(const QString& name)
+{
+    m_transcriptFile = name;
+    if (m_debugger != 0 && m_debugger->driver() != 0)
+	m_debugger->driver()->setLogFileName(m_transcriptFile);
+}
+
+void DebuggerMainWnd::setAttachPid(const QString& pid)
+{
+    assert(m_debugger != 0);
+    m_debugger->setAttachPid(pid);
+}
+
 void DebuggerMainWnd::slotNewStatusMsg()
 {
-    newStatusMsg(statusBar());
+    QString msg = m_debugger->statusMessage();
+    statusBar()->changeItem(msg, ID_STATUS_MSG);
 }
 
 void DebuggerMainWnd::slotFileGlobalSettings()
 {
     int oldTabWidth = m_tabWidth;
 
-    doGlobalOptions(this);
+    QTabDialog dlg(this, "global_options", true);
+    QString title = kapp->caption();
+    title += i18n(": Global options");
+    dlg.setCaption(title);
+    dlg.setCancelButton(i18n("Cancel"));
+    dlg.setOKButton(i18n("OK"));
+
+    PrefDebugger prefDebugger(&dlg);
+    prefDebugger.setDebuggerCmd(m_debuggerCmdStr.isEmpty()  ?
+				GdbDriver::defaultGdb()  :  m_debuggerCmdStr);
+    prefDebugger.setTerminal(m_outputTermCmdStr);
+
+    PrefMisc prefMisc(&dlg);
+    prefMisc.setPopIntoForeground(m_popForeground);
+    prefMisc.setBackTimeout(m_backTimeout);
+    prefMisc.setTabWidth(m_tabWidth);
+    prefMisc.setSourceFilter(m_sourceFilter);
+    prefMisc.setHeaderFilter(m_headerFilter);
+
+    dlg.addTab(&prefDebugger, i18n("&Debugger"));
+    dlg.addTab(&prefMisc, i18n("&Miscellaneous"));
+    if (dlg.exec() == QDialog::Accepted)
+    {
+	setDebuggerCmdStr(prefDebugger.debuggerCmd());
+	setTerminalCmd(prefDebugger.terminal());
+	m_popForeground = prefMisc.popIntoForeground();
+	m_backTimeout = prefMisc.backTimeout();
+	m_tabWidth = prefMisc.tabWidth();
+	m_sourceFilter = prefMisc.sourceFilter();
+	if (m_sourceFilter.isEmpty())
+	    m_sourceFilter = defaultSourceFilter;
+	m_headerFilter = prefMisc.headerFilter();
+	if (m_headerFilter.isEmpty())
+	    m_headerFilter = defaultHeaderFilter;
+    }
 
     if (m_tabWidth != oldTabWidth) {
 	emit setTabWidth(m_tabWidth);
     }
 }
 
+void DebuggerMainWnd::setTerminalCmd(const QString& cmd)
+{
+    m_outputTermCmdStr = cmd;
+    // revert to default if empty
+    if (m_outputTermCmdStr.isEmpty()) {
+	m_outputTermCmdStr = defaultTermCmdStr;
+    }
+}
+
+void DebuggerMainWnd::setDebuggerCmdStr(const QString& cmd)
+{
+    m_debuggerCmdStr = cmd;
+    // make empty if it is the default
+    if (m_debuggerCmdStr == GdbDriver::defaultGdb()) {
+	m_debuggerCmdStr = QString();
+    }
+}
+
 void DebuggerMainWnd::slotDebuggerStarting()
 {
-    DebuggerMainWndBase::slotDebuggerStarting();
+    if (m_debugger == 0)		/* paranoia check */
+	return;
+
+    if (m_ttyLevel == m_debugger->ttyLevel())
+	return;
+
+    // shut down terminal emulations we will not need
+    switch (m_ttyLevel) {
+    case KDebugger::ttySimpleOutputOnly:
+	m_ttyWindow->deactivate();
+	break;
+    case KDebugger::ttyFull:
+	if (m_outputTermProc != 0) {
+	    m_outputTermProc->kill();
+	    // will be deleted in slot
+	}
+	break;
+    default: break;
+    }
+
+    m_ttyLevel = m_debugger->ttyLevel();
+
+    QString ttyName;
+    switch (m_ttyLevel) {
+    case KDebugger::ttySimpleOutputOnly:
+	ttyName = m_ttyWindow->activate();
+	break;
+    case KDebugger::ttyFull:
+	if (m_outputTermProc == 0) {
+	    // create an output window
+	    ttyName = createOutputWindow();
+	    TRACE(ttyName.isEmpty() ?
+		  "createOuputWindow failed" : "successfully created output window");
+	}
+	break;
+    default: break;
+    }
+
+    m_debugger->setTerminal(ttyName);
 }
 
 void DebuggerMainWnd::slotToggleBreak(const QString& fileName, int lineNo,
@@ -645,17 +981,119 @@ void DebuggerMainWnd::slotEnaDisBreak(const QString& fileName, int lineNo,
 
 QString DebuggerMainWnd::createOutputWindow()
 {
-    QString tty = DebuggerMainWndBase::createOutputWindow();
-    if (!tty.isEmpty()) {
+    // create a name for a fifo
+    QString fifoName;
+    fifoName.sprintf("/tmp/kdbgttywin%05d", ::getpid());
+
+    // create a fifo that will pass in the tty name
+    QFile::remove(fifoName);		// remove remnants
+#ifdef HAVE_MKFIFO
+    if (::mkfifo(fifoName.local8Bit(), S_IRUSR|S_IWUSR) < 0) {
+	// failed
+	TRACE("mkfifo " + fifoName + " failed");
+	return QString();
+    }
+#else
+    if (::mknod(fifoName.local8Bit(), S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
+	// failed
+	TRACE("mknod " + fifoName + " failed");
+	return QString();
+    }
+#endif
+
+    m_outputTermProc = new KProcess;
+
+    /*
+     * Spawn an xterm that in turn runs a shell script that passes us
+     * back the terminal name and then only sits and waits.
+     */
+    static const char shellScriptFmt[] =
+	"tty>%s;"
+	"trap \"\" INT QUIT TSTP;"	/* ignore various signals */
+	"exec<&-;exec>&-;"		/* close stdin and stdout */
+	"while :;do sleep 3600;done";
+    // let config file override this script
+    QString shellScript;
+    if (!m_outputTermKeepScript.isEmpty()) {
+	shellScript = m_outputTermKeepScript;
+    } else {
+	shellScript = shellScriptFmt;
+    }
+
+    shellScript.replace("%s", fifoName);
+    TRACE("output window script is " + shellScript);
+
+    QString title = kapp->caption();
+    title += i18n(": Program output");
+
+    // parse the command line specified in the preferences
+    QStringList cmdParts = QStringList::split(' ', m_outputTermCmdStr);
+
+    /*
+     * Build the argv array. Thereby substitute special sequences:
+     */
+    struct {
+	char seq[4];
+	QString replace;
+    } substitute[] = {
+	{ "%T", title },
+	{ "%C", shellScript }
+    };
+
+    for (QStringList::iterator i = cmdParts.begin(); i != cmdParts.end(); ++i)
+    {
+	QString& str = *i;
+	for (int j = sizeof(substitute)/sizeof(substitute[0])-1; j >= 0; j--) {
+	    int pos = str.find(substitute[j].seq);
+	    if (pos >= 0) {
+		str.replace(pos, 2, substitute[j].replace);
+		break;		/* substitute only one sequence */
+	    }
+	}
+	*m_outputTermProc << str;
+    }
+
+    QString tty;
+
+    if (m_outputTermProc->start())
+    {
+	// read the ttyname from the fifo
+	QFile f(fifoName);
+	if (f.open(IO_ReadOnly))
+	{
+	    QByteArray t = f.readAll();
+	    tty = QString::fromLocal8Bit(t, t.size());
+	    f.close();
+	}
+	f.remove();
+
+	// remove whitespace
+	tty = tty.stripWhiteSpace();
+	TRACE("tty=" + tty);
+
 	connect(m_outputTermProc, SIGNAL(processExited(KProcess*)),
 		SLOT(slotTermEmuExited()));
     }
+    else
+    {
+	// error, could not start xterm
+	TRACE("fork failed for fifo " + fifoName);
+	QFile::remove(fifoName);
+	shutdownTermWindow();
+    }
+
     return tty;
 }
 
 void DebuggerMainWnd::slotTermEmuExited()
 {
     shutdownTermWindow();
+}
+
+void DebuggerMainWnd::shutdownTermWindow()
+{
+    delete m_outputTermProc;
+    m_outputTermProc = 0;
 }
 
 void DebuggerMainWnd::slotProgramStopped()
@@ -757,6 +1195,22 @@ void DebuggerMainWnd::slotEditValue()
 	QString text = m_debugger->driver()->editableValue(expr);
 	wnd->editValue(expr, text);
     }
+}
+
+// helper that gets a file name (it only differs in the caption of the dialog)
+static QString myGetFileName(QString caption,
+			     QString dir, QString filter,
+	 		     QWidget* parent)
+{
+    QString filename;
+    KFileDialog dlg(dir, filter, parent, "filedialog", true);
+
+    dlg.setCaption(caption);
+
+    if (dlg.exec() == QDialog::Accepted)
+	filename = dlg.selectedFile();
+
+    return filename;
 }
 
 void DebuggerMainWnd::slotFileOpen()
