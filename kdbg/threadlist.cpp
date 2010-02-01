@@ -105,7 +105,7 @@ void ThreadList::makeNoFocusIcon()
     m_noFocusIcon = m_focusIcon;
     {
 	QPainter p(&m_noFocusIcon);
-	p.fillRect(0,0, m_noFocusIcon.width(),m_noFocusIcon.height(), QColor(white));
+	p.fillRect(0,0, m_noFocusIcon.width(),m_noFocusIcon.height(), QColor(Qt::white));
     }
     m_noFocusIcon.setMask(m_noFocusIcon.createHeuristicMask());
 }

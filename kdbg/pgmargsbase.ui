@@ -419,20 +419,6 @@
                         <property name="spacing">
                             <number>6</number>
                         </property>
-                        <widget class="QPushButton">
-                            <property name="name">
-                                <cstring>buttonHelp</cstring>
-                            </property>
-                            <property name="text">
-                                <string>&amp;Help</string>
-                            </property>
-                            <property name="accel">
-                                <string>F1</string>
-                            </property>
-                            <property name="autoDefault">
-                                <bool>true</bool>
-                            </property>
-                        </widget>
                         <spacer>
                             <property name="name">
                                 <cstring>spacer3</cstring>
@@ -531,12 +517,6 @@
         <slot>envListCurrentChanged()</slot>
     </connection>
     <connection>
-        <sender>buttonHelp</sender>
-        <signal>clicked()</signal>
-        <receiver>PgmArgsBase</receiver>
-        <slot>invokeHelp()</slot>
-    </connection>
-    <connection>
         <sender>insertDir</sender>
         <signal>clicked()</signal>
         <receiver>PgmArgsBase</receiver>
@@ -544,19 +524,19 @@
     </connection>
 </connections>
 <tabstops>
-    <tabstop>envVar</tabstop>
-    <tabstop>envList</tabstop>
-    <tabstop>buttonModify</tabstop>
-    <tabstop>buttonDelete</tabstop>
+    <tabstop>tabWidget</tabstop>
     <tabstop>programArgs</tabstop>
     <tabstop>insertFile</tabstop>
     <tabstop>insertDir</tabstop>
-    <tabstop>buttonHelp</tabstop>
-    <tabstop>buttonOk</tabstop>
-    <tabstop>buttonCancel</tabstop>
-    <tabstop>tabWidget</tabstop>
     <tabstop>wdEdit</tabstop>
     <tabstop>wdBrowse</tabstop>
+    <tabstop>envVar</tabstop>
+    <tabstop>buttonModify</tabstop>
+    <tabstop>buttonDelete</tabstop>
+    <tabstop>envList</tabstop>
+    <tabstop>xsldbgOptions</tabstop>
+    <tabstop>buttonOk</tabstop>
+    <tabstop>buttonCancel</tabstop>
 </tabstops>
 <slots>
     <slot specifier="pure virtual">browseArgFile()</slot>
@@ -564,7 +544,6 @@
     <slot specifier="pure virtual">modifyVar()</slot>
     <slot specifier="pure virtual">deleteVar()</slot>
     <slot specifier="pure virtual">envListCurrentChanged()</slot>
-    <slot specifier="pure virtual">invokeHelp()</slot>
     <slot specifier="pure virtual">browseArgDir()</slot>
 </slots>
 <layoutdefaults spacing="6" margin="11"/>

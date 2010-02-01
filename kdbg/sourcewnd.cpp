@@ -44,7 +44,7 @@ SourceWindow::SourceWindow(const QString& fileName, QWidget* parent, const char*
     setReadOnly(true);
     setMargins(m_widthItems+m_widthPlus+m_widthLineNo, 0, 0 ,0);
     setAutoFormatting(AutoNone);
-    setTextFormat(PlainText);
+    setTextFormat(Qt::PlainText);
     setWordWrap(NoWrap);
     connect(verticalScrollBar(), SIGNAL(valueChanged(int)),
 	    this, SLOT(update()));
@@ -236,7 +236,7 @@ void SourceWindow::drawFrame(QPainter* p)
 	}
 	p->translate(m_widthPlus, 0);
 	if (!isRowDisassCode(row)) {
-	    p->drawText(0, 0, m_widthLineNo, h, AlignRight|AlignVCenter,
+	    p->drawText(0, 0, m_widthLineNo, h, Qt::AlignRight|Qt::AlignVCenter,
 			QString().setNum(rowToLine(row)+1));
 	}
 	p->restore();
@@ -335,7 +335,7 @@ void SourceWindow::find(const QString& text, bool caseSensitive, FindDirection d
 void SourceWindow::mousePressEvent(QMouseEvent* ev)
 {
     // we handle left and middle button
-    if (ev->button() != LeftButton && ev->button() != MidButton)
+    if (ev->button() != Qt::LeftButton && ev->button() != Qt::MidButton)
     {
 	QTextEdit::mousePressEvent(ev);
 	return;
@@ -369,12 +369,12 @@ void SourceWindow::mousePressEvent(QMouseEvent* ev)
     }
 
     switch (ev->button()) {
-    case LeftButton:
+    case Qt::LeftButton:
 	TRACE(QString().sprintf("left-clicked line %d", line));
 	emit clickedLeft(m_fileName, line, address,
-			 (ev->state() & ShiftButton) != 0);
+			 (ev->state() & Qt::ShiftButton) != 0);
 	break;
-    case MidButton:
+    case Qt::MidButton:
 	TRACE(QString().sprintf("mid-clicked row %d", line));
 	emit clickedMid(m_fileName, line, address);
 	break;
@@ -387,30 +387,30 @@ void SourceWindow::keyPressEvent(QKeyEvent* ev)
     int top1, top2;
     QPoint top;
     switch (ev->key()) {
-    case Key_Plus:
+    case Qt::Key_Plus:
 	actionExpandRow(m_curRow);
 	return;
-    case Key_Minus:
+    case Qt::Key_Minus:
 	actionCollapseRow(m_curRow);
 	return;
-    case Key_Up:
+    case Qt::Key_Up:
 	if (m_curRow > 0) {
 	    setCursorPosition(m_curRow-1, 0);
 	}
 	return;
-    case Key_Down:
+    case Qt::Key_Down:
 	if (m_curRow < paragraphs()-1) {
 	    setCursorPosition(m_curRow+1, 0);
 	}
 	return;
-    case Key_Home:
+    case Qt::Key_Home:
 	setCursorPosition(0, 0);
 	return;
-    case Key_End:
+    case Qt::Key_End:
 	setCursorPosition(paragraphs()-1, 0);
 	return;
-    case Key_Next:
-    case Key_Prior:
+    case Qt::Key_Next:
+    case Qt::Key_Prior:
 	top = viewportToContents(QPoint(0,0));
 	top1 = paragraphAt(top);
     }
@@ -418,8 +418,8 @@ void SourceWindow::keyPressEvent(QKeyEvent* ev)
     QTextEdit::keyPressEvent(ev);
 
     switch (ev->key()) {
-    case Key_Next:
-    case Key_Prior:
+    case Qt::Key_Next:
+    case Qt::Key_Prior:
 	top = viewportToContents(QPoint(0,0));
 	top2 = paragraphAt(top);
 	setCursorPosition(m_curRow+(top2-top1), 0);
@@ -866,7 +866,7 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
     // highlight assembly lines
     if (m_srcWnd->isRowDisassCode(row))
     {
-	setFormat(0, text.length(), blue);
+	setFormat(0, text.length(), Qt::blue);
 	return state;
     }
 

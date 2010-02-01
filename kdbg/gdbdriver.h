@@ -75,7 +75,6 @@ public:
     virtual QString parseSetVariable(const char* output);
     virtual QString editableValue(VarTree* value);
 protected:
-    int m_gdbMajor, m_gdbMinor;
     QString m_programWD;		/* just an intermediate storage */
     QString m_redirect;			/* redirection to /dev/null */
     bool m_haveCoreFile;
@@ -86,6 +85,7 @@ protected:
     QString makeCmdString(DbgCommand cmd, QString strArg, int intArg);
     QString makeCmdString(DbgCommand cmd, QString strArg1, QString strArg2);
     QString makeCmdString(DbgCommand cmd, int intArg1, int intArg2);
+    virtual int findPrompt(const char* output, size_t len) const;
     void parseMarker(CmdQueueItem* cmd);
 };
 

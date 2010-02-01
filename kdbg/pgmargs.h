@@ -45,7 +45,6 @@ protected slots:
     void browseWd();
     void browseArgFile();
     void browseArgDir();
-    void invokeHelp();
 };
 
 #endif // PgmArgs_included

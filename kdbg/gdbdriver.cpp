@@ -30,8 +30,6 @@ static bool parseValueSeq(const char*& s, ExprValue* variable);
 
 #define PROMPT "(kdbg)"
 #define PROMPT_LEN 6
-#define PROMPT_LAST_CHAR ')'		/* needed when searching for prompt string */
-
 
 // TODO: make this cmd info stuff non-static to allow multiple
 // simultaneous gdbs to run!
@@ -71,7 +69,11 @@ static GdbCmdInfo cmds[] = {
     { DCtty, "tty %s\n", GdbCmdInfo::argString },
     { DCexecutable, "file \"%s\"\n", GdbCmdInfo::argString },
     { DCtargetremote, "target remote %s\n", GdbCmdInfo::argString },
-    { DCcorefile, "core-file %s\n", GdbCmdInfo::argString },
+#ifdef __FreeBSD__
+    { DCcorefile, "target FreeBSD-core %s\n", GdbCmdInfo::argString },
+#else
+    { DCcorefile, "target core %s\n", GdbCmdInfo::argString },
+#endif
     { DCattach, "attach %s\n", GdbCmdInfo::argString },
     { DCinfolinemain, "kdbg_infolinemain\n", GdbCmdInfo::argNone },
     { DCinfolocals, "kdbg__alllocals\n", GdbCmdInfo::argNone },
@@ -124,13 +126,8 @@ static GdbCmdInfo cmds[] = {
 #define MAX_FMTLEN 200
 
 GdbDriver::GdbDriver() :
-	DebuggerDriver(),
-	m_gdbMajor(4), m_gdbMinor(16)
+	DebuggerDriver()
 {
-    strcpy(m_prompt, PROMPT);
-    m_promptMinLen = PROMPT_LEN;
-    m_promptLastChar = PROMPT_LAST_CHAR;
-
 #ifndef NDEBUG
     // check command info array
     const char* perc;
@@ -279,43 +276,6 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
 	return;
     }
 
-    switch (cmd->m_cmd) {
-    case DCinitialize:
-	// get version number from preamble
-	{
-	    int len;
-	    QRegExp GDBVersion("\\nGDB [0-9]+\\.[0-9]+");
-	    int offset = GDBVersion.match(m_output, 0, &len);
-	    if (offset >= 0) {
-		char* start = m_output + offset + 5;	// skip "\nGDB "
-		char* end;
-		m_gdbMajor = strtol(start, &end, 10);
-		m_gdbMinor = strtol(end + 1, 0, 10);	// skip "."
-		if (start == end) {
-		    // nothing was parsed
-		    m_gdbMajor = 4;
-		    m_gdbMinor = 16;
-		}
-	    } else {
-		// assume some default version (what would make sense?)
-		m_gdbMajor = 4;
-		m_gdbMinor = 16;
-	    }
-	    // use a feasible core-file command
-	    if (m_gdbMajor > 4 || (m_gdbMajor == 4 && m_gdbMinor >= 16)) {
-#ifdef __FreeBSD__
-		cmds[DCcorefile].fmt = "target FreeBSD-core %s\n";
-#else
-		cmds[DCcorefile].fmt = "target core %s\n";
-#endif
-	    } else {
-		cmds[DCcorefile].fmt = "core-file %s\n";
-	    }
-	}
-	break;
-    default:;
-    }
-
     /* ok, the command is ready */
     emit commandReceived(cmd, m_output);
 
@@ -336,6 +296,27 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
 	parseMarker(cmd);
     default:;
     }
+}
+
+int GdbDriver::findPrompt(const char* output, size_t len) const
+{
+    /*
+     * If there's a prompt string in the collected output, it must be at
+     * the very end.
+     * 
+     * Note: It could nevertheless happen that a character sequence that is
+     * equal to the prompt string appears at the end of the output,
+     * although it is very, very unlikely (namely as part of a string that
+     * lingered in gdb's output buffer due to some timing/heavy load
+     * conditions for a very long time such that that buffer overflowed
+     * exactly at the end of the prompt string look-a-like).
+     */
+    if (len >= PROMPT_LEN &&
+	strncmp(output+len-PROMPT_LEN, PROMPT, PROMPT_LEN) == 0)
+    {
+	return len-PROMPT_LEN;
+    }
+    return -1;
 }
 
 /*
@@ -359,17 +340,17 @@ void GdbDriver::parseMarker(CmdQueueItem* cmd)
     *endMarker = '\0';
 
     // extract filename and line number
-    static QRegExp MarkerRE(":[0-9]+:[0-9]+:[begmidl]+:0x");
+    static QRegExp MarkerRE(":(\\d+):\\d+:[begmidl]+:0x");
 
-    int len;
-    int lineNoStart = MarkerRE.match(startMarker, 0, &len);
+    int lineNoStart = MarkerRE.search(startMarker);
     if (lineNoStart >= 0) {
-	int lineNo = atoi(startMarker + lineNoStart+1);
+	int lineNo = MarkerRE.cap(1).toInt();
 
 	// get address unless there is one in cmd
 	DbgAddr address = cmd->m_addr;
 	if (address.isEmpty()) {
-	    const char* addrStart = startMarker + lineNoStart + len - 2;
+	    const char* addrStart = startMarker + lineNoStart +
+				    MarkerRE.matchedLength() - 2;
 	    address = QString(addrStart).stripWhiteSpace();
 	}
 

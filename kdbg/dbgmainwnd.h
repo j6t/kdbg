@@ -13,6 +13,7 @@
 #include "regwnd.h"
 
 class KRecentFilesAction;
+class KToggleAction;
 class WinStack;
 class QListBox;
 class QCString;
@@ -56,17 +57,54 @@ protected:
     QTimer m_backTimer;
 
     // recent execs in File menu
+    KAction* m_closeAction;
+    KAction* m_reloadAction;
+    KAction* m_fileExecAction;
     KRecentFilesAction* m_recentExecAction;
+    KAction* m_coreDumpAction;
+    KAction* m_settingsAction;
+    KToggleAction* m_findAction;
+    KToggleAction* m_btWindowAction;
+    KToggleAction* m_localVariablesAction;
+    KToggleAction* m_watchesAction;
+    KToggleAction* m_registersAction;
+    KToggleAction* m_bpTableAction;
+    KToggleAction* m_ttyWindowAction;
+    KToggleAction* m_threadsAction;
+    KToggleAction* m_memoryWindowAction;
+    KAction* m_runAction;
+    KAction* m_stepIntoAction;
+    KAction* m_stepOverAction;
+    KAction* m_stepOutAction;
+    KAction* m_toCursorAction;
+    KAction* m_stepIntoIAction;
+    KAction* m_stepOverIAction;
+    KAction* m_execMovePCAction;
+    KAction* m_breakAction;
+    KAction* m_killAction;
+    KAction* m_restartAction;
+    KAction* m_attachAction;
+    KAction* m_argumentsAction;
+    KAction* m_bpSetAction;
+    KAction* m_bpSetTempAction;
+    KAction* m_bpEnableAction;
+    KAction* m_editValueAction;
 
 protected:
     virtual bool queryClose();
     virtual TTYWindow* ttyWindow();
     virtual QString createOutputWindow();
+    KAction* createAction(const QString& text, const char* icon,
+			int shortcut, const QObject* receiver,
+			const char* slot, const char* name);
+    KAction* createAction(const QString& text,
+			int shortcut, const QObject* receiver,
+			const char* slot, const char* name);
 
     KDockWidget* dockParent(QWidget* w);
     bool isDockVisible(QWidget* w);
     bool canChangeDockVisibility(QWidget* w);
-    void dockUpdateHelper(QString action, QWidget* w);
+    void dockUpdateHelper(KToggleAction* action, QWidget* w);
     void fixDockConfig(KConfig* c, bool upgrade);
 
     QString makeSourceFilter();

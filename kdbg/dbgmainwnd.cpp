@@ -173,126 +173,123 @@ DebuggerMainWnd::~DebuggerMainWnd()
     delete m_filesWindow;
 }
 
+KAction* DebuggerMainWnd::createAction(const QString& text, const char* icon,
+			int shortcut, const QObject* receiver,
+			const char* slot, const char* name)
+{
+    KAction* a = new KAction(text, icon, shortcut, receiver, slot,
+			actionCollection(), name);
+    return a;
+}
+
+KAction* DebuggerMainWnd::createAction(const QString& text,
+			int shortcut, const QObject* receiver,
+			const char* slot, const char* name)
+{
+    KAction* a = new KAction(text, shortcut, receiver, slot,
+			actionCollection(), name);
+    return a;
+}
+
+
 void DebuggerMainWnd::initKAction()
 {
     // file menu
     KAction* open = KStdAction::open(this, SLOT(slotFileOpen()), 
                       actionCollection());
     open->setText(i18n("&Open Source..."));
-    KStdAction::close(m_filesWindow, SLOT(slotClose()), actionCollection());
-    (void)new KAction(i18n("&Reload Source"), "reload", 0, m_filesWindow, 
-                      SLOT(slotFileReload()), actionCollection(), 
-                      "file_reload");
-    (void)new KAction(i18n("&Executable..."), "execopen", 0, this, 
-                      SLOT(slotFileExe()), actionCollection(), 
-                      "file_executable");
+    m_closeAction = KStdAction::close(m_filesWindow, SLOT(slotClose()), actionCollection());
+    m_reloadAction = createAction(i18n("&Reload Source"), "reload", 0,
+			m_filesWindow, SLOT(slotFileReload()), "file_reload");
+    m_fileExecAction = createAction(i18n("&Executable..."), "execopen", 0,
+			this, SLOT(slotFileExe()), "file_executable");
     m_recentExecAction = new KRecentFilesAction(i18n("Recent E&xecutables"), 0,
 		      this, SLOT(slotRecentExec(const KURL&)),
 		      actionCollection(), "file_executable_recent");
-    (void)new KAction(i18n("&Core dump..."), 0, this, SLOT(slotFileCore()),
-                      actionCollection(), "file_core_dump");
+    m_coreDumpAction = createAction(i18n("&Core dump..."), 0,
+			this, SLOT(slotFileCore()), "file_core_dump");
     KStdAction::quit(kapp, SLOT(closeAllWindows()), actionCollection());
 
     // settings menu
-    (void)new KAction(i18n("This &Program..."), 0, this,
-		      SLOT(slotFileProgSettings()), actionCollection(),
-		      "settings_program");
-    (void)new KAction(i18n("&Global Options..."), 0, this, 
-                      SLOT(slotFileGlobalSettings()), actionCollection(),
-                      "settings_global");
+    m_settingsAction = createAction(i18n("This &Program..."), 0,
+			this, SLOT(slotFileProgSettings()), "settings_program");
+    createAction(i18n("&Global Options..."), 0,
+			this, SLOT(slotFileGlobalSettings()), "settings_global");
     KStdAction::keyBindings(this, SLOT(slotConfigureKeys()), actionCollection());
     KStdAction::showStatusbar(this, SLOT(slotViewStatusbar()), actionCollection());
 
     // view menu
-    (void)new KToggleAction(i18n("&Find"), "find", CTRL+Key_F, m_filesWindow,
+    m_findAction = new KToggleAction(i18n("&Find"), "find", CTRL+Key_F, m_filesWindow,
 			    SLOT(slotViewFind()), actionCollection(),
 			    "view_find");
     (void)KStdAction::findNext(m_filesWindow, SLOT(slotFindForward()), actionCollection(), "view_findnext");
     (void)KStdAction::findPrev(m_filesWindow, SLOT(slotFindBackward()), actionCollection(), "view_findprev");
 
     i18n("Source &code");
-    struct { QString text; QWidget* w; QString id; } dw[] = {
-	{ i18n("Stac&k"), m_btWindow, "view_stack"},
-	{ i18n("&Locals"), m_localVariables, "view_locals"},
-	{ i18n("&Watched expressions"), m_watches, "view_watched_expressions"},
-	{ i18n("&Registers"), m_registers, "view_registers"},
-	{ i18n("&Breakpoints"), m_bpTable, "view_breakpoints"},
-	{ i18n("T&hreads"), m_threads, "view_threads"},
-	{ i18n("&Output"), m_ttyWindow, "view_output"},
-	{ i18n("&Memory"), m_memoryWindow, "view_memory"}
+    struct { QString text; QWidget* w; QString id; KToggleAction** act; } dw[] = {
+	{ i18n("Stac&k"), m_btWindow, "view_stack", &m_btWindowAction },
+	{ i18n("&Locals"), m_localVariables, "view_locals", &m_localVariablesAction },
+	{ i18n("&Watched expressions"), m_watches, "view_watched_expressions", &m_watchesAction },
+	{ i18n("&Registers"), m_registers, "view_registers", &m_registersAction },
+	{ i18n("&Breakpoints"), m_bpTable, "view_breakpoints", &m_bpTableAction },
+	{ i18n("T&hreads"), m_threads, "view_threads", &m_threadsAction },
+	{ i18n("&Output"), m_ttyWindow, "view_output", &m_ttyWindowAction },
+	{ i18n("&Memory"), m_memoryWindow, "view_memory", &m_memoryWindowAction }
     };
     for (unsigned i = 0; i < sizeof(dw)/sizeof(dw[0]); i++) {
 	KDockWidget* d = dockParent(dw[i].w);
-	(void)new KToggleAction(dw[i].text, 0, d, SLOT(changeHideShowState()),
+	*dw[i].act = new KToggleAction(dw[i].text, 0, d, SLOT(changeHideShowState()),
 			  actionCollection(), dw[i].id);
     }
 
-    
     // execution menu
-    KAction* a = new KAction(i18n("&Run"), "pgmrun", Key_F5, m_debugger, 
-		      SLOT(programRun()), actionCollection(), "exec_run");
-    connect(a, SIGNAL(activated()), this, SLOT(intoBackground()));
-    a = new KAction(i18n("Step &into"), "pgmstep", Key_F8, m_debugger, 
-                      SLOT(programStep()), actionCollection(), 
-                      "exec_step_into");
-    connect(a, SIGNAL(activated()), this, SLOT(intoBackground()));
-    a = new KAction(i18n("Step &over"), "pgmnext", Key_F10, m_debugger, 
-                      SLOT(programNext()), actionCollection(), 
-                      "exec_step_over");
-    connect(a, SIGNAL(activated()), this, SLOT(intoBackground()));
-    a = new KAction(i18n("Step o&ut"), "pgmfinish", Key_F6, m_debugger,
-                      SLOT(programFinish()), actionCollection(), 
-                      "exec_step_out");
-    connect(a, SIGNAL(activated()), this, SLOT(intoBackground()));
-    a = new KAction(i18n("Run to &cursor"), Key_F7, this,
-                      SLOT(slotExecUntil()), actionCollection(), 
-                      "exec_run_to_cursor");
-    connect(a, SIGNAL(activated()), this, SLOT(intoBackground()));
-    a = new KAction(i18n("Step i&nto by instruction"), "pgmstepi", 
-		      SHIFT+Key_F8, m_debugger, SLOT(programStepi()), 
-		      actionCollection(), "exec_step_into_by_insn");
-    connect(a, SIGNAL(activated()), this, SLOT(intoBackground()));
-    a = new KAction(i18n("Step o&ver by instruction"), "pgmnexti", 
-		      SHIFT+Key_F10, m_debugger, SLOT(programNexti()), 
-		      actionCollection(), "exec_step_over_by_insn");
-    connect(a, SIGNAL(activated()), this, SLOT(intoBackground()));
-    (void)new KAction(i18n("&Program counter to current line"), 0,
-		      m_filesWindow, SLOT(slotMoveProgramCounter()),
-		      actionCollection(), "exec_movepc");
-    (void)new KAction(i18n("&Break"), 0, m_debugger,
-                      SLOT(programBreak()), actionCollection(),
-                      "exec_break");
-    (void)new KAction(i18n("&Kill"), 0, m_debugger,
-                      SLOT(programKill()), actionCollection(),
-                      "exec_kill");
-    (void)new KAction(i18n("Re&start"), 0, m_debugger,
-                      SLOT(programRunAgain()), actionCollection(),
-                      "exec_restart");
-    (void)new KAction(i18n("A&ttach..."), 0, this,
-                      SLOT(slotExecAttach()), actionCollection(),
-                      "exec_attach");
-    (void)new KAction(i18n("&Arguments..."), 0, this,
-                      SLOT(slotExecArgs()), actionCollection(),
-                      "exec_arguments");
-   
+    m_runAction = createAction(i18n("&Run"), "pgmrun", Qt::Key_F5,
+			m_debugger, SLOT(programRun()), "exec_run");
+    connect(m_runAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    m_stepIntoAction = createAction(i18n("Step &into"), "pgmstep", Qt::Key_F8,
+			m_debugger, SLOT(programStep()), "exec_step_into");
+    connect(m_stepIntoAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    m_stepOverAction = createAction(i18n("Step &over"), "pgmnext", Qt::Key_F10,
+			m_debugger, SLOT(programNext()), "exec_step_over");
+    connect(m_stepOverAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    m_stepOutAction = createAction(i18n("Step o&ut"), "pgmfinish", Qt::Key_F6,
+			m_debugger, SLOT(programFinish()), "exec_step_out");
+    connect(m_stepOutAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    m_toCursorAction = createAction(i18n("Run to &cursor"), Qt::Key_F7,
+			this, SLOT(slotExecUntil()), "exec_run_to_cursor");
+    connect(m_toCursorAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    m_stepIntoIAction = createAction(i18n("Step i&nto by instruction"), "pgmstepi", Qt::SHIFT+Qt::Key_F8,
+			m_debugger, SLOT(programStepi()), "exec_step_into_by_insn");
+    connect(m_stepIntoIAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    m_stepOverIAction = createAction(i18n("Step o&ver by instruction"), "pgmnexti", Qt::SHIFT+Qt::Key_F10,
+			m_debugger, SLOT(programNexti()), "exec_step_over_by_insn");
+    connect(m_stepOverIAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    m_execMovePCAction = createAction(i18n("&Program counter to current line"), 0,
+			m_filesWindow, SLOT(slotMoveProgramCounter()), "exec_movepc");
+    m_breakAction = createAction(i18n("&Break"), 0,
+			m_debugger, SLOT(programBreak()), "exec_break");
+    m_killAction = createAction(i18n("&Kill"), 0,
+			m_debugger, SLOT(programKill()), "exec_kill");
+    m_restartAction = createAction(i18n("Re&start"), 0,
+			m_debugger, SLOT(programRunAgain()), "exec_restart");
+    m_attachAction = createAction(i18n("A&ttach..."), 0,
+			this, SLOT(slotExecAttach()), "exec_attach");
+    m_argumentsAction = createAction(i18n("&Arguments..."), 0,
+			this, SLOT(slotExecArgs()), "exec_arguments");
+
     // breakpoint menu
-    (void)new KAction(i18n("Set/Clear &breakpoint"), "brkpt", Key_F9,
-                      m_filesWindow, SLOT(slotBrkptSet()), actionCollection(),
-                      "breakpoint_set");
-    (void)new KAction(i18n("Set &temporary breakpoint"), SHIFT+Key_F9,
-                      m_filesWindow, SLOT(slotBrkptSetTemp()), actionCollection(),
-                      "breakpoint_set_temporary");
-    (void)new KAction(i18n("&Enable/Disable breakpoint"), CTRL+Key_F9,
-                      m_filesWindow, SLOT(slotBrkptEnable()), actionCollection(),
-                      "breakpoint_enable");
-   
+    m_bpSetAction = createAction(i18n("Set/Clear &breakpoint"), "brkpt", Qt::Key_F9,
+			m_filesWindow, SLOT(slotBrkptSet()), "breakpoint_set");
+    m_bpSetTempAction = createAction(i18n("Set &temporary breakpoint"), Qt::SHIFT+Qt::Key_F9,
+			m_filesWindow, SLOT(slotBrkptSetTemp()), "breakpoint_set_temporary");
+    m_bpEnableAction = createAction(i18n("&Enable/Disable breakpoint"), Qt::CTRL+Qt::Key_F9,
+			m_filesWindow, SLOT(slotBrkptEnable()), "breakpoint_enable");
+
     // only in popup menus
-    (void)new KAction(i18n("Watch Expression"), 0, this,
-                      SLOT(slotLocalsToWatch()), actionCollection(),
-                      "watch_expression");
-    (void)new KAction(i18n("Edit Value"), Key_F2, this,
-		      SLOT(slotEditValue()), actionCollection(),
-		      "edit_value");
+    createAction(i18n("Watch Expression"), 0,
+			this, SLOT(slotLocalsToWatch()), "watch_expression");
+    m_editValueAction = createAction(i18n("Edit Value"), Qt::Key_F2,
+			this, SLOT(slotEditValue()), "edit_value");
 
     // all actions force an UI update
     QValueList<KAction*> actions = actionCollection()->actions();
@@ -308,8 +305,7 @@ void DebuggerMainWnd::initToolbar()
 {
     KToolBar* toolbar = toolBar("mainToolBar");
     toolbar->insertAnimatedWidget(ID_STATUS_BUSY,
-	actionCollection()->action("exec_break"), SLOT(activate()),
-	"pulse", -1);
+	m_breakAction, SLOT(activate()), "pulse", -1);
     toolbar->alignItemRight(ID_STATUS_BUSY, true);
     m_animRunning = false;
 
@@ -421,42 +417,39 @@ void DebuggerMainWnd::restoreSettings(KConfig* config)
 
 void DebuggerMainWnd::updateUI()
 {
-    KToggleAction* viewFind =
-	static_cast<KToggleAction*>(actionCollection()->action("view_find"));
-    viewFind->setChecked(m_filesWindow->m_findDlg.isVisible());
-    viewFind->setEnabled(m_filesWindow->hasWindows());
-    actionCollection()->action("breakpoint_set")->setEnabled(m_debugger->canChangeBreakpoints());
-    actionCollection()->action("breakpoint_set_temporary")->setEnabled(m_debugger->canChangeBreakpoints());
-    actionCollection()->action("breakpoint_enable")->setEnabled(m_debugger->canChangeBreakpoints());
-    dockUpdateHelper("view_breakpoints", m_bpTable);
-    dockUpdateHelper("view_stack", m_btWindow);
-    dockUpdateHelper("view_locals", m_localVariables);
-    dockUpdateHelper("view_watched_expressions", m_watches);
-    dockUpdateHelper("view_registers", m_registers);
-    dockUpdateHelper("view_threads", m_threads);
-    dockUpdateHelper("view_memory", m_memoryWindow);
-    dockUpdateHelper("view_output", m_ttyWindow);
+    m_findAction->setChecked(m_filesWindow->m_findDlg.isVisible());
+    m_findAction->setEnabled(m_filesWindow->hasWindows());
+    m_bpSetAction->setEnabled(m_debugger->canChangeBreakpoints());
+    m_bpSetTempAction->setEnabled(m_debugger->canChangeBreakpoints());
+    m_bpEnableAction->setEnabled(m_debugger->canChangeBreakpoints());
+    dockUpdateHelper(m_bpTableAction, m_bpTable);
+    dockUpdateHelper(m_btWindowAction, m_btWindow);
+    dockUpdateHelper(m_localVariablesAction, m_localVariables);
+    dockUpdateHelper(m_watchesAction, m_watches);
+    dockUpdateHelper(m_registersAction, m_registers);
+    dockUpdateHelper(m_threadsAction, m_threads);
+    dockUpdateHelper(m_memoryWindowAction, m_memoryWindow);
+    dockUpdateHelper(m_ttyWindowAction, m_ttyWindow);
 
-    // AB: maybe in mainwndbase.cpp?
-    actionCollection()->action("file_executable")->setEnabled(m_debugger->isIdle());
-    actionCollection()->action("settings_program")->setEnabled(m_debugger->haveExecutable());
-    actionCollection()->action("file_core_dump")->setEnabled(m_debugger->canStart());
-    actionCollection()->action("file_close")->setEnabled(m_filesWindow->hasWindows());
-    actionCollection()->action("file_reload")->setEnabled(m_filesWindow->hasWindows());
-    actionCollection()->action("exec_step_into")->setEnabled(m_debugger->canSingleStep());
-    actionCollection()->action("exec_step_into_by_insn")->setEnabled(m_debugger->canSingleStep());
-    actionCollection()->action("exec_step_over")->setEnabled(m_debugger->canSingleStep());
-    actionCollection()->action("exec_step_over_by_insn")->setEnabled(m_debugger->canSingleStep());
-    actionCollection()->action("exec_step_out")->setEnabled(m_debugger->canSingleStep());
-    actionCollection()->action("exec_run_to_cursor")->setEnabled(m_debugger->canSingleStep());
-    actionCollection()->action("exec_movepc")->setEnabled(m_debugger->canSingleStep());
-    actionCollection()->action("exec_restart")->setEnabled(m_debugger->canSingleStep());
-    actionCollection()->action("exec_attach")->setEnabled(m_debugger->isReady());
-    actionCollection()->action("exec_run")->setEnabled(m_debugger->canStart() || m_debugger->canSingleStep());
-    actionCollection()->action("exec_kill")->setEnabled(m_debugger->haveExecutable() && m_debugger->isProgramActive());
-    actionCollection()->action("exec_break")->setEnabled(m_debugger->isProgramRunning());
-    actionCollection()->action("exec_arguments")->setEnabled(m_debugger->haveExecutable());
-    actionCollection()->action("edit_value")->setEnabled(m_debugger->canSingleStep());
+    m_fileExecAction->setEnabled(m_debugger->isIdle());
+    m_settingsAction->setEnabled(m_debugger->haveExecutable());
+    m_coreDumpAction->setEnabled(m_debugger->canStart());
+    m_closeAction->setEnabled(m_filesWindow->hasWindows());
+    m_reloadAction->setEnabled(m_filesWindow->hasWindows());
+    m_stepIntoAction->setEnabled(m_debugger->canSingleStep());
+    m_stepIntoIAction->setEnabled(m_debugger->canSingleStep());
+    m_stepOverAction->setEnabled(m_debugger->canSingleStep());
+    m_stepOverIAction->setEnabled(m_debugger->canSingleStep());
+    m_stepOutAction->setEnabled(m_debugger->canSingleStep());
+    m_toCursorAction->setEnabled(m_debugger->canSingleStep());
+    m_execMovePCAction->setEnabled(m_debugger->canSingleStep());
+    m_restartAction->setEnabled(m_debugger->canSingleStep());
+    m_attachAction->setEnabled(m_debugger->isReady());
+    m_runAction->setEnabled(m_debugger->canStart() || m_debugger->canSingleStep());
+    m_killAction->setEnabled(m_debugger->haveExecutable() && m_debugger->isProgramActive());
+    m_breakAction->setEnabled(m_debugger->isProgramRunning());
+    m_argumentsAction->setEnabled(m_debugger->haveExecutable());
+    m_editValueAction->setEnabled(m_debugger->canSingleStep());
 
     // animation
     KAnimWidget* w = toolBar("mainToolBar")->animatedWidget(ID_STATUS_BUSY);
@@ -482,13 +475,11 @@ void DebuggerMainWnd::updateUI()
     }
 }
 
-void DebuggerMainWnd::dockUpdateHelper(QString action, QWidget* w)
+void DebuggerMainWnd::dockUpdateHelper(KToggleAction* action, QWidget* w)
 {
-    KToggleAction* item =
-	static_cast<KToggleAction*>(actionCollection()->action(action));
     bool canChange = canChangeDockVisibility(w);
-    item->setEnabled(canChange);
-    item->setChecked(canChange && isDockVisible(w));
+    action->setEnabled(canChange);
+    action->setChecked(canChange && isDockVisible(w));
 }
 
 void DebuggerMainWnd::updateLineItems()

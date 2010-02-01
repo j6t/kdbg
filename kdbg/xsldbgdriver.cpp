@@ -104,13 +104,8 @@ static XsldbgCmdInfo cmds[] = {
 #define MAX_FMTLEN 200
 
 XsldbgDriver::XsldbgDriver():
-DebuggerDriver(), m_gdbMajor(2), m_gdbMinor(0)
+	DebuggerDriver()
 {
-    m_promptRE.setPattern("\\(xsldbg\\) .*> ");
-    m_promptMinLen = 11;
-    m_promptLastChar = ' ';
-  
-    m_markerRE.setPattern("^Breakpoint for file ");
     m_haveDataFile = FALSE;
 
 #ifndef NDEBUG
@@ -258,39 +253,6 @@ XsldbgDriver::commandFinished(CmdQueueItem * cmd)
         return;
     }
 
-    switch (cmd->m_cmd) {
-        case DCinitialize:
-            // get version number from preamble
-            {
-                int len;
-                QRegExp xsldbgVersion("^XSLDBG [0-9]+\\.[0-9]+\\.[0-9]+");
-                int offset = xsldbgVersion.match(m_output, 0, &len);
-
-                if (offset >= 0) {
-                    char *start = m_output + offset + 7;        // skip "^XSLDBG "
-                    char *end;
-
-                    TRACE("Reading version");
-                    TRACE(start);
-                    m_gdbMajor = strtol(start, &end, 10);
-                    m_gdbMinor = strtol(end + 1, 0, 10);        // skip "."
-                    if (start == end) {
-                        // nothing was parsed
-                        m_gdbMajor = 0;
-                        m_gdbMinor = 7;
-                    }
-                } else {
-                    // assume some default version (what would make sense?)
-                    m_gdbMajor = 0;
-                    m_gdbMinor = 7;
-                }
-                TRACE(QString("Got version ") +
-                      QString::number(m_gdbMajor) + "." +
-                      QString::number(m_gdbMinor));
-                break;
-            }
-        default:;
-    }
     /* ok, the command is ready */
     emit commandReceived(cmd, m_output);
 
@@ -321,33 +283,45 @@ XsldbgDriver::commandFinished(CmdQueueItem * cmd)
     }
 }
 
+int
+XsldbgDriver::findPrompt(const char* output, size_t len) const
+{
+    /*
+     * If there's a prompt string in the collected output, it must be at
+     * the very end. We do a quick check whether the last characters of
+     * output are suitable and do the full search only if they are.
+     */
+    if (len < 11 || output[len-1] != ' ' || output[len-2] != '>')
+	return -1;
+
+    // There can be text between "(xsldbg) " and the "> " at the end
+    // since we do not know what that text is, we accept the former
+    // anywhere in the output.
+    const char* prompt = strstr(output, "(xsldbg) ");
+    return prompt ? prompt-output : 0;
+}
+
 void
 XsldbgDriver::parseMarker()
 {
-
-    // TRACE("parseMarker : xsldbg");
-    //  TRACE(m_output);
-    int len, markerStart = -1;
     char *p = m_output;
 
-    while (markerStart == -1) {
+    for (;;) {
         if ((p == 0) || (*p == '\0')) {
             m_output[0] = '\0';
             return;
         }
-        //TRACE(QString("parseMarker is looking at :") + p);
-        markerStart = m_markerRE.match(p, 0, &len);
-        if (markerStart == -1) {
-            // try to marker on next line !
-            p = strchr(p, '\n');
-            if ((p != 0) && (*p != '\0'))
-                p++;
-        }
+        if (strncmp(p, "Breakpoint for file ", 20) == 0)
+	    break;
+	// try to marker on next line !
+	p = strchr(p, '\n');
+	if ((p != 0) && (*p != '\0'))
+	    p++;
     }
 
 
     // extract the marker
-    char *startMarker = p + markerStart + len;
+    char *startMarker = p + 20;
 
     //TRACE(QString("found marker:") + startMarker);
     char *endMarker = strchr(startMarker, '\n');
@@ -358,12 +332,12 @@ XsldbgDriver::parseMarker()
     *endMarker = '\0';
 
     // extract filename and line number
-    static QRegExp MarkerRE(" at line [0-9]+");
+    static QRegExp MarkerRE(" at line (\\d+)");
 
-    int lineNoStart = MarkerRE.match(startMarker, 0, &len);
+    int lineNoStart = MarkerRE.search(startMarker);
 
     if (lineNoStart >= 0) {
-        int lineNo = atoi(startMarker + lineNoStart + 8);
+        int lineNo = MarkerRE.cap(1).toInt();
 
         DbgAddr address;
 
@@ -1345,18 +1319,11 @@ XsldbgDriver::parseChangeExecutable(const char *output, QString & message)
     TRACE(QString("XsldbgDriver::parseChangeExecutable :") + output);
     m_haveCoreFile = false;
 
-    /*
-     * The command is successful if there is no output or the single
-     * message (no debugging symbols found)...
-     */
-    QRegExp exp(".*Load of source deferred. Use the run command.*");
-    int len, index = exp.match(output, 0, &len);
-
-    if (index != -1) {
+    if (strstr(output, "Load of source deferred. Use the run command") != 0) {
         TRACE("Parsed stylesheet executable");
-        message = "";
+        message = QString();
     }
-    return (output[0] == '\0') || (index != -1);
+    return message.isEmpty();
 }
 
 bool
@@ -1364,10 +1331,8 @@ XsldbgDriver::parseCoreFile(const char *output)
 {
     TRACE("XsldbgDriver::parseCoreFile");
     TRACE(output);
-    QRegExp exp(".*Load of data file deferred. Use the run command.*");
-    int len, index = exp.match(output, 0, &len);
 
-    if (index != -1) {
+    if (strstr(output, "Load of data file deferred. Use the run command") != 0) {
         m_haveCoreFile = true;
         TRACE("Parsed data file name");
     }

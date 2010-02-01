@@ -86,13 +86,11 @@ class XsldbgDriver:public DebuggerDriver {
     virtual QString parseSetVariable(const char* output);
 
   protected:
-    int m_gdbMajor, m_gdbMinor;
     QString m_programWD;        /* just an intermediate storage */
     QString m_xslFile;		/* needed to display it initially */
     bool m_haveDataFile;       /* have we set the XML data file to use? */ 
     QString m_redirect;         /* redirection to /dev/null */
     bool m_haveCoreFile;
-    QRegExp m_markerRE;
 
     QString makeCmdString(DbgCommand cmd, QString strArg);
     QString makeCmdString(DbgCommand cmd, int intArg);
@@ -100,6 +98,7 @@ class XsldbgDriver:public DebuggerDriver {
     QString makeCmdString(DbgCommand cmd, QString strArg1,
                           QString strArg2);
     QString makeCmdString(DbgCommand cmd, int intArg1, int intArg2);
+    virtual int findPrompt(const char* output, size_t len) const;
     void parseMarker();
 };
 

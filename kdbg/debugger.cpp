@@ -95,7 +95,7 @@ bool KDebugger::debugProgram(const QString& name,
 {
     if (m_d != 0 && m_d->isRunning())
     {
-	QApplication::setOverrideCursor(waitCursor);
+	QApplication::setOverrideCursor(Qt::waitCursor);
 
 	stopDriver();
 

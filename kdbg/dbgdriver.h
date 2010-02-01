@@ -566,10 +566,12 @@ protected:
     /** @internal */
     virtual int commSetupDoneC();
 
-    char m_prompt[10];
-    size_t m_promptMinLen;
-    char m_promptLastChar;
-    QRegExp m_promptRE;
+    /**
+     * Returns the start of the prompt in \a output or -1.
+     * \a len specifies the size of \a output, but in addition, the contents
+     * of \a output are NUL-terminated, i.e., \c output[len] is zero.
+     */
+    virtual int findPrompt(const char* output, size_t len) const = 0;
 
     // log file
     QString m_logFileName;
