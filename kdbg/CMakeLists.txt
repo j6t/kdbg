@@ -72,13 +72,14 @@ set(kdbg_UI
 
 kde4_add_ui_files(kdbg_SRCS ${kdbg_UI})
 
+add_definitions(-DQT3_SUPPORT)
 kde4_add_executable(kdbg ${kdbg_SRCS})
 
 IF (HAVE_LIB_UTIL)
     set(LIB_UTIL util)
 ENDIF (HAVE_LIB_UTIL)
 
-target_link_libraries(kdbg ${KDE4_KDECORE_LIBS} ${KDE4_KIO_LIBS} ${LIB_UTIL})
+target_link_libraries(kdbg ${KDE4_KDECORE_LIBS} ${KDE4_KIO_LIBS} ${KDE4_KDE3SUPPORT_LIBS} ${QT_QT3SUPPORT_LIBRARY} ${LIB_UTIL})
 
 install(TARGETS kdbg ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES kdbg.desktop DESTINATION ${XDG_APPS_INSTALL_DIR})
