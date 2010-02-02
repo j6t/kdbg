@@ -15,7 +15,7 @@
 #include <kaction.h>
 #include <kpopupmenu.h>
 #include <kfiledialog.h>
-#include <kprocess.h>
+#include <k3process.h>
 #include <kkeydialog.h>
 #include <kanimwidget.h>
 #include <kwin.h>
@@ -935,7 +935,7 @@ QString DebuggerMainWnd::createOutputWindow()
     }
 #endif
 
-    m_outputTermProc = new KProcess;
+    m_outputTermProc = new K3Process;
 
     /*
      * Spawn an xterm that in turn runs a shell script that passes us
@@ -1005,7 +1005,7 @@ QString DebuggerMainWnd::createOutputWindow()
 	tty = tty.stripWhiteSpace();
 	TRACE("tty=" + tty);
 
-	connect(m_outputTermProc, SIGNAL(processExited(KProcess*)),
+	connect(m_outputTermProc, SIGNAL(processExited(K3Process*)),
 		SLOT(slotTermEmuExited()));
     }
     else

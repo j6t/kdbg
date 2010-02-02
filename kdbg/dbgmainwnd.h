@@ -14,7 +14,7 @@
 #include "regwnd.h"
 
 typedef Q3DockWindow QDockWidget;
-class KProcess;
+class K3Process;
 class KRecentFilesAction;
 class KToggleAction;
 class WinStack;
@@ -140,7 +140,7 @@ protected:
     // output window
     QString m_outputTermCmdStr;
     QString m_outputTermKeepScript;
-    KProcess* m_outputTermProc;
+    K3Process* m_outputTermProc;
     int m_ttyLevel;
 
     QString createOutputWindow();

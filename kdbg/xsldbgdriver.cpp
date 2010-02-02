@@ -205,7 +205,7 @@ QStringList XsldbgDriver::boolOptionList() const
 
 
 void
-XsldbgDriver::slotReceiveOutput(KProcess * process, char *buffer,
+XsldbgDriver::slotReceiveOutput(K3Process * process, char *buffer,
                                 int buflen)
 {
     //TRACE(buffer);

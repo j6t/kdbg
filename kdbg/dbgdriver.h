@@ -10,7 +10,7 @@
 #include <qfile.h>
 #include <qregexp.h>
 #include <q3cstring.h>
-#include <kprocess.h>
+#include <k3process.h>
 #include <queue>
 #include <list>
 
@@ -271,7 +271,7 @@ struct MemoryDump
  * interface to the commandline debugger. As such it implements the
  * commands and parses the output.
  */
-class DebuggerDriver : public KProcess
+class DebuggerDriver : public K3Process
 {
     Q_OBJECT
 public:
@@ -581,9 +581,9 @@ public slots:
     void dequeueCmdByVar(VarTree* var);
 
 protected slots:
-    virtual void slotReceiveOutput(KProcess*, char* buffer, int buflen);
-    virtual void slotCommandRead(KProcess*);
-    virtual void slotExited(KProcess*);
+    virtual void slotReceiveOutput(K3Process*, char* buffer, int buflen);
+    virtual void slotCommandRead(K3Process*);
+    virtual void slotExited(K3Process*);
     
 signals:
     /**

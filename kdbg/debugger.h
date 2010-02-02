@@ -30,7 +30,7 @@ class Breakpoint;
 struct DisassembledCode;
 struct MemoryDump;
 struct DbgAddr;
-class KProcess;
+class K3Process;
 
 
 class KDebugger : public QObject
@@ -433,7 +433,7 @@ protected:
     QString m_statusMessage;
 
 protected slots:
-    void gdbExited(KProcess*);
+    void gdbExited(K3Process*);
     void slotInferiorRunning();
     void backgroundUpdate();
     void gotoFrame(int);

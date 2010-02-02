@@ -111,10 +111,10 @@ bool KDebugger::debugProgram(const QString& name,
     // wire up the driver
     connect(driver, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
 	    this, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)));
-    connect(driver, SIGNAL(processExited(KProcess*)), SLOT(gdbExited(KProcess*)));
+    connect(driver, SIGNAL(processExited(K3Process*)), SLOT(gdbExited(K3Process*)));
     connect(driver, SIGNAL(commandReceived(CmdQueueItem*,const char*)),
 	    SLOT(parse(CmdQueueItem*,const char*)));
-    connect(driver, SIGNAL(wroteStdin(KProcess*)), SIGNAL(updateUI()));
+    connect(driver, SIGNAL(wroteStdin(K3Process*)), SIGNAL(updateUI()));
     connect(driver, SIGNAL(inferiorRunning()), SLOT(slotInferiorRunning()));
     connect(driver, SIGNAL(enterIdleState()), SLOT(backgroundUpdate()));
     connect(driver, SIGNAL(enterIdleState()), SIGNAL(updateUI()));
@@ -633,7 +633,7 @@ void KDebugger::stopDriver()
     }
 }
 
-void KDebugger::gdbExited(KProcess*)
+void KDebugger::gdbExited(K3Process*)
 {
     /*
      * Save settings, but only if gdb has already processed "info line

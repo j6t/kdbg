@@ -9,7 +9,7 @@
 #include <qtoolbutton.h>
 #include <qlineedit.h>
 #include <Q3CString>
-#include <kprocess.h>
+#include <k3process.h>
 #include <ctype.h>
 #include <kapplication.h>
 #include <kiconloader.h>
@@ -22,10 +22,10 @@ ProcAttachPS::ProcAttachPS(QWidget* parent) :
 	m_pidCol(-1),
 	m_ppidCol(-1)
 {
-    m_ps = new KProcess;
-    connect(m_ps, SIGNAL(receivedStdout(KProcess*, char*, int)),
-	    this, SLOT(slotTextReceived(KProcess*, char*, int)));
-    connect(m_ps, SIGNAL(processExited(KProcess*)),
+    m_ps = new K3Process;
+    connect(m_ps, SIGNAL(receivedStdout(K3Process*, char*, int)),
+	    this, SLOT(slotTextReceived(K3Process*, char*, int)));
+    connect(m_ps, SIGNAL(processExited(K3Process*)),
 	    this, SLOT(slotPSDone()));
 
     QIcon icon = SmallIconSet("clear_left");
@@ -65,10 +65,10 @@ void ProcAttachPS::runPS()
     m_pidCol = -1;
     m_ppidCol = -1;
 
-    m_ps->start(KProcess::NotifyOnExit, KProcess::Stdout);
+    m_ps->start(K3Process::NotifyOnExit, K3Process::Stdout);
 }
 
-void ProcAttachPS::slotTextReceived(KProcess*, char* buffer, int buflen)
+void ProcAttachPS::slotTextReceived(K3Process*, char* buffer, int buflen)
 {
     const char* end = buffer+buflen;
     while (buffer < end)

@@ -15,7 +15,7 @@
 
 
 DebuggerDriver::DebuggerDriver() :
-	KProcess(),
+	K3Process(),
 	m_state(DSidle),
 	m_output(0),
 	m_outputLen(0),
@@ -26,10 +26,10 @@ DebuggerDriver::DebuggerDriver() :
     m_output = new char[m_outputAlloc];
 
     // debugger process
-    connect(this, SIGNAL(receivedStdout(KProcess*,char*,int)),
-	    SLOT(slotReceiveOutput(KProcess*,char*,int)));
-    connect(this, SIGNAL(wroteStdin(KProcess*)), SLOT(slotCommandRead(KProcess*)));
-    connect(this, SIGNAL(processExited(KProcess*)), SLOT(slotExited(KProcess*)));
+    connect(this, SIGNAL(receivedStdout(K3Process*,char*,int)),
+	    SLOT(slotReceiveOutput(K3Process*,char*,int)));
+    connect(this, SIGNAL(wroteStdin(K3Process*)), SLOT(slotCommandRead(K3Process*)));
+    connect(this, SIGNAL(processExited(K3Process*)), SLOT(slotExited(K3Process*)));
 }
 
 DebuggerDriver::~DebuggerDriver()
@@ -43,7 +43,7 @@ int DebuggerDriver::commSetupDoneC()
 {
     TRACE(__PRETTY_FUNCTION__);
 
-    if (!KProcess::commSetupDoneC())
+    if (!K3Process::commSetupDoneC())
 	return 0;
 
     close(STDERR_FILENO);
@@ -70,8 +70,8 @@ bool DebuggerDriver::startup(QString cmdStr)
 	*this << *i;
     }
 
-    if (!start(KProcess::NotifyOnExit,
-	       KProcess::Communication(KProcess::Stdin|KProcess::Stdout))) {
+    if (!start(K3Process::NotifyOnExit,
+	       K3Process::Communication(K3Process::Stdin|K3Process::Stdout))) {
 	return false;
     }
 
@@ -84,7 +84,7 @@ bool DebuggerDriver::startup(QString cmdStr)
     return true;
 }
 
-void DebuggerDriver::slotExited(KProcess*)
+void DebuggerDriver::slotExited(K3Process*)
 {
     static const char txt[] = "\n====== debugger exited ======\n";
     if (m_logFile.isOpen()) {
@@ -238,7 +238,7 @@ void DebuggerDriver::flushCommands(bool hipriOnly)
     }
 }
 
-void DebuggerDriver::slotCommandRead(KProcess*)
+void DebuggerDriver::slotCommandRead(K3Process*)
 {
     TRACE(__PRETTY_FUNCTION__);
 
@@ -270,7 +270,7 @@ void DebuggerDriver::slotCommandRead(KProcess*)
     }
 }
 
-void DebuggerDriver::slotReceiveOutput(KProcess*, char* buffer, int buflen)
+void DebuggerDriver::slotReceiveOutput(K3Process*, char* buffer, int buflen)
 {
     /*
      * The debugger should be running (processing a command) at this point.

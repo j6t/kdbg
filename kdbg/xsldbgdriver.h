@@ -22,7 +22,7 @@ class XsldbgDriver:public DebuggerDriver {
     static QString defaultXsldbg();
     virtual bool startup(QString cmdStr);
     virtual void commandFinished(CmdQueueItem * cmd);
-    void slotReceiveOutput(KProcess * process, char *buffer, int buflen);
+    void slotReceiveOutput(K3Process * process, char *buffer, int buflen);
 
     virtual CmdQueueItem *executeCmd(DbgCommand, bool clearLow = false);
     virtual CmdQueueItem *executeCmd(DbgCommand, QString strArg,

@@ -19,7 +19,7 @@
 #include <Q3HBoxLayout>
 
 
-class KProcess;
+class K3Process;
 
 /*
  * This is the full-featured version of the dialog. It is used when the
@@ -42,14 +42,14 @@ protected:
     virtual void selectedChanged();
 
 protected slots:
-    void slotTextReceived(KProcess* proc, char* buffer, int buflen);
+    void slotTextReceived(K3Process* proc, char* buffer, int buflen);
     void slotPSDone();
 
 protected:
     void pushLine();
     bool setVisibility(Q3ListViewItem* i, const QString& text);
 
-    KProcess* m_ps;
+    K3Process* m_ps;
     // parse state
     int m_pidCol;	//!< The PID column in the ps output
     int m_ppidCol;	//!< The parent-PID column in the ps output
