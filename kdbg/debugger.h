@@ -20,7 +20,7 @@ class ProgramTypeTable;
 class KTreeViewItem;
 class KConfig;
 class KConfigBase;
-class KConfig;
+class KConfigGroup;
 class Q3ListBox;
 class RegisterInfo;
 class ThreadInfo;
@@ -424,7 +424,7 @@ protected:
     KConfig* m_programConfig;		/* program-specific settings (brkpts etc) */
     void saveProgramSettings();
     void restoreProgramSettings();
-    QString readDebuggerCmd();
+    QString readDebuggerCmd(const KConfigGroup& g);
 
     // debugger process
     DebuggerDriver* m_d;

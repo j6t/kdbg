@@ -7,10 +7,11 @@
 #include "memwindow.h"
 #include <q3header.h>
 #include <QMouseEvent>
-#include <Q3StrList>
 #include <QEvent>
+#include <QList>
 #include <klocale.h>
 #include <kconfigbase.h>
+#include <kconfiggroup.h>
 #include "debugger.h"
 
 
@@ -245,10 +246,10 @@ static const char ColumnWidths[] = "ColumnWidths";
 
 void MemoryWindow::saveProgramSpecific(KConfigBase* config)
 {
-    KConfigGroupSaver s(config, MemoryGroup);
+    KConfigGroup g = config->group(MemoryGroup);
 
     int numEntries = m_expression.count();
-    config->writeEntry(NumExprs, numEntries);
+    g.writeEntry(NumExprs, numEntries);
     QString exprEntry;
     QString fmtEntry;
     for (int i = 0; i < numEntries;) {
@@ -256,28 +257,26 @@ void MemoryWindow::saveProgramSpecific(KConfigBase* config)
 	i++;				/* entries are counted 1-based */
 	exprEntry.sprintf(ExpressionFmt, i);
 	fmtEntry.sprintf(FormatFmt, i);
-	config->writeEntry(exprEntry, text);
+	g.writeEntry(exprEntry, text);
 	QMap<QString,unsigned>::iterator pFormat = m_formatCache.find(text);
 	unsigned fmt = pFormat != m_formatCache.end()  ?  *pFormat  :  MDTword | MDThex;
-	config->writeEntry(fmtEntry, fmt);
+	g.writeEntry(fmtEntry, fmt);
     }
 
     // column widths
-    Q3StrList widths;
-    QString wStr;
+    QList<int> widths;
     for (int i = 0; i < 2; i++) {
 	int w = m_memory.columnWidth(i);
-	wStr.setNum(w);
-	widths.append(wStr);
+	widths.append(w);
     }
-    config->writeEntry(ColumnWidths, widths);
+    g.writeEntry(ColumnWidths, widths);
 }
 
 void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
 {
-    KConfigGroupSaver s(config, MemoryGroup);
+    KConfigGroup g = config->group(MemoryGroup);
 
-    int numEntries = config->readNumEntry(NumExprs, 0);
+    int numEntries = g.readEntry(NumExprs, 0);
     m_expression.clear();
 
     QString exprEntry;
@@ -286,8 +285,8 @@ void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
     for (int i = 1; i <= numEntries; i++) {
 	exprEntry.sprintf(ExpressionFmt, i);
 	fmtEntry.sprintf(FormatFmt, i);
-	QString expr = config->readEntry(exprEntry);
-	unsigned fmt = config->readNumEntry(fmtEntry, MDTword | MDThex);
+	QString expr = g.readEntry(exprEntry, QString());
+	unsigned fmt = g.readEntry(fmtEntry, MDTword | MDThex);
 	m_expression.insertItem(expr);
 	m_formatCache[expr] = fmt & (MDTsizemask | MDTformatmask);
     }
@@ -302,16 +301,10 @@ void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
     }
 
     // column widths
-    Q3StrList widths;
-    int n = config->readListEntry(ColumnWidths, widths);
-    if (n > 2)
-	n = 2;
-    for (int i = 0; i < n; i++) {
-	QString wStr = widths.at(i);
-	bool ok;
-	int w = wStr.toInt(&ok);
-	if (ok)
-	    m_memory.setColumnWidth(i, w);
+    QList<int> widths = g.readEntry(ColumnWidths, QList<int>());
+    QList<int>::iterator w = widths.begin();
+    for (int i = 0; i < 2 && w != widths.end(); ++i, ++w) {
+	m_memory.setColumnWidth(i, *w);
     }
 }
 

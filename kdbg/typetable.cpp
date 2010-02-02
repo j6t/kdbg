@@ -8,7 +8,8 @@
 #include <q3ptrlist.h>
 #include <kglobal.h>
 #include <kstandarddirs.h>
-#include <ksimpleconfig.h>
+#include <kconfig.h>
+#include <kconfiggroup.h>
 #include <list>
 #include <algorithm>
 #include <iterator>
@@ -86,12 +87,12 @@ static const char FunctionGuardEntryFmt[] = "FunctionGuard%d";
 void TypeTable::loadFromFile(const QString& fileName)
 {
     TRACE("reading file " + fileName);
-    KSimpleConfig cf(fileName, true);	/* read-only */
+    KConfig confFile(fileName, KConfig::SimpleConfig);
 
     /*
      * Read library name and properties.
      */
-    cf.setGroup(TypeTableGroup);
+    KConfigGroup cf = confFile.group(TypeTableGroup);
     m_displayName = cf.readEntry(LibDisplayName);
     if (m_displayName.isEmpty()) {
 	// use file name instead
@@ -100,7 +101,7 @@ void TypeTable::loadFromFile(const QString& fileName)
     }
 
     m_shlibNameRE = QRegExp(cf.readEntry(ShlibRE));
-    m_enabledBuiltins = cf.readListEntry(EnableBuiltin);
+    m_enabledBuiltins = cf.readEntry(EnableBuiltin, QStringList());
 
     QString printQString = cf.readEntry(PrintQStringCmd);
     const char* ascii = printQString.ascii();
@@ -117,18 +118,18 @@ void TypeTable::loadFromFile(const QString& fileName)
     QString typesEntry;
     for (int i = 1; ; i++) {
 	// next bunch of types
-	cf.setGroup(TypeTableGroup);
+	KConfigGroup cf = confFile.group(TypeTableGroup);
 	typesEntry.sprintf(TypesEntryFmt, i);
 	if (!cf.hasKey(typesEntry))
 	    break;
 
-	QStringList typeNames = cf.readListEntry(typesEntry, ',');
+	QStringList typeNames = cf.readEntry(typesEntry, QStringList());
 
 	// now read them
 	QString alias;
 	for (QStringList::iterator it = typeNames.begin(); it != typeNames.end(); ++it)
 	{
-	    cf.setGroup(*it);
+	    KConfigGroup cf = confFile.group(*it);
 	    // check if this is an alias
 	    alias = cf.readEntry(AliasEntry);
 	    if (alias.isEmpty()) {
@@ -147,7 +148,7 @@ void TypeTable::loadFromFile(const QString& fileName)
     } // for all Types%d
 }
 
-void TypeTable::readType(KConfigBase& cf, const QString& type)
+void TypeTable::readType(const KConfigGroup& cf, const QString& type)
 {
     // the display string
     QString expr = cf.readEntry(DisplayEntry);

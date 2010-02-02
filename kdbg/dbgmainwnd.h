@@ -55,11 +55,11 @@ public:
 
 protected:
     // session properties
-    virtual void saveProperties(KConfig*);
-    virtual void readProperties(KConfig*);
+    virtual void saveProperties(KConfigGroup& cg);
+    virtual void readProperties(const KConfigGroup& cg);
     // settings
-    void saveSettings(KConfig*);
-    void restoreSettings(KConfig*);
+    void saveSettings(KSharedConfigPtr);
+    void restoreSettings(KSharedConfigPtr);
 
     void initToolbar();
     void initKAction();

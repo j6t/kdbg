@@ -168,7 +168,7 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
     connect(m_localVariables, SIGNAL(contextMenuRequested(Q3ListViewItem*, const QPoint&, int)),
 	    this, SLOT(slotLocalsPopup(Q3ListViewItem*, const QPoint&)));
 
-    restoreSettings(kapp->config());
+    restoreSettings(KGlobal::config());
 
     updateUI();
     m_bpTable->updateUI();
@@ -176,7 +176,7 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 
 DebuggerMainWnd::~DebuggerMainWnd()
 {
-    saveSettings(kapp->config());
+    saveSettings(KGlobal::config());
     // must delete m_debugger early since it references our windows
     delete m_debugger;
     m_debugger = 0;
@@ -364,20 +364,20 @@ bool DebuggerMainWnd::queryClose()
 
 
 // instance properties
-void DebuggerMainWnd::saveProperties(KConfig* config)
+void DebuggerMainWnd::saveProperties(KConfigGroup& cg)
 {
     // session management
     QString executable = "";
     if (m_debugger != 0) {
 	executable = m_debugger->executable();
     }
-    config->writeEntry("executable", executable);
+    cg.writeEntry("executable", executable);
 }
 
-void DebuggerMainWnd::readProperties(KConfig* config)
+void DebuggerMainWnd::readProperties(const KConfigGroup& cg)
 {
     // session management
-    QString execName = config->readEntry("executable");
+    QString execName = cg.readEntry("executable");
 
     TRACE("readProperties: executable=" + execName);
     if (!execName.isEmpty()) {
@@ -400,84 +400,80 @@ static const char TabWidth[] = "TabWidth";
 static const char SourceFileFilter[] = "SourceFileFilter";
 static const char HeaderFileFilter[] = "HeaderFileFilter";
 
-void DebuggerMainWnd::saveSettings(KConfig* config)
+void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
 {
-    KConfigGroupSaver g(config, WindowGroup);
+    KConfigGroup g = config->group(WindowGroup);
 
     QString layout;
     {
 	Q3TextStream stream(&layout, QIODevice::WriteOnly);
 	stream << *this;
     }
-    config->writeEntry("Layout", layout);
+    g.writeEntry("Layout", layout);
 
-    m_recentExecAction->saveEntries(config, RecentExecutables);
+    m_recentExecAction->saveEntries(config->group(RecentExecutables));
 
-    KConfigGroupSaver g2(config, LastSession);
-    config->writeEntry("Width0Locals", m_localVariables->columnWidth(0));
-    config->writeEntry("Width0Watches", m_watches->columnWidth(0));
+    KConfigGroup lg = config->group(LastSession);
+    lg.writeEntry("Width0Locals", m_localVariables->columnWidth(0));
+    lg.writeEntry("Width0Watches", m_watches->columnWidth(0));
 
     if (m_debugger != 0) {
-	m_debugger->saveSettings(config);
+	m_debugger->saveSettings(config.data());
     }
 
-    KConfigGroupSaver g3(config, OutputWindowGroup);
-    config->writeEntry(TermCmdStr, m_outputTermCmdStr);
+    config->group(OutputWindowGroup).writeEntry(TermCmdStr, m_outputTermCmdStr);
+    config->group(DebuggerGroup).writeEntry(DebuggerCmdStr, m_debuggerCmdStr);
 
-    config->setGroup(DebuggerGroup);
-    config->writeEntry(DebuggerCmdStr, m_debuggerCmdStr);
-
-    config->setGroup(PreferencesGroup);
-    config->writeEntry(PopForeground, m_popForeground);
-    config->writeEntry(BackTimeout, m_backTimeout);
-    config->writeEntry(TabWidth, m_tabWidth);
-    config->writeEntry(SourceFileFilter, m_sourceFilter);
-    config->writeEntry(HeaderFileFilter, m_headerFilter);
+    KConfigGroup pg(config->group(PreferencesGroup));
+    pg.writeEntry(PopForeground, m_popForeground);
+    pg.writeEntry(BackTimeout, m_backTimeout);
+    pg.writeEntry(TabWidth, m_tabWidth);
+    pg.writeEntry(SourceFileFilter, m_sourceFilter);
+    pg.writeEntry(HeaderFileFilter, m_headerFilter);
 }
 
-void DebuggerMainWnd::restoreSettings(KConfig* config)
+void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
 {
-    KConfigGroupSaver g(config, WindowGroup);
+    KConfigGroup g = config->group(WindowGroup);
 
-    QString layout = config->readEntry("Layout");
+    QByteArray layout = g.readEntry("Layout", QByteArray());
     {
 	Q3TextStream stream(&layout, QIODevice::ReadOnly);
 	stream >> *this;
     }
 
-    m_recentExecAction->loadEntries(config, RecentExecutables);
+    m_recentExecAction->loadEntries(config->group(RecentExecutables));
 
-    KConfigGroupSaver g2(config, LastSession);
+    KConfigGroup lg = config->group(LastSession);
     int w;
-    w = config->readNumEntry("Width0Locals", -1);
+    w = lg.readEntry("Width0Locals", -1);
     if (w >= 0 && w < 30000)
 	m_localVariables->setColumnWidth(0, w);
-    w = config->readNumEntry("Width0Watches", -1);
+    w = lg.readEntry("Width0Watches", -1);
     if (w >= 0 && w < 30000)
 	m_watches->setColumnWidth(0, w);
 
     if (m_debugger != 0) {
-	m_debugger->restoreSettings(config);
+	m_debugger->restoreSettings(config.data());
     }
 
-    KConfigGroupSaver g3(config, OutputWindowGroup);
+    KConfigGroup og(config->group(OutputWindowGroup));
     /*
      * For debugging and emergency purposes, let the config file override
      * the shell script that is used to keep the output window open. This
      * string must have EXACTLY 1 %s sequence in it.
      */
-    setTerminalCmd(config->readEntry(TermCmdStr, defaultTermCmdStr));
-    m_outputTermKeepScript = config->readEntry(KeepScript);
+    setTerminalCmd(og.readEntry(TermCmdStr, defaultTermCmdStr));
+    m_outputTermKeepScript = og.readEntry(KeepScript);
 
-    config->setGroup(DebuggerGroup);
-    setDebuggerCmdStr(config->readEntry(DebuggerCmdStr));
+    setDebuggerCmdStr(config->group(DebuggerGroup).readEntry(DebuggerCmdStr));
 
-    config->setGroup(PreferencesGroup);
-    m_popForeground = config->readBoolEntry(PopForeground, false);
-    m_backTimeout = config->readNumEntry(BackTimeout, 1000);
-    m_tabWidth = config->readNumEntry(TabWidth, 0);
-    m_sourceFilter = config->readEntry(SourceFileFilter, m_sourceFilter);
-    m_headerFilter = config->readEntry(HeaderFileFilter, m_headerFilter);
+    KConfigGroup pg(config->group(PreferencesGroup));
+    m_popForeground = pg.readEntry(PopForeground, false);
+    m_backTimeout = pg.readEntry(BackTimeout, 1000);
+    m_tabWidth = pg.readEntry(TabWidth, 0);
+    m_sourceFilter = pg.readEntry(SourceFileFilter, m_sourceFilter);
+    m_headerFilter = pg.readEntry(HeaderFileFilter, m_headerFilter);
 
     emit setTabWidth(m_tabWidth);
 }
@@ -635,14 +631,14 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 	QString configName = m_debugger->getConfigForExe(executable);
 	if (QFile::exists(configName))
 	{
-	    KSimpleConfig c(configName, true);	// read-only
-	    c.setGroup(GeneralGroup);
+	    KConfig c(configName, KConfig::SimpleConfig);
 
 	    // Using "GDB" as default here is for backwards compatibility:
 	    // The config file exists but doesn't have an entry,
 	    // so it must have been created by an old version of KDbg
 	    // that had only the GDB driver.
-	    lang = c.readEntry(KDebugger::DriverNameEntry, "GDB");
+	    lang = c.group(GeneralGroup)
+		    .readEntry(KDebugger::DriverNameEntry, "GDB");
 
 	    TRACE(QString("...bad, trying config driver %1...").arg(lang));
 	    driver = driverFromLang(lang);

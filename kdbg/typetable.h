@@ -10,7 +10,7 @@
 #include <qstringlist.h>
 #include <map>
 
-class KConfigBase;
+class KConfigGroup;
 
 /**
  * The maximum number of sub-expressions that may appear in a single struct
@@ -117,7 +117,7 @@ protected:
      */
     static void loadTypeTables();
     void loadFromFile(const QString& fileName);
-    void readType(KConfigBase& cf, const QString& type);
+    void readType(const KConfigGroup& cf, const QString& type);
     Q3Dict<TypeInfo> m_typeDict;
     Q3Dict<TypeInfo> m_aliasDict;
     TypeMap m_templates;

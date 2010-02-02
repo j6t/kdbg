@@ -128,10 +128,10 @@ bool KDebugger::debugProgram(const QString& name,
 
     // get debugger command from per-program settings
     if (m_programConfig != 0) {
-	m_programConfig->setGroup(GeneralGroup);
-	m_debuggerCmd = readDebuggerCmd();
+	KConfigGroup g = m_programConfig->group(GeneralGroup);
+	m_debuggerCmd = readDebuggerCmd(g);
 	// get terminal emulation level
-	m_ttyLevel = TTYLevel(m_programConfig->readNumEntry(TTYLevelEntry, ttyFull));
+	m_ttyLevel = TTYLevel(g.readEntry(TTYLevelEntry, int(ttyFull)));
     }
     // the rest is read in later in the handler of DCexecutable
 
@@ -710,21 +710,21 @@ const char ExprFmt[] = "Expr%d";
 void KDebugger::saveProgramSettings()
 {
     ASSERT(m_programConfig != 0);
-    m_programConfig->setGroup(GeneralGroup);
-    m_programConfig->writeEntry(FileVersion, 1);
-    m_programConfig->writeEntry(ProgramArgs, m_programArgs);
-    m_programConfig->writeEntry(WorkingDirectory, m_programWD);
-    m_programConfig->writeEntry(OptionsSelected, m_boolOptions);
-    m_programConfig->writeEntry(DebuggerCmdStr, m_debuggerCmd);
-    m_programConfig->writeEntry(TTYLevelEntry, int(m_ttyLevel));
+    KConfigGroup gg = m_programConfig->group(GeneralGroup);
+    gg.writeEntry(FileVersion, 1);
+    gg.writeEntry(ProgramArgs, m_programArgs);
+    gg.writeEntry(WorkingDirectory, m_programWD);
+    gg.writeEntry(OptionsSelected, m_boolOptions);
+    gg.writeEntry(DebuggerCmdStr, m_debuggerCmd);
+    gg.writeEntry(TTYLevelEntry, int(m_ttyLevel));
     QString driverName;
     if (m_d != 0)
 	driverName = m_d->driverName();
-    m_programConfig->writeEntry(DriverNameEntry, driverName);
+    gg.writeEntry(DriverNameEntry, driverName);
 
     // write environment variables
     m_programConfig->deleteGroup(EnvironmentGroup);
-    m_programConfig->setGroup(EnvironmentGroup);
+    KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
     Q3DictIterator<EnvVar> it = m_envVars;
     EnvVar* var;
     QString varName;
@@ -732,8 +732,8 @@ void KDebugger::saveProgramSettings()
     for (int i = 0; (var = it) != 0; ++it, ++i) {
 	varName.sprintf(Variable, i);
 	varValue.sprintf(Value, i);
-	m_programConfig->writeEntry(varName, it.currentKey());
-	m_programConfig->writeEntry(varValue, var->value);
+	eg.writeEntry(varName, it.currentKey());
+	eg.writeEntry(varValue, var->value);
     }
 
     saveBreakpoints(m_programConfig);
@@ -742,12 +742,12 @@ void KDebugger::saveProgramSettings()
     // first get rid of whatever was in this group
     m_programConfig->deleteGroup(WatchGroup);
     // then start a new group
-    m_programConfig->setGroup(WatchGroup);
+    KConfigGroup wg = m_programConfig->group(WatchGroup);
     VarTree* item = m_watchVariables.firstChild();
     int watchNum = 0;
     for (; item != 0; item = item->nextSibling(), ++watchNum) {
 	varName.sprintf(ExprFmt, watchNum);
-	m_programConfig->writeEntry(varName, item->getText());
+	wg.writeEntry(varName, item->getText());
     }
 
     // give others a chance
@@ -757,27 +757,27 @@ void KDebugger::saveProgramSettings()
 void KDebugger::overrideProgramArguments(const QString& args)
 {
     ASSERT(m_programConfig != 0);
-    m_programConfig->setGroup(GeneralGroup);
-    m_programConfig->writeEntry(ProgramArgs, args);
+    KConfigGroup g = m_programConfig->group(GeneralGroup);
+    g.writeEntry(ProgramArgs, args);
 }
 
 void KDebugger::restoreProgramSettings()
 {
     ASSERT(m_programConfig != 0);
-    m_programConfig->setGroup(GeneralGroup);
+    KConfigGroup gg = m_programConfig->group(GeneralGroup);
     /*
      * We ignore file version for now we will use it in the future to
      * distinguish different versions of this configuration file.
      */
     // m_debuggerCmd has been read in already
     // m_ttyLevel has been read in already
-    QString pgmArgs = m_programConfig->readEntry(ProgramArgs);
-    QString pgmWd = m_programConfig->readEntry(WorkingDirectory);
-    QStringList boolOptions = m_programConfig->readListEntry(OptionsSelected);
+    QString pgmArgs = gg.readEntry(ProgramArgs);
+    QString pgmWd = gg.readEntry(WorkingDirectory);
+    QStringList boolOptions = gg.readEntry(OptionsSelected, QStringList());
     m_boolOptions = QStringList();
 
     // read environment variables
-    m_programConfig->setGroup(EnvironmentGroup);
+    KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
     m_envVars.clear();
     Q3Dict<EnvVar> pgmVars;
     EnvVar* var;
@@ -786,17 +786,17 @@ void KDebugger::restoreProgramSettings()
     for (int i = 0;; ++i) {
 	varName.sprintf(Variable, i);
 	varValue.sprintf(Value, i);
-	if (!m_programConfig->hasKey(varName)) {
+	if (!eg.hasKey(varName)) {
 	    /* entry not present, assume that we've hit them all */
 	    break;
 	}
-	QString name = m_programConfig->readEntry(varName);
+	QString name = eg.readEntry(varName, QString());
 	if (name.isEmpty()) {
 	    // skip empty names
 	    continue;
 	}
 	var = new EnvVar;
-	var->value = m_programConfig->readEntry(varValue);
+	var->value = eg.readEntry(varValue, QString());
 	var->status = EnvVar::EVnew;
 	pgmVars.insert(name, var);
     }
@@ -806,15 +806,15 @@ void KDebugger::restoreProgramSettings()
     restoreBreakpoints(m_programConfig);
 
     // watch expressions
-    m_programConfig->setGroup(WatchGroup);
+    KConfigGroup wg = m_programConfig->group(WatchGroup);
     m_watchVariables.clear();
     for (int i = 0;; ++i) {
 	varName.sprintf(ExprFmt, i);
-	if (!m_programConfig->hasKey(varName)) {
+	if (!wg.hasKey(varName)) {
 	    /* entry not present, assume that we've hit them all */
 	    break;
 	}
-	QString expr = m_programConfig->readEntry(varName);
+	QString expr = wg.readEntry(varName, QString());
 	if (expr.isEmpty()) {
 	    // skip empty expressions
 	    continue;
@@ -830,9 +830,9 @@ void KDebugger::restoreProgramSettings()
  * Reads the debugger command line from the program settings. The config
  * group must have been set by the caller.
  */
-QString KDebugger::readDebuggerCmd()
+QString KDebugger::readDebuggerCmd(const KConfigGroup& g)
 {
-    QString debuggerCmd = m_programConfig->readEntry(DebuggerCmdStr);
+    QString debuggerCmd = g.readEntry(DebuggerCmdStr);
 
     // always let the user confirm the debugger cmd if we are root
     if (::geteuid() == 0)
@@ -878,7 +878,7 @@ void KDebugger::saveBreakpoints(KConfig* config)
 	/* remove remmants */
 	config->deleteGroup(groupName);
 
-	config->setGroup(groupName);
+	KConfigGroup g = config->group(groupName);
 	if (!bp->text.isEmpty()) {
 	    /*
 	     * The breakpoint was set using the text box in the breakpoint
@@ -886,29 +886,28 @@ void KDebugger::saveBreakpoints(KConfig* config)
 	     * but instead honor what the user typed (a function name, for
 	     * example, which could move between sessions).
 	     */
-	    config->writeEntry(Text, bp->text);
+	    g.writeEntry(Text, bp->text);
 	} else if (!bp->fileName.isEmpty()) {
-	    config->writeEntry(File, bp->fileName);
-	    config->writeEntry(Line, bp->lineNo);
+	    g.writeEntry(File, bp->fileName);
+	    g.writeEntry(Line, bp->lineNo);
 	    /*
 	     * Addresses are hardly correct across sessions, so we don't
 	     * save it.
 	     */
 	} else {
-	    config->writeEntry(Address, bp->address.asString());
+	    g.writeEntry(Address, bp->address.asString());
 	}
-	config->writeEntry(Temporary, bp->temporary);
-	config->writeEntry(Enabled, bp->enabled);
+	g.writeEntry(Temporary, bp->temporary);
+	g.writeEntry(Enabled, bp->enabled);
 	if (!bp->condition.isEmpty())
-	    config->writeEntry(Condition, bp->condition);
+	    g.writeEntry(Condition, bp->condition);
 	// we do not save the ignore count
     }
     // delete remaining groups
     // we recognize that a group is present if there is an Enabled entry
     for (;; i++) {
 	groupName.sprintf(BPGroup, i);
-	config->setGroup(groupName);
-	if (!config->hasKey(Enabled)) {
+	if (!config->group(groupName).hasKey(Enabled)) {
 	    /* group not present, assume that we've hit them all */
 	    break;
 	}
@@ -925,16 +924,16 @@ void KDebugger::restoreBreakpoints(KConfig* config)
      */
     for (int i = 0;; i++) {
 	groupName.sprintf(BPGroup, i);
-	config->setGroup(groupName);
-	if (!config->hasKey(Enabled)) {
+	KConfigGroup g = config->group(groupName);
+	if (!g.hasKey(Enabled)) {
 	    /* group not present, assume that we've hit them all */
 	    break;
 	}
 	Breakpoint* bp = new Breakpoint;
-	bp->fileName = config->readEntry(File);
-	bp->lineNo = config->readNumEntry(Line, -1);
-	bp->text = config->readEntry(Text);
-	bp->address = config->readEntry(Address);
+	bp->fileName = g.readEntry(File);
+	bp->lineNo = g.readEntry(Line, -1);
+	bp->text = g.readEntry(Text);
+	bp->address = g.readEntry(Address);
 	// check consistency
 	if ((bp->fileName.isEmpty() || bp->lineNo < 0) &&
 	    bp->text.isEmpty() &&
@@ -943,9 +942,9 @@ void KDebugger::restoreBreakpoints(KConfig* config)
 	    delete bp;
 	    continue;
 	}
-	bp->enabled = config->readBoolEntry(Enabled, true);
-	bp->temporary = config->readBoolEntry(Temporary, false);
-	bp->condition = config->readEntry(Condition);
+	bp->enabled = g.readEntry(Enabled, true);
+	bp->temporary = g.readEntry(Temporary, false);
+	bp->condition = g.readEntry(Condition);
 
 	/*
 	 * Add the breakpoint.
