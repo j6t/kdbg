@@ -790,7 +790,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
     int oldTabWidth = m_tabWidth;
 
     Q3TabDialog dlg(this, "global_options", true);
-    QString title = kapp->caption();
+    QString title = KGlobal::caption();
     title += i18n(": Global options");
     dlg.setCaption(title);
     dlg.setCancelButton(i18n("Cancel"));
@@ -953,7 +953,7 @@ QString DebuggerMainWnd::createOutputWindow()
     shellScript.replace("%s", fifoName);
     TRACE("output window script is " + shellScript);
 
-    QString title = kapp->caption();
+    QString title = KGlobal::caption();
     title += i18n(": Program output");
 
     // parse the command line specified in the preferences

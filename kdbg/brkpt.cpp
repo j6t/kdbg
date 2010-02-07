@@ -4,7 +4,7 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <kapplication.h>
+#include <kglobal.h>
 #include <klocale.h>			/* i18n */
 #include <kiconloader.h>
 #include <ksimpleconfig.h>
@@ -443,7 +443,7 @@ ConditionalDlg::ConditionalDlg(QWidget* parent) :
 	m_inputs(2, 2, 10),
 	m_buttons(4)
 {
-    QString title = kapp->caption();
+    QString title = KGlobal::caption();
     title += i18n(": Conditional breakpoint");
     setCaption(title);
 

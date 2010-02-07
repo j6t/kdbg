@@ -11,7 +11,7 @@
 #include <q3popupmenu.h>
 #include <QContextMenuEvent>
 #include <QCloseEvent>
-#include <kapplication.h>
+#include <kglobal.h>
 #include <kmainwindow.h>
 #include <klocale.h>			/* i18n */
 #include "mydebug.h"
@@ -386,7 +386,7 @@ FindDialog::FindDialog() :
 	m_layout(this, 8),
 	m_buttons(4)
 {
-    setCaption(QString(kapp->caption()) + i18n(": Search"));
+    setCaption(KGlobal::caption() + i18n(": Search"));
 
     m_searchText.setMinimumSize(330, 24);
     m_searchText.setMaxLength(10000);

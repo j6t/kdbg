@@ -6,7 +6,7 @@
 
 #include "pgmsettings.h"
 #include <klocale.h>			/* i18n */
-#include <kapplication.h>
+#include <kglobal.h>
 #include <qfileinfo.h>
 #include <qlayout.h>
 #include <qlineedit.h>
@@ -101,7 +101,7 @@ ProgramSettings::ProgramSettings(QWidget* parent, QString exeName, bool modal) :
 {
     // construct title
     QFileInfo fi(exeName);
-    QString cap = kapp->caption();
+    QString cap = KGlobal::caption();
     QString title = i18n("%1: Settings for %2");
     setCaption(title.arg(cap, fi.fileName()));
 

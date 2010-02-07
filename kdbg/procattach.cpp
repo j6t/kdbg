@@ -11,7 +11,7 @@
 #include <Q3CString>
 #include <k3process.h>
 #include <ctype.h>
-#include <kapplication.h>
+#include <kglobal.h>
 #include <kiconloader.h>
 #include <klocale.h>			/* i18n */
 #include "config.h"
@@ -266,7 +266,7 @@ ProcAttach::ProcAttach(QWidget* parent) :
 	m_layout(this, 8),
 	m_buttons(4)
 {
-    QString title = kapp->caption();
+    QString title = KGlobal::caption();
     title += i18n(": Attach to process");
     setCaption(title);
 
