@@ -16,7 +16,6 @@
 typedef Q3DockWindow QDockWidget;
 class K3Process;
 class KRecentFilesAction;
-class KToggleAction;
 class WinStack;
 class Q3ListBox;
 class Q3CString;
@@ -78,46 +77,46 @@ protected:
     QTimer m_backTimer;
 
     // recent execs in File menu
-    KAction* m_closeAction;
-    KAction* m_reloadAction;
-    KAction* m_fileExecAction;
+    QAction* m_closeAction;
+    QAction* m_reloadAction;
+    QAction* m_fileExecAction;
     KRecentFilesAction* m_recentExecAction;
-    KAction* m_coreDumpAction;
-    KAction* m_settingsAction;
-    KToggleAction* m_findAction;
-    KToggleAction* m_btWindowAction;
-    KToggleAction* m_localVariablesAction;
-    KToggleAction* m_watchesAction;
-    KToggleAction* m_registersAction;
-    KToggleAction* m_bpTableAction;
-    KToggleAction* m_ttyWindowAction;
-    KToggleAction* m_threadsAction;
-    KToggleAction* m_memoryWindowAction;
-    KAction* m_runAction;
-    KAction* m_stepIntoAction;
-    KAction* m_stepOverAction;
-    KAction* m_stepOutAction;
-    KAction* m_toCursorAction;
-    KAction* m_stepIntoIAction;
-    KAction* m_stepOverIAction;
-    KAction* m_execMovePCAction;
-    KAction* m_breakAction;
-    KAction* m_killAction;
-    KAction* m_restartAction;
-    KAction* m_attachAction;
-    KAction* m_argumentsAction;
-    KAction* m_bpSetAction;
-    KAction* m_bpSetTempAction;
-    KAction* m_bpEnableAction;
-    KAction* m_editValueAction;
+    QAction* m_coreDumpAction;
+    QAction* m_settingsAction;
+    QAction* m_findAction;
+    QAction* m_btWindowAction;
+    QAction* m_localVariablesAction;
+    QAction* m_watchesAction;
+    QAction* m_registersAction;
+    QAction* m_bpTableAction;
+    QAction* m_ttyWindowAction;
+    QAction* m_threadsAction;
+    QAction* m_memoryWindowAction;
+    QAction* m_runAction;
+    QAction* m_stepIntoAction;
+    QAction* m_stepOverAction;
+    QAction* m_stepOutAction;
+    QAction* m_toCursorAction;
+    QAction* m_stepIntoIAction;
+    QAction* m_stepOverIAction;
+    QAction* m_execMovePCAction;
+    QAction* m_breakAction;
+    QAction* m_killAction;
+    QAction* m_restartAction;
+    QAction* m_attachAction;
+    QAction* m_argumentsAction;
+    QAction* m_bpSetAction;
+    QAction* m_bpSetTempAction;
+    QAction* m_bpEnableAction;
+    QAction* m_editValueAction;
     QString m_lastDirectory;		/* the dir of the most recently opened file */
 
 protected:
     virtual bool queryClose();
-    KAction* createAction(const QString& text, const char* icon,
+    QAction* createAction(const QString& text, const char* icon,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name);
-    KAction* createAction(const QString& text,
+    QAction* createAction(const QString& text,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name);
 

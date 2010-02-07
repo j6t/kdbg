@@ -9,14 +9,16 @@
 #include <kmessagebox.h>
 #include <kconfig.h>
 #include <kstatusbar.h>
-#include <kiconloader.h>
-#include <kstdaccel.h>
-#include <kstdaction.h>
+#include <kicon.h>
+#include <kstandardaction.h>
+#include <kstandardshortcut.h>
 #include <kaction.h>
-#include <kpopupmenu.h>
+#include <kactioncollection.h>
+#include <krecentfilesaction.h>
+#include <ktoggleaction.h>
 #include <kfiledialog.h>
 #include <k3process.h>
-#include <kkeydialog.h>
+#include <kshortcutsdialog.h>
 #include <kanimwidget.h>
 #include <kwin.h>
 #include <kxmlguifactory.h>
@@ -209,21 +211,28 @@ QDockWidget* DebuggerMainWnd::createDockWidget(const char* name, const QString& 
     return w;
 }
 
-KAction* DebuggerMainWnd::createAction(const QString& text, const char* icon,
+QAction* DebuggerMainWnd::createAction(const QString& text, const char* icon,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name)
 {
-    KAction* a = new KAction(text, icon, shortcut, receiver, slot,
-			actionCollection(), name);
+    KAction* a = actionCollection()->addAction(name);
+    a->setText(text);
+    a->setIcon(KIcon(icon));
+    if (shortcut)
+	a->setShortcut(KShortcut(shortcut));
+    connect(a, SIGNAL(triggered()), receiver, slot);
     return a;
 }
 
-KAction* DebuggerMainWnd::createAction(const QString& text,
+QAction* DebuggerMainWnd::createAction(const QString& text,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name)
 {
-    KAction* a = new KAction(text, shortcut, receiver, slot,
-			actionCollection(), name);
+    KAction* a = actionCollection()->addAction(name);
+    a->setText(text);
+    if (shortcut)
+	a->setShortcut(KShortcut(shortcut));
+    connect(a, SIGNAL(triggered()), receiver, slot);
     return a;
 }
 
@@ -231,38 +240,38 @@ KAction* DebuggerMainWnd::createAction(const QString& text,
 void DebuggerMainWnd::initKAction()
 {
     // file menu
-    KAction* open = KStdAction::open(this, SLOT(slotFileOpen()), 
+    KAction* open = KStandardAction::open(this, SLOT(slotFileOpen()),
                       actionCollection());
     open->setText(i18n("&Open Source..."));
-    m_closeAction = KStdAction::close(m_filesWindow, SLOT(slotClose()), actionCollection());
+    m_closeAction = KStandardAction::close(m_filesWindow, SLOT(slotClose()), actionCollection());
     m_reloadAction = createAction(i18n("&Reload Source"), "reload", 0,
 			m_filesWindow, SLOT(slotFileReload()), "file_reload");
     m_fileExecAction = createAction(i18n("&Executable..."), "execopen", 0,
 			this, SLOT(slotFileExe()), "file_executable");
-    m_recentExecAction = new KRecentFilesAction(i18n("Recent E&xecutables"), 0,
-		      this, SLOT(slotRecentExec(const KURL&)),
-		      actionCollection(), "file_executable_recent");
+    m_recentExecAction = new KRecentFilesAction(i18n("Recent E&xecutables"),
+		      actionCollection());
+    m_recentExecAction->setObjectName("file_executable_recent");
+    connect(m_recentExecAction, SIGNAL(urlSelected(const KUrl&)),
+	    this, SLOT(slotRecentExec(const KUrl&)));
     m_coreDumpAction = createAction(i18n("&Core dump..."), 0,
 			this, SLOT(slotFileCore()), "file_core_dump");
-    KStdAction::quit(kapp, SLOT(closeAllWindows()), actionCollection());
+    KStandardAction::quit(kapp, SLOT(closeAllWindows()), actionCollection());
 
     // settings menu
     m_settingsAction = createAction(i18n("This &Program..."), 0,
 			this, SLOT(slotFileProgSettings()), "settings_program");
     createAction(i18n("&Global Options..."), 0,
 			this, SLOT(slotFileGlobalSettings()), "settings_global");
-    KStdAction::keyBindings(this, SLOT(slotConfigureKeys()), actionCollection());
-    KStdAction::showStatusbar(this, SLOT(slotViewStatusbar()), actionCollection());
+    KStandardAction::keyBindings(this, SLOT(slotConfigureKeys()), actionCollection());
+    KStandardAction::showStatusbar(this, SLOT(slotViewStatusbar()), actionCollection());
 
     // view menu
-    m_findAction = new KToggleAction(i18n("&Find"), "find", CTRL+Key_F, m_filesWindow,
-			    SLOT(slotViewFind()), actionCollection(),
-			    "view_find");
-    (void)KStdAction::findNext(m_filesWindow, SLOT(slotFindForward()), actionCollection(), "view_findnext");
-    (void)KStdAction::findPrev(m_filesWindow, SLOT(slotFindBackward()), actionCollection(), "view_findprev");
+    m_findAction = KStandardAction::find(m_filesWindow, SLOT(slotViewFind()), actionCollection());
+    KStandardAction::findNext(m_filesWindow, SLOT(slotFindForward()), actionCollection());
+    KStandardAction::findPrev(m_filesWindow, SLOT(slotFindBackward()), actionCollection());
 
     i18n("Source &code");
-    struct { QString text; QWidget* w; QString id; KToggleAction** act; } dw[] = {
+    struct { QString text; QWidget* w; QString id; QAction** act; } dw[] = {
 	{ i18n("Stac&k"), m_btWindow, "view_stack", &m_btWindowAction },
 	{ i18n("&Locals"), m_localVariables, "view_locals", &m_localVariablesAction },
 	{ i18n("&Watched expressions"), m_watches, "view_watched_expressions", &m_watchesAction },
@@ -274,8 +283,9 @@ void DebuggerMainWnd::initKAction()
     };
     for (unsigned i = 0; i < sizeof(dw)/sizeof(dw[0]); i++) {
 	QDockWidget* d = dockParent(dw[i].w);
-	*dw[i].act = new KToggleAction(dw[i].text, 0, d, SLOT(show()),
-			  actionCollection(), dw[i].id);
+	*dw[i].act = new KToggleAction(dw[i].text, actionCollection());
+	actionCollection()->addAction(dw[i].id, *dw[i].act);
+	connect(*dw[i].act, SIGNAL(triggered()), d, SLOT(show()));
     }
 
     // execution menu
@@ -328,8 +338,8 @@ void DebuggerMainWnd::initKAction()
 			this, SLOT(slotEditValue()), "edit_value");
 
     // all actions force an UI update
-    Q3ValueList<KAction*> actions = actionCollection()->actions();
-    Q3ValueList<KAction*>::Iterator it = actions.begin();
+    Q3ValueList<QAction*> actions = actionCollection()->actions();
+    Q3ValueList<QAction*>::Iterator it = actions.begin();
     for (; it != actions.end(); ++it) {
 	connect(*it, SIGNAL(activated()), this, SLOT(updateUI()));
     }
@@ -1246,7 +1256,7 @@ void DebuggerMainWnd::slotExecArgs()
 
 void DebuggerMainWnd::slotConfigureKeys()
 {
-    KKeyDialog::configure(actionCollection(), this);
+    KShortcutsDialog::configure(actionCollection());
 }
 
 #include "dbgmainwnd.moc"
