@@ -20,7 +20,8 @@
 #include <kapplication.h>
 #include <kiconloader.h>
 #include <kglobalsettings.h>
-#include <kmainwindow.h>
+#include <kxmlguiwindow.h>
+#include <kxmlguifactory.h>
 #include <algorithm>
 #include "mydebug.h"
 
@@ -754,7 +755,7 @@ void SourceWindow::contextMenuEvent(QContextMenuEvent* e)
     do
 	top = top->parentWidget();
     while (!top->isTopLevel());
-    KMainWindow* mw = static_cast<KMainWindow*>(top);
+    KXmlGuiWindow* mw = static_cast<KXmlGuiWindow*>(top);
     Q3PopupMenu* m =
 	static_cast<Q3PopupMenu*>(mw->factory()->container("popup_files", mw));
     m->exec(e->globalPos());

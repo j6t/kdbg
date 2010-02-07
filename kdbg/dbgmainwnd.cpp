@@ -19,6 +19,7 @@
 #include <kkeydialog.h>
 #include <kanimwidget.h>
 #include <kwin.h>
+#include <kxmlguifactory.h>
 #include <q3listbox.h>
 #include <qfile.h>
 #include <qfileinfo.h>
@@ -49,8 +50,8 @@ static const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %
 static const char defaultSourceFilter[] = "*.c *.cc *.cpp *.c++ *.C *.CC";
 static const char defaultHeaderFilter[] = "*.h *.hh *.hpp *.h++";
 
-DebuggerMainWnd::DebuggerMainWnd(const char* name) :
-	KMainWindow(0, name),
+DebuggerMainWnd::DebuggerMainWnd() :
+	KXmlGuiWindow(),
 	m_debugger(0),
 #ifdef GDB_TRANSCRIPT
 	m_transcriptFile(GDB_TRANSCRIPT),

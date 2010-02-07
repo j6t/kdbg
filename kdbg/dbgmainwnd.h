@@ -10,7 +10,7 @@
 #include <qtimer.h>
 #include <q3dockwindow.h>
 #include <Q3CString>
-#include <kmainwindow.h>
+#include <kxmlguiwindow.h>
 #include "regwnd.h"
 
 typedef Q3DockWindow QDockWidget;
@@ -30,11 +30,11 @@ class KDebugger;
 class DebuggerDriver;
 struct DbgAddr;
 
-class DebuggerMainWnd : public KMainWindow
+class DebuggerMainWnd : public KXmlGuiWindow
 {
     Q_OBJECT
 public:
-    DebuggerMainWnd(const char* name);
+    DebuggerMainWnd();
     ~DebuggerMainWnd();
 
     bool debugProgram(const QString& exe, const QString& lang);

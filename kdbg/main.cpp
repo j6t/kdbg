@@ -56,7 +56,8 @@ int main(int argc, char** argv)
 
     KGlobal::dirs()->addResourceType("types", "share/apps/kdbg/types");
 
-    DebuggerMainWnd* debugger = new DebuggerMainWnd("kdbg_main");
+    DebuggerMainWnd* debugger = new DebuggerMainWnd;
+    debugger->setObjectName("mainwindow");
 
     /* type libraries */
     TypeTable::initTypeLibraries();

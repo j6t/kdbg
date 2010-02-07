@@ -12,7 +12,8 @@
 #include <QContextMenuEvent>
 #include <QCloseEvent>
 #include <kglobal.h>
-#include <kmainwindow.h>
+#include <kxmlguiwindow.h>
+#include <kxmlguifactory.h>
 #include <klocale.h>			/* i18n */
 #include "mydebug.h"
 
@@ -44,7 +45,7 @@ void WinStack::contextMenuEvent(QContextMenuEvent* e)
     do
 	top = top->parentWidget();
     while (!top->isTopLevel());
-    KMainWindow* mw = static_cast<KMainWindow*>(top);
+    KXmlGuiWindow* mw = static_cast<KXmlGuiWindow*>(top);
     Q3PopupMenu* m =
 	static_cast<Q3PopupMenu*>(mw->factory()->container("popup_files_empty", mw));
     m->exec(e->globalPos());
