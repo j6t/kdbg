@@ -19,8 +19,9 @@
 #include <kfiledialog.h>
 #include <k3process.h>
 #include <kshortcutsdialog.h>
-#include <kanimwidget.h>
+#include <kanimatedbutton.h>
 #include <kwin.h>
+#include <ktoolbar.h>
 #include <kxmlguifactory.h>
 #include <q3listbox.h>
 #include <qfile.h>
@@ -67,6 +68,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	m_tabWidth(0),
 	m_sourceFilter(defaultSourceFilter),
 	m_headerFilter(defaultHeaderFilter),
+	m_animation(0),
 	m_statusActive(i18n("active"))
 {
     m_filesWindow = new WinStack(this);
@@ -351,9 +353,10 @@ void DebuggerMainWnd::initKAction()
 void DebuggerMainWnd::initToolbar()
 {
     KToolBar* toolbar = toolBar("mainToolBar");
-    toolbar->insertAnimatedWidget(ID_STATUS_BUSY,
-	m_breakAction, SLOT(activate()), "pulse", -1);
-    toolbar->alignItemRight(ID_STATUS_BUSY, true);
+    m_animation = new KAnimatedButton(toolbar);
+    toolbar->addWidget(m_animation);
+    m_animation->setIcons("pulse");
+    connect(m_animation, SIGNAL(triggered(QAction*)), m_debugger, SLOT(programBreak()));
     m_animRunning = false;
 
     KStatusBar* statusbar = statusBar();
@@ -521,15 +524,14 @@ void DebuggerMainWnd::updateUI()
     m_editValueAction->setEnabled(m_debugger->canSingleStep());
 
     // animation
-    KAnimWidget* w = toolBar("mainToolBar")->animatedWidget(ID_STATUS_BUSY);
     if (m_debugger->isIdle()) {
 	if (m_animRunning) {
-	    w->stop();
+	    m_animation->stop();
 	    m_animRunning = false;
 	}
     } else {
 	if (!m_animRunning) {
-	    w->start();
+	    m_animation->start();
 	    m_animRunning = true;
 	}
     }
