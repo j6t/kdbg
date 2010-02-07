@@ -22,6 +22,7 @@
 #include <kanimatedbutton.h>
 #include <kwin.h>
 #include <ktoolbar.h>
+#include <kurl.h>
 #include <kxmlguifactory.h>
 #include <q3listbox.h>
 #include <qfile.h>
@@ -631,7 +632,7 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
 
     if (success)
     {
-	m_recentExecAction->addURL(KURL(fi.absFilePath()));
+	m_recentExecAction->addUrl(KUrl(fi.absFilePath()));
 
 	// keep the directory
 	m_lastDirectory = fi.dirPath(true);
@@ -643,7 +644,7 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
     }
     else
     {
-	m_recentExecAction->removeURL(KURL(fi.absFilePath()));
+	m_recentExecAction->removeUrl(KUrl(fi.absFilePath()));
     }
 
     return success;
@@ -1082,7 +1083,7 @@ void DebuggerMainWnd::slotBackTimer()
     lower();
 }
 
-void DebuggerMainWnd::slotRecentExec(const KURL& url)
+void DebuggerMainWnd::slotRecentExec(const KUrl& url)
 {
     QString exe = url.path();
     debugProgram(exe, "");
