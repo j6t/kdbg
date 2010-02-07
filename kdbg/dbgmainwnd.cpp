@@ -29,6 +29,7 @@
 #include <q3textstream.h>
 #include <Q3ValueList>
 #include <Q3PopupMenu>
+#include <QDockWidget>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "commandids.h"
@@ -204,8 +205,8 @@ DebuggerMainWnd::~DebuggerMainWnd()
 
 QDockWidget* DebuggerMainWnd::createDockWidget(const char* name, const QString& title)
 {
-    QDockWidget* w = new QDockWidget(this, name);
-    w->setCaption(title);
+    QDockWidget* w = new QDockWidget(title, this);
+    w->setObjectName(name);
     // view menu changes when docking state changes
     connect(w, SIGNAL(visibilityChanged(bool)), SLOT(updateUI()));
     return w;
@@ -415,11 +416,7 @@ void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
 {
     KConfigGroup g = config->group(WindowGroup);
 
-    QString layout;
-    {
-	Q3TextStream stream(&layout, QIODevice::WriteOnly);
-	stream << *this;
-    }
+    QByteArray layout = saveState();
     g.writeEntry("Layout", layout);
 
     m_recentExecAction->saveEntries(config->group(RecentExecutables));
@@ -448,10 +445,8 @@ void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
     KConfigGroup g = config->group(WindowGroup);
 
     QByteArray layout = g.readEntry("Layout", QByteArray());
-    {
-	Q3TextStream stream(&layout, QIODevice::ReadOnly);
-	stream >> *this;
-    }
+    if (!restoreState(layout))
+	makeDefaultLayout();
 
     m_recentExecAction->loadEntries(config->group(RecentExecutables));
 
@@ -579,7 +574,7 @@ void DebuggerMainWnd::slotNewFileLoaded()
 QDockWidget* DebuggerMainWnd::dockParent(QWidget* w)
 {
     while ((w = w->parentWidget()) != 0) {
-	if (w->isA("QDockWindow"))
+	if (w->isA("QDockWidget"))
 	    return static_cast<QDockWidget*>(w);
     }
     return 0;
@@ -589,6 +584,31 @@ bool DebuggerMainWnd::isDockVisible(QWidget* w)
 {
     QDockWidget* d = dockParent(w);
     return d != 0 && d->isVisible();
+}
+
+void DebuggerMainWnd::makeDefaultLayout()
+{
+    // +---------------+---------+
+    // | Source        | Locals  |
+    // |               |         |
+    // |---------------+---------+
+    // |Stack, Brkpts, | Watches |
+    // |Output,...     |         |
+    // +---------------+---------+
+
+    addDockWidget(Qt::RightDockWidgetArea, dockParent(m_localVariables));
+    addDockWidget(Qt::BottomDockWidgetArea, dockParent(m_memoryWindow));
+    splitDockWidget(dockParent(m_memoryWindow), dockParent(m_threads), Qt::Horizontal);
+    tabifyDockWidget(dockParent(m_memoryWindow), dockParent(m_registers));
+    tabifyDockWidget(dockParent(m_registers), dockParent(m_bpTable));
+    tabifyDockWidget(dockParent(m_bpTable), dockParent(m_ttyWindow));
+    tabifyDockWidget(dockParent(m_ttyWindow), dockParent(m_btWindow));
+    tabifyDockWidget(dockParent(m_threads), dockParent(m_watches));
+    dockParent(m_localVariables)->setVisible(true);
+    dockParent(m_ttyWindow)->setVisible(true);
+    dockParent(m_watches)->setVisible(true);
+    dockParent(m_btWindow)->setVisible(true);
+    dockParent(m_bpTable)->setVisible(true);
 }
 
 bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)

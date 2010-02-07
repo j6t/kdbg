@@ -8,12 +8,11 @@
 #define DBGMAINWND_H
 
 #include <qtimer.h>
-#include <q3dockwindow.h>
 #include <Q3CString>
 #include <kxmlguiwindow.h>
 #include "regwnd.h"
 
-typedef Q3DockWindow QDockWidget;
+class QDockWidget;
 class K3Process;
 class KRecentFilesAction;
 class WinStack;
@@ -156,6 +155,7 @@ protected:
     QDockWidget* createDockWidget(const char* name, const QString& title);
     QDockWidget* dockParent(QWidget* w);
     bool isDockVisible(QWidget* w);
+    void makeDefaultLayout();
 
     QString makeSourceFilter();
 
