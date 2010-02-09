@@ -17,6 +17,7 @@
 #include <Q3VBoxLayout>
 #include <Q3CString>
 #include <Q3HBoxLayout>
+#include <kdialog.h>
 
 
 class K3Process;
@@ -26,22 +27,23 @@ class K3Process;
  * system features a suitable ps command.
  */
 
-class ProcAttachPS : public ProcAttachBase
+class ProcAttachPS : public KDialog, private Ui::ProcAttachBase
 {
     Q_OBJECT
 public:
     ProcAttachPS(QWidget* parent);
     ~ProcAttachPS();
 
+    void setFilterText(const QString& text) { filterEdit->setText(text); }
     QString text() const;
 
 protected:
     void runPS();
-    virtual void refresh();
-    virtual void filterEdited(const QString& text);
-    virtual void selectedChanged();
 
 protected slots:
+    void on_buttonRefresh_clicked();
+    void on_filterEdit_textChanged(const QString& text);
+    void on_processList_selectionChanged();
     void slotTextReceived(K3Process* proc, char* buffer, int buflen);
     void slotPSDone();
 

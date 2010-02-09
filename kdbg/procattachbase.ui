@@ -200,6 +200,7 @@
  </customwidgets>
  <tabstops>
   <tabstop>filterEdit</tabstop>
+  <tabstop>filterClear</tabstop>
   <tabstop>processList</tabstop>
   <tabstop>buttonRefresh</tabstop>
   <tabstop>buttonOk</tabstop>
@@ -214,8 +215,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>450</x>
+     <y>405</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -230,40 +231,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonRefresh</sender>
-   <signal>clicked()</signal>
-   <receiver>ProcAttachBase</receiver>
-   <slot>refresh()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>filterEdit</sender>
-   <signal>textChanged(QString)</signal>
-   <receiver>ProcAttachBase</receiver>
-   <slot>filterEdited(QString)</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>503</x>
+     <y>405</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -278,28 +247,12 @@
    <slot>clear()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>548</x>
+     <y>26</y>
     </hint>
     <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>processList</sender>
-   <signal>selectionChanged()</signal>
-   <receiver>ProcAttachBase</receiver>
-   <slot>selectedChanged()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>97</x>
+     <y>26</y>
     </hint>
    </hints>
   </connection>

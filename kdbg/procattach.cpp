@@ -18,10 +18,12 @@
 
 
 ProcAttachPS::ProcAttachPS(QWidget* parent) :
-	ProcAttachBase(parent),
+	KDialog(parent),
 	m_pidCol(-1),
 	m_ppidCol(-1)
 {
+    setupUi(this);
+
     m_ps = new K3Process;
     connect(m_ps, SIGNAL(receivedStdout(K3Process*, char*, int)),
 	    this, SLOT(slotTextReceived(K3Process*, char*, int)));
@@ -194,7 +196,7 @@ void ProcAttachPS::pushLine()
 
 void ProcAttachPS::slotPSDone()
 {
-    filterEdited(filterEdit->text());
+    on_filterEdit_textChanged(filterEdit->text());
 }
 
 QString ProcAttachPS::text() const
@@ -207,7 +209,7 @@ QString ProcAttachPS::text() const
     return item->text(1);
 }
 
-void ProcAttachPS::refresh()
+void ProcAttachPS::on_buttonRefresh_clicked()
 {
     if (!m_ps->isRunning())
     {
@@ -217,7 +219,7 @@ void ProcAttachPS::refresh()
     }
 }
 
-void ProcAttachPS::filterEdited(const QString& text)
+void ProcAttachPS::on_filterEdit_textChanged(const QString& text)
 {
     Q3ListViewItem* i = processList->firstChild();
     if (i) {
@@ -251,7 +253,7 @@ bool ProcAttachPS::setVisibility(Q3ListViewItem* i, const QString& text)
     return visible;
 }
 
-void ProcAttachPS::selectedChanged()
+void ProcAttachPS::on_processList_selectionChanged()
 {
     buttonOk->setEnabled(processList->selectedItem() != 0);
 }

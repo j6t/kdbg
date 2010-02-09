@@ -1167,7 +1167,7 @@ static QString myGetFileName(QString caption,
 	 		     QWidget* parent)
 {
     QString filename;
-    KFileDialog dlg(dir, filter, parent, "filedialog", true);
+    KFileDialog dlg(dir, filter, parent);
 
     dlg.setCaption(caption);
 
@@ -1260,7 +1260,7 @@ void DebuggerMainWnd::slotExecAttach()
     ProcAttachPS dlg(this);
     // seed filter with executable name
     QFileInfo fi = m_debugger->executable();
-    dlg.filterEdit->setText(fi.fileName());
+    dlg.setFilterText(fi.fileName());
 #else
     ProcAttach dlg(this);
     dlg.setText(m_debugger->attachedPid());

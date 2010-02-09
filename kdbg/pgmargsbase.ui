@@ -415,8 +415,8 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>409</x>
+     <y>392</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>
@@ -431,104 +431,8 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>insertFile</sender>
-   <signal>clicked()</signal>
-   <receiver>PgmArgsBase</receiver>
-   <slot>browseArgFile()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>wdBrowse</sender>
-   <signal>clicked()</signal>
-   <receiver>PgmArgsBase</receiver>
-   <slot>browseWd()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonModify</sender>
-   <signal>clicked()</signal>
-   <receiver>PgmArgsBase</receiver>
-   <slot>modifyVar()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>buttonDelete</sender>
-   <signal>clicked()</signal>
-   <receiver>PgmArgsBase</receiver>
-   <slot>deleteVar()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>envList</sender>
-   <signal>selectionChanged()</signal>
-   <receiver>PgmArgsBase</receiver>
-   <slot>envListCurrentChanged()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-    <hint type="destinationlabel" >
-     <x>20</x>
-     <y>20</y>
-    </hint>
-   </hints>
-  </connection>
-  <connection>
-   <sender>insertDir</sender>
-   <signal>clicked()</signal>
-   <receiver>PgmArgsBase</receiver>
-   <slot>browseArgDir()</slot>
-   <hints>
-    <hint type="sourcelabel" >
-     <x>20</x>
-     <y>20</y>
+     <x>464</x>
+     <y>392</y>
     </hint>
     <hint type="destinationlabel" >
      <x>20</x>

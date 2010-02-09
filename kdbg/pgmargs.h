@@ -10,11 +10,12 @@
 #include "ui_pgmargsbase.h"
 #include <qlineedit.h>
 #include <q3dict.h>
+#include <kdialog.h>
 #include "envvar.h"
 
 class QStringList;
 
-class PgmArgs : public PgmArgsBase
+class PgmArgs : public KDialog, private Ui::PgmArgsBase
 {
     Q_OBJECT
 public:
@@ -36,15 +37,15 @@ protected:
     void initEnvList();
     void parseEnvInput(QString& name, QString& value);
     void modifyVar(bool resurrect);
+    virtual void accept();
 
 protected slots:
-    void modifyVar();
-    void deleteVar();
-    void envListCurrentChanged();
-    void accept();
-    void browseWd();
-    void browseArgFile();
-    void browseArgDir();
+    void on_buttonModify_clicked();
+    void on_buttonDelete_clicked();
+    void on_envList_selectionChanged();
+    void on_wdBrowse_clicked();
+    void on_insertFile_clicked();
+    void on_insertDir_clicked();
 };
 
 #endif // PgmArgs_included

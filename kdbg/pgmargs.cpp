@@ -16,9 +16,11 @@
 
 PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, Q3Dict<EnvVar>& envVars,
 		 const QStringList& allOptions) :
-	PgmArgsBase(parent, "pgmargs", true),
+	KDialog(parent),
 	m_envVars(envVars)
 {
+    setupUi(this);
+
     m_envVars.setAutoDelete(false);
 
     {
@@ -74,7 +76,7 @@ QStringList PgmArgs::options() const
 }
 
 // this is a slot
-void PgmArgs::modifyVar()
+void PgmArgs::on_buttonModify_clicked()
 {
     modifyVar(true);	// re-add deleted entries
 }
@@ -118,7 +120,7 @@ void PgmArgs::modifyVar(bool resurrect)
 }
 
 // delete the selected item
-void PgmArgs::deleteVar()
+void PgmArgs::on_buttonDelete_clicked()
 {
     Q3ListViewItem* item = envList->selectedItem();
     if (item == 0)
@@ -174,7 +176,7 @@ void PgmArgs::initEnvList()
     buttonDelete->setEnabled(envList->selectedItem() != 0);
 }
 
-void PgmArgs::envListCurrentChanged()
+void PgmArgs::on_envList_selectionChanged()
 {
     Q3ListViewItem* item = envList->selectedItem();
     buttonDelete->setEnabled(item != 0);
@@ -200,7 +202,7 @@ void PgmArgs::accept()
     QDialog::accept();
 }
 
-void PgmArgs::browseWd()
+void PgmArgs::on_wdBrowse_clicked()
 {
     // browse for the working directory
     QString newDir = KFileDialog::getExistingDirectory(wd(), this);
@@ -209,7 +211,7 @@ void PgmArgs::browseWd()
     }
 }
 
-void PgmArgs::browseArgFile()
+void PgmArgs::on_insertFile_clicked()
 {
     QString caption = i18n("Select a file name to insert as program argument");
 
@@ -223,7 +225,7 @@ void PgmArgs::browseArgFile()
     }
 }
 
-void PgmArgs::browseArgDir()
+void PgmArgs::on_insertDir_clicked()
 {
     QString caption = i18n("Select a directory to insert as program argument");
 
