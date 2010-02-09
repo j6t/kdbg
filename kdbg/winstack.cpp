@@ -11,6 +11,7 @@
 #include <q3popupmenu.h>
 #include <QContextMenuEvent>
 #include <QCloseEvent>
+#include <QToolTip>
 #include <kglobal.h>
 #include <kxmlguiwindow.h>
 #include <kxmlguifactory.h>
@@ -22,8 +23,6 @@
 WinStack::WinStack(QWidget* parent) :
 	KTabWidget(parent),
 	m_pcLine(-1),
-	m_valueTip(this),
-	m_tipLocation(1,1,10,10),
 	m_tabWidth(0)
 {
     connect(&m_findDlg.m_buttonForward,
@@ -243,31 +242,39 @@ void WinStack::slotFindBackward()
 			     SourceWindow::findBackward);
 }
 
-void WinStack::maybeTip(const QPoint& p)
+bool WinStack::event(QEvent* evt)
 {
+    if (evt->type() != QEvent::ToolTip)
+	return KTabWidget::event(evt);
+
     SourceWindow* w = activeWindow();
     if (w == 0)
-	return;
+	return true;
 
+    QPoint p = static_cast<QHelpEvent*>(evt)->pos();
     // get the word at the point
     QString word;
     QRect r;
-    if (!w->wordAtPoint(w->mapFrom(this, p), word, r))
-	return;
+    if (!w->wordAtPoint(w->mapFrom(this, p), word, r)) {
+	QToolTip::hideText();
+	return true;
+    }
 
     // must be valid
     assert(!word.isEmpty());
     assert(r.isValid());
 
     // remember the location
-    m_tipLocation = QRect(w->mapTo(this, r.topLeft()), r.size());
+    m_tipLocation = mapToGlobal(p);
+    m_tipRegion = QRect(w->mapTo(this, r.topLeft()), r.size());
 
     emit initiateValuePopup(word);
+    return true;
 }
 
 void WinStack::slotShowValueTip(const QString& tipText)
 {
-    m_valueTip.tip(m_tipLocation, tipText);
+    QToolTip::showText(m_tipLocation, tipText, this, m_tipRegion);
 }
 
 void WinStack::slotDisassembled(const QString& fileName, int lineNo,
@@ -362,18 +369,6 @@ void WinStack::slotClose()
 
     removePage(w);
     delete w;
-}
-
-
-ValueTip::ValueTip(WinStack* parent) :
-	QToolTip(parent)
-{
-}
-
-void ValueTip::maybeTip(const QPoint& p)
-{
-    WinStack* w = static_cast<WinStack*>(parentWidget());
-    w->maybeTip(p);
 }
 
 
