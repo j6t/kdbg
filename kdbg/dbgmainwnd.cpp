@@ -20,7 +20,7 @@
 #include <k3process.h>
 #include <kshortcutsdialog.h>
 #include <kanimatedbutton.h>
-#include <kwin.h>
+#include <kwindowsystem.h>
 #include <ktoolbar.h>
 #include <kurl.h>
 #include <kxmlguifactory.h>
@@ -1065,8 +1065,8 @@ void DebuggerMainWnd::slotProgramStopped()
     // when the program stopped, move the window to the foreground
     if (m_popForeground) {
 	// unfortunately, this requires quite some force to work :-(
-	KWin::raiseWindow(winId());
-	KWin::forceActiveWindow(winId());
+	KWindowSystem::raiseWindow(winId());
+	KWindowSystem::forceActiveWindow(winId());
     }
     m_backTimer.stop();
 }
