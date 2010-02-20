@@ -292,7 +292,7 @@ QStringList ProgramTypeTable::splitTemplateArgs(const QString& t)
     // look for the next comma or the closing '>', skipping nested '<>'
     int nest = 0;
     int start = i;
-    for (; unsigned(i) < t.length() && nest >= 0; i++)
+    for (; i < t.length() && nest >= 0; i++)
     {
 	if (t[i] == '<')
 	    nest++;
@@ -306,7 +306,7 @@ QStringList ProgramTypeTable::splitTemplateArgs(const QString& t)
 	}
     }
     // accept the template only if the closing '>' is the last character
-    if (nest < 0 && unsigned(i) == t.length()) {
+    if (nest < 0 && i == t.length()) {
 	QString arg = t.mid(start, i-start-1);
 	result.push_back(arg);
     } else {

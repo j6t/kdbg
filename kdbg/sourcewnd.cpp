@@ -886,7 +886,7 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
     QFont identFont = textEdit()->currentFont();
     identFont.setBold(!identFont.bold());
 
-    unsigned start = 0;
+    int start = 0;
     while (start < text.length())
     {
 	int end;

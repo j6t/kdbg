@@ -202,7 +202,7 @@ static QString toBinary(QString hex)
     };
     QString result;
     
-    for (unsigned i = 2; i < hex.length(); i++) {
+    for (int i = 2; i < hex.length(); i++) {
 	int idx = hexCharToDigit(hex[i].latin1());
 	if (idx < 0) {
 	    // not a hex digit; no conversion
@@ -252,7 +252,7 @@ static QString toDecimal(QString hex)
      * We convert only numbers that are small enough for this computer's
      * size of long integers.
      */
-    if (hex.length() > sizeof(unsigned long)*2+2)	/*  count in leading "0x" */
+    if (hex.length() > int(sizeof(unsigned long)*2+2))	/*  count in leading "0x" */
 	return hex;
 
     const char* start = hex.latin1();
@@ -290,7 +290,7 @@ static char* toRaw(const QString& hex, uint& length)
     } else { // big endian
 	uint j=0;
 	if (hex.length()<=2) return 0;
-	for (uint i=2; i<hex.length(); ) {
+	for (int i=2; i<hex.length(); ) {
 	    if (j%2==0) data[j/2]=hexCharToDigit(hex[i].latin1())<<4;
 	    else data[j/2]|=hexCharToDigit(hex[i].latin1());
 	    i++;j++;
@@ -321,7 +321,7 @@ static long double extractNumber(const QString& hex)
 static QString toFloat(const QString& hex, char p)
 {
     uint bits;
-    uint prec=6;
+    int prec=6;
     if (hex.length()<=10) { bits=32; prec=6; }
     else if (hex.length()<=18) { bits=64; prec=17; }
     else { bits=80; prec=20; }
@@ -352,7 +352,7 @@ static QString convertSingle(const QString& raw, const RegisterDisplay mode)
 QString convertRaw(const RegisterInfo reg, RegisterDisplay mode)
 {
     QString cooked;
-    uint totalNibles=0, nibles=mode.bits()>>2;
+    int totalNibles=0, nibles=mode.bits()>>2;
     if (RegisterDisplay::nada!=mode.presentationFlag() &&
         reg.rawValue.length() > 2 && reg.rawValue[0] == '0' && reg.rawValue[1] == 'x')
     {

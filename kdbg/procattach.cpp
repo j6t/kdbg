@@ -127,7 +127,7 @@ void ProcAttachPS::pushLine()
 	// we assume that the last column is the command
 	m_line.pop_back();
 
-	for (uint i = 0; i < m_line.size(); i++) {
+	for (int i = 0; i < m_line.size(); i++) {
 	    // we don't allocate the PID and PPID columns,
 	    // but we need to know where in the ps output they are
 	    if (m_line[i] == "PID") {
@@ -161,7 +161,7 @@ void ProcAttachPS::pushLine()
 	item->setOpen(true);
 	m_line.pop_back();
 	int k = 3;
-	for (uint i = 0; i < m_line.size(); i++)
+	for (int i = 0; i < m_line.size(); i++)
 	{
 	    // display the pid and ppid columns' contents in columns 1 and 2
 	    if (int(i) == m_pidCol)

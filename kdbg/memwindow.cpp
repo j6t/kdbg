@@ -202,7 +202,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 
     //add the needed columns
     QStringList sl = QStringList::split( "\t", md->dump );
-    for (uint i = 0; i < sl.count(); i++)
+    for (int i = 0; i < sl.count(); i++)
 	m_memory.addColumn("", -1);
 
     QMap<QString,QString> tmpMap;
@@ -223,7 +223,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	if( pos != m_old_memory.end() )
 	    tmplist = QStringList::split( "\t", pos.data() );
 
-	for (uint i = 0; i < sl.count(); i++)
+	for (int i = 0; i < sl.count(); i++)
 	{
             after->setText( i+1, sl[i] );
 
