@@ -129,7 +129,7 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 	// tab width
 	connect(this, SIGNAL(setTabWidth(int)), fw, SLOT(setTabWidth(int)));
 	fw->setTabWidth(m_tabWidth);
-	fw->setFocusPolicy(QWidget::WheelFocus);
+	fw->setFocusPolicy(Qt::WheelFocus);
 
 	// set PC if there is one
 	emit newFileLoaded();

@@ -808,7 +808,7 @@ void ValueEdit::focusOutEvent(QFocusEvent* ev)
 {
     TRACE("ValueEdit::focusOutEvent");
     QFocusEvent* focusEv = static_cast<QFocusEvent*>(ev);
-    if (focusEv->reason() == QFocusEvent::ActiveWindow)
+    if (focusEv->reason() == Qt::ActiveWindowFocusReason)
     {
 	// Switching to a different window should terminate the edit,
 	// because if the window with this variable display is floating
@@ -818,7 +818,7 @@ void ValueEdit::focusOutEvent(QFocusEvent* ev)
 	terminate(false);
     }
     // Don't let a RMB close the editor
-    else if (focusEv->reason() != QFocusEvent::Popup)
+    else if (focusEv->reason() != Qt::PopupFocusReason)
     {
 	terminate(true);
     }
