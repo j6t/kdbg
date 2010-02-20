@@ -15,12 +15,12 @@
 #ifdef NDEBUG
 # define ASSERT(x) ((void)0)
 #else
-# define ASSERT(x) ((x) ? void(0) : void(kdDebug() << \
+# define ASSERT(x) ((x) ? void(0) : void(kDebug() << \
 					(QString("assertion failed: ") + #x).ascii() << "\n"))
 #endif
 
 #ifdef WANT_TRACE_OUTPUT
-# define TRACE(x) (kdDebug() << (const char*)(x) << "\n")
+# define TRACE(x) (kDebug() << (x))
 #else
 # define TRACE(x) ((void)0)
 #endif
