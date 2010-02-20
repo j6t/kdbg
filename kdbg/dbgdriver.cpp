@@ -202,8 +202,8 @@ void DebuggerDriver::writeCommand()
     m_activeCmd = cmd;
     TRACE("in writeCommand: " + cmd->m_cmdString);
 
-    const char* str = cmd->m_cmdString;
-    writeStdin(const_cast<char*>(str), cmd->m_cmdString.length());
+    QByteArray str = cmd->m_cmdString.toLocal8Bit();
+    writeStdin(str.data(), str.length());
 
     // write also to log file
     if (m_logFile.isOpen()) {
