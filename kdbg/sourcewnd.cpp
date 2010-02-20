@@ -878,7 +878,7 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
     // check for preprocessor line
     if (state == 0 && text.stripWhiteSpace().startsWith("#"))
     {
-	setFormat(0, text.length(), QColor("dark green"));
+	setFormat(0, text.length(), QColor("darkgreen"));
 	return 0;
     }
 
@@ -894,7 +894,7 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
 	case hlCommentLine:
 	    end = text.length();
 	    state = 0;
-	    setFormat(start, end-start, QColor("gray50"));
+	    setFormat(start, end-start, QColor("gray"));
 	    break;
 	case hlCommentBlock:
 	    end = text.find("*/", start);
@@ -902,7 +902,7 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
 		end += 2, state = 0;
 	    else
 		end = text.length();
-	    setFormat(start, end-start, QColor("gray50"));
+	    setFormat(start, end-start, QColor("gray"));
 	    break;
 	case hlString:
 	    for (end = start+1; end < int(text.length()); end++) {
@@ -915,7 +915,7 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
 		}
 	    }
 	    state = 0;
-	    setFormat(start, end-start, QColor("dark red"));
+	    setFormat(start, end-start, QColor("darkred"));
 	    break;
 	case hlIdent:
 	    for (end = start+1; end < int(text.length()); end++) {
