@@ -14,7 +14,7 @@
 #include <qfileinfo.h>
 #include <q3listbox.h>
 #include <qstringlist.h>
-#include <kapplication.h>
+#include <QApplication>
 #include <kconfig.h>
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
@@ -623,13 +623,13 @@ void KDebugger::stopDriver()
      * this timeout be reached, the only reasonable thing one could do then
      * is exiting kdbg.
      */
-    kapp->processEvents(1000);		/* ideally, this will already shut it down */
+    QApplication::processEvents(QEventLoop::AllEvents, 1000);
     int maxTime = 20;			/* about 20 seconds */
     while (m_haveExecutable && maxTime > 0) {
 	// give gdb time to die (and send a SIGCLD)
 	::sleep(1);
 	--maxTime;
-	kapp->processEvents(1000);
+	QApplication::processEvents(QEventLoop::AllEvents, 1000);
     }
 }
 
