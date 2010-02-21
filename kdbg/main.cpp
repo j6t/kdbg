@@ -52,7 +52,7 @@ int main(int argc, char** argv)
 
     KApplication app;
 
-    KGlobal::dirs()->addResourceType("types", "share/apps/kdbg/types");
+    KGlobal::dirs()->addResourceType("types", "data", "kdbg/types");
 
     DebuggerMainWnd* debugger = new DebuggerMainWnd;
     debugger->setObjectName("mainwindow");

@@ -5,7 +5,7 @@
  */
 
 #include <qdir.h>
-#include <q3ptrlist.h>
+#include <q3valuelist.h>
 #include <kglobal.h>
 #include <kstandarddirs.h>
 #include <kconfig.h>
@@ -39,14 +39,14 @@ void TypeTable::loadTypeTables()
     typeTablesInited = true;
 
     const QStringList files = KGlobal::dirs()->findAllResources("types", "*.kdbgtt",
-			false, true);
+			KStandardDirs::NoDuplicates);
     
     if (files.isEmpty()) {
 	TRACE("no type tables found");
 	return;
     }
 
-    for (Q3ValueListConstIterator<QString> p = files.begin(); p != files.end(); ++p) {
+    for (QStringList::ConstIterator p = files.begin(); p != files.end(); ++p) {
 	typeTables.push_back(TypeTable());
 	typeTables.back().loadFromFile(*p);
     }
