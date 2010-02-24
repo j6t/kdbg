@@ -50,7 +50,7 @@ class TTYWindow : public QTextEdit
 {
     Q_OBJECT
 public:
-    TTYWindow(QWidget* parent, const char* name);
+    TTYWindow(QWidget* parent);
     ~TTYWindow();
 
     QString activate();

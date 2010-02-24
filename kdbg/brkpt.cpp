@@ -31,8 +31,8 @@ public:
 };
 
 
-BreakpointTable::BreakpointTable(QWidget* parent, const char* name) :
-	QWidget(parent, name),
+BreakpointTable::BreakpointTable(QWidget* parent) :
+	QWidget(parent),
 	m_debugger(0),
 	m_bpEdit(this, "bpedit"),
 	m_list(this, "bptable"),

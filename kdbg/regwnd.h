@@ -21,7 +21,7 @@ class RegisterView : public QListView
 {
     Q_OBJECT
 public:
-    RegisterView(QWidget* parent, const char *name = 0L);
+    RegisterView(QWidget* parent);
     ~RegisterView();
 
 protected slots:

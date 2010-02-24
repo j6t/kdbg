@@ -21,7 +21,7 @@ class BreakpointTable : public QWidget
 {
     Q_OBJECT
 public:
-    BreakpointTable(QWidget* parent, const char* name);
+    BreakpointTable(QWidget* parent);
     ~BreakpointTable();
     void setDebugger(KDebugger* deb) { m_debugger = deb; }
 

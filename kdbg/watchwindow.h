@@ -16,7 +16,7 @@ class WatchWindow : public QWidget
 {
     Q_OBJECT
 public:
-    WatchWindow(QWidget* parent, const char* name);
+    WatchWindow(QWidget* parent);
     ~WatchWindow();
     ExprWnd* watchVariables() { return &m_watchVariables; }
     QString watchText() const { return m_watchEdit.text(); }

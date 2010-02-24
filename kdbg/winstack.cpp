@@ -16,8 +16,8 @@
 
 
 
-WinStack::WinStack(QWidget* parent, const char* name) :
-	KTabWidget(parent, name),
+WinStack::WinStack(QWidget* parent) :
+	KTabWidget(parent),
 	m_pcLine(-1),
 	m_valueTip(this),
 	m_tipLocation(1,1,10,10),
@@ -100,7 +100,7 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
     }
     if (fw == 0) {
 	// not found, load it
-	fw = new SourceWindow(pathName, this, "fileWindow");
+	fw = new SourceWindow(pathName, this);
 
 	// slurp the file in
 	if (!fw->loadFile()) {

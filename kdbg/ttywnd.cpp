@@ -130,8 +130,8 @@ void STTY::outReceived(int f)
 
 
 
-TTYWindow::TTYWindow(QWidget* parent, const char* name) :
-	QTextEdit(parent, name),
+TTYWindow::TTYWindow(QWidget* parent) :
+	QTextEdit(parent),
 	m_tty(0),
 	m_hPos(0)
 {

@@ -21,7 +21,7 @@ class SourceWindow : public QTextEdit
 {
     Q_OBJECT
 public:
-    SourceWindow(const QString& fileName, QWidget* parent, const char* name);
+    SourceWindow(const QString& fileName, QWidget* parent);
     ~SourceWindow();
     
     bool loadFile();

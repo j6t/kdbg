@@ -64,7 +64,7 @@ class WinStack : public KTabWidget
 {
     Q_OBJECT
 public:
-    WinStack(QWidget* parent, const char* name);
+    WinStack(QWidget* parent);
     virtual ~WinStack();
 
     /**

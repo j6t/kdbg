@@ -63,32 +63,32 @@ DebuggerMainWnd::DebuggerMainWnd(const char* name) :
 	m_headerFilter(defaultHeaderFilter),
 	m_statusActive(i18n("active"))
 {
-    m_filesWindow = new WinStack(this, "files");
+    m_filesWindow = new WinStack(this);
     setCentralWidget(m_filesWindow);
 
     QDockWidget* dw1 = createDockWidget("Stack", i18n("Stack"));
-    m_btWindow = new QListBox(dw1, "backtrace");
+    m_btWindow = new QListBox(dw1);
     dw1->setWidget(m_btWindow);
     QDockWidget* dw2 = createDockWidget("Locals", i18n("Locals"));
-    m_localVariables = new ExprWnd(dw2, i18n("Variable"), "locals");
+    m_localVariables = new ExprWnd(dw2, i18n("Variable"));
     dw2->setWidget(m_localVariables);
     QDockWidget* dw3 = createDockWidget("Watches", i18n("Watches"));
-    m_watches = new WatchWindow(dw3, "watches");
+    m_watches = new WatchWindow(dw3);
     dw3->setWidget(m_watches);
     QDockWidget* dw4 = createDockWidget("Registers", i18n("Registers"));
-    m_registers = new RegisterView(dw4, "registers");
+    m_registers = new RegisterView(dw4);
     dw4->setWidget(m_registers);
     QDockWidget* dw5 = createDockWidget("Breakpoints", i18n("Breakpoints"));
-    m_bpTable = new BreakpointTable(dw5, "breakpoints");
+    m_bpTable = new BreakpointTable(dw5);
     dw5->setWidget(m_bpTable);
     QDockWidget* dw6 = createDockWidget("Output", i18n("Output"));
-    m_ttyWindow = new TTYWindow(dw6, "output");
+    m_ttyWindow = new TTYWindow(dw6);
     dw6->setWidget(m_ttyWindow);
     QDockWidget* dw7 = createDockWidget("Threads", i18n("Threads"));
-    m_threads = new ThreadList(dw7, "threads");
+    m_threads = new ThreadList(dw7);
     dw7->setWidget(m_threads);
     QDockWidget* dw8 = createDockWidget("Memory", i18n("Memory"));
-    m_memoryWindow = new MemoryWindow(dw8, "memory");
+    m_memoryWindow = new MemoryWindow(dw8);
     dw8->setWidget(m_memoryWindow);
 
     m_debugger = new KDebugger(this, m_localVariables, m_watches->watchVariables(), m_btWindow);

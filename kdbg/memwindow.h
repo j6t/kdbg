@@ -21,7 +21,7 @@ class MemoryWindow : public QWidget
 {
     Q_OBJECT
 public:
-    MemoryWindow(QWidget* parent, const char* name);
+    MemoryWindow(QWidget* parent);
     ~MemoryWindow();
 
     void setDebugger(KDebugger* deb) { m_debugger = deb; }

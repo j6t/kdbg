@@ -18,7 +18,7 @@ class ThreadList : public QListView
 {
     Q_OBJECT
 public:
-    ThreadList(QWidget* parent, const char* name);
+    ThreadList(QWidget* parent);
     ~ThreadList();
 
 public slots:

@@ -8,12 +8,12 @@
 #include <qdragobject.h>
 #include "watchwindow.h"
 
-WatchWindow::WatchWindow(QWidget* parent, const char* name) :
-	QWidget(parent, name),
-	m_watchEdit(this, "watch_edit"),
-	m_watchAdd(i18n(" Add "), this, "watch_add"),
-	m_watchDelete(i18n(" Del "), this, "watch_delete"),
-	m_watchVariables(this, i18n("Expression"), "watch_variables"),
+WatchWindow::WatchWindow(QWidget* parent) :
+	QWidget(parent),
+	m_watchEdit(this),
+	m_watchAdd(i18n(" Add "), this),
+	m_watchDelete(i18n(" Del "), this),
+	m_watchVariables(this, i18n("Expression")),
 	m_watchV(this, 0),
 	m_watchH(0)
 {

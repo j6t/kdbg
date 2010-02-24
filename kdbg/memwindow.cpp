@@ -39,8 +39,8 @@ void MemoryViewItem::paintCell(QPainter* p, const QColorGroup& cg,
 }
 
 
-MemoryWindow::MemoryWindow(QWidget* parent, const char* name) :
-	QWidget(parent, name),
+MemoryWindow::MemoryWindow(QWidget* parent) :
+	QWidget(parent),
 	m_debugger(0),
 	m_expression(true, this, "expression"),
 	m_memory(this, "memory"),

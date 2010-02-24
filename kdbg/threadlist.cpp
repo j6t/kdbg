@@ -35,8 +35,8 @@ void ThreadEntry::setFunction(const QString& func)
 }
 
 
-ThreadList::ThreadList(QWidget* parent, const char* name) :
-	QListView(parent, name)
+ThreadList::ThreadList(QWidget* parent) :
+	QListView(parent)
 {
     addColumn(i18n("Thread ID"), 150);
     addColumn(i18n("Location"));

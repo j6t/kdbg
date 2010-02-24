@@ -414,8 +414,8 @@ void RegisterViewItem::paintCell(QPainter* p, const QColorGroup& cg,
 }
 
 
-RegisterView::RegisterView(QWidget* parent, const char* name) :
-	QListView(parent, name)
+RegisterView::RegisterView(QWidget* parent) :
+	QListView(parent)
 {
     setSorting(-1);
     setFont(KGlobalSettings::fixedFont());

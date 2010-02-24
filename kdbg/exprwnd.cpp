@@ -303,8 +303,8 @@ int ExprValue::childCount() const
 
 
 
-ExprWnd::ExprWnd(QWidget* parent, const QString& colHeader, const char* name) :
-	QListView(parent, name),
+ExprWnd::ExprWnd(QWidget* parent, const QString& colHeader) :
+	QListView(parent),
 	m_edit(0)
 {
     addColumn(colHeader);

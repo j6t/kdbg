@@ -21,8 +21,8 @@
 #include "mydebug.h"
 
 
-SourceWindow::SourceWindow(const QString& fileName, QWidget* parent, const char* name) :
-	QTextEdit(parent, name),
+SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
+	QTextEdit(parent),
 	m_fileName(fileName),
 	m_curRow(-1),
 	m_widthItems(16),
