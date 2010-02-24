@@ -60,7 +60,9 @@ public:
     bool isWcharT() const;
 
     QString getText() const { return text(0); }
+    using Q3ListViewItem::setText;
     void setText(const QString& t) { Q3ListViewItem::setText(0, t); }
+    using Q3ListViewItem::setPixmap;
     void setPixmap(const QPixmap& p) { Q3ListViewItem::setPixmap(0, p); }
     QString value() const { return m_baseValue; }
     VarTree* firstChild() const { return static_cast<VarTree*>(Q3ListViewItem::firstChild()); }

@@ -225,11 +225,11 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 
 	for (uint i = 0; i < sl.count(); i++)
 	{
-            after->setText( i+1, *sl.at(i) );
+            after->setText( i+1, sl[i] );
 
 	    bool changed =
 		tmplist.count() > 0 &&
-		*sl.at(i) != *tmplist.at(i);
+		sl[i] != tmplist[i];
 	    after->setChanged(i, changed);
 	}
     }
