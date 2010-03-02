@@ -402,6 +402,7 @@ void DebuggerMainWnd::readProperties(const KConfigGroup& cg)
 }
 
 static const char WindowGroup[] = "Windows";
+static const char ToolbarGroup[] = "ToolbarSettings";
 static const char RecentExecutables[] = "RecentExecutables";
 static const char LastSession[] = "LastSession";
 static const char OutputWindowGroup[] = "OutputWindow";
@@ -422,6 +423,10 @@ void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
 
     QByteArray layout = saveState();
     g.writeEntry("Layout", layout);
+    g.writeEntry("Geometry", geometry());
+
+    KConfigGroup tg = config->group(ToolbarGroup);
+    toolBar("mainToolBar")->saveSettings(tg);
 
     m_recentExecAction->saveEntries(config->group(RecentExecutables));
 
@@ -451,6 +456,11 @@ void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
     QByteArray layout = g.readEntry("Layout", QByteArray());
     if (!restoreState(layout))
 	makeDefaultLayout();
+    QRect r = g.readEntry("Geometry", QRect());
+    if (!r.isEmpty())
+	setGeometry(r);
+
+    toolBar("mainToolBar")->applySettings(config->group(ToolbarGroup));
 
     m_recentExecAction->loadEntries(config->group(RecentExecutables));
 
