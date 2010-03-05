@@ -6,7 +6,7 @@
 
 #include "dbgdriver.h"
 #include "exprwnd.h"
-#include <qstringlist.h>
+#include <QStringList>
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
 #include <algorithm>

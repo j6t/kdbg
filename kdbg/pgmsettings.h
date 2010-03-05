@@ -7,7 +7,7 @@
 #ifndef PGMSETTINGS_H
 #define PGMSETTINGS_H
 
-#include <q3tabdialog.h>
+#include <Q3TabDialog>
 
 class Q3ButtonGroup;
 class QLineEdit;

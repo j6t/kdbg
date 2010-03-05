@@ -8,8 +8,7 @@
 #define PgmArgs_included
 
 #include "ui_pgmargsbase.h"
-#include <qlineedit.h>
-#include <q3dict.h>
+#include <Q3Dict>
 #include <kdialog.h>
 #include "envvar.h"
 

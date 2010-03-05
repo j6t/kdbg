@@ -7,12 +7,11 @@
 #include "pgmsettings.h"
 #include <klocale.h>			/* i18n */
 #include <kglobal.h>
-#include <qfileinfo.h>
-#include <qlayout.h>
-#include <qlineedit.h>
-#include <qlabel.h>
-#include <qradiobutton.h>
-#include <q3buttongroup.h>
+#include <QFileInfo>
+#include <QLineEdit>
+#include <QLabel>
+#include <QRadioButton>
+#include <Q3ButtonGroup>
 #include <Q3VBoxLayout>
 #include "mydebug.h"
 

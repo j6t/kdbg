@@ -6,7 +6,6 @@
 
 #include "prefmisc.h"
 #include <klocale.h>			/* i18n */
-#include <QLabel>
 
 PrefMisc::PrefMisc(QWidget* parent) :
 	QWidget(parent, "debugger"),

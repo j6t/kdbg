@@ -5,7 +5,6 @@
  */
 
 #include <klocale.h>			/* i18n */
-#include <qlayout.h>
 #include "prefdebugger.h"
 
 PrefDebugger::PrefDebugger(QWidget* parent) :

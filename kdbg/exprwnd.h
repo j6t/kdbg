@@ -7,12 +7,9 @@
 #ifndef EXPRWND_H
 #define EXPRWND_H
 
-#include "q3listview.h"
-#include <qlineedit.h>
-#include <qpixmap.h>
-#include <QPaintEvent>
-#include <QFocusEvent>
-#include <QKeyEvent>
+#include <Q3ListView>
+#include <QLineEdit>
+#include <QPixmap>
 #include <list>
 
 class ProgramTypeTable;

@@ -4,9 +4,9 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <qsocketnotifier.h>
-#include <q3popupmenu.h>
 #include "ttywnd.h"
+#include <QSocketNotifier>
+#include <Q3PopupMenu>
 #include <kglobalsettings.h>
 #include <klocale.h>
 

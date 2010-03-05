@@ -4,13 +4,12 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
+#include "watchwindow.h"
 #include <klocale.h>			/* i18n */
-#include <q3dragobject.h>
-#include <QEvent>
+#include <Q3DragObject>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QKeyEvent>
-#include "watchwindow.h"
 
 WatchWindow::WatchWindow(QWidget* parent) :
 	QWidget(parent),

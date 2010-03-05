@@ -7,13 +7,9 @@
 #ifndef SOURCEWND_H
 #define SOURCEWND_H
 
-#include <qpixmap.h>
-#include <q3textedit.h>
-#include <q3syntaxhighlighter.h>
-#include <QEvent>
-#include <QMouseEvent>
-#include <QContextMenuEvent>
-#include <QKeyEvent>
+#include <QPixmap>
+#include <Q3TextEdit>
+#include <Q3SyntaxHighlighter>
 #include <vector>
 #include "dbgdriver.h"
 

@@ -24,11 +24,10 @@
 #include <ktoolbar.h>
 #include <kurl.h>
 #include <kxmlguifactory.h>
-#include <q3listbox.h>
-#include <qfile.h>
-#include <qfileinfo.h>
-#include <q3tabdialog.h>
-#include <q3textstream.h>
+#include <Q3ListBox>
+#include <QFile>
+#include <QFileInfo>
+#include <Q3TabDialog>
 #include <Q3ValueList>
 #include <Q3PopupMenu>
 #include <QDockWidget>

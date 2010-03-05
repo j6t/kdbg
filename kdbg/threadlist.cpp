@@ -8,8 +8,8 @@
 #include "dbgdriver.h"
 #include <klocale.h>
 #include <kiconloader.h>
-#include <qbitmap.h>
-#include <qpainter.h>
+#include <QBitmap>
+#include <QPainter>
 
 
 class ThreadEntry : public Q3ListViewItem, public ThreadInfo

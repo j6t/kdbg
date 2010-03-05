@@ -10,10 +10,8 @@
 #include "typetable.h"
 #include "exprwnd.h"
 #include "pgmsettings.h"
-#include <qregexp.h>
-#include <qfileinfo.h>
-#include <q3listbox.h>
-#include <qstringlist.h>
+#include <QFileInfo>
+#include <Q3ListBox>
 #include <QApplication>
 #include <kconfig.h>
 #include <klocale.h>			/* i18n */

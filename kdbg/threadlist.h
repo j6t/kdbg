@@ -7,8 +7,8 @@
 #ifndef THREADLIST_H
 #define THREADLIST_H
 
-#include <q3listview.h>
-#include <qpixmap.h>
+#include <Q3ListView>
+#include <QPixmap>
 #include <list>
 
 class ThreadInfo;

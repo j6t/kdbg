@@ -7,13 +7,11 @@
 #include "exprwnd.h"
 #include "exprwnd.moc"
 #include "typetable.h"
-#include <qstringlist.h>
-#include <qpainter.h>
-#include <qscrollbar.h>
+#include <QStringList>
+#include <QPainter>
 #include <QPaintEvent>
 #include <QFocusEvent>
 #include <QKeyEvent>
-#include <kapplication.h>
 #include <kiconloader.h>		/* icons */
 #include <klocale.h>			/* i18n */
 #include "mydebug.h"

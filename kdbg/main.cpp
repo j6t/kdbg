@@ -11,8 +11,6 @@
 #include <kstandarddirs.h>
 #include <kcmdlineargs.h> 
 #include <kaboutdata.h>
-#include <kpopupmenu.h>
-#include <kmenubar.h>
 #include "dbgmainwnd.h"
 #include "typetable.h"
 #include "version.h"

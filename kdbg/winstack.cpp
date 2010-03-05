@@ -6,11 +6,10 @@
 
 #include "winstack.h"
 #include "sourcewnd.h"
-#include <qbrush.h>
-#include <qfileinfo.h>
-#include <q3popupmenu.h>
+#include "dbgdriver.h"
+#include <QFileInfo>
+#include <Q3PopupMenu>
 #include <QContextMenuEvent>
-#include <QCloseEvent>
 #include <QToolTip>
 #include <kglobal.h>
 #include <kxmlguiwindow.h>

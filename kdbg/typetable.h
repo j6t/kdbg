@@ -4,10 +4,10 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <q3dict.h>
-#include <qstring.h>
-#include <qregexp.h>
-#include <qstringlist.h>
+#include <Q3Dict>
+#include <QString>
+#include <QRegExp>
+#include <QStringList>
 #include <map>
 
 class KConfigGroup;

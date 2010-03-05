@@ -7,15 +7,12 @@
 #ifndef WINSTACK_H
 #define WINSTACK_H
 
-#include <qdialog.h>
-#include <qlineedit.h>
-#include <qlayout.h>
-#include <qcheckbox.h>
-#include <qpushbutton.h>
+#include <QDialog>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QPushButton>
 #include <Q3HBoxLayout>
 #include <Q3VBoxLayout>
-#include <QContextMenuEvent>
-#include <QCloseEvent>
 #include <ktabwidget.h>
 #include <list>
 

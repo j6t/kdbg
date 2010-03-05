@@ -7,13 +7,9 @@
 #ifndef WATCHWINDOW_H
 #define WATCHWINDOW_H
 
-#include <qlineedit.h>
-#include <qlayout.h>
-#include <qpushbutton.h>
+#include <QLineEdit>
+#include <QPushButton>
 #include <Q3VBoxLayout>
-#include <QEvent>
-#include <QDropEvent>
-#include <QDragEnterEvent>
 #include <Q3HBoxLayout>
 #include "exprwnd.h"
 

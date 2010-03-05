@@ -7,14 +7,11 @@
 #ifndef MEMWINDOW_H
 #define MEMWINDOW_H
 
-#include <q3popupmenu.h>
-#include <q3listview.h>
-#include <qcombobox.h>
-#include <qlayout.h>
-#include <qmap.h>
-#include <QMouseEvent>
+#include <Q3PopupMenu>
+#include <Q3ListView>
+#include <QComboBox>
+#include <QMap>
 #include <Q3VBoxLayout>
-#include <QEvent>
 #include "dbgdriver.h"
 
 class KDebugger;

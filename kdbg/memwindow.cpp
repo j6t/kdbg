@@ -5,9 +5,8 @@
  */
 
 #include "memwindow.h"
-#include <q3header.h>
+#include <Q3Header>
 #include <QMouseEvent>
-#include <QEvent>
 #include <QList>
 #include <klocale.h>
 #include <kconfigbase.h>

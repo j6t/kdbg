@@ -7,11 +7,10 @@
 #ifndef BRKPT_H
 #define BRKPT_H
 
-#include <q3listview.h>
-#include <qlayout.h>
-#include <qpushbutton.h>
-#include <qlineedit.h>
-#include <q3valuevector.h>
+#include <Q3ListView>
+#include <QPushButton>
+#include <QLineEdit>
+#include <Q3ValueVector>
 #include <QPixmap>
 #include <QEvent>
 #include <Q3HBoxLayout>

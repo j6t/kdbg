@@ -6,18 +6,15 @@
 
 #include "debugger.h"
 #include "sourcewnd.h"
-#include <q3textstream.h>
-#include <qpainter.h>
-#include <qbrush.h>
-#include <qfile.h>
-#include <qfileinfo.h>
-#include <qnamespace.h>
-#include <q3popupmenu.h>
+#include "dbgdriver.h"
+#include <Q3TextStream>
+#include <QPainter>
+#include <QFile>
+#include <QFileInfo>
+#include <Q3PopupMenu>
 #include <QContextMenuEvent>
 #include <QKeyEvent>
 #include <QMouseEvent>
-#include <QEvent>
-#include <kapplication.h>
 #include <kiconloader.h>
 #include <kglobalsettings.h>
 #include <kxmlguiwindow.h>

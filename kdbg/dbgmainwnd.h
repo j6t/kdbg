@@ -7,8 +7,7 @@
 #ifndef DBGMAINWND_H
 #define DBGMAINWND_H
 
-#include <qtimer.h>
-#include <Q3CString>
+#include <QTimer>
 #include <kxmlguiwindow.h>
 #include "regwnd.h"
 

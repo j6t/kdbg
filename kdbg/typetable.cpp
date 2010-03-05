@@ -4,8 +4,8 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <qdir.h>
-#include <q3valuelist.h>
+#include "typetable.h"
+#include <QFileInfo>
 #include <kglobal.h>
 #include <kstandarddirs.h>
 #include <kconfig.h>
@@ -13,7 +13,6 @@
 #include <list>
 #include <algorithm>
 #include <iterator>
-#include "typetable.h"
 #include "mydebug.h"
 
 //! the TypeTables of all known libraries

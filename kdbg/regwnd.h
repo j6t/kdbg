@@ -7,8 +7,7 @@
 #ifndef REGWND_H
 #define REGWND_H
 
-#include <q3listview.h>
-#include <Q3PopupMenu>
+#include <Q3ListView>
 #include <list>
 #include <map>
 

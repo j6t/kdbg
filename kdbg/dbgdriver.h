@@ -7,9 +7,8 @@
 #ifndef DBGDRIVER_H
 #define DBGDRIVER_H
 
-#include <qfile.h>
-#include <qregexp.h>
-#include <q3cstring.h>
+#include <QFile>
+#include <QByteArray>
 #include <k3process.h>
 #include <queue>
 #include <list>

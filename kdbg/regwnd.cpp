@@ -4,19 +4,17 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <q3header.h>
+#include "regwnd.h"
+#include "dbgdriver.h"
+#include <Q3Header>
 #include <QPixmap>
 #include <kglobalsettings.h>
 #include <klocale.h>			/* i18n */
 #include <kiconloader.h>
-#include <qfontdialog.h>
-#include <qmessagebox.h>
-#include <q3popupmenu.h>
-#include <qregexp.h>
-#include <qstringlist.h>
+#include <Q3PopupMenu>
+#include <QRegExp>
+#include <QStringList>
 #include <stdlib.h>			/* strtoul */
-#include "regwnd.h"
-#include "dbgdriver.h"
 
 /** 
  * Register display modes

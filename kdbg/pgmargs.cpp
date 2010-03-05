@@ -5,11 +5,7 @@
  */
 
 #include "pgmargs.h"
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <q3listview.h>
-#include <q3listbox.h>
-#include <qtabwidget.h>
+#include <Q3ListView>
 #include <kfiledialog.h>
 #include <klocale.h>			/* i18n */
 #include "mydebug.h"

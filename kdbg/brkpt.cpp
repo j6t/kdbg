@@ -8,17 +8,12 @@
 #include <klocale.h>			/* i18n */
 #include <kiconloader.h>
 #include <ksimpleconfig.h>
-#include <qdialog.h>
-#include <qnamespace.h>
-#include <qpainter.h>
-#include <qlabel.h>
-#include <qbitmap.h>
-#include <Q3HBoxLayout>
+#include <QDialog>
+#include <QPainter>
+#include <QLabel>
+#include <QBitmap>
 #include <Q3GridLayout>
-#include <QPixmap>
 #include <QMouseEvent>
-#include <QEvent>
-#include <Q3VBoxLayout>
 #include "debugger.h"
 #include "brkpt.h"
 #include "dbgdriver.h"

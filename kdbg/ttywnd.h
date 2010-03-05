@@ -7,8 +7,7 @@
 #ifndef TTYWND_H
 #define TTYWND_H
 
-#include <q3textedit.h>
-#include <Q3PopupMenu>
+#include <Q3TextEdit>
 
 class QSocketNotifier;
 class Q3PopupMenu;

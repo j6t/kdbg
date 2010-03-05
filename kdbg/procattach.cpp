@@ -5,10 +5,7 @@
  */
 
 #include "procattach.h"
-#include <q3listview.h>
-#include <qtoolbutton.h>
-#include <qlineedit.h>
-#include <Q3CString>
+#include <Q3ListView>
 #include <k3process.h>
 #include <ctype.h>
 #include <kglobal.h>

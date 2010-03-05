@@ -8,12 +8,11 @@
 #define ProcAttach_included
 
 #include "ui_procattachbase.h"
-#include <q3valuevector.h>
-#include <qdialog.h>
-#include <qlabel.h>
-#include <qlineedit.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
+#include <Q3ValueVector>
+#include <QDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
 #include <Q3VBoxLayout>
 #include <Q3CString>
 #include <Q3HBoxLayout>

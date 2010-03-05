@@ -8,7 +8,6 @@
 #define XSLDBGDRIVER_H
 
 #include "dbgdriver.h"
-#include "qregexp.h"
 
 
 class XsldbgDriver:public DebuggerDriver {

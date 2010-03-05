@@ -7,9 +7,8 @@
 #ifndef DEBUGGER_H
 #define DEBUGGER_H
 
-#include <qtimer.h>
-#include <q3dict.h>
-#include <qstringlist.h>
+#include <Q3Dict>
+#include <QStringList>
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
 
