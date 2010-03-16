@@ -251,11 +251,10 @@ void DebuggerMainWnd::initKAction()
 			m_filesWindow, SLOT(slotFileReload()), "file_reload");
     m_fileExecAction = createAction(i18n("&Executable..."), "execopen", 0,
 			this, SLOT(slotFileExe()), "file_executable");
-    m_recentExecAction = new KRecentFilesAction(i18n("Recent E&xecutables"),
+    m_recentExecAction = KStandardAction::openRecent(this, SLOT(slotRecentExec(const KUrl&)),
 		      actionCollection());
     m_recentExecAction->setObjectName("file_executable_recent");
-    connect(m_recentExecAction, SIGNAL(urlSelected(const KUrl&)),
-	    this, SLOT(slotRecentExec(const KUrl&)));
+    m_recentExecAction->setText(i18n("Recent E&xecutables"));
     m_coreDumpAction = createAction(i18n("&Core dump..."), 0,
 			this, SLOT(slotFileCore()), "file_core_dump");
     KStandardAction::quit(kapp, SLOT(closeAllWindows()), actionCollection());
