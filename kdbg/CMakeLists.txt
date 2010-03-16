@@ -73,6 +73,8 @@ set(kdbg_UI
 kde4_add_ui_files(kdbg_SRCS ${kdbg_UI})
 
 add_definitions(-DQT3_SUPPORT)
+kde4_add_app_icon(kdbg_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/pics/hi*-app-kdbg.png")
+kde4_add_app_icon(kdbg_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/pics/lo*-app-kdbg.png")
 kde4_add_executable(kdbg ${kdbg_SRCS})
 
 IF (HAVE_LIB_UTIL)

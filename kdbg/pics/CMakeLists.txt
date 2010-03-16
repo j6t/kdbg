@@ -14,7 +14,6 @@ set(PICTOGRAMS
 	watchdis.xpm
 	pointer.xpm)
 
-install(FILES $(PICTOGRAMS) DESTINATION ${DATA_INSTALL_DIR}/kdbg/pics)
-install(FILES DESTINATION ${DATA_INSTALL_DIR}/kdbg/icons)
+install(FILES ${PICTOGRAMS} DESTINATION "${DATA_INSTALL_DIR}/kdbg/pics")
 
-kde4_install_icons(${ICON_INSTALL_DIR})
+kde4_install_icons("${DATA_INSTALL_DIR}/kdbg/icons")
