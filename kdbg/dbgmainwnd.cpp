@@ -28,7 +28,7 @@
 #include <QFile>
 #include <QFileInfo>
 #include <Q3TabDialog>
-#include <Q3ValueList>
+#include <QList>
 #include <Q3PopupMenu>
 #include <QDockWidget>
 #include "dbgmainwnd.h"
@@ -340,10 +340,9 @@ void DebuggerMainWnd::initKAction()
 			this, SLOT(slotEditValue()), "edit_value");
 
     // all actions force an UI update
-    Q3ValueList<QAction*> actions = actionCollection()->actions();
-    Q3ValueList<QAction*>::Iterator it = actions.begin();
-    for (; it != actions.end(); ++it) {
-	connect(*it, SIGNAL(activated()), this, SLOT(updateUI()));
+    QList<QAction*> actions = actionCollection()->actions();
+    foreach(QAction* action, actions) {
+	connect(action, SIGNAL(activated()), this, SLOT(updateUI()));
     }
 
     createGUI("kdbgui.rc");
