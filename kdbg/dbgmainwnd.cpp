@@ -247,7 +247,7 @@ void DebuggerMainWnd::initKAction()
                       actionCollection());
     open->setText(i18n("&Open Source..."));
     m_closeAction = KStandardAction::close(m_filesWindow, SLOT(slotClose()), actionCollection());
-    m_reloadAction = createAction(i18n("&Reload Source"), "reload", 0,
+    m_reloadAction = createAction(i18n("&Reload Source"), "view-refresh", 0,
 			m_filesWindow, SLOT(slotFileReload()), "file_reload");
     m_fileExecAction = createAction(i18n("&Executable..."), "execopen", 0,
 			this, SLOT(slotFileExe()), "file_executable");
