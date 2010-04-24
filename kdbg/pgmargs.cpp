@@ -12,7 +12,7 @@
 
 PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, Q3Dict<EnvVar>& envVars,
 		 const QStringList& allOptions) :
-	KDialog(parent),
+	QDialog(parent),
 	m_envVars(envVars)
 {
     setupUi(this);

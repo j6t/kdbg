@@ -26,7 +26,7 @@ class K3Process;
  * system features a suitable ps command.
  */
 
-class ProcAttachPS : public KDialog, private Ui::ProcAttachBase
+class ProcAttachPS : public QDialog, private Ui::ProcAttachBase
 {
     Q_OBJECT
 public:

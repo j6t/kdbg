@@ -15,11 +15,12 @@
 
 
 ProcAttachPS::ProcAttachPS(QWidget* parent) :
-	KDialog(parent),
+	QDialog(parent),
 	m_pidCol(-1),
 	m_ppidCol(-1)
 {
     setupUi(this);
+    on_processList_selectionChanged(); //update OK button disabled state.
 
     m_ps = new K3Process;
     connect(m_ps, SIGNAL(receivedStdout(K3Process*, char*, int)),
@@ -211,7 +212,7 @@ void ProcAttachPS::on_buttonRefresh_clicked()
     if (!m_ps->isRunning())
     {
 	processList->clear();
-	buttonOk->setEnabled(false);	// selection was cleared
+	dialogButtons->button(QDialogButtonBox::Ok)->setEnabled(false);	// selection was cleared
 	runPS();
     }
 }
@@ -245,14 +246,14 @@ bool ProcAttachPS::setVisibility(Q3ListViewItem* i, const QString& text)
 
     // disable the OK button if the selected item becomes invisible
     if (i->isSelected())
-	buttonOk->setEnabled(visible);
+	dialogButtons->button(QDialogButtonBox::Ok)->setEnabled(visible);
 
     return visible;
 }
 
 void ProcAttachPS::on_processList_selectionChanged()
 {
-    buttonOk->setEnabled(processList->selectedItem() != 0);
+    dialogButtons->button(QDialogButtonBox::Ok)->setEnabled(processList->selectedItem() != 0);
 }
 
 

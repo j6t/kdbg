@@ -9,12 +9,12 @@
 
 #include "ui_pgmargsbase.h"
 #include <Q3Dict>
-#include <kdialog.h>
+#include <QDialog>
 #include "envvar.h"
 
 class QStringList;
 
-class PgmArgs : public KDialog, private Ui::PgmArgsBase
+class PgmArgs : public QDialog, private Ui::PgmArgsBase
 {
     Q_OBJECT
 public:
