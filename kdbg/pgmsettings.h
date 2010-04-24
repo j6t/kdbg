@@ -7,7 +7,7 @@
 #ifndef PGMSETTINGS_H
 #define PGMSETTINGS_H
 
-#include <Q3TabDialog>
+#include <KPageDialog>
 
 class Q3ButtonGroup;
 class QLineEdit;
@@ -39,11 +39,11 @@ protected slots:
 };
 
 
-class ProgramSettings : public Q3TabDialog
+class ProgramSettings : public KPageDialog
 {
     Q_OBJECT
 public:
-    ProgramSettings(QWidget* parent, QString exeName, bool modal = true);
+    ProgramSettings(QWidget* parent, QString exeName);
 
 public:
     ChooseDriver m_chooseDriver;

@@ -24,10 +24,10 @@
 #include <ktoolbar.h>
 #include <kurl.h>
 #include <kxmlguifactory.h>
+#include <KPageDialog>
 #include <Q3ListBox>
 #include <QFile>
 #include <QFileInfo>
-#include <Q3TabDialog>
 #include <QList>
 #include <Q3PopupMenu>
 #include <QDockWidget>
@@ -830,12 +830,10 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 {
     int oldTabWidth = m_tabWidth;
 
-    Q3TabDialog dlg(this, "global_options", true);
+    KPageDialog dlg(this);
     QString title = KGlobal::caption();
     title += i18n(": Global options");
     dlg.setCaption(title);
-    dlg.setCancelButton(i18n("Cancel"));
-    dlg.setOKButton(i18n("OK"));
 
     PrefDebugger prefDebugger(&dlg);
     prefDebugger.setDebuggerCmd(m_debuggerCmdStr.isEmpty()  ?
@@ -849,8 +847,8 @@ void DebuggerMainWnd::slotFileGlobalSettings()
     prefMisc.setSourceFilter(m_sourceFilter);
     prefMisc.setHeaderFilter(m_headerFilter);
 
-    dlg.addTab(&prefDebugger, i18n("&Debugger"));
-    dlg.addTab(&prefMisc, i18n("&Miscellaneous"));
+    dlg.addPage(&prefDebugger, i18n("Debugger"));
+    dlg.addPage(&prefMisc, i18n("Miscellaneous"));
     if (dlg.exec() == QDialog::Accepted)
     {
 	setDebuggerCmdStr(prefDebugger.debuggerCmd());

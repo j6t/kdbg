@@ -93,8 +93,8 @@ void OutputSettings::slotLevelChanged(int id)
 
 
 
-ProgramSettings::ProgramSettings(QWidget* parent, QString exeName, bool modal) :
-	Q3TabDialog(parent, "program_settings", modal),
+ProgramSettings::ProgramSettings(QWidget* parent, QString exeName) :
+	KPageDialog(parent),
 	m_chooseDriver(this),
 	m_output(this)
 {
@@ -104,11 +104,8 @@ ProgramSettings::ProgramSettings(QWidget* parent, QString exeName, bool modal) :
     QString title = i18n("%1: Settings for %2");
     setCaption(title.arg(cap, fi.fileName()));
 
-    setCancelButton(i18n("Cancel"));
-    setOKButton(i18n("OK"));
-
-    addTab(&m_chooseDriver, i18n("&Debugger"));
-    addTab(&m_output, i18n("&Output"));
+    addPage(&m_chooseDriver, i18n("Debugger"));
+    addPage(&m_output, i18n("Output"));
 }
 
 #include "pgmsettings.moc"
