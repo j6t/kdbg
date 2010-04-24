@@ -28,9 +28,6 @@ ProcAttachPS::ProcAttachPS(QWidget* parent) :
     connect(m_ps, SIGNAL(processExited(K3Process*)),
 	    this, SLOT(slotPSDone()));
 
-    QIcon icon = SmallIconSet("clear_left");
-    filterClear->setIconSet(icon);
-
     processList->setColumnWidth(0, 300);
     processList->setColumnWidthMode(0, Q3ListView::Manual);
     processList->setColumnAlignment(1, Qt::AlignRight);
