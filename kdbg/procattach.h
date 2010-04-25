@@ -19,7 +19,7 @@
 #include <kdialog.h>
 
 
-class K3Process;
+class QProcess;
 
 /*
  * This is the full-featured version of the dialog. It is used when the
@@ -43,14 +43,14 @@ protected slots:
     void on_buttonRefresh_clicked();
     void on_filterEdit_textChanged(const QString& text);
     void on_processList_selectionChanged();
-    void slotTextReceived(K3Process* proc, char* buffer, int buflen);
+    void slotTextReceived();
     void slotPSDone();
 
 protected:
     void pushLine();
     bool setVisibility(Q3ListViewItem* i, const QString& text);
 
-    K3Process* m_ps;
+    QProcess* m_ps;
     // parse state
     int m_pidCol;	//!< The PID column in the ps output
     int m_ppidCol;	//!< The parent-PID column in the ps output

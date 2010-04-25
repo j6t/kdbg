@@ -6,7 +6,7 @@
 
 #include "procattach.h"
 #include <Q3ListView>
-#include <k3process.h>
+#include <QProcess>
 #include <ctype.h>
 #include <kglobal.h>
 #include <kiconloader.h>
@@ -22,29 +22,16 @@ ProcAttachPS::ProcAttachPS(QWidget* parent) :
     setupUi(this);
     on_processList_selectionChanged(); //update OK button disabled state.
 
-    m_ps = new K3Process;
-    connect(m_ps, SIGNAL(receivedStdout(K3Process*, char*, int)),
-	    this, SLOT(slotTextReceived(K3Process*, char*, int)));
-    connect(m_ps, SIGNAL(processExited(K3Process*)),
+    m_ps = new QProcess;
+    connect(m_ps, SIGNAL(readyReadStandardOutput()),
+	    this, SLOT(slotTextReceived()));
+    connect(m_ps, SIGNAL(finished(int,QProcess::ExitStatus)),
 	    this, SLOT(slotPSDone()));
 
     processList->setColumnWidth(0, 300);
     processList->setColumnWidthMode(0, Q3ListView::Manual);
     processList->setColumnAlignment(1, Qt::AlignRight);
     processList->setColumnAlignment(2, Qt::AlignRight);
-
-    // set the command line
-    static const char* const psCommand[] = {
-#ifdef PS_COMMAND
-	PS_COMMAND,
-#else
-	"/bin/false",
-#endif
-	0
-    };
-    for (int i = 0; psCommand[i] != 0; i++) {
-	*m_ps << psCommand[i];
-    }
 
     runPS();
 }
@@ -62,12 +49,29 @@ void ProcAttachPS::runPS()
     m_pidCol = -1;
     m_ppidCol = -1;
 
-    m_ps->start(K3Process::NotifyOnExit, K3Process::Stdout);
+    // set the command line
+    char* const psCommand[] = {
+#ifdef PS_COMMAND
+	PS_COMMAND,
+#else
+	"/bin/false",
+#endif
+	0
+    };
+    QStringList args;
+    for (int i = 1; psCommand[i] != 0; i++) {
+	args.push_back(psCommand[i]);
+    }
+
+    m_ps->start(psCommand[0], args);
 }
 
-void ProcAttachPS::slotTextReceived(K3Process*, char* buffer, int buflen)
+void ProcAttachPS::slotTextReceived()
 {
-    const char* end = buffer+buflen;
+    QByteArray data = m_ps->readAllStandardOutput();
+    char* buffer = data.data();
+    char* end = buffer + data.size();
+
     while (buffer < end)
     {
 	// check new line
@@ -206,7 +210,7 @@ QString ProcAttachPS::text() const
 
 void ProcAttachPS::on_buttonRefresh_clicked()
 {
-    if (!m_ps->isRunning())
+    if (m_ps->state() == QProcess::NotRunning)
     {
 	processList->clear();
 	dialogButtons->button(QDialogButtonBox::Ok)->setEnabled(false);	// selection was cleared
