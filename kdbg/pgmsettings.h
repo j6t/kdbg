@@ -9,7 +9,7 @@
 
 #include <KPageDialog>
 
-class Q3ButtonGroup;
+class QButtonGroup;
 class QLineEdit;
 
 
@@ -33,7 +33,7 @@ public:
     int ttyLevel() const { return m_ttyLevel; }
 protected:
     int m_ttyLevel;
-    Q3ButtonGroup* m_group;
+    QButtonGroup* m_group;
 protected slots:
     void slotLevelChanged(int);
 };
