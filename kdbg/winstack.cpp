@@ -8,7 +8,7 @@
 #include "sourcewnd.h"
 #include "dbgdriver.h"
 #include <QFileInfo>
-#include <Q3PopupMenu>
+#include <QMenu>
 #include <QContextMenuEvent>
 #include <QToolTip>
 #include <kglobal.h>
@@ -44,8 +44,8 @@ void WinStack::contextMenuEvent(QContextMenuEvent* e)
 	top = top->parentWidget();
     while (!top->isTopLevel());
     KXmlGuiWindow* mw = static_cast<KXmlGuiWindow*>(top);
-    Q3PopupMenu* m =
-	static_cast<Q3PopupMenu*>(mw->factory()->container("popup_files_empty", mw));
+    QMenu* m =
+	static_cast<QMenu*>(mw->factory()->container("popup_files_empty", mw));
     m->exec(e->globalPos());
 }
 
