@@ -378,14 +378,15 @@ FindDialog::FindDialog() :
 	m_buttonForward(this, "forward"),
 	m_buttonBackward(this, "backward"),
 	m_buttonClose(this, "close"),
-	m_layout(this, 8),
-	m_buttons(4)
+	m_layout(this),
+	m_buttons(this)
 {
     setCaption(KGlobal::caption() + i18n(": Search"));
 
     m_searchText.setMinimumSize(330, 24);
     m_searchText.setMaxLength(10000);
     m_searchText.setFrame(true);
+    m_searchText.setFocus();
 
     m_caseCheck.setText(i18n("&Case sensitive"));
     m_caseCheck.setChecked(true);
@@ -394,34 +395,17 @@ FindDialog::FindDialog() :
     m_buttonBackward.setText(i18n("&Backward"));
     m_buttonClose.setText(i18n("Close"));
 
-    m_caseCheck.setMinimumSize(330, 24);
-
-    // get maximum size of buttons
-    QSize maxSize(80,30);
-    maxSize.expandedTo(m_buttonForward.sizeHint());
-    maxSize.expandedTo(m_buttonBackward.sizeHint());
-    maxSize.expandedTo(m_buttonClose.sizeHint());
-
-    m_buttonForward.setMinimumSize(maxSize);
-    m_buttonBackward.setMinimumSize(maxSize);
-    m_buttonClose.setMinimumSize(maxSize);
-
     connect(&m_buttonClose, SIGNAL(clicked()), SLOT(reject()));
 
     m_layout.addWidget(&m_searchText);
     m_layout.addWidget(&m_caseCheck);
     m_layout.addLayout(&m_buttons);
-    m_layout.addStretch(10);
+
     m_buttons.addWidget(&m_buttonForward);
-    m_buttons.addStretch(10);
     m_buttons.addWidget(&m_buttonBackward);
-    m_buttons.addStretch(10);
     m_buttons.addWidget(&m_buttonClose);
 
-    m_layout.activate();
-
-    m_searchText.setFocus();
-    resize( 350, 120 );
+    setLayout(&m_layout);
 }
 
 FindDialog::~FindDialog()

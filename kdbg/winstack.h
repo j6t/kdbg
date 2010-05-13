@@ -11,8 +11,8 @@
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QPushButton>
-#include <Q3HBoxLayout>
-#include <Q3VBoxLayout>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <ktabwidget.h>
 #include <list>
 
@@ -45,8 +45,8 @@ signals:
 
 protected:
     virtual void closeEvent(QCloseEvent* ev);
-    Q3VBoxLayout m_layout;
-    Q3HBoxLayout m_buttons;
+    QVBoxLayout m_layout;
+    QHBoxLayout m_buttons;
 };
 
 
