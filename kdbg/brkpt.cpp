@@ -22,10 +22,10 @@
 #include "mydebug.h"
 
 
-class BreakpointItem : public Q3ListViewItem, public Breakpoint
+class BreakpointItem : public QTreeWidgetItem, public Breakpoint
 {
 public:
-    BreakpointItem(Q3ListView* list, const Breakpoint& bp);
+    BreakpointItem(QTreeWidget* list, const Breakpoint& bp);
     void updateFrom(const Breakpoint& bp);
     void display();			/* sets icon and visible texts */
     bool enabled() const { return Breakpoint::enabled; }
@@ -36,7 +36,7 @@ BreakpointTable::BreakpointTable(QWidget* parent) :
 	QWidget(parent),
 	m_debugger(0),
 	m_bpEdit(this, "bpedit"),
-	m_list(this, "bptable"),
+	m_list(this),
 	m_btAddBP(this, "addbp"),
 	m_btAddWP(this, "addwp"),
 	m_btRemove(this, "remove"),
@@ -51,9 +51,12 @@ BreakpointTable::BreakpointTable(QWidget* parent) :
     connect(&m_bpEdit, SIGNAL(returnPressed()), this, SLOT(addBP()));
 
     initListAndIcons();
-    connect(&m_list, SIGNAL(currentChanged(Q3ListViewItem*)), SLOT(updateUI()));
+
+    m_list.setRootIsDecorated(false);
+
+    connect(&m_list, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), SLOT(updateUI()));
     // double click on item is same as View code
-    connect(&m_list, SIGNAL(doubleClicked(Q3ListViewItem*)), this, SLOT(viewBP()));
+    connect(&m_list, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(viewBP()));
 
     // need mouse button events
     m_list.viewport()->installEventFilter(this);
@@ -121,8 +124,9 @@ void BreakpointTable::updateBreakList()
 {
     std::list<BreakpointItem*> deletedItems;
 
-    for (Q3ListViewItem* it = m_list.firstChild(); it != 0; it = it->nextSibling()) {
-	deletedItems.push_back(static_cast<BreakpointItem*>(it));
+    for (int i = 0 ; i < m_list.topLevelItemCount(); i++)
+    {
+        deletedItems.push_back(static_cast<BreakpointItem*>(m_list.topLevelItem(i)));
     }
 
     // get the new list
@@ -149,8 +153,8 @@ nextItem:;
     }
 }
 
-BreakpointItem::BreakpointItem(Q3ListView* list, const Breakpoint& bp) :
-	Q3ListViewItem(list),
+BreakpointItem::BreakpointItem(QTreeWidget* list, const Breakpoint& bp) :
+	QTreeWidgetItem(list),
 	Breakpoint(bp)
 {
     display();
@@ -312,15 +316,22 @@ void BreakpointTable::conditionalBP()
 
 void BreakpointTable::initListAndIcons()
 {
-    m_list.addColumn(i18n("Location"), 220);
-    m_list.addColumn(i18n("Address"), 65);
-    m_list.addColumn(i18n("Hits"), 30);
-    m_list.addColumn(i18n("Ignore"), 30);
-    m_list.addColumn(i18n("Condition"), 200);
+    m_list.setHeaderLabels(
+    QStringList()
+	<< i18n("Location")
+	<< i18n("Address")
+	<< i18n("Hits")
+	<< i18n("Ignore")
+	<< i18n("Condition"));
+    m_list.setColumnWidth(0, 220);
+    m_list.setColumnWidth(1, 65);
+    m_list.setColumnWidth(2, 30);
+    m_list.setColumnWidth(3, 30);
+    m_list.setColumnWidth(4, 200);
 
     m_list.setMinimumSize(200, 100);
 
-    m_list.setSorting(-1);
+    m_list.setSortingEnabled(false);
 
     // add pixmaps
     QPixmap brkena = UserIcon("brkena.xpm");
@@ -371,7 +382,7 @@ void BreakpointTable::initListAndIcons()
 
 void BreakpointItem::display()
 {
-    BreakpointTable* lb = static_cast<BreakpointTable*>(listView()->parent());
+    BreakpointTable* lb = static_cast<BreakpointTable*>(treeWidget()->parent());
 
     /* breakpoint icon code; keep order the same as in BreakpointTable::initListAndIcons */
     int code = enabled() ? 1 : 0;
@@ -379,11 +390,11 @@ void BreakpointItem::display()
 	code += 2;
     if (!condition.isEmpty() || ignoreCount > 0)
 	code += 4;
-    if (type == watchpoint)
+    if (Breakpoint::type == watchpoint)
 	code += 8;
     if (isOrphaned())
 	code += 16;
-    setPixmap(0, lb->m_icons[code]);
+    setIcon(0, QIcon(lb->m_icons[code]));
 
     // more breakpoint info
     if (!location.isEmpty()) {

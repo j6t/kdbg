@@ -7,7 +7,7 @@
 #ifndef BRKPT_H
 #define BRKPT_H
 
-#include <Q3ListView>
+#include <QTreeWidget>
 #include <QPushButton>
 #include <QLineEdit>
 #include <Q3ValueVector>
@@ -31,7 +31,7 @@ public:
 protected:
     KDebugger* m_debugger;
     QLineEdit m_bpEdit;
-    Q3ListView m_list;
+    QTreeWidget m_list;
     QPushButton m_btAddBP;
     QPushButton m_btAddWP;
     QPushButton m_btRemove;
