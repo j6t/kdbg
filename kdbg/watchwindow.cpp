@@ -17,17 +17,21 @@ WatchWindow::WatchWindow(QWidget* parent) :
 	m_watchAdd(i18n(" Add "), this),
 	m_watchDelete(i18n(" Del "), this),
 	m_watchVariables(this, i18n("Expression")),
-	m_watchV(this, 0),
-	m_watchH(0)
+	m_watchV(this),
+	m_watchH()
 {
     // setup the layout
     m_watchAdd.setMinimumSize(m_watchAdd.sizeHint());
     m_watchDelete.setMinimumSize(m_watchDelete.sizeHint());
-    m_watchV.addLayout(&m_watchH, 0);
-    m_watchV.addWidget(&m_watchVariables, 10);
-    m_watchH.addWidget(&m_watchEdit, 10);
-    m_watchH.addWidget(&m_watchAdd, 0);
-    m_watchH.addWidget(&m_watchDelete, 0);
+    m_watchV.setMargin(0);
+    m_watchV.setSpacing(0);
+    m_watchH.setMargin(0);
+    m_watchH.setSpacing(0);
+    m_watchV.addLayout(&m_watchH);
+    m_watchV.addWidget(&m_watchVariables);
+    m_watchH.addWidget(&m_watchEdit);
+    m_watchH.addWidget(&m_watchAdd);
+    m_watchH.addWidget(&m_watchDelete);
 
     connect(&m_watchEdit, SIGNAL(returnPressed()), SIGNAL(addWatch()));
     connect(&m_watchAdd, SIGNAL(clicked()), SIGNAL(addWatch()));

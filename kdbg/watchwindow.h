@@ -9,8 +9,8 @@
 
 #include <QLineEdit>
 #include <QPushButton>
-#include <Q3VBoxLayout>
-#include <Q3HBoxLayout>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 #include "exprwnd.h"
 
 class WatchWindow : public QWidget
@@ -29,8 +29,8 @@ protected:
     QPushButton m_watchAdd;
     QPushButton m_watchDelete;
     ExprWnd m_watchVariables;
-    Q3VBoxLayout m_watchV;
-    Q3HBoxLayout m_watchH;
+    QVBoxLayout m_watchV;
+    QHBoxLayout m_watchH;
 
     virtual bool eventFilter(QObject* ob, QEvent* ev);
     virtual void dragEnterEvent(QDragEnterEvent* event);
