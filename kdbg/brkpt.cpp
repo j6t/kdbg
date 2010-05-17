@@ -12,6 +12,7 @@
 #include <QPainter>
 #include <QLabel>
 #include <QBitmap>
+#include <QPixmap>
 #include <Q3GridLayout>
 #include <QMouseEvent>
 #include "debugger.h"
@@ -376,7 +377,7 @@ void BreakpointTable::initListAndIcons()
 	    }
 	}
 	canvas.setMask(canvas.createHeuristicMask());
-	m_icons[i] = canvas;
+	m_icons[i] = QIcon(canvas);
     }
 }
 
@@ -394,7 +395,7 @@ void BreakpointItem::display()
 	code += 8;
     if (isOrphaned())
 	code += 16;
-    setIcon(0, QIcon(lb->m_icons[code]));
+    setIcon(0, lb->m_icons[code]);
 
     // more breakpoint info
     if (!location.isEmpty()) {

@@ -10,11 +10,11 @@
 #include <QTreeWidget>
 #include <QPushButton>
 #include <QLineEdit>
-#include <Q3ValueVector>
-#include <QPixmap>
+#include <QIcon>
 #include <QEvent>
 #include <Q3HBoxLayout>
 #include <Q3VBoxLayout>
+#include <vector>
 
 class KDebugger;
 class BreakpointItem;
@@ -41,7 +41,7 @@ protected:
     Q3HBoxLayout m_layout;
     Q3VBoxLayout m_listandedit;
     Q3VBoxLayout m_buttons;
-    Q3ValueVector<QPixmap> m_icons;
+    std::vector<QIcon> m_icons;
 
     void insertBreakpoint(int num, bool temp, bool enabled, QString location,
 			  QString fileName = 0, int lineNo = -1,
