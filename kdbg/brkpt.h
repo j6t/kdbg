@@ -7,14 +7,11 @@
 #ifndef BRKPT_H
 #define BRKPT_H
 
-#include <QTreeWidget>
-#include <QPushButton>
-#include <QLineEdit>
 #include <QIcon>
 #include <QEvent>
-#include <Q3HBoxLayout>
-#include <Q3VBoxLayout>
 #include <vector>
+
+#include "ui_brkptbase.h"
 
 class KDebugger;
 class BreakpointItem;
@@ -30,17 +27,7 @@ public:
 
 protected:
     KDebugger* m_debugger;
-    QLineEdit m_bpEdit;
-    QTreeWidget m_list;
-    QPushButton m_btAddBP;
-    QPushButton m_btAddWP;
-    QPushButton m_btRemove;
-    QPushButton m_btEnaDis;
-    QPushButton m_btViewCode;
-    QPushButton m_btConditional;
-    Q3HBoxLayout m_layout;
-    Q3VBoxLayout m_listandedit;
-    Q3VBoxLayout m_buttons;
+    Ui::BrkPtBase m_ui;
     std::vector<QIcon> m_icons;
 
     void insertBreakpoint(int num, bool temp, bool enabled, QString location,
@@ -65,12 +52,12 @@ signals:
      */
     void activateFileLine(const QString& file, int lineNo, const DbgAddr& address);
 public slots:
-    virtual void addBP();
-    virtual void addWP();
-    virtual void removeBP();
-    virtual void enadisBP();
-    virtual void viewBP();
-    virtual void conditionalBP();
+    void on_btAddBP_clicked();
+    void on_btAddWP_clicked();
+    void on_btRemove_clicked();
+    void on_btEnaDis_clicked();
+    void on_btViewCode_clicked();
+    void on_btConditional_clicked();
     void updateUI();
     void updateBreakList();
 };

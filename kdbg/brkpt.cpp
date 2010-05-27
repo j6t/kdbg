@@ -14,6 +14,9 @@
 #include <QBitmap>
 #include <QPixmap>
 #include <Q3GridLayout>
+#include <Q3VBoxLayout>
+#include <Q3HBoxLayout>
+
 #include <QMouseEvent>
 #include "debugger.h"
 #include "brkpt.h"
@@ -35,86 +38,22 @@ public:
 
 BreakpointTable::BreakpointTable(QWidget* parent) :
 	QWidget(parent),
-	m_debugger(0),
-	m_bpEdit(this, "bpedit"),
-	m_list(this),
-	m_btAddBP(this, "addbp"),
-	m_btAddWP(this, "addwp"),
-	m_btRemove(this, "remove"),
-	m_btEnaDis(this, "enadis"),
-	m_btViewCode(this, "view"),
-	m_btConditional(this, "conditional"),
-	m_layout(this, 8),
-	m_listandedit(8),
-	m_buttons(8)
+	m_debugger(0)
 {
-    m_bpEdit.setMinimumSize(m_bpEdit.sizeHint());
-    connect(&m_bpEdit, SIGNAL(returnPressed()), this, SLOT(addBP()));
+    m_ui.setupUi(this);
+    connect(m_ui.bpEdit, SIGNAL(returnPressed()),
+	    this, SLOT(on_btAddBP_clicked()));
 
     initListAndIcons();
 
-    m_list.setRootIsDecorated(false);
-
-    connect(&m_list, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)), SLOT(updateUI()));
+    connect(m_ui.bpList, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)),
+	    this, SLOT(updateUI()));
     // double click on item is same as View code
-    connect(&m_list, SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)), this, SLOT(viewBP()));
+    connect(m_ui.bpList,SIGNAL(itemDoubleClicked(QTreeWidgetItem*,int)),
+	    this, SLOT(on_btViewCode_clicked()));
 
     // need mouse button events
-    m_list.viewport()->installEventFilter(this);
-
-    m_btAddBP.setText(i18n("Add &Breakpoint"));
-    m_btAddBP.setMinimumSize(m_btAddBP.sizeHint());
-    connect(&m_btAddBP, SIGNAL(clicked()), this, SLOT(addBP()));
-
-    m_btAddWP.setText(i18n("Add &Watchpoint"));
-    m_btAddWP.setMinimumSize(m_btAddWP.sizeHint());
-    connect(&m_btAddWP, SIGNAL(clicked()), this, SLOT(addWP()));
-
-    m_btRemove.setText(i18n("&Remove"));
-    m_btRemove.setMinimumSize(m_btRemove.sizeHint());
-    connect(&m_btRemove, SIGNAL(clicked()), this, SLOT(removeBP()));
-
-    // the Enable/Disable button changes its label
-    m_btEnaDis.setText(i18n("&Disable"));
-    // make a dummy button to get the size of the alternate label
-    {
-	QSize size = m_btEnaDis.sizeHint();
-	QPushButton dummy(this);
-	dummy.setText(i18n("&Enable"));
-	QSize sizeAlt = dummy.sizeHint();
-	if (sizeAlt.width() > size.width())
-	    size.setWidth(sizeAlt.width());
-	if (sizeAlt.height() > size.height())
-	    size.setHeight(sizeAlt.height());
-	m_btEnaDis.setMinimumSize(size);
-    }
-    connect(&m_btEnaDis, SIGNAL(clicked()), this, SLOT(enadisBP()));
-
-    m_btViewCode.setText(i18n("&View Code"));
-    m_btViewCode.setMinimumSize(m_btViewCode.sizeHint());
-    connect(&m_btViewCode, SIGNAL(clicked()), this, SLOT(viewBP()));
-
-    m_btConditional.setText(i18n("&Conditional..."));
-    m_btConditional.setMinimumSize(m_btConditional.sizeHint());
-    connect(&m_btConditional, SIGNAL(clicked()), this, SLOT(conditionalBP()));
-
-    m_layout.addLayout(&m_listandedit, 10);
-    m_layout.addLayout(&m_buttons);
-    m_listandedit.addWidget(&m_bpEdit);
-    m_listandedit.addWidget(&m_list, 10);
-    m_buttons.addWidget(&m_btAddBP);
-    m_buttons.addWidget(&m_btAddWP);
-    m_buttons.addWidget(&m_btRemove);
-    m_buttons.addWidget(&m_btEnaDis);
-    m_buttons.addWidget(&m_btViewCode);
-    m_buttons.addWidget(&m_btConditional);
-    m_buttons.addStretch(10);
-
-    m_layout.activate();
-
-    resize(350, 300);
-
-    m_bpEdit.setFocus();
+    m_ui.bpList->viewport()->installEventFilter(this);
 }
 
 BreakpointTable::~BreakpointTable()
@@ -125,9 +64,9 @@ void BreakpointTable::updateBreakList()
 {
     std::list<BreakpointItem*> deletedItems;
 
-    for (int i = 0 ; i < m_list.topLevelItemCount(); i++)
+    for (int i = 0 ; i < m_ui.bpList->topLevelItemCount(); i++)
     {
-        deletedItems.push_back(static_cast<BreakpointItem*>(m_list.topLevelItem(i)));
+        deletedItems.push_back(static_cast<BreakpointItem*>(m_ui.bpList->topLevelItem(i)));
     }
 
     // get the new list
@@ -143,7 +82,7 @@ void BreakpointTable::updateBreakList()
 	    }
 	}
 	// not in the list; add it
-	new BreakpointItem(&m_list, *bp);
+	new BreakpointItem(m_ui.bpList,*bp);
 nextItem:;
     }
 
@@ -167,10 +106,10 @@ void BreakpointItem::updateFrom(const Breakpoint& bp)
     display();
 }
 
-void BreakpointTable::addBP()
+void BreakpointTable::on_btAddBP_clicked()
 {
     // set a breakpoint at the specified text
-    QString bpText = m_bpEdit.text();
+    QString bpText = m_ui.bpEdit->text();
     bpText = bpText.stripWhiteSpace();
     if (m_debugger->isReady())
     {
@@ -181,10 +120,10 @@ void BreakpointTable::addBP()
     }
 }
 
-void BreakpointTable::addWP()
+void BreakpointTable::on_btAddWP_clicked()
 {
     // set a watchpoint for the specified expression
-    QString wpExpr = m_bpEdit.text();
+    QString wpExpr = m_ui.bpEdit->text();
     wpExpr = wpExpr.stripWhiteSpace();
     if (m_debugger->isReady()) {
 	Breakpoint* bp = new Breakpoint;
@@ -195,9 +134,9 @@ void BreakpointTable::addWP()
     }
 }
 
-void BreakpointTable::removeBP()
+void BreakpointTable::on_btRemove_clicked()
 {
-    BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
+    BreakpointItem* bp = static_cast<BreakpointItem*>(m_ui.bpList->currentItem());
     if (bp != 0) {
 	m_debugger->deleteBreakpoint(bp->id);
 	// note that bp may be deleted by now
@@ -205,17 +144,17 @@ void BreakpointTable::removeBP()
     }
 }
 
-void BreakpointTable::enadisBP()
+void BreakpointTable::on_btEnaDis_clicked()
 {
-    BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
+    BreakpointItem* bp = static_cast<BreakpointItem*>(m_ui.bpList->currentItem());
     if (bp != 0) {
 	m_debugger->enableDisableBreakpoint(bp->id);
     }
 }
 
-void BreakpointTable::viewBP()
+void BreakpointTable::on_btViewCode_clicked()
 {
-    BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
+    BreakpointItem* bp = static_cast<BreakpointItem*>(m_ui.bpList->currentItem());
     if (bp == 0)
 	return;
 
@@ -226,24 +165,24 @@ void BreakpointTable::viewBP()
 void BreakpointTable::updateUI()
 {
     bool enableChkpt = m_debugger->canChangeBreakpoints();
-    m_btAddBP.setEnabled(enableChkpt);
-    m_btAddWP.setEnabled(enableChkpt);
+    m_ui.btAddBP->setEnabled(enableChkpt);
+    m_ui.btAddWP->setEnabled(enableChkpt);
 
-    BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
-    m_btViewCode.setEnabled(bp != 0);
+    BreakpointItem* bp = static_cast<BreakpointItem*>(m_ui.bpList->currentItem());
+    m_ui.btViewCode->setEnabled(bp != 0);
 
     if (bp == 0) {
 	enableChkpt = false;
     } else {
 	if (bp->enabled()) {
-	    m_btEnaDis.setText(i18n("&Disable"));
+	    m_ui.btEnaDis->setText(i18n("&Disable"));
 	} else {
-	    m_btEnaDis.setText(i18n("&Enable"));
+	    m_ui.btEnaDis->setText(i18n("&Enable"));
 	}
     }
-    m_btRemove.setEnabled(enableChkpt);
-    m_btEnaDis.setEnabled(enableChkpt);
-    m_btConditional.setEnabled(enableChkpt);
+    m_ui.btRemove->setEnabled(enableChkpt);
+    m_ui.btEnaDis->setEnabled(enableChkpt);
+    m_ui.btConditional->setEnabled(enableChkpt);
 }
 
 bool BreakpointTable::eventFilter(QObject* ob, QEvent* ev)
@@ -254,7 +193,7 @@ bool BreakpointTable::eventFilter(QObject* ob, QEvent* ev)
 	if (mev->button() == Qt::MidButton) {
 	    // enable or disable the clicked-on item
 	    BreakpointItem* bp =
-		static_cast<BreakpointItem*>(m_list.itemAt(mev->pos()));
+		static_cast<BreakpointItem*>(m_ui.bpList->itemAt(mev->pos()));
 	    if (bp != 0)
 	    {
 		m_debugger->enableDisableBreakpoint(bp->id);
@@ -288,9 +227,9 @@ protected:
     Q3HBoxLayout m_buttons;
 };
 
-void BreakpointTable::conditionalBP()
+void BreakpointTable::on_btConditional_clicked()
 {
-    BreakpointItem* bp = static_cast<BreakpointItem*>(m_list.currentItem());
+    BreakpointItem* bp = static_cast<BreakpointItem*>(m_ui.bpList->currentItem());
     if (bp == 0)
 	return;
 
@@ -317,22 +256,11 @@ void BreakpointTable::conditionalBP()
 
 void BreakpointTable::initListAndIcons()
 {
-    m_list.setHeaderLabels(
-    QStringList()
-	<< i18n("Location")
-	<< i18n("Address")
-	<< i18n("Hits")
-	<< i18n("Ignore")
-	<< i18n("Condition"));
-    m_list.setColumnWidth(0, 220);
-    m_list.setColumnWidth(1, 65);
-    m_list.setColumnWidth(2, 30);
-    m_list.setColumnWidth(3, 30);
-    m_list.setColumnWidth(4, 200);
-
-    m_list.setMinimumSize(200, 100);
-
-    m_list.setSortingEnabled(false);
+    m_ui.bpList->setColumnWidth(0, 220);
+    m_ui.bpList->setColumnWidth(1, 65);
+    m_ui.bpList->setColumnWidth(2, 30);
+    m_ui.bpList->setColumnWidth(3, 30);
+    m_ui.bpList->setColumnWidth(4, 200);
 
     // add pixmaps
     QPixmap brkena = UserIcon("brkena.xpm");
