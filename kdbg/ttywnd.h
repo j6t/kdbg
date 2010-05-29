@@ -7,10 +7,9 @@
 #ifndef TTYWND_H
 #define TTYWND_H
 
-#include <Q3TextEdit>
+#include <QPlainTextEdit>
 
 class QSocketNotifier;
-class Q3PopupMenu;
 
 /**
  * This class is cortesy Judin Max <novaprint@mtu-net.ru>.
@@ -46,7 +45,7 @@ protected:
     bool findTTY();
 };
 
-class TTYWindow : public Q3TextEdit
+class TTYWindow : public QPlainTextEdit
 {
     Q_OBJECT
 public:
@@ -58,8 +57,8 @@ public:
 
 protected:
     STTY* m_tty;
-    virtual Q3PopupMenu* createPopupMenu(const QPoint& pos);
-    int m_hPos;		//!< tracks horizontal cursor position
+    QTextCursor m_pos;		//!< tracks horizontal cursor position
+    virtual void contextMenuEvent(QContextMenuEvent*);
 
 protected slots:
     void slotAppend(char* buffer, int count);
