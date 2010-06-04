@@ -35,6 +35,9 @@ int main(int argc, char** argv)
     aboutData.addCredit(ki18n("Daniel Kristjansson"),
 			ki18n("Register groups and formating"),
 			"danielk@cat.nyu.edu");
+    aboutData.addCredit(ki18n("David Edmundson"),
+			ki18n("KDE4 porting"),
+			"david@davidedmundson.co.uk");
     KCmdLineArgs::init( argc, argv, &aboutData );
 
     KCmdLineOptions opts;
