@@ -220,10 +220,8 @@ void ProcAttachPS::on_buttonRefresh_clicked()
 
 void ProcAttachPS::on_filterEdit_textChanged(const QString& text)
 {
-    Q3ListViewItem* i = processList->firstChild();
-    if (i) {
+    for (Q3ListViewItem* i = processList->firstChild(); i; i = i->nextSibling())
 	setVisibility(i, text);
-    }
 }
 
 /**
@@ -232,6 +230,7 @@ void ProcAttachPS::on_filterEdit_textChanged(const QString& text)
  */
 bool ProcAttachPS::setVisibility(Q3ListViewItem* i, const QString& text)
 {
+    i->setVisible(true);
     bool visible = false;
     for (Q3ListViewItem* j = i->firstChild(); j; j = j->nextSibling())
     {
@@ -243,7 +242,8 @@ bool ProcAttachPS::setVisibility(Q3ListViewItem* i, const QString& text)
 	i->text(0).find(text, 0, false) >= 0 ||
 	i->text(1).find(text) >= 0;
 
-    i->setVisible(visible);
+    if (!visible)
+	i->setVisible(false);
 
     // disable the OK button if the selected item becomes invisible
     if (i->isSelected())
