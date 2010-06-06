@@ -6,26 +6,29 @@
 
 #ifndef REGWND_H
 #define REGWND_H
+#include <QTreeWidget>
 
-#include <Q3ListView>
 #include <list>
 #include <map>
 
 class Q3PopupMenu;
 class RegisterViewItem;
 class GroupingViewItem;
+class QContextMenuEvent;
 struct RegisterInfo;
 
 
-class RegisterView : public Q3ListView
+class RegisterView : public QTreeWidget
 {
     Q_OBJECT
 public:
     RegisterView(QWidget* parent);
     ~RegisterView();
 
+protected:
+    void contextMenuEvent(QContextMenuEvent*);
+
 protected slots:
-    void rightButtonClicked(Q3ListViewItem*, const QPoint&, int);
     void slotModeChange(int);
     void updateRegisters(const std::list<RegisterInfo>&);
 

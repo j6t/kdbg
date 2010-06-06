@@ -30,6 +30,7 @@
 #include <QFileInfo>
 #include <QList>
 #include <Q3PopupMenu>
+#include <Q3ListViewItem>
 #include <QDockWidget>
 #include "dbgmainwnd.h"
 #include "debugger.h"

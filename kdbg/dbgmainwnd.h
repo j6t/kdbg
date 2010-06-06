@@ -18,6 +18,7 @@ class KRecentFilesAction;
 class KUrl;
 class WinStack;
 class Q3ListBox;
+class Q3ListViewItem;
 class ExprWnd;
 class BreakpointTable;
 class ThreadList;

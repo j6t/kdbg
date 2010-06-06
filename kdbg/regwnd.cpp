@@ -14,6 +14,8 @@
 #include <Q3PopupMenu>
 #include <QRegExp>
 #include <QStringList>
+#include <QHeaderView>
+#include <QContextMenuEvent>
 #include <stdlib.h>			/* strtoul */
 
 /** 
@@ -93,11 +95,11 @@ uint RegisterDisplay::bitMap[] = {
   64, 80, 128, /*default*/32,
 };
 
-class ModeItem : public Q3ListViewItem 
+class ModeItem : public QTreeWidgetItem
 {
 public:
-    ModeItem(Q3ListView* parent, const QString& name) : Q3ListViewItem(parent, name) {}
-    ModeItem(Q3ListViewItem* parent) : Q3ListViewItem(parent) {}
+    ModeItem(QTreeWidget* parent, const QString& name) : QTreeWidgetItem(parent, QStringList(name)) {}
+    ModeItem(QTreeWidgetItem* parent) : QTreeWidgetItem(parent) {}
 
     virtual void setMode(RegisterDisplay mode) = 0;
     virtual RegisterDisplay mode() = 0;
@@ -111,22 +113,27 @@ public:
 		     RegisterDisplay mode) :
 	ModeItem(parent, name), matcher(pattern), gmode(mode)
     {
-        setExpandable(true);
-        setOpen(true);
+	setExpanded(true);
     } 
+
     bool matchName(const QString& str) const
     {
         return matcher.exactMatch(str);
     }
+
     virtual void setMode(RegisterDisplay mode)
     {
 	gmode=mode; 
-	Q3ListViewItem *it=firstChild();
-	for (; 0!=it; it=it->nextSibling()) {
-	    (static_cast<ModeItem*>(it))->setMode(gmode);
+	for(int i = 0; i < childCount(); i++)
+	{
+	    static_cast<ModeItem*>(child(i))->setMode(gmode);
 	}
     }
-    virtual RegisterDisplay mode() { return gmode; }
+
+    virtual RegisterDisplay mode()
+    {
+        return gmode;
+    }
 
 private:
     QRegExp matcher;
@@ -147,11 +154,6 @@ public:
     RegisterDisplay m_mode;		/* display mode */
     bool m_changes;
     bool m_found;
-
-protected:
-    virtual void paintCell(QPainter*, const QColorGroup& cg,
-			   int column, int width, int alignment);
-
 };
 
 
@@ -400,42 +402,27 @@ void RegisterViewItem::setMode(RegisterDisplay mode)
     setText(2, cookedValue);
 }
 
-void RegisterViewItem::paintCell(QPainter* p, const QColorGroup& cg,
-				 int column, int width, int alignment)
-{
-    if (m_changes) {
-	QColorGroup newcg = cg;
-	newcg.setColor(QColorGroup::Text, Qt::red);
-	Q3ListViewItem::paintCell(p, newcg, column, width, alignment);
-    } else {
-	Q3ListViewItem::paintCell(p, cg, column, width, alignment);
-    }
-}
-
 
 RegisterView::RegisterView(QWidget* parent) :
-	Q3ListView(parent)
+	QTreeWidget(parent)
 {
-    setSorting(-1);
     setFont(KGlobalSettings::fixedFont());
 
     QPixmap iconRegs = UserIcon("regs.xpm");
     QPixmap iconWatchcoded = UserIcon("watchcoded.xpm");
     QPixmap iconWatch = UserIcon("watch.xpm");
 
-    addColumn(QIcon(iconRegs), i18n("Register"));
-    addColumn(QIcon(iconWatchcoded), i18n("Value"));
-    addColumn(QIcon(iconWatch), i18n("Decoded value"));
+    QTreeWidgetItem* header = headerItem();
+    header->setText(0, i18n("Register"));
+    header->setIcon(0, QIcon(iconRegs));
 
-    setColumnAlignment(0, Qt::AlignLeft);
-    setColumnAlignment(1, Qt::AlignLeft);
-    setColumnAlignment(2, Qt::AlignLeft);
+    header->setText(1, i18n("Value"));
+    header->setIcon(1, QIcon(iconWatchcoded));
 
-    setAllColumnsShowFocus( true );
-    header()->setClickEnabled(false);
+    header->setText(2, i18n("Decoded value"));
+    header->setIcon(2, QIcon(iconWatch));
 
-    connect(this, SIGNAL(contextMenuRequested(Q3ListViewItem*, const QPoint&, int)),
-	    SLOT(rightButtonClicked(Q3ListViewItem*,const QPoint&,int)));
+    setAllColumnsShowFocus(true);
 
     m_modemenu = new Q3PopupMenu(this, "ERROR");
     for (uint i=0; i<sizeof(menuitems)/sizeof(MenuPair); i++) {
@@ -446,26 +433,26 @@ RegisterView::RegisterView(QWidget* parent) :
     }
     connect(m_modemenu,SIGNAL(activated(int)),SLOT(slotModeChange(int)));
     
-    new GroupingViewItem(this, "MIPS VU", "^vu.*",
-                         RegisterDisplay::bits32|RegisterDisplay::realE);
-    new GroupingViewItem(this, "AltiVec", "^vr.*",
-                         RegisterDisplay::bits32|RegisterDisplay::realE);
-    new GroupingViewItem(this, "POWER real", "^fpr.*",
-                         RegisterDisplay::bits32|RegisterDisplay::realE);
-    new GroupingViewItem(this, "MMX", "^mm.*", 
-                         RegisterDisplay::bits32|RegisterDisplay::realE);
-    new GroupingViewItem(this, "SSE", "^xmm.*", 
-                         RegisterDisplay::bits32|RegisterDisplay::realE);
-    new GroupingViewItem(this, "x87", "^st.*",
-                         RegisterDisplay::bits80|RegisterDisplay::realE);
-    new GroupingViewItem(this, i18n("x86/x87 segment"), 
-                         "(^cs$|^ss$|^ds$|^es$|^fs$|^gs$|^fiseg$|^foseg$)",
-			 RegisterDisplay::nada);
-    new GroupingViewItem(this, i18n("Flags"), 
-                         "(^eflags$|^fctrl$|^mxcsr$|^cr$|^fpscr$|^vscr$|^ftag$|^fstat$)", 
-                         RegisterDisplay::bits32|RegisterDisplay::binary);
     new GroupingViewItem(this, i18n("GP and others"), "^$",
 			 RegisterDisplay::nada);
+    new GroupingViewItem(this, i18n("Flags"),
+			 "(^eflags$|^fctrl$|^mxcsr$|^cr$|^fpscr$|^vscr$|^ftag$|^fstat$)",
+			 RegisterDisplay::bits32|RegisterDisplay::binary);
+    new GroupingViewItem(this, i18n("x86/x87 segment"),
+			 "(^cs$|^ss$|^ds$|^es$|^fs$|^gs$|^fiseg$|^foseg$)",
+			 RegisterDisplay::nada);
+    new GroupingViewItem(this, "x87", "^st.*",
+			 RegisterDisplay::bits80|RegisterDisplay::realE);
+    new GroupingViewItem(this, "SSE", "^xmm.*",
+			 RegisterDisplay::bits32|RegisterDisplay::realE);
+    new GroupingViewItem(this, "MMX", "^mm.*",
+			 RegisterDisplay::bits32|RegisterDisplay::realE);
+    new GroupingViewItem(this, "POWER real", "^fpr.*",
+			 RegisterDisplay::bits32|RegisterDisplay::realE);
+    new GroupingViewItem(this, "AltiVec", "^vr.*",
+			 RegisterDisplay::bits32|RegisterDisplay::realE);
+    new GroupingViewItem(this, "MIPS VU", "^vu.*",
+			 RegisterDisplay::bits32|RegisterDisplay::realE);
 
     updateGroupVisibility();
     setRootIsDecorated(true);
@@ -479,31 +466,35 @@ RegisterView::~RegisterView()
 
 GroupingViewItem* RegisterView::findMatchingGroup(const QString& regName)
 {
-    for (Q3ListViewItem* it = firstChild(); it != 0; it = it->nextSibling())
+    for (int i = 0; i < topLevelItemCount(); i++)
     {
-	GroupingViewItem* i = static_cast<GroupingViewItem*>(it);
-	if (i->matchName(regName))
-	    return i;
+	GroupingViewItem* it = static_cast<GroupingViewItem*>(topLevelItem(i));
+	if (it->matchName(regName))
+	    return it;
     }
     // not better match found, so return "GP and others"
-    return static_cast<GroupingViewItem*>(firstChild());
+    return static_cast<GroupingViewItem*>(topLevelItem(0));
 }
 
 GroupingViewItem* RegisterView::findGroup(const QString& groupName)
 {
-    for (Q3ListViewItem* it = firstChild(); it != 0; it = it->nextSibling())
+    for (int i = 0; i < topLevelItemCount(); i++)
     {
+	QTreeWidgetItem* it = topLevelItem(i);
 	if (it->text(0) == groupName)
 	    return static_cast<GroupingViewItem*>(it);
     }
+    // return that nothing was found.
     return 0;
 }
 
+// only show a group if it has subitems.
 void RegisterView::updateGroupVisibility()
 {
-    for (Q3ListViewItem* it = firstChild(); it != 0; it = it->nextSibling())
+    for(int i = 0; i < topLevelItemCount(); i++)
     {
-	it->setVisible(it->childCount() > 0);
+	QTreeWidgetItem* item = topLevelItem(i);
+	item->setHidden(item->childCount() == 0);
     }
 }
 
@@ -518,8 +509,7 @@ void RegisterView::updateRegisters(const std::list<RegisterInfo>& regs)
     }
 
     // parse register values
-    // must iterate last to first, since QListView inserts at the top
-    for (std::list<RegisterInfo>::const_reverse_iterator reg = regs.rbegin(); reg != regs.rend(); ++reg)
+    for (std::list<RegisterInfo>::const_iterator reg = regs.begin(); reg != regs.end(); ++reg)
     {
 	// check if this is a new register
 	RegMap::iterator i = m_registers.find(reg->regName);
@@ -533,7 +523,11 @@ void RegisterView::updateRegisters(const std::list<RegisterInfo>& regs)
 	    {
 		it->m_changes = true;
 		it->setValue(*reg);
-		repaintItem(it);
+
+		it->setForeground(0,Qt::red);
+		it->setForeground(1,Qt::red);
+		it->setForeground(2,Qt::red);
+
 	    } else {
 		/*
 		 * If there was a change last time, but not now, we
@@ -541,7 +535,9 @@ void RegisterView::updateRegisters(const std::list<RegisterInfo>& regs)
 		 */
 		if (it->m_changes) {
 		    it->m_changes = false;
-		    repaintItem(it);
+		    it->setForeground(0,Qt::black);
+		    it->setForeground(1,Qt::black);
+		    it->setForeground(2,Qt::black);
 		}
 	    }
 	}
@@ -570,12 +566,13 @@ void RegisterView::updateRegisters(const std::list<RegisterInfo>& regs)
 
     updateGroupVisibility();
     setUpdatesEnabled(true);
-    triggerUpdate();
 }
   
 
-void RegisterView::rightButtonClicked(Q3ListViewItem* item, const QPoint& p, int)
+void RegisterView::contextMenuEvent(QContextMenuEvent* event)
 {
+    QTreeWidgetItem *item = itemAt(event->pos());
+
     if (item) {
         RegisterDisplay mode=static_cast<ModeItem*>(item)->mode();        
         for (unsigned int i = 0; i<sizeof(menuitems)/sizeof(MenuPair); i++) {
@@ -583,7 +580,9 @@ void RegisterView::rightButtonClicked(Q3ListViewItem* item, const QPoint& p, int
                                        mode.contains(menuitems[i].mode));
         }
         m_modemenu->setCaption(item->text(0));
-        m_modemenu->popup(p);
+	m_modemenu->popup(event->globalPos());
+
+	event->accept();
     }    
 }
 
@@ -606,7 +605,6 @@ void RegisterView::slotModeChange(int pcode)
 void RegisterView::paletteChange(const QPalette& oldPal)
 {
     setFont(KGlobalSettings::fixedFont());
-    Q3ListView::paletteChange(oldPal);
 }
 
 #include "regwnd.moc"
