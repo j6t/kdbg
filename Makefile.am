@@ -6,7 +6,8 @@ AUTOMAKE_OPTIONS = foreign
 
 EXTRA_DIST = BUGS ChangeLog-pre-2.2.0 COPYING TODO admin \
 	ReleaseNotes-2.2.0 \
-	ReleaseNotes-2.2.1
+	ReleaseNotes-2.2.1 \
+	ReleaseNotes-2.2.2
 
 $(top_srcdir)/configure.in: configure.in.in $(top_srcdir)/subdirs
 	cd $(top_srcdir) && $(MAKE) -f admin/Makefile.common configure.in ;
