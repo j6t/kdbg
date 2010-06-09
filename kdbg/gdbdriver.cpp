@@ -312,6 +312,32 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
 		cmds[DCcorefile].fmt = "core-file %s\n";
 	    }
 	}
+	{
+	    /*
+	     * Check for GDB 7.1 or later; the syntax for the disassemble
+	     * command has changed.
+	     * This RE picks the last version number in the first line,
+	     * because at least OpenSUSE writes its own version number
+	     * in the first line (but before GDB's version number).
+	     */
+	    QRegExp re(
+		" "			// must be preceded by space
+		"[(]?"			// SLES 10 embeds in parentheses
+		"(\\d+)\\.(\\d+)"	// major, minor
+		"[^ ]*\\n"		// no space until end of line
+		);
+	    int pos = re.search(m_output);
+	    const char* disass = "disassemble %s %s\n";
+	    if (pos >= 0) {
+		int major = re.cap(1).toInt();
+		int minor = re.cap(2).toInt();
+		if (major > 7 || (major == 7 && minor >= 1))
+		{
+		    disass = "disassemble %s, %s\n";
+		}
+	    }
+	    cmds[DCdisassemble].fmt = disass;
+	}
 	break;
     default:;
     }
