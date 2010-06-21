@@ -70,6 +70,7 @@ set(kdbg_SRCS
 
 set(kdbg_UI
     brkptbase.ui
+    brkptcondition.ui
     pgmargsbase.ui
     procattachbase.ui
 )

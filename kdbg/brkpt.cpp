@@ -13,9 +13,6 @@
 #include <QLabel>
 #include <QBitmap>
 #include <QPixmap>
-#include <Q3GridLayout>
-#include <Q3VBoxLayout>
-#include <Q3HBoxLayout>
 
 #include <QMouseEvent>
 #include "debugger.h"
@@ -24,6 +21,9 @@
 #include <ctype.h>
 #include <list>
 #include "mydebug.h"
+
+#include "ui_brkptcondition.h"
+
 
 
 class BreakpointItem : public QTreeWidgetItem, public Breakpoint
@@ -206,25 +206,17 @@ bool BreakpointTable::eventFilter(QObject* ob, QEvent* ev)
 
 class ConditionalDlg : public QDialog
 {
+private:
+      Ui::BrkPtCondition m_ui;
+
 public:
     ConditionalDlg(QWidget* parent);
     ~ConditionalDlg();
 
-    void setCondition(const QString& text) { m_condition.setText(text); }
-    QString condition() { return m_condition.text(); }
-    void setIgnoreCount(uint count);
-    uint ignoreCount();
-
-protected:
-    QLabel m_conditionLabel;
-    QLineEdit m_condition;
-    QLabel m_ignoreLabel;
-    QLineEdit m_ignoreCount;
-    QPushButton m_buttonOK;
-    QPushButton m_buttonCancel;
-    Q3VBoxLayout m_layout;
-    Q3GridLayout m_inputs;
-    Q3HBoxLayout m_buttons;
+    void setCondition(const QString& text) { m_ui.condition->setText(text); }
+    QString condition() { return m_ui.condition->text(); }
+    void setIgnoreCount(uint count){ m_ui.ignoreCount->setValue(count); };
+    uint ignoreCount(){ return m_ui.ignoreCount->value(); };
 };
 
 void BreakpointTable::on_btConditional_clicked()
@@ -367,85 +359,16 @@ void BreakpointItem::display()
 
 
 ConditionalDlg::ConditionalDlg(QWidget* parent) :
-	QDialog(parent, "conditional", true),
-	m_conditionLabel(this, "condLabel"),
-	m_condition(this, "condition"),
-	m_ignoreLabel(this, "ignoreLabel"),
-	m_ignoreCount(this, "ignoreCount"),
-	m_buttonOK(this, "ok"),
-	m_buttonCancel(this, "cancel"),
-	m_layout(this, 10),
-	m_inputs(2, 2, 10),
-	m_buttons(4)
+	QDialog(parent)
 {
+    m_ui.setupUi(this);
     QString title = KGlobal::caption();
     title += i18n(": Conditional breakpoint");
     setCaption(title);
-
-    m_conditionLabel.setText(i18n("&Condition:"));
-    m_conditionLabel.setMinimumSize(m_conditionLabel.sizeHint());
-    m_ignoreLabel.setText(i18n("Ignore &next hits:"));
-    m_ignoreLabel.setMinimumSize(m_ignoreLabel.sizeHint());
-
-    m_condition.setMinimumSize(150, 24);
-    m_condition.setMaxLength(10000);
-    m_condition.setFrame(true);
-    m_ignoreCount.setMinimumSize(150, 24);
-    m_ignoreCount.setMaxLength(10000);
-    m_ignoreCount.setFrame(true);
-
-    m_conditionLabel.setBuddy(&m_condition);
-    m_ignoreLabel.setBuddy(&m_ignoreCount);
-
-    m_buttonOK.setMinimumSize(100, 30);
-    connect(&m_buttonOK, SIGNAL(clicked()), SLOT(accept()));
-    m_buttonOK.setText(i18n("OK"));
-    m_buttonOK.setDefault(true);
-
-    m_buttonCancel.setMinimumSize(100, 30);
-    connect(&m_buttonCancel, SIGNAL(clicked()), SLOT(reject()));
-    m_buttonCancel.setText(i18n("Cancel"));
-
-    m_layout.addLayout(&m_inputs);
-    m_inputs.addWidget(&m_conditionLabel, 0, 0);
-    m_inputs.addWidget(&m_condition, 0, 1);
-    m_inputs.addWidget(&m_ignoreLabel, 1, 0);
-    m_inputs.addWidget(&m_ignoreCount, 1, 1);
-    m_inputs.setColStretch(1, 10);
-    m_layout.addLayout(&m_buttons);
-    m_layout.addStretch(10);
-    m_buttons.addStretch(10);
-    m_buttons.addWidget(&m_buttonOK);
-    m_buttons.addSpacing(40);
-    m_buttons.addWidget(&m_buttonCancel);
-    m_buttons.addStretch(10);
-
-    m_layout.activate();
-
-    m_condition.setFocus();
-    resize(400, 100);
 }
 
 ConditionalDlg::~ConditionalDlg()
 {
-}
-
-uint ConditionalDlg::ignoreCount()
-{
-    bool ok;
-    QString input = m_ignoreCount.text();
-    uint result = input.toUInt(&ok);
-    return ok ? result : 0;
-}
-
-void ConditionalDlg::setIgnoreCount(uint count)
-{
-    QString text;
-    // set empty if ignore count is zero
-    if (count > 0) {
-	text.setNum(count);
-    }
-    m_ignoreCount.setText(text);
 }
 
 
