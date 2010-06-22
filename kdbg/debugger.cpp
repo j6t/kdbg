@@ -13,10 +13,11 @@
 #include <QFileInfo>
 #include <Q3ListBox>
 #include <QApplication>
+#include <kcodecs.h>			// KMD5
 #include <kconfig.h>
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
-#include <kconfig.h>
+#include <kstandarddirs.h>
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
 #include <unistd.h>			/* sleep(3) */
@@ -677,11 +678,15 @@ void KDebugger::gdbExited(K3Process*)
 QString KDebugger::getConfigForExe(const QString& name)
 {
     QFileInfo fi(name);
-    QString pgmConfigFile = fi.dirPath(true);
-    if (!pgmConfigFile.isEmpty()) {
-	pgmConfigFile += '/';
-    }
-    pgmConfigFile += ".kdbgrc." + fi.fileName();
+    QString dir = fi.absolutePath();
+
+    // The session file for the given executable consists of
+    // a hash of the directory, followed by the program name.
+    // Assume that the first 15 positions of the hash are unique;
+    // this keeps the file names short.
+    QString hash = KMD5(dir.toUtf8()).base64Digest();
+    QString pgmConfigFile = hash.left(15) + "-" + fi.fileName();
+    pgmConfigFile = KStandardDirs::locateLocal("sessions", pgmConfigFile);
     TRACE("program config file = " + pgmConfigFile);
     return pgmConfigFile;
 }
@@ -693,6 +698,12 @@ void KDebugger::openProgramConfig(const QString& name)
     QString pgmConfigFile = getConfigForExe(name);
 
     m_programConfig = new KConfig(pgmConfigFile);
+
+    // this leaves a clue behind in the config file which
+    // executable it applies to; it is mostly intended for
+    // users peeking into the file
+    KConfigGroup g = m_programConfig->group(GeneralGroup);
+    g.writeEntry("ExecutableFile", name);
 }
 
 const char EnvironmentGroup[] = "Environment";
