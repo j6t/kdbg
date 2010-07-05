@@ -25,7 +25,7 @@
 #include <kurl.h>
 #include <kxmlguifactory.h>
 #include <KPageDialog>
-#include <Q3ListBox>
+#include <QListWidget>
 #include <QFile>
 #include <QFileInfo>
 #include <QList>
@@ -76,7 +76,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
     setCentralWidget(m_filesWindow);
 
     QDockWidget* dw1 = createDockWidget("Stack", i18n("Stack"));
-    m_btWindow = new Q3ListBox(dw1);
+    m_btWindow = new QListWidget(dw1);
     dw1->setWidget(m_btWindow);
     QDockWidget* dw2 = createDockWidget("Locals", i18n("Locals"));
     m_localVariables = new ExprWnd(dw2, i18n("Variable"));

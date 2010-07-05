@@ -20,7 +20,7 @@ class KTreeViewItem;
 class KConfig;
 class KConfigBase;
 class KConfigGroup;
-class Q3ListBox;
+class QListWidget;
 class RegisterInfo;
 class ThreadInfo;
 class DebuggerDriver;
@@ -39,7 +39,7 @@ public:
     KDebugger(QWidget* parent,		/* will be used as the parent for dialogs */
 	      ExprWnd* localVars,
 	      ExprWnd* watchVars,
-	      Q3ListBox* backtrace);
+	      QListWidget* backtrace);
     ~KDebugger();
 
     /**
@@ -554,7 +554,7 @@ signals:
 protected:
     ExprWnd& m_localVariables;
     ExprWnd& m_watchVariables;
-    Q3ListBox& m_btWindow;
+    QListWidget& m_btWindow;
 
     // implementation helpers
 protected:

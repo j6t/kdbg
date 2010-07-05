@@ -11,7 +11,7 @@
 #include "exprwnd.h"
 #include "pgmsettings.h"
 #include <QFileInfo>
-#include <Q3ListBox>
+#include <QListWidget>
 #include <QApplication>
 #include <kcodecs.h>			// KMD5
 #include <kconfig.h>
@@ -27,7 +27,7 @@
 KDebugger::KDebugger(QWidget* parent,
 		     ExprWnd* localVars,
 		     ExprWnd* watchVars,
-		     Q3ListBox* backtrace) :
+		     QListWidget* backtrace) :
 	QObject(parent, "debugger"),
 	m_ttyLevel(ttyFull),
 	m_memoryFormat(MDTword | MDThex),
@@ -53,7 +53,7 @@ KDebugger::KDebugger(QWidget* parent,
     connect(&m_watchVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
 	    SLOT(slotValueEdited(VarTree*, const QString&)));
 
-    connect(&m_btWindow, SIGNAL(highlighted(int)), SLOT(gotoFrame(int)));
+    connect(&m_btWindow, SIGNAL(currentRowChanged(int)), this, SLOT(gotoFrame(int)));
 
     emit updateUI();
 }
@@ -1467,9 +1467,6 @@ bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 // parse the output of bt
 void KDebugger::handleBacktrace(const char* output)
 {
-    // reduce flicker
-    m_btWindow.setAutoUpdate(false);
-
     m_btWindow.clear();
 
     std::list<StackFrame> stack;
@@ -1487,14 +1484,13 @@ void KDebugger::handleBacktrace(const char* output)
 		func = frm->var->m_name;
 	    else
 		func = frm->fileName + ":" + QString().setNum(frm->lineNo+1);
-	    m_btWindow.insertItem(func);
+        
+ 	    m_btWindow.addItem(func);
 	    TRACE("frame " + func + " (" + frm->fileName + ":" +
 		  QString().setNum(frm->lineNo+1) + ")");
 	}
     }
 
-    m_btWindow.setAutoUpdate(true);
-    m_btWindow.repaint();
 }
 
 void KDebugger::gotoFrame(int frame)

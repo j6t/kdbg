@@ -17,7 +17,7 @@ class KAnimatedButton;
 class KRecentFilesAction;
 class KUrl;
 class WinStack;
-class Q3ListBox;
+class QListWidget;
 class Q3ListViewItem;
 class ExprWnd;
 class BreakpointTable;
@@ -65,7 +65,7 @@ protected:
 
     // view windows
     WinStack* m_filesWindow;
-    Q3ListBox* m_btWindow;
+    QListWidget* m_btWindow;
     ExprWnd* m_localVariables;
     WatchWindow* m_watches;
     RegisterView* m_registers;
