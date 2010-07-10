@@ -6,26 +6,25 @@
 
 #include "debugger.h"
 #include "sourcewnd.h"
-#include <qtextstream.h>
-#include <qpainter.h>
-#include <qbrush.h>
-#include <qfile.h>
-#include <qfileinfo.h>
-#include <qkeycode.h>
-#include <qpopupmenu.h>
-#include <kapplication.h>
+#include "dbgdriver.h"
+#include <Q3TextStream>
+#include <QPainter>
+#include <QFile>
+#include <QFileInfo>
+#include <Q3PopupMenu>
+#include <QContextMenuEvent>
+#include <QKeyEvent>
+#include <QMouseEvent>
 #include <kiconloader.h>
 #include <kglobalsettings.h>
-#include <kmainwindow.h>
+#include <kxmlguiwindow.h>
+#include <kxmlguifactory.h>
 #include <algorithm>
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "mydebug.h"
 
 
-SourceWindow::SourceWindow(const QString& fileName, QWidget* parent, const char* name) :
-	QTextEdit(parent, name),
+SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
+	Q3TextEdit(parent),
 	m_fileName(fileName),
 	m_curRow(-1),
 	m_widthItems(16),
@@ -67,11 +66,11 @@ bool SourceWindow::loadFile()
 {
     // first we load the code into QTextEdit
     QFile f(m_fileName);
-    if (!f.open(IO_ReadOnly)) {
+    if (!f.open(QIODevice::ReadOnly)) {
 	return false;
     }
 
-    QTextStream t(&f);
+    Q3TextStream t(&f);
     setText(t.read());
     f.close();
 
@@ -95,7 +94,7 @@ bool SourceWindow::loadFile()
 void SourceWindow::reloadFile()
 {
     QFile f(m_fileName);
-    if (!f.open(IO_ReadOnly)) {
+    if (!f.open(QIODevice::ReadOnly)) {
 	// open failed; leave alone
 	return;
     }
@@ -103,7 +102,7 @@ void SourceWindow::reloadFile()
     // read text into m_sourceCode
     m_sourceCode.clear();		/* clear old text */
 
-    QTextStream t(&f);
+    Q3TextStream t(&f);
     setText(t.read());
     f.close();
 
@@ -150,7 +149,7 @@ void SourceWindow::scrollToRow(int row)
 
 void SourceWindow::drawFrame(QPainter* p)
 {
-    QTextEdit::drawFrame(p);
+    Q3TextEdit::drawFrame(p);
 
     // and paragraph at the top is...
     int top = paragraphAt(QPoint(0,contentsY()));
@@ -325,11 +324,11 @@ void SourceWindow::setPC(bool set, int lineNo, const DbgAddr& address, int frame
 void SourceWindow::find(const QString& text, bool caseSensitive, FindDirection dir)
 {
     ASSERT(dir == 1 || dir == -1);
-    if (QTextEdit::find(text, caseSensitive, false, dir > 0))
+    if (Q3TextEdit::find(text, caseSensitive, false, dir > 0))
 	return;
     // not found; wrap around
     int para = dir > 0 ? 0 : paragraphs(), index = 0;
-    QTextEdit::find(text, caseSensitive, false, dir > 0, &para, &index);
+    Q3TextEdit::find(text, caseSensitive, false, dir > 0, &para, &index);
 }
 
 void SourceWindow::mousePressEvent(QMouseEvent* ev)
@@ -337,7 +336,7 @@ void SourceWindow::mousePressEvent(QMouseEvent* ev)
     // we handle left and middle button
     if (ev->button() != Qt::LeftButton && ev->button() != Qt::MidButton)
     {
-	QTextEdit::mousePressEvent(ev);
+	Q3TextEdit::mousePressEvent(ev);
 	return;
     }
 
@@ -415,7 +414,7 @@ void SourceWindow::keyPressEvent(QKeyEvent* ev)
 	top1 = paragraphAt(top);
     }
 
-    QTextEdit::keyPressEvent(ev);
+    Q3TextEdit::keyPressEvent(ev);
 
     switch (ev->key()) {
     case Qt::Key_Next:
@@ -459,7 +458,7 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 void SourceWindow::paletteChange(const QPalette& oldPal)
 {
     setFont(KGlobalSettings::fixedFont());
-    QTextEdit::paletteChange(oldPal);
+    Q3TextEdit::paletteChange(oldPal);
 }
 
 /*
@@ -753,9 +752,9 @@ void SourceWindow::contextMenuEvent(QContextMenuEvent* e)
     do
 	top = top->parentWidget();
     while (!top->isTopLevel());
-    KMainWindow* mw = static_cast<KMainWindow*>(top);
-    QPopupMenu* m =
-	static_cast<QPopupMenu*>(mw->factory()->container("popup_files", mw));
+    KXmlGuiWindow* mw = static_cast<KXmlGuiWindow*>(top);
+    Q3PopupMenu* m =
+	static_cast<Q3PopupMenu*>(mw->factory()->container("popup_files", mw));
     m->exec(e->globalPos());
 }
 
@@ -766,11 +765,11 @@ bool SourceWindow::eventFilter(QObject* watched, QEvent* e)
 	contextMenuEvent(static_cast<QContextMenuEvent*>(e));
 	return true;
     }
-    return QTextEdit::eventFilter(watched, e);
+    return Q3TextEdit::eventFilter(watched, e);
 }
 
 HighlightCpp::HighlightCpp(SourceWindow* srcWnd) :
-	QSyntaxHighlighter(srcWnd),
+	Q3SyntaxHighlighter(srcWnd),
 	m_srcWnd(srcWnd)
 {
 }
@@ -876,7 +875,7 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
     // check for preprocessor line
     if (state == 0 && text.stripWhiteSpace().startsWith("#"))
     {
-	setFormat(0, text.length(), QColor("dark green"));
+	setFormat(0, text.length(), QColor("darkgreen"));
 	return 0;
     }
 
@@ -884,7 +883,7 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
     QFont identFont = textEdit()->currentFont();
     identFont.setBold(!identFont.bold());
 
-    unsigned start = 0;
+    int start = 0;
     while (start < text.length())
     {
 	int end;
@@ -892,7 +891,7 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
 	case hlCommentLine:
 	    end = text.length();
 	    state = 0;
-	    setFormat(start, end-start, QColor("gray50"));
+	    setFormat(start, end-start, QColor("gray"));
 	    break;
 	case hlCommentBlock:
 	    end = text.find("*/", start);
@@ -900,7 +899,7 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
 		end += 2, state = 0;
 	    else
 		end = text.length();
-	    setFormat(start, end-start, QColor("gray50"));
+	    setFormat(start, end-start, QColor("gray"));
 	    break;
 	case hlString:
 	    for (end = start+1; end < int(text.length()); end++) {
@@ -913,7 +912,7 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
 		}
 	    }
 	    state = 0;
-	    setFormat(start, end-start, QColor("dark red"));
+	    setFormat(start, end-start, QColor("darkred"));
 	    break;
 	case hlIdent:
 	    for (end = start+1; end < int(text.length()); end++) {

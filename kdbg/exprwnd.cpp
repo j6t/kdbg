@@ -7,19 +7,17 @@
 #include "exprwnd.h"
 #include "exprwnd.moc"
 #include "typetable.h"
-#include <qstringlist.h>
-#include <qpainter.h>
-#include <qscrollbar.h>
-#include <kapplication.h>
+#include <QStringList>
+#include <QPainter>
+#include <QPaintEvent>
+#include <QFocusEvent>
+#include <QKeyEvent>
 #include <kiconloader.h>		/* icons */
 #include <klocale.h>			/* i18n */
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "mydebug.h"
 
-VarTree::VarTree(VarTree* parent, QListViewItem* after, ExprValue* v) :
-	QListViewItem(parent, after),
+VarTree::VarTree(VarTree* parent, Q3ListViewItem* after, ExprValue* v) :
+	Q3ListViewItem(parent, after),
 	m_varKind(v->m_varKind),
 	m_nameKind(v->m_nameKind),
 	m_type(0),
@@ -29,14 +27,14 @@ VarTree::VarTree(VarTree* parent, QListViewItem* after, ExprValue* v) :
 	m_baseChanged(false),
 	m_structChanged(false)
 {
-    QListViewItem::setText(0, v->m_name);
+    Q3ListViewItem::setText(0, v->m_name);
     updateValueText();
     setExpandable(m_varKind == VarTree::VKpointer);
     setOpen(v->m_initiallyExpanded);
 }
 
-VarTree::VarTree(ExprWnd* parent, QListViewItem* after, const QString& name) :
-	QListViewItem(parent, after),
+VarTree::VarTree(ExprWnd* parent, Q3ListViewItem* after, const QString& name) :
+	Q3ListViewItem(parent, after),
 	m_varKind(VKsimple),
 	m_nameKind(VarTree::NKplain),
 	m_type(0),
@@ -45,7 +43,7 @@ VarTree::VarTree(ExprWnd* parent, QListViewItem* after, const QString& name) :
 	m_baseChanged(false),
 	m_structChanged(false)
 {
-    QListViewItem::setText(0, name);
+    Q3ListViewItem::setText(0, name);
 }
 
 VarTree::~VarTree()
@@ -57,9 +55,9 @@ void VarTree::paintCell(QPainter* p, const QColorGroup& cg, int column, int widt
     if (column == 1 && (m_baseChanged || m_structChanged)) {
 	QColorGroup cgChg = cg;
 	cgChg.setColor(QColorGroup::Text, Qt::red);
-	QListViewItem::paintCell(p, cgChg, column, width, align);
+	Q3ListViewItem::paintCell(p, cgChg, column, width, align);
     } else {
-	QListViewItem::paintCell(p, cg, column, width, align);
+	Q3ListViewItem::paintCell(p, cg, column, width, align);
     }
 }
 
@@ -124,7 +122,7 @@ bool VarTree::isToplevelExpr() const
 
 bool VarTree::isAncestorEq(const VarTree* child) const
 {
-    const QListViewItem* c = child;
+    const Q3ListViewItem* c = child;
     while (c != 0 && c != this) {
 	c = c->parent();
     }
@@ -168,11 +166,11 @@ bool VarTree::updateStructValue(const QString& newValue)
 void VarTree::updateValueText()
 {
     if (m_baseValue.isEmpty()) {
-	QListViewItem::setText(1, m_structValue);
+	Q3ListViewItem::setText(1, m_structValue);
     } else if (m_structValue.isEmpty()) {
-	QListViewItem::setText(1, m_baseValue);
+	Q3ListViewItem::setText(1, m_baseValue);
     } else {
-	QListViewItem::setText(1, m_baseValue + " " + m_structValue);
+	Q3ListViewItem::setText(1, m_baseValue + " " + m_structValue);
     }
 }
 
@@ -306,8 +304,8 @@ int ExprValue::childCount() const
 
 
 
-ExprWnd::ExprWnd(QWidget* parent, const QString& colHeader, const char* name) :
-	QListView(parent, name),
+ExprWnd::ExprWnd(QWidget* parent, const QString& colHeader) :
+	Q3ListView(parent),
 	m_edit(0)
 {
     addColumn(colHeader);
@@ -542,7 +540,7 @@ void ExprWnd::replaceChildren(VarTree* display, ExprValue* newValues)
 
 void ExprWnd::collectUnknownTypes(VarTree* var)
 {
-    QListViewItemIterator i(var);
+    Q3ListViewItemIterator i(var);
     for (; i.current(); ++i)
     {
 	checkUnknownType(static_cast<VarTree*>(i.current()));
@@ -710,7 +708,7 @@ void ExprWnd::editValue(VarTree* item, const QString& text)
     int y = r.y();
     int w = columnWidth(1);
     int h = r.height();
-    QListView* lv = item->listView();
+    Q3ListView* lv = item->listView();
 
     /*
      * Make the edit widget at least 5 characters wide (but not wider than
@@ -762,9 +760,9 @@ ValueEdit::ValueEdit(ExprWnd* parent) :
     hide();
     lower();	// lower the window below scrollbars
     connect(parent, SIGNAL(selectionChanged()), SLOT(slotSelectionChanged()));
-    connect(parent, SIGNAL(currentChanged(QListViewItem*)), SLOT(slotSelectionChanged()));
-    connect(parent, SIGNAL(expanded(QListViewItem*)), SLOT(slotSelectionChanged()));
-    connect(parent, SIGNAL(collapsed(QListViewItem*)), SLOT(slotSelectionChanged()));
+    connect(parent, SIGNAL(currentChanged(Q3ListViewItem*)), SLOT(slotSelectionChanged()));
+    connect(parent, SIGNAL(expanded(Q3ListViewItem*)), SLOT(slotSelectionChanged()));
+    connect(parent, SIGNAL(collapsed(Q3ListViewItem*)), SLOT(slotSelectionChanged()));
     connect(this, SIGNAL(done(VarTree*, const QString&)),
 	    parent, SIGNAL(editValueCommitted(VarTree*, const QString&)));
 }
@@ -808,7 +806,7 @@ void ValueEdit::focusOutEvent(QFocusEvent* ev)
 {
     TRACE("ValueEdit::focusOutEvent");
     QFocusEvent* focusEv = static_cast<QFocusEvent*>(ev);
-    if (focusEv->reason() == QFocusEvent::ActiveWindow)
+    if (focusEv->reason() == Qt::ActiveWindowFocusReason)
     {
 	// Switching to a different window should terminate the edit,
 	// because if the window with this variable display is floating
@@ -818,7 +816,7 @@ void ValueEdit::focusOutEvent(QFocusEvent* ev)
 	terminate(false);
     }
     // Don't let a RMB close the editor
-    else if (focusEv->reason() != QFocusEvent::Popup)
+    else if (focusEv->reason() != Qt::PopupFocusReason)
     {
 	terminate(true);
     }

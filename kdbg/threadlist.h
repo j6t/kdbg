@@ -7,23 +7,23 @@
 #ifndef THREADLIST_H
 #define THREADLIST_H
 
-#include <qlistview.h>
-#include <qpixmap.h>
+#include <Q3ListView>
+#include <QPixmap>
 #include <list>
 
 class ThreadInfo;
 class ThreadEntry;
 
-class ThreadList : public QListView
+class ThreadList : public Q3ListView
 {
     Q_OBJECT
 public:
-    ThreadList(QWidget* parent, const char* name);
+    ThreadList(QWidget* parent);
     ~ThreadList();
 
 public slots:
     void updateThreads(const std::list<ThreadInfo>&);
-    void slotCurrentChanged(QListViewItem*);
+    void slotCurrentChanged(Q3ListViewItem*);
 
 signals:
     void setThread(int);

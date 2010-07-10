@@ -2,7 +2,7 @@
 Types1=QString,QDir,QFileInfo,QFile
 Types2=QObject,QTableView
 LibDisplayName=libqt 1.x
-ShlibRE=libqt\.so\.1$
+ShlibRE=libqt\\.so\\.1$
 [QString]
 Display={ % }
 Expr1=(%s).shd->data

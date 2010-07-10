@@ -6,21 +6,20 @@
 
 #include "pgmsettings.h"
 #include <klocale.h>			/* i18n */
-#include <kapplication.h>
-#include <qfileinfo.h>
-#include <qlayout.h>
-#include <qlineedit.h>
-#include <qlabel.h>
-#include <qradiobutton.h>
-#include <qbuttongroup.h>
-#include "config.h"
+#include <kglobal.h>
+#include <QFileInfo>
+#include <QLineEdit>
+#include <QLabel>
+#include <QRadioButton>
+#include <QButtonGroup>
+#include <QVBoxLayout>
 #include "mydebug.h"
 
 
 ChooseDriver::ChooseDriver(QWidget* parent) :
 	QWidget(parent, "driver")
 {
-    QVBoxLayout* layout = new QVBoxLayout(this, 10);
+    QVBoxLayout* layout = new QVBoxLayout(this);
 
     QLabel* label = new QLabel(this);
     label->setText(i18n("How to invoke &GDB - leave empty to use\n"
@@ -33,7 +32,8 @@ ChooseDriver::ChooseDriver(QWidget* parent) :
     layout->addWidget(m_debuggerCmd);
     label->setBuddy(m_debuggerCmd);
 
-    layout->addStretch(10);
+    layout->addStretch();
+    this->setLayout(layout);
 }
 
 void ChooseDriver::setDebuggerCmd(const QString& cmd)
@@ -50,39 +50,38 @@ QString ChooseDriver::debuggerCmd() const
 OutputSettings::OutputSettings(QWidget* parent) :
 	QWidget(parent, "output")
 {
-    // the group is invisible
     m_group = new QButtonGroup(this);
-    m_group->hide();
 
-    QVBoxLayout* layout = new QVBoxLayout(this, 10);
+    QVBoxLayout* layout = new QVBoxLayout(this);
 
     QRadioButton* btn;
 
     btn = new QRadioButton(i18n("&No input and output"), this);
-    m_group->insert(btn, 0);
-    btn->setMinimumSize(btn->sizeHint());
+    m_group->addButton(btn, 0);
     layout->addWidget(btn);
 
     btn = new QRadioButton(i18n("&Only output, simple terminal emulation"), this);
-    m_group->insert(btn, 1);
-    btn->setMinimumSize(btn->sizeHint());
+    m_group->addButton(btn, 1);
     layout->addWidget(btn);
 
     btn = new QRadioButton(i18n("&Full terminal emulation"), this);
-    m_group->insert(btn, 7);
-    btn->setMinimumSize(btn->sizeHint());
+    m_group->addButton(btn, 7);
     layout->addWidget(btn);
 
-    layout->addStretch(10);
+    layout->addStretch();
+
+    this->setLayout(layout);
 
     // there is no simpler way to get to the active button than
     // to connect to a signal
-    connect(m_group, SIGNAL(clicked(int)), SLOT(slotLevelChanged(int)));
+    connect(m_group, SIGNAL(buttonClicked(int)), SLOT(slotLevelChanged(int)));
 }
 
 void OutputSettings::setTTYLevel(int l)
 {
-    m_group->setButton(l);
+    QAbstractButton* button = m_group->button(l);
+    Q_ASSERT(button);
+    button->setChecked(true);
     m_ttyLevel = l;
 }
 
@@ -94,22 +93,19 @@ void OutputSettings::slotLevelChanged(int id)
 
 
 
-ProgramSettings::ProgramSettings(QWidget* parent, QString exeName, bool modal) :
-	QTabDialog(parent, "program_settings", modal),
+ProgramSettings::ProgramSettings(QWidget* parent, QString exeName) :
+	KPageDialog(parent),
 	m_chooseDriver(this),
 	m_output(this)
 {
     // construct title
     QFileInfo fi(exeName);
-    QString cap = kapp->caption();
+    QString cap = KGlobal::caption();
     QString title = i18n("%1: Settings for %2");
     setCaption(title.arg(cap, fi.fileName()));
 
-    setCancelButton(i18n("Cancel"));
-    setOKButton(i18n("OK"));
-
-    addTab(&m_chooseDriver, i18n("&Debugger"));
-    addTab(&m_output, i18n("&Output"));
+    addPage(&m_chooseDriver, i18n("Debugger"));
+    addPage(&m_output, i18n("Output"));
 }
 
 #include "pgmsettings.moc"

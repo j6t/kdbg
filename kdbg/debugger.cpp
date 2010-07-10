@@ -10,27 +10,24 @@
 #include "typetable.h"
 #include "exprwnd.h"
 #include "pgmsettings.h"
-#include "programconfig.h"
-#include <qregexp.h>
-#include <qfileinfo.h>
-#include <qlistbox.h>
-#include <qstringlist.h>
-#include <kapplication.h>
+#include <QFileInfo>
+#include <QListWidget>
+#include <QApplication>
+#include <kcodecs.h>			// KMD5
 #include <kconfig.h>
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
+#include <kstandarddirs.h>
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>			/* sleep(3) */
-#endif
 #include "mydebug.h"
 
 
 KDebugger::KDebugger(QWidget* parent,
 		     ExprWnd* localVars,
 		     ExprWnd* watchVars,
-		     QListBox* backtrace) :
+		     QListWidget* backtrace) :
 	QObject(parent, "debugger"),
 	m_ttyLevel(ttyFull),
 	m_memoryFormat(MDTword | MDThex),
@@ -47,16 +44,16 @@ KDebugger::KDebugger(QWidget* parent,
 {
     m_envVars.setAutoDelete(true);
 
-    connect(&m_localVariables, SIGNAL(expanded(QListViewItem*)),
-	    SLOT(slotExpanding(QListViewItem*)));
-    connect(&m_watchVariables, SIGNAL(expanded(QListViewItem*)),
-	    SLOT(slotExpanding(QListViewItem*)));
+    connect(&m_localVariables, SIGNAL(expanded(Q3ListViewItem*)),
+	    SLOT(slotExpanding(Q3ListViewItem*)));
+    connect(&m_watchVariables, SIGNAL(expanded(Q3ListViewItem*)),
+	    SLOT(slotExpanding(Q3ListViewItem*)));
     connect(&m_localVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
 	    SLOT(slotValueEdited(VarTree*, const QString&)));
     connect(&m_watchVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
 	    SLOT(slotValueEdited(VarTree*, const QString&)));
 
-    connect(&m_btWindow, SIGNAL(highlighted(int)), SLOT(gotoFrame(int)));
+    connect(&m_btWindow, SIGNAL(currentRowChanged(int)), this, SLOT(gotoFrame(int)));
 
     emit updateUI();
 }
@@ -113,10 +110,10 @@ bool KDebugger::debugProgram(const QString& name,
     // wire up the driver
     connect(driver, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
 	    this, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)));
-    connect(driver, SIGNAL(processExited(KProcess*)), SLOT(gdbExited(KProcess*)));
+    connect(driver, SIGNAL(processExited(K3Process*)), SLOT(gdbExited(K3Process*)));
     connect(driver, SIGNAL(commandReceived(CmdQueueItem*,const char*)),
 	    SLOT(parse(CmdQueueItem*,const char*)));
-    connect(driver, SIGNAL(wroteStdin(KProcess*)), SIGNAL(updateUI()));
+    connect(driver, SIGNAL(wroteStdin(K3Process*)), SIGNAL(updateUI()));
     connect(driver, SIGNAL(inferiorRunning()), SLOT(slotInferiorRunning()));
     connect(driver, SIGNAL(enterIdleState()), SLOT(backgroundUpdate()));
     connect(driver, SIGNAL(enterIdleState()), SIGNAL(updateUI()));
@@ -130,10 +127,10 @@ bool KDebugger::debugProgram(const QString& name,
 
     // get debugger command from per-program settings
     if (m_programConfig != 0) {
-	m_programConfig->setGroup(GeneralGroup);
-	m_debuggerCmd = readDebuggerCmd();
+	KConfigGroup g = m_programConfig->group(GeneralGroup);
+	m_debuggerCmd = readDebuggerCmd(g);
 	// get terminal emulation level
-	m_ttyLevel = TTYLevel(m_programConfig->readNumEntry(TTYLevelEntry, ttyFull));
+	m_ttyLevel = TTYLevel(g.readEntry(TTYLevelEntry, int(ttyFull)));
     }
     // the rest is read in later in the handler of DCexecutable
 
@@ -625,17 +622,17 @@ void KDebugger::stopDriver()
      * this timeout be reached, the only reasonable thing one could do then
      * is exiting kdbg.
      */
-    kapp->processEvents(1000);		/* ideally, this will already shut it down */
+    QApplication::processEvents(QEventLoop::AllEvents, 1000);
     int maxTime = 20;			/* about 20 seconds */
     while (m_haveExecutable && maxTime > 0) {
 	// give gdb time to die (and send a SIGCLD)
 	::sleep(1);
 	--maxTime;
-	kapp->processEvents(1000);
+	QApplication::processEvents(QEventLoop::AllEvents, 1000);
     }
 }
 
-void KDebugger::gdbExited(KProcess*)
+void KDebugger::gdbExited(K3Process*)
 {
     /*
      * Save settings, but only if gdb has already processed "info line
@@ -681,11 +678,15 @@ void KDebugger::gdbExited(KProcess*)
 QString KDebugger::getConfigForExe(const QString& name)
 {
     QFileInfo fi(name);
-    QString pgmConfigFile = fi.dirPath(true);
-    if (!pgmConfigFile.isEmpty()) {
-	pgmConfigFile += '/';
-    }
-    pgmConfigFile += ".kdbgrc." + fi.fileName();
+    QString dir = fi.absolutePath();
+
+    // The session file for the given executable consists of
+    // a hash of the directory, followed by the program name.
+    // Assume that the first 15 positions of the hash are unique;
+    // this keeps the file names short.
+    QString hash = KMD5(dir.toUtf8()).base64Digest();
+    QString pgmConfigFile = hash.left(15) + "-" + fi.fileName();
+    pgmConfigFile = KStandardDirs::locateLocal("sessions", pgmConfigFile);
     TRACE("program config file = " + pgmConfigFile);
     return pgmConfigFile;
 }
@@ -696,7 +697,13 @@ void KDebugger::openProgramConfig(const QString& name)
 
     QString pgmConfigFile = getConfigForExe(name);
 
-    m_programConfig = new ProgramConfig(pgmConfigFile);
+    m_programConfig = new KConfig(pgmConfigFile);
+
+    // this leaves a clue behind in the config file which
+    // executable it applies to; it is mostly intended for
+    // users peeking into the file
+    KConfigGroup g = m_programConfig->group(GeneralGroup);
+    g.writeEntry("ExecutableFile", name);
 }
 
 const char EnvironmentGroup[] = "Environment";
@@ -712,30 +719,30 @@ const char ExprFmt[] = "Expr%d";
 void KDebugger::saveProgramSettings()
 {
     ASSERT(m_programConfig != 0);
-    m_programConfig->setGroup(GeneralGroup);
-    m_programConfig->writeEntry(FileVersion, 1);
-    m_programConfig->writeEntry(ProgramArgs, m_programArgs);
-    m_programConfig->writeEntry(WorkingDirectory, m_programWD);
-    m_programConfig->writeEntry(OptionsSelected, m_boolOptions);
-    m_programConfig->writeEntry(DebuggerCmdStr, m_debuggerCmd);
-    m_programConfig->writeEntry(TTYLevelEntry, int(m_ttyLevel));
+    KConfigGroup gg = m_programConfig->group(GeneralGroup);
+    gg.writeEntry(FileVersion, 1);
+    gg.writeEntry(ProgramArgs, m_programArgs);
+    gg.writeEntry(WorkingDirectory, m_programWD);
+    gg.writeEntry(OptionsSelected, m_boolOptions);
+    gg.writeEntry(DebuggerCmdStr, m_debuggerCmd);
+    gg.writeEntry(TTYLevelEntry, int(m_ttyLevel));
     QString driverName;
     if (m_d != 0)
 	driverName = m_d->driverName();
-    m_programConfig->writeEntry(DriverNameEntry, driverName);
+    gg.writeEntry(DriverNameEntry, driverName);
 
     // write environment variables
     m_programConfig->deleteGroup(EnvironmentGroup);
-    m_programConfig->setGroup(EnvironmentGroup);
-    QDictIterator<EnvVar> it = m_envVars;
+    KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
+    Q3DictIterator<EnvVar> it = m_envVars;
     EnvVar* var;
     QString varName;
     QString varValue;
     for (int i = 0; (var = it) != 0; ++it, ++i) {
 	varName.sprintf(Variable, i);
 	varValue.sprintf(Value, i);
-	m_programConfig->writeEntry(varName, it.currentKey());
-	m_programConfig->writeEntry(varValue, var->value);
+	eg.writeEntry(varName, it.currentKey());
+	eg.writeEntry(varValue, var->value);
     }
 
     saveBreakpoints(m_programConfig);
@@ -744,12 +751,12 @@ void KDebugger::saveProgramSettings()
     // first get rid of whatever was in this group
     m_programConfig->deleteGroup(WatchGroup);
     // then start a new group
-    m_programConfig->setGroup(WatchGroup);
+    KConfigGroup wg = m_programConfig->group(WatchGroup);
     VarTree* item = m_watchVariables.firstChild();
     int watchNum = 0;
     for (; item != 0; item = item->nextSibling(), ++watchNum) {
 	varName.sprintf(ExprFmt, watchNum);
-	m_programConfig->writeEntry(varName, item->getText());
+	wg.writeEntry(varName, item->getText());
     }
 
     // give others a chance
@@ -759,46 +766,46 @@ void KDebugger::saveProgramSettings()
 void KDebugger::overrideProgramArguments(const QString& args)
 {
     ASSERT(m_programConfig != 0);
-    m_programConfig->setGroup(GeneralGroup);
-    m_programConfig->writeEntry(ProgramArgs, args);
+    KConfigGroup g = m_programConfig->group(GeneralGroup);
+    g.writeEntry(ProgramArgs, args);
 }
 
 void KDebugger::restoreProgramSettings()
 {
     ASSERT(m_programConfig != 0);
-    m_programConfig->setGroup(GeneralGroup);
+    KConfigGroup gg = m_programConfig->group(GeneralGroup);
     /*
      * We ignore file version for now we will use it in the future to
      * distinguish different versions of this configuration file.
      */
     // m_debuggerCmd has been read in already
     // m_ttyLevel has been read in already
-    QString pgmArgs = m_programConfig->readEntry(ProgramArgs);
-    QString pgmWd = m_programConfig->readEntry(WorkingDirectory);
-    QStringList boolOptions = m_programConfig->readListEntry(OptionsSelected);
+    QString pgmArgs = gg.readEntry(ProgramArgs);
+    QString pgmWd = gg.readEntry(WorkingDirectory);
+    QStringList boolOptions = gg.readEntry(OptionsSelected, QStringList());
     m_boolOptions = QStringList();
 
     // read environment variables
-    m_programConfig->setGroup(EnvironmentGroup);
+    KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
     m_envVars.clear();
-    QDict<EnvVar> pgmVars;
+    Q3Dict<EnvVar> pgmVars;
     EnvVar* var;
     QString varName;
     QString varValue;
     for (int i = 0;; ++i) {
 	varName.sprintf(Variable, i);
 	varValue.sprintf(Value, i);
-	if (!m_programConfig->hasKey(varName)) {
+	if (!eg.hasKey(varName)) {
 	    /* entry not present, assume that we've hit them all */
 	    break;
 	}
-	QString name = m_programConfig->readEntry(varName);
+	QString name = eg.readEntry(varName, QString());
 	if (name.isEmpty()) {
 	    // skip empty names
 	    continue;
 	}
 	var = new EnvVar;
-	var->value = m_programConfig->readEntry(varValue);
+	var->value = eg.readEntry(varValue, QString());
 	var->status = EnvVar::EVnew;
 	pgmVars.insert(name, var);
     }
@@ -808,15 +815,15 @@ void KDebugger::restoreProgramSettings()
     restoreBreakpoints(m_programConfig);
 
     // watch expressions
-    m_programConfig->setGroup(WatchGroup);
+    KConfigGroup wg = m_programConfig->group(WatchGroup);
     m_watchVariables.clear();
     for (int i = 0;; ++i) {
 	varName.sprintf(ExprFmt, i);
-	if (!m_programConfig->hasKey(varName)) {
+	if (!wg.hasKey(varName)) {
 	    /* entry not present, assume that we've hit them all */
 	    break;
 	}
-	QString expr = m_programConfig->readEntry(varName);
+	QString expr = wg.readEntry(varName, QString());
 	if (expr.isEmpty()) {
 	    // skip empty expressions
 	    continue;
@@ -832,9 +839,9 @@ void KDebugger::restoreProgramSettings()
  * Reads the debugger command line from the program settings. The config
  * group must have been set by the caller.
  */
-QString KDebugger::readDebuggerCmd()
+QString KDebugger::readDebuggerCmd(const KConfigGroup& g)
 {
-    QString debuggerCmd = m_programConfig->readEntry(DebuggerCmdStr);
+    QString debuggerCmd = g.readEntry(DebuggerCmdStr);
 
     // always let the user confirm the debugger cmd if we are root
     if (::geteuid() == 0)
@@ -867,7 +874,7 @@ const char Temporary[] = "Temporary";
 const char Enabled[] = "Enabled";
 const char Condition[] = "Condition";
 
-void KDebugger::saveBreakpoints(ProgramConfig* config)
+void KDebugger::saveBreakpoints(KConfig* config)
 {
     QString groupName;
     int i = 0;
@@ -880,7 +887,7 @@ void KDebugger::saveBreakpoints(ProgramConfig* config)
 	/* remove remmants */
 	config->deleteGroup(groupName);
 
-	config->setGroup(groupName);
+	KConfigGroup g = config->group(groupName);
 	if (!bp->text.isEmpty()) {
 	    /*
 	     * The breakpoint was set using the text box in the breakpoint
@@ -888,29 +895,28 @@ void KDebugger::saveBreakpoints(ProgramConfig* config)
 	     * but instead honor what the user typed (a function name, for
 	     * example, which could move between sessions).
 	     */
-	    config->writeEntry(Text, bp->text);
+	    g.writeEntry(Text, bp->text);
 	} else if (!bp->fileName.isEmpty()) {
-	    config->writeEntry(File, bp->fileName);
-	    config->writeEntry(Line, bp->lineNo);
+	    g.writeEntry(File, bp->fileName);
+	    g.writeEntry(Line, bp->lineNo);
 	    /*
 	     * Addresses are hardly correct across sessions, so we don't
 	     * save it.
 	     */
 	} else {
-	    config->writeEntry(Address, bp->address.asString());
+	    g.writeEntry(Address, bp->address.asString());
 	}
-	config->writeEntry(Temporary, bp->temporary);
-	config->writeEntry(Enabled, bp->enabled);
+	g.writeEntry(Temporary, bp->temporary);
+	g.writeEntry(Enabled, bp->enabled);
 	if (!bp->condition.isEmpty())
-	    config->writeEntry(Condition, bp->condition);
+	    g.writeEntry(Condition, bp->condition);
 	// we do not save the ignore count
     }
     // delete remaining groups
     // we recognize that a group is present if there is an Enabled entry
     for (;; i++) {
 	groupName.sprintf(BPGroup, i);
-	config->setGroup(groupName);
-	if (!config->hasKey(Enabled)) {
+	if (!config->group(groupName).hasKey(Enabled)) {
 	    /* group not present, assume that we've hit them all */
 	    break;
 	}
@@ -918,7 +924,7 @@ void KDebugger::saveBreakpoints(ProgramConfig* config)
     }
 }
 
-void KDebugger::restoreBreakpoints(ProgramConfig* config)
+void KDebugger::restoreBreakpoints(KConfig* config)
 {
     QString groupName;
     /*
@@ -927,16 +933,16 @@ void KDebugger::restoreBreakpoints(ProgramConfig* config)
      */
     for (int i = 0;; i++) {
 	groupName.sprintf(BPGroup, i);
-	config->setGroup(groupName);
-	if (!config->hasKey(Enabled)) {
+	KConfigGroup g = config->group(groupName);
+	if (!g.hasKey(Enabled)) {
 	    /* group not present, assume that we've hit them all */
 	    break;
 	}
 	Breakpoint* bp = new Breakpoint;
-	bp->fileName = config->readEntry(File);
-	bp->lineNo = config->readNumEntry(Line, -1);
-	bp->text = config->readEntry(Text);
-	bp->address = config->readEntry(Address);
+	bp->fileName = g.readEntry(File);
+	bp->lineNo = g.readEntry(Line, -1);
+	bp->text = g.readEntry(Text);
+	bp->address = g.readEntry(Address);
 	// check consistency
 	if ((bp->fileName.isEmpty() || bp->lineNo < 0) &&
 	    bp->text.isEmpty() &&
@@ -945,9 +951,9 @@ void KDebugger::restoreBreakpoints(ProgramConfig* config)
 	    delete bp;
 	    continue;
 	}
-	bp->enabled = config->readBoolEntry(Enabled, true);
-	bp->temporary = config->readBoolEntry(Temporary, false);
-	bp->condition = config->readEntry(Condition);
+	bp->enabled = g.readEntry(Enabled, true);
+	bp->temporary = g.readEntry(Temporary, false);
+	bp->condition = g.readEntry(Condition);
 
 	/*
 	 * Add the breakpoint.
@@ -1248,7 +1254,7 @@ void KDebugger::updateAllExprs()
 }
 
 void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
-				      const QDict<EnvVar>& newVars,
+				      const Q3Dict<EnvVar>& newVars,
 				      const QStringList& newOptions)
 {
     m_programArgs = args;
@@ -1262,7 +1268,7 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
     }
 
     // update environment variables
-    QDictIterator<EnvVar> it = newVars;
+    Q3DictIterator<EnvVar> it = newVars;
     EnvVar* val;
     for (; (val = it) != 0; ++it) {
 	QString var = it.currentKey();
@@ -1461,9 +1467,6 @@ bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 // parse the output of bt
 void KDebugger::handleBacktrace(const char* output)
 {
-    // reduce flicker
-    m_btWindow.setAutoUpdate(false);
-
     m_btWindow.clear();
 
     std::list<StackFrame> stack;
@@ -1481,14 +1484,13 @@ void KDebugger::handleBacktrace(const char* output)
 		func = frm->var->m_name;
 	    else
 		func = frm->fileName + ":" + QString().setNum(frm->lineNo+1);
-	    m_btWindow.insertItem(func);
+        
+ 	    m_btWindow.addItem(func);
 	    TRACE("frame " + func + " (" + frm->fileName + ":" +
 		  QString().setNum(frm->lineNo+1) + ")");
 	}
     }
 
-    m_btWindow.setAutoUpdate(true);
-    m_btWindow.repaint();
 }
 
 void KDebugger::gotoFrame(int frame)
@@ -1814,7 +1816,7 @@ CmdQueueItem* KDebugger::loadCoreFile()
     return m_d->queueCmd(DCcorefile, m_corefile, DebuggerDriver::QMoverride);
 }
 
-void KDebugger::slotExpanding(QListViewItem* item)
+void KDebugger::slotExpanding(Q3ListViewItem* item)
 {
     VarTree* exprItem = static_cast<VarTree*>(item);
     if (exprItem->m_varKind != VarTree::VKpointer) {

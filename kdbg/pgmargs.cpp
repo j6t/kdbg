@@ -5,21 +5,18 @@
  */
 
 #include "pgmargs.h"
-#include <qlabel.h>
-#include <qpushbutton.h>
-#include <qlistview.h>
-#include <qlistbox.h>
-#include <qtabwidget.h>
+#include <Q3ListView>
 #include <kfiledialog.h>
 #include <klocale.h>			/* i18n */
-#include "config.h"
 #include "mydebug.h"
 
-PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars,
+PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, Q3Dict<EnvVar>& envVars,
 		 const QStringList& allOptions) :
-	PgmArgsBase(parent, "pgmargs", true),
+	QDialog(parent),
 	m_envVars(envVars)
 {
+    setupUi(this);
+
     m_envVars.setAutoDelete(false);
 
     {
@@ -75,7 +72,7 @@ QStringList PgmArgs::options() const
 }
 
 // this is a slot
-void PgmArgs::modifyVar()
+void PgmArgs::on_buttonModify_clicked()
 {
     modifyVar(true);	// re-add deleted entries
 }
@@ -97,7 +94,7 @@ void PgmArgs::modifyVar(bool resurrect)
 	    {
 		val->value = value;
 		val->status = EnvVar::EVdirty;
-		val->item = new QListViewItem(envList, name, value);	// inserts itself
+		val->item = new Q3ListViewItem(envList, name, value);	// inserts itself
 		m_envVars.insert(name, val);
 	    }
 	} else if (value != val->value) {
@@ -111,7 +108,7 @@ void PgmArgs::modifyVar(bool resurrect)
 	val = new EnvVar;
 	val->value = value;
 	val->status = EnvVar::EVnew;
-	val->item = new QListViewItem(envList, name, value);	// inserts itself
+	val->item = new Q3ListViewItem(envList, name, value);	// inserts itself
 	m_envVars.insert(name, val);
     }
     envList->setSelected(val->item, true);
@@ -119,9 +116,9 @@ void PgmArgs::modifyVar(bool resurrect)
 }
 
 // delete the selected item
-void PgmArgs::deleteVar()
+void PgmArgs::on_buttonDelete_clicked()
 {
-    QListViewItem* item = envList->selectedItem();
+    Q3ListViewItem* item = envList->selectedItem();
     if (item == 0)
 	return;
     QString name = item->text(0);
@@ -162,22 +159,22 @@ void PgmArgs::parseEnvInput(QString& name, QString& value)
 
 void PgmArgs::initEnvList()
 {
-    QDictIterator<EnvVar> it = m_envVars;
+    Q3DictIterator<EnvVar> it = m_envVars;
     EnvVar* val;
     QString name;
     for (; (val = it) != 0; ++it) {
 	val->status = EnvVar::EVclean;
 	name = it.currentKey();
-	val->item = new QListViewItem(envList, name, val->value);	// inserts itself
+	val->item = new Q3ListViewItem(envList, name, val->value);	// inserts itself
     }
 
     envList->setAllColumnsShowFocus(true);
     buttonDelete->setEnabled(envList->selectedItem() != 0);
 }
 
-void PgmArgs::envListCurrentChanged()
+void PgmArgs::on_envList_selectionChanged()
 {
-    QListViewItem* item = envList->selectedItem();
+    Q3ListViewItem* item = envList->selectedItem();
     buttonDelete->setEnabled(item != 0);
     if (item == 0)
 	return;
@@ -201,7 +198,7 @@ void PgmArgs::accept()
     QDialog::accept();
 }
 
-void PgmArgs::browseWd()
+void PgmArgs::on_wdBrowse_clicked()
 {
     // browse for the working directory
     QString newDir = KFileDialog::getExistingDirectory(wd(), this);
@@ -210,7 +207,7 @@ void PgmArgs::browseWd()
     }
 }
 
-void PgmArgs::browseArgFile()
+void PgmArgs::on_insertFile_clicked()
 {
     QString caption = i18n("Select a file name to insert as program argument");
 
@@ -224,7 +221,7 @@ void PgmArgs::browseArgFile()
     }
 }
 
-void PgmArgs::browseArgDir()
+void PgmArgs::on_insertDir_clicked()
 {
     QString caption = i18n("Select a directory to insert as program argument");
 

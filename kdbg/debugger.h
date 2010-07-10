@@ -7,15 +7,10 @@
 #ifndef DEBUGGER_H
 #define DEBUGGER_H
 
-#include <qtimer.h>
-#include <qdict.h>
-#include <qstringlist.h>
+#include <Q3Dict>
+#include <QStringList>
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
-
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 
 class ExprWnd;
 class VarTree;
@@ -24,8 +19,8 @@ class ProgramTypeTable;
 class KTreeViewItem;
 class KConfig;
 class KConfigBase;
-class ProgramConfig;
-class QListBox;
+class KConfigGroup;
+class QListWidget;
 class RegisterInfo;
 class ThreadInfo;
 class DebuggerDriver;
@@ -34,7 +29,7 @@ class Breakpoint;
 struct DisassembledCode;
 struct MemoryDump;
 struct DbgAddr;
-class KProcess;
+class K3Process;
 
 
 class KDebugger : public QObject
@@ -44,7 +39,7 @@ public:
     KDebugger(QWidget* parent,		/* will be used as the parent for dialogs */
 	      ExprWnd* localVars,
 	      ExprWnd* watchVars,
-	      QListBox* backtrace);
+	      QListWidget* backtrace);
     ~KDebugger();
 
     /**
@@ -368,7 +363,7 @@ protected:
     void handleRunCommands(const char* output);
     void updateAllExprs();
     void updateProgEnvironment(const QString& args, const QString& wd,
-			       const QDict<EnvVar>& newVars,
+			       const Q3Dict<EnvVar>& newVars,
 			       const QStringList& newOptions);
     void parseLocals(const char* output, std::list<ExprValue*>& newVars);
     void handleLocals(const char* output);
@@ -403,8 +398,8 @@ protected:
     void newBreakpoint(CmdQueueItem* cmd, const char* output);
     void updateBreakList(const char* output);
     bool stopMayChangeBreakList() const;
-    void saveBreakpoints(ProgramConfig* config);
-    void restoreBreakpoints(ProgramConfig* config);
+    void saveBreakpoints(KConfig* config);
+    void restoreBreakpoints(KConfig* config);
     bool enableDisableBreakpoint(BrkptIterator bp);
     bool deleteBreakpoint(BrkptIterator bp);
     bool conditionalBreakpoint(BrkptIterator bp,
@@ -421,14 +416,14 @@ protected:
     QString m_programArgs;
     QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
-    QDict<EnvVar> m_envVars;		/* environment variables set by user */
+    Q3Dict<EnvVar> m_envVars;		/* environment variables set by user */
     QStringList m_boolOptions;		/* boolean options */
     QStringList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
-    ProgramConfig* m_programConfig;	/* program-specific settings (brkpts etc) */
+    KConfig* m_programConfig;		/* program-specific settings (brkpts etc) */
     void saveProgramSettings();
     void restoreProgramSettings();
-    QString readDebuggerCmd();
+    QString readDebuggerCmd(const KConfigGroup& g);
 
     // debugger process
     DebuggerDriver* m_d;
@@ -437,11 +432,11 @@ protected:
     QString m_statusMessage;
 
 protected slots:
-    void gdbExited(KProcess*);
+    void gdbExited(K3Process*);
     void slotInferiorRunning();
     void backgroundUpdate();
     void gotoFrame(int);
-    void slotExpanding(QListViewItem*);
+    void slotExpanding(Q3ListViewItem*);
     void slotDeleteWatch();
     void slotValuePopup(const QString&);
     void slotDisassemble(const QString&, int);
@@ -559,7 +554,7 @@ signals:
 protected:
     ExprWnd& m_localVariables;
     ExprWnd& m_watchVariables;
-    QListBox& m_btWindow;
+    QListWidget& m_btWindow;
 
     // implementation helpers
 protected:

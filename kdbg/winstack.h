@@ -7,12 +7,12 @@
 #ifndef WINSTACK_H
 #define WINSTACK_H
 
-#include <qdialog.h>
-#include <qlineedit.h>
-#include <qlayout.h>
-#include <qcheckbox.h>
-#include <qpushbutton.h>
-#include <qtooltip.h>
+#include <QDialog>
+#include <QLineEdit>
+#include <QCheckBox>
+#include <QPushButton>
+#include <QHBoxLayout>
+#include <QVBoxLayout>
 #include <ktabwidget.h>
 #include <list>
 
@@ -50,21 +50,11 @@ protected:
 };
 
 
-class ValueTip : public QToolTip
-{
-public:
-    ValueTip(WinStack* parent);
-    virtual ~ValueTip() {}	// Qt3's QToolTip lacks virtual dtor!
-    virtual void maybeTip(const QPoint& p);
-    void tip(const QRect& r, const QString& s) { QToolTip::tip(r, s); }
-};
-
-
 class WinStack : public KTabWidget
 {
     Q_OBJECT
 public:
-    WinStack(QWidget* parent, const char* name);
+    WinStack(QWidget* parent);
     virtual ~WinStack();
 
     /**
@@ -75,7 +65,6 @@ public:
     void activateFile(const QString& fileName);
     bool activeLine(QString& filename, int& lineNo);
     bool activeLine(QString& filename, int& lineNo, DbgAddr& address);
-    void maybeTip(const QPoint& p);
     bool hasWindows() const { return count() > 0; }
     QString activeFileName() const;
     SourceWindow* activeWindow() const;
@@ -123,6 +112,7 @@ protected:
     bool activatePath(QString pathname, int lineNo, const DbgAddr& address);
     virtual bool activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& address);	/* -1 doesnt change line */
     virtual void contextMenuEvent(QContextMenuEvent* e);
+    virtual bool event(QEvent* event);
     void setPC(bool set, const QString& fileName, int lineNo,
 	       const DbgAddr& address, int frameNo);
     SourceWindow* findByFileName(const QString& fileName) const;
@@ -134,8 +124,8 @@ protected:
     QString m_pcAddress;		/* exact address of PC */
     int m_pcFrame;
 
-    ValueTip m_valueTip;
-    QRect m_tipLocation;		/* where tip should appear */
+    QPoint m_tipLocation;		/* where tip should appear */
+    QRect m_tipRegion;			/* where tip should remain */
 
     int m_tabWidth;			/* number of chars */
 

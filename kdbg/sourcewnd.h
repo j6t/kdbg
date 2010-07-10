@@ -7,9 +7,9 @@
 #ifndef SOURCEWND_H
 #define SOURCEWND_H
 
-#include <qpixmap.h>
-#include <qtextedit.h>
-#include <qsyntaxhighlighter.h>
+#include <QPixmap>
+#include <Q3TextEdit>
+#include <Q3SyntaxHighlighter>
 #include <vector>
 #include "dbgdriver.h"
 
@@ -17,11 +17,11 @@
 class KDebugger;
 struct DbgAddr;
 
-class SourceWindow : public QTextEdit
+class SourceWindow : public Q3TextEdit
 {
     Q_OBJECT
 public:
-    SourceWindow(const QString& fileName, QWidget* parent, const char* name);
+    SourceWindow(const QString& fileName, QWidget* parent);
     ~SourceWindow();
     
     bool loadFile();
@@ -112,7 +112,7 @@ protected:
     int m_widthLineNo;			//!< The width of the line number columns
 };
 
-class HighlightCpp : public QSyntaxHighlighter
+class HighlightCpp : public Q3SyntaxHighlighter
 {
     SourceWindow* m_srcWnd;
 

@@ -8,21 +8,21 @@
 #include "dbgdriver.h"
 #include <klocale.h>
 #include <kiconloader.h>
-#include <qbitmap.h>
-#include <qpainter.h>
+#include <QBitmap>
+#include <QPainter>
 
 
-class ThreadEntry : public QListViewItem, public ThreadInfo
+class ThreadEntry : public Q3ListViewItem, public ThreadInfo
 {
 public:
-    ThreadEntry(QListView* parent, const ThreadInfo& thread);
+    ThreadEntry(Q3ListView* parent, const ThreadInfo& thread);
     void setFunction(const QString& func);
 
     bool m_delete;			/* used for updating the list */
 };
 
-ThreadEntry::ThreadEntry(QListView* parent, const ThreadInfo& thread) :
-	QListViewItem(parent, thread.threadName, thread.function),
+ThreadEntry::ThreadEntry(Q3ListView* parent, const ThreadInfo& thread) :
+	Q3ListViewItem(parent, thread.threadName, thread.function),
 	ThreadInfo(thread),
 	m_delete(false)
 {
@@ -35,8 +35,8 @@ void ThreadEntry::setFunction(const QString& func)
 }
 
 
-ThreadList::ThreadList(QWidget* parent, const char* name) :
-	QListView(parent, name)
+ThreadList::ThreadList(QWidget* parent) :
+	Q3ListView(parent)
 {
     addColumn(i18n("Thread ID"), 150);
     addColumn(i18n("Location"));
@@ -45,8 +45,8 @@ ThreadList::ThreadList(QWidget* parent, const char* name) :
     m_focusIcon = UserIcon("pcinner");
     makeNoFocusIcon();
 
-    connect(this, SIGNAL(currentChanged(QListViewItem*)),
-	    this, SLOT(slotCurrentChanged(QListViewItem*)));
+    connect(this, SIGNAL(currentChanged(Q3ListViewItem*)),
+	    this, SLOT(slotCurrentChanged(Q3ListViewItem*)));
 }
 
 ThreadList::~ThreadList()
@@ -56,7 +56,7 @@ ThreadList::~ThreadList()
 void ThreadList::updateThreads(const std::list<ThreadInfo>& threads)
 {
     // reset flag in all items
-    for (QListViewItem* e = firstChild(); e != 0; e = e->nextSibling()) {
+    for (Q3ListViewItem* e = firstChild(); e != 0; e = e->nextSibling()) {
 	static_cast<ThreadEntry*>(e)->m_delete = true;
     }
 
@@ -76,7 +76,7 @@ void ThreadList::updateThreads(const std::list<ThreadInfo>& threads)
     }
 
     // delete all entries that have not been seen
-    for (QListViewItem* e = firstChild(); e != 0;) {
+    for (Q3ListViewItem* e = firstChild(); e != 0;) {
 	ThreadEntry* te = static_cast<ThreadEntry*>(e);
 	e = e->nextSibling();		/* step ahead before deleting it ;-) */
 	if (te->m_delete) {
@@ -87,7 +87,7 @@ void ThreadList::updateThreads(const std::list<ThreadInfo>& threads)
 
 ThreadEntry* ThreadList::threadById(int id)
 {
-    for (QListViewItem* e = firstChild(); e != 0; e = e->nextSibling()) {
+    for (Q3ListViewItem* e = firstChild(); e != 0; e = e->nextSibling()) {
 	ThreadEntry* te = static_cast<ThreadEntry*>(e);
 	if (te->id == id) {
 	    return te;
@@ -110,7 +110,7 @@ void ThreadList::makeNoFocusIcon()
     m_noFocusIcon.setMask(m_noFocusIcon.createHeuristicMask());
 }
 
-void ThreadList::slotCurrentChanged(QListViewItem* newItem)
+void ThreadList::slotCurrentChanged(Q3ListViewItem* newItem)
 {
     if (newItem == 0)
 	return;

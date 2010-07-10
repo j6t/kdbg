@@ -5,17 +5,20 @@
  */
 
 #include "memwindow.h"
-#include <qheader.h>
+#include <Q3Header>
+#include <QMouseEvent>
+#include <QList>
 #include <klocale.h>
 #include <kconfigbase.h>
+#include <kconfiggroup.h>
 #include "debugger.h"
 
 
-class MemoryViewItem : public QListViewItem
+class MemoryViewItem : public Q3ListViewItem
 {
 public:
-    MemoryViewItem(QListView* parent, QListViewItem* insertAfter, QString raw, QString cooked)
-        : QListViewItem(parent, insertAfter, raw, cooked) {}
+    MemoryViewItem(Q3ListView* parent, Q3ListViewItem* insertAfter, QString raw, QString cooked)
+        : Q3ListViewItem(parent, insertAfter, raw, cooked) {}
 
     void setChanged(uint pos, bool b) { m_changed[pos] = b; }
 
@@ -32,15 +35,15 @@ void MemoryViewItem::paintCell(QPainter* p, const QColorGroup& cg,
     if( column > 0 && m_changed[column - 1] ) {
 	QColorGroup newcg = cg;
 	newcg.setColor(QColorGroup::Text, Qt::red);
-	QListViewItem::paintCell(p, newcg, column, width, alignment);
+	Q3ListViewItem::paintCell(p, newcg, column, width, alignment);
     } else {
-	QListViewItem::paintCell(p, cg, column, width, alignment);
+	Q3ListViewItem::paintCell(p, cg, column, width, alignment);
     }
 }
 
 
-MemoryWindow::MemoryWindow(QWidget* parent, const char* name) :
-	QWidget(parent, name),
+MemoryWindow::MemoryWindow(QWidget* parent) :
+	QWidget(parent),
 	m_debugger(0),
 	m_expression(true, this, "expression"),
 	m_memory(this, "memory"),
@@ -185,7 +188,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 {
     m_memory.clear();
     if (!msg.isEmpty()) {
-	new QListViewItem(&m_memory, QString(), msg);
+	new Q3ListViewItem(&m_memory, QString(), msg);
 	return;
     }
 
@@ -198,7 +201,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 
     //add the needed columns
     QStringList sl = QStringList::split( "\t", md->dump );
-    for (uint i = 0; i < sl.count(); i++)
+    for (int i = 0; i < sl.count(); i++)
 	m_memory.addColumn("", -1);
 
     QMap<QString,QString> tmpMap;
@@ -219,13 +222,13 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	if( pos != m_old_memory.end() )
 	    tmplist = QStringList::split( "\t", pos.data() );
 
-	for (uint i = 0; i < sl.count(); i++)
+	for (int i = 0; i < sl.count(); i++)
 	{
-            after->setText( i+1, *sl.at(i) );
+            after->setText( i+1, sl[i] );
 
 	    bool changed =
 		tmplist.count() > 0 &&
-		*sl.at(i) != *tmplist.at(i);
+		sl[i] != tmplist[i];
 	    after->setChanged(i, changed);
 	}
     }
@@ -242,10 +245,10 @@ static const char ColumnWidths[] = "ColumnWidths";
 
 void MemoryWindow::saveProgramSpecific(KConfigBase* config)
 {
-    KConfigGroupSaver s(config, MemoryGroup);
+    KConfigGroup g = config->group(MemoryGroup);
 
     int numEntries = m_expression.count();
-    config->writeEntry(NumExprs, numEntries);
+    g.writeEntry(NumExprs, numEntries);
     QString exprEntry;
     QString fmtEntry;
     for (int i = 0; i < numEntries;) {
@@ -253,28 +256,26 @@ void MemoryWindow::saveProgramSpecific(KConfigBase* config)
 	i++;				/* entries are counted 1-based */
 	exprEntry.sprintf(ExpressionFmt, i);
 	fmtEntry.sprintf(FormatFmt, i);
-	config->writeEntry(exprEntry, text);
+	g.writeEntry(exprEntry, text);
 	QMap<QString,unsigned>::iterator pFormat = m_formatCache.find(text);
 	unsigned fmt = pFormat != m_formatCache.end()  ?  *pFormat  :  MDTword | MDThex;
-	config->writeEntry(fmtEntry, fmt);
+	g.writeEntry(fmtEntry, fmt);
     }
 
     // column widths
-    QStrList widths;
-    QString wStr;
+    QList<int> widths;
     for (int i = 0; i < 2; i++) {
 	int w = m_memory.columnWidth(i);
-	wStr.setNum(w);
-	widths.append(wStr);
+	widths.append(w);
     }
-    config->writeEntry(ColumnWidths, widths);
+    g.writeEntry(ColumnWidths, widths);
 }
 
 void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
 {
-    KConfigGroupSaver s(config, MemoryGroup);
+    KConfigGroup g = config->group(MemoryGroup);
 
-    int numEntries = config->readNumEntry(NumExprs, 0);
+    int numEntries = g.readEntry(NumExprs, 0);
     m_expression.clear();
 
     QString exprEntry;
@@ -283,8 +284,8 @@ void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
     for (int i = 1; i <= numEntries; i++) {
 	exprEntry.sprintf(ExpressionFmt, i);
 	fmtEntry.sprintf(FormatFmt, i);
-	QString expr = config->readEntry(exprEntry);
-	unsigned fmt = config->readNumEntry(fmtEntry, MDTword | MDThex);
+	QString expr = g.readEntry(exprEntry, QString());
+	unsigned fmt = g.readEntry(fmtEntry, MDTword | MDThex);
 	m_expression.insertItem(expr);
 	m_formatCache[expr] = fmt & (MDTsizemask | MDTformatmask);
     }
@@ -299,16 +300,10 @@ void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
     }
 
     // column widths
-    QStrList widths;
-    int n = config->readListEntry(ColumnWidths, widths);
-    if (n > 2)
-	n = 2;
-    for (int i = 0; i < n; i++) {
-	QString wStr = widths.at(i);
-	bool ok;
-	int w = wStr.toInt(&ok);
-	if (ok)
-	    m_memory.setColumnWidth(i, w);
+    QList<int> widths = g.readEntry(ColumnWidths, QList<int>());
+    QList<int>::iterator w = widths.begin();
+    for (int i = 0; i < 2 && w != widths.end(); ++i, ++w) {
+	m_memory.setColumnWidth(i, *w);
     }
 }
 

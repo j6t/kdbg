@@ -7,18 +7,18 @@
 #ifndef PgmArgs_included
 #define PgmArgs_included
 
-#include "pgmargsbase.h"
-#include <qlineedit.h>
-#include <qdict.h>
+#include "ui_pgmargsbase.h"
+#include <Q3Dict>
+#include <QDialog>
 #include "envvar.h"
 
 class QStringList;
 
-class PgmArgs : public PgmArgsBase
+class PgmArgs : public QDialog, private Ui::PgmArgsBase
 {
     Q_OBJECT
 public:
-    PgmArgs(QWidget* parent, const QString& pgm, QDict<EnvVar>& envVars,
+    PgmArgs(QWidget* parent, const QString& pgm, Q3Dict<EnvVar>& envVars,
 	    const QStringList& allOptions);
     virtual ~PgmArgs();
 
@@ -28,23 +28,23 @@ public:
     QStringList options() const;
     void setWd(const QString& wd) { wdEdit->setText(wd); }
     QString wd() const { return wdEdit->text(); }
-    QDict<EnvVar>& envVars() { return m_envVars; }
+    Q3Dict<EnvVar>& envVars() { return m_envVars; }
 
 protected:
-    QDict<EnvVar> m_envVars;
+    Q3Dict<EnvVar> m_envVars;
 
     void initEnvList();
     void parseEnvInput(QString& name, QString& value);
     void modifyVar(bool resurrect);
+    virtual void accept();
 
 protected slots:
-    void modifyVar();
-    void deleteVar();
-    void envListCurrentChanged();
-    void accept();
-    void browseWd();
-    void browseArgFile();
-    void browseArgDir();
+    void on_buttonModify_clicked();
+    void on_buttonDelete_clicked();
+    void on_envList_selectionChanged();
+    void on_wdBrowse_clicked();
+    void on_insertFile_clicked();
+    void on_insertDir_clicked();
 };
 
 #endif // PgmArgs_included

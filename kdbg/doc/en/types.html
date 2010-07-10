@@ -58,7 +58,9 @@ to the program being debugged. For this purpose KDbg determines the shared
 libraries to which the program is linked. If any of the libraries matches
 this entry, the type table applies. The regular expression is a Qt-regular
 expression (the metacharacters <tt>.*?[]^$\</tt> are recognized in the
-usual way, but there is no possibility to group characters.)</li>
+usual way, but there is no possibility to group characters.)
+Note that back-slashes must be doubled because the back-slash is an escape
+character in the configuration file syntax.</li>
 
 <li>
 <tt>LibDisplayName</tt>. This entry is used in lists where the available
@@ -148,7 +150,7 @@ whose name ends in <tt>libqt-mt.so.3</tt>.</p>
 Types1=QString,QRect
 Types2=QValueVector
 LibDisplayName=libqt 3.x
-ShlibRE=libqt-mt\.so\.3$
+ShlibRE=libqt-mt\\.so\\.3$
 EnableBuiltin=QString::Data,QCharIsShort
 
 [QString]

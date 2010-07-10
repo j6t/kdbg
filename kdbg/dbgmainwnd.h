@@ -7,16 +7,18 @@
 #ifndef DBGMAINWND_H
 #define DBGMAINWND_H
 
-#include <qtimer.h>
-#include <kdockwidget.h>
+#include <QTimer>
+#include <kxmlguiwindow.h>
 #include "regwnd.h"
 
-class KProcess;
+class QDockWidget;
+class K3Process;
+class KAnimatedButton;
 class KRecentFilesAction;
-class KToggleAction;
+class KUrl;
 class WinStack;
-class QListBox;
-class QCString;
+class QListWidget;
+class Q3ListViewItem;
 class ExprWnd;
 class BreakpointTable;
 class ThreadList;
@@ -27,11 +29,11 @@ class KDebugger;
 class DebuggerDriver;
 struct DbgAddr;
 
-class DebuggerMainWnd : public KDockMainWindow
+class DebuggerMainWnd : public KXmlGuiWindow
 {
     Q_OBJECT
 public:
-    DebuggerMainWnd(const char* name);
+    DebuggerMainWnd();
     ~DebuggerMainWnd();
 
     bool debugProgram(const QString& exe, const QString& lang);
@@ -52,18 +54,18 @@ public:
 
 protected:
     // session properties
-    virtual void saveProperties(KConfig*);
-    virtual void readProperties(KConfig*);
+    virtual void saveProperties(KConfigGroup& cg);
+    virtual void readProperties(const KConfigGroup& cg);
     // settings
-    void saveSettings(KConfig*);
-    void restoreSettings(KConfig*);
+    void saveSettings(KSharedConfigPtr);
+    void restoreSettings(KSharedConfigPtr);
 
     void initToolbar();
     void initKAction();
 
     // view windows
     WinStack* m_filesWindow;
-    QListBox* m_btWindow;
+    QListWidget* m_btWindow;
     ExprWnd* m_localVariables;
     WatchWindow* m_watches;
     RegisterView* m_registers;
@@ -75,46 +77,46 @@ protected:
     QTimer m_backTimer;
 
     // recent execs in File menu
-    KAction* m_closeAction;
-    KAction* m_reloadAction;
-    KAction* m_fileExecAction;
+    QAction* m_closeAction;
+    QAction* m_reloadAction;
+    QAction* m_fileExecAction;
     KRecentFilesAction* m_recentExecAction;
-    KAction* m_coreDumpAction;
-    KAction* m_settingsAction;
-    KToggleAction* m_findAction;
-    KToggleAction* m_btWindowAction;
-    KToggleAction* m_localVariablesAction;
-    KToggleAction* m_watchesAction;
-    KToggleAction* m_registersAction;
-    KToggleAction* m_bpTableAction;
-    KToggleAction* m_ttyWindowAction;
-    KToggleAction* m_threadsAction;
-    KToggleAction* m_memoryWindowAction;
-    KAction* m_runAction;
-    KAction* m_stepIntoAction;
-    KAction* m_stepOverAction;
-    KAction* m_stepOutAction;
-    KAction* m_toCursorAction;
-    KAction* m_stepIntoIAction;
-    KAction* m_stepOverIAction;
-    KAction* m_execMovePCAction;
-    KAction* m_breakAction;
-    KAction* m_killAction;
-    KAction* m_restartAction;
-    KAction* m_attachAction;
-    KAction* m_argumentsAction;
-    KAction* m_bpSetAction;
-    KAction* m_bpSetTempAction;
-    KAction* m_bpEnableAction;
-    KAction* m_editValueAction;
+    QAction* m_coreDumpAction;
+    QAction* m_settingsAction;
+    QAction* m_findAction;
+    QAction* m_btWindowAction;
+    QAction* m_localVariablesAction;
+    QAction* m_watchesAction;
+    QAction* m_registersAction;
+    QAction* m_bpTableAction;
+    QAction* m_ttyWindowAction;
+    QAction* m_threadsAction;
+    QAction* m_memoryWindowAction;
+    QAction* m_runAction;
+    QAction* m_stepIntoAction;
+    QAction* m_stepOverAction;
+    QAction* m_stepOutAction;
+    QAction* m_toCursorAction;
+    QAction* m_stepIntoIAction;
+    QAction* m_stepOverIAction;
+    QAction* m_execMovePCAction;
+    QAction* m_breakAction;
+    QAction* m_killAction;
+    QAction* m_restartAction;
+    QAction* m_attachAction;
+    QAction* m_argumentsAction;
+    QAction* m_bpSetAction;
+    QAction* m_bpSetTempAction;
+    QAction* m_bpEnableAction;
+    QAction* m_editValueAction;
     QString m_lastDirectory;		/* the dir of the most recently opened file */
 
 protected:
     virtual bool queryClose();
-    KAction* createAction(const QString& text, const char* icon,
+    QAction* createAction(const QString& text, const char* icon,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name);
-    KAction* createAction(const QString& text,
+    QAction* createAction(const QString& text,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name);
 
@@ -137,7 +139,7 @@ protected:
     // output window
     QString m_outputTermCmdStr;
     QString m_outputTermKeepScript;
-    KProcess* m_outputTermProc;
+    K3Process* m_outputTermProc;
     int m_ttyLevel;
 
     QString createOutputWindow();
@@ -151,16 +153,16 @@ protected:
     void setTerminalCmd(const QString& cmd);
     void setDebuggerCmdStr(const QString& cmd);
 
-    KDockWidget* dockParent(QWidget* w);
+    QDockWidget* createDockWidget(const char* name, const QString& title);
+    QDockWidget* dockParent(QWidget* w);
     bool isDockVisible(QWidget* w);
-    bool canChangeDockVisibility(QWidget* w);
-    void dockUpdateHelper(KToggleAction* action, QWidget* w);
-    void fixDockConfig(KConfig* c, bool upgrade);
+    void makeDefaultLayout();
 
     QString makeSourceFilter();
 
     // to avoid flicker when the status bar is updated,
     // we store the last string that we put there
+    KAnimatedButton* m_animation;
     QString m_lastActiveStatusText;
     bool m_animRunning;
 
@@ -183,8 +185,8 @@ public slots:
     void slotTermEmuExited();
     void slotProgramStopped();
     void slotBackTimer();
-    void slotRecentExec(const KURL& url);
-    void slotLocalsPopup(QListViewItem*, const QPoint& pt);
+    void slotRecentExec(const KUrl& url);
+    void slotLocalsPopup(Q3ListViewItem*, const QPoint& pt);
     void slotLocalsToWatch();
     void slotEditValue();
 

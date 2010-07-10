@@ -4,18 +4,15 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <qdir.h>
-#include <qptrlist.h>
+#include "typetable.h"
+#include <QFileInfo>
 #include <kglobal.h>
 #include <kstandarddirs.h>
-#include <ksimpleconfig.h>
+#include <kconfig.h>
+#include <kconfiggroup.h>
 #include <list>
 #include <algorithm>
 #include <iterator>
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-#include "typetable.h"
 #include "mydebug.h"
 
 //! the TypeTables of all known libraries
@@ -41,14 +38,14 @@ void TypeTable::loadTypeTables()
     typeTablesInited = true;
 
     const QStringList files = KGlobal::dirs()->findAllResources("types", "*.kdbgtt",
-			false, true);
+			KStandardDirs::NoDuplicates);
     
     if (files.isEmpty()) {
 	TRACE("no type tables found");
 	return;
     }
 
-    for (QValueListConstIterator<QString> p = files.begin(); p != files.end(); ++p) {
+    for (QStringList::ConstIterator p = files.begin(); p != files.end(); ++p) {
 	typeTables.push_back(TypeTable());
 	typeTables.back().loadFromFile(*p);
     }
@@ -89,12 +86,12 @@ static const char FunctionGuardEntryFmt[] = "FunctionGuard%d";
 void TypeTable::loadFromFile(const QString& fileName)
 {
     TRACE("reading file " + fileName);
-    KSimpleConfig cf(fileName, true);	/* read-only */
+    KConfig confFile(fileName, KConfig::SimpleConfig);
 
     /*
      * Read library name and properties.
      */
-    cf.setGroup(TypeTableGroup);
+    KConfigGroup cf = confFile.group(TypeTableGroup);
     m_displayName = cf.readEntry(LibDisplayName);
     if (m_displayName.isEmpty()) {
 	// use file name instead
@@ -103,7 +100,7 @@ void TypeTable::loadFromFile(const QString& fileName)
     }
 
     m_shlibNameRE = QRegExp(cf.readEntry(ShlibRE));
-    m_enabledBuiltins = cf.readListEntry(EnableBuiltin);
+    m_enabledBuiltins = cf.readEntry(EnableBuiltin, QStringList());
 
     QString printQString = cf.readEntry(PrintQStringCmd);
     const char* ascii = printQString.ascii();
@@ -120,18 +117,18 @@ void TypeTable::loadFromFile(const QString& fileName)
     QString typesEntry;
     for (int i = 1; ; i++) {
 	// next bunch of types
-	cf.setGroup(TypeTableGroup);
+	KConfigGroup cf = confFile.group(TypeTableGroup);
 	typesEntry.sprintf(TypesEntryFmt, i);
 	if (!cf.hasKey(typesEntry))
 	    break;
 
-	QStringList typeNames = cf.readListEntry(typesEntry, ',');
+	QStringList typeNames = cf.readEntry(typesEntry, QStringList());
 
 	// now read them
 	QString alias;
 	for (QStringList::iterator it = typeNames.begin(); it != typeNames.end(); ++it)
 	{
-	    cf.setGroup(*it);
+	    KConfigGroup cf = confFile.group(*it);
 	    // check if this is an alias
 	    alias = cf.readEntry(AliasEntry);
 	    if (alias.isEmpty()) {
@@ -150,7 +147,7 @@ void TypeTable::loadFromFile(const QString& fileName)
     } // for all Types%d
 }
 
-void TypeTable::readType(KConfigBase& cf, const QString& type)
+void TypeTable::readType(const KConfigGroup& cf, const QString& type)
 {
     // the display string
     QString expr = cf.readEntry(DisplayEntry);
@@ -185,12 +182,12 @@ void TypeTable::readType(KConfigBase& cf, const QString& type)
     TRACE(type + QString().sprintf(": %d exprs", info->m_numExprs));
 }
 
-void TypeTable::copyTypes(QDict<TypeInfo>& dict)
+void TypeTable::copyTypes(Q3Dict<TypeInfo>& dict)
 {
-    for (QDictIterator<TypeInfo> it = m_typeDict; it != 0; ++it) {
+    for (Q3DictIterator<TypeInfo> it = m_typeDict; it != 0; ++it) {
 	dict.insert(it.currentKey(), it);
     }
-    for (QDictIterator<TypeInfo> it = m_aliasDict; it != 0; ++it) {
+    for (Q3DictIterator<TypeInfo> it = m_aliasDict; it != 0; ++it) {
 	dict.insert(it.currentKey(), it);
     }
 }
@@ -294,7 +291,7 @@ QStringList ProgramTypeTable::splitTemplateArgs(const QString& t)
     // look for the next comma or the closing '>', skipping nested '<>'
     int nest = 0;
     int start = i;
-    for (; unsigned(i) < t.length() && nest >= 0; i++)
+    for (; i < t.length() && nest >= 0; i++)
     {
 	if (t[i] == '<')
 	    nest++;
@@ -308,7 +305,7 @@ QStringList ProgramTypeTable::splitTemplateArgs(const QString& t)
 	}
     }
     // accept the template only if the closing '>' is the last character
-    if (nest < 0 && unsigned(i) == t.length()) {
+    if (nest < 0 && i == t.length()) {
 	QString arg = t.mid(start, i-start-1);
 	result.push_back(arg);
     } else {

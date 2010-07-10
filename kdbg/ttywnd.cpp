@@ -4,25 +4,18 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <qsocketnotifier.h>
-#include <qpopupmenu.h>
 #include "ttywnd.h"
+#include <QSocketNotifier>
+#include <QContextMenuEvent>
+#include <QMenu>
 #include <kglobalsettings.h>
 #include <klocale.h>
 
 #include "config.h"
-#ifdef HAVE_FCNTL_H
 #include <fcntl.h>
-#endif
-#ifdef HAVE_UNISTD_H
 #include <unistd.h>			/* open, close, etc. */
-#endif
-#ifdef HAVE_SYS_IOCTL_H
 #include <sys/ioctl.h>
-#endif
-#ifdef HAVE_SYS_STAT_H
 #include <sys/stat.h>
-#endif
 #ifdef HAVE_PTY_H
 #include <pty.h>			/* openpty on Linux */
 #endif
@@ -138,16 +131,16 @@ void STTY::outReceived(int f)
 
 
 
-TTYWindow::TTYWindow(QWidget* parent, const char* name) :
-	QTextEdit(parent, name),
+TTYWindow::TTYWindow(QWidget* parent) :
+	QPlainTextEdit(parent),
 	m_tty(0),
-	m_hPos(0)
+	m_pos(document())
 {
     setFont(KGlobalSettings::fixedFont());
     setReadOnly(true);
-    setAutoFormatting(AutoNone);
-    setTextFormat(Qt::PlainText);
-    setWordWrap(NoWrap);
+    setWordWrapMode(QTextOption::NoWrap);
+    setUndoRedoEnabled(false);
+    m_pos.setPosition(0);
 }
 
 TTYWindow::~TTYWindow()
@@ -180,11 +173,6 @@ void TTYWindow::deactivate()
     m_tty = 0;
 }
 
-/**
- * Note that it is necessary to track the horizontal position explicitly
- * since if the user modifies the selected text in the window, the cursor
- * position changes, too.
- */
 void TTYWindow::slotAppend(char* buffer, int count)
 {
     // parse off lines
@@ -198,42 +186,40 @@ void TTYWindow::slotAppend(char* buffer, int count)
 	if (len > 0) {
 	    QString str = QString::fromLatin1(start, len);
 	    // replace text in the last line
-	    int para = paragraphs()-1;
 	    // this selection is non-empty only after a '\r' that was not
 	    // followed by a '\n'
-	    setSelection(para, m_hPos, para, m_hPos+len, 1);
-	    removeSelectedText(1);
-	    insertAt(str, para, m_hPos);
-	    m_hPos += len;
+	    m_pos.movePosition(QTextCursor::Right, QTextCursor::KeepAnchor, len);
+	    m_pos.insertText(str);
 	    start += len;
 	    len = 0;
 	}
 	if (count > 0 && *start == '\r') {
 	    ++start;
 	    --count;
-	    m_hPos = 0;
+	    m_pos.movePosition(QTextCursor::StartOfLine);
 	}
 	if (count > 0 && *start == '\n') {
 	    ++start;
 	    --count;
-	    append(QString());
-	    m_hPos = 0;
+	    m_pos.movePosition(QTextCursor::End);
+	    m_pos.insertText(QString('\n'));
 	}
     }
 }
 
-QPopupMenu* TTYWindow::createPopupMenu(const QPoint& pos)
+void TTYWindow::contextMenuEvent(QContextMenuEvent *event)
 {
-    QPopupMenu* menu = QTextEdit::createPopupMenu(pos);
-    menu->insertSeparator();
-    menu->insertItem(i18n("&Clear"), this, SLOT(slotClear()));
-    return menu;
+    QMenu* menu = createStandardContextMenu();
+    menu->addSeparator();
+    menu->addAction(i18n("&Clear"),this, SLOT(slotClear()));
+    menu->exec(event->globalPos());
+    delete menu;
 }
 
 void TTYWindow::slotClear()
 {
     clear();
-    m_hPos = 0;
+    m_pos.movePosition(QTextCursor::End);
 }
 
 #include "ttywnd.moc"

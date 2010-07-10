@@ -11,70 +11,60 @@
 #include <kstandarddirs.h>
 #include <kcmdlineargs.h> 
 #include <kaboutdata.h>
-#include <kpopupmenu.h>
-#include <kmenubar.h>
 #include "dbgmainwnd.h"
 #include "typetable.h"
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
-#ifndef VERSION
-#define VERSION ""
-#endif
-#ifdef HAVE_FCNTL_H
-#include <fcntl.h>			/* open(2) */
-#endif
-#ifdef HAVE_UNISTD_H
-#include <unistd.h>			/* getopt(3) */
-#endif
+#include "version.h"
 #include <stdlib.h>			/* getenv(3) */
 #include "mydebug.h"
 
 
 int main(int argc, char** argv)
 {
-    KAboutData aboutData("kdbg", "KDbg",
-			 VERSION,
-			 I18N_NOOP("A Debugger"),
+    KAboutData aboutData("kdbg", "kdbg", ki18n("KDbg"),
+			 KDBG_VERSION,
+			 ki18n("A Debugger"),
 			 KAboutData::License_GPL, 
-			 "(c) 1998-2010 Johannes Sixt",
-			 0,		/* any text */
+			 ki18n("(c) 1998-2010 Johannes Sixt"),
+			 KLocalizedString(),	/* any text */
 			 "http://www.kdbg.org/",
 			 "j6t@kdbg.org");
-    aboutData.addAuthor("Johannes Sixt", 0, "j6t@kdbg.org");
-    aboutData.addCredit("Keith Isdale",
-			I18N_NOOP("XSLT debugging"),
+    aboutData.addAuthor(ki18n("Johannes Sixt"), KLocalizedString(), "j6t@kdbg.org");
+    aboutData.addCredit(ki18n("Keith Isdale"),
+			ki18n("XSLT debugging"),
 			"k_isdale@tpg.com.au");
-    aboutData.addCredit("Daniel Kristjansson",
-			I18N_NOOP("Register groups and formating"),
+    aboutData.addCredit(ki18n("Daniel Kristjansson"),
+			ki18n("Register groups and formating"),
 			"danielk@cat.nyu.edu");
+    aboutData.addCredit(ki18n("David Edmundson"),
+			ki18n("KDE4 porting"),
+			"david@davidedmundson.co.uk");
     KCmdLineArgs::init( argc, argv, &aboutData );
 
-    static KCmdLineOptions options[] = {
-	{ "t <file>", I18N_NOOP("transcript of conversation with the debugger"), 0 },
-	{ "r <device>", I18N_NOOP("remote debugging via <device>"), 0 },
-	{ "l <language>", I18N_NOOP("specify language: C, XSLT"), ""},
-	{ "x", I18N_NOOP("use language XSLT (deprecated)"), 0 },
-	{ "a <args>", I18N_NOOP("specify arguments of debugged executable"), 0},
-	{ "p <pid>", I18N_NOOP("specify PID of process to debug"), 0},
-	{ "+[program]", I18N_NOOP("path of executable to debug"), 0 },
-	{ "+[core]", I18N_NOOP("a core file to use"), 0},
-	{ 0, 0, 0 }
-    };
-    KCmdLineArgs::addCmdLineOptions(options);
-    
+    KCmdLineOptions opts;
+    opts.add("t <file>", ki18n("transcript of conversation with the debugger"));
+    opts.add("r <device>", ki18n("remote debugging via <device>"));
+    opts.add("l <language>", ki18n("specify language: C, XSLT"));
+    opts.add("x", ki18n("use language XSLT (deprecated)"));
+    opts.add("a <args>", ki18n("specify arguments of debugged executable"));
+    opts.add("p <pid>", ki18n("specify PID of process to debug"));
+    opts.add("+[program]", ki18n("path of executable to debug"));
+    opts.add("+[core]", ki18n("a core file to use"));
+    KCmdLineArgs::addCmdLineOptions(opts);
+
     KApplication app;
 
-    KGlobal::dirs()->addResourceType("types", "share/apps/kdbg/types");
+    KGlobal::dirs()->addResourceType("types", "data", "kdbg/types");
+    KGlobal::dirs()->addResourceType("sessions", "data", "kdbg/sessions");
 
-    DebuggerMainWnd* debugger = new DebuggerMainWnd("kdbg_main");
+    DebuggerMainWnd* debugger = new DebuggerMainWnd;
+    debugger->setObjectName("mainwindow");
 
     /* type libraries */
     TypeTable::initTypeLibraries();
 
     // session management
     bool restored = false;
-    if (app.isRestored()) {
+    if (app.isSessionRestored()) {
 	if (KMainWindow::canBeRestored(1)) {
 	    debugger->restore(1);
 	    restored = true;

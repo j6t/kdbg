@@ -6,7 +6,8 @@
 
 #include "xsldbgdriver.h"
 #include "exprwnd.h"
-#include <qstringlist.h>
+#include <QRegExp>
+#include <QStringList>
 #include <klocale.h>            /* i18n */
 #include <ctype.h>
 #include <stdlib.h>             /* strtol, atoi */
@@ -14,9 +15,6 @@
 #include <kmessagebox.h>
 
 #include "assert.h"
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "mydebug.h"
 
 
@@ -208,7 +206,7 @@ QStringList XsldbgDriver::boolOptionList() const
 
 
 void
-XsldbgDriver::slotReceiveOutput(KProcess * process, char *buffer,
+XsldbgDriver::slotReceiveOutput(K3Process * process, char *buffer,
                                 int buflen)
 {
     //TRACE(buffer);

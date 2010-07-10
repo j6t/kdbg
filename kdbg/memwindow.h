@@ -7,11 +7,11 @@
 #ifndef MEMWINDOW_H
 #define MEMWINDOW_H
 
-#include <qpopupmenu.h>
-#include <qlistview.h>
-#include <qcombobox.h>
-#include <qlayout.h>
-#include <qmap.h>
+#include <Q3PopupMenu>
+#include <Q3ListView>
+#include <QComboBox>
+#include <QMap>
+#include <Q3VBoxLayout>
 #include "dbgdriver.h"
 
 class KDebugger;
@@ -21,7 +21,7 @@ class MemoryWindow : public QWidget
 {
     Q_OBJECT
 public:
-    MemoryWindow(QWidget* parent, const char* name);
+    MemoryWindow(QWidget* parent);
     ~MemoryWindow();
 
     void setDebugger(KDebugger* deb) { m_debugger = deb; }
@@ -30,15 +30,15 @@ protected:
     KDebugger* m_debugger;
     QComboBox m_expression;
 
-    QListView m_memory;
+    Q3ListView m_memory;
     QMap<QString,QString> m_old_memory;
 
-    QVBoxLayout m_layout;
+    Q3VBoxLayout m_layout;
 
     unsigned m_format;
     QMap<QString,unsigned> m_formatCache;
 
-    QPopupMenu m_popup;
+    Q3PopupMenu m_popup;
 
     virtual bool eventFilter(QObject* o, QEvent* ev);
     void handlePopup(QMouseEvent* ev);

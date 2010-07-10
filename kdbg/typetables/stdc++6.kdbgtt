@@ -2,7 +2,7 @@
 Types1=string,basic_string<char>,ostringstream,basic_ostringstream<char>
 Types2=std::vector,std::vector<bool>,std::list,std::map
 LibDisplayName=libstdc++6
-ShlibRE=libstdc\+\+\.so\.6$
+ShlibRE=libstdc\\+\\+\\.so\\.6$
 
 [string]
 Display={ % }

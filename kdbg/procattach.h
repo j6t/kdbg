@@ -7,51 +7,55 @@
 #ifndef ProcAttach_included
 #define ProcAttach_included
 
-#include "procattachbase.h"
-#include <qvaluevector.h>
-#include <qdialog.h>
-#include <qlabel.h>
-#include <qlineedit.h>
-#include <qpushbutton.h>
-#include <qlayout.h>
+#include "ui_procattachbase.h"
+#include <Q3ValueVector>
+#include <QDialog>
+#include <QLabel>
+#include <QLineEdit>
+#include <QPushButton>
+#include <Q3VBoxLayout>
+#include <Q3CString>
+#include <Q3HBoxLayout>
+#include <kdialog.h>
 
 
-class KProcess;
+class QProcess;
 
 /*
  * This is the full-featured version of the dialog. It is used when the
  * system features a suitable ps command.
  */
 
-class ProcAttachPS : public ProcAttachBase
+class ProcAttachPS : public QDialog, private Ui::ProcAttachBase
 {
     Q_OBJECT
 public:
     ProcAttachPS(QWidget* parent);
     ~ProcAttachPS();
 
+    void setFilterText(const QString& text) { filterEdit->setText(text); }
     QString text() const;
 
 protected:
     void runPS();
-    virtual void refresh();
-    virtual void filterEdited(const QString& text);
-    virtual void selectedChanged();
 
 protected slots:
-    void slotTextReceived(KProcess* proc, char* buffer, int buflen);
+    void on_buttonRefresh_clicked();
+    void on_filterEdit_textChanged(const QString& text);
+    void on_processList_selectionChanged();
+    void slotTextReceived();
     void slotPSDone();
 
 protected:
     void pushLine();
-    bool setVisibility(QListViewItem* i, const QString& text);
+    bool setVisibility(Q3ListViewItem* i, const QString& text);
 
-    KProcess* m_ps;
+    QProcess* m_ps;
     // parse state
     int m_pidCol;	//!< The PID column in the ps output
     int m_ppidCol;	//!< The parent-PID column in the ps output
-    QCString m_token;
-    QValueVector<QString> m_line;
+    Q3CString m_token;
+    Q3ValueVector<QString> m_line;
 };
 
 
@@ -74,8 +78,8 @@ protected:
     QLineEdit m_processId;
     QPushButton m_buttonOK;
     QPushButton m_buttonCancel;
-    QVBoxLayout m_layout;
-    QHBoxLayout m_buttons;
+    Q3VBoxLayout m_layout;
+    Q3HBoxLayout m_buttons;
 };
 
 #endif // ProcAttach_included

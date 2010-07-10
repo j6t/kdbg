@@ -7,16 +7,16 @@
 #ifndef PREFDEBUGGER_H
 #define PREFDEBUGGER_H
 
-#include <qlayout.h>
-#include <qlineedit.h>
-#include <qlabel.h>
+#include <QLineEdit>
+#include <QLabel>
+#include <Q3GridLayout>
 
 class PrefDebugger : public QWidget
 {
 public:
     PrefDebugger(QWidget* parent);
 
-    QGridLayout m_grid;
+    Q3GridLayout m_grid;
 
     // --- the hint about defaults
 protected:

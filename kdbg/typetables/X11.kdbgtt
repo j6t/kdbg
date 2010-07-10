@@ -1,7 +1,7 @@
 [Type Table]
 Types1=_XDisplay,Display
 LibDisplayName=libX11 (all versions)
-ShlibRE=libX11\.so
+ShlibRE=libX11\\.so
 [_XDisplay]
 Display={ name=% }
 Expr1=(%1).display_name

@@ -4,32 +4,39 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <klocale.h>			/* i18n */
-#include <qdragobject.h>
 #include "watchwindow.h"
+#include <klocale.h>			/* i18n */
+#include <Q3DragObject>
+#include <QDragEnterEvent>
+#include <QDropEvent>
+#include <QKeyEvent>
 
-WatchWindow::WatchWindow(QWidget* parent, const char* name) :
-	QWidget(parent, name),
-	m_watchEdit(this, "watch_edit"),
-	m_watchAdd(i18n(" Add "), this, "watch_add"),
-	m_watchDelete(i18n(" Del "), this, "watch_delete"),
-	m_watchVariables(this, i18n("Expression"), "watch_variables"),
-	m_watchV(this, 0),
-	m_watchH(0)
+WatchWindow::WatchWindow(QWidget* parent) :
+	QWidget(parent),
+	m_watchEdit(this),
+	m_watchAdd(i18n(" Add "), this),
+	m_watchDelete(i18n(" Del "), this),
+	m_watchVariables(this, i18n("Expression")),
+	m_watchV(this),
+	m_watchH()
 {
     // setup the layout
     m_watchAdd.setMinimumSize(m_watchAdd.sizeHint());
     m_watchDelete.setMinimumSize(m_watchDelete.sizeHint());
-    m_watchV.addLayout(&m_watchH, 0);
-    m_watchV.addWidget(&m_watchVariables, 10);
-    m_watchH.addWidget(&m_watchEdit, 10);
-    m_watchH.addWidget(&m_watchAdd, 0);
-    m_watchH.addWidget(&m_watchDelete, 0);
+    m_watchV.setMargin(0);
+    m_watchV.setSpacing(0);
+    m_watchH.setMargin(0);
+    m_watchH.setSpacing(0);
+    m_watchV.addLayout(&m_watchH);
+    m_watchV.addWidget(&m_watchVariables);
+    m_watchH.addWidget(&m_watchEdit);
+    m_watchH.addWidget(&m_watchAdd);
+    m_watchH.addWidget(&m_watchDelete);
 
     connect(&m_watchEdit, SIGNAL(returnPressed()), SIGNAL(addWatch()));
     connect(&m_watchAdd, SIGNAL(clicked()), SIGNAL(addWatch()));
     connect(&m_watchDelete, SIGNAL(clicked()), SIGNAL(deleteWatch()));
-    connect(&m_watchVariables, SIGNAL(currentChanged(QListViewItem*)),
+    connect(&m_watchVariables, SIGNAL(currentChanged(Q3ListViewItem*)),
 	    SLOT(slotWatchHighlighted()));
 
     m_watchVariables.installEventFilter(this);
@@ -45,7 +52,7 @@ bool WatchWindow::eventFilter(QObject*, QEvent* ev)
     if (ev->type() == QEvent::KeyPress)
     {
 	QKeyEvent* kev = static_cast<QKeyEvent*>(ev);
-	if (kev->key() == Key_Delete) {
+	if (kev->key() == Qt::Key_Delete) {
 	    emit deleteWatch();
 	    return true;
 	}
@@ -55,13 +62,13 @@ bool WatchWindow::eventFilter(QObject*, QEvent* ev)
 
 void WatchWindow::dragEnterEvent(QDragEnterEvent* event)
 {
-    event->accept(QTextDrag::canDecode(event));
+    event->accept(Q3TextDrag::canDecode(event));
 }
 
 void WatchWindow::dropEvent(QDropEvent* event)
 {
     QString text;
-    if (QTextDrag::decode(event, text))
+    if (Q3TextDrag::decode(event, text))
     {
 	// pick only the first line
 	text = text.stripWhiteSpace();

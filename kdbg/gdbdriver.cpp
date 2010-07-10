@@ -6,17 +6,14 @@
 
 #include "gdbdriver.h"
 #include "exprwnd.h"
-#include <qregexp.h>
-#include <qstringlist.h>
+#include <QRegExp>
+#include <QStringList>
 #include <klocale.h>			/* i18n */
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
 #include <string.h>			/* strcpy */
 
 #include "assert.h"
-#ifdef HAVE_CONFIG_H
-#include "config.h"
-#endif
 #include "mydebug.h"
 
 static void skipString(const char*& p);

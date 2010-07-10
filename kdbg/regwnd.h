@@ -6,26 +6,29 @@
 
 #ifndef REGWND_H
 #define REGWND_H
+#include <QTreeWidget>
 
-#include <qlistview.h>
 #include <list>
 #include <map>
 
-class QPopupMenu;
+class Q3PopupMenu;
 class RegisterViewItem;
 class GroupingViewItem;
+class QContextMenuEvent;
 struct RegisterInfo;
 
 
-class RegisterView : public QListView
+class RegisterView : public QTreeWidget
 {
     Q_OBJECT
 public:
-    RegisterView(QWidget* parent, const char *name = 0L);
+    RegisterView(QWidget* parent);
     ~RegisterView();
 
+protected:
+    void contextMenuEvent(QContextMenuEvent*);
+
 protected slots:
-    void rightButtonClicked(QListViewItem*, const QPoint&, int);
     void slotModeChange(int);
     void updateRegisters(const std::list<RegisterInfo>&);
 
@@ -34,7 +37,7 @@ private:
     void updateGroupVisibility();
     GroupingViewItem* findMatchingGroup(const QString& regName);
     GroupingViewItem* findGroup(const QString& groupName);
-    QPopupMenu* m_modemenu;
+    Q3PopupMenu* m_modemenu;
     typedef std::map<QString,RegisterViewItem*> RegMap;
     RegMap m_registers;
 
