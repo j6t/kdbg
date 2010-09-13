@@ -112,7 +112,7 @@ void SourceWindow::reloadFile()
     }
     // expanded lines are collapsed: move existing line items up
     for (size_t i = 0; i < m_lineItems.size(); i++) {
-	if (m_rowToLine[i] != i) {
+	if (m_rowToLine[i] != int(i)) {
 	    m_lineItems[m_rowToLine[i]] |= m_lineItems[i];
 	    m_lineItems[i] = 0;
 	}
@@ -948,8 +948,8 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
 		    state = hlString;
 		    break;
 		}
-		else if (text[end] >= 'A' && text[end] <= 'Z' ||
-			 text[end] >= 'a' && text[end] <= 'z' ||
+		else if ((text[end] >= 'A' && text[end] <= 'Z') ||
+			 (text[end] >= 'a' && text[end] <= 'z') ||
 			 text[end] == '_')
 		{
 		    state = hlIdent;

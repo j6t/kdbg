@@ -50,7 +50,7 @@ void ProcAttachPS::runPS()
     m_ppidCol = -1;
 
     // set the command line
-    char* const psCommand[] = {
+    const char* const psCommand[] = {
 #ifdef PS_COMMAND
 	PS_COMMAND,
 #else
