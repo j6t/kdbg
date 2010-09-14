@@ -60,7 +60,8 @@ protected:
     void saveSettings(KSharedConfigPtr);
     void restoreSettings(KSharedConfigPtr);
 
-    void initToolbar();
+    void initAnimation();
+    void initStatusBar();
     void initKAction();
 
     // view windows

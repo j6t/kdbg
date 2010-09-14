@@ -111,7 +111,8 @@ DebuggerMainWnd::DebuggerMainWnd() :
 
     setStandardToolBarMenuEnabled(true);
     initKAction();
-    initToolbar(); // kind of obsolete?
+    initAnimation();
+    initStatusBar();
 
     connect(m_watches, SIGNAL(addWatch()), SLOT(slotAddWatch()));
     connect(m_watches, SIGNAL(deleteWatch()), m_debugger, SLOT(slotDeleteWatch()));
@@ -349,7 +350,7 @@ void DebuggerMainWnd::initKAction()
     createGUI("kdbgui.rc");
 }
 
-void DebuggerMainWnd::initToolbar()
+void DebuggerMainWnd::initAnimation()
 {
     KToolBar* toolbar = toolBar("mainToolBar");
     m_animation = new KAnimatedButton(toolbar);
@@ -357,7 +358,10 @@ void DebuggerMainWnd::initToolbar()
     m_animation->setIcons("pulse");
     connect(m_animation, SIGNAL(triggered(QAction*)), m_debugger, SLOT(programBreak()));
     m_animRunning = false;
+}
 
+void DebuggerMainWnd::initStatusBar()
+{
     KStatusBar* statusbar = statusBar();
     statusbar->insertItem(m_statusActive, ID_STATUS_ACTIVE);
     m_lastActiveStatusText = m_statusActive;
