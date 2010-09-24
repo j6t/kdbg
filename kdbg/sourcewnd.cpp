@@ -7,11 +7,11 @@
 #include "debugger.h"
 #include "sourcewnd.h"
 #include "dbgdriver.h"
-#include <Q3TextStream>
+#include <QTextStream>
 #include <QPainter>
 #include <QFile>
 #include <QFileInfo>
-#include <Q3PopupMenu>
+#include <QMenu>
 #include <QContextMenuEvent>
 #include <QKeyEvent>
 #include <QMouseEvent>
@@ -24,12 +24,13 @@
 
 
 SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
-	Q3TextEdit(parent),
+	QPlainTextEdit(parent),
 	m_fileName(fileName),
-	m_curRow(-1),
+	m_highlighter(0),
 	m_widthItems(16),
 	m_widthPlus(12),
-	m_widthLineNo(30)
+	m_widthLineNo(30),
+	m_lineInfoArea(new LineInfoArea(this))
 {
     // load pixmaps
     m_pcinner = UserIcon("pcinner");
@@ -41,25 +42,27 @@ SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
     m_brkorph = UserIcon("brkorph");
     setFont(KGlobalSettings::fixedFont());
     setReadOnly(true);
-    setMargins(m_widthItems+m_widthPlus+m_widthLineNo, 0, 0 ,0);
-    setAutoFormatting(AutoNone);
-    setTextFormat(Qt::PlainText);
-    setWordWrap(NoWrap);
-    connect(verticalScrollBar(), SIGNAL(valueChanged(int)),
-	    this, SLOT(update()));
-    connect(this, SIGNAL(cursorPositionChanged(int,int)), this, SLOT(cursorChanged(int)));
-    viewport()->installEventFilter(this);
+    setViewportMargins(lineInfoAreaWidth(), 0, 0 ,0);
+    setWordWrapMode(QTextOption::NoWrap);
+    connect(this, SIGNAL(updateRequest(const QRect&, int)),
+	    m_lineInfoArea, SLOT(update()));
+    connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorChanged()));
 
     // add a syntax highlighter
-    if (QRegExp("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h)?|HH?)$").search(m_fileName) >= 0)
+    if (QRegExp("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h)?|HH?)$").indexIn(m_fileName) >= 0)
     {
-	new HighlightCpp(this);
+	m_highlighter = new HighlightCpp(this);
     }
 }
 
 SourceWindow::~SourceWindow()
 {
-    delete syntaxHighlighter();
+    delete m_highlighter;
+}
+
+int SourceWindow::lineInfoAreaWidth() const
+{
+    return 3 + m_widthItems + m_widthPlus + m_widthLineNo;
 }
 
 bool SourceWindow::loadFile()
@@ -69,11 +72,11 @@ bool SourceWindow::loadFile()
 	return false;
     }
 
-    Q3TextStream t(&f);
-    setText(t.read());
+    QTextStream t(&f);
+    setPlainText(t.readAll());
     f.close();
 
-    int n = paragraphs();
+    int n = blockCount();
     m_sourceCode.resize(n);
     m_rowToLine.resize(n);
     for (int i = 0; i < n; i++) {
@@ -82,7 +85,7 @@ bool SourceWindow::loadFile()
     m_lineItems.resize(n, 0);
 
     // set a font for line numbers
-    m_lineNoFont = currentFont();
+    m_lineNoFont = currentCharFormat().font();
     m_lineNoFont.setPixelSize(11);
 
     return true;
@@ -98,11 +101,11 @@ void SourceWindow::reloadFile()
 
     m_sourceCode.clear();		/* clear old text */
 
-    Q3TextStream t(&f);
-    setText(t.read());
+    QTextStream t(&f);
+    setPlainText(t.readAll());
     f.close();
 
-    m_sourceCode.resize(paragraphs());
+    m_sourceCode.resize(blockCount());
     // expanded lines are collapsed: move existing line items up
     for (size_t i = 0; i < m_lineItems.size(); i++) {
 	if (m_rowToLine[i] != int(i)) {
@@ -120,9 +123,8 @@ void SourceWindow::reloadFile()
     // Highlighting was applied above when the text was inserted into widget,
     // but at that time m_rowToLine was not corrected, yet, so that lines
     // that previously were assembly were painted incorrectly.
-    if (syntaxHighlighter())
-	syntaxHighlighter()->rehighlight();
-    update();	// line numbers
+    if (m_highlighter)
+	m_highlighter->rehighlight();
 }
 
 void SourceWindow::scrollTo(int lineNo, const DbgAddr& address)
@@ -136,43 +138,42 @@ void SourceWindow::scrollTo(int lineNo, const DbgAddr& address)
 
 void SourceWindow::scrollToRow(int row)
 {
-    setCursorPosition(row, 0);
+    QTextCursor cursor(document()->findBlockByNumber(row));
+    setTextCursor(cursor);
     ensureCursorVisible();
 }
 
-void SourceWindow::drawFrame(QPainter* p)
+void SourceWindow::resizeEvent(QResizeEvent* e)
 {
-    Q3TextEdit::drawFrame(p);
+    QPlainTextEdit::resizeEvent(e);
 
-    // and paragraph at the top is...
-    int top = paragraphAt(QPoint(0,contentsY()));
-    int bot = paragraphAt(QPoint(0,contentsY()+visibleHeight()-1));
-    if (bot < 0)
-	bot = paragraphs()-1;
+    QRect cr = contentsRect();
+    cr.setRight(lineInfoAreaWidth());
+    m_lineInfoArea->setGeometry(cr);
+}
 
-    p->save();
-
-    // set a clip rectangle
-    int fw = frameWidth();
-    QRect inside = rect();
-    inside.addCoords(fw,fw,-fw,-fw);
-    QRegion clip = p->clipRegion();
-    clip &= QRegion(inside);
-    p->setClipRegion(clip);
+void SourceWindow::drawLineInfoArea(QPainter* p, QPaintEvent* event)
+{
+    QTextBlock block = firstVisibleBlock();
 
     p->setFont(m_lineNoFont);
-    p->setPen(colorGroup().text());
-    p->eraseRect(inside);
 
-    for (int row = top; row <= bot; row++)
+    for (; block.isValid(); block = block.next())
     {
-	uchar item = m_lineItems[row];
-	p->save();
+	if (!block.isVisible())
+	    continue;
 
-	QRect r = paragraphRect(row);
-	QPoint pt = contentsToViewport(r.topLeft());
+	QRect r = blockBoundingGeometry(block).translated(contentOffset()).toRect();
+	if (r.top() > event->rect().bottom() || r.bottom() < event->rect().top())
+	    continue;
+
+	int row = block.blockNumber();
+	uchar item = m_lineItems[row];
+
+	QPoint pt = r.topLeft();
 	int h = r.height();
-	p->translate(fw, pt.y()+viewport()->y());
+	p->save();
+	p->translate(0, r.top());
 
 	if (item & liBP) {
 	    // enabled breakpoint
@@ -233,7 +234,6 @@ void SourceWindow::drawFrame(QPainter* p)
 	}
 	p->restore();
     }
-    p->restore();
 }
 
 void SourceWindow::updateLineItems(const KDebugger* dbg)
@@ -258,7 +258,6 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
 	    if (bp == dbg->breakpointsEnd()) {
 		/* doesn't exist anymore, remove it */
 		m_lineItems[i] &= ~liBPany;
-		update();
 	    }
 	}
     }
@@ -284,10 +283,10 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
 	    if ((m_lineItems[row] & liBPany) != flags) {
 		m_lineItems[row] &= ~liBPany;
 		m_lineItems[row] |= flags;
-		update();
 	    }
 	}
     }
+    m_lineInfoArea->update();
 }
 
 void SourceWindow::setPC(bool set, int lineNo, const DbgAddr& address, int frameNo)
@@ -303,13 +302,13 @@ void SourceWindow::setPC(bool set, int lineNo, const DbgAddr& address, int frame
 	// set only if not already set
 	if ((m_lineItems[row] & flag) == 0) {
 	    m_lineItems[row] |= flag;
-	    update();
+	    m_lineInfoArea->update();
 	}
     } else {
 	// clear only if not set
 	if ((m_lineItems[row] & flag) != 0) {
 	    m_lineItems[row] &= ~flag;
-	    update();
+	    m_lineInfoArea->update();
 	}
     }
 }
@@ -317,29 +316,36 @@ void SourceWindow::setPC(bool set, int lineNo, const DbgAddr& address, int frame
 void SourceWindow::find(const QString& text, bool caseSensitive, FindDirection dir)
 {
     ASSERT(dir == 1 || dir == -1);
-    if (Q3TextEdit::find(text, caseSensitive, false, dir > 0))
+    QTextDocument::FindFlags flags = 0;
+    if (caseSensitive)
+	flags |= QTextDocument::FindCaseSensitively;
+    if (dir < 0)
+	flags |= QTextDocument::FindBackward;
+    if (QPlainTextEdit::find(text, flags))
 	return;
     // not found; wrap around
-    int para = dir > 0 ? 0 : paragraphs(), index = 0;
-    Q3TextEdit::find(text, caseSensitive, false, dir > 0, &para, &index);
+    QTextCursor cursor(document());
+    if (dir < 0)
+	cursor.movePosition(QTextCursor::End);
+    cursor = document()->find(text, cursor, flags);
+    if (!cursor.isNull())
+	setTextCursor(cursor);
 }
 
-void SourceWindow::mousePressEvent(QMouseEvent* ev)
+void SourceWindow::infoMousePress(QMouseEvent* ev)
 {
     // we handle left and middle button
     if (ev->button() != Qt::LeftButton && ev->button() != Qt::MidButton)
     {
-	Q3TextEdit::mousePressEvent(ev);
 	return;
     }
 
     // get row
-    QPoint p = viewportToContents(QPoint(0, ev->y() - viewport()->y()));
-    int row = paragraphAt(p);
+    int row = cursorForPosition(QPoint(0, ev->y())).blockNumber();
     if (row < 0)
 	return;
 
-    if (ev->x() > m_widthItems+frameWidth())
+    if (ev->x() > m_widthItems)
     {
 	if (isRowExpanded(row)) {
 	    actionCollapseRow(row);
@@ -376,45 +382,47 @@ void SourceWindow::mousePressEvent(QMouseEvent* ev)
 
 void SourceWindow::keyPressEvent(QKeyEvent* ev)
 {
-    int top1, top2;
-    QPoint top;
+    int top1 = 0, top2;
     switch (ev->key()) {
     case Qt::Key_Plus:
-	actionExpandRow(m_curRow);
+	actionExpandRow(textCursor().blockNumber());
 	return;
     case Qt::Key_Minus:
-	actionCollapseRow(m_curRow);
+	actionCollapseRow(textCursor().blockNumber());
 	return;
     case Qt::Key_Up:
-	if (m_curRow > 0) {
-	    setCursorPosition(m_curRow-1, 0);
-	}
+	moveCursor(QTextCursor::PreviousBlock);
 	return;
     case Qt::Key_Down:
-	if (m_curRow < paragraphs()-1) {
-	    setCursorPosition(m_curRow+1, 0);
-	}
+	moveCursor(QTextCursor::NextBlock);
 	return;
     case Qt::Key_Home:
-	setCursorPosition(0, 0);
+	moveCursor(QTextCursor::Start);
 	return;
     case Qt::Key_End:
-	setCursorPosition(paragraphs()-1, 0);
+	moveCursor(QTextCursor::End);
 	return;
     case Qt::Key_Next:
     case Qt::Key_Prior:
-	top = viewportToContents(QPoint(0,0));
-	top1 = paragraphAt(top);
+	top1 = firstVisibleBlock().blockNumber();
     }
 
-    Q3TextEdit::keyPressEvent(ev);
+    QPlainTextEdit::keyPressEvent(ev);
 
     switch (ev->key()) {
     case Qt::Key_Next:
     case Qt::Key_Prior:
-	top = viewportToContents(QPoint(0,0));
-	top2 = paragraphAt(top);
-	setCursorPosition(m_curRow+(top2-top1), 0);
+	top2 = firstVisibleBlock().blockNumber();
+	{
+	    QTextCursor cursor = textCursor();
+	    if (top1 < top2)
+		cursor.movePosition(QTextCursor::NextBlock,
+				    QTextCursor::MoveAnchor, top2-top1);
+	    else
+		cursor.movePosition(QTextCursor::PreviousBlock,
+				    QTextCursor::MoveAnchor, top1-top2);
+	    setTextCursor(cursor);
+	}
     }
 }
 
@@ -425,13 +433,15 @@ static inline bool isident(QChar c)
 
 bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 {
-    QPoint pv = viewportToContents(p - viewport()->pos());
-    int row, col  = charAt(pv, &row);
+    QTextCursor cursor = cursorForPosition(p);
+    int row = cursor.blockNumber();
+    int col = cursor.columnNumber();
+
     if (row < 0 || col < 0)
 	return false;
 
     // isolate the word at row, col
-    QString line = text(row);
+    QString line = cursor.block().text();
     if (!isident(line[col]))
 	return false;
 
@@ -443,7 +453,7 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
     while (col < int(line.length()) && isident(line[col]));
 
     r = QRect(p, p);
-    r.addCoords(-5,-5,5,5);
+    r.adjust(-5,-5,5,5);
     word = line.mid(begin, col-begin);
     return true;
 }
@@ -451,7 +461,7 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 void SourceWindow::paletteChange(const QPalette& oldPal)
 {
     setFont(KGlobalSettings::fixedFont());
-    Q3TextEdit::paletteChange(oldPal);
+    QPlainTextEdit::paletteChange(oldPal);
 }
 
 /*
@@ -490,7 +500,7 @@ void SourceWindow::disassembled(int lineNo, const std::list<DisassembledCode>& d
 	expandRow(row);
     } else {
 	// clear expansion marker
-	update();
+	m_lineInfoArea->update();
     }
 }
 
@@ -594,23 +604,18 @@ void SourceWindow::expandRow(int row)
     // remove PC (must be set again in slot of signal expanded())
     m_lineItems[row] &= ~(liPC|liPCup);
 
-    // adjust current row
-    if (m_curRow > row) {
-	m_curRow += disass.size();
-	// highlight is moved automatically
-    }
-
     // insert new lines
     setUpdatesEnabled(false);
     ++row;
+    m_rowToLine.insert(m_rowToLine.begin()+row, disass.size(), line);
+    m_lineItems.insert(m_lineItems.begin()+row, disass.size(), 0);
+
+    QTextCursor cursor(document()->findBlockByNumber(row));
     for (size_t i = 0; i < disass.size(); i++) {
-	m_rowToLine.insert(m_rowToLine.begin()+row, line);
-	m_lineItems.insert(m_lineItems.begin()+row, 0);
-	insertParagraph(disass[i], row++);
+	cursor.insertText(disass[i]);
+	cursor.insertBlock();
     }
     setUpdatesEnabled(true);
-    viewport()->update();
-    update();		// line items
 
     emit expanded(line);		/* must set PC */
 }
@@ -626,28 +631,22 @@ void SourceWindow::collapseRow(int row)
 	end++;
     }
     ++row;
-    // adjust current row
-    if (m_curRow >= row) {
-	m_curRow -= end-row;
-	if (m_curRow < row)	// was m_curRow in disassembled code?
-	    m_curRow = -1;
-    }
     setUpdatesEnabled(false);
+    QTextCursor cursor(document()->findBlockByNumber(end-1));
     while (--end >= row) {
 	m_rowToLine.erase(m_rowToLine.begin()+end);
 	m_lineItems.erase(m_lineItems.begin()+end);
-	removeParagraph(end);
+	cursor.select(QTextCursor::BlockUnderCursor);
+	cursor.removeSelectedText();
     }
     setUpdatesEnabled(true);
-    viewport()->update();
-    update();		// line items
 
     emit collapsed(line);
 }
 
 void SourceWindow::activeLine(int& line, DbgAddr& address)
 {
-    int row = m_curRow;
+    int row = textCursor().blockNumber();
 
     int sourceRow;
     line = rowToLine(row, &sourceRow);
@@ -715,29 +714,28 @@ void SourceWindow::setTabWidth(int numChars)
 {
     if (numChars <= 0)
 	numChars = 8;
-    QFontMetrics fm(currentFont());
+    QFontMetrics fm(document()->defaultFont());
     QString s;
     int w = fm.width(s.fill('x', numChars));
     setTabStopWidth(w);
 }
 
-void SourceWindow::cursorChanged(int row)
+void SourceWindow::cursorChanged()
 {
-    if (row == m_curRow)
-	return;
+    QList<QTextEdit::ExtraSelection> extraSelections;
+    QTextEdit::ExtraSelection selection;
 
-    if (m_curRow >= 0 && m_curRow < paragraphs())
-	clearParagraphBackground(m_curRow);
-    m_curRow = row;
-    setParagraphBackgroundColor(row, colorGroup().background());
+    selection.format.setBackground(QColor("#E7E7E7"));
+    selection.format.setProperty(QTextFormat::FullWidthSelection, true);
+    selection.cursor = textCursor();
+    selection.cursor.clearSelection();
+    extraSelections.append(selection);
+    setExtraSelections(extraSelections);
 }
 
 /*
- * We must override the context menu handling because QTextEdit's handling
- * requires that it receives ownership of the popup menu; but the popup menu
- * returned from the GUI factory is owned by the factory.
+ * Show our own context menu.
  */
-
 void SourceWindow::contextMenuEvent(QContextMenuEvent* e)
 {
     // get the context menu from the GUI factory
@@ -746,23 +744,29 @@ void SourceWindow::contextMenuEvent(QContextMenuEvent* e)
 	top = top->parentWidget();
     while (!top->isTopLevel());
     KXmlGuiWindow* mw = static_cast<KXmlGuiWindow*>(top);
-    Q3PopupMenu* m =
-	static_cast<Q3PopupMenu*>(mw->factory()->container("popup_files", mw));
-    m->exec(e->globalPos());
+    QMenu* m = static_cast<QMenu*>(mw->factory()->container("popup_files", mw));
+    if (m)
+	m->exec(e->globalPos());
 }
 
-bool SourceWindow::eventFilter(QObject* watched, QEvent* e)
+void LineInfoArea::paintEvent(QPaintEvent* e)
 {
-    if (e->type() == QEvent::ContextMenu && watched == viewport())
-    {
-	contextMenuEvent(static_cast<QContextMenuEvent*>(e));
-	return true;
-    }
-    return Q3TextEdit::eventFilter(watched, e);
+    QPainter p(this);
+    static_cast<SourceWindow*>(parent())->drawLineInfoArea(&p, e);
+}
+
+void LineInfoArea::mousePressEvent(QMouseEvent* ev)
+{
+    static_cast<SourceWindow*>(parent())->infoMousePress(ev);
+}
+
+void LineInfoArea::contextMenuEvent(QContextMenuEvent* e)
+{
+    static_cast<SourceWindow*>(parent())->contextMenuEvent(e);
 }
 
 HighlightCpp::HighlightCpp(SourceWindow* srcWnd) :
-	Q3SyntaxHighlighter(srcWnd),
+	QSyntaxHighlighter(srcWnd->document()),
 	m_srcWnd(srcWnd)
 {
 }
@@ -852,11 +856,17 @@ static const QString ckw[] =
     "xor_eq"
 };
 
-int HighlightCpp::highlightParagraph(const QString& text, int state)
+void HighlightCpp::highlightBlock(const QString& text)
 {
-    int row = currentParagraph();
+    int state = previousBlockState();
+    state = highlight(text, state);
+    setCurrentBlockState(state);
+}
+
+int HighlightCpp::highlight(const QString& text, int state)
+{
     // highlight assembly lines
-    if (m_srcWnd->isRowDisassCode(row))
+    if (m_srcWnd->isRowDisassCode(currentBlock().blockNumber()))
     {
 	setFormat(0, text.length(), Qt::blue);
 	return state;
@@ -873,8 +883,8 @@ int HighlightCpp::highlightParagraph(const QString& text, int state)
     }
 
     // a font for keywords
-    QFont identFont = textEdit()->currentFont();
-    identFont.setBold(!identFont.bold());
+    QTextCharFormat identFont;
+    identFont.setFontWeight(QFont::Bold);
 
     int start = 0;
     while (start < text.length())

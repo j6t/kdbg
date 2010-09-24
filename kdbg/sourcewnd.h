@@ -8,16 +8,18 @@
 #define SOURCEWND_H
 
 #include <QPixmap>
-#include <Q3TextEdit>
-#include <Q3SyntaxHighlighter>
+#include <QPlainTextEdit>
+#include <QSyntaxHighlighter>
 #include <vector>
 #include "dbgdriver.h"
 
 // forward declarations
 class KDebugger;
 struct DbgAddr;
+class LineInfoArea;
+class HighlightCpp;
 
-class SourceWindow : public Q3TextEdit
+class SourceWindow : public QPlainTextEdit
 {
     Q_OBJECT
 public:
@@ -53,10 +55,10 @@ public:
     void activeLine(int& lineNo, DbgAddr& address);
 
 protected:
-    virtual void drawFrame(QPainter* p);
-    virtual bool eventFilter(QObject* watched, QEvent* e);
+    void drawLineInfoArea(QPainter* p, QPaintEvent* event);
+    void infoMousePress(QMouseEvent* ev);
+    virtual void resizeEvent(QResizeEvent* e);
     virtual void contextMenuEvent(QContextMenuEvent* e);
-    virtual void mousePressEvent(QMouseEvent* ev);
     virtual void keyPressEvent(QKeyEvent* ev);
     virtual void paletteChange(const QPalette&);
     void expandRow(int row);
@@ -64,6 +66,7 @@ protected:
     void scrollToRow(int row);
     /** translates (0-based) line number plus a code address into a row number */
     int lineToRow(int row, const DbgAddr& address);
+    int lineInfoAreaWidth() const;
 
     void actionExpandRow(int row);
     void actionCollapseRow(int row);
@@ -76,7 +79,7 @@ signals:
     void collapsed(int lineNo);		/* source lineNo has been collapsed */
 public slots:
     void setTabWidth(int numChars);
-    void cursorChanged(int row);
+    void cursorChanged();
 
 protected:
     QString m_fileName;
@@ -94,6 +97,7 @@ protected:
 	int findAddressRowOffset(const DbgAddr& address) const;
     };
     std::vector<SourceLine> m_sourceCode;
+    HighlightCpp* m_highlighter;
 
     std::vector<int> m_rowToLine;	//!< The source line number for each row
     std::vector<uchar> m_lineItems;	//!< Icons displayed on the line
@@ -105,19 +109,31 @@ protected:
     QPixmap m_brkcond;			/* conditional breakpoint marker */
     QPixmap m_brkorph;			/* orphaned breakpoint marker */
     QFont m_lineNoFont;			//!< The font used to draw line numbers
-    int m_curRow;			//!< The highlighted row
     int m_widthItems;			//!< The width of the item column
     int m_widthPlus;			//!< The width of the expander column
     int m_widthLineNo;			//!< The width of the line number columns
+    LineInfoArea* m_lineInfoArea;
+
+    friend class LineInfoArea;
 };
 
-class HighlightCpp : public Q3SyntaxHighlighter
+class LineInfoArea : public QWidget
+{
+public:
+    LineInfoArea(QWidget* parent) : QWidget(parent) { }
+    virtual void paintEvent(QPaintEvent* e);
+    virtual void mousePressEvent(QMouseEvent* ev);
+    virtual void contextMenuEvent(QContextMenuEvent* e);
+};
+
+class HighlightCpp : public QSyntaxHighlighter
 {
     SourceWindow* m_srcWnd;
 
 public:
     HighlightCpp(SourceWindow* srcWnd);
-    virtual int highlightParagraph(const QString& text, int state);
+    virtual void highlightBlock(const QString& text);
+    int highlight(const QString& text, int state);
 };
 
 #endif // SOURCEWND_H
