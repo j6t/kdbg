@@ -72,6 +72,8 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	m_animation(0),
 	m_statusActive(i18n("active"))
 {
+    setDockNestingEnabled(true);
+
     m_filesWindow = new WinStack(this);
     setCentralWidget(m_filesWindow);
 
@@ -111,7 +113,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 
     setStandardToolBarMenuEnabled(true);
     initKAction();
-    initToolbar(); // kind of obsolete?
+    initStatusBar();
 
     connect(m_watches, SIGNAL(addWatch()), SLOT(slotAddWatch()));
     connect(m_watches, SIGNAL(deleteWatch()), m_debugger, SLOT(slotDeleteWatch()));
@@ -175,7 +177,13 @@ DebuggerMainWnd::DebuggerMainWnd() :
     connect(m_localVariables, SIGNAL(contextMenuRequested(Q3ListViewItem*, const QPoint&, int)),
 	    this, SLOT(slotLocalsPopup(Q3ListViewItem*, const QPoint&)));
 
+    makeDefaultLayout();
+    setupGUI(KXmlGuiWindow::Default, "kdbgui.rc");
     restoreSettings(KGlobal::config());
+
+    // The animation button is not part of the restored window state.
+    // We must create it after the toolbar was loaded.
+    initAnimation();
 
     updateUI();
     m_bpTable->updateUI();
@@ -345,11 +353,9 @@ void DebuggerMainWnd::initKAction()
     foreach(QAction* action, actions) {
 	connect(action, SIGNAL(activated()), this, SLOT(updateUI()));
     }
-
-    createGUI("kdbgui.rc");
 }
 
-void DebuggerMainWnd::initToolbar()
+void DebuggerMainWnd::initAnimation()
 {
     KToolBar* toolbar = toolBar("mainToolBar");
     m_animation = new KAnimatedButton(toolbar);
@@ -357,7 +363,10 @@ void DebuggerMainWnd::initToolbar()
     m_animation->setIcons("pulse");
     connect(m_animation, SIGNAL(triggered(QAction*)), m_debugger, SLOT(programBreak()));
     m_animRunning = false;
+}
 
+void DebuggerMainWnd::initStatusBar()
+{
     KStatusBar* statusbar = statusBar();
     statusbar->insertItem(m_statusActive, ID_STATUS_ACTIVE);
     m_lastActiveStatusText = m_statusActive;
@@ -399,8 +408,6 @@ void DebuggerMainWnd::readProperties(const KConfigGroup& cg)
     }
 }
 
-static const char WindowGroup[] = "Windows";
-static const char ToolbarGroup[] = "ToolbarSettings";
 static const char RecentExecutables[] = "RecentExecutables";
 static const char LastSession[] = "LastSession";
 static const char OutputWindowGroup[] = "OutputWindow";
@@ -417,15 +424,6 @@ static const char HeaderFileFilter[] = "HeaderFileFilter";
 
 void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
 {
-    KConfigGroup g = config->group(WindowGroup);
-
-    QByteArray layout = saveState();
-    g.writeEntry("Layout", layout);
-    g.writeEntry("Geometry", geometry());
-
-    KConfigGroup tg = config->group(ToolbarGroup);
-    toolBar("mainToolBar")->saveSettings(tg);
-
     m_recentExecAction->saveEntries(config->group(RecentExecutables));
 
     KConfigGroup lg = config->group(LastSession);
@@ -449,17 +447,6 @@ void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
 
 void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
 {
-    KConfigGroup g = config->group(WindowGroup);
-
-    QByteArray layout = g.readEntry("Layout", QByteArray());
-    if (!restoreState(layout))
-	makeDefaultLayout();
-    QRect r = g.readEntry("Geometry", QRect());
-    if (!r.isEmpty())
-	setGeometry(r);
-
-    toolBar("mainToolBar")->applySettings(config->group(ToolbarGroup));
-
     m_recentExecAction->loadEntries(config->group(RecentExecutables));
 
     KConfigGroup lg = config->group(LastSession);
@@ -534,12 +521,12 @@ void DebuggerMainWnd::updateUI()
 
     // animation
     if (m_debugger->isIdle()) {
-	if (m_animRunning) {
+	if (m_animRunning && m_animation) {
 	    m_animation->stop();
 	    m_animRunning = false;
 	}
     } else {
-	if (!m_animRunning) {
+	if (!m_animRunning && m_animation) {
 	    m_animation->start();
 	    m_animRunning = true;
 	}

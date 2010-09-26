@@ -250,11 +250,11 @@ bool WinStack::event(QEvent* evt)
     if (w == 0)
 	return true;
 
-    QPoint p = static_cast<QHelpEvent*>(evt)->pos();
+    QPoint p = static_cast<QHelpEvent*>(evt)->globalPos();
     // get the word at the point
     QString word;
     QRect r;
-    if (!w->wordAtPoint(w->mapFrom(this, p), word, r)) {
+    if (!w->wordAtPoint(w->mapFromGlobal(p), word, r)) {
 	QToolTip::hideText();
 	return true;
     }
@@ -264,7 +264,7 @@ bool WinStack::event(QEvent* evt)
     assert(r.isValid());
 
     // remember the location
-    m_tipLocation = mapToGlobal(p);
+    m_tipLocation = p;
     m_tipRegion = QRect(w->mapTo(this, r.topLeft()), r.size());
 
     emit initiateValuePopup(word);
