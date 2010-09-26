@@ -9,7 +9,7 @@
 
 #include <QFile>
 #include <QByteArray>
-#include <k3process.h>
+#include <QProcess>
 #include <queue>
 #include <list>
 
@@ -270,7 +270,7 @@ struct MemoryDump
  * interface to the commandline debugger. As such it implements the
  * commands and parses the output.
  */
-class DebuggerDriver : public K3Process
+class DebuggerDriver : public QProcess
 {
     Q_OBJECT
 public:
@@ -290,6 +290,7 @@ public:
 
     virtual bool startup(QString cmdStr);
     void setLogFileName(const QString& fname) { m_logFileName = fname; }
+    bool isRunning() { return state() != NotRunning; }
 
 protected:
     QString m_runCmd;
@@ -562,8 +563,7 @@ protected:
     virtual void commandFinished(CmdQueueItem* cmd) = 0;
 
 protected:
-    /** @internal */
-    virtual int commSetupDoneC();
+    void processOutput(const QByteArray& data);
 
     /**
      * Returns the start of the prompt in \a output or -1.
@@ -580,9 +580,9 @@ public slots:
     void dequeueCmdByVar(VarTree* var);
 
 protected slots:
-    virtual void slotReceiveOutput(K3Process*, char* buffer, int buflen);
-    virtual void slotCommandRead(K3Process*);
-    virtual void slotExited(K3Process*);
+    virtual void slotReceiveOutput();
+    virtual void slotCommandRead();
+    virtual void slotExited();
     
 signals:
     /**

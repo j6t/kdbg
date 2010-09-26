@@ -29,7 +29,6 @@ class Breakpoint;
 struct DisassembledCode;
 struct MemoryDump;
 struct DbgAddr;
-class K3Process;
 
 
 class KDebugger : public QObject
@@ -432,7 +431,7 @@ protected:
     QString m_statusMessage;
 
 protected slots:
-    void gdbExited(K3Process*);
+    void gdbExited();
     void slotInferiorRunning();
     void backgroundUpdate();
     void gotoFrame(int);

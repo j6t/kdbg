@@ -10,6 +10,7 @@
 #include <QStringList>
 #include <klocale.h>			/* i18n */
 #include <ctype.h>
+#include <signal.h>
 #include <stdlib.h>			/* strtol, atoi */
 #include <string.h>			/* strcpy */
 
@@ -608,20 +609,20 @@ CmdQueueItem* GdbDriver::queueCmd(DbgCommand cmd, QString strArg1, QString strAr
 
 void GdbDriver::terminate()
 {
-    kill(SIGTERM);
+    ::kill(pid(), SIGTERM);
     m_state = DSidle;
 }
 
 void GdbDriver::detachAndTerminate()
 {
-    kill(SIGINT);
+    ::kill(pid(), SIGINT);
     flushCommands();
     executeCmdString(DCinitialize, "detach\nquit\n", true);
 }
 
 void GdbDriver::interruptInferior()
 {
-    kill(SIGINT);
+    ::kill(pid(), SIGINT);
     // remove accidentally queued commands
     flushHiPriQueue();
 }

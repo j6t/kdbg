@@ -8,6 +8,7 @@
 #include "exprwnd.h"
 #include <QStringList>
 #include <ctype.h>
+#include <signal.h>
 #include <stdlib.h>			/* strtol, atoi */
 #include <algorithm>
 #include "mydebug.h"
@@ -15,7 +16,6 @@
 
 
 DebuggerDriver::DebuggerDriver() :
-	K3Process(),
 	m_state(DSidle),
 	m_output(0),
 	m_outputLen(0),
@@ -26,10 +26,10 @@ DebuggerDriver::DebuggerDriver() :
     m_output = new char[m_outputAlloc];
 
     // debugger process
-    connect(this, SIGNAL(receivedStdout(K3Process*,char*,int)),
-	    SLOT(slotReceiveOutput(K3Process*,char*,int)));
-    connect(this, SIGNAL(wroteStdin(K3Process*)), SLOT(slotCommandRead(K3Process*)));
-    connect(this, SIGNAL(processExited(K3Process*)), SLOT(slotExited(K3Process*)));
+    connect(this, SIGNAL(readyReadStandardOutput()), SLOT(slotReceiveOutput()));
+    connect(this, SIGNAL(bytesWritten(qint64)), SLOT(slotCommandRead()));
+    connect(this, SIGNAL(finished(int, QProcess::ExitStatus)),
+	    SLOT(slotExited()));
 }
 
 DebuggerDriver::~DebuggerDriver()
@@ -37,17 +37,6 @@ DebuggerDriver::~DebuggerDriver()
     delete[] m_output;
     flushHiPriQueue();
     flushLoPriQueue();
-}
-
-int DebuggerDriver::commSetupDoneC()
-{
-    TRACE(__PRETTY_FUNCTION__);
-
-    if (!K3Process::commSetupDoneC())
-	return 0;
-
-    close(STDERR_FILENO);
-    return dup2(STDOUT_FILENO, STDERR_FILENO) != -1;
 }
 
 
@@ -65,15 +54,14 @@ bool DebuggerDriver::startup(QString cmdStr)
 	cmdStr = defaultInvocation();
 
     QStringList cmd = QStringList::split(' ', cmdStr);
-    clearArguments();
-    for (QStringList::iterator i = cmd.begin(); i != cmd.end(); ++i) {
-	*this << *i;
-    }
-
-    if (!start(K3Process::NotifyOnExit,
-	       K3Process::Communication(K3Process::Stdin|K3Process::Stdout))) {
+    if (cmd.isEmpty())
 	return false;
-    }
+    QString pgm = cmd.takeFirst();
+
+    setProcessChannelMode(MergedChannels);
+    start(pgm, cmd);
+    if (!waitForStarted(-1))
+	return false;
 
     // open log file
     if (!m_logFile.isOpen() && !m_logFileName.isEmpty()) {
@@ -84,7 +72,7 @@ bool DebuggerDriver::startup(QString cmdStr)
     return true;
 }
 
-void DebuggerDriver::slotExited(K3Process*)
+void DebuggerDriver::slotExited()
 {
     static const char txt[] = "\n====== debugger exited ======\n";
     if (m_logFile.isOpen()) {
@@ -110,7 +98,7 @@ CmdQueueItem* DebuggerDriver::executeCmdString(DbgCommand cmd,
 	if (m_state == DSrunningLow) {
 	    // take the liberty to interrupt the running command
 	    m_state = DSinterrupted;
-	    kill(SIGINT);
+	    ::kill(pid(), SIGINT);
 	    ASSERT(m_activeCmd != 0);
 	    TRACE(QString().sprintf("interrupted the command %d",
 		  (m_activeCmd ? m_activeCmd->m_cmd : -1)));
@@ -203,7 +191,15 @@ void DebuggerDriver::writeCommand()
     TRACE("in writeCommand: " + cmd->m_cmdString);
 
     QByteArray str = cmd->m_cmdString.toLocal8Bit();
-    writeStdin(str.data(), str.length());
+    const char* data = str.data();
+    qint64 len = str.length();
+    while (len > 0) {
+	qint64 n = write(data, len);
+	if (n <= 0)
+	    break;	// ignore error
+	len -= n;
+	data += n;
+    }
 
     // write also to log file
     if (m_logFile.isOpen()) {
@@ -238,7 +234,7 @@ void DebuggerDriver::flushCommands(bool hipriOnly)
     }
 }
 
-void DebuggerDriver::slotCommandRead(K3Process*)
+void DebuggerDriver::slotCommandRead()
 {
     TRACE(__PRETTY_FUNCTION__);
 
@@ -262,36 +258,43 @@ void DebuggerDriver::slotCommandRead(K3Process*)
 	break;
     }
 
-    // re-receive delayed output
+    // process delayed output
     while (!m_delayedOutput.empty()) {
 	QByteArray delayed = m_delayedOutput.front();
 	m_delayedOutput.pop();
-	slotReceiveOutput(0, const_cast<char*>(delayed.data()), delayed.size());
+	processOutput(delayed);
     }
 }
 
-void DebuggerDriver::slotReceiveOutput(K3Process*, char* buffer, int buflen)
+void DebuggerDriver::slotReceiveOutput()
 {
+    QByteArray data = readAllStandardOutput();
+
     /*
      * The debugger should be running (processing a command) at this point.
      * If it is not, it is still idle because we haven't received the
-     * wroteStdin signal yet, in which case there must be an active command
+     * bytesWritten signal yet, in which case there must be an active command
      * which is not commited.
      */
     if (m_state == DScommandSent || m_state == DScommandSentLow) {
 	ASSERT(m_activeCmd != 0);
 	ASSERT(!m_activeCmd->m_committed);
 	/*
-	 * We received output before we got signal wroteStdin. Collect this
-	 * output, it will be re-sent by commandRead when it gets the
+	 * We received output before we got signal bytesWritten. Collect this
+	 * output, it will be processed by commandRead when it gets the
 	 * acknowledgment for the uncommitted command.
 	 */
-	m_delayedOutput.push(QByteArray().duplicate(buffer, buflen));
+	m_delayedOutput.push(data);
 	return;
     }
+    processOutput(data);
+}
+
+void DebuggerDriver::processOutput(const QByteArray& data)
+{
     // write to log file (do not log delayed output - it would appear twice)
     if (m_logFile.isOpen()) {
-	m_logFile.writeBlock(buffer, buflen);
+	m_logFile.write(data);
 	m_logFile.flush();
     }
     
@@ -303,7 +306,7 @@ void DebuggerDriver::slotReceiveOutput(K3Process*, char* buffer, int buflen)
      */
     if (m_activeCmd == 0 && m_state != DSinterrupted) {
 	// ignore the output
-	TRACE("ignoring stray output: " + QString::fromLatin1(buffer, buflen));
+	TRACE("ignoring stray output: " + QString(data));
 	return;
     }
     ASSERT(m_state == DSrunning || m_state == DSrunningLow || m_state == DSinterrupted);
@@ -312,7 +315,7 @@ void DebuggerDriver::slotReceiveOutput(K3Process*, char* buffer, int buflen)
     // collect output until next prompt string is found
     
     // accumulate it
-    if (m_outputLen + buflen >= m_outputAlloc) {
+    if (m_outputLen + data.length() >= m_outputAlloc) {
 	/*
 	 * Must enlarge m_output: double it. Note: That particular
 	 * sequence of commandes here ensures exception safety.
@@ -324,8 +327,8 @@ void DebuggerDriver::slotReceiveOutput(K3Process*, char* buffer, int buflen)
 	m_output = newBuf;
 	m_outputAlloc = newSize;
     }
-    memcpy(m_output+m_outputLen, buffer, buflen);
-    m_outputLen += buflen;
+    memcpy(m_output+m_outputLen, data.data(), data.length());
+    m_outputLen += data.length();
     m_output[m_outputLen] = '\0';
 
     // check for a prompt
