@@ -64,7 +64,6 @@ SourceWindow::~SourceWindow()
 
 bool SourceWindow::loadFile()
 {
-    // first we load the code into QTextEdit
     QFile f(m_fileName);
     if (!f.open(QIODevice::ReadOnly)) {
 	return false;
@@ -74,12 +73,10 @@ bool SourceWindow::loadFile()
     setText(t.read());
     f.close();
 
-    // then we copy it into our own m_sourceCode
     int n = paragraphs();
     m_sourceCode.resize(n);
     m_rowToLine.resize(n);
     for (int i = 0; i < n; i++) {
-	m_sourceCode[i].code = text(i);
 	m_rowToLine[i] = i;
     }
     m_lineItems.resize(n, 0);
@@ -99,7 +96,6 @@ void SourceWindow::reloadFile()
 	return;
     }
 
-    // read text into m_sourceCode
     m_sourceCode.clear();		/* clear old text */
 
     Q3TextStream t(&f);
@@ -107,9 +103,6 @@ void SourceWindow::reloadFile()
     f.close();
 
     m_sourceCode.resize(paragraphs());
-    for (size_t i = 0; i < m_sourceCode.size(); i++) {
-	m_sourceCode[i].code = text(i);
-    }
     // expanded lines are collapsed: move existing line items up
     for (size_t i = 0; i < m_lineItems.size(); i++) {
 	if (m_rowToLine[i] != int(i)) {

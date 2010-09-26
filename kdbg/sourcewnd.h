@@ -87,7 +87,6 @@ protected:
     };
 
     struct SourceLine {
-	QString code;			/* a line of text */
 	std::vector<QString> disass;		/* its disassembled code */
 	std::vector<DbgAddr> disassAddr;	/* the addresses thereof */
 	bool canDisass;			/* if line can be disassembled */
