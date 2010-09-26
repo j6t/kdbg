@@ -426,35 +426,26 @@ void SourceWindow::keyPressEvent(QKeyEvent* ev)
     }
 }
 
-static inline bool isident(QChar c)
-{
-    return c.isLetterOrNumber() || c.latin1() == '_';
-}
-
 bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 {
-    QTextCursor cursor = cursorForPosition(p);
-    int row = cursor.blockNumber();
-    int col = cursor.columnNumber();
-
-    if (row < 0 || col < 0)
+    QTextCursor cursor = cursorForPosition(viewport()->mapFrom(this, p));
+    if (cursor.isNull())
 	return false;
 
-    // isolate the word at row, col
-    QString line = cursor.block().text();
-    if (!isident(line[col]))
+    cursor.select(QTextCursor::WordUnderCursor);
+    word = cursor.selectedText();
+
+    if (word.isEmpty())
 	return false;
 
-    int begin = col;
-    while (begin > 0 && isident(line[begin-1]))
-	--begin;
-    do
-	++col;
-    while (col < int(line.length()) && isident(line[col]));
+    // keep only letters and digits
+    QRegExp w("[\\dA-Za-z_]+");
+    if (w.indexIn(word) < 0)
+	return false;
+    word = w.cap();
 
     r = QRect(p, p);
     r.adjust(-5,-5,5,5);
-    word = line.mid(begin, col-begin);
     return true;
 }
 
