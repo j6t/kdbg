@@ -17,7 +17,6 @@
 #include <krecentfilesaction.h>
 #include <ktoggleaction.h>
 #include <kfiledialog.h>
-#include <k3process.h>
 #include <kshortcutsdialog.h>
 #include <kanimatedbutton.h>
 #include <kwindowsystem.h>
@@ -32,6 +31,7 @@
 #include <Q3PopupMenu>
 #include <Q3ListViewItem>
 #include <QDockWidget>
+#include <QProcess>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "commandids.h"
@@ -62,7 +62,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	m_transcriptFile(GDB_TRANSCRIPT),
 #endif
 	m_outputTermCmdStr(defaultTermCmdStr),
-	m_outputTermProc(0),
+	m_outputTermProc(new QProcess),
 	m_ttyLevel(-1),			/* no tty yet */
 	m_popForeground(false),
 	m_backTimeout(1000),
@@ -206,12 +206,7 @@ DebuggerMainWnd::~DebuggerMainWnd()
     delete m_btWindow;
     delete m_filesWindow;
 
-    // if the output window is open, close it
-    if (m_outputTermProc != 0) {
-	m_outputTermProc->disconnect();	/* ignore signals */
-	m_outputTermProc->kill();
-	shutdownTermWindow();
-    }
+    delete m_outputTermProc;
 }
 
 QDockWidget* DebuggerMainWnd::createDockWidget(const char* name, const QString& title)
@@ -889,10 +884,7 @@ void DebuggerMainWnd::slotDebuggerStarting()
 	m_ttyWindow->deactivate();
 	break;
     case KDebugger::ttyFull:
-	if (m_outputTermProc != 0) {
-	    m_outputTermProc->kill();
-	    // will be deleted in slot
-	}
+	m_outputTermProc->kill();
 	break;
     default: break;
     }
@@ -905,12 +897,10 @@ void DebuggerMainWnd::slotDebuggerStarting()
 	ttyName = m_ttyWindow->activate();
 	break;
     case KDebugger::ttyFull:
-	if (m_outputTermProc == 0) {
-	    // create an output window
-	    ttyName = createOutputWindow();
-	    TRACE(ttyName.isEmpty() ?
-		  "createOuputWindow failed" : "successfully created output window");
-	}
+	// create an output window
+	ttyName = createOutputWindow();
+	TRACE(ttyName.isEmpty() ?
+	      "createOuputWindow failed" : "successfully created output window");
 	break;
     default: break;
     }
@@ -957,8 +947,6 @@ QString DebuggerMainWnd::createOutputWindow()
 	return QString();
     }
 #endif
-
-    m_outputTermProc = new K3Process;
 
     /*
      * Spawn an xterm that in turn runs a shell script that passes us
@@ -1007,12 +995,12 @@ QString DebuggerMainWnd::createOutputWindow()
 		break;		/* substitute only one sequence */
 	    }
 	}
-	*m_outputTermProc << str;
     }
 
-    QString tty;
+    QString tty, pgm = cmdParts.takeFirst();
 
-    if (m_outputTermProc->start())
+    m_outputTermProc->start(pgm, cmdParts);
+    if (m_outputTermProc->waitForStarted())
     {
 	// read the ttyname from the fifo
 	QFile f(fifoName);
@@ -1027,30 +1015,15 @@ QString DebuggerMainWnd::createOutputWindow()
 	// remove whitespace
 	tty = tty.stripWhiteSpace();
 	TRACE("tty=" + tty);
-
-	connect(m_outputTermProc, SIGNAL(processExited(K3Process*)),
-		SLOT(slotTermEmuExited()));
     }
     else
     {
 	// error, could not start xterm
 	TRACE("fork failed for fifo " + fifoName);
 	QFile::remove(fifoName);
-	shutdownTermWindow();
     }
 
     return tty;
-}
-
-void DebuggerMainWnd::slotTermEmuExited()
-{
-    shutdownTermWindow();
-}
-
-void DebuggerMainWnd::shutdownTermWindow()
-{
-    delete m_outputTermProc;
-    m_outputTermProc = 0;
 }
 
 void DebuggerMainWnd::slotProgramStopped()
