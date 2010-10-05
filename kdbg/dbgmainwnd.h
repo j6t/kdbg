@@ -18,7 +18,6 @@ class KRecentFilesAction;
 class KUrl;
 class WinStack;
 class QListWidget;
-class Q3ListViewItem;
 class ExprWnd;
 class BreakpointTable;
 class ThreadList;
@@ -185,7 +184,7 @@ public slots:
     void slotProgramStopped();
     void slotBackTimer();
     void slotRecentExec(const KUrl& url);
-    void slotLocalsPopup(Q3ListViewItem*, const QPoint& pt);
+    void slotLocalsPopup(const QPoint& pt);
     void slotLocalsToWatch();
     void slotEditValue();
 

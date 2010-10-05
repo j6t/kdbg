@@ -36,7 +36,7 @@ WatchWindow::WatchWindow(QWidget* parent) :
     connect(&m_watchEdit, SIGNAL(returnPressed()), SIGNAL(addWatch()));
     connect(&m_watchAdd, SIGNAL(clicked()), SIGNAL(addWatch()));
     connect(&m_watchDelete, SIGNAL(clicked()), SIGNAL(deleteWatch()));
-    connect(&m_watchVariables, SIGNAL(currentChanged(Q3ListViewItem*)),
+    connect(&m_watchVariables, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)),
 	    SLOT(slotWatchHighlighted()));
 
     m_watchVariables.installEventFilter(this);

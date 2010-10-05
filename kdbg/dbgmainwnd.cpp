@@ -29,7 +29,6 @@
 #include <QFileInfo>
 #include <QList>
 #include <Q3PopupMenu>
-#include <Q3ListViewItem>
 #include <QDockWidget>
 #include <QProcess>
 #include "dbgmainwnd.h"
@@ -174,8 +173,9 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	    m_debugger, SLOT(setThread(int)));
 
     // popup menu of the local variables window
-    connect(m_localVariables, SIGNAL(contextMenuRequested(Q3ListViewItem*, const QPoint&, int)),
-	    this, SLOT(slotLocalsPopup(Q3ListViewItem*, const QPoint&)));
+    m_localVariables->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_localVariables, SIGNAL(customContextMenuRequested(const QPoint&)),
+	    this, SLOT(slotLocalsPopup(const QPoint&)));
 
     makeDefaultLayout();
     setupGUI(KXmlGuiWindow::Default, "kdbgui.rc");
@@ -1068,7 +1068,7 @@ QString DebuggerMainWnd::makeSourceFilter()
 /*
  * Pop up the context menu in the locals window
  */
-void DebuggerMainWnd::slotLocalsPopup(Q3ListViewItem*, const QPoint& pt)
+void DebuggerMainWnd::slotLocalsPopup(const QPoint& pt)
 {
     Q3PopupMenu* popup =
 	static_cast<Q3PopupMenu*>(factory()->container("popup_locals", this));
@@ -1078,7 +1078,7 @@ void DebuggerMainWnd::slotLocalsPopup(Q3ListViewItem*, const QPoint& pt)
     if (popup->isVisible()) {
 	popup->hide();
     } else {
-	popup->popup(pt);
+	popup->popup(m_localVariables->viewport()->mapToGlobal(pt));
     }
 }
 
@@ -1116,8 +1116,8 @@ void DebuggerMainWnd::slotEditValue()
     {
 	return;				/* don't edit twice */
     }
-    
-    VarTree* expr = wnd->currentItem();
+
+    VarTree* expr = wnd->selectedItem();
     if (expr != 0 && m_debugger != 0 && m_debugger->canSingleStep())
     {
 	TRACE("edit value");

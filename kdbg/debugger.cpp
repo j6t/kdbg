@@ -44,10 +44,10 @@ KDebugger::KDebugger(QWidget* parent,
 {
     m_envVars.setAutoDelete(true);
 
-    connect(&m_localVariables, SIGNAL(expanded(Q3ListViewItem*)),
-	    SLOT(slotExpanding(Q3ListViewItem*)));
-    connect(&m_watchVariables, SIGNAL(expanded(Q3ListViewItem*)),
-	    SLOT(slotExpanding(Q3ListViewItem*)));
+    connect(&m_localVariables, SIGNAL(itemExpanded(QTreeWidgetItem*)),
+	    SLOT(slotExpanding(QTreeWidgetItem*)));
+    connect(&m_watchVariables, SIGNAL(itemExpanded(QTreeWidgetItem*)),
+	    SLOT(slotExpanding(QTreeWidgetItem*)));
     connect(&m_localVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
 	    SLOT(slotValueEdited(VarTree*, const QString&)));
     connect(&m_watchVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
@@ -753,11 +753,10 @@ void KDebugger::saveProgramSettings()
     m_programConfig->deleteGroup(WatchGroup);
     // then start a new group
     KConfigGroup wg = m_programConfig->group(WatchGroup);
-    VarTree* item = m_watchVariables.firstChild();
     int watchNum = 0;
-    for (; item != 0; item = item->nextSibling(), ++watchNum) {
-	varName.sprintf(ExprFmt, watchNum);
-	wg.writeEntry(varName, item->getText());
+    foreach (QString expr, m_watchVariables.exprList()) {
+	varName.sprintf(ExprFmt, watchNum++);
+	wg.writeEntry(varName, expr);
     }
 
     // give others a chance
@@ -1248,9 +1247,8 @@ void KDebugger::updateAllExprs()
     }
 
     // update watch expressions
-    VarTree* item = m_watchVariables.firstChild();
-    for (; item != 0; item = item->nextSibling()) {
-	m_watchEvalExpr.push_back(item->getText());
+    foreach (QString expr, m_watchVariables.exprList()) {
+	m_watchEvalExpr.push_back(expr);
     }
 }
 
@@ -1817,13 +1815,13 @@ CmdQueueItem* KDebugger::loadCoreFile()
     return m_d->queueCmd(DCcorefile, m_corefile, DebuggerDriver::QMoverride);
 }
 
-void KDebugger::slotExpanding(Q3ListViewItem* item)
+void KDebugger::slotExpanding(QTreeWidgetItem* item)
 {
     VarTree* exprItem = static_cast<VarTree*>(item);
     if (exprItem->m_varKind != VarTree::VKpointer) {
 	return;
     }
-    ExprWnd* wnd = static_cast<ExprWnd*>(item->listView());
+    ExprWnd* wnd = static_cast<ExprWnd*>(item->treeWidget());
     dereferencePointer(wnd, exprItem, true);
 }
 
@@ -1854,7 +1852,7 @@ void KDebugger::slotDeleteWatch()
     if (m_d == 0 || !m_d->isIdle())
 	return;
 
-    VarTree* item = m_watchVariables.currentItem();
+    VarTree* item = m_watchVariables.selectedItem();
     if (item == 0 || !item->isToplevelExpr())
 	return;
 
@@ -2190,7 +2188,7 @@ void KDebugger::slotValueEdited(VarTree* expr, const QString& text)
     if (text.simplifyWhiteSpace().isEmpty())
 	return;			       /* no text entered: ignore request */
 
-    ExprWnd* wnd = static_cast<ExprWnd*>(expr->listView());
+    ExprWnd* wnd = static_cast<ExprWnd*>(expr->treeWidget());
     TRACE(QString().sprintf("Changing %s to ",
 			    wnd->name()) + text);
 

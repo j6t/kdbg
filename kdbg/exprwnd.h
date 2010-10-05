@@ -7,7 +7,7 @@
 #ifndef EXPRWND_H
 #define EXPRWND_H
 
-#include <Q3ListView>
+#include <QTreeWidget>
 #include <QLineEdit>
 #include <QPixmap>
 #include <list>
@@ -19,7 +19,7 @@ class ExprWnd;
 class QStringList;
 
 /*! \brief a variable's value is the tree of sub-variables */
-class VarTree : public Q3ListViewItem
+class VarTree : public QTreeWidgetItem
 {
 public:
     enum VarKind { VKsimple, VKpointer, VKstruct, VKarray,
@@ -36,11 +36,10 @@ public:
     bool m_exprIndexUseGuard;		//!< ditto; if guard expr should be used
     QString m_partialValue;		//!< while struct value update is in progress
 
-    VarTree(VarTree* parent, Q3ListViewItem* after, ExprValue* v);
-    VarTree(ExprWnd* parent, Q3ListViewItem* after, const QString& name);
+    VarTree(VarTree* parent, ExprValue* v);
+    VarTree(ExprWnd* parent, const QString& name);
     virtual ~VarTree();
 public:
-    virtual void paintCell(QPainter* p, const QColorGroup& cg, int column, int width, int align);
     QString computeExpr() const;
     bool isToplevelExpr() const;
     /** is this element an ancestor of (or equal to) child? */
@@ -57,13 +56,11 @@ public:
     bool isWcharT() const;
 
     QString getText() const { return text(0); }
-    using Q3ListViewItem::setText;
-    void setText(const QString& t) { Q3ListViewItem::setText(0, t); }
-    using Q3ListViewItem::setPixmap;
-    void setPixmap(const QPixmap& p) { Q3ListViewItem::setPixmap(0, p); }
+    using QTreeWidgetItem::setText;
+    void setText(const QString& t) { QTreeWidgetItem::setText(0, t); }
+    void setPixmap(const QPixmap& p) { QTreeWidgetItem::setIcon(0, QIcon(p)); }
     QString value() const { return m_baseValue; }
-    VarTree* firstChild() const { return static_cast<VarTree*>(Q3ListViewItem::firstChild()); }
-    VarTree* nextSibling() const { return static_cast<VarTree*>(Q3ListViewItem::nextSibling()); }
+    VarTree* child(int i) const { return static_cast<VarTree*>(QTreeWidgetItem::child(i)); }
 
 private:
     void updateValueText();
@@ -115,7 +112,7 @@ signals:
 };
 
 
-class ExprWnd : public Q3ListView
+class ExprWnd : public QTreeWidget
 {
     Q_OBJECT
 public:
@@ -152,9 +149,8 @@ public:
     /** tells whether the a value is currently edited */
     bool isEditing() const;
 
-    VarTree* firstChild() const { return static_cast<VarTree*>(Q3ListView::firstChild()); }
-    VarTree* currentItem() const { return static_cast<VarTree*>(Q3ListView::currentItem()); }
-    VarTree* selectedItem() const { return static_cast<VarTree*>(Q3ListView::selectedItem()); }
+    VarTree* selectedItem() const { return static_cast<VarTree*>(QTreeWidget::currentItem()); }
+    VarTree* topLevelItem(int i) const { return static_cast<VarTree*>(QTreeWidget::topLevelItem(i)); }
 
 protected:
     void updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeTable& typeTable);

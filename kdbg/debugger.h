@@ -435,7 +435,7 @@ protected slots:
     void slotInferiorRunning();
     void backgroundUpdate();
     void gotoFrame(int);
-    void slotExpanding(Q3ListViewItem*);
+    void slotExpanding(QTreeWidgetItem*);
     void slotDeleteWatch();
     void slotValuePopup(const QString&);
     void slotDisassemble(const QString&, int);
