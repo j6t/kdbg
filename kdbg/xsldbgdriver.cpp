@@ -233,7 +233,7 @@ XsldbgDriver::commandFinished(CmdQueueItem * cmd)
     }
 
     /* ok, the command is ready */
-    emit commandReceived(cmd, m_output);
+    emit commandReceived(cmd, m_output.constData());
 
     switch (cmd->m_cmd) {
         case DCbt:
@@ -243,7 +243,7 @@ XsldbgDriver::commandFinished(CmdQueueItem * cmd)
         case DCstep:
         case DCnext:
         case DCfinish:{
-	  if (!::isErrorExpr(m_output))
+	  if (!::isErrorExpr(m_output.constData()))
             parseMarker();
 	  else{
 	    // This only shows an error for DCinfolocals 
@@ -263,31 +263,31 @@ XsldbgDriver::commandFinished(CmdQueueItem * cmd)
 }
 
 int
-XsldbgDriver::findPrompt(const char* output, size_t len) const
+XsldbgDriver::findPrompt(const QByteArray& output) const
 {
     /*
      * If there's a prompt string in the collected output, it must be at
      * the very end. We do a quick check whether the last characters of
      * output are suitable and do the full search only if they are.
      */
+    int len = output.length();
     if (len < 11 || output[len-1] != ' ' || output[len-2] != '>')
 	return -1;
 
     // There can be text between "(xsldbg) " and the "> " at the end
     // since we do not know what that text is, we accept the former
     // anywhere in the output.
-    const char* prompt = strstr(output, "(xsldbg) ");
-    return prompt ? prompt-output : 0;
+    return output.indexOf("(xsldbg) ");
 }
 
 void
 XsldbgDriver::parseMarker()
 {
-    char *p = m_output;
+    char *p = m_output.data();
 
     for (;;) {
         if ((p == 0) || (*p == '\0')) {
-            m_output[0] = '\0';
+            m_output.clear();
             return;
         }
         if (strncmp(p, "Breakpoint for file ", 20) == 0)

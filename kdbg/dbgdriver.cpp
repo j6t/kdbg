@@ -17,14 +17,8 @@
 
 DebuggerDriver::DebuggerDriver() :
 	m_state(DSidle),
-	m_output(0),
-	m_outputLen(0),
-	m_outputAlloc(0),
 	m_activeCmd(0)
 {
-    m_outputAlloc = 4000;
-    m_output = new char[m_outputAlloc];
-
     // debugger process
     connect(this, SIGNAL(readyReadStandardOutput()), SLOT(slotReceiveOutput()));
     connect(this, SIGNAL(bytesWritten(qint64)), SLOT(slotCommandRead()));
@@ -34,7 +28,6 @@ DebuggerDriver::DebuggerDriver() :
 
 DebuggerDriver::~DebuggerDriver()
 {
-    delete[] m_output;
     flushHiPriQueue();
     flushLoPriQueue();
 }
@@ -82,8 +75,7 @@ void DebuggerDriver::slotExited()
     // reset state
     m_state = DSidle;
     // empty buffer
-    m_outputLen = 0;
-    *m_output = '\0';
+    m_output.clear();
 }
 
 
@@ -315,30 +307,16 @@ void DebuggerDriver::processOutput(const QByteArray& data)
     // collect output until next prompt string is found
     
     // accumulate it
-    if (m_outputLen + data.length() >= m_outputAlloc) {
-	/*
-	 * Must enlarge m_output: double it. Note: That particular
-	 * sequence of commandes here ensures exception safety.
-	 */
-	int newSize = m_outputAlloc * 2;
-	char* newBuf = new char[newSize];
-	memcpy(newBuf, m_output, m_outputLen);
-	delete[] m_output;
-	m_output = newBuf;
-	m_outputAlloc = newSize;
-    }
-    memcpy(m_output+m_outputLen, data.data(), data.length());
-    m_outputLen += data.length();
-    m_output[m_outputLen] = '\0';
+    m_output += data;
 
     // check for a prompt
-    int promptStart = findPrompt(m_output, m_outputLen);
+    int promptStart = findPrompt(m_output);
     if (promptStart >= 0)
     {
 	// found prompt!
 
 	// terminate output before the prompt
-	m_output[promptStart] = '\0';
+	m_output.resize(promptStart);
 
 	/*
 	 * We've got output for the active command. But if it was
@@ -358,8 +336,7 @@ void DebuggerDriver::processOutput(const QByteArray& data)
 	}
 
 	// empty buffer
-	m_outputLen = 0;
-	*m_output = '\0';
+	m_output.clear();
 	// also clear delayed output if interrupted
 	if (m_state == DSinterrupted) {
 	    m_delayedOutput = std::queue<QByteArray>();

@@ -275,7 +275,7 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
     }
 
     /* ok, the command is ready */
-    emit commandReceived(cmd, m_output);
+    emit commandReceived(cmd, m_output.constData());
 
     switch (cmd->m_cmd) {
     case DCcorefile:
@@ -296,7 +296,7 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
     }
 }
 
-int GdbDriver::findPrompt(const char* output, size_t len) const
+int GdbDriver::findPrompt(const QByteArray& output) const
 {
     /*
      * If there's a prompt string in the collected output, it must be at
@@ -309,8 +309,9 @@ int GdbDriver::findPrompt(const char* output, size_t len) const
      * conditions for a very long time such that that buffer overflowed
      * exactly at the end of the prompt string look-a-like).
      */
+    int len = output.length();
     if (len >= PROMPT_LEN &&
-	strncmp(output+len-PROMPT_LEN, PROMPT, PROMPT_LEN) == 0)
+	strncmp(output.data()+len-PROMPT_LEN, PROMPT, PROMPT_LEN) == 0)
     {
 	return len-PROMPT_LEN;
     }
@@ -324,7 +325,7 @@ int GdbDriver::findPrompt(const char* output, size_t len) const
  */
 void GdbDriver::parseMarker(CmdQueueItem* cmd)
 {
-    char* startMarker = strstr(m_output, "\032\032");
+    char* startMarker = strstr(m_output.data(), "\032\032");
     if (startMarker == 0)
 	return;
 
