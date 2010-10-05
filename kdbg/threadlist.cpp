@@ -9,20 +9,21 @@
 #include <klocale.h>
 #include <kiconloader.h>
 #include <QBitmap>
+#include <QHeaderView>
 #include <QPainter>
 
 
-class ThreadEntry : public Q3ListViewItem, public ThreadInfo
+class ThreadEntry : public QTreeWidgetItem, public ThreadInfo
 {
 public:
-    ThreadEntry(Q3ListView* parent, const ThreadInfo& thread);
+    ThreadEntry(QTreeWidget* parent, const ThreadInfo& thread);
     void setFunction(const QString& func);
 
     bool m_delete;			/* used for updating the list */
 };
 
-ThreadEntry::ThreadEntry(Q3ListView* parent, const ThreadInfo& thread) :
-	Q3ListViewItem(parent, thread.threadName, thread.function),
+ThreadEntry::ThreadEntry(QTreeWidget* parent, const ThreadInfo& thread) :
+	QTreeWidgetItem(parent, QStringList() << thread.threadName << thread.function),
 	ThreadInfo(thread),
 	m_delete(false)
 {
@@ -36,17 +37,18 @@ void ThreadEntry::setFunction(const QString& func)
 
 
 ThreadList::ThreadList(QWidget* parent) :
-	Q3ListView(parent)
+	QTreeWidget(parent)
 {
-    addColumn(i18n("Thread ID"), 150);
-    addColumn(i18n("Location"));
+    setHeaderLabels(QStringList() << i18n("Thread ID") << i18n("Location"));
+    header()->setResizeMode(1, QHeaderView::Interactive);
+    setRootIsDecorated(false);
 
     // load pixmaps
     m_focusIcon = UserIcon("pcinner");
     makeNoFocusIcon();
 
-    connect(this, SIGNAL(currentChanged(Q3ListViewItem*)),
-	    this, SLOT(slotCurrentChanged(Q3ListViewItem*)));
+    connect(this, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
+	    this, SLOT(slotCurrentChanged(QTreeWidgetItem*)));
 }
 
 ThreadList::~ThreadList()
@@ -56,9 +58,8 @@ ThreadList::~ThreadList()
 void ThreadList::updateThreads(const std::list<ThreadInfo>& threads)
 {
     // reset flag in all items
-    for (Q3ListViewItem* e = firstChild(); e != 0; e = e->nextSibling()) {
-	static_cast<ThreadEntry*>(e)->m_delete = true;
-    }
+    for (QTreeWidgetItemIterator i(this); *i; ++i)
+	static_cast<ThreadEntry*>(*i)->m_delete = true;
 
     for (std::list<ThreadInfo>::const_iterator i = threads.begin(); i != threads.end(); ++i)
     {
@@ -72,13 +73,14 @@ void ThreadList::updateThreads(const std::list<ThreadInfo>& threads)
 	}
 	// set focus icon
 	te->hasFocus = i->hasFocus;
-	te->setPixmap(0, i->hasFocus  ?  m_focusIcon  :  m_noFocusIcon);
+	te->setIcon(0, i->hasFocus  ?  QIcon(m_focusIcon)  :  QIcon(m_noFocusIcon));
     }
 
     // delete all entries that have not been seen
-    for (Q3ListViewItem* e = firstChild(); e != 0;) {
-	ThreadEntry* te = static_cast<ThreadEntry*>(e);
-	e = e->nextSibling();		/* step ahead before deleting it ;-) */
+    for (QTreeWidgetItemIterator i(this); *i;)
+    {
+	ThreadEntry* te = static_cast<ThreadEntry*>(*i);
+	++i;		// step ahead before deleting it ;-)
 	if (te->m_delete) {
 	    delete te;
 	}
@@ -87,8 +89,9 @@ void ThreadList::updateThreads(const std::list<ThreadInfo>& threads)
 
 ThreadEntry* ThreadList::threadById(int id)
 {
-    for (Q3ListViewItem* e = firstChild(); e != 0; e = e->nextSibling()) {
-	ThreadEntry* te = static_cast<ThreadEntry*>(e);
+    for (QTreeWidgetItemIterator i(this); *i; ++i)
+    {
+	ThreadEntry* te = static_cast<ThreadEntry*>(*i);
 	if (te->id == id) {
 	    return te;
 	}
@@ -110,7 +113,7 @@ void ThreadList::makeNoFocusIcon()
     m_noFocusIcon.setMask(m_noFocusIcon.createHeuristicMask());
 }
 
-void ThreadList::slotCurrentChanged(Q3ListViewItem* newItem)
+void ThreadList::slotCurrentChanged(QTreeWidgetItem* newItem)
 {
     if (newItem == 0)
 	return;
