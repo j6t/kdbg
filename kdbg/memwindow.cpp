@@ -5,7 +5,7 @@
  */
 
 #include "memwindow.h"
-#include <Q3Header>
+#include <QHeaderView>
 #include <QMouseEvent>
 #include <QList>
 #include <klocale.h>
@@ -14,60 +14,45 @@
 #include "debugger.h"
 
 
-class MemoryViewItem : public Q3ListViewItem
-{
-public:
-    MemoryViewItem(Q3ListView* parent, Q3ListViewItem* insertAfter, QString raw, QString cooked)
-        : Q3ListViewItem(parent, insertAfter, raw, cooked) {}
-
-    void setChanged(uint pos, bool b) { m_changed[pos] = b; }
-
-protected:
-    virtual void paintCell(QPainter* p, const QColorGroup& cg,
-			   int column, int width, int alignment);
-
-    bool m_changed[8];
-};
-
-void MemoryViewItem::paintCell(QPainter* p, const QColorGroup& cg,
-			       int column, int width, int alignment)
-{
-    if( column > 0 && m_changed[column - 1] ) {
-	QColorGroup newcg = cg;
-	newcg.setColor(QColorGroup::Text, Qt::red);
-	Q3ListViewItem::paintCell(p, newcg, column, width, alignment);
-    } else {
-	Q3ListViewItem::paintCell(p, cg, column, width, alignment);
-    }
-}
-
-
 MemoryWindow::MemoryWindow(QWidget* parent) :
 	QWidget(parent),
 	m_debugger(0),
-	m_expression(true, this, "expression"),
-	m_memory(this, "memory"),
-	m_layout(this, 0, 2),
+	m_expression(this),
+	m_memory(this),
+	m_layout(QBoxLayout::TopToBottom, this),
 	m_format(MDTword | MDThex)
 {
+    m_expression.setEditable(true);
     QSize minSize = m_expression.sizeHint();
     m_expression.setMinimumSize(minSize);
-    m_expression.setInsertionPolicy(QComboBox::NoInsertion);
+    m_expression.setInsertPolicy(QComboBox::NoInsert);
     m_expression.setMaxCount(15);
 
-    m_memory.addColumn(i18n("Address"), 80);
+    m_memory.setColumnCount(9);
+    m_memory.setHeaderLabel(i18n("Address"));
+    for (int i = 1; i < 9; i++) {
+	m_memory.hideColumn(i);
+	m_memory.header()->setResizeMode(QHeaderView::ResizeToContents);
+	m_memory.headerItem()->setText(i, QString());
+    }
+    m_memory.header()->setStretchLastSection(false);
 
-    m_memory.setSorting(-1);		/* don't sort */
+    m_memory.setSortingEnabled(false);		/* don't sort */
     m_memory.setAllColumnsShowFocus(true);
-    m_memory.header()->setClickEnabled(false);
+    m_memory.setRootIsDecorated(false);
+    m_memory.header()->setClickable(false);
+    m_memory.setContextMenuPolicy(Qt::NoContextMenu);	// defer to parent
 
     // create layout
+    m_layout.setSpacing(2);
     m_layout.addWidget(&m_expression, 0);
     m_layout.addWidget(&m_memory, 10);
     m_layout.activate();
 
     connect(&m_expression, SIGNAL(activated(const QString&)),
 	    this, SLOT(slotNewExpression(const QString&)));
+    connect(m_expression.lineEdit(), SIGNAL(returnPressed()),
+	    this, SLOT(slotNewExpression()));
 
     // the popup menu
     m_popup.insertItem(i18n("B&ytes"), MDTbyte);
@@ -86,42 +71,21 @@ MemoryWindow::MemoryWindow(QWidget* parent) :
     m_popup.insertItem(i18n("&Strings"), MDTstring);
     m_popup.insertItem(i18n("&Instructions"), MDTinsn);
     connect(&m_popup, SIGNAL(activated(int)), this, SLOT(slotTypeChange(int)));
-
-    /*
-     * Handle right mouse button. Signal righteButtonClicked cannot be
-     * used, because it works only over items, not over the blank window.
-     */
-    m_memory.viewport()->installEventFilter(this);
 }
 
 MemoryWindow::~MemoryWindow()
 {
 }
 
-bool MemoryWindow::eventFilter(QObject*, QEvent* ev)
+void MemoryWindow::contextMenuEvent(QContextMenuEvent* ev)
 {
-    if (ev->type() == QEvent::MouseButtonRelease) {
-	handlePopup(static_cast<QMouseEvent*>(ev));
-	return true;
-    }
-    return false;
+    m_popup.popup(ev->globalPos());
+    ev->accept();
 }
 
-void MemoryWindow::handlePopup(QMouseEvent* ev)
+void MemoryWindow::slotNewExpression()
 {
-    if (ev->button() == Qt::RightButton)
-    {
-	// show popup menu
-	if (m_popup.isVisible())
-	{
-	    m_popup.hide();
-	}
-	else
-	{
-	    m_popup.popup(mapToGlobal(ev->pos()));
-	}
-	return;
-    }
+    slotNewExpression(m_expression.lineEdit()->text());
 }
 
 void MemoryWindow::slotNewExpression(const QString& newText)
@@ -188,21 +152,16 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 {
     m_memory.clear();
     if (!msg.isEmpty()) {
-	new Q3ListViewItem(&m_memory, QString(), msg);
+	new QTreeWidgetItem(&m_memory, QStringList() << QString() << msg);
 	return;
     }
 
-    MemoryViewItem* after = 0;
     std::list<MemoryDump>::const_iterator md = memdump.begin();
 
-    // remove all columns, except the address column
-    for(int k = m_memory.columns() - 1; k > 0; k--)
-	m_memory.removeColumn(k);
-
-    //add the needed columns
+    // show only needed columns
     QStringList sl = QStringList::split( "\t", md->dump );
-    for (int i = 0; i < sl.count(); i++)
-	m_memory.addColumn("", -1);
+    for (int i = m_memory.columnCount()-1; i > 0; i--)
+	m_memory.setColumnHidden(i, i > sl.count());
 
     QMap<QString,QString> tmpMap;
 
@@ -214,7 +173,8 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	// save memory
 	tmpMap[addr] = md->dump;
 
-	after = new MemoryViewItem(&m_memory, after, addr, "");
+	QTreeWidgetItem* line =
+		new QTreeWidgetItem(&m_memory, QStringList(addr) << sl);
 
 	QStringList tmplist;
 	QMap<QString,QString>::Iterator pos = m_old_memory.find( addr );
@@ -224,12 +184,10 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 
 	for (int i = 0; i < sl.count(); i++)
 	{
-            after->setText( i+1, sl[i] );
-
 	    bool changed =
 		tmplist.count() > 0 &&
 		sl[i] != tmplist[i];
-	    after->setChanged(i, changed);
+	    line->setForeground(i+1, changed ? QBrush(QColor(Qt::red)) : palette().text());
 	}
     }
 
