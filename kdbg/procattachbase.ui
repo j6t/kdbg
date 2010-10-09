@@ -45,7 +45,7 @@
     </layout>
    </item>
    <item>
-    <widget class="Q3ListView" name="processList" >
+    <widget class="QTreeWidget" name="processList" >
      <property name="minimumSize" >
       <size>
        <width>300</width>
@@ -55,6 +55,9 @@
      <property name="whatsThis" >
       <string>&lt;p>This list displays all processes that are currently running. You must select the process that you want KDbg to attach to. Use the &lt;b>Filter or PID&lt;/b> edit box to reduce the number of entries in this list.&lt;p>The text in the &lt;i>Command&lt;/i> column is usually, but not always, the command that was used to start the process. The &lt;i>PID&lt;/i> column shows the process ID. The &lt;i>PPID&lt;/i> column shows the process ID of the parent process. Additional columns show more information about the processes that is also available via the system's &lt;i>ps&lt;/i> command.&lt;/p>&lt;p>The list is not updated automatically. Use the &lt;b>Refresh&lt;/b> button to update it.&lt;/p></string>
      </property>
+     <property name="rootIsDecorated" >
+      <bool>false</bool>
+     </property>
      <property name="allColumnsShowFocus" >
       <bool>true</bool>
      </property>
@@ -62,33 +65,15 @@
       <property name="text" >
        <string>Command</string>
       </property>
-      <property name="clickable" >
-       <bool>true</bool>
-      </property>
-      <property name="resizable" >
-       <bool>true</bool>
-      </property>
      </column>
      <column>
       <property name="text" >
        <string>PID</string>
       </property>
-      <property name="clickable" >
-       <bool>true</bool>
-      </property>
-      <property name="resizable" >
-       <bool>true</bool>
-      </property>
      </column>
      <column>
       <property name="text" >
        <string>PPID</string>
-      </property>
-      <property name="clickable" >
-       <bool>true</bool>
-      </property>
-      <property name="resizable" >
-       <bool>true</bool>
       </property>
      </column>
     </widget>
@@ -134,11 +119,6 @@
    <class>KLineEdit</class>
    <extends>QLineEdit</extends>
    <header>klineedit.h</header>
-  </customwidget>
-  <customwidget>
-   <class>Q3ListView</class>
-   <extends>Q3Frame</extends>
-   <header>q3listview.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

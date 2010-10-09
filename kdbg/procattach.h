@@ -42,13 +42,13 @@ protected:
 protected slots:
     void on_buttonRefresh_clicked();
     void on_filterEdit_textChanged(const QString& text);
-    void on_processList_selectionChanged();
+    void on_processList_currentItemChanged();
     void slotTextReceived();
     void slotPSDone();
 
 protected:
     void pushLine();
-    bool setVisibility(Q3ListViewItem* i, const QString& text);
+    bool setVisibility(QTreeWidgetItem* i, const QString& text);
 
     QProcess* m_ps;
     // parse state
