@@ -240,7 +240,7 @@ bool VarTree::isWcharT() const
 /*
  * Get the type of the first base class whose type we know.
  */
-TypeInfo* VarTree::inferTypeFromBaseClass()
+const TypeInfo* VarTree::inferTypeFromBaseClass()
 {
     if (m_varKind == VKstruct) {
 	for (int i = 0; i < childCount(); i++)

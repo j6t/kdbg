@@ -1613,7 +1613,7 @@ void KDebugger::handleFindType(CmdQueueItem* cmd, const char* output)
     {
 	ASSERT(cmd != 0 && cmd->m_expr != 0);
 
-	TypeInfo* info = m_typeTable->lookup(type);
+	const TypeInfo* info = m_typeTable->lookup(type);
 
 	if (info == 0) {
 	    /*

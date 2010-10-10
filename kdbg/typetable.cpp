@@ -56,8 +56,6 @@ TypeTable::TypeTable() :
 	m_printQStringDataCmd(0)
 {
     m_typeDict.setAutoDelete(true);
-    // aliasDict keeps only pointers to items into typeDict
-    m_aliasDict.setAutoDelete(false);
 }
 
 TypeTable::~TypeTable()
@@ -139,7 +137,7 @@ void TypeTable::loadFromFile(const QString& fileName)
 		if (info == 0) {
 		    TRACE(*it + ": alias " + alias + " not found");
 		} else {
-		    m_aliasDict.insert(alias, info);
+		    m_aliasDict.insert(std::make_pair(*it, info));
 		    TRACE(*it + ": alias " + alias);
 		}
 	    }
@@ -182,14 +180,13 @@ void TypeTable::readType(const KConfigGroup& cf, const QString& type)
     TRACE(type + QString().sprintf(": %d exprs", info->m_numExprs));
 }
 
-void TypeTable::copyTypes(Q3Dict<TypeInfo>& dict)
+void TypeTable::copyTypes(TypeInfoRefMap& dict)
 {
     for (Q3DictIterator<TypeInfo> it = m_typeDict; it != 0; ++it) {
-	dict.insert(it.currentKey(), it);
+	dict.insert(std::make_pair(it.currentKey(), it));
     }
-    for (Q3DictIterator<TypeInfo> it = m_aliasDict; it != 0; ++it) {
-	dict.insert(it.currentKey(), it);
-    }
+    std::copy(m_aliasDict.begin(), m_aliasDict.end(),
+	      std::inserter(dict, dict.begin()));
 }
 
 bool TypeTable::isEnabledBuiltin(const QString& feature) const
@@ -228,8 +225,6 @@ ProgramTypeTable::ProgramTypeTable() :
 	m_QCharIsShort(false),
 	m_printQStringDataCmd(0)
 {
-    m_types.setAutoDelete(false);	/* paranoia */
-    m_aliasDict.setAutoDelete(false);	/* paranoia */
 }
 
 ProgramTypeTable::~ProgramTypeTable()
@@ -315,20 +310,20 @@ QStringList ProgramTypeTable::splitTemplateArgs(const QString& t)
     return result;
 }
 
-TypeInfo* ProgramTypeTable::lookup(QString type)
+const TypeInfo* ProgramTypeTable::lookup(QString type)
 {
     /*
      * Registered aliases contain the complete template parameter list.
      * Check for an alias first so that this case is out of the way.
      */
-    if (TypeInfo* result = m_aliasDict[type])
+    if (const TypeInfo* result = m_aliasDict[type])
 	return result;
 
     /*
      * Check for a normal type. Even if type is a template instance,
      * it could have been registered as a normal type instead of a pattern.
      */
-    if (TypeInfo* result = m_types[type])
+    if (const TypeInfo* result = m_types[type])
 	return result;
 
     /*
@@ -343,7 +338,7 @@ TypeInfo* ProgramTypeTable::lookup(QString type)
 	m_templates.equal_range(parts.front());
     // We pick the one that has the wildcards in the later parameters.
     unsigned minPenalty = ~0U;
-    TypeInfo* result = 0;
+    const TypeInfo* result = 0;
     parts.pop_front();
 
     for (TemplateMap::const_iterator i = range.first; i != range.second; ++i)
@@ -383,10 +378,10 @@ TypeInfo* ProgramTypeTable::lookup(QString type)
     return result;
 }
 
-void ProgramTypeTable::registerAlias(const QString& name, TypeInfo* type)
+void ProgramTypeTable::registerAlias(const QString& name, const TypeInfo* type)
 {
     ASSERT(lookup(name) == 0 || lookup(name) == type);
-    m_aliasDict.insert(name, type);
+    m_aliasDict.insert(std::make_pair(name, type));
 }
 
 void ProgramTypeTable::loadLibTypes(const QStringList& libs)

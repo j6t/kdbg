@@ -31,7 +31,7 @@ public:
 	NKaddress			//!< a dereferenced pointer
     };
     NameKind m_nameKind;
-    TypeInfo* m_type;			//!< the type of struct if it could be derived
+    const TypeInfo* m_type;			//!< the type of struct if it could be derived
     int m_exprIndex;			//!< used in struct value update
     bool m_exprIndexUseGuard;		//!< ditto; if guard expr should be used
     QString m_partialValue;		//!< while struct value update is in progress
@@ -51,7 +51,7 @@ public:
     /** find out the type of this value using the child values */
     void inferTypesOfChildren(ProgramTypeTable& typeTable);
     /** get the type from base class part */
-    TypeInfo* inferTypeFromBaseClass();
+    const TypeInfo* inferTypeFromBaseClass();
     /** returns whether the pointer is a wchar_t */
     bool isWcharT() const;
 
