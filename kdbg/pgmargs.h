@@ -41,7 +41,7 @@ protected:
 protected slots:
     void on_buttonModify_clicked();
     void on_buttonDelete_clicked();
-    void on_envList_selectionChanged();
+    void on_envList_currentItemChanged();
     void on_wdBrowse_clicked();
     void on_insertFile_clicked();
     void on_insertDir_clicked();

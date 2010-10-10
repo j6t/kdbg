@@ -211,33 +211,27 @@
             </widget>
            </item>
            <item>
-            <widget class="Q3ListView" name="envList" >
+            <widget class="QTreeWidget" name="envList" >
              <property name="whatsThis" >
               <string>Environment variables that are set &lt;i>in addition&lt;/i> to those that are inherited are listed in this table. To add new environment variables, specify them as &lt;tt>NAME=value&lt;/tt> in the edit box above and click &lt;b>Modify&lt;/b>. To modify a value, select it in this list and click &lt;b>Modify&lt;/b>. To delete an environment variable, select it in this list and click &lt;b>Delete&lt;/b>.</string>
              </property>
-             <property name="selectionMode" >
-              <enum>Q3ListView::Single</enum>
+             <property name="rootIsDecorated" >
+              <bool>false</bool>
+             </property>
+             <property name="itemsExpandable" >
+              <bool>false</bool>
+             </property>
+             <property name="allColumnsShowFocus" >
+              <bool>true</bool>
              </property>
              <column>
               <property name="text" >
                <string>Name</string>
               </property>
-              <property name="clickable" >
-               <bool>false</bool>
-              </property>
-              <property name="resizable" >
-               <bool>true</bool>
-              </property>
              </column>
              <column>
               <property name="text" >
                <string>Value</string>
-              </property>
-              <property name="clickable" >
-               <bool>false</bool>
-              </property>
-              <property name="resizable" >
-               <bool>true</bool>
               </property>
              </column>
             </widget>
@@ -300,9 +294,9 @@
       </attribute>
       <layout class="QHBoxLayout" >
        <item>
-        <widget class="Q3ListBox" name="xsldbgOptions" >
+        <widget class="QListWidget" name="xsldbgOptions" >
          <property name="selectionMode" >
-          <enum>Q3ListBox::Multi</enum>
+          <enum>QAbstractItemView::MultiSelection</enum>
          </property>
         </widget>
        </item>
@@ -326,16 +320,6 @@
    <class>KDialogButtonBox</class>
    <extends>QDialogButtonBox</extends>
    <header>kdialogbuttonbox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>Q3ListBox</class>
-   <extends>Q3Frame</extends>
-   <header>q3listbox.h</header>
-  </customwidget>
-  <customwidget>
-   <class>Q3ListView</class>
-   <extends>Q3Frame</extends>
-   <header>q3listview.h</header>
   </customwidget>
  </customwidgets>
  <tabstops>

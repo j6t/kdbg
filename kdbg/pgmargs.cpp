@@ -5,7 +5,6 @@
  */
 
 #include "pgmargs.h"
-#include <Q3ListView>
 #include <kfiledialog.h>
 #include <klocale.h>			/* i18n */
 #include "mydebug.h"
@@ -28,7 +27,7 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, Q3Dict<EnvVar>& envVars,
     // add options only if the option list is non-empty
     if (!allOptions.isEmpty()) 
     {
-	xsldbgOptions->insertStringList(allOptions);
+	xsldbgOptions->addItems(allOptions);
     }
     else
     {
@@ -48,9 +47,9 @@ void PgmArgs::setOptions(const QStringList& selectedOptions)
 {
     QStringList::ConstIterator it;
     for (it = selectedOptions.begin(); it != selectedOptions.end(); ++it) {
-	for (uint i = 0; i < xsldbgOptions->count(); i++) {
-	    if (xsldbgOptions->text(i) == *it) {
-		xsldbgOptions->setSelected(i, true);
+	for (int i = 0; i < xsldbgOptions->count(); i++) {
+	    if (xsldbgOptions->item(i)->text() == *it) {
+		xsldbgOptions->item(i)->setSelected(true);
 		break;
 	    }
 	}
@@ -63,9 +62,9 @@ QStringList PgmArgs::options() const
     QStringList sel;
     if (xsldbgOptionsPage != 0)
     {
-	for (uint i = 0; i < xsldbgOptions->count(); i++) {
-	    if (xsldbgOptions->isSelected(i))
-		sel.append(xsldbgOptions->text(i));
+	for (int i = 0; i < xsldbgOptions->count(); i++) {
+	    if (xsldbgOptions->item(i)->isSelected())
+		sel.append(xsldbgOptions->item(i)->text());
 	}
     }
     return sel;
@@ -94,7 +93,7 @@ void PgmArgs::modifyVar(bool resurrect)
 	    {
 		val->value = value;
 		val->status = EnvVar::EVdirty;
-		val->item = new Q3ListViewItem(envList, name, value);	// inserts itself
+		val->item = new QTreeWidgetItem(envList, QStringList() << name << value);
 		m_envVars.insert(name, val);
 	    }
 	} else if (value != val->value) {
@@ -108,17 +107,17 @@ void PgmArgs::modifyVar(bool resurrect)
 	val = new EnvVar;
 	val->value = value;
 	val->status = EnvVar::EVnew;
-	val->item = new Q3ListViewItem(envList, name, value);	// inserts itself
+	val->item = new QTreeWidgetItem(envList, QStringList() << name << value);
 	m_envVars.insert(name, val);
     }
-    envList->setSelected(val->item, true);
+    envList->setCurrentItem(val->item);
     buttonDelete->setEnabled(true);
 }
 
 // delete the selected item
 void PgmArgs::on_buttonDelete_clicked()
 {
-    Q3ListViewItem* item = envList->selectedItem();
+    QTreeWidgetItem* item = envList->currentItem();
     if (item == 0)
 	return;
     QString name = item->text(0);
@@ -165,16 +164,16 @@ void PgmArgs::initEnvList()
     for (; (val = it) != 0; ++it) {
 	val->status = EnvVar::EVclean;
 	name = it.currentKey();
-	val->item = new Q3ListViewItem(envList, name, val->value);	// inserts itself
+	val->item = new QTreeWidgetItem(envList, QStringList() << name << val->value);
     }
 
     envList->setAllColumnsShowFocus(true);
-    buttonDelete->setEnabled(envList->selectedItem() != 0);
+    buttonDelete->setEnabled(envList->currentItem() != 0);
 }
 
-void PgmArgs::on_envList_selectionChanged()
+void PgmArgs::on_envList_currentItemChanged()
 {
-    Q3ListViewItem* item = envList->selectedItem();
+    QTreeWidgetItem* item = envList->currentItem();
     buttonDelete->setEnabled(item != 0);
     if (item == 0)
 	return;
