@@ -55,16 +55,11 @@ void TypeTable::loadTypeTables()
 TypeTable::TypeTable() :
 	m_printQStringDataCmd(0)
 {
-    m_typeDict.setAutoDelete(true);
 }
 
 TypeTable::~TypeTable()
 {
     delete[] m_printQStringDataCmd;
-    while (!m_templates.empty()) {
-	delete m_templates.begin()->second;
-	m_templates.erase(m_templates.begin());
-    }
 }
 
 
@@ -133,11 +128,11 @@ void TypeTable::loadFromFile(const QString& fileName)
 		readType(cf, *it);
 	    } else {
 		// look up the alias type and insert it
-		TypeInfo* info = m_typeDict[alias];
-		if (info == 0) {
+		TypeInfoMap::iterator i = m_typeDict.find(alias);
+		if (i == m_typeDict.end()) {
 		    TRACE(*it + ": alias " + alias + " not found");
 		} else {
-		    m_aliasDict.insert(std::make_pair(*it, info));
+		    m_aliasDict.insert(std::make_pair(*it, &i->second));
 		    TRACE(*it + ": alias " + alias);
 		}
 	    }
@@ -150,40 +145,40 @@ void TypeTable::readType(const KConfigGroup& cf, const QString& type)
     // the display string
     QString expr = cf.readEntry(DisplayEntry);
 
-    TypeInfo* info = new TypeInfo(expr);
-    if (info->m_numExprs == 0) {
+    TypeInfo info(expr);
+    if (info.m_numExprs == 0) {
 	TRACE("bogus type " + type + ": no %% in Display: " + expr);
-	delete info;
 	return;
     }
 
-    info->m_templatePattern = cf.readEntry(TemplateEntry);
+    info.m_templatePattern = cf.readEntry(TemplateEntry);
 
     // Expr1, Expr2, etc...
     QString exprEntry;
     QString funcGuardEntry;
-    for (int j = 0; j < info->m_numExprs; j++) {
+    for (int j = 0; j < info.m_numExprs; j++)
+    {
 	exprEntry.sprintf(ExprEntryFmt, j+1);
 	expr = cf.readEntry(exprEntry);
-	info->m_exprStrings[j] = expr;
+	info.m_exprStrings[j] = expr;
 
 	funcGuardEntry.sprintf(FunctionGuardEntryFmt, j+1);
 	expr = cf.readEntry(funcGuardEntry);
-	info->m_guardStrings[j] = expr;
+	info.m_guardStrings[j] = expr;
     }
 
     // add the new type
-    if (info->m_templatePattern.find('<') < 0)
-	m_typeDict.insert(type, info);
+    if (info.m_templatePattern.find('<') < 0)
+	m_typeDict.insert(std::make_pair(type, info));
     else
-	m_templates[type] = info;
-    TRACE(type + QString().sprintf(": %d exprs", info->m_numExprs));
+	m_templates.insert(std::make_pair(type, info));
+    TRACE(type + QString().sprintf(": %d exprs", info.m_numExprs));
 }
 
 void TypeTable::copyTypes(TypeInfoRefMap& dict)
 {
-    for (Q3DictIterator<TypeInfo> it = m_typeDict; it != 0; ++it) {
-	dict.insert(std::make_pair(it.currentKey(), it));
+    for (TypeInfoMap::iterator i = m_typeDict.begin(); i != m_typeDict.end(); ++i) {
+	dict.insert(std::make_pair(i->first, &i->second));
     }
     std::copy(m_aliasDict.begin(), m_aliasDict.end(),
 	      std::inserter(dict, dict.begin()));
@@ -236,7 +231,7 @@ void ProgramTypeTable::loadTypeTable(TypeTable* table)
     table->copyTypes(m_types);
 
     // add templates
-    const TypeTable::TypeMap& t = table->templates();
+    const TypeTable::TypeInfoMap& t = table->templates();
     std::transform(t.begin(), t.end(),
 		std::inserter(m_templates, m_templates.begin()),
 		std::ptr_fun(template2Info));
@@ -254,12 +249,12 @@ void ProgramTypeTable::loadTypeTable(TypeTable* table)
 }
 
 ProgramTypeTable::TemplateMap::value_type
-	ProgramTypeTable::template2Info(const TypeTable::TypeMap::value_type& tt)
+	ProgramTypeTable::template2Info(const TypeTable::TypeInfoMap::value_type& tt)
 {
-    QStringList args = splitTemplateArgs(tt.second->m_templatePattern);
+    QStringList args = splitTemplateArgs(tt.second.m_templatePattern);
 
     TemplateMap::value_type result(args.front(), TemplateInfo());
-    result.second.type = tt.second;
+    result.second.type = &tt.second;
     args.pop_front();
     result.second.templateArgs = args;
     return result;
