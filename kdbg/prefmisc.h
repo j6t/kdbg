@@ -10,14 +10,14 @@
 #include <QCheckBox>
 #include <QLabel>
 #include <QLineEdit>
-#include <Q3GridLayout>
+#include <QGridLayout>
 
 class PrefMisc : public QWidget
 {
 public:
     PrefMisc(QWidget* parent);
 
-    Q3GridLayout m_grid;
+    QGridLayout m_grid;
 
 protected:
     QCheckBox m_popForeground;

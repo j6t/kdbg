@@ -7,10 +7,10 @@
 #ifndef MEMWINDOW_H
 #define MEMWINDOW_H
 
-#include <Q3PopupMenu>
 #include <QBoxLayout>
 #include <QComboBox>
 #include <QMap>
+#include <QMenu>
 #include <QTreeWidget>
 #include "dbgdriver.h"
 
@@ -38,7 +38,7 @@ protected:
     unsigned m_format;
     QMap<QString,unsigned> m_formatCache;
 
-    Q3PopupMenu m_popup;
+    QMenu m_popup;
 
     virtual void contextMenuEvent(QContextMenuEvent* ev);
     void displayNewExpression(const QString& expr);
@@ -46,7 +46,7 @@ protected:
 public slots:
     void slotNewExpression(const QString&);
     void slotNewExpression();
-    void slotTypeChange(int id);
+    void slotTypeChange(QAction*);
     void slotNewMemoryDump(const QString&, const std::list<MemoryDump>&);
     void saveProgramSpecific(KConfigBase* config);
     void restoreProgramSpecific(KConfigBase* config);

@@ -9,7 +9,7 @@
 
 PrefDebugger::PrefDebugger(QWidget* parent) :
 	QWidget(parent, "debugger"),
-	m_grid(this, 5, 2, 10),
+	m_grid(this),
 	m_defaultHint(this, "default_hint"),
 	m_debuggerCCppLabel(this, "debugger_label"),
 	m_debuggerCCpp(this, "debugger"),

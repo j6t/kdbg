@@ -9,14 +9,14 @@
 
 #include <QLineEdit>
 #include <QLabel>
-#include <Q3GridLayout>
+#include <QGridLayout>
 
 class PrefDebugger : public QWidget
 {
 public:
     PrefDebugger(QWidget* parent);
 
-    Q3GridLayout m_grid;
+    QGridLayout m_grid;
 
     // --- the hint about defaults
 protected:

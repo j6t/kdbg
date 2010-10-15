@@ -28,7 +28,6 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QList>
-#include <Q3PopupMenu>
 #include <QDockWidget>
 #include <QProcess>
 #include "dbgmainwnd.h"
@@ -1070,8 +1069,7 @@ QString DebuggerMainWnd::makeSourceFilter()
  */
 void DebuggerMainWnd::slotLocalsPopup(const QPoint& pt)
 {
-    Q3PopupMenu* popup =
-	static_cast<Q3PopupMenu*>(factory()->container("popup_locals", this));
+    QMenu* popup = static_cast<QMenu*>(factory()->container("popup_locals", this));
     if (popup == 0) {
         return;
     }

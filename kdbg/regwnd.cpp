@@ -6,12 +6,11 @@
 
 #include "regwnd.h"
 #include "dbgdriver.h"
-#include <Q3Header>
 #include <QPixmap>
 #include <kglobalsettings.h>
 #include <klocale.h>			/* i18n */
 #include <kiconloader.h>
-#include <Q3PopupMenu>
+#include <QMenu>
 #include <QRegExp>
 #include <QStringList>
 #include <QHeaderView>
@@ -424,14 +423,17 @@ RegisterView::RegisterView(QWidget* parent) :
 
     setAllColumnsShowFocus(true);
 
-    m_modemenu = new Q3PopupMenu(this, "ERROR");
+    m_modemenu = new QMenu("ERROR", this);
     for (uint i=0; i<sizeof(menuitems)/sizeof(MenuPair); i++) {
 	if (menuitems[i].isSeparator())
-	    m_modemenu->insertSeparator();
-	else
-	    m_modemenu->insertItem(i18n(menuitems[i].name), menuitems[i].mode);
+	    m_modemenu->addSeparator();
+	else {
+	    QAction* action = m_modemenu->addAction(i18n(menuitems[i].name));
+	    action->setData(menuitems[i].mode);
+	    action->setCheckable(true);
+	}
     }
-    connect(m_modemenu,SIGNAL(activated(int)),SLOT(slotModeChange(int)));
+    connect(m_modemenu, SIGNAL(triggered(QAction*)), SLOT(slotModeChange(QAction*)));
     
     new GroupingViewItem(this, i18n("GP and others"), "^$",
 			 RegisterDisplay::nada);
@@ -575,9 +577,11 @@ void RegisterView::contextMenuEvent(QContextMenuEvent* event)
 
     if (item) {
         RegisterDisplay mode=static_cast<ModeItem*>(item)->mode();        
-        for (unsigned int i = 0; i<sizeof(menuitems)/sizeof(MenuPair); i++) {
-            m_modemenu->setItemChecked(menuitems[i].mode, 
-                                       mode.contains(menuitems[i].mode));
+	int i = 0;
+	foreach(QAction* action, m_modemenu->actions())
+	{
+	    action->setChecked(mode.contains(menuitems[i].mode));
+	    ++i;
         }
         m_modemenu->setCaption(item->text(0));
 	m_modemenu->popup(event->globalPos());
@@ -586,7 +590,7 @@ void RegisterView::contextMenuEvent(QContextMenuEvent* event)
     }    
 }
 
-void RegisterView::slotModeChange(int pcode)
+void RegisterView::slotModeChange(QAction* action)
 {
     RegMap::iterator it=m_registers.find(m_modemenu->caption());
     ModeItem* view;
@@ -597,7 +601,7 @@ void RegisterView::slotModeChange(int pcode)
 
     if (view) {
 	RegisterDisplay mode = view->mode();
-	mode.changeFlag(pcode);
+	mode.changeFlag(action->data().toInt());
 	view->setMode(mode);
     }
 }

@@ -55,22 +55,37 @@ MemoryWindow::MemoryWindow(QWidget* parent) :
 	    this, SLOT(slotNewExpression()));
 
     // the popup menu
-    m_popup.insertItem(i18n("B&ytes"), MDTbyte);
-    m_popup.insertItem(i18n("Halfwords (&2 Bytes)"), MDThalfword);
-    m_popup.insertItem(i18n("Words (&4 Bytes)"), MDTword);
-    m_popup.insertItem(i18n("Giantwords (&8 Bytes)"), MDTgiantword);
-    m_popup.insertSeparator();
-    m_popup.insertItem(i18n("He&xadecimal"), MDThex);
-    m_popup.insertItem(i18n("Signed &decimal"), MDTsigned);
-    m_popup.insertItem(i18n("&Unsigned decimal"), MDTunsigned);
-    m_popup.insertItem(i18n("&Octal"), MDToctal);
-    m_popup.insertItem(i18n("&Binary"), MDTbinary);
-    m_popup.insertItem(i18n("&Addresses"), MDTaddress);
-    m_popup.insertItem(i18n("&Character"), MDTchar);
-    m_popup.insertItem(i18n("&Floatingpoint"), MDTfloat);
-    m_popup.insertItem(i18n("&Strings"), MDTstring);
-    m_popup.insertItem(i18n("&Instructions"), MDTinsn);
-    connect(&m_popup, SIGNAL(activated(int)), this, SLOT(slotTypeChange(int)));
+    QAction* pAction;
+    pAction = m_popup.addAction(i18n("B&ytes"));
+    pAction->setData(MDTbyte);
+    pAction = m_popup.addAction(i18n("Halfwords (&2 Bytes)"));
+    pAction->setData(MDThalfword);
+    pAction = m_popup.addAction(i18n("Words (&4 Bytes)"));
+    pAction->setData(MDTword);
+    pAction = m_popup.addAction(i18n("Giantwords (&8 Bytes)"));
+    pAction->setData(MDTgiantword);
+    m_popup.addSeparator();
+    pAction = m_popup.addAction(i18n("He&xadecimal"));
+    pAction->setData(MDThex);
+    pAction = m_popup.addAction(i18n("Signed &decimal"));
+    pAction->setData(MDTsigned);
+    pAction = m_popup.addAction(i18n("&Unsigned decimal"));
+    pAction->setData(MDTunsigned);
+    pAction = m_popup.addAction(i18n("&Octal"));
+    pAction->setData(MDToctal);
+    pAction = m_popup.addAction(i18n("&Binary"));
+    pAction->setData(MDTbinary);
+    pAction = m_popup.addAction(i18n("&Addresses"));
+    pAction->setData(MDTaddress);
+    pAction = m_popup.addAction(i18n("&Character"));
+    pAction->setData(MDTchar);
+    pAction = m_popup.addAction(i18n("&Floatingpoint"));
+    pAction->setData(MDTfloat);
+    pAction = m_popup.addAction(i18n("&Strings"));
+    pAction->setData(MDTstring);
+    pAction = m_popup.addAction(i18n("&Instructions"));
+    pAction->setData(MDTinsn);
+    connect(&m_popup, SIGNAL(triggered(QAction*)), this, SLOT(slotTypeChange(QAction*)));
 }
 
 MemoryWindow::~MemoryWindow()
@@ -129,8 +144,10 @@ void MemoryWindow::displayNewExpression(const QString& expr)
     }
 }
 
-void MemoryWindow::slotTypeChange(int id)
+void MemoryWindow::slotTypeChange(QAction* action)
 {
+    int id = action->data().toInt();
+
     m_old_memory.clear();
 
     // compute new type

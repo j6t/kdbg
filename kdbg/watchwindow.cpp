@@ -6,10 +6,10 @@
 
 #include "watchwindow.h"
 #include <klocale.h>			/* i18n */
-#include <Q3DragObject>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QKeyEvent>
+#include <QMimeData>
 
 WatchWindow::WatchWindow(QWidget* parent) :
 	QWidget(parent),
@@ -62,14 +62,14 @@ bool WatchWindow::eventFilter(QObject*, QEvent* ev)
 
 void WatchWindow::dragEnterEvent(QDragEnterEvent* event)
 {
-    event->accept(Q3TextDrag::canDecode(event));
+    if (event->mimeData()->hasText())
+	event->acceptProposedAction();
 }
 
 void WatchWindow::dropEvent(QDropEvent* event)
 {
-    QString text;
-    if (Q3TextDrag::decode(event, text))
-    {
+    if (event->mimeData()->hasText()) {
+	QString text = event->mimeData()->text();
 	// pick only the first line
 	text = text.stripWhiteSpace();
 	int pos = text.find('\n');
@@ -79,6 +79,7 @@ void WatchWindow::dropEvent(QDropEvent* event)
 	if (!text.isEmpty())
 	    emit textDropped(text);
     }
+    event->acceptProposedAction();
 }
 
 

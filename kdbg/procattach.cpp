@@ -48,7 +48,7 @@ ProcAttachPS::~ProcAttachPS()
 void ProcAttachPS::runPS()
 {
     // clear the parse state from previous runs
-    m_token = "";
+    m_token.clear();
     m_line.clear();
     m_pidCol = -1;
     m_ppidCol = -1;
@@ -87,7 +87,7 @@ void ProcAttachPS::slotTextReceived()
 	    // push a tokens onto the line
 	    if (!m_token.isEmpty()) {
 		m_line.push_back(QString::fromLatin1(m_token));
-		m_token = "";
+		m_token.clear();
 	    }
 	    // and insert the line in the list
 	    pushLine();
@@ -101,7 +101,7 @@ void ProcAttachPS::slotTextReceived()
 	    // push a token onto the line
 	    if (!m_token.isEmpty()) {
 		m_line.push_back(QString::fromLatin1(m_token));
-		m_token = "";
+		m_token.clear();
 	    }
 	    do {
 		++buffer;
@@ -115,7 +115,7 @@ void ProcAttachPS::slotTextReceived()
 		++buffer;
 	    } while (buffer < end && !isspace(*buffer));
 	    // append to the current token
-	    m_token += Q3CString(start, buffer-start+1);	// must count the '\0'
+	    m_token += QByteArray(start, buffer-start);
 	}
     }
     processList->setUpdatesEnabled(true);
@@ -137,7 +137,8 @@ void ProcAttachPS::pushLine()
 	if (allocate)
 	    processList->setColumnCount(1 + m_line.size());
 
-	for (int i = 0; i < m_line.size(); i++) {
+	for (size_t i = 0; i < m_line.size(); i++)
+	{
 	    // we don't allocate the PID and PPID columns,
 	    // but we need to know where in the ps output they are
 	    if (m_line[i] == "PID") {
@@ -176,7 +177,7 @@ void ProcAttachPS::pushLine()
 	item->setExpanded(true);
 	m_line.pop_back();
 	int k = 3;
-	for (int i = 0; i < m_line.size(); i++)
+	for (size_t i = 0; i < m_line.size(); i++)
 	{
 	    // display the pid and ppid columns' contents in columns 1 and 2
 	    int col;

@@ -9,7 +9,7 @@
 
 PrefMisc::PrefMisc(QWidget* parent) :
 	QWidget(parent, "debugger"),
-	m_grid(this, 6, 2, 10),
+	m_grid(this),
 	m_popForeground(this, "pop_fore"),
 	m_backTimeoutLabel(this, "back_to_lab"),
 	m_backTimeout(this, "back_to"),
