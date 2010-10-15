@@ -9,14 +9,12 @@
 #include <klocale.h>			/* i18n */
 #include "mydebug.h"
 
-PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, Q3Dict<EnvVar>& envVars,
+PgmArgs::PgmArgs(QWidget* parent, const QString& pgm,
+		 const std::map<QString,QString>& envVars,
 		 const QStringList& allOptions) :
-	QDialog(parent),
-	m_envVars(envVars)
+	QDialog(parent)
 {
     setupUi(this);
-
-    m_envVars.setAutoDelete(false);
 
     {
 	QFileInfo fi = pgm;
@@ -35,7 +33,17 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, Q3Dict<EnvVar>& envVars,
 	xsldbgOptionsPage = 0;
     }
 
-    initEnvList();
+    EnvVar val;
+    val.status = EnvVar::EVclean;
+    for (std::map<QString,QString>::const_iterator i = envVars.begin(); i != envVars.end(); ++i)
+    {
+	val.value = i->second;
+	val.item = new QTreeWidgetItem(envList, QStringList() << i->first << i->second);
+	m_envVars[i->first] = val;
+    }
+
+    envList->setAllColumnsShowFocus(true);
+    buttonDelete->setEnabled(envList->currentItem() != 0);
 }
 
 PgmArgs::~PgmArgs()
@@ -84,8 +92,10 @@ void PgmArgs::modifyVar(bool resurrect)
 	return;
 
     // lookup the value in the dictionary
-    EnvVar* val = m_envVars[name];
-    if (val != 0) {
+    EnvVar* val;
+    std::map<QString,EnvVar>::iterator i = m_envVars.find(name);
+    if (i != m_envVars.end()) {
+	val = &i->second;
 	// see if this is a zombie
 	if (val->status == EnvVar::EVdeleted) {
 	    // resurrect
@@ -94,7 +104,6 @@ void PgmArgs::modifyVar(bool resurrect)
 		val->value = value;
 		val->status = EnvVar::EVdirty;
 		val->item = new QTreeWidgetItem(envList, QStringList() << name << value);
-		m_envVars.insert(name, val);
 	    }
 	} else if (value != val->value) {
 	    // change the value
@@ -104,11 +113,10 @@ void PgmArgs::modifyVar(bool resurrect)
 	}
     } else {
 	// add the value
-	val = new EnvVar;
+	val = &m_envVars[name];
 	val->value = value;
 	val->status = EnvVar::EVnew;
 	val->item = new QTreeWidgetItem(envList, QStringList() << name << value);
-	m_envVars.insert(name, val);
     }
     envList->setCurrentItem(val->item);
     buttonDelete->setEnabled(true);
@@ -123,15 +131,15 @@ void PgmArgs::on_buttonDelete_clicked()
     QString name = item->text(0);
 
     // lookup the value in the dictionary
-    EnvVar* val = m_envVars[name];
-    if (val != 0)
+    std::map<QString,EnvVar>::iterator i = m_envVars.find(name);
+    if (i != m_envVars.end())
     {
+	EnvVar* val = &i->second;
 	// delete from list
 	val->item = 0;
 	// if this is a new item, delete it completely, otherwise zombie-ize it
 	if (val->status == EnvVar::EVnew) {
-	    m_envVars.remove(name);
-	    delete val;
+	    m_envVars.erase(i);
 	} else {
 	    // mark value deleted
 	    val->status = EnvVar::EVdeleted;
@@ -156,21 +164,6 @@ void PgmArgs::parseEnvInput(QString& name, QString& value)
     }
 }
 
-void PgmArgs::initEnvList()
-{
-    Q3DictIterator<EnvVar> it = m_envVars;
-    EnvVar* val;
-    QString name;
-    for (; (val = it) != 0; ++it) {
-	val->status = EnvVar::EVclean;
-	name = it.currentKey();
-	val->item = new QTreeWidgetItem(envList, QStringList() << name << val->value);
-    }
-
-    envList->setAllColumnsShowFocus(true);
-    buttonDelete->setEnabled(envList->currentItem() != 0);
-}
-
 void PgmArgs::on_envList_currentItemChanged()
 {
     QTreeWidgetItem* item = envList->currentItem();
@@ -180,13 +173,7 @@ void PgmArgs::on_envList_currentItemChanged()
 
     // must get name from list box
     QString name = item->text(0);
-    EnvVar* val = m_envVars[name];
-    ASSERT(val != 0);
-    if (val != 0) {
-	envVar->setText(name + "=" + val->value);
-    } else {
-	envVar->setText(name);
-    }
+    envVar->setText(name + "=" + m_envVars[name].value);
 }
 
 void PgmArgs::accept()

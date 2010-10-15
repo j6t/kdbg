@@ -9,7 +9,7 @@
 
 /*
  * Description of environment variables. Note that the name of the variable
- * is given as the key in the QDict, so we don't repeat it here.
+ * is given as the key in the map, so we don't repeat it here.
  */
 
 class QTreeWidgetItem;

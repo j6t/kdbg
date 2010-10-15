@@ -42,8 +42,6 @@ KDebugger::KDebugger(QWidget* parent,
 	m_watchVariables(*watchVars),
 	m_btWindow(*backtrace)
 {
-    m_envVars.setAutoDelete(true);
-
     connect(&m_localVariables, SIGNAL(itemExpanded(QTreeWidgetItem*)),
 	    SLOT(slotExpanding(QTreeWidgetItem*)));
     connect(&m_watchVariables, SIGNAL(itemExpanded(QTreeWidgetItem*)),
@@ -735,15 +733,15 @@ void KDebugger::saveProgramSettings()
     // write environment variables
     m_programConfig->deleteGroup(EnvironmentGroup);
     KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
-    Q3DictIterator<EnvVar> it = m_envVars;
-    EnvVar* var;
     QString varName;
     QString varValue;
-    for (int i = 0; (var = it) != 0; ++it, ++i) {
+    int i = 0;
+    for (std::map<QString,QString>::iterator it = m_envVars.begin(); it != m_envVars.end(); ++it, ++i)
+    {
 	varName.sprintf(Variable, i);
 	varValue.sprintf(Value, i);
-	eg.writeEntry(varName, it.currentKey());
-	eg.writeEntry(varValue, var->value);
+	eg.writeEntry(varName, it->first);
+	eg.writeEntry(varValue, it->second);
     }
 
     saveBreakpoints(m_programConfig);
@@ -788,8 +786,7 @@ void KDebugger::restoreProgramSettings()
     // read environment variables
     KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
     m_envVars.clear();
-    Q3Dict<EnvVar> pgmVars;
-    EnvVar* var;
+    std::map<QString,EnvVar> pgmVars;
     QString varName;
     QString varValue;
     for (int i = 0;; ++i) {
@@ -804,10 +801,9 @@ void KDebugger::restoreProgramSettings()
 	    // skip empty names
 	    continue;
 	}
-	var = new EnvVar;
+	EnvVar* var = &pgmVars[name];
 	var->value = eg.readEntry(varValue, QString());
 	var->status = EnvVar::EVnew;
-	pgmVars.insert(name, var);
     }
 
     updateProgEnvironment(pgmArgs, pgmWd, pgmVars, boolOptions);
@@ -1253,7 +1249,7 @@ void KDebugger::updateAllExprs()
 }
 
 void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
-				      const Q3Dict<EnvVar>& newVars,
+				      const std::map<QString,EnvVar>& newVars,
 				      const QStringList& newOptions)
 {
     m_programArgs = args;
@@ -1267,26 +1263,21 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
     }
 
     // update environment variables
-    Q3DictIterator<EnvVar> it = newVars;
-    EnvVar* val;
-    for (; (val = it) != 0; ++it) {
-	QString var = it.currentKey();
+    for (std::map<QString,EnvVar>::const_iterator i = newVars.begin(); i != newVars.end(); ++i)
+    {
+	QString var = i->first;
+	const EnvVar* val = &i->second;
 	switch (val->status) {
 	case EnvVar::EVnew:
-	    m_envVars.insert(var, val);
-	    // fall thru
 	case EnvVar::EVdirty:
-	    // the value must be in our list
-	    ASSERT(m_envVars[var] == val);
+	    m_envVars[var] = val->value;
 	    // update value
 	    m_d->executeCmd(DCsetenv, var, val->value);
 	    break;
 	case EnvVar::EVdeleted:
-	    // must be in our list
-	    ASSERT(m_envVars[var] == val);
 	    // delete value
 	    m_d->executeCmd(DCunsetenv, var);
-	    m_envVars.remove(var);
+	    m_envVars.erase(var);
 	    break;
 	default:
 	    ASSERT(false);

@@ -7,8 +7,8 @@
 #ifndef DEBUGGER_H
 #define DEBUGGER_H
 
-#include <Q3Dict>
 #include <QStringList>
+#include <map>
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
 
@@ -362,7 +362,7 @@ protected:
     void handleRunCommands(const char* output);
     void updateAllExprs();
     void updateProgEnvironment(const QString& args, const QString& wd,
-			       const Q3Dict<EnvVar>& newVars,
+			       const std::map<QString,EnvVar>& newVars,
 			       const QStringList& newOptions);
     void parseLocals(const char* output, std::list<ExprValue*>& newVars);
     void handleLocals(const char* output);
@@ -415,7 +415,7 @@ protected:
     QString m_programArgs;
     QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
-    Q3Dict<EnvVar> m_envVars;		/* environment variables set by user */
+    std::map<QString,QString> m_envVars;	/* environment variables set by user */
     QStringList m_boolOptions;		/* boolean options */
     QStringList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
