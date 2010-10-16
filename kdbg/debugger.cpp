@@ -723,7 +723,7 @@ void KDebugger::saveProgramSettings()
     gg.writeEntry(FileVersion, 1);
     gg.writeEntry(ProgramArgs, m_programArgs);
     gg.writeEntry(WorkingDirectory, m_programWD);
-    gg.writeEntry(OptionsSelected, m_boolOptions);
+    gg.writeEntry(OptionsSelected, m_boolOptions.toList());
     gg.writeEntry(DebuggerCmdStr, m_debuggerCmd);
     gg.writeEntry(TTYLevelEntry, int(m_ttyLevel));
     QString driverName;
@@ -781,8 +781,8 @@ void KDebugger::restoreProgramSettings()
     // m_ttyLevel has been read in already
     QString pgmArgs = gg.readEntry(ProgramArgs);
     QString pgmWd = gg.readEntry(WorkingDirectory);
-    QStringList boolOptions = gg.readEntry(OptionsSelected, QStringList());
-    m_boolOptions = QStringList();
+    QSet<QString> boolOptions = QSet<QString>::fromList(gg.readEntry(OptionsSelected, QStringList()));
+    m_boolOptions.clear();
 
     // read environment variables
     KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
@@ -1251,7 +1251,7 @@ void KDebugger::updateAllExprs()
 
 void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
 				      const std::map<QString,EnvVar>& newVars,
-				      const QStringList& newOptions)
+				      const QSet<QString>& newOptions)
 {
     m_programArgs = args;
     m_d->executeCmd(DCsetargs, m_programArgs);
@@ -1289,27 +1289,17 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
     }
 
     // update options
-    QStringList::ConstIterator oi;
-    for (oi = newOptions.begin(); oi != newOptions.end(); ++oi)
+    foreach (QString opt, newOptions - m_boolOptions)
     {
-	if (m_boolOptions.findIndex(*oi) < 0) {
-	    // the options is currently not set, so set it
-	    m_d->executeCmd(DCsetoption, *oi, 1);
-	} else {
-	    // option is set, no action required, but move it to the end
-	    m_boolOptions.remove(*oi);
-	}
-	m_boolOptions.append(*oi);
+	// option is not set, set it
+	m_d->executeCmd(DCsetoption, opt, 1);
     }
-    /*
-     * Now all options that should be set are at the end of m_boolOptions.
-     * If some options need to be unset, they are at the front of the list.
-     * Here we unset and remove them.
-     */
-    while (m_boolOptions.count() > newOptions.count()) {
-	m_d->executeCmd(DCsetoption, m_boolOptions.first(), 0);
-	m_boolOptions.remove(m_boolOptions.begin());
+    foreach (QString opt, m_boolOptions - newOptions)
+    {
+	// option is set, unset it
+	m_d->executeCmd(DCsetoption, opt, 0);
     }
+    m_boolOptions = newOptions;
 }
 
 void KDebugger::handleLocals(const char* output)

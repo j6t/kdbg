@@ -7,6 +7,7 @@
 #ifndef DEBUGGER_H
 #define DEBUGGER_H
 
+#include <QSet>
 #include <QStringList>
 #include <list>
 #include <map>
@@ -364,7 +365,7 @@ protected:
     void updateAllExprs();
     void updateProgEnvironment(const QString& args, const QString& wd,
 			       const std::map<QString,EnvVar>& newVars,
-			       const QStringList& newOptions);
+			       const QSet<QString>& newOptions);
     void parseLocals(const char* output, std::list<ExprValue*>& newVars);
     void handleLocals(const char* output);
     bool handlePrint(CmdQueueItem* cmd, const char* output);
@@ -417,7 +418,7 @@ protected:
     QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
     std::map<QString,QString> m_envVars;	/* environment variables set by user */
-    QStringList m_boolOptions;		/* boolean options */
+    QSet<QString> m_boolOptions;	/* boolean options */
     QStringList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
     KConfig* m_programConfig;		/* program-specific settings (brkpts etc) */

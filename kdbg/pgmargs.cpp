@@ -51,28 +51,25 @@ PgmArgs::~PgmArgs()
 }
 
 // initializes the selected options
-void PgmArgs::setOptions(const QStringList& selectedOptions)
+void PgmArgs::setOptions(const QSet<QString>& selectedOptions)
 {
-    QStringList::ConstIterator it;
-    for (it = selectedOptions.begin(); it != selectedOptions.end(); ++it) {
-	for (int i = 0; i < xsldbgOptions->count(); i++) {
-	    if (xsldbgOptions->item(i)->text() == *it) {
-		xsldbgOptions->item(i)->setSelected(true);
-		break;
-	    }
+    for (int i = 0; i < xsldbgOptions->count(); i++) {
+	if (selectedOptions.contains(xsldbgOptions->item(i)->text()))
+	{
+	    xsldbgOptions->item(i)->setSelected(true);
 	}
     }
 }
 
 // returns the selected options
-QStringList PgmArgs::options() const
+QSet<QString> PgmArgs::options() const
 {
-    QStringList sel;
+    QSet<QString> sel;
     if (xsldbgOptionsPage != 0)
     {
 	for (int i = 0; i < xsldbgOptions->count(); i++) {
 	    if (xsldbgOptions->item(i)->isSelected())
-		sel.append(xsldbgOptions->item(i)->text());
+		sel.insert(xsldbgOptions->item(i)->text());
 	}
     }
     return sel;
