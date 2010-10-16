@@ -8,6 +8,7 @@
 #define DEBUGGER_H
 
 #include <QStringList>
+#include <list>
 #include <map>
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
@@ -351,7 +352,7 @@ protected:
     void stopDriver();
     void writeCommand();
     
-    QStringList m_watchEvalExpr;	/* exprs to evaluate for watch window */
+    std::list<QString> m_watchEvalExpr;	/* exprs to evaluate for watch window */
     std::list<Breakpoint> m_brkpts;
     QString m_memoryExpression;		/* memory location to watch */
     unsigned m_memoryFormat;		/* how that output should look */

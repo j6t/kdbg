@@ -21,6 +21,7 @@
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
 #include <unistd.h>			/* sleep(3) */
+#include <algorithm>
 #include "mydebug.h"
 
 
@@ -1848,7 +1849,8 @@ void KDebugger::slotDeleteWatch()
 	return;
 
     // remove the variable from the list to evaluate
-    QStringList::iterator i = m_watchEvalExpr.find(item->getText());
+    std::list<QString>::iterator i =
+	    std::find(m_watchEvalExpr.begin(), m_watchEvalExpr.end(), item->getText());
     if (i != m_watchEvalExpr.end()) {
 	m_watchEvalExpr.erase(i);
     }
