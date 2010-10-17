@@ -266,7 +266,7 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
     for (KDebugger::BrkptROIterator bp = dbg->breakpointsBegin(); bp != dbg->breakpointsEnd(); ++bp)
     {
 	if (fileNameMatches(bp->fileName)) {
-	    TRACE(QString().sprintf("updating %s:%d", bp->fileName.data(), bp->lineNo));
+	    TRACE(QString("updating %2:%1").arg(bp->lineNo).arg(bp->fileName));
 	    int i = bp->lineNo;
 	    if (i < 0 || i >= int(m_sourceCode.size()))
 		continue;

@@ -888,7 +888,7 @@ static ExprValue* parseVar(const char*& s)
 	while (isspace(*p))
 	    p++;
 	if (*p != '=') {
-	    TRACE(QString().sprintf("parse error: = not found after %s", (const char*)name));
+	    TRACE("parse error: = not found after " + name);
 	    return 0;
 	}
 	// skip the '=' and more whitespace
