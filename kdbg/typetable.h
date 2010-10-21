@@ -109,7 +109,7 @@ public:
     /**
      * Returns the command to print the QString data.
      */
-    const char* printQStringDataCmd() const { return m_printQStringDataCmd; }
+    const char* printQStringDataCmd() const { return m_printQStringDataCmd.constData(); }
     
 protected:
     /**
@@ -124,7 +124,7 @@ protected:
     QString m_displayName;
     QRegExp m_shlibNameRE;
     QStringList m_enabledBuiltins;
-    char* m_printQStringDataCmd;
+    QByteArray m_printQStringDataCmd;
 };
 
 
@@ -189,5 +189,5 @@ protected:
     static QStringList splitTemplateArgs(const QString& t);
     bool m_parseQt2QStrings;
     bool m_QCharIsShort;
-    const char* m_printQStringDataCmd;
+    QByteArray m_printQStringDataCmd;
 };

@@ -52,14 +52,12 @@ void TypeTable::loadTypeTables()
 }
 
 
-TypeTable::TypeTable() :
-	m_printQStringDataCmd(0)
+TypeTable::TypeTable()
 {
 }
 
 TypeTable::~TypeTable()
 {
-    delete[] m_printQStringDataCmd;
 }
 
 
@@ -96,11 +94,7 @@ void TypeTable::loadFromFile(const QString& fileName)
     m_enabledBuiltins = cf.readEntry(EnableBuiltin, QStringList());
 
     QString printQString = cf.readEntry(PrintQStringCmd);
-    const char* ascii = printQString.ascii();
-    if (ascii == 0)
-	ascii = "";
-    m_printQStringDataCmd = new char[strlen(ascii)+1];
-    strcpy(m_printQStringDataCmd, ascii);
+    m_printQStringDataCmd = printQString.toAscii();
 
     /*
      * Get the types. We search for entries of kind Types1, Types2, etc.
@@ -243,7 +237,7 @@ void ProgramTypeTable::loadTypeTable(TypeTable* table)
     if (!m_QCharIsShort) {
 	m_QCharIsShort = table->isEnabledBuiltin("QCharIsShort");
     }
-    if (!m_printQStringDataCmd && *table->printQStringDataCmd()) {
+    if (m_printQStringDataCmd.isEmpty()) {
 	m_printQStringDataCmd = table->printQStringDataCmd();
     }
 }
