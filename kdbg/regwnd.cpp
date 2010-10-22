@@ -202,7 +202,7 @@ static QString toBinary(QString hex)
     QString result;
     
     for (int i = 2; i < hex.length(); i++) {
-	int idx = hexCharToDigit(hex[i].latin1());
+	int idx = hexCharToDigit(hex[i].toLatin1());
 	if (idx < 0) {
 	    // not a hex digit; no conversion
 	    return hex;
@@ -211,7 +211,7 @@ static QString toBinary(QString hex)
 	result += bindigits;
     }
     // remove leading zeros
-    switch (hexCharToDigit(hex[2].latin1())) {
+    switch (hexCharToDigit(hex[2].toLatin1())) {
     case 0: case 1: result.remove(0, 3); break;
     case 2: case 3: result.remove(0, 2); break;
     case 4: case 5:
@@ -226,7 +226,7 @@ static QString toOctal(QString hex)
     int shift = 0;
     unsigned v = 0;
     for (int i = hex.length()-1; i >= 2; i--) {
-	int idx = hexCharToDigit(hex[i].latin1());
+	int idx = hexCharToDigit(hex[i].toLatin1());
 	if (idx < 0)
 	    return hex;
 	v += idx << shift;
@@ -254,10 +254,9 @@ static QString toDecimal(QString hex)
     if (hex.length() > int(sizeof(unsigned long)*2+2))	/*  count in leading "0x" */
 	return hex;
 
-    const char* start = hex.latin1();
-    char* end;
-    unsigned long val = strtoul(start, &end, 0);
-    if (start == end)
+    bool ok = false;
+    unsigned long val = hex.toULong(&ok, 0);
+    if (!ok)
 	return hex;
     else
 	return QString().setNum(val);
@@ -282,16 +281,20 @@ static char* toRaw(const QString& hex, uint& length)
 	uint j=0;
 	if (hex.length()<=2) return 0;
 	for (int i=hex.length()-1; i>=2; ) {
-	    if (j%2==0) data[j/2]=hexCharToDigit(hex[i].latin1());
-	    else data[j/2]|=(hexCharToDigit(hex[i].latin1())<<4);
+	    if (j%2==0)
+		data[j/2]=hexCharToDigit(hex[i].toLatin1());
+	    else
+		data[j/2]|=(hexCharToDigit(hex[i].toLatin1())<<4);
 	    i--;j++;
 	}
     } else { // big endian
 	uint j=0;
 	if (hex.length()<=2) return 0;
 	for (int i=2; i<hex.length(); ) {
-	    if (j%2==0) data[j/2]=hexCharToDigit(hex[i].latin1())<<4;
-	    else data[j/2]|=hexCharToDigit(hex[i].latin1());
+	    if (j%2==0)
+		data[j/2]=hexCharToDigit(hex[i].toLatin1())<<4;
+	    else
+		data[j/2]|=hexCharToDigit(hex[i].toLatin1());
 	    i++;j++;
 	}
     }
@@ -583,7 +586,7 @@ void RegisterView::contextMenuEvent(QContextMenuEvent* event)
 	    action->setChecked(mode.contains(menuitems[i].mode));
 	    ++i;
         }
-        m_modemenu->setCaption(item->text(0));
+        m_modemenu->setTitle(item->text(0));
 	m_modemenu->popup(event->globalPos());
 
 	event->accept();
@@ -592,12 +595,12 @@ void RegisterView::contextMenuEvent(QContextMenuEvent* event)
 
 void RegisterView::slotModeChange(QAction* action)
 {
-    RegMap::iterator it=m_registers.find(m_modemenu->caption());
+    RegMap::iterator it=m_registers.find(m_modemenu->title());
     ModeItem* view;
     if (it != m_registers.end())
 	view = it->second;
     else
-	view = findGroup(m_modemenu->caption());
+	view = findGroup(m_modemenu->title());
 
     if (view) {
 	RegisterDisplay mode = view->mode();
@@ -606,7 +609,7 @@ void RegisterView::slotModeChange(QAction* action)
     }
 }
 
-void RegisterView::paletteChange(const QPalette& oldPal)
+void RegisterView::paletteChange(const QPalette&)
 {
     setFont(KGlobalSettings::fixedFont());
 }

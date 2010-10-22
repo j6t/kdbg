@@ -581,7 +581,7 @@ void ExprWnd::checkUnknownType(VarTree* var)
 
 QString ExprWnd::formatWCharPointer(QString value)
 {
-    int pos = value.find(") ");
+    int pos = value.indexOf(") ");
     if (pos > 0)
 	value = value.mid(pos+2);
     return value + " L";
@@ -730,7 +730,7 @@ void ExprWnd::editValue(VarTree* item, const QString& text)
     {
 	// scroll so that more text is visible
 	QScrollBar* pScrollBar = horizontalScrollBar();
-	int wScroll = QMIN(x-wThis/2, x+w-wThis);
+	int wScroll = qMin(x-wThis/2, x+w-wThis);
 	pScrollBar->setValue(pScrollBar->value() + wScroll);
 	x -= wScroll;
     }
@@ -759,7 +759,7 @@ bool ExprWnd::isEditing() const
 
 
 ValueEdit::ValueEdit(ExprWnd* parent) :
-	QLineEdit(parent->viewport(), "valueedit")
+	QLineEdit(parent->viewport())
 {
     setFrame(false);
     hide();

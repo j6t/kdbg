@@ -9,6 +9,7 @@
 #include <kiconloader.h>
 #include <ksimpleconfig.h>
 #include <QDialog>
+#include <QFileInfo>
 #include <QPainter>
 #include <QLabel>
 #include <QBitmap>
@@ -110,7 +111,7 @@ void BreakpointTable::on_btAddBP_clicked()
 {
     // set a breakpoint at the specified text
     QString bpText = m_ui.bpEdit->text();
-    bpText = bpText.stripWhiteSpace();
+    bpText = bpText.trimmed();
     if (m_debugger->isReady())
     {
 	Breakpoint* bp = new Breakpoint;
@@ -124,7 +125,7 @@ void BreakpointTable::on_btAddWP_clicked()
 {
     // set a watchpoint for the specified expression
     QString wpExpr = m_ui.bpEdit->text();
-    wpExpr = wpExpr.stripWhiteSpace();
+    wpExpr = wpExpr.trimmed();
     if (m_debugger->isReady()) {
 	Breakpoint* bp = new Breakpoint;
 	bp->type = Breakpoint::watchpoint;
@@ -324,11 +325,7 @@ void BreakpointItem::display()
 	setText(0, Breakpoint::text);
     } else if (!fileName.isEmpty()) {
 	// use only the file name portion
-	QString file = fileName;
-	int slash = file.findRev('/');
-	if (slash >= 0) {
-	    file = file.mid(slash+1);
-	}
+	QString file = QFileInfo(fileName).fileName();
 	// correct zero-based line-numbers
 	setText(0, file + ":" + QString::number(lineNo+1));
     } else {
@@ -364,7 +361,7 @@ ConditionalDlg::ConditionalDlg(QWidget* parent) :
     m_ui.setupUi(this);
     QString title = KGlobal::caption();
     title += i18n(": Conditional breakpoint");
-    setCaption(title);
+    setWindowTitle(title);
 }
 
 ConditionalDlg::~ConditionalDlg()

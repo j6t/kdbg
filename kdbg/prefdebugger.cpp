@@ -8,14 +8,14 @@
 #include "prefdebugger.h"
 
 PrefDebugger::PrefDebugger(QWidget* parent) :
-	QWidget(parent, "debugger"),
+	QWidget(parent),
 	m_grid(this),
-	m_defaultHint(this, "default_hint"),
-	m_debuggerCCppLabel(this, "debugger_label"),
-	m_debuggerCCpp(this, "debugger"),
-	m_terminalHint(this, "terminal_hint"),
-	m_terminalLabel(this, "terminal_label"),
-	m_terminal(this, "terminal")
+	m_defaultHint(this),
+	m_debuggerCCppLabel(this),
+	m_debuggerCCpp(this),
+	m_terminalHint(this),
+	m_terminalLabel(this),
+	m_terminal(this)
 {
     m_defaultHint.setText(i18n("To revert to the default settings, clear the entries."));
     m_defaultHint.setMinimumHeight(m_defaultHint.sizeHint().height());
@@ -41,7 +41,7 @@ PrefDebugger::PrefDebugger(QWidget* parent) :
     m_grid.addWidget(&m_terminalLabel, 3, 0);
     m_grid.addWidget(&m_terminal, 3, 1);
 
-    m_grid.setColStretch(1, 10);
+    m_grid.setColumnStretch(1, 10);
     // last (empty) row gets all the vertical stretch
     m_grid.setRowStretch(4, 10);
 }

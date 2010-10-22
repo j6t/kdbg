@@ -566,8 +566,8 @@ void DebuggerMainWnd::slotNewFileLoaded()
 QDockWidget* DebuggerMainWnd::dockParent(QWidget* w)
 {
     while ((w = w->parentWidget()) != 0) {
-	if (w->isA("QDockWidget"))
-	    return static_cast<QDockWidget*>(w);
+	if (QDockWidget* dock = qobject_cast<QDockWidget*>(w))
+	    return dock;
     }
     return 0;
 }
@@ -616,15 +616,15 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
     }
     else
     {
-	success = startDriver(fi.absFilePath(), lang);
+	success = startDriver(fi.absoluteFilePath(), lang);
     }
 
     if (success)
     {
-	m_recentExecAction->addUrl(KUrl(fi.absFilePath()));
+	m_recentExecAction->addUrl(KUrl(fi.absoluteFilePath()));
 
 	// keep the directory
-	m_lastDirectory = fi.dirPath(true);
+	m_lastDirectory = fi.absolutePath();
 	m_filesWindow->setExtraDirectory(m_lastDirectory);
 
 	// set caption to basename part of executable
@@ -633,7 +633,7 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
     }
     else
     {
-	m_recentExecAction->removeUrl(KUrl(fi.absFilePath()));
+	m_recentExecAction->removeUrl(KUrl(fi.absoluteFilePath()));
     }
 
     return success;
@@ -704,7 +704,7 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
 {
     // lang is needed in all lowercase
-    lang = lang.lower();
+    lang = lang.toLower();
 
     // The following table relates languages and debugger drivers
     static const struct L {
@@ -764,7 +764,7 @@ DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
 QString DebuggerMainWnd::driverNameFromFile(const QString& exe)
 {
     /* Inprecise but simple test to see if file is in XSLT language */
-    if (exe.right(4).lower() == ".xsl")
+    if (exe.right(4).toLower() == ".xsl")
 	return "XSLT";
 
     return "GDB";
@@ -934,13 +934,13 @@ QString DebuggerMainWnd::createOutputWindow()
     // create a fifo that will pass in the tty name
     QFile::remove(fifoName);		// remove remnants
 #ifdef HAVE_MKFIFO
-    if (::mkfifo(fifoName.local8Bit(), S_IRUSR|S_IWUSR) < 0) {
+    if (::mkfifo(fifoName.toLocal8Bit(), S_IRUSR|S_IWUSR) < 0) {
 	// failed
 	TRACE("mkfifo " + fifoName + " failed");
 	return QString();
     }
 #else
-    if (::mknod(fifoName.local8Bit(), S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
+    if (::mknod(fifoName.toLocal8Bit(), S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
 	// failed
 	TRACE("mknod " + fifoName + " failed");
 	return QString();
@@ -971,7 +971,7 @@ QString DebuggerMainWnd::createOutputWindow()
     title += i18n(": Program output");
 
     // parse the command line specified in the preferences
-    QStringList cmdParts = QStringList::split(' ', m_outputTermCmdStr);
+    QStringList cmdParts = m_outputTermCmdStr.split(' ');
 
     /*
      * Build the argv array. Thereby substitute special sequences:
@@ -988,7 +988,7 @@ QString DebuggerMainWnd::createOutputWindow()
     {
 	QString& str = *i;
 	for (int j = sizeof(substitute)/sizeof(substitute[0])-1; j >= 0; j--) {
-	    int pos = str.find(substitute[j].seq);
+	    int pos = str.indexOf(substitute[j].seq);
 	    if (pos >= 0) {
 		str.replace(pos, 2, substitute[j].replace);
 		break;		/* substitute only one sequence */
@@ -1012,7 +1012,7 @@ QString DebuggerMainWnd::createOutputWindow()
 	f.remove();
 
 	// remove whitespace
-	tty = tty.stripWhiteSpace();
+	tty = tty.trimmed();
 	TRACE("tty=" + tty);
     }
     else
@@ -1039,7 +1039,8 @@ void DebuggerMainWnd::slotProgramStopped()
 void DebuggerMainWnd::intoBackground()
 {
     if (m_popForeground) {
-        m_backTimer.start(m_backTimeout, true);	/* single-shot */
+	m_backTimer.setSingleShot(true);
+	m_backTimer.start(m_backTimeout);
     }
 }
 
@@ -1149,7 +1150,7 @@ void DebuggerMainWnd::slotFileOpen()
     QString fileName = m_filesWindow->activeFileName();
     if (!fileName.isEmpty()) {
 	QFileInfo fi(fileName);
-	dir = fi.dirPath();
+	dir = fi.path();
     }
 
     fileName = myGetFileName(i18n("Open"),
@@ -1159,7 +1160,7 @@ void DebuggerMainWnd::slotFileOpen()
     if (!fileName.isEmpty())
     {
 	QFileInfo fi(fileName);
-	m_lastDirectory = fi.dirPath();
+	m_lastDirectory = fi.path();
 	m_filesWindow->setExtraDirectory(m_lastDirectory);
 	m_filesWindow->activateFile(fileName);
     }

@@ -29,7 +29,7 @@ KDebugger::KDebugger(QWidget* parent,
 		     ExprWnd* localVars,
 		     ExprWnd* watchVars,
 		     QListWidget* backtrace) :
-	QObject(parent, "debugger"),
+	QObject(parent),
 	m_ttyLevel(ttyFull),
 	m_memoryFormat(MDTword | MDThex),
 	m_haveExecutable(false),
@@ -91,7 +91,7 @@ bool KDebugger::debugProgram(const QString& name,
 {
     if (m_d != 0 && m_d->isRunning())
     {
-	QApplication::setOverrideCursor(Qt::waitCursor);
+	QApplication::setOverrideCursor(Qt::WaitCursor);
 
 	stopDriver();
 
@@ -283,12 +283,8 @@ bool KDebugger::runUntil(const QString& fileName, int lineNo)
 {
     if (isReady() && m_programActive && !m_programRunning) {
 	// strip off directory part of file name
-	QString file = fileName;
-	int offset = file.findRev("/");
-	if (offset >= 0) {
-	    file.remove(0, offset+1);
-	}
-	m_d->executeCmd(DCuntil, file, lineNo, true);
+	QFileInfo fi(fileName);
+	m_d->executeCmd(DCuntil, fi.fileName(), lineNo, true);
 	m_programRunning = true;
 	return true;
     } else {
@@ -403,11 +399,7 @@ CmdQueueItem* KDebugger::executeBreakpoint(const Breakpoint* bp, bool queueOnly)
     else if (bp->address.isEmpty())
     {
 	// strip off directory part of file name
-	QString file = bp->fileName;
-	int offset = file.findRev("/");
-	if (offset >= 0) {
-	    file.remove(0, offset+1);
-	}
+	QString file = QFileInfo(bp->fileName).fileName();
 	if (queueOnly) {
 	    cmd = m_d->queueCmd(bp->temporary ? DCtbreakline : DCbreakline,
 				file, bp->lineNo, DebuggerDriver::QMoverride);
@@ -1257,7 +1249,7 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
     m_d->executeCmd(DCsetargs, m_programArgs);
     TRACE("new pgm args: " + m_programArgs + "\n");
 
-    m_programWD = wd.stripWhiteSpace();
+    m_programWD = wd.trimmed();
     if (!m_programWD.isEmpty()) {
 	m_d->executeCmd(DCcd, m_programWD);
 	TRACE("new wd: " + m_programWD + "\n");
@@ -1810,7 +1802,7 @@ void KDebugger::slotExpanding(QTreeWidgetItem* item)
 // add the expression in the edit field to the watch expressions
 void KDebugger::addWatch(const QString& t)
 {
-    QString expr = t.stripWhiteSpace();
+    QString expr = t.trimmed();
     // don't add a watched expression again
     if (expr.isEmpty() || m_watchVariables.topLevelExprByName(expr) != 0)
 	return;
@@ -1988,18 +1980,12 @@ KDebugger::BrkptIterator KDebugger::breakpointByFilePos(QString file, int lineNo
 	}
     }
     // not found, so try basename
-    // strip off directory part of file name
-    int offset = file.findRev("/");
-    file.remove(0, offset+1);
+    file = QFileInfo(file).fileName();
 
     for (BrkptIterator bp = m_brkpts.begin(); bp != m_brkpts.end(); ++bp)
     {
 	// get base name of breakpoint's file
-	QString basename = bp->fileName;
-	int offset = basename.findRev("/");
-	if (offset >= 0) {
-	    basename.remove(0, offset+1);
-	}
+	QString basename = QFileInfo(bp->fileName).fileName();
 
 	if (bp->lineNo == lineNo &&
 	    basename == file &&
@@ -2168,7 +2154,7 @@ void KDebugger::handleSetPC(const char* /*output*/)
 
 void KDebugger::slotValueEdited(VarTree* expr, const QString& text)
 {
-    if (text.simplifyWhiteSpace().isEmpty())
+    if (text.simplified().isEmpty())
 	return;			       /* no text entered: ignore request */
 
     ExprWnd* wnd = static_cast<ExprWnd*>(expr->treeWidget());

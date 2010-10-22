@@ -370,7 +370,7 @@ void SourceWindow::infoMousePress(QMouseEvent* ev)
     case Qt::LeftButton:
 	TRACE(QString().sprintf("left-clicked line %d", line));
 	emit clickedLeft(m_fileName, line, address,
-			 (ev->state() & Qt::ShiftButton) != 0);
+ 			 (ev->modifiers() & Qt::ShiftModifier) != 0);
 	break;
     case Qt::MidButton:
 	TRACE(QString().sprintf("mid-clicked row %d", line));
@@ -402,16 +402,16 @@ void SourceWindow::keyPressEvent(QKeyEvent* ev)
     case Qt::Key_End:
 	moveCursor(QTextCursor::End);
 	return;
-    case Qt::Key_Next:
-    case Qt::Key_Prior:
+    case Qt::Key_PageUp:
+    case Qt::Key_PageDown:
 	top1 = firstVisibleBlock().blockNumber();
     }
 
     QPlainTextEdit::keyPressEvent(ev);
 
     switch (ev->key()) {
-    case Qt::Key_Next:
-    case Qt::Key_Prior:
+    case Qt::Key_PageUp:
+    case Qt::Key_PageDown:
 	top2 = firstVisibleBlock().blockNumber();
 	{
 	    QTextCursor cursor = textCursor();
@@ -867,7 +867,7 @@ int HighlightCpp::highlight(const QString& text, int state)
 	state = 0;
 
     // check for preprocessor line
-    if (state == 0 && text.stripWhiteSpace().startsWith("#"))
+    if (state == 0 && text.trimmed().startsWith("#"))
     {
 	setFormat(0, text.length(), QColor("darkgreen"));
 	return 0;
@@ -888,7 +888,7 @@ int HighlightCpp::highlight(const QString& text, int state)
 	    setFormat(start, end-start, QColor("gray"));
 	    break;
 	case hlCommentBlock:
-	    end = text.find("*/", start);
+	    end = text.indexOf("*/", start);
 	    if (end >= 0)
 		end += 2, state = 0;
 	    else
@@ -919,7 +919,7 @@ int HighlightCpp::highlight(const QString& text, int state)
 	    {
 		setFormat(start, end-start, identFont);
 	    } else {
-		setFormat(start, end-start, m_srcWnd->colorGroup().text());
+		setFormat(start, end-start, m_srcWnd->palette().color(QPalette::WindowText));
 	    }
 	    break;
 	default:
@@ -950,7 +950,7 @@ int HighlightCpp::highlight(const QString& text, int state)
 		    break;
 		}
 	    }
-	    setFormat(start, end-start, m_srcWnd->colorGroup().text());
+	    setFormat(start, end-start, m_srcWnd->palette().color(QPalette::WindowText));
 	}
 	start = end;
     }

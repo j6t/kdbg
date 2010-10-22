@@ -46,7 +46,7 @@ bool DebuggerDriver::startup(QString cmdStr)
     if (cmdStr.isEmpty())
 	cmdStr = defaultInvocation();
 
-    QStringList cmd = QStringList::split(' ', cmdStr);
+    QStringList cmd = cmdStr.split(' ', QString::SkipEmptyParts);
     if (cmd.isEmpty())
 	return false;
     QString pgm = cmd.takeFirst();
@@ -58,7 +58,7 @@ bool DebuggerDriver::startup(QString cmdStr)
 
     // open log file
     if (!m_logFile.isOpen() && !m_logFileName.isEmpty()) {
-	m_logFile.setName(m_logFileName);
+	m_logFile.setFileName(m_logFileName);
 	m_logFile.open(QIODevice::WriteOnly);
     }
 
@@ -69,7 +69,7 @@ void DebuggerDriver::slotExited()
 {
     static const char txt[] = "\n====== debugger exited ======\n";
     if (m_logFile.isOpen()) {
-	m_logFile.writeBlock(txt,sizeof(txt)-1);
+	m_logFile.write(txt,sizeof(txt)-1);
     }
 
     // reset state
@@ -195,7 +195,7 @@ void DebuggerDriver::writeCommand()
 
     // write also to log file
     if (m_logFile.isOpen()) {
-	m_logFile.writeBlock(str, cmd->m_cmdString.length());
+	m_logFile.write(str, cmd->m_cmdString.length());
 	m_logFile.flush();
     }
 

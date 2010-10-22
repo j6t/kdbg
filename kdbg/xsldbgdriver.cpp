@@ -6,6 +6,7 @@
 
 #include "xsldbgdriver.h"
 #include "exprwnd.h"
+#include <QFileInfo>
 #include <QRegExp>
 #include <QStringList>
 #include <klocale.h>            /* i18n */
@@ -313,7 +314,7 @@ XsldbgDriver::parseMarker()
     // extract filename and line number
     static QRegExp MarkerRE(" at line (\\d+)");
 
-    int lineNoStart = MarkerRE.search(startMarker);
+    int lineNoStart = MarkerRE.indexIn(startMarker);
 
     if (lineNoStart >= 0) {
         int lineNo = MarkerRE.cap(1).toInt();
@@ -365,7 +366,7 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg)
     }
 
     QString cmdString;
-    cmdString.sprintf(cmds[cmd].fmt, strArg.latin1());
+    cmdString.sprintf(cmds[cmd].fmt, strArg.toLatin1().constData());
     return cmdString;
 }
 
@@ -467,14 +468,11 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
         }
         if (cmd == DCinfoline) {
             // must split off file name part
-            int slash = strArg.findRev('/');
-
-            if (slash >= 0)
-                strArg = strArg.right(strArg.length() - slash - 1);
+            strArg = QFileInfo(strArg).fileName();
         }
-        cmdString.sprintf(cmds[cmd].fmt, strArg.latin1(), intArg);
+        cmdString.sprintf(cmds[cmd].fmt, strArg.toLatin1().constData(), intArg);
     } else {
-        cmdString.sprintf(cmds[cmd].fmt, intArg, strArg.latin1());
+        cmdString.sprintf(cmds[cmd].fmt, intArg, strArg.toLatin1().constData());
     }
     return cmdString;
 }
@@ -490,7 +488,9 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg1,
     normalizeStringArg(strArg2);
 
     QString cmdString;
-    cmdString.sprintf(cmds[cmd].fmt, strArg1.latin1(), strArg2.latin1());
+    cmdString.sprintf(cmds[cmd].fmt,
+		      strArg1.toLatin1().constData(),
+		      strArg2.toLatin1().constData());
     return cmdString;
 }
 
@@ -1282,7 +1282,7 @@ XsldbgDriver::parseChangeWD(const char *output, QString & message)
 
     if (strncmp(output, "Change to directory", 20) == 0) {
         output = output + 20;   /* skip 'Change to directory' */
-        message = QString(output).simplifyWhiteSpace();
+        message = QString(output).simplified();
         if (message.isEmpty()) {
             message = i18n("New working directory: ") + m_programWD;
             isGood = true;

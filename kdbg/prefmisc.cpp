@@ -8,22 +8,22 @@
 #include <klocale.h>			/* i18n */
 
 PrefMisc::PrefMisc(QWidget* parent) :
-	QWidget(parent, "debugger"),
+	QWidget(parent),
 	m_grid(this),
-	m_popForeground(this, "pop_fore"),
-	m_backTimeoutLabel(this, "back_to_lab"),
-	m_backTimeout(this, "back_to"),
-	m_tabWidthLabel(this, "tabwidth_lab"),
-	m_tabWidth(this, "tabwidth"),
-	m_sourceFilterLabel(this, "sourcefilter_lab"),
-	m_sourceFilter(this, "sourcefilter"),
-	m_headerFilterLabel(this, "headerfilter_lab"),
-	m_headerFilter(this, "headerfilter")
+	m_popForeground(this),
+	m_backTimeoutLabel(this),
+	m_backTimeout(this),
+	m_tabWidthLabel(this),
+	m_tabWidth(this),
+	m_sourceFilterLabel(this),
+	m_sourceFilter(this),
+	m_headerFilterLabel(this),
+	m_headerFilter(this)
 {
     m_popForeground.setText(i18n("&Pop into foreground when program stops"));
     m_popForeground.setMinimumSize(m_popForeground.sizeHint());
-    m_grid.addMultiCellWidget(&m_popForeground, 0, 0, 0, 1);
-    m_grid.addRowSpacing(0, m_popForeground.sizeHint().height());
+    m_grid.addWidget(&m_popForeground, 0, 0, 2, 1);
+    m_grid.addItem(new QSpacerItem(0, m_popForeground.sizeHint().height()), 0, 0);
 
     m_backTimeoutLabel.setText(i18n("Time until window goes &back (in milliseconds):"));
     m_backTimeoutLabel.setMinimumSize(m_backTimeoutLabel.sizeHint());
@@ -39,7 +39,7 @@ PrefMisc::PrefMisc(QWidget* parent) :
     setupEditGroup(i18n("File filter for &header files:"),
 		   m_headerFilterLabel, m_headerFilter, 4);
 
-    m_grid.setColStretch(1, 10);
+    m_grid.setColumnStretch(1, 10);
     // last (empty) row gets all the vertical stretch
     m_grid.setRowStretch(5, 10);
 }

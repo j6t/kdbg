@@ -85,7 +85,7 @@ void PgmArgs::modifyVar(bool resurrect)
 {
     QString name, value;
     parseEnvInput(name, value);
-    if (name.isEmpty() || name.find(' ') >= 0)	/* disallow spaces in names */
+    if (name.isEmpty() || name.indexOf(' ') >= 0)	// disallow spaces in names
 	return;
 
     // lookup the value in the dictionary
@@ -151,12 +151,12 @@ void PgmArgs::parseEnvInput(QString& name, QString& value)
 {
     // parse input from edit field
     QString input = envVar->text();
-    int equalSign = input.find('=');
+    int equalSign = input.indexOf('=');
     if (equalSign >= 0) {
-	name = input.left(equalSign).stripWhiteSpace();
+	name = input.left(equalSign).trimmed();
 	value = input.mid(equalSign+1);
     } else {
-	name = input.stripWhiteSpace();
+	name = input.trimmed();
 	value = QString();		/* value is empty */
     }
 }
@@ -195,7 +195,7 @@ void PgmArgs::on_insertFile_clicked()
     QString caption = i18n("Select a file name to insert as program argument");
 
     // use the selection as default
-    QString f = programArgs->markedText();
+    QString f = programArgs->selectedText();
     f = KFileDialog::getSaveFileName(f, QString::null,
 				     this, caption);
     // don't clear the selection if no file was selected
@@ -209,7 +209,7 @@ void PgmArgs::on_insertDir_clicked()
     QString caption = i18n("Select a directory to insert as program argument");
 
     // use the selection as default
-    QString f = programArgs->markedText();
+    QString f = programArgs->selectedText();
     f = KFileDialog::getExistingDirectory(f, this, caption);
     // don't clear the selection if no file was selected
     if (!f.isEmpty()) {

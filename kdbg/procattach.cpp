@@ -258,8 +258,8 @@ bool ProcAttachPS::setVisibility(QTreeWidgetItem* i, const QString& text)
     }
     // look for text in the process name and in the PID
     visible = visible || text.isEmpty() ||
-	i->text(0).find(text, 0, false) >= 0 ||
-	i->text(1).find(text) >= 0;
+	i->text(0).indexOf(text, 0, Qt::CaseInsensitive) >= 0 ||
+	i->text(1).indexOf(text) >= 0;
 
     if (!visible)
 	i->setHidden(true);
@@ -278,17 +278,17 @@ void ProcAttachPS::on_processList_currentItemChanged()
 
 
 ProcAttach::ProcAttach(QWidget* parent) :
-	QDialog(parent, "procattach", true),
-	m_label(this, "label"),
-	m_processId(this, "procid"),
-	m_buttonOK(this, "ok"),
-	m_buttonCancel(this, "cancel"),
-	m_layout(this, 8),
-	m_buttons(4)
+	QDialog(parent),
+	m_label(this),
+	m_processId(this),
+	m_buttonOK(this),
+	m_buttonCancel(this),
+	m_layout(this),
+	m_buttons()
 {
     QString title = KGlobal::caption();
     title += i18n(": Attach to process");
-    setCaption(title);
+    setWindowTitle(title);
 
     m_label.setMinimumSize(330, 24);
     m_label.setText(i18n("Specify the process number to attach to:"));

@@ -105,13 +105,13 @@ void MemoryWindow::slotNewExpression()
 
 void MemoryWindow::slotNewExpression(const QString& newText)
 {
-    QString text = newText.simplifyWhiteSpace();
+    QString text = newText.simplified();
 
     // see if the string is in the list
     // (note: must count downwards because of removeItem!)
     for (int i = m_expression.count()-1; i >= 0; i--)
     {
-	if (m_expression.text(i) == text) {
+	if (m_expression.itemText(i) == text) {
 	    // yes it is!
 	    // look up the format that was used last time for this expr
 	    QMap<QString,unsigned>::iterator pFormat = m_formatCache.find(text);
@@ -123,7 +123,7 @@ void MemoryWindow::slotNewExpression(const QString& newText)
 	    m_expression.removeItem(i);
 	}
     }
-    m_expression.insertItem(text, 0);
+    m_expression.insertItem(0, text);
 
     if (!text.isEmpty()) {
 	m_formatCache[text] = m_format;
@@ -159,7 +159,7 @@ void MemoryWindow::slotTypeChange(QAction* action)
 
     // change the format in the cache
     QString expr = m_expression.currentText();
-    m_formatCache[expr.simplifyWhiteSpace()] = m_format;
+    m_formatCache[expr.simplified()] = m_format;
 
     // force redisplay
     displayNewExpression(expr);
@@ -176,7 +176,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
     std::list<MemoryDump>::const_iterator md = memdump.begin();
 
     // show only needed columns
-    QStringList sl = QStringList::split( "\t", md->dump );
+    QStringList sl = md->dump.split( "\t" );
     for (int i = m_memory.columnCount()-1; i > 0; i--)
 	m_memory.setColumnHidden(i, i > sl.count());
 
@@ -185,7 +185,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
     for (; md != memdump.end(); ++md)
     {
 	QString addr = md->address.asString() + " " + md->address.fnoffs;
-	QStringList sl = QStringList::split( "\t", md->dump );
+	QStringList sl = md->dump.split( "\t" );
 
 	// save memory
 	tmpMap[addr] = md->dump;
@@ -197,7 +197,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	QMap<QString,QString>::Iterator pos = m_old_memory.find( addr );
 
 	if( pos != m_old_memory.end() )
-	    tmplist = QStringList::split( "\t", pos.data() );
+	    tmplist = pos.value().split( "\t" );
 
 	for (int i = 0; i < sl.count(); i++)
 	{
@@ -227,7 +227,7 @@ void MemoryWindow::saveProgramSpecific(KConfigBase* config)
     QString exprEntry;
     QString fmtEntry;
     for (int i = 0; i < numEntries;) {
-	QString text = m_expression.text(i);
+	QString text = m_expression.itemText(i);
 	i++;				/* entries are counted 1-based */
 	exprEntry.sprintf(ExpressionFmt, i);
 	fmtEntry.sprintf(FormatFmt, i);
@@ -261,14 +261,14 @@ void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
 	fmtEntry.sprintf(FormatFmt, i);
 	QString expr = g.readEntry(exprEntry, QString());
 	unsigned fmt = g.readEntry(fmtEntry, MDTword | MDThex);
-	m_expression.insertItem(expr);
+	m_expression.addItem(expr);
 	m_formatCache[expr] = fmt & (MDTsizemask | MDTformatmask);
     }
 
     // initialize with top expression
     if (numEntries > 0) {
-	m_expression.setCurrentItem(0);
-	QString expr = m_expression.text(0);
+	m_expression.setCurrentIndex(0);
+	QString expr = m_expression.itemText(0);
 	m_format = m_formatCache[expr];
 	m_debugger->setMemoryFormat(m_format);
 	displayNewExpression(expr);

@@ -71,8 +71,6 @@ int main(int argc, char** argv)
 	}
     }
 
-    app.setMainWidget(debugger);
-
     debugger->show();
 
     // handle options

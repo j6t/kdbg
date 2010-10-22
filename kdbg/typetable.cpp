@@ -87,7 +87,7 @@ void TypeTable::loadFromFile(const QString& fileName)
     if (m_displayName.isEmpty()) {
 	// use file name instead
 	QFileInfo fi(fileName);
-	m_displayName = fi.baseName(true);
+	m_displayName = fi.completeBaseName();
     }
 
     m_shlibNameRE = QRegExp(cf.readEntry(ShlibRE));
@@ -162,7 +162,7 @@ void TypeTable::readType(const KConfigGroup& cf, const QString& type)
     }
 
     // add the new type
-    if (info.m_templatePattern.find('<') < 0)
+    if (info.m_templatePattern.indexOf('<') < 0)
 	m_typeDict.insert(std::make_pair(type, info));
     else
 	m_templates.insert(std::make_pair(type, info));
@@ -180,7 +180,7 @@ void TypeTable::copyTypes(TypeInfoRefMap& dict)
 
 bool TypeTable::isEnabledBuiltin(const QString& feature) const
 {
-    return m_enabledBuiltins.find(feature) != m_enabledBuiltins.end();
+    return m_enabledBuiltins.indexOf(feature) >= 0;
 }
 
 TypeInfo::TypeInfo(const QString& displayString)
@@ -190,7 +190,7 @@ TypeInfo::TypeInfo(const QString& displayString)
     int startIdx = 0;
     int idx;
     while (i < typeInfoMaxExpr &&
-	   (idx = displayString.find('%', startIdx)) >= 0)
+	   (idx = displayString.indexOf('%', startIdx)) >= 0)
     {
 	m_displayString[i] = displayString.mid(startIdx, idx-startIdx);
 	startIdx = idx+1;
@@ -264,7 +264,7 @@ QStringList ProgramTypeTable::splitTemplateArgs(const QString& t)
     QStringList result;
     result.push_back(t);
 
-    int i = t.find('<');
+    int i = t.indexOf('<');
     if (i < 0)
 	return result;
 

@@ -16,7 +16,7 @@
 # define ASSERT(x) ((void)0)
 #else
 # define ASSERT(x) ((x) ? void(0) : void(kDebug() << \
-					(QString("assertion failed: ") + #x).ascii() << "\n"))
+					"assertion failed: " << #x << "\n"))
 #endif
 
 #ifdef WANT_TRACE_OUTPUT
