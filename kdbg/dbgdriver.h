@@ -9,7 +9,7 @@
 
 #include <QFile>
 #include <QByteArray>
-#include <k3process.h>
+#include <QProcess>
 #include <queue>
 #include <list>
 
@@ -270,7 +270,7 @@ struct MemoryDump
  * interface to the commandline debugger. As such it implements the
  * commands and parses the output.
  */
-class DebuggerDriver : public K3Process
+class DebuggerDriver : public QProcess
 {
     Q_OBJECT
 public:
@@ -290,6 +290,7 @@ public:
 
     virtual bool startup(QString cmdStr);
     void setLogFileName(const QString& fname) { m_logFileName = fname; }
+    bool isRunning() { return state() != NotRunning; }
 
 protected:
     QString m_runCmd;
@@ -312,11 +313,8 @@ public:
     bool canExecuteImmediately() const { return m_hipriCmdQueue.empty(); }
 
 protected:
-    char* m_output;			/* normal gdb output */
-    size_t m_outputLen;			/* amount of data so far accumulated in m_output */
-    size_t m_outputAlloc;		/* space available in m_output */
-    std::queue<QByteArray> m_delayedOutput;	/* output colleced while we have receivedOutput */
-					/* but before signal wroteStdin arrived */
+    QByteArray m_output;		// normal gdb output
+    std::queue<QByteArray> m_delayedOutput;	// output colleced before signal bytesWritten() arrived
 
 public:
     /**
@@ -562,15 +560,14 @@ protected:
     virtual void commandFinished(CmdQueueItem* cmd) = 0;
 
 protected:
-    /** @internal */
-    virtual int commSetupDoneC();
+    void processOutput(const QByteArray& data);
 
     /**
      * Returns the start of the prompt in \a output or -1.
      * \a len specifies the size of \a output, but in addition, the contents
      * of \a output are NUL-terminated, i.e., \c output[len] is zero.
      */
-    virtual int findPrompt(const char* output, size_t len) const = 0;
+    virtual int findPrompt(const QByteArray& output) const = 0;
 
     // log file
     QString m_logFileName;
@@ -580,9 +577,9 @@ public slots:
     void dequeueCmdByVar(VarTree* var);
 
 protected slots:
-    virtual void slotReceiveOutput(K3Process*, char* buffer, int buflen);
-    virtual void slotCommandRead(K3Process*);
-    virtual void slotExited(K3Process*);
+    virtual void slotReceiveOutput();
+    virtual void slotCommandRead();
+    virtual void slotExited();
     
 signals:
     /**

@@ -6,10 +6,12 @@
 
 #include "gdbdriver.h"
 #include "exprwnd.h"
+#include <QFileInfo>
 #include <QRegExp>
 #include <QStringList>
 #include <klocale.h>			/* i18n */
 #include <ctype.h>
+#include <signal.h>
 #include <stdlib.h>			/* strtol, atoi */
 #include <string.h>			/* strcpy */
 
@@ -289,7 +291,7 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
 		"(\\d+)\\.(\\d+)"	// major, minor
 		"[^ ]*\\n"		// no space until end of line
 		);
-	    int pos = re.search(m_output);
+	    int pos = re.indexIn(m_output);
 	    const char* disass = "disassemble %s %s\n";
 	    if (pos >= 0) {
 		int major = re.cap(1).toInt();
@@ -306,7 +308,7 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
     }
 
     /* ok, the command is ready */
-    emit commandReceived(cmd, m_output);
+    emit commandReceived(cmd, m_output.constData());
 
     switch (cmd->m_cmd) {
     case DCcorefile:
@@ -327,7 +329,7 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
     }
 }
 
-int GdbDriver::findPrompt(const char* output, size_t len) const
+int GdbDriver::findPrompt(const QByteArray& output) const
 {
     /*
      * If there's a prompt string in the collected output, it must be at
@@ -340,8 +342,9 @@ int GdbDriver::findPrompt(const char* output, size_t len) const
      * conditions for a very long time such that that buffer overflowed
      * exactly at the end of the prompt string look-a-like).
      */
+    int len = output.length();
     if (len >= PROMPT_LEN &&
-	strncmp(output+len-PROMPT_LEN, PROMPT, PROMPT_LEN) == 0)
+	strncmp(output.data()+len-PROMPT_LEN, PROMPT, PROMPT_LEN) == 0)
     {
 	return len-PROMPT_LEN;
     }
@@ -355,7 +358,7 @@ int GdbDriver::findPrompt(const char* output, size_t len) const
  */
 void GdbDriver::parseMarker(CmdQueueItem* cmd)
 {
-    char* startMarker = strstr(m_output, "\032\032");
+    char* startMarker = strstr(m_output.data(), "\032\032");
     if (startMarker == 0)
 	return;
 
@@ -371,7 +374,7 @@ void GdbDriver::parseMarker(CmdQueueItem* cmd)
     // extract filename and line number
     static QRegExp MarkerRE(":(\\d+):\\d+:[begmidl]+:0x");
 
-    int lineNoStart = MarkerRE.search(startMarker);
+    int lineNoStart = MarkerRE.indexIn(startMarker);
     if (lineNoStart >= 0) {
 	int lineNo = MarkerRE.cap(1).toInt();
 
@@ -380,7 +383,7 @@ void GdbDriver::parseMarker(CmdQueueItem* cmd)
 	if (address.isEmpty()) {
 	    const char* addrStart = startMarker + lineNoStart +
 				    MarkerRE.matchedLength() - 2;
-	    address = QString(addrStart).stripWhiteSpace();
+	    address = QString(addrStart).trimmed();
 	}
 
 	// now show the window
@@ -426,7 +429,7 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg)
     }
 
     QString cmdString;
-    cmdString.sprintf(cmds[cmd].fmt, strArg.latin1());
+    cmdString.sprintf(cmds[cmd].fmt, strArg.toLatin1().constData());
     return cmdString;
 }
 
@@ -530,15 +533,13 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
 	if (cmd == DCinfoline)
 	{
 	    // must split off file name part
-	    int slash = strArg.findRev('/');
-	    if (slash >= 0)
-		strArg = strArg.right(strArg.length()-slash-1);
+	    strArg = QFileInfo(strArg).fileName();
 	}
-	cmdString.sprintf(cmds[cmd].fmt, strArg.latin1(), intArg);
+	cmdString.sprintf(cmds[cmd].fmt, strArg.toLatin1().constData(), intArg);
     }
     else
     {
-	cmdString.sprintf(cmds[cmd].fmt, intArg, strArg.latin1());
+	cmdString.sprintf(cmds[cmd].fmt, intArg, strArg.toLatin1().constData());
     }
     return cmdString;
 }
@@ -552,7 +553,9 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg1, QString strArg
     normalizeStringArg(strArg2);
 
     QString cmdString;
-    cmdString.sprintf(cmds[cmd].fmt, strArg1.latin1(), strArg2.latin1());
+    cmdString.sprintf(cmds[cmd].fmt,
+		      strArg1.toLatin1().constData(),
+		      strArg2.toLatin1().constData());
     return cmdString;
 }
 
@@ -640,20 +643,20 @@ CmdQueueItem* GdbDriver::queueCmd(DbgCommand cmd, QString strArg1, QString strAr
 
 void GdbDriver::terminate()
 {
-    kill(SIGTERM);
+    ::kill(pid(), SIGTERM);
     m_state = DSidle;
 }
 
 void GdbDriver::detachAndTerminate()
 {
-    kill(SIGINT);
+    ::kill(pid(), SIGINT);
     flushCommands();
     executeCmdString(DCinitialize, "detach\nquit\n", true);
 }
 
 void GdbDriver::interruptInferior()
 {
-    kill(SIGINT);
+    ::kill(pid(), SIGINT);
     // remove accidentally queued commands
     flushHiPriQueue();
 }
@@ -822,7 +825,7 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
 
 	    // escape a few frequently used characters
 	    char escapeCode = '\0';
-	    switch (ch.latin1()) {
+	    switch (ch.toLatin1()) {
 	    case '\n': escapeCode = 'n'; break;
 	    case '\r': escapeCode = 'r'; break;
 	    case '\t': escapeCode = 't'; break;
@@ -918,7 +921,7 @@ static ExprValue* parseVar(const char*& s)
 	while (isspace(*p))
 	    p++;
 	if (*p != '=') {
-	    TRACE(QString().sprintf("parse error: = not found after %s", (const char*)name));
+	    TRACE("parse error: = not found after " + name);
 	    return 0;
 	}
 	// skip the '=' and more whitespace
@@ -1654,23 +1657,23 @@ static void parseFrameInfo(const char*& s, QString& func,
 
     /*
      * Replace \n (and whitespace around it) in func by a blank. We cannot
-     * use QString::simplifyWhiteSpace() for this because this would also
+     * use QString::simplified() for this because this would also
      * simplify space that belongs to a string arguments that gdb sometimes
      * prints in the argument lists of the function.
      */
-    ASSERT(!isspace(func[0].latin1()));		/* there must be non-white before first \n */
+    ASSERT(!isspace(func[0].toLatin1()));	// there must be non-white before first \n
     int nl = 0;
-    while ((nl = func.find('\n', nl)) >= 0) {
+    while ((nl = func.indexOf('\n', nl)) >= 0) {
 	// search back to the beginning of the whitespace
 	int startWhite = nl;
 	do {
 	    --startWhite;
-	} while (isspace(func[startWhite].latin1()));
+	} while (isspace(func[startWhite].toLatin1()));
 	startWhite++;
 	// search forward to the end of the whitespace
 	do {
 	    nl++;
-	} while (isspace(func[nl].latin1()));
+	} while (isspace(func[nl].toLatin1()));
 	// replace
 	func.replace(startWhite, nl-startWhite, " ");
 	/* continue searching for more \n's at this place: */
@@ -1807,7 +1810,7 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 	    bp.location = p;
 	    p += bp.location.length();
 	} else {
-	    bp.location = QString::fromLatin1(p, end-p).stripWhiteSpace();
+	    bp.location = QString::fromLatin1(p, end-p).trimmed();
 	    p = end+1;			/* skip over \n */
 	}
 
@@ -1830,7 +1833,7 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 	    } else if (strncmp(p, "stop only if ", 13) == 0) {
 		// extract condition
 		p += 13;
-		bp.condition = QString::fromLatin1(p, end-p).stripWhiteSpace();
+		bp.condition = QString::fromLatin1(p, end-p).trimmed();
 		TRACE("condition: "+bp.condition);
 	    } else if (strncmp(p, "ignore next ", 12) == 0) {
 		// extract ignore count
@@ -1839,7 +1842,7 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 		TRACE(QString("ignore count %1").arg(bp.ignoreCount));
 	    } else {
 		// indeed a continuation
-		bp.location += " " + QString::fromLatin1(p, end-p).stripWhiteSpace();
+		bp.location += " " + QString::fromLatin1(p, end-p).trimmed();
 	    }
 	    p = end;
 	    if (*p != '\0')
@@ -1993,7 +1996,7 @@ static bool parseNewWatchpoint(const char* o, int& id,
     p += 2;
 
     // all the rest on the line is the expression
-    expr = QString::fromLatin1(p, strlen(p)).stripWhiteSpace();
+    expr = QString::fromLatin1(p, strlen(p)).trimmed();
     return true;
 }
 
@@ -2052,7 +2055,7 @@ ExprValue* GdbDriver::parsePrintExpr(const char* output, bool wantErrorValue)
 bool GdbDriver::parseChangeWD(const char* output, QString& message)
 {
     bool isGood = false;
-    message = QString(output).simplifyWhiteSpace();
+    message = QString(output).simplified();
     if (message.isEmpty()) {
 	message = i18n("New working directory: ") + m_programWD;
 	isGood = true;
@@ -2254,7 +2257,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 	{
 	    start = output;
 	    skipNested(output, '{', '}');
-	    value = QString::fromLatin1(start, output-start).simplifyWhiteSpace();
+	    value = QString::fromLatin1(start, output-start).simplified();
 	    // skip space, but not the end of line
 	    while (isspace(*output) && *output != '\n')
 		output++;
@@ -2271,7 +2274,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 
 		start = output;
 		skipNested(output, '{', '}');
-		value = QString::fromLatin1(start, output-start).simplifyWhiteSpace();
+		value = QString::fromLatin1(start, output-start).simplified();
 	    } else {
 		// for gdb 5.3
 		// find first type that does not have an array, this is the RAW value
@@ -2288,7 +2291,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 			end=cur;
 			while (*end && (*end!='}') && (*end!=',') && (*end!='\n'))
 			    end++;
-			QString rawValue = QString::fromLatin1(cur, end-cur).simplifyWhiteSpace();
+			QString rawValue = QString::fromLatin1(cur, end-cur).simplified();
 			reg.rawValue = rawValue;
 
 			if (rawValue.left(2)=="0x") {
@@ -2325,7 +2328,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 	    output = strchr(output,'\n');
 	    if (output == 0)
 		output = start + strlen(start);
-	    value = QString::fromLatin1(start, output-start).simplifyWhiteSpace();
+	    value = QString::fromLatin1(start, output-start).simplified();
 
 	    /*
 	     * We split the raw from the cooked values.
@@ -2333,7 +2336,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 	     * Here, the cooked value comes first, and the raw value is in
 	     * the second part.
 	     */
-	    int pos = value.find(" (raw ");
+	    int pos = value.indexOf(" (raw ");
 	    if (pos >= 0)
 	    {
 		reg.cookedValue = value.left(pos);
@@ -2348,7 +2351,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 		* whitespace). It is the raw value. The remainder of the line
 		* is the cooked value.
 		*/
-		int pos = value.find(' ');
+		int pos = value.indexOf(' ');
 		if (pos < 0) {
 		    reg.rawValue = value;
 		    reg.cookedValue = QString();
@@ -2458,7 +2461,7 @@ QString GdbDriver::parseMemoryDump(const char* output, std::list<MemoryDump>& me
     if (isErrorExpr(output)) {
 	// error; strip space
 	QString msg = output;
-	return msg.stripWhiteSpace();
+	return msg.trimmed();
     }
 
     const char* p = output;		/* save typing */
@@ -2502,7 +2505,8 @@ QString GdbDriver::parseMemoryDump(const char* output, std::list<MemoryDump>& me
 
 QString GdbDriver::editableValue(VarTree* value)
 {
-    const char* s = value->value().latin1();
+    QByteArray ba = value->value().toLatin1();
+    const char* s = ba.constData();
 
     // if the variable is a pointer value that contains a cast,
     // remove the cast
@@ -2553,7 +2557,7 @@ QString GdbDriver::parseSetVariable(const char* output)
 {
     // if there is any output, it is an error message
     QString msg = output;
-    return msg.stripWhiteSpace();
+    return msg.trimmed();
 }
 
 

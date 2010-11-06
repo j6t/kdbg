@@ -81,7 +81,7 @@ void WinStack::activate(const QString& fileName, int lineNo, const DbgAddr& addr
 	}
     }
     // if this is not an absolute path name, make it one
-    activatePath(fi.absFilePath(), lineNo, address);
+    activatePath(fi.absoluteFilePath(), lineNo, address);
 }
 
 void WinStack::activateFile(const QString& fileName)
@@ -110,8 +110,8 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 	    return false;
 	}
 
-	addTab(fw, QFileInfo(pathName).fileName());
-	setTabToolTip(fw, pathName);
+	int idx = addTab(fw, QFileInfo(pathName).fileName());
+	setTabToolTip(idx, pathName);
 
 	connect(fw, SIGNAL(clickedLeft(const QString&,int,const DbgAddr&,bool)),
 		SIGNAL(toggleBreak(const QString&,int,const DbgAddr&,bool)));
@@ -145,7 +145,7 @@ bool WinStack::activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& addre
 	fw->scrollTo(lineNo, address);
     }
 
-    showPage(fw);
+    setCurrentWidget(fw);
     fw->setFocus();
 
     return true;
@@ -211,12 +211,12 @@ void WinStack::setPC(bool set, const QString& fileName, int lineNo,
 
 SourceWindow* WinStack::windowAt(int i) const
 {
-    return static_cast<SourceWindow*>(page(i));
+    return static_cast<SourceWindow*>(widget(i));
 }
 
 SourceWindow* WinStack::activeWindow() const
 {
-    return static_cast<SourceWindow*>(currentPage());
+    return static_cast<SourceWindow*>(currentWidget());
 }
 
 QString WinStack::activeFileName() const
@@ -372,16 +372,16 @@ void WinStack::slotClose()
 
 
 FindDialog::FindDialog() :
-	QDialog(0, "find", false),
-	m_searchText(this, "text"),
-	m_caseCheck(this, "case"),
-	m_buttonForward(this, "forward"),
-	m_buttonBackward(this, "backward"),
-	m_buttonClose(this, "close"),
+	QDialog(),
+	m_searchText(this),
+	m_caseCheck(this),
+	m_buttonForward(this),
+	m_buttonBackward(this),
+	m_buttonClose(this),
 	m_layout(this),
 	m_buttons(this)
 {
-    setCaption(KGlobal::caption() + i18n(": Search"));
+    setWindowTitle(KGlobal::caption() + i18n(": Search"));
 
     m_searchText.setMinimumSize(330, 24);
     m_searchText.setMaxLength(10000);

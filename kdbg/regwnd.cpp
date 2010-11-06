@@ -6,12 +6,11 @@
 
 #include "regwnd.h"
 #include "dbgdriver.h"
-#include <Q3Header>
 #include <QPixmap>
 #include <kglobalsettings.h>
 #include <klocale.h>			/* i18n */
 #include <kiconloader.h>
-#include <Q3PopupMenu>
+#include <QMenu>
 #include <QRegExp>
 #include <QStringList>
 #include <QHeaderView>
@@ -203,7 +202,7 @@ static QString toBinary(QString hex)
     QString result;
     
     for (int i = 2; i < hex.length(); i++) {
-	int idx = hexCharToDigit(hex[i].latin1());
+	int idx = hexCharToDigit(hex[i].toLatin1());
 	if (idx < 0) {
 	    // not a hex digit; no conversion
 	    return hex;
@@ -212,7 +211,7 @@ static QString toBinary(QString hex)
 	result += bindigits;
     }
     // remove leading zeros
-    switch (hexCharToDigit(hex[2].latin1())) {
+    switch (hexCharToDigit(hex[2].toLatin1())) {
     case 0: case 1: result.remove(0, 3); break;
     case 2: case 3: result.remove(0, 2); break;
     case 4: case 5:
@@ -227,7 +226,7 @@ static QString toOctal(QString hex)
     int shift = 0;
     unsigned v = 0;
     for (int i = hex.length()-1; i >= 2; i--) {
-	int idx = hexCharToDigit(hex[i].latin1());
+	int idx = hexCharToDigit(hex[i].toLatin1());
 	if (idx < 0)
 	    return hex;
 	v += idx << shift;
@@ -255,10 +254,9 @@ static QString toDecimal(QString hex)
     if (hex.length() > int(sizeof(unsigned long)*2+2))	/*  count in leading "0x" */
 	return hex;
 
-    const char* start = hex.latin1();
-    char* end;
-    unsigned long val = strtoul(start, &end, 0);
-    if (start == end)
+    bool ok = false;
+    unsigned long val = hex.toULong(&ok, 0);
+    if (!ok)
 	return hex;
     else
 	return QString().setNum(val);
@@ -283,16 +281,20 @@ static char* toRaw(const QString& hex, uint& length)
 	uint j=0;
 	if (hex.length()<=2) return 0;
 	for (int i=hex.length()-1; i>=2; ) {
-	    if (j%2==0) data[j/2]=hexCharToDigit(hex[i].latin1());
-	    else data[j/2]|=(hexCharToDigit(hex[i].latin1())<<4);
+	    if (j%2==0)
+		data[j/2]=hexCharToDigit(hex[i].toLatin1());
+	    else
+		data[j/2]|=(hexCharToDigit(hex[i].toLatin1())<<4);
 	    i--;j++;
 	}
     } else { // big endian
 	uint j=0;
 	if (hex.length()<=2) return 0;
 	for (int i=2; i<hex.length(); ) {
-	    if (j%2==0) data[j/2]=hexCharToDigit(hex[i].latin1())<<4;
-	    else data[j/2]|=hexCharToDigit(hex[i].latin1());
+	    if (j%2==0)
+		data[j/2]=hexCharToDigit(hex[i].toLatin1())<<4;
+	    else
+		data[j/2]|=hexCharToDigit(hex[i].toLatin1());
 	    i++;j++;
 	}
     }
@@ -424,14 +426,17 @@ RegisterView::RegisterView(QWidget* parent) :
 
     setAllColumnsShowFocus(true);
 
-    m_modemenu = new Q3PopupMenu(this, "ERROR");
+    m_modemenu = new QMenu("ERROR", this);
     for (uint i=0; i<sizeof(menuitems)/sizeof(MenuPair); i++) {
 	if (menuitems[i].isSeparator())
-	    m_modemenu->insertSeparator();
-	else
-	    m_modemenu->insertItem(i18n(menuitems[i].name), menuitems[i].mode);
+	    m_modemenu->addSeparator();
+	else {
+	    QAction* action = m_modemenu->addAction(i18n(menuitems[i].name));
+	    action->setData(menuitems[i].mode);
+	    action->setCheckable(true);
+	}
     }
-    connect(m_modemenu,SIGNAL(activated(int)),SLOT(slotModeChange(int)));
+    connect(m_modemenu, SIGNAL(triggered(QAction*)), SLOT(slotModeChange(QAction*)));
     
     new GroupingViewItem(this, i18n("GP and others"), "^$",
 			 RegisterDisplay::nada);
@@ -575,34 +580,36 @@ void RegisterView::contextMenuEvent(QContextMenuEvent* event)
 
     if (item) {
         RegisterDisplay mode=static_cast<ModeItem*>(item)->mode();        
-        for (unsigned int i = 0; i<sizeof(menuitems)/sizeof(MenuPair); i++) {
-            m_modemenu->setItemChecked(menuitems[i].mode, 
-                                       mode.contains(menuitems[i].mode));
+	int i = 0;
+	foreach(QAction* action, m_modemenu->actions())
+	{
+	    action->setChecked(mode.contains(menuitems[i].mode));
+	    ++i;
         }
-        m_modemenu->setCaption(item->text(0));
+        m_modemenu->setTitle(item->text(0));
 	m_modemenu->popup(event->globalPos());
 
 	event->accept();
     }    
 }
 
-void RegisterView::slotModeChange(int pcode)
+void RegisterView::slotModeChange(QAction* action)
 {
-    RegMap::iterator it=m_registers.find(m_modemenu->caption());
+    RegMap::iterator it=m_registers.find(m_modemenu->title());
     ModeItem* view;
     if (it != m_registers.end())
 	view = it->second;
     else
-	view = findGroup(m_modemenu->caption());
+	view = findGroup(m_modemenu->title());
 
     if (view) {
 	RegisterDisplay mode = view->mode();
-	mode.changeFlag(pcode);
+	mode.changeFlag(action->data().toInt());
 	view->setMode(mode);
     }
 }
 
-void RegisterView::paletteChange(const QPalette& oldPal)
+void RegisterView::paletteChange(const QPalette&)
 {
     setFont(KGlobalSettings::fixedFont());
 }

@@ -21,7 +21,6 @@ class XsldbgDriver:public DebuggerDriver {
     static QString defaultXsldbg();
     virtual bool startup(QString cmdStr);
     virtual void commandFinished(CmdQueueItem * cmd);
-    void slotReceiveOutput(K3Process * process, char *buffer, int buflen);
 
     virtual CmdQueueItem *executeCmd(DbgCommand, bool clearLow = false);
     virtual CmdQueueItem *executeCmd(DbgCommand, QString strArg,
@@ -97,7 +96,7 @@ class XsldbgDriver:public DebuggerDriver {
     QString makeCmdString(DbgCommand cmd, QString strArg1,
                           QString strArg2);
     QString makeCmdString(DbgCommand cmd, int intArg1, int intArg2);
-    virtual int findPrompt(const char* output, size_t len) const;
+    virtual int findPrompt(const QByteArray& output) const;
     void parseMarker();
 };
 

@@ -21,6 +21,7 @@
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
 #include <unistd.h>			/* sleep(3) */
+#include <algorithm>
 #include "mydebug.h"
 
 
@@ -28,7 +29,7 @@ KDebugger::KDebugger(QWidget* parent,
 		     ExprWnd* localVars,
 		     ExprWnd* watchVars,
 		     QListWidget* backtrace) :
-	QObject(parent, "debugger"),
+	QObject(parent),
 	m_ttyLevel(ttyFull),
 	m_memoryFormat(MDTword | MDThex),
 	m_haveExecutable(false),
@@ -42,12 +43,10 @@ KDebugger::KDebugger(QWidget* parent,
 	m_watchVariables(*watchVars),
 	m_btWindow(*backtrace)
 {
-    m_envVars.setAutoDelete(true);
-
-    connect(&m_localVariables, SIGNAL(expanded(Q3ListViewItem*)),
-	    SLOT(slotExpanding(Q3ListViewItem*)));
-    connect(&m_watchVariables, SIGNAL(expanded(Q3ListViewItem*)),
-	    SLOT(slotExpanding(Q3ListViewItem*)));
+    connect(&m_localVariables, SIGNAL(itemExpanded(QTreeWidgetItem*)),
+	    SLOT(slotExpanding(QTreeWidgetItem*)));
+    connect(&m_watchVariables, SIGNAL(itemExpanded(QTreeWidgetItem*)),
+	    SLOT(slotExpanding(QTreeWidgetItem*)));
     connect(&m_localVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
 	    SLOT(slotValueEdited(VarTree*, const QString&)));
     connect(&m_watchVariables, SIGNAL(editValueCommitted(VarTree*, const QString&)),
@@ -92,7 +91,7 @@ bool KDebugger::debugProgram(const QString& name,
 {
     if (m_d != 0 && m_d->isRunning())
     {
-	QApplication::setOverrideCursor(Qt::waitCursor);
+	QApplication::setOverrideCursor(Qt::WaitCursor);
 
 	stopDriver();
 
@@ -110,10 +109,11 @@ bool KDebugger::debugProgram(const QString& name,
     // wire up the driver
     connect(driver, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
 	    this, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)));
-    connect(driver, SIGNAL(processExited(K3Process*)), SLOT(gdbExited(K3Process*)));
+    connect(driver, SIGNAL(finished(int, QProcess::ExitStatus)),
+	    SLOT(gdbExited()));
     connect(driver, SIGNAL(commandReceived(CmdQueueItem*,const char*)),
 	    SLOT(parse(CmdQueueItem*,const char*)));
-    connect(driver, SIGNAL(wroteStdin(K3Process*)), SIGNAL(updateUI()));
+    connect(driver, SIGNAL(bytesWritten(qint64)), SIGNAL(updateUI()));
     connect(driver, SIGNAL(inferiorRunning()), SLOT(slotInferiorRunning()));
     connect(driver, SIGNAL(enterIdleState()), SLOT(backgroundUpdate()));
     connect(driver, SIGNAL(enterIdleState()), SIGNAL(updateUI()));
@@ -283,12 +283,8 @@ bool KDebugger::runUntil(const QString& fileName, int lineNo)
 {
     if (isReady() && m_programActive && !m_programRunning) {
 	// strip off directory part of file name
-	QString file = fileName;
-	int offset = file.findRev("/");
-	if (offset >= 0) {
-	    file.remove(0, offset+1);
-	}
-	m_d->executeCmd(DCuntil, file, lineNo, true);
+	QFileInfo fi(fileName);
+	m_d->executeCmd(DCuntil, fi.fileName(), lineNo, true);
 	m_programRunning = true;
 	return true;
     } else {
@@ -403,11 +399,7 @@ CmdQueueItem* KDebugger::executeBreakpoint(const Breakpoint* bp, bool queueOnly)
     else if (bp->address.isEmpty())
     {
 	// strip off directory part of file name
-	QString file = bp->fileName;
-	int offset = file.findRev("/");
-	if (offset >= 0) {
-	    file.remove(0, offset+1);
-	}
+	QString file = QFileInfo(bp->fileName).fileName();
 	if (queueOnly) {
 	    cmd = m_d->queueCmd(bp->temporary ? DCtbreakline : DCbreakline,
 				file, bp->lineNo, DebuggerDriver::QMoverride);
@@ -632,7 +624,7 @@ void KDebugger::stopDriver()
     }
 }
 
-void KDebugger::gdbExited(K3Process*)
+void KDebugger::gdbExited()
 {
     /*
      * Save settings, but only if gdb has already processed "info line
@@ -723,7 +715,7 @@ void KDebugger::saveProgramSettings()
     gg.writeEntry(FileVersion, 1);
     gg.writeEntry(ProgramArgs, m_programArgs);
     gg.writeEntry(WorkingDirectory, m_programWD);
-    gg.writeEntry(OptionsSelected, m_boolOptions);
+    gg.writeEntry(OptionsSelected, m_boolOptions.toList());
     gg.writeEntry(DebuggerCmdStr, m_debuggerCmd);
     gg.writeEntry(TTYLevelEntry, int(m_ttyLevel));
     QString driverName;
@@ -734,15 +726,15 @@ void KDebugger::saveProgramSettings()
     // write environment variables
     m_programConfig->deleteGroup(EnvironmentGroup);
     KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
-    Q3DictIterator<EnvVar> it = m_envVars;
-    EnvVar* var;
     QString varName;
     QString varValue;
-    for (int i = 0; (var = it) != 0; ++it, ++i) {
+    int i = 0;
+    for (std::map<QString,QString>::iterator it = m_envVars.begin(); it != m_envVars.end(); ++it, ++i)
+    {
 	varName.sprintf(Variable, i);
 	varValue.sprintf(Value, i);
-	eg.writeEntry(varName, it.currentKey());
-	eg.writeEntry(varValue, var->value);
+	eg.writeEntry(varName, it->first);
+	eg.writeEntry(varValue, it->second);
     }
 
     saveBreakpoints(m_programConfig);
@@ -752,11 +744,10 @@ void KDebugger::saveProgramSettings()
     m_programConfig->deleteGroup(WatchGroup);
     // then start a new group
     KConfigGroup wg = m_programConfig->group(WatchGroup);
-    VarTree* item = m_watchVariables.firstChild();
     int watchNum = 0;
-    for (; item != 0; item = item->nextSibling(), ++watchNum) {
-	varName.sprintf(ExprFmt, watchNum);
-	wg.writeEntry(varName, item->getText());
+    foreach (QString expr, m_watchVariables.exprList()) {
+	varName.sprintf(ExprFmt, watchNum++);
+	wg.writeEntry(varName, expr);
     }
 
     // give others a chance
@@ -782,14 +773,13 @@ void KDebugger::restoreProgramSettings()
     // m_ttyLevel has been read in already
     QString pgmArgs = gg.readEntry(ProgramArgs);
     QString pgmWd = gg.readEntry(WorkingDirectory);
-    QStringList boolOptions = gg.readEntry(OptionsSelected, QStringList());
-    m_boolOptions = QStringList();
+    QSet<QString> boolOptions = QSet<QString>::fromList(gg.readEntry(OptionsSelected, QStringList()));
+    m_boolOptions.clear();
 
     // read environment variables
     KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
     m_envVars.clear();
-    Q3Dict<EnvVar> pgmVars;
-    EnvVar* var;
+    std::map<QString,EnvVar> pgmVars;
     QString varName;
     QString varValue;
     for (int i = 0;; ++i) {
@@ -804,10 +794,9 @@ void KDebugger::restoreProgramSettings()
 	    // skip empty names
 	    continue;
 	}
-	var = new EnvVar;
+	EnvVar* var = &pgmVars[name];
 	var->value = eg.readEntry(varValue, QString());
 	var->status = EnvVar::EVnew;
-	pgmVars.insert(name, var);
     }
 
     updateProgEnvironment(pgmArgs, pgmWd, pgmVars, boolOptions);
@@ -1247,47 +1236,41 @@ void KDebugger::updateAllExprs()
     }
 
     // update watch expressions
-    VarTree* item = m_watchVariables.firstChild();
-    for (; item != 0; item = item->nextSibling()) {
-	m_watchEvalExpr.push_back(item->getText());
+    foreach (QString expr, m_watchVariables.exprList()) {
+	m_watchEvalExpr.push_back(expr);
     }
 }
 
 void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
-				      const Q3Dict<EnvVar>& newVars,
-				      const QStringList& newOptions)
+				      const std::map<QString,EnvVar>& newVars,
+				      const QSet<QString>& newOptions)
 {
     m_programArgs = args;
     m_d->executeCmd(DCsetargs, m_programArgs);
     TRACE("new pgm args: " + m_programArgs + "\n");
 
-    m_programWD = wd.stripWhiteSpace();
+    m_programWD = wd.trimmed();
     if (!m_programWD.isEmpty()) {
 	m_d->executeCmd(DCcd, m_programWD);
 	TRACE("new wd: " + m_programWD + "\n");
     }
 
     // update environment variables
-    Q3DictIterator<EnvVar> it = newVars;
-    EnvVar* val;
-    for (; (val = it) != 0; ++it) {
-	QString var = it.currentKey();
+    for (std::map<QString,EnvVar>::const_iterator i = newVars.begin(); i != newVars.end(); ++i)
+    {
+	QString var = i->first;
+	const EnvVar* val = &i->second;
 	switch (val->status) {
 	case EnvVar::EVnew:
-	    m_envVars.insert(var, val);
-	    // fall thru
 	case EnvVar::EVdirty:
-	    // the value must be in our list
-	    ASSERT(m_envVars[var] == val);
+	    m_envVars[var] = val->value;
 	    // update value
 	    m_d->executeCmd(DCsetenv, var, val->value);
 	    break;
 	case EnvVar::EVdeleted:
-	    // must be in our list
-	    ASSERT(m_envVars[var] == val);
 	    // delete value
 	    m_d->executeCmd(DCunsetenv, var);
-	    m_envVars.remove(var);
+	    m_envVars.erase(var);
 	    break;
 	default:
 	    ASSERT(false);
@@ -1298,27 +1281,17 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
     }
 
     // update options
-    QStringList::ConstIterator oi;
-    for (oi = newOptions.begin(); oi != newOptions.end(); ++oi)
+    foreach (QString opt, newOptions - m_boolOptions)
     {
-	if (m_boolOptions.findIndex(*oi) < 0) {
-	    // the options is currently not set, so set it
-	    m_d->executeCmd(DCsetoption, *oi, 1);
-	} else {
-	    // option is set, no action required, but move it to the end
-	    m_boolOptions.remove(*oi);
-	}
-	m_boolOptions.append(*oi);
+	// option is not set, set it
+	m_d->executeCmd(DCsetoption, opt, 1);
     }
-    /*
-     * Now all options that should be set are at the end of m_boolOptions.
-     * If some options need to be unset, they are at the front of the list.
-     * Here we unset and remove them.
-     */
-    while (m_boolOptions.count() > newOptions.count()) {
-	m_d->executeCmd(DCsetoption, m_boolOptions.first(), 0);
-	m_boolOptions.remove(m_boolOptions.begin());
+    foreach (QString opt, m_boolOptions - newOptions)
+    {
+	// option is set, unset it
+	m_d->executeCmd(DCsetoption, opt, 0);
     }
+    m_boolOptions = newOptions;
 }
 
 void KDebugger::handleLocals(const char* output)
@@ -1623,7 +1596,7 @@ void KDebugger::handleFindType(CmdQueueItem* cmd, const char* output)
     {
 	ASSERT(cmd != 0 && cmd->m_expr != 0);
 
-	TypeInfo* info = m_typeTable->lookup(type);
+	const TypeInfo* info = m_typeTable->lookup(type);
 
 	if (info == 0) {
 	    /*
@@ -1816,20 +1789,20 @@ CmdQueueItem* KDebugger::loadCoreFile()
     return m_d->queueCmd(DCcorefile, m_corefile, DebuggerDriver::QMoverride);
 }
 
-void KDebugger::slotExpanding(Q3ListViewItem* item)
+void KDebugger::slotExpanding(QTreeWidgetItem* item)
 {
     VarTree* exprItem = static_cast<VarTree*>(item);
     if (exprItem->m_varKind != VarTree::VKpointer) {
 	return;
     }
-    ExprWnd* wnd = static_cast<ExprWnd*>(item->listView());
+    ExprWnd* wnd = static_cast<ExprWnd*>(item->treeWidget());
     dereferencePointer(wnd, exprItem, true);
 }
 
 // add the expression in the edit field to the watch expressions
 void KDebugger::addWatch(const QString& t)
 {
-    QString expr = t.stripWhiteSpace();
+    QString expr = t.trimmed();
     // don't add a watched expression again
     if (expr.isEmpty() || m_watchVariables.topLevelExprByName(expr) != 0)
 	return;
@@ -1853,12 +1826,13 @@ void KDebugger::slotDeleteWatch()
     if (m_d == 0 || !m_d->isIdle())
 	return;
 
-    VarTree* item = m_watchVariables.currentItem();
+    VarTree* item = m_watchVariables.selectedItem();
     if (item == 0 || !item->isToplevelExpr())
 	return;
 
     // remove the variable from the list to evaluate
-    QStringList::iterator i = m_watchEvalExpr.find(item->getText());
+    std::list<QString>::iterator i =
+	    std::find(m_watchEvalExpr.begin(), m_watchEvalExpr.end(), item->getText());
     if (i != m_watchEvalExpr.end()) {
 	m_watchEvalExpr.erase(i);
     }
@@ -2006,18 +1980,12 @@ KDebugger::BrkptIterator KDebugger::breakpointByFilePos(QString file, int lineNo
 	}
     }
     // not found, so try basename
-    // strip off directory part of file name
-    int offset = file.findRev("/");
-    file.remove(0, offset+1);
+    file = QFileInfo(file).fileName();
 
     for (BrkptIterator bp = m_brkpts.begin(); bp != m_brkpts.end(); ++bp)
     {
 	// get base name of breakpoint's file
-	QString basename = bp->fileName;
-	int offset = basename.findRev("/");
-	if (offset >= 0) {
-	    basename.remove(0, offset+1);
-	}
+	QString basename = QFileInfo(bp->fileName).fileName();
 
 	if (bp->lineNo == lineNo &&
 	    basename == file &&
@@ -2186,10 +2154,10 @@ void KDebugger::handleSetPC(const char* /*output*/)
 
 void KDebugger::slotValueEdited(VarTree* expr, const QString& text)
 {
-    if (text.simplifyWhiteSpace().isEmpty())
+    if (text.simplified().isEmpty())
 	return;			       /* no text entered: ignore request */
 
-    ExprWnd* wnd = static_cast<ExprWnd*>(expr->listView());
+    ExprWnd* wnd = static_cast<ExprWnd*>(expr->treeWidget());
     TRACE(QString().sprintf("Changing %s to ",
 			    wnd->name()) + text);
 

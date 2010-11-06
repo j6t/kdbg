@@ -5,19 +5,16 @@
  */
 
 #include "pgmargs.h"
-#include <Q3ListView>
 #include <kfiledialog.h>
 #include <klocale.h>			/* i18n */
 #include "mydebug.h"
 
-PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, Q3Dict<EnvVar>& envVars,
+PgmArgs::PgmArgs(QWidget* parent, const QString& pgm,
+		 const std::map<QString,QString>& envVars,
 		 const QStringList& allOptions) :
-	QDialog(parent),
-	m_envVars(envVars)
+	QDialog(parent)
 {
     setupUi(this);
-
-    m_envVars.setAutoDelete(false);
 
     {
 	QFileInfo fi = pgm;
@@ -28,7 +25,7 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, Q3Dict<EnvVar>& envVars,
     // add options only if the option list is non-empty
     if (!allOptions.isEmpty()) 
     {
-	xsldbgOptions->insertStringList(allOptions);
+	xsldbgOptions->addItems(allOptions);
     }
     else
     {
@@ -36,7 +33,17 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm, Q3Dict<EnvVar>& envVars,
 	xsldbgOptionsPage = 0;
     }
 
-    initEnvList();
+    EnvVar val;
+    val.status = EnvVar::EVclean;
+    for (std::map<QString,QString>::const_iterator i = envVars.begin(); i != envVars.end(); ++i)
+    {
+	val.value = i->second;
+	val.item = new QTreeWidgetItem(envList, QStringList() << i->first << i->second);
+	m_envVars[i->first] = val;
+    }
+
+    envList->setAllColumnsShowFocus(true);
+    buttonDelete->setEnabled(envList->currentItem() != 0);
 }
 
 PgmArgs::~PgmArgs()
@@ -44,28 +51,25 @@ PgmArgs::~PgmArgs()
 }
 
 // initializes the selected options
-void PgmArgs::setOptions(const QStringList& selectedOptions)
+void PgmArgs::setOptions(const QSet<QString>& selectedOptions)
 {
-    QStringList::ConstIterator it;
-    for (it = selectedOptions.begin(); it != selectedOptions.end(); ++it) {
-	for (uint i = 0; i < xsldbgOptions->count(); i++) {
-	    if (xsldbgOptions->text(i) == *it) {
-		xsldbgOptions->setSelected(i, true);
-		break;
-	    }
+    for (int i = 0; i < xsldbgOptions->count(); i++) {
+	if (selectedOptions.contains(xsldbgOptions->item(i)->text()))
+	{
+	    xsldbgOptions->item(i)->setSelected(true);
 	}
     }
 }
 
 // returns the selected options
-QStringList PgmArgs::options() const
+QSet<QString> PgmArgs::options() const
 {
-    QStringList sel;
+    QSet<QString> sel;
     if (xsldbgOptionsPage != 0)
     {
-	for (uint i = 0; i < xsldbgOptions->count(); i++) {
-	    if (xsldbgOptions->isSelected(i))
-		sel.append(xsldbgOptions->text(i));
+	for (int i = 0; i < xsldbgOptions->count(); i++) {
+	    if (xsldbgOptions->item(i)->isSelected())
+		sel.insert(xsldbgOptions->item(i)->text());
 	}
     }
     return sel;
@@ -81,12 +85,14 @@ void PgmArgs::modifyVar(bool resurrect)
 {
     QString name, value;
     parseEnvInput(name, value);
-    if (name.isEmpty() || name.find(' ') >= 0)	/* disallow spaces in names */
+    if (name.isEmpty() || name.indexOf(' ') >= 0)	// disallow spaces in names
 	return;
 
     // lookup the value in the dictionary
-    EnvVar* val = m_envVars[name];
-    if (val != 0) {
+    EnvVar* val;
+    std::map<QString,EnvVar>::iterator i = m_envVars.find(name);
+    if (i != m_envVars.end()) {
+	val = &i->second;
 	// see if this is a zombie
 	if (val->status == EnvVar::EVdeleted) {
 	    // resurrect
@@ -94,8 +100,7 @@ void PgmArgs::modifyVar(bool resurrect)
 	    {
 		val->value = value;
 		val->status = EnvVar::EVdirty;
-		val->item = new Q3ListViewItem(envList, name, value);	// inserts itself
-		m_envVars.insert(name, val);
+		val->item = new QTreeWidgetItem(envList, QStringList() << name << value);
 	    }
 	} else if (value != val->value) {
 	    // change the value
@@ -105,34 +110,33 @@ void PgmArgs::modifyVar(bool resurrect)
 	}
     } else {
 	// add the value
-	val = new EnvVar;
+	val = &m_envVars[name];
 	val->value = value;
 	val->status = EnvVar::EVnew;
-	val->item = new Q3ListViewItem(envList, name, value);	// inserts itself
-	m_envVars.insert(name, val);
+	val->item = new QTreeWidgetItem(envList, QStringList() << name << value);
     }
-    envList->setSelected(val->item, true);
+    envList->setCurrentItem(val->item);
     buttonDelete->setEnabled(true);
 }
 
 // delete the selected item
 void PgmArgs::on_buttonDelete_clicked()
 {
-    Q3ListViewItem* item = envList->selectedItem();
+    QTreeWidgetItem* item = envList->currentItem();
     if (item == 0)
 	return;
     QString name = item->text(0);
 
     // lookup the value in the dictionary
-    EnvVar* val = m_envVars[name];
-    if (val != 0)
+    std::map<QString,EnvVar>::iterator i = m_envVars.find(name);
+    if (i != m_envVars.end())
     {
+	EnvVar* val = &i->second;
 	// delete from list
 	val->item = 0;
 	// if this is a new item, delete it completely, otherwise zombie-ize it
 	if (val->status == EnvVar::EVnew) {
-	    m_envVars.remove(name);
-	    delete val;
+	    m_envVars.erase(i);
 	} else {
 	    // mark value deleted
 	    val->status = EnvVar::EVdeleted;
@@ -147,47 +151,26 @@ void PgmArgs::parseEnvInput(QString& name, QString& value)
 {
     // parse input from edit field
     QString input = envVar->text();
-    int equalSign = input.find('=');
+    int equalSign = input.indexOf('=');
     if (equalSign >= 0) {
-	name = input.left(equalSign).stripWhiteSpace();
+	name = input.left(equalSign).trimmed();
 	value = input.mid(equalSign+1);
     } else {
-	name = input.stripWhiteSpace();
+	name = input.trimmed();
 	value = QString();		/* value is empty */
     }
 }
 
-void PgmArgs::initEnvList()
+void PgmArgs::on_envList_currentItemChanged()
 {
-    Q3DictIterator<EnvVar> it = m_envVars;
-    EnvVar* val;
-    QString name;
-    for (; (val = it) != 0; ++it) {
-	val->status = EnvVar::EVclean;
-	name = it.currentKey();
-	val->item = new Q3ListViewItem(envList, name, val->value);	// inserts itself
-    }
-
-    envList->setAllColumnsShowFocus(true);
-    buttonDelete->setEnabled(envList->selectedItem() != 0);
-}
-
-void PgmArgs::on_envList_selectionChanged()
-{
-    Q3ListViewItem* item = envList->selectedItem();
+    QTreeWidgetItem* item = envList->currentItem();
     buttonDelete->setEnabled(item != 0);
     if (item == 0)
 	return;
 
     // must get name from list box
     QString name = item->text(0);
-    EnvVar* val = m_envVars[name];
-    ASSERT(val != 0);
-    if (val != 0) {
-	envVar->setText(name + "=" + val->value);
-    } else {
-	envVar->setText(name);
-    }
+    envVar->setText(name + "=" + m_envVars[name].value);
 }
 
 void PgmArgs::accept()
@@ -212,7 +195,7 @@ void PgmArgs::on_insertFile_clicked()
     QString caption = i18n("Select a file name to insert as program argument");
 
     // use the selection as default
-    QString f = programArgs->markedText();
+    QString f = programArgs->selectedText();
     f = KFileDialog::getSaveFileName(f, QString::null,
 				     this, caption);
     // don't clear the selection if no file was selected
@@ -226,7 +209,7 @@ void PgmArgs::on_insertDir_clicked()
     QString caption = i18n("Select a directory to insert as program argument");
 
     // use the selection as default
-    QString f = programArgs->markedText();
+    QString f = programArgs->selectedText();
     f = KFileDialog::getExistingDirectory(f, this, caption);
     // don't clear the selection if no file was selected
     if (!f.isEmpty()) {

@@ -6,10 +6,12 @@
 
 #include "xsldbgdriver.h"
 #include "exprwnd.h"
+#include <QFileInfo>
 #include <QRegExp>
 #include <QStringList>
 #include <klocale.h>            /* i18n */
 #include <ctype.h>
+#include <signal.h>
 #include <stdlib.h>             /* strtol, atoi */
 #include <string.h>             /* strcpy */
 #include <kmessagebox.h>
@@ -204,26 +206,6 @@ QStringList XsldbgDriver::boolOptionList() const
     return allOptions;
 }
 
-
-void
-XsldbgDriver::slotReceiveOutput(K3Process * process, char *buffer,
-                                int buflen)
-{
-    //TRACE(buffer);
-    if (m_state != DSidle) {
-        //    TRACE(buffer);
-        DebuggerDriver::slotReceiveOutput(process, buffer, buflen);
-    } else {
-        if (strncmp(buffer, "quit", 4) == 0) {
-            TRACE("Ignoring text when xsldbg is quiting");
-        } else {
-            TRACE
-                ("Stray output received by XsldbgDriver::slotReceiveOutput");
-            TRACE(buffer);
-        }
-    }
-}
-
 bool
 XsldbgDriver::startup(QString cmdStr)
 {
@@ -252,7 +234,7 @@ XsldbgDriver::commandFinished(CmdQueueItem * cmd)
     }
 
     /* ok, the command is ready */
-    emit commandReceived(cmd, m_output);
+    emit commandReceived(cmd, m_output.constData());
 
     switch (cmd->m_cmd) {
         case DCbt:
@@ -262,7 +244,7 @@ XsldbgDriver::commandFinished(CmdQueueItem * cmd)
         case DCstep:
         case DCnext:
         case DCfinish:{
-	  if (!::isErrorExpr(m_output))
+	  if (!::isErrorExpr(m_output.constData()))
             parseMarker();
 	  else{
 	    // This only shows an error for DCinfolocals 
@@ -282,31 +264,31 @@ XsldbgDriver::commandFinished(CmdQueueItem * cmd)
 }
 
 int
-XsldbgDriver::findPrompt(const char* output, size_t len) const
+XsldbgDriver::findPrompt(const QByteArray& output) const
 {
     /*
      * If there's a prompt string in the collected output, it must be at
      * the very end. We do a quick check whether the last characters of
      * output are suitable and do the full search only if they are.
      */
+    int len = output.length();
     if (len < 11 || output[len-1] != ' ' || output[len-2] != '>')
 	return -1;
 
     // There can be text between "(xsldbg) " and the "> " at the end
     // since we do not know what that text is, we accept the former
     // anywhere in the output.
-    const char* prompt = strstr(output, "(xsldbg) ");
-    return prompt ? prompt-output : 0;
+    return output.indexOf("(xsldbg) ");
 }
 
 void
 XsldbgDriver::parseMarker()
 {
-    char *p = m_output;
+    char *p = m_output.data();
 
     for (;;) {
         if ((p == 0) || (*p == '\0')) {
-            m_output[0] = '\0';
+            m_output.clear();
             return;
         }
         if (strncmp(p, "Breakpoint for file ", 20) == 0)
@@ -332,7 +314,7 @@ XsldbgDriver::parseMarker()
     // extract filename and line number
     static QRegExp MarkerRE(" at line (\\d+)");
 
-    int lineNoStart = MarkerRE.search(startMarker);
+    int lineNoStart = MarkerRE.indexIn(startMarker);
 
     if (lineNoStart >= 0) {
         int lineNo = MarkerRE.cap(1).toInt();
@@ -384,7 +366,7 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg)
     }
 
     QString cmdString;
-    cmdString.sprintf(cmds[cmd].fmt, strArg.latin1());
+    cmdString.sprintf(cmds[cmd].fmt, strArg.toLatin1().constData());
     return cmdString;
 }
 
@@ -486,14 +468,11 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
         }
         if (cmd == DCinfoline) {
             // must split off file name part
-            int slash = strArg.findRev('/');
-
-            if (slash >= 0)
-                strArg = strArg.right(strArg.length() - slash - 1);
+            strArg = QFileInfo(strArg).fileName();
         }
-        cmdString.sprintf(cmds[cmd].fmt, strArg.latin1(), intArg);
+        cmdString.sprintf(cmds[cmd].fmt, strArg.toLatin1().constData(), intArg);
     } else {
-        cmdString.sprintf(cmds[cmd].fmt, intArg, strArg.latin1());
+        cmdString.sprintf(cmds[cmd].fmt, intArg, strArg.toLatin1().constData());
     }
     return cmdString;
 }
@@ -509,7 +488,9 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg1,
     normalizeStringArg(strArg2);
 
     QString cmdString;
-    cmdString.sprintf(cmds[cmd].fmt, strArg1.latin1(), strArg2.latin1());
+    cmdString.sprintf(cmds[cmd].fmt,
+		      strArg1.toLatin1().constData(),
+		      strArg2.toLatin1().constData());
     return cmdString;
 }
 
@@ -612,7 +593,7 @@ XsldbgDriver::terminate()
     qDebug("XsldbgDriver::Terminate");
     flushCommands();
     executeCmdString(DCinitialize, "quit\n", true);
-    kill(SIGTERM);
+    ::kill(pid(), SIGTERM);
     m_state = DSidle;
 }
 
@@ -622,7 +603,7 @@ XsldbgDriver::detachAndTerminate()
     qDebug("XsldbgDriver::detachAndTerminate");
     flushCommands();
     executeCmdString(DCinitialize, "quit\n", true);
-    kill(SIGINT);
+    ::kill(pid(), SIGINT);
 }
 
 void
@@ -631,7 +612,7 @@ XsldbgDriver::interruptInferior()
     // remove accidentally queued commands
     qDebug("interruptInferior");
     flushHiPriQueue();
-    kill(SIGINT);
+    ::kill(pid(), SIGINT);
 }
 
 static bool
@@ -1301,7 +1282,7 @@ XsldbgDriver::parseChangeWD(const char *output, QString & message)
 
     if (strncmp(output, "Change to directory", 20) == 0) {
         output = output + 20;   /* skip 'Change to directory' */
-        message = QString(output).simplifyWhiteSpace();
+        message = QString(output).simplified();
         if (message.isEmpty()) {
             message = i18n("New working directory: ") + m_programWD;
             isGood = true;

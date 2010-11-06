@@ -11,7 +11,7 @@
 #include <list>
 #include <map>
 
-class Q3PopupMenu;
+class QMenu;
 class RegisterViewItem;
 class GroupingViewItem;
 class QContextMenuEvent;
@@ -29,7 +29,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent*);
 
 protected slots:
-    void slotModeChange(int);
+    void slotModeChange(QAction*);
     void updateRegisters(const std::list<RegisterInfo>&);
 
 private:
@@ -37,7 +37,7 @@ private:
     void updateGroupVisibility();
     GroupingViewItem* findMatchingGroup(const QString& regName);
     GroupingViewItem* findGroup(const QString& groupName);
-    Q3PopupMenu* m_modemenu;
+    QMenu* m_modemenu;
     typedef std::map<QString,RegisterViewItem*> RegMap;
     RegMap m_registers;
 

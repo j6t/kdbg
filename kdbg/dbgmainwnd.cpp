@@ -17,7 +17,6 @@
 #include <krecentfilesaction.h>
 #include <ktoggleaction.h>
 #include <kfiledialog.h>
-#include <k3process.h>
 #include <kshortcutsdialog.h>
 #include <kanimatedbutton.h>
 #include <kwindowsystem.h>
@@ -29,9 +28,8 @@
 #include <QFile>
 #include <QFileInfo>
 #include <QList>
-#include <Q3PopupMenu>
-#include <Q3ListViewItem>
 #include <QDockWidget>
+#include <QProcess>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "commandids.h"
@@ -62,7 +60,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	m_transcriptFile(GDB_TRANSCRIPT),
 #endif
 	m_outputTermCmdStr(defaultTermCmdStr),
-	m_outputTermProc(0),
+	m_outputTermProc(new QProcess),
 	m_ttyLevel(-1),			/* no tty yet */
 	m_popForeground(false),
 	m_backTimeout(1000),
@@ -174,8 +172,9 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	    m_debugger, SLOT(setThread(int)));
 
     // popup menu of the local variables window
-    connect(m_localVariables, SIGNAL(contextMenuRequested(Q3ListViewItem*, const QPoint&, int)),
-	    this, SLOT(slotLocalsPopup(Q3ListViewItem*, const QPoint&)));
+    m_localVariables->setContextMenuPolicy(Qt::CustomContextMenu);
+    connect(m_localVariables, SIGNAL(customContextMenuRequested(const QPoint&)),
+	    this, SLOT(slotLocalsPopup(const QPoint&)));
 
     makeDefaultLayout();
     setupGUI(KXmlGuiWindow::Default, "kdbgui.rc");
@@ -206,12 +205,7 @@ DebuggerMainWnd::~DebuggerMainWnd()
     delete m_btWindow;
     delete m_filesWindow;
 
-    // if the output window is open, close it
-    if (m_outputTermProc != 0) {
-	m_outputTermProc->disconnect();	/* ignore signals */
-	m_outputTermProc->kill();
-	shutdownTermWindow();
-    }
+    delete m_outputTermProc;
 }
 
 QDockWidget* DebuggerMainWnd::createDockWidget(const char* name, const QString& title)
@@ -572,8 +566,8 @@ void DebuggerMainWnd::slotNewFileLoaded()
 QDockWidget* DebuggerMainWnd::dockParent(QWidget* w)
 {
     while ((w = w->parentWidget()) != 0) {
-	if (w->isA("QDockWidget"))
-	    return static_cast<QDockWidget*>(w);
+	if (QDockWidget* dock = qobject_cast<QDockWidget*>(w))
+	    return dock;
     }
     return 0;
 }
@@ -622,15 +616,15 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
     }
     else
     {
-	success = startDriver(fi.absFilePath(), lang);
+	success = startDriver(fi.absoluteFilePath(), lang);
     }
 
     if (success)
     {
-	m_recentExecAction->addUrl(KUrl(fi.absFilePath()));
+	m_recentExecAction->addUrl(KUrl(fi.absoluteFilePath()));
 
 	// keep the directory
-	m_lastDirectory = fi.dirPath(true);
+	m_lastDirectory = fi.absolutePath();
 	m_filesWindow->setExtraDirectory(m_lastDirectory);
 
 	// set caption to basename part of executable
@@ -639,7 +633,7 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
     }
     else
     {
-	m_recentExecAction->removeUrl(KUrl(fi.absFilePath()));
+	m_recentExecAction->removeUrl(KUrl(fi.absoluteFilePath()));
     }
 
     return success;
@@ -710,7 +704,7 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
 {
     // lang is needed in all lowercase
-    lang = lang.lower();
+    lang = lang.toLower();
 
     // The following table relates languages and debugger drivers
     static const struct L {
@@ -770,7 +764,7 @@ DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
 QString DebuggerMainWnd::driverNameFromFile(const QString& exe)
 {
     /* Inprecise but simple test to see if file is in XSLT language */
-    if (exe.right(4).lower() == ".xsl")
+    if (exe.right(4).toLower() == ".xsl")
 	return "XSLT";
 
     return "GDB";
@@ -889,10 +883,7 @@ void DebuggerMainWnd::slotDebuggerStarting()
 	m_ttyWindow->deactivate();
 	break;
     case KDebugger::ttyFull:
-	if (m_outputTermProc != 0) {
-	    m_outputTermProc->kill();
-	    // will be deleted in slot
-	}
+	m_outputTermProc->kill();
 	break;
     default: break;
     }
@@ -905,12 +896,10 @@ void DebuggerMainWnd::slotDebuggerStarting()
 	ttyName = m_ttyWindow->activate();
 	break;
     case KDebugger::ttyFull:
-	if (m_outputTermProc == 0) {
-	    // create an output window
-	    ttyName = createOutputWindow();
-	    TRACE(ttyName.isEmpty() ?
-		  "createOuputWindow failed" : "successfully created output window");
-	}
+	// create an output window
+	ttyName = createOutputWindow();
+	TRACE(ttyName.isEmpty() ?
+	      "createOuputWindow failed" : "successfully created output window");
 	break;
     default: break;
     }
@@ -945,20 +934,18 @@ QString DebuggerMainWnd::createOutputWindow()
     // create a fifo that will pass in the tty name
     QFile::remove(fifoName);		// remove remnants
 #ifdef HAVE_MKFIFO
-    if (::mkfifo(fifoName.local8Bit(), S_IRUSR|S_IWUSR) < 0) {
+    if (::mkfifo(fifoName.toLocal8Bit(), S_IRUSR|S_IWUSR) < 0) {
 	// failed
 	TRACE("mkfifo " + fifoName + " failed");
 	return QString();
     }
 #else
-    if (::mknod(fifoName.local8Bit(), S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
+    if (::mknod(fifoName.toLocal8Bit(), S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
 	// failed
 	TRACE("mknod " + fifoName + " failed");
 	return QString();
     }
 #endif
-
-    m_outputTermProc = new K3Process;
 
     /*
      * Spawn an xterm that in turn runs a shell script that passes us
@@ -984,7 +971,7 @@ QString DebuggerMainWnd::createOutputWindow()
     title += i18n(": Program output");
 
     // parse the command line specified in the preferences
-    QStringList cmdParts = QStringList::split(' ', m_outputTermCmdStr);
+    QStringList cmdParts = m_outputTermCmdStr.split(' ');
 
     /*
      * Build the argv array. Thereby substitute special sequences:
@@ -1001,18 +988,18 @@ QString DebuggerMainWnd::createOutputWindow()
     {
 	QString& str = *i;
 	for (int j = sizeof(substitute)/sizeof(substitute[0])-1; j >= 0; j--) {
-	    int pos = str.find(substitute[j].seq);
+	    int pos = str.indexOf(substitute[j].seq);
 	    if (pos >= 0) {
 		str.replace(pos, 2, substitute[j].replace);
 		break;		/* substitute only one sequence */
 	    }
 	}
-	*m_outputTermProc << str;
     }
 
-    QString tty;
+    QString tty, pgm = cmdParts.takeFirst();
 
-    if (m_outputTermProc->start())
+    m_outputTermProc->start(pgm, cmdParts);
+    if (m_outputTermProc->waitForStarted())
     {
 	// read the ttyname from the fifo
 	QFile f(fifoName);
@@ -1025,32 +1012,17 @@ QString DebuggerMainWnd::createOutputWindow()
 	f.remove();
 
 	// remove whitespace
-	tty = tty.stripWhiteSpace();
+	tty = tty.trimmed();
 	TRACE("tty=" + tty);
-
-	connect(m_outputTermProc, SIGNAL(processExited(K3Process*)),
-		SLOT(slotTermEmuExited()));
     }
     else
     {
 	// error, could not start xterm
 	TRACE("fork failed for fifo " + fifoName);
 	QFile::remove(fifoName);
-	shutdownTermWindow();
     }
 
     return tty;
-}
-
-void DebuggerMainWnd::slotTermEmuExited()
-{
-    shutdownTermWindow();
-}
-
-void DebuggerMainWnd::shutdownTermWindow()
-{
-    delete m_outputTermProc;
-    m_outputTermProc = 0;
 }
 
 void DebuggerMainWnd::slotProgramStopped()
@@ -1067,7 +1039,8 @@ void DebuggerMainWnd::slotProgramStopped()
 void DebuggerMainWnd::intoBackground()
 {
     if (m_popForeground) {
-        m_backTimer.start(m_backTimeout, true);	/* single-shot */
+	m_backTimer.setSingleShot(true);
+	m_backTimer.start(m_backTimeout);
     }
 }
 
@@ -1095,17 +1068,16 @@ QString DebuggerMainWnd::makeSourceFilter()
 /*
  * Pop up the context menu in the locals window
  */
-void DebuggerMainWnd::slotLocalsPopup(Q3ListViewItem*, const QPoint& pt)
+void DebuggerMainWnd::slotLocalsPopup(const QPoint& pt)
 {
-    Q3PopupMenu* popup =
-	static_cast<Q3PopupMenu*>(factory()->container("popup_locals", this));
+    QMenu* popup = static_cast<QMenu*>(factory()->container("popup_locals", this));
     if (popup == 0) {
         return;
     }
     if (popup->isVisible()) {
 	popup->hide();
     } else {
-	popup->popup(pt);
+	popup->popup(m_localVariables->viewport()->mapToGlobal(pt));
     }
 }
 
@@ -1143,8 +1115,8 @@ void DebuggerMainWnd::slotEditValue()
     {
 	return;				/* don't edit twice */
     }
-    
-    VarTree* expr = wnd->currentItem();
+
+    VarTree* expr = wnd->selectedItem();
     if (expr != 0 && m_debugger != 0 && m_debugger->canSingleStep())
     {
 	TRACE("edit value");
@@ -1178,7 +1150,7 @@ void DebuggerMainWnd::slotFileOpen()
     QString fileName = m_filesWindow->activeFileName();
     if (!fileName.isEmpty()) {
 	QFileInfo fi(fileName);
-	dir = fi.dirPath();
+	dir = fi.path();
     }
 
     fileName = myGetFileName(i18n("Open"),
@@ -1188,7 +1160,7 @@ void DebuggerMainWnd::slotFileOpen()
     if (!fileName.isEmpty())
     {
 	QFileInfo fi(fileName);
-	m_lastDirectory = fi.dirPath();
+	m_lastDirectory = fi.path();
 	m_filesWindow->setExtraDirectory(m_lastDirectory);
 	m_filesWindow->activateFile(fileName);
     }

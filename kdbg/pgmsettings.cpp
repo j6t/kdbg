@@ -17,7 +17,7 @@
 
 
 ChooseDriver::ChooseDriver(QWidget* parent) :
-	QWidget(parent, "driver")
+	QWidget(parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
 
@@ -48,7 +48,7 @@ QString ChooseDriver::debuggerCmd() const
 
 
 OutputSettings::OutputSettings(QWidget* parent) :
-	QWidget(parent, "output")
+	QWidget(parent)
 {
     m_group = new QButtonGroup(this);
 

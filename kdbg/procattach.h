@@ -8,15 +8,15 @@
 #define ProcAttach_included
 
 #include "ui_procattachbase.h"
-#include <Q3ValueVector>
+#include <QByteArray>
 #include <QDialog>
 #include <QLabel>
 #include <QLineEdit>
 #include <QPushButton>
-#include <Q3VBoxLayout>
-#include <Q3CString>
-#include <Q3HBoxLayout>
+#include <QVBoxLayout>
+#include <QHBoxLayout>
 #include <kdialog.h>
+#include <vector>
 
 
 class QProcess;
@@ -42,20 +42,20 @@ protected:
 protected slots:
     void on_buttonRefresh_clicked();
     void on_filterEdit_textChanged(const QString& text);
-    void on_processList_selectionChanged();
+    void on_processList_currentItemChanged();
     void slotTextReceived();
     void slotPSDone();
 
 protected:
     void pushLine();
-    bool setVisibility(Q3ListViewItem* i, const QString& text);
+    bool setVisibility(QTreeWidgetItem* i, const QString& text);
 
     QProcess* m_ps;
     // parse state
     int m_pidCol;	//!< The PID column in the ps output
     int m_ppidCol;	//!< The parent-PID column in the ps output
-    Q3CString m_token;
-    Q3ValueVector<QString> m_line;
+    QByteArray m_token;
+    std::vector<QString> m_line;
 };
 
 
@@ -78,8 +78,8 @@ protected:
     QLineEdit m_processId;
     QPushButton m_buttonOK;
     QPushButton m_buttonCancel;
-    Q3VBoxLayout m_layout;
-    Q3HBoxLayout m_buttons;
+    QVBoxLayout m_layout;
+    QHBoxLayout m_buttons;
 };
 
 #endif // ProcAttach_included

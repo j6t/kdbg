@@ -5,8 +5,9 @@
  */
 
 #include "procattach.h"
-#include <Q3ListView>
+#include <QHeaderView>
 #include <QProcess>
+#include <QTreeWidget>
 #include <ctype.h>
 #include <kglobal.h>
 #include <kiconloader.h>
@@ -20,7 +21,7 @@ ProcAttachPS::ProcAttachPS(QWidget* parent) :
 	m_ppidCol(-1)
 {
     setupUi(this);
-    on_processList_selectionChanged(); //update OK button disabled state.
+    on_processList_currentItemChanged();	// update OK button state
 
     m_ps = new QProcess;
     connect(m_ps, SIGNAL(readyReadStandardOutput()),
@@ -29,9 +30,12 @@ ProcAttachPS::ProcAttachPS(QWidget* parent) :
 	    this, SLOT(slotPSDone()));
 
     processList->setColumnWidth(0, 300);
-    processList->setColumnWidthMode(0, Q3ListView::Manual);
-    processList->setColumnAlignment(1, Qt::AlignRight);
-    processList->setColumnAlignment(2, Qt::AlignRight);
+    processList->header()->setResizeMode(0, QHeaderView::Interactive);
+    processList->header()->setResizeMode(1, QHeaderView::ResizeToContents);
+    processList->header()->setResizeMode(2, QHeaderView::ResizeToContents);
+    processList->headerItem()->setTextAlignment(1, Qt::AlignRight);
+    processList->headerItem()->setTextAlignment(2, Qt::AlignRight);
+    processList->header()->setStretchLastSection(false);
 
     runPS();
 }
@@ -44,7 +48,7 @@ ProcAttachPS::~ProcAttachPS()
 void ProcAttachPS::runPS()
 {
     // clear the parse state from previous runs
-    m_token = "";
+    m_token.clear();
     m_line.clear();
     m_pidCol = -1;
     m_ppidCol = -1;
@@ -72,6 +76,9 @@ void ProcAttachPS::slotTextReceived()
     char* buffer = data.data();
     char* end = buffer + data.size();
 
+    // avoid expensive updates while items are inserted
+    processList->setUpdatesEnabled(false);
+
     while (buffer < end)
     {
 	// check new line
@@ -80,7 +87,7 @@ void ProcAttachPS::slotTextReceived()
 	    // push a tokens onto the line
 	    if (!m_token.isEmpty()) {
 		m_line.push_back(QString::fromLatin1(m_token));
-		m_token = "";
+		m_token.clear();
 	    }
 	    // and insert the line in the list
 	    pushLine();
@@ -88,13 +95,13 @@ void ProcAttachPS::slotTextReceived()
 	    ++buffer;
 	}
 	// blanks: the last column gets the rest of the line, including blanks
-	else if ((m_pidCol < 0 || int(m_line.size()) < processList->columns()-1) &&
+	else if ((m_pidCol < 0 || int(m_line.size()) < processList->columnCount()-1) &&
 		 isspace(*buffer))
 	{
 	    // push a token onto the line
 	    if (!m_token.isEmpty()) {
 		m_line.push_back(QString::fromLatin1(m_token));
-		m_token = "";
+		m_token.clear();
 	    }
 	    do {
 		++buffer;
@@ -108,9 +115,10 @@ void ProcAttachPS::slotTextReceived()
 		++buffer;
 	    } while (buffer < end && !isspace(*buffer));
 	    // append to the current token
-	    m_token += Q3CString(start, buffer-start+1);	// must count the '\0'
+	    m_token += QByteArray(start, buffer-start);
 	}
     }
+    processList->setUpdatesEnabled(true);
 }
 
 void ProcAttachPS::pushLine()
@@ -121,12 +129,16 @@ void ProcAttachPS::pushLine()
     if (m_pidCol < 0)
     {
 	// create columns if we don't have them yet
-	bool allocate =	processList->columns() == 3;
+	bool allocate =	processList->columnCount() == 3;
 
 	// we assume that the last column is the command
 	m_line.pop_back();
 
-	for (int i = 0; i < m_line.size(); i++) {
+	if (allocate)
+	    processList->setColumnCount(1 + m_line.size());
+
+	for (size_t i = 0; i < m_line.size(); i++)
+	{
 	    // we don't allocate the PID and PPID columns,
 	    // but we need to know where in the ps output they are
 	    if (m_line[i] == "PID") {
@@ -134,10 +146,12 @@ void ProcAttachPS::pushLine()
 	    } else if (m_line[i] == "PPID") {
 		m_ppidCol = i;
 	    } else if (allocate) {
-		processList->addColumn(m_line[i]);
+		processList->headerItem()->setText(i+1, m_line[i]);
 		// these columns are normally numbers
-		processList->setColumnAlignment(processList->columns()-1,
-						Qt::AlignRight);
+		processList->headerItem()->setTextAlignment(i+1,
+					Qt::AlignRight);
+		processList->header()->setResizeMode(i+1,
+					QHeaderView::ResizeToContents);
 	    }
 	}
     }
@@ -145,30 +159,36 @@ void ProcAttachPS::pushLine()
     {
 	// insert a line
 	// find the parent process
-	Q3ListViewItem* parent = 0;
+	QTreeWidgetItem* parent = 0;
 	if (m_ppidCol >= 0 && m_ppidCol < int(m_line.size())) {
-	    parent = processList->findItem(m_line[m_ppidCol], 1);
+	    QList<QTreeWidgetItem*> items =
+	    	processList->findItems(m_line[m_ppidCol], Qt::MatchFixedString|Qt::MatchRecursive, 1);
+	    if (!items.isEmpty())
+		parent = items.front();
 	}
 
 	// we assume that the last column is the command
-	Q3ListViewItem* item;
+	QTreeWidgetItem* item;
 	if (parent == 0) {
-	    item = new Q3ListViewItem(processList, m_line.back());
+	    item = new QTreeWidgetItem(processList, QStringList(m_line.back()));
 	} else {
-	    item = new Q3ListViewItem(parent, m_line.back());
+	    item = new QTreeWidgetItem(parent, QStringList(m_line.back()));
 	}
-	item->setOpen(true);
+	item->setExpanded(true);
 	m_line.pop_back();
 	int k = 3;
-	for (int i = 0; i < m_line.size(); i++)
+	for (size_t i = 0; i < m_line.size(); i++)
 	{
 	    // display the pid and ppid columns' contents in columns 1 and 2
+	    int col;
 	    if (int(i) == m_pidCol)
-		item->setText(1, m_line[i]);
+		col = 1;
 	    else if (int(i) == m_ppidCol)
-		item->setText(2, m_line[i]);
+		col = 2;
 	    else
-		item->setText(k++, m_line[i]);
+		col = k++;
+	    item->setText(col, m_line[i]);
+	    item->setTextAlignment(col, Qt::AlignRight);
 	}
 
 	if (m_ppidCol >= 0 && m_pidCol >= 0) {	// need PID & PPID for this
@@ -178,16 +198,15 @@ void ProcAttachPS::pushLine()
 	     * were placed at the root. Here we go through all root items
 	     * and check whether we must reparent them.
 	     */
-	    Q3ListViewItem* i = processList->firstChild();
-	    while (i != 0)
+	    int i = 0;
+	    while (i < processList->topLevelItemCount())
 	    {
-		// advance before we reparent the item
-		Q3ListViewItem* it = i;
-		i = i->nextSibling();
+		QTreeWidgetItem* it = processList->topLevelItem(i);
 		if (it->text(2) == m_line[m_pidCol]) {
-		    processList->takeItem(it);
-		    item->insertItem(it);
-		}
+		    processList->takeTopLevelItem(i);
+		    item->addChild(it);
+		} else
+		    ++i;
 	    }
 	}
     }
@@ -200,7 +219,7 @@ void ProcAttachPS::slotPSDone()
 
 QString ProcAttachPS::text() const
 {
-    Q3ListViewItem* item = processList->selectedItem();
+    QTreeWidgetItem* item = processList->currentItem();
 
     if (item == 0)
 	return QString();
@@ -220,30 +239,30 @@ void ProcAttachPS::on_buttonRefresh_clicked()
 
 void ProcAttachPS::on_filterEdit_textChanged(const QString& text)
 {
-    for (Q3ListViewItem* i = processList->firstChild(); i; i = i->nextSibling())
-	setVisibility(i, text);
+    for (int i = 0; i < processList->topLevelItemCount(); i++)
+	setVisibility(processList->topLevelItem(i), text);
 }
 
 /**
  * Sets the visibility of \a i and
  * returns whether it was made visible.
  */
-bool ProcAttachPS::setVisibility(Q3ListViewItem* i, const QString& text)
+bool ProcAttachPS::setVisibility(QTreeWidgetItem* i, const QString& text)
 {
-    i->setVisible(true);
+    i->setHidden(false);
     bool visible = false;
-    for (Q3ListViewItem* j = i->firstChild(); j; j = j->nextSibling())
+    for (int j = 0; j < i->childCount(); j++)
     {
-	if (setVisibility(j, text))
+	if (setVisibility(i->child(j), text))
 	    visible = true;
     }
     // look for text in the process name and in the PID
     visible = visible || text.isEmpty() ||
-	i->text(0).find(text, 0, false) >= 0 ||
-	i->text(1).find(text) >= 0;
+	i->text(0).indexOf(text, 0, Qt::CaseInsensitive) >= 0 ||
+	i->text(1).indexOf(text) >= 0;
 
     if (!visible)
-	i->setVisible(false);
+	i->setHidden(true);
 
     // disable the OK button if the selected item becomes invisible
     if (i->isSelected())
@@ -252,24 +271,24 @@ bool ProcAttachPS::setVisibility(Q3ListViewItem* i, const QString& text)
     return visible;
 }
 
-void ProcAttachPS::on_processList_selectionChanged()
+void ProcAttachPS::on_processList_currentItemChanged()
 {
-    dialogButtons->button(QDialogButtonBox::Ok)->setEnabled(processList->selectedItem() != 0);
+    dialogButtons->button(QDialogButtonBox::Ok)->setEnabled(processList->currentItem() != 0);
 }
 
 
 ProcAttach::ProcAttach(QWidget* parent) :
-	QDialog(parent, "procattach", true),
-	m_label(this, "label"),
-	m_processId(this, "procid"),
-	m_buttonOK(this, "ok"),
-	m_buttonCancel(this, "cancel"),
-	m_layout(this, 8),
-	m_buttons(4)
+	QDialog(parent),
+	m_label(this),
+	m_processId(this),
+	m_buttonOK(this),
+	m_buttonCancel(this),
+	m_layout(this),
+	m_buttons()
 {
     QString title = KGlobal::caption();
     title += i18n(": Attach to process");
-    setCaption(title);
+    setWindowTitle(title);
 
     m_label.setMinimumSize(330, 24);
     m_label.setText(i18n("Specify the process number to attach to:"));

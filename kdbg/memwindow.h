@@ -7,11 +7,11 @@
 #ifndef MEMWINDOW_H
 #define MEMWINDOW_H
 
-#include <Q3PopupMenu>
-#include <Q3ListView>
+#include <QBoxLayout>
 #include <QComboBox>
 #include <QMap>
-#include <Q3VBoxLayout>
+#include <QMenu>
+#include <QTreeWidget>
 #include "dbgdriver.h"
 
 class KDebugger;
@@ -30,23 +30,23 @@ protected:
     KDebugger* m_debugger;
     QComboBox m_expression;
 
-    Q3ListView m_memory;
+    QTreeWidget m_memory;
     QMap<QString,QString> m_old_memory;
 
-    Q3VBoxLayout m_layout;
+    QBoxLayout m_layout;
 
     unsigned m_format;
     QMap<QString,unsigned> m_formatCache;
 
-    Q3PopupMenu m_popup;
+    QMenu m_popup;
 
-    virtual bool eventFilter(QObject* o, QEvent* ev);
-    void handlePopup(QMouseEvent* ev);
+    virtual void contextMenuEvent(QContextMenuEvent* ev);
     void displayNewExpression(const QString& expr);
 
 public slots:
     void slotNewExpression(const QString&);
-    void slotTypeChange(int id);
+    void slotNewExpression();
+    void slotTypeChange(QAction*);
     void slotNewMemoryDump(const QString&, const std::list<MemoryDump>&);
     void saveProgramSpecific(KConfigBase* config);
     void restoreProgramSpecific(KConfigBase* config);

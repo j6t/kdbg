@@ -6,10 +6,10 @@
 
 #include "watchwindow.h"
 #include <klocale.h>			/* i18n */
-#include <Q3DragObject>
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QKeyEvent>
+#include <QMimeData>
 
 WatchWindow::WatchWindow(QWidget* parent) :
 	QWidget(parent),
@@ -36,7 +36,7 @@ WatchWindow::WatchWindow(QWidget* parent) :
     connect(&m_watchEdit, SIGNAL(returnPressed()), SIGNAL(addWatch()));
     connect(&m_watchAdd, SIGNAL(clicked()), SIGNAL(addWatch()));
     connect(&m_watchDelete, SIGNAL(clicked()), SIGNAL(deleteWatch()));
-    connect(&m_watchVariables, SIGNAL(currentChanged(Q3ListViewItem*)),
+    connect(&m_watchVariables, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)),
 	    SLOT(slotWatchHighlighted()));
 
     m_watchVariables.installEventFilter(this);
@@ -62,23 +62,24 @@ bool WatchWindow::eventFilter(QObject*, QEvent* ev)
 
 void WatchWindow::dragEnterEvent(QDragEnterEvent* event)
 {
-    event->accept(Q3TextDrag::canDecode(event));
+    if (event->mimeData()->hasText())
+	event->acceptProposedAction();
 }
 
 void WatchWindow::dropEvent(QDropEvent* event)
 {
-    QString text;
-    if (Q3TextDrag::decode(event, text))
-    {
+    if (event->mimeData()->hasText()) {
+	QString text = event->mimeData()->text();
 	// pick only the first line
-	text = text.stripWhiteSpace();
-	int pos = text.find('\n');
+	text = text.trimmed();
+	int pos = text.indexOf('\n');
 	if (pos > 0)
 	    text.truncate(pos);
-	text = text.stripWhiteSpace();
+	text = text.trimmed();
 	if (!text.isEmpty())
 	    emit textDropped(text);
     }
+    event->acceptProposedAction();
 }
 
 

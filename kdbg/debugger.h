@@ -7,8 +7,10 @@
 #ifndef DEBUGGER_H
 #define DEBUGGER_H
 
-#include <Q3Dict>
+#include <QSet>
 #include <QStringList>
+#include <list>
+#include <map>
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
 
@@ -29,7 +31,6 @@ class Breakpoint;
 struct DisassembledCode;
 struct MemoryDump;
 struct DbgAddr;
-class K3Process;
 
 
 class KDebugger : public QObject
@@ -352,7 +353,7 @@ protected:
     void stopDriver();
     void writeCommand();
     
-    QStringList m_watchEvalExpr;	/* exprs to evaluate for watch window */
+    std::list<QString> m_watchEvalExpr;	/* exprs to evaluate for watch window */
     std::list<Breakpoint> m_brkpts;
     QString m_memoryExpression;		/* memory location to watch */
     unsigned m_memoryFormat;		/* how that output should look */
@@ -363,8 +364,8 @@ protected:
     void handleRunCommands(const char* output);
     void updateAllExprs();
     void updateProgEnvironment(const QString& args, const QString& wd,
-			       const Q3Dict<EnvVar>& newVars,
-			       const QStringList& newOptions);
+			       const std::map<QString,EnvVar>& newVars,
+			       const QSet<QString>& newOptions);
     void parseLocals(const char* output, std::list<ExprValue*>& newVars);
     void handleLocals(const char* output);
     bool handlePrint(CmdQueueItem* cmd, const char* output);
@@ -416,8 +417,8 @@ protected:
     QString m_programArgs;
     QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
-    Q3Dict<EnvVar> m_envVars;		/* environment variables set by user */
-    QStringList m_boolOptions;		/* boolean options */
+    std::map<QString,QString> m_envVars;	/* environment variables set by user */
+    QSet<QString> m_boolOptions;	/* boolean options */
     QStringList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable;	/* known types used by the program */
     KConfig* m_programConfig;		/* program-specific settings (brkpts etc) */
@@ -432,11 +433,11 @@ protected:
     QString m_statusMessage;
 
 protected slots:
-    void gdbExited(K3Process*);
+    void gdbExited();
     void slotInferiorRunning();
     void backgroundUpdate();
     void gotoFrame(int);
-    void slotExpanding(Q3ListViewItem*);
+    void slotExpanding(QTreeWidgetItem*);
     void slotDeleteWatch();
     void slotValuePopup(const QString&);
     void slotDisassemble(const QString&, int);

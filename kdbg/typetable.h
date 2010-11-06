@@ -4,7 +4,6 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <Q3Dict>
 #include <QString>
 #include <QRegExp>
 #include <QStringList>
@@ -77,7 +76,8 @@ public:
     TypeTable();
     ~TypeTable();
 
-    typedef std::map<QString,TypeInfo*> TypeMap;
+    typedef std::map<QString,TypeInfo> TypeInfoMap;
+    typedef std::map<QString,const TypeInfo*> TypeInfoRefMap;
 
     /**
      * Load all known type libraries.
@@ -87,18 +87,18 @@ public:
     /**
      * Copy type infos to the specified dictionary.
      */
-    void copyTypes(Q3Dict<TypeInfo>& dict);
+    void copyTypes(TypeInfoRefMap& dict);
 
     /**
      * Returns the template types
      */
-    const TypeMap& templates() const { return m_templates; }
+    const TypeInfoMap& templates() const { return m_templates; }
 
     /**
      * Does the file name match this library?
      */
     bool matchFileName(const QString& fileName) const {
-	return m_shlibNameRE.search(fileName) >= 0;
+	return m_shlibNameRE.indexIn(fileName) >= 0;
     }
 
     /**
@@ -109,7 +109,7 @@ public:
     /**
      * Returns the command to print the QString data.
      */
-    const char* printQStringDataCmd() const { return m_printQStringDataCmd; }
+    const char* printQStringDataCmd() const { return m_printQStringDataCmd.constData(); }
     
 protected:
     /**
@@ -118,13 +118,13 @@ protected:
     static void loadTypeTables();
     void loadFromFile(const QString& fileName);
     void readType(const KConfigGroup& cf, const QString& type);
-    Q3Dict<TypeInfo> m_typeDict;
-    Q3Dict<TypeInfo> m_aliasDict;
-    TypeMap m_templates;
+    TypeInfoMap m_typeDict;
+    TypeInfoRefMap m_aliasDict;
+    TypeInfoMap m_templates;
     QString m_displayName;
     QRegExp m_shlibNameRE;
     QStringList m_enabledBuiltins;
-    char* m_printQStringDataCmd;
+    QByteArray m_printQStringDataCmd;
 };
 
 
@@ -153,12 +153,12 @@ public:
      * 
      * If the type is unknown, 0 is returned.
      */
-    TypeInfo* lookup(QString type);
+    const TypeInfo* lookup(QString type);
 
     /**
      * Adds a new alias for a type name.
      */
-    void registerAlias(const QString& name, TypeInfo* type);
+    void registerAlias(const QString& name, const TypeInfo* type);
 
     /**
      * Tells whether we use built-in support to understand QStrings.
@@ -176,18 +176,18 @@ public:
     const char* printQStringDataCmd() const { return m_printQStringDataCmd; }
 
 protected:
-    Q3Dict<TypeInfo> m_types;
-    Q3Dict<TypeInfo> m_aliasDict;
+    TypeTable::TypeInfoRefMap m_types;
+    TypeTable::TypeInfoRefMap m_aliasDict;
     struct TemplateInfo {
 	QStringList templateArgs;
-	TypeInfo* type;
+	const TypeInfo* type;
     };
     typedef std::multimap<QString, TemplateInfo> TemplateMap;
     TemplateMap m_templates;	//!< one or more template patterns per template name
     static TemplateMap::value_type
-		template2Info(const TypeTable::TypeMap::value_type& tt);
+		template2Info(const TypeTable::TypeInfoMap::value_type& tt);
     static QStringList splitTemplateArgs(const QString& t);
     bool m_parseQt2QStrings;
     bool m_QCharIsShort;
-    const char* m_printQStringDataCmd;
+    QByteArray m_printQStringDataCmd;
 };

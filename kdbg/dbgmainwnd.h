@@ -12,13 +12,12 @@
 #include "regwnd.h"
 
 class QDockWidget;
-class K3Process;
+class QProcess;
 class KAnimatedButton;
 class KRecentFilesAction;
 class KUrl;
 class WinStack;
 class QListWidget;
-class Q3ListViewItem;
 class ExprWnd;
 class BreakpointTable;
 class ThreadList;
@@ -140,11 +139,10 @@ protected:
     // output window
     QString m_outputTermCmdStr;
     QString m_outputTermKeepScript;
-    K3Process* m_outputTermProc;
+    QProcess* m_outputTermProc;
     int m_ttyLevel;
 
     QString createOutputWindow();
-    void shutdownTermWindow();
 
     bool m_popForeground;		/* whether main wnd raises when prog stops */
     int m_backTimeout;			/* when wnd goes back */
@@ -183,11 +181,10 @@ public slots:
     void slotDebuggerStarting();
     void slotToggleBreak(const QString&, int, const DbgAddr&, bool);
     void slotEnaDisBreak(const QString&, int, const DbgAddr&);
-    void slotTermEmuExited();
     void slotProgramStopped();
     void slotBackTimer();
     void slotRecentExec(const KUrl& url);
-    void slotLocalsPopup(Q3ListViewItem*, const QPoint& pt);
+    void slotLocalsPopup(const QPoint& pt);
     void slotLocalsToWatch();
     void slotEditValue();
 

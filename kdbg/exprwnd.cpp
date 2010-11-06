@@ -7,17 +7,19 @@
 #include "exprwnd.h"
 #include "exprwnd.moc"
 #include "typetable.h"
+#include <QHeaderView>
 #include <QStringList>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QFocusEvent>
 #include <QKeyEvent>
+#include <QScrollBar>
 #include <kiconloader.h>		/* icons */
 #include <klocale.h>			/* i18n */
 #include "mydebug.h"
 
-VarTree::VarTree(VarTree* parent, Q3ListViewItem* after, ExprValue* v) :
-	Q3ListViewItem(parent, after),
+VarTree::VarTree(VarTree* parent, ExprValue* v) :
+	QTreeWidgetItem(parent),
 	m_varKind(v->m_varKind),
 	m_nameKind(v->m_nameKind),
 	m_type(0),
@@ -27,14 +29,17 @@ VarTree::VarTree(VarTree* parent, Q3ListViewItem* after, ExprValue* v) :
 	m_baseChanged(false),
 	m_structChanged(false)
 {
-    Q3ListViewItem::setText(0, v->m_name);
+    setText(v->m_name);
     updateValueText();
-    setExpandable(m_varKind == VarTree::VKpointer);
-    setOpen(v->m_initiallyExpanded);
+    if (v->m_initiallyExpanded || m_varKind == VarTree::VKpointer)
+	setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
+    else
+	setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
+    setExpanded(v->m_initiallyExpanded);
 }
 
-VarTree::VarTree(ExprWnd* parent, Q3ListViewItem* after, const QString& name) :
-	Q3ListViewItem(parent, after),
+VarTree::VarTree(ExprWnd* parent, const QString& name) :
+	QTreeWidgetItem(parent),
 	m_varKind(VKsimple),
 	m_nameKind(VarTree::NKplain),
 	m_type(0),
@@ -43,22 +48,11 @@ VarTree::VarTree(ExprWnd* parent, Q3ListViewItem* after, const QString& name) :
 	m_baseChanged(false),
 	m_structChanged(false)
 {
-    Q3ListViewItem::setText(0, name);
+    setText(name);
 }
 
 VarTree::~VarTree()
 {
-}
-
-void VarTree::paintCell(QPainter* p, const QColorGroup& cg, int column, int width, int align)
-{
-    if (column == 1 && (m_baseChanged || m_structChanged)) {
-	QColorGroup cgChg = cg;
-	cgChg.setColor(QColorGroup::Text, Qt::red);
-	Q3ListViewItem::paintCell(p, cgChg, column, width, align);
-    } else {
-	Q3ListViewItem::paintCell(p, cg, column, width, align);
-    }
 }
 
 QString VarTree::computeExpr() const
@@ -122,7 +116,7 @@ bool VarTree::isToplevelExpr() const
 
 bool VarTree::isAncestorEq(const VarTree* child) const
 {
-    const Q3ListViewItem* c = child;
+    const QTreeWidgetItem* c = child;
     while (c != 0 && c != this) {
 	c = c->parent();
     }
@@ -136,6 +130,9 @@ bool VarTree::updateValue(const QString& newValue)
     if ((m_baseChanged = m_baseValue != newValue)) {
 	m_baseValue = newValue;
 	updateValueText();
+	setForeground(1, QBrush(QColor(Qt::red)));
+    } else if (prevValueChanged) {
+	setForeground(1, treeWidget()->palette().text());
     }
     /*
      * We must repaint the cell if the value changed. If it did not change,
@@ -153,6 +150,9 @@ bool VarTree::updateStructValue(const QString& newValue)
     if ((m_structChanged = m_structValue != newValue)) {
 	m_structValue = newValue;
 	updateValueText();
+	setForeground(1, QBrush(QColor(Qt::red)));
+    } else if (prevValueChanged) {
+	setForeground(1, treeWidget()->palette().text());
     }
     /*
     * We must repaint the cell if the value changed. If it did not change,
@@ -166,11 +166,11 @@ bool VarTree::updateStructValue(const QString& newValue)
 void VarTree::updateValueText()
 {
     if (m_baseValue.isEmpty()) {
-	Q3ListViewItem::setText(1, m_structValue);
+	setText(1, m_structValue);
     } else if (m_structValue.isEmpty()) {
-	Q3ListViewItem::setText(1, m_baseValue);
+	setText(1, m_baseValue);
     } else {
-	Q3ListViewItem::setText(1, m_baseValue + " " + m_structValue);
+	setText(1, m_baseValue + " " + m_structValue);
     }
 }
 
@@ -183,10 +183,9 @@ void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
      */
 
     // first recurse children
-    VarTree* child = firstChild();
-    while (child != 0) {
-	child->inferTypesOfChildren(typeTable);
-	child = child->nextSibling();
+    for (int i = 0; i < childCount(); i++)
+    {
+	child(i)->inferTypesOfChildren(typeTable);
     }
 
     // if this is a pointer, get the type from the value (less the pointer)
@@ -198,7 +197,7 @@ void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
 	     * of characters is printed similar to how QStrings are decoded.
 	     */
 	    m_varKind = VKstruct;
-	    setExpandable(false);
+	    setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
 	}
 	// don't know how to do this cleanly
     } else if (m_varKind == VKstruct) {
@@ -241,21 +240,21 @@ bool VarTree::isWcharT() const
 /*
  * Get the type of the first base class whose type we know.
  */
-TypeInfo* VarTree::inferTypeFromBaseClass()
+const TypeInfo* VarTree::inferTypeFromBaseClass()
 {
     if (m_varKind == VKstruct) {
-	VarTree* child = firstChild();
-	while (child != 0 &&
-	       // only check base class parts (i.e. type names)
-	       child->m_nameKind == NKtype)
+	for (int i = 0; i < childCount(); i++)
 	{
+	    VarTree* child = VarTree::child(i);
+	    // only check base class parts (i.e. type names)
+	    if (child->m_nameKind != NKtype)
+		break;
 	    if (child->m_type != 0 &&
 		child->m_type != TypeInfo::unknownType())
 	    {
 		// got a type!
 		return child->m_type;
 	    }
-	    child = child->nextSibling();
 	}
     }
     return 0;
@@ -305,14 +304,17 @@ int ExprValue::childCount() const
 
 
 ExprWnd::ExprWnd(QWidget* parent, const QString& colHeader) :
-	Q3ListView(parent),
+	QTreeWidget(parent),
 	m_edit(0)
 {
-    addColumn(colHeader);
-    addColumn(i18n("Value"));
-    setSorting(-1);		// do not sort items
-    setColumnWidthMode(0, Manual);
-    setColumnWidthMode(1, Maximum);
+    QTreeWidgetItem* pHeaderItem = new QTreeWidgetItem();
+    pHeaderItem->setText(0, colHeader);
+    pHeaderItem->setText(1, i18n("Value"));
+    setHeaderItem(pHeaderItem);
+    header()->setResizeMode(0, QHeaderView::Interactive);
+    header()->setResizeMode(1, QHeaderView::Interactive);
+
+    setSortingEnabled(false);		// do not sort items
     setRootIsDecorated(true);
     setAllColumnsShowFocus(true);
 
@@ -328,9 +330,9 @@ ExprWnd::~ExprWnd()
 QStringList ExprWnd::exprList() const
 {
     QStringList exprs;
-    VarTree* item;
-    for (item = firstChild(); item != 0; item = item->nextSibling()) {
-	exprs.append(item->getText());
+    for (int i = 0; i < topLevelItemCount(); i++)
+    {
+	exprs.append(topLevelItem(i)->getText());
     }
     return exprs;
 }
@@ -338,11 +340,7 @@ QStringList ExprWnd::exprList() const
 VarTree* ExprWnd::insertExpr(ExprValue* expr, ProgramTypeTable& typeTable)
 {
     // append a new dummy expression
-    VarTree* last = 0;	// last top-level item
-    for (VarTree* i = firstChild(); i != 0; i = i->nextSibling()) {
-	last = i;
-    }
-    VarTree* display = new VarTree(this, last, expr->m_name);
+    VarTree* display = new VarTree(this, expr->m_name);
 
     // replace it right away
     updateExpr(display, expr, typeTable);
@@ -352,9 +350,14 @@ VarTree* ExprWnd::insertExpr(ExprValue* expr, ProgramTypeTable& typeTable)
 void ExprWnd::updateExpr(ExprValue* expr, ProgramTypeTable& typeTable)
 {
     // search the root variable
-    VarTree* item = firstChild();
-    while (item != 0 && item->getText() != expr->m_name)
-	item = item->nextSibling();
+    VarTree* item = 0;
+    for (int i = 0; i < topLevelItemCount(); i++)
+    {
+	if (topLevelItem(i)->getText() == expr->m_name) {
+	    item = topLevelItem(i);
+	    break;
+	}
+    }
     if (item == 0) {
 	return;
     }
@@ -374,7 +377,7 @@ void ExprWnd::updateExpr(VarTree* display, ExprValue* newValues, ProgramTypeTabl
  */
 void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeTable& typeTable)
 {
-    bool isExpanded = display->isOpen();
+    bool isExpanded = display->isExpanded();
 
     /*
      * If we are updating a pointer without children by a dummy, we don't
@@ -407,7 +410,7 @@ void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	  newValues->m_child != 0)))
     {
 	if (isExpanded) {
-	    display->setOpen(false);
+	    display->setExpanded(false);
 	}
 
 	// since children changed, it is likely that the type has also changed
@@ -420,7 +423,15 @@ void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	// update the m_varKind
 	if (newValues->m_varKind != VarTree::VKdummy) {
 	    display->m_varKind = newValues->m_varKind;
-	    display->setExpandable(newValues->m_varKind == VarTree::VKpointer);
+	    switch (display->m_varKind) {
+	    case VarTree::VKpointer:
+	    case VarTree::VKstruct:
+		display->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
+		break;
+	    default:
+		display->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
+		break;
+	    }
 	}
 
 	// get some types (after the new m_varKind has been set!)
@@ -455,9 +466,10 @@ void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
     ASSERT(display->childCount() == newValues->childCount());
 
     // go for children
-    VarTree* vDisplay = display->firstChild();
     ExprValue* vNew = newValues->m_child;
-    while (vDisplay != 0) {
+    for (int i = 0; i < display->childCount(); i++)
+    {
+	VarTree* vDisplay = display->child(i);
 	// check whether the names are the same
 	if (vDisplay->getText() != vNew->m_name) {
 	    // set new name
@@ -466,7 +478,6 @@ void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	// recurse
 	updateExprRec(vDisplay, vNew, typeTable);
 
-	vDisplay = vDisplay->nextSibling();
 	vNew = vNew->m_next;
     }
 }
@@ -502,18 +513,14 @@ void ExprWnd::updateSingleExpr(VarTree* display, ExprValue* newValue)
 	m_updateStruct.push_back(display);
     }
 
-    if (display->updateValue(newValue->m_value)) {
-	triggerUpdate();
-    }
+    display->updateValue(newValue->m_value);
 }
 
 void ExprWnd::updateStructValue(VarTree* display)
 {
     ASSERT(display->m_varKind == VarTree::VKstruct);
 
-    if (display->updateStructValue(display->m_partialValue)) {
-	triggerUpdate();
-    }
+    display->updateStructValue(display->m_partialValue);
     // reset the value
     display->m_partialValue = "";
     display->m_exprIndex = -1;
@@ -524,15 +531,14 @@ void ExprWnd::replaceChildren(VarTree* display, ExprValue* newValues)
     ASSERT(display->childCount() == 0 || display->m_varKind != VarTree::VKsimple);
 
     // delete all children of display
-    while (VarTree* c = display->firstChild()) {
+    while (VarTree* c = display->child(0)) {
 	unhookSubtree(c);
 	delete c;
     }
     // insert copies of the newValues
-    VarTree* vNew = 0;
     for (ExprValue* v = newValues->m_child; v != 0; v = v->m_next)
     {
-	vNew = new VarTree(display, vNew, v);
+	VarTree* vNew = new VarTree(display, v);
 	// recurse
 	replaceChildren(vNew, v);
     }
@@ -540,10 +546,10 @@ void ExprWnd::replaceChildren(VarTree* display, ExprValue* newValues)
 
 void ExprWnd::collectUnknownTypes(VarTree* var)
 {
-    Q3ListViewItemIterator i(var);
-    for (; i.current(); ++i)
+    QTreeWidgetItemIterator i(var);
+    for (; *i; ++i)
     {
-	checkUnknownType(static_cast<VarTree*>(i.current()));
+	checkUnknownType(static_cast<VarTree*>(*i));
     }
 }
 
@@ -575,7 +581,7 @@ void ExprWnd::checkUnknownType(VarTree* var)
 
 QString ExprWnd::formatWCharPointer(QString value)
 {
-    int pos = value.find(") ");
+    int pos = value.indexOf(") ");
     if (pos > 0)
 	value = value.mid(pos+2);
     return value + " L";
@@ -584,11 +590,12 @@ QString ExprWnd::formatWCharPointer(QString value)
 
 VarTree* ExprWnd::topLevelExprByName(const QString& name) const
 {
-    VarTree* item = firstChild();
-    while (item != 0 && item->getText() != name)
-	item = item->nextSibling();
-
-    return item;
+    for (int i = 0; i < topLevelItemCount(); i++)
+    {
+	if (topLevelItem(i)->getText() == name)
+	    return topLevelItem(i);
+    }
+    return 0;
 }
 
 VarTree* ExprWnd::ptrMemberByName(VarTree* v, const QString& name)
@@ -598,32 +605,30 @@ VarTree* ExprWnd::ptrMemberByName(VarTree* v, const QString& name)
 	return 0;
 
     // the only child of v is the pointer value that represents the struct
-    VarTree* item = v->firstChild();
+    VarTree* item = v->child(0);
     return memberByName(item, name);
 }
 
 VarTree* ExprWnd::memberByName(VarTree* v, const QString& name)
 {
     // search immediate children for name
-    VarTree* item = v->firstChild();
-    while (item != 0 && item->getText() != name)
-	item = item->nextSibling();
-
-    if (item != 0)
-	return item;
+    for (int i = 0; i < v->childCount(); i++)
+    {
+	if (v->child(i)->getText() == name)
+	    return v->child(i);
+    }
 
     // try in base classes and members that are anonymous structs or unions
-    item = v->firstChild();
-    while (item != 0)
+    for (int i = 0; i < v->childCount(); i++)
     {
+	VarTree* item = v->child(i);
 	if (item->m_nameKind == VarTree::NKtype ||
 	    item->m_nameKind == VarTree::NKanonymous)
 	{
-	    v = memberByName(item, name);
-	    if (v != 0)
-		return v;
+	    item = memberByName(item, name);
+	    if (item != 0)
+		return item;
 	}
-	item = item->nextSibling();
     }
     return 0;
 }
@@ -703,12 +708,11 @@ void ExprWnd::editValue(VarTree* item, const QString& text)
     if (m_edit == 0)
 	m_edit = new ValueEdit(this);
 
-    QRect r = itemRect(item);
-    int x = r.x()+columnWidth(0);
+    QRect r = visualItemRect(item);
+    int x = columnViewportPosition(1);
     int y = r.y();
     int w = columnWidth(1);
     int h = r.height();
-    Q3ListView* lv = item->listView();
 
     /*
      * Make the edit widget at least 5 characters wide (but not wider than
@@ -720,13 +724,14 @@ void ExprWnd::editValue(VarTree* item, const QString& text)
     int wMin = metr.width("88888");
     if (w < wMin)
 	w = wMin;
-    int wThis = lv->visibleWidth();
+    int wThis = viewport()->width();
     if (x >= wThis/2 &&		// less than half the width displays text
 	x+w > wThis)		// not all text is visible
     {
 	// scroll so that more text is visible
-	int wScroll = QMIN(x-wThis/2, x+w-wThis);
-	lv->scrollBy(wScroll, 0);
+	QScrollBar* pScrollBar = horizontalScrollBar();
+	int wScroll = qMin(x-wThis/2, x+w-wThis);
+	pScrollBar->setValue(pScrollBar->value() + wScroll);
 	x -= wScroll;
     }
     else if (x < 0)
@@ -754,15 +759,19 @@ bool ExprWnd::isEditing() const
 
 
 ValueEdit::ValueEdit(ExprWnd* parent) :
-	QLineEdit(parent->viewport(), "valueedit")
+	QLineEdit(parent->viewport())
 {
     setFrame(false);
     hide();
     lower();	// lower the window below scrollbars
-    connect(parent, SIGNAL(selectionChanged()), SLOT(slotSelectionChanged()));
-    connect(parent, SIGNAL(currentChanged(Q3ListViewItem*)), SLOT(slotSelectionChanged()));
-    connect(parent, SIGNAL(expanded(Q3ListViewItem*)), SLOT(slotSelectionChanged()));
-    connect(parent, SIGNAL(collapsed(Q3ListViewItem*)), SLOT(slotSelectionChanged()));
+    connect(parent, SIGNAL(itemActivated(QTreeWidgetItem*,int)),
+	    SLOT(slotSelectionChanged()));
+    connect(parent, SIGNAL(currentItemChanged(QTreeWidgetItem*,QTreeWidgetItem*)),
+	    SLOT(slotSelectionChanged()));
+    connect(parent, SIGNAL(itemExpanded(QTreeWidgetItem*)),
+	    SLOT(slotSelectionChanged()));
+    connect(parent, SIGNAL(itemCollapsed(QTreeWidgetItem*)),
+	    SLOT(slotSelectionChanged()));
     connect(this, SIGNAL(done(VarTree*, const QString&)),
 	    parent, SIGNAL(editValueCommitted(VarTree*, const QString&)));
 }

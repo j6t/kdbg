@@ -5,7 +5,7 @@
  */
 
 #include "memwindow.h"
-#include <Q3Header>
+#include <QHeaderView>
 #include <QMouseEvent>
 #include <QList>
 #include <klocale.h>
@@ -14,125 +14,104 @@
 #include "debugger.h"
 
 
-class MemoryViewItem : public Q3ListViewItem
-{
-public:
-    MemoryViewItem(Q3ListView* parent, Q3ListViewItem* insertAfter, QString raw, QString cooked)
-        : Q3ListViewItem(parent, insertAfter, raw, cooked) {}
-
-    void setChanged(uint pos, bool b) { m_changed[pos] = b; }
-
-protected:
-    virtual void paintCell(QPainter* p, const QColorGroup& cg,
-			   int column, int width, int alignment);
-
-    bool m_changed[8];
-};
-
-void MemoryViewItem::paintCell(QPainter* p, const QColorGroup& cg,
-			       int column, int width, int alignment)
-{
-    if( column > 0 && m_changed[column - 1] ) {
-	QColorGroup newcg = cg;
-	newcg.setColor(QColorGroup::Text, Qt::red);
-	Q3ListViewItem::paintCell(p, newcg, column, width, alignment);
-    } else {
-	Q3ListViewItem::paintCell(p, cg, column, width, alignment);
-    }
-}
-
-
 MemoryWindow::MemoryWindow(QWidget* parent) :
 	QWidget(parent),
 	m_debugger(0),
-	m_expression(true, this, "expression"),
-	m_memory(this, "memory"),
-	m_layout(this, 0, 2),
+	m_expression(this),
+	m_memory(this),
+	m_layout(QBoxLayout::TopToBottom, this),
 	m_format(MDTword | MDThex)
 {
+    m_expression.setEditable(true);
     QSize minSize = m_expression.sizeHint();
     m_expression.setMinimumSize(minSize);
-    m_expression.setInsertionPolicy(QComboBox::NoInsertion);
+    m_expression.setInsertPolicy(QComboBox::NoInsert);
     m_expression.setMaxCount(15);
 
-    m_memory.addColumn(i18n("Address"), 80);
+    m_memory.setColumnCount(9);
+    m_memory.setHeaderLabel(i18n("Address"));
+    for (int i = 1; i < 9; i++) {
+	m_memory.hideColumn(i);
+	m_memory.header()->setResizeMode(QHeaderView::ResizeToContents);
+	m_memory.headerItem()->setText(i, QString());
+    }
+    m_memory.header()->setStretchLastSection(false);
 
-    m_memory.setSorting(-1);		/* don't sort */
+    m_memory.setSortingEnabled(false);		/* don't sort */
     m_memory.setAllColumnsShowFocus(true);
-    m_memory.header()->setClickEnabled(false);
+    m_memory.setRootIsDecorated(false);
+    m_memory.header()->setClickable(false);
+    m_memory.setContextMenuPolicy(Qt::NoContextMenu);	// defer to parent
 
     // create layout
+    m_layout.setSpacing(2);
     m_layout.addWidget(&m_expression, 0);
     m_layout.addWidget(&m_memory, 10);
     m_layout.activate();
 
     connect(&m_expression, SIGNAL(activated(const QString&)),
 	    this, SLOT(slotNewExpression(const QString&)));
+    connect(m_expression.lineEdit(), SIGNAL(returnPressed()),
+	    this, SLOT(slotNewExpression()));
 
     // the popup menu
-    m_popup.insertItem(i18n("B&ytes"), MDTbyte);
-    m_popup.insertItem(i18n("Halfwords (&2 Bytes)"), MDThalfword);
-    m_popup.insertItem(i18n("Words (&4 Bytes)"), MDTword);
-    m_popup.insertItem(i18n("Giantwords (&8 Bytes)"), MDTgiantword);
-    m_popup.insertSeparator();
-    m_popup.insertItem(i18n("He&xadecimal"), MDThex);
-    m_popup.insertItem(i18n("Signed &decimal"), MDTsigned);
-    m_popup.insertItem(i18n("&Unsigned decimal"), MDTunsigned);
-    m_popup.insertItem(i18n("&Octal"), MDToctal);
-    m_popup.insertItem(i18n("&Binary"), MDTbinary);
-    m_popup.insertItem(i18n("&Addresses"), MDTaddress);
-    m_popup.insertItem(i18n("&Character"), MDTchar);
-    m_popup.insertItem(i18n("&Floatingpoint"), MDTfloat);
-    m_popup.insertItem(i18n("&Strings"), MDTstring);
-    m_popup.insertItem(i18n("&Instructions"), MDTinsn);
-    connect(&m_popup, SIGNAL(activated(int)), this, SLOT(slotTypeChange(int)));
-
-    /*
-     * Handle right mouse button. Signal righteButtonClicked cannot be
-     * used, because it works only over items, not over the blank window.
-     */
-    m_memory.viewport()->installEventFilter(this);
+    QAction* pAction;
+    pAction = m_popup.addAction(i18n("B&ytes"));
+    pAction->setData(MDTbyte);
+    pAction = m_popup.addAction(i18n("Halfwords (&2 Bytes)"));
+    pAction->setData(MDThalfword);
+    pAction = m_popup.addAction(i18n("Words (&4 Bytes)"));
+    pAction->setData(MDTword);
+    pAction = m_popup.addAction(i18n("Giantwords (&8 Bytes)"));
+    pAction->setData(MDTgiantword);
+    m_popup.addSeparator();
+    pAction = m_popup.addAction(i18n("He&xadecimal"));
+    pAction->setData(MDThex);
+    pAction = m_popup.addAction(i18n("Signed &decimal"));
+    pAction->setData(MDTsigned);
+    pAction = m_popup.addAction(i18n("&Unsigned decimal"));
+    pAction->setData(MDTunsigned);
+    pAction = m_popup.addAction(i18n("&Octal"));
+    pAction->setData(MDToctal);
+    pAction = m_popup.addAction(i18n("&Binary"));
+    pAction->setData(MDTbinary);
+    pAction = m_popup.addAction(i18n("&Addresses"));
+    pAction->setData(MDTaddress);
+    pAction = m_popup.addAction(i18n("&Character"));
+    pAction->setData(MDTchar);
+    pAction = m_popup.addAction(i18n("&Floatingpoint"));
+    pAction->setData(MDTfloat);
+    pAction = m_popup.addAction(i18n("&Strings"));
+    pAction->setData(MDTstring);
+    pAction = m_popup.addAction(i18n("&Instructions"));
+    pAction->setData(MDTinsn);
+    connect(&m_popup, SIGNAL(triggered(QAction*)), this, SLOT(slotTypeChange(QAction*)));
 }
 
 MemoryWindow::~MemoryWindow()
 {
 }
 
-bool MemoryWindow::eventFilter(QObject*, QEvent* ev)
+void MemoryWindow::contextMenuEvent(QContextMenuEvent* ev)
 {
-    if (ev->type() == QEvent::MouseButtonRelease) {
-	handlePopup(static_cast<QMouseEvent*>(ev));
-	return true;
-    }
-    return false;
+    m_popup.popup(ev->globalPos());
+    ev->accept();
 }
 
-void MemoryWindow::handlePopup(QMouseEvent* ev)
+void MemoryWindow::slotNewExpression()
 {
-    if (ev->button() == Qt::RightButton)
-    {
-	// show popup menu
-	if (m_popup.isVisible())
-	{
-	    m_popup.hide();
-	}
-	else
-	{
-	    m_popup.popup(mapToGlobal(ev->pos()));
-	}
-	return;
-    }
+    slotNewExpression(m_expression.lineEdit()->text());
 }
 
 void MemoryWindow::slotNewExpression(const QString& newText)
 {
-    QString text = newText.simplifyWhiteSpace();
+    QString text = newText.simplified();
 
     // see if the string is in the list
     // (note: must count downwards because of removeItem!)
     for (int i = m_expression.count()-1; i >= 0; i--)
     {
-	if (m_expression.text(i) == text) {
+	if (m_expression.itemText(i) == text) {
 	    // yes it is!
 	    // look up the format that was used last time for this expr
 	    QMap<QString,unsigned>::iterator pFormat = m_formatCache.find(text);
@@ -144,7 +123,7 @@ void MemoryWindow::slotNewExpression(const QString& newText)
 	    m_expression.removeItem(i);
 	}
     }
-    m_expression.insertItem(text, 0);
+    m_expression.insertItem(0, text);
 
     if (!text.isEmpty()) {
 	m_formatCache[text] = m_format;
@@ -165,8 +144,10 @@ void MemoryWindow::displayNewExpression(const QString& expr)
     }
 }
 
-void MemoryWindow::slotTypeChange(int id)
+void MemoryWindow::slotTypeChange(QAction* action)
 {
+    int id = action->data().toInt();
+
     m_old_memory.clear();
 
     // compute new type
@@ -178,7 +159,7 @@ void MemoryWindow::slotTypeChange(int id)
 
     // change the format in the cache
     QString expr = m_expression.currentText();
-    m_formatCache[expr.simplifyWhiteSpace()] = m_format;
+    m_formatCache[expr.simplified()] = m_format;
 
     // force redisplay
     displayNewExpression(expr);
@@ -188,48 +169,42 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 {
     m_memory.clear();
     if (!msg.isEmpty()) {
-	new Q3ListViewItem(&m_memory, QString(), msg);
+	new QTreeWidgetItem(&m_memory, QStringList() << QString() << msg);
 	return;
     }
 
-    MemoryViewItem* after = 0;
     std::list<MemoryDump>::const_iterator md = memdump.begin();
 
-    // remove all columns, except the address column
-    for(int k = m_memory.columns() - 1; k > 0; k--)
-	m_memory.removeColumn(k);
-
-    //add the needed columns
-    QStringList sl = QStringList::split( "\t", md->dump );
-    for (int i = 0; i < sl.count(); i++)
-	m_memory.addColumn("", -1);
+    // show only needed columns
+    QStringList sl = md->dump.split( "\t" );
+    for (int i = m_memory.columnCount()-1; i > 0; i--)
+	m_memory.setColumnHidden(i, i > sl.count());
 
     QMap<QString,QString> tmpMap;
 
     for (; md != memdump.end(); ++md)
     {
 	QString addr = md->address.asString() + " " + md->address.fnoffs;
-	QStringList sl = QStringList::split( "\t", md->dump );
+	QStringList sl = md->dump.split( "\t" );
 
 	// save memory
 	tmpMap[addr] = md->dump;
 
-	after = new MemoryViewItem(&m_memory, after, addr, "");
+	QTreeWidgetItem* line =
+		new QTreeWidgetItem(&m_memory, QStringList(addr) << sl);
 
 	QStringList tmplist;
 	QMap<QString,QString>::Iterator pos = m_old_memory.find( addr );
 
 	if( pos != m_old_memory.end() )
-	    tmplist = QStringList::split( "\t", pos.data() );
+	    tmplist = pos.value().split( "\t" );
 
 	for (int i = 0; i < sl.count(); i++)
 	{
-            after->setText( i+1, sl[i] );
-
 	    bool changed =
 		tmplist.count() > 0 &&
 		sl[i] != tmplist[i];
-	    after->setChanged(i, changed);
+	    line->setForeground(i+1, changed ? QBrush(QColor(Qt::red)) : palette().text());
 	}
     }
 
@@ -252,7 +227,7 @@ void MemoryWindow::saveProgramSpecific(KConfigBase* config)
     QString exprEntry;
     QString fmtEntry;
     for (int i = 0; i < numEntries;) {
-	QString text = m_expression.text(i);
+	QString text = m_expression.itemText(i);
 	i++;				/* entries are counted 1-based */
 	exprEntry.sprintf(ExpressionFmt, i);
 	fmtEntry.sprintf(FormatFmt, i);
@@ -286,14 +261,14 @@ void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
 	fmtEntry.sprintf(FormatFmt, i);
 	QString expr = g.readEntry(exprEntry, QString());
 	unsigned fmt = g.readEntry(fmtEntry, MDTword | MDThex);
-	m_expression.insertItem(expr);
+	m_expression.addItem(expr);
 	m_formatCache[expr] = fmt & (MDTsizemask | MDTformatmask);
     }
 
     // initialize with top expression
     if (numEntries > 0) {
-	m_expression.setCurrentItem(0);
-	QString expr = m_expression.text(0);
+	m_expression.setCurrentIndex(0);
+	QString expr = m_expression.itemText(0);
 	m_format = m_formatCache[expr];
 	m_debugger->setMemoryFormat(m_format);
 	displayNewExpression(expr);
