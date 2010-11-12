@@ -677,6 +677,7 @@ QString KDebugger::getConfigForExe(const QString& name)
     // Assume that the first 15 positions of the hash are unique;
     // this keeps the file names short.
     QString hash = KMD5(dir.toUtf8()).base64Digest();
+    hash.replace('/', QString());	// avoid directory separators
     QString pgmConfigFile = hash.left(15) + "-" + fi.fileName();
     pgmConfigFile = KStandardDirs::locateLocal("sessions", pgmConfigFile);
     TRACE("program config file = " + pgmConfigFile);
