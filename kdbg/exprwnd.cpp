@@ -31,7 +31,7 @@ VarTree::VarTree(VarTree* parent, ExprValue* v) :
 {
     setText(v->m_name);
     updateValueText();
-    if (v->m_initiallyExpanded || m_varKind == VarTree::VKpointer)
+    if (v->m_child != 0 || m_varKind == VarTree::VKpointer)
 	setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
     else
 	setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
@@ -423,15 +423,10 @@ void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	// update the m_varKind
 	if (newValues->m_varKind != VarTree::VKdummy) {
 	    display->m_varKind = newValues->m_varKind;
-	    switch (display->m_varKind) {
-	    case VarTree::VKpointer:
-	    case VarTree::VKstruct:
+	    if (newValues->m_child != 0 || newValues->m_varKind == VarTree::VKpointer)
 		display->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
-		break;
-	    default:
+	    else
 		display->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
-		break;
-	    }
 	}
 
 	// get some types (after the new m_varKind has been set!)
