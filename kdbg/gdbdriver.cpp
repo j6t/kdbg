@@ -1076,7 +1076,8 @@ moreStrings:
 	}
     }
     // is the string continued?
-    if (*p == ',') {
+    if (*p == ',')
+    {
 	// look ahead for another quote
 	const char* q = p+1;
 	while (isspace(*q))
@@ -1085,6 +1086,17 @@ moreStrings:
 	    // yes!
 	    p = q;
 	    goto moreStrings;
+	}
+
+	// some strings can end in <incomplete sequence ...>
+	if (strncmp(q, "<incomplete sequence", 20) == 0)
+	{
+	    p = q+20;
+	    while (*p != '\0' && *p != '>')
+		p++;
+	    if (*p != '\0') {
+		p++;		/* skip the '>' */
+	    }
 	}
     }
     /* very long strings are followed by `...' */
