@@ -53,6 +53,9 @@ PgmArgs::~PgmArgs()
 // initializes the selected options
 void PgmArgs::setOptions(const QSet<QString>& selectedOptions)
 {
+    if (xsldbgOptionsPage == 0)
+	return;
+
     for (int i = 0; i < xsldbgOptions->count(); i++) {
 	if (selectedOptions.contains(xsldbgOptions->item(i)->text()))
 	{
