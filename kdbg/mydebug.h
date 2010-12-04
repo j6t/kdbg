@@ -13,14 +13,13 @@
 #endif
 
 #ifdef NDEBUG
-# define ASSERT(x) ((void)0)
+# define ASSERT(x) do {} while (0)
 #else
-# define ASSERT(x) ((x) ? void(0) : void(kDebug() << \
-					"assertion failed: " << #x << "\n"))
+# define ASSERT(x) kDebug(!(x)) << "assertion failed: " #x "\n"
 #endif
 
 #ifdef WANT_TRACE_OUTPUT
-# define TRACE(x) (kDebug() << (x))
+# define TRACE(x) kDebug() << (x)
 #else
-# define TRACE(x) ((void)0)
+# define TRACE(x) do {} while (0)
 #endif
