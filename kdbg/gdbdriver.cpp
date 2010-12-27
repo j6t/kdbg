@@ -1223,6 +1223,15 @@ repeat:
 	    while (isspace(*s))
 		s++;
 	}
+    }
+    // Sometimes we find a warning; it ends at the next LF
+    else if (strncmp(s, "warning: ", 9) == 0) {
+	const char* end = strchr(s, '\n');
+	s = end ? end : s+strlen(s);
+	// skip space at start of next line
+	while (isspace(*s))
+	    s++;
+	goto repeat;
     } else {
 	// examples of leaf values (cannot be the empty string):
 	//  123
