@@ -1067,7 +1067,8 @@ moreStrings:
 	}
     }
     // is the string continued?
-    if (*p == ',') {
+    if (*p == ',')
+    {
 	// look ahead for another quote
 	const char* q = p+1;
 	while (isspace(*q))
@@ -1076,6 +1077,17 @@ moreStrings:
 	    // yes!
 	    p = q;
 	    goto moreStrings;
+	}
+
+	// some strings can end in <incomplete sequence ...>
+	if (strncmp(q, "<incomplete sequence", 20) == 0)
+	{
+	    p = q+20;
+	    while (*p != '\0' && *p != '>')
+		p++;
+	    if (*p != '\0') {
+		p++;		/* skip the '>' */
+	    }
 	}
     }
     /* very long strings are followed by `...' */
@@ -1202,6 +1214,15 @@ repeat:
 	    while (isspace(*s))
 		s++;
 	}
+    }
+    // Sometimes we find a warning; it ends at the next LF
+    else if (strncmp(s, "warning: ", 9) == 0) {
+	const char* end = strchr(s, '\n');
+	s = end ? end : s+strlen(s);
+	// skip space at start of next line
+	while (isspace(*s))
+	    s++;
+	goto repeat;
     } else {
 	// examples of leaf values (cannot be the empty string):
 	//  123
@@ -2425,6 +2446,15 @@ std::list<DisassembledCode> GdbDriver::parseDisassemble(const char* output)
     while (p != end)
     {
 	DisassembledCode c;
+	// skip initial space or PC pointer ("=>", since gdb 7.1)
+	while (p != end) {
+	    if (isspace(*p))
+		++p;
+	    else if (p[0] == '=' && p[1] == '>')
+		p += 2;
+	    else
+		break;
+	}
 	const char* start = p;
 	// address
 	while (p != end && !isspace(*p))
