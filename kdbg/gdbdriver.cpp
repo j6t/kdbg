@@ -2446,6 +2446,15 @@ std::list<DisassembledCode> GdbDriver::parseDisassemble(const char* output)
     while (p != end)
     {
 	DisassembledCode c;
+	// skip initial space or PC pointer ("=>", since gdb 7.1)
+	while (p != end) {
+	    if (isspace(*p))
+		++p;
+	    else if (p[0] == '=' && p[1] == '>')
+		p += 2;
+	    else
+		break;
+	}
 	const char* start = p;
 	// address
 	while (p != end && !isspace(*p))
