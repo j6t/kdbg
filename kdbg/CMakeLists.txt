@@ -3,6 +3,7 @@ add_subdirectory(pics)
 add_subdirectory(typetables)
 
 include_directories(${KDE4_INCLUDES} ${KDE4_INCLUDE_DIR} ${QT_INCLUDES} )
+include(CheckFunctionExists)
 
 CHECK_INCLUDE_FILES(pty.h HAVE_PTY_H)
 CHECK_INCLUDE_FILES(libutil.h HAVE_LIBUTIL_H)
