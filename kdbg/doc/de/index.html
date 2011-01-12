@@ -32,9 +32,6 @@ F&uuml;r Fortgeschrittene: <a href="../../en/kdbg/types.html">Typentabellen</a>
 (nur Englisch)</li>
 
 <li>
-<a href="#KnownProblems">Bekannte Probleme</a></li>
-
-<li>
 <a href="#Author">Autor</a></li>
 </ul>
 
@@ -109,8 +106,8 @@ Ausf&uuml;hren und schrittweisen Abarbeiten des Programms verwenden. Weiters
 k&ouml;nnen Sie das laufende Programm unterbrechen. Die wichtigen Befehle
 k&ouml;nnen auch mit Funktionstasten gegeben werden. Zum effizienten Arbeiten
 empfehle ich, dass Sie sich diese Tasten eingew&ouml;hnen.
-<br><font size=-1>Diese Funktionen sind nicht konfigurierbar, aber vielleicht
-wollen Sie ein St&uuml;ckchen Code beisteuern, mit dem das geht?</font>
+Sie k&ouml;nnen <i>Einstellungen|Kurzbefehle festlegen</i> verwenden, falls
+Sie die Funktionen anderen Tasten zuweisen wollen.
 <p>Im Men&uuml; <i>Haltepunkt</i> finden Sie Befehle zum Setzen, Entfernen,
 Aktivieren und Inaktivieren von permanenten und tempor&auml;ren Haltepunkten.
 Nat&uuml;rlich k&ouml;nnen Sie auch eine <a href="breakptlist.html">Liste
@@ -118,15 +115,15 @@ der Haltepunkte</a> anzeigen. Sie k&ouml;nnen einen Haltepunkt auch setzen,
 indem Sie mit der Maus in den Freiraum links der entsprechenden Quellcode-Zeile
 klicken (mit der linken Maustaste); weiters k&ouml;nnen sie einen vorhandenen
 Haltepunkt mit der mittleren Maustaste aktivieren und deaktivieren.
-<p>Das Zahnrad in der Werkzeugleiste zeigt an, ob <tt>gdb</tt> gerade arbeitet:
-Dies ist der Fall, wenn es rotiert. Solange es schnell rotiert, nimmt KDbg
-kein Eingaben an; wenn es langsam rotiert, aktualisiert KDbg gerade alle
-Variablenanzeigen.
+<p>Die Animation in der Werkzeugleiste zeigt an, ob das Programm gerade l&auml;uft.
+Sie bleibt stehen, sobald das Programm an einem Haltepunkt oder aus einem
+anderen Grund angehalten wird oder sobald es beendet wird.
+Ein Klick auf die Animation hat die Funktion von <i>Ausf&uuml;hrung|Unterbrechen</i>.
 <h2>
 <a NAME="InfoWindows"></a>Die Informationsfenster von KDbg</h2>
 KDbg zeigt Information in einer Reihe verschiedener Fenster an. Im Men&uuml;
 <i>Ansicht</i>
-finden Sie die Befehle, die diese Fenster anzeigen und schliessen. Es handelt
+finden Sie die Befehle, die diese Fenster anzeigen und schlie&szlig;en. Es handelt
 sich dabei um <i>dockende</i> Fenster, sodass Sie deren Anordnung beliebig
 ver&auml;ndern k&ouml;nnen.
 <ul>
@@ -169,18 +166,6 @@ ver&auml;ndern k&ouml;nnen.
 <a href="howdoi.html">Wie kann ich...?</a></li>
 </ul>
 
-<h2>
-<a NAME="KnownProblems"></a>Bekannte Probleme</h2>
-<tt>gdb </tt>4.16 hat Probleme bei der Handhabung von C++-Klassen mit virtuellen
-Basisklassen. (Diese kommen h&auml;ufig in CORBA-Programmen vor.) Gdb st&uuml;rzt
-dabei h&auml;ufig aufgrund eines Speicherzugriffsfehlers ab. KDbg erkennt,
-wenn <tt>gdb</tt> unerwartet beendet wird. Leider l&auml;sst sich nicht
-wirklich was dagegen unternehmen. Sie m&uuml;ssen <tt>gdb</tt> mittels
-<i>Datei|Programm</i>
-neu starten, das hei&szlig;t auch f&uuml;r die Debug-Sitzung zur&uuml;ck
-an den Start :-(.
-<p>Die Typerkennung von KDbg arbeitet nur, wenn die Bibilotheken dynamisch
-ins Programm gebunden sind.
 <h2>
 <a NAME="Author"></a>Autor</h2>
 KDbg wurde von <a href="mailto:j6t@kdbg.org">Johannes Sixt</a>

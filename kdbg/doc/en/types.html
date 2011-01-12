@@ -56,9 +56,8 @@ Sometimes the order in which the names are listed is important
 <tt>ShlibRE</tt>. KDbg uses this entry to determine if the type table applies
 to the program being debugged. For this purpose KDbg determines the shared
 libraries to which the program is linked. If any of the libraries matches
-this entry, the type table applies. The regular expression is a Qt-regular
-expression (the metacharacters <tt>.*?[]^$\</tt> are recognized in the
-usual way, but there is no possibility to group characters.)
+this entry, the type table applies. The entry is a <a href="http://doc.trolltech.com/4.0/qregexp.html#introduction">Qt regular
+expression</a>.
 Note that back-slashes must be doubled because the back-slash is an escape
 character in the configuration file syntax.</li>
 
@@ -92,9 +91,8 @@ will mention the template name and a type parameter list.</p>
 
 <h2>
 The type's group</h2>
-<p>There is one group for each type that is named exactly as the type. <font size=-1>At
-the moment C++ template classes are not supported.</font> Each group contains
-the following entries:</p>
+<p>There is one group for each type that is named exactly as the type.
+Each group contains the following entries:</p>
 <ul>
 <li>An optional <tt>Template</tt> entry that specifies the exact template type
 name as it is reported by gdb's <tt>whatis</tt> command. However, it is
