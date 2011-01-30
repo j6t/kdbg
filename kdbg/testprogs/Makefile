@@ -7,6 +7,7 @@ QT3LIB = $(QT3)/lib64/libqt-mt.so
 PROGS = \
 	anonstruct \
 	locals \
+	longdouble \
 	maths \
 	nestedclass \
 	qt \
@@ -23,6 +24,9 @@ anonstruct: anonstruct.cpp
 
 locals: locals.cpp
 	g++ -o $@ $(CXXFLAGS) $^
+
+longdouble: longdouble.c
+	gcc -o $@ $(CXXFLAGS) $^
 
 maths: maths.cpp
 	g++ -o $@ $(CXXFLAGS) $^

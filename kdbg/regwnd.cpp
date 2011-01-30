@@ -328,7 +328,11 @@ static QString toFloat(const QString& hex, char p)
     else if (hex.length()<=18) { bits=64; prec=17; }
     else { bits=80; prec=20; }
 
-    QString cooked=QString::number(extractNumber(hex), p, prec);
+    char fmt[8] = "%.*Lf";
+    fmt[4] = p;
+    char buf[50];
+    sprintf(buf, fmt, prec, extractNumber(hex));
+    QString cooked = QString::fromLatin1(buf);
     if (p=='e') {
 	prec+=7;    
 	while (cooked.length()<prec) cooked=cooked.prepend(" ");
