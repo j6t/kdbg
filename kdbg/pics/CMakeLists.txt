@@ -10,8 +10,8 @@ set(PICTOGRAMS
 	regs.xpm
 	watch.xpm
 	watchcoded.xpm
-	watchena.xpm
-	watchdis.xpm
+	watchena.png
+	watchdis.png
 	pointer.xpm)
 
 install(FILES ${PICTOGRAMS} DESTINATION "${DATA_INSTALL_DIR}/kdbg/pics")

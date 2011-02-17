@@ -258,8 +258,8 @@ void BreakpointTable::initListAndIcons()
     // add pixmaps
     QPixmap brkena = UserIcon("brkena");
     QPixmap brkdis = UserIcon("brkdis");
-    QPixmap watchena = UserIcon("watchena.xpm");
-    QPixmap watchdis = UserIcon("watchdis.xpm");
+    QPixmap watchena = UserIcon("watchena");
+    QPixmap watchdis = UserIcon("watchdis");
     QPixmap brktmp = UserIcon("brktmp");
     QPixmap brkcond = UserIcon("brkcond");
     QPixmap brkorph = UserIcon("brkorph");
