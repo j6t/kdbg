@@ -218,7 +218,7 @@ msgstr "Depuración XSLT"
 
 #: main.cpp:49
 #, fuzzy
-msgid "Register groups and formating"
+msgid "Register groups and formatting"
 msgstr "Registro de grupos y formato"
 
 #: main.cpp:54

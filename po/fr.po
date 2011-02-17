@@ -217,7 +217,7 @@ msgid "XSLT debugging"
 msgstr "Déboggage XSLT"
 
 #: main.cpp:49
-msgid "Register groups and formating"
+msgid "Register groups and formatting"
 msgstr "Groupes de registre et formatage"
 
 #: main.cpp:54

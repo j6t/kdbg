@@ -214,7 +214,7 @@ msgid "XSLT debugging"
 msgstr "XSLT调试"
 
 #: main.cpp:49
-msgid "Register groups and formating"
+msgid "Register groups and formatting"
 msgstr "寄存器组与格式化"
 
 #: main.cpp:54

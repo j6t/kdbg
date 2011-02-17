@@ -33,7 +33,7 @@ int main(int argc, char** argv)
 			ki18n("XSLT debugging"),
 			"k_isdale@tpg.com.au");
     aboutData.addCredit(ki18n("Daniel Kristjansson"),
-			ki18n("Register groups and formating"),
+			ki18n("Register groups and formatting"),
 			"danielk@cat.nyu.edu");
     aboutData.addCredit(ki18n("David Edmundson"),
 			ki18n("KDE4 porting"),
