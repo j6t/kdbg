@@ -5,8 +5,8 @@ set(PICTOGRAMS
 	brktmp.png
 	brkcond.png
 	brkorph.png
-	pcinner.xpm
-	pcup.xpm
+	pcinner.png
+	pcup.png
 	regs.xpm
 	watch.xpm
 	watchcoded.xpm
