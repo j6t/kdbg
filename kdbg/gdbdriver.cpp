@@ -1956,6 +1956,9 @@ bool GdbDriver::parseBreakpoint(const char* output, int& id,
     if (strncmp(o, "Breakpoint ", 11) == 0) {
 	output += 11;			/* skip "Breakpoint " */
 	return ::parseNewBreakpoint(output, id, file, lineNo, address);
+    } else if (strncmp(o, "Temporary breakpoint ", 21) == 0) {
+	output += 21;
+	return ::parseNewBreakpoint(output, id, file, lineNo, address);
     } else if (strncmp(o, "Hardware watchpoint ", 20) == 0) {
 	output += 20;
 	return ::parseNewWatchpoint(output, id, address);
