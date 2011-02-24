@@ -295,7 +295,8 @@ void DebuggerMainWnd::initKAction()
     }
 
     // execution menu
-    m_runAction = createAction(i18n("&Run"), "pgmrun", Qt::Key_F5,
+    m_runAction = createAction(i18n("&Run"),
+			"debug-run", Qt::Key_F5,
 			m_debugger, SLOT(programRun()), "exec_run");
     connect(m_runAction, SIGNAL(activated()), this, SLOT(intoBackground()));
     m_stepIntoAction = createAction(i18n("Step &into"),
