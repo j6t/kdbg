@@ -2251,8 +2251,6 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 	return regs;
     }
 
-    QString value;
-
     // parse register values
     while (*output != '\0')
     {
@@ -2272,6 +2270,8 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 	// skip space
 	while (isspace(*output))
 	    output++;
+
+	QString value;
 
 	/*
 	 * If we find a brace now, this is a vector register. We look for
@@ -2347,12 +2347,24 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 	}
 	else
 	{
+	continuation:
 	    // the rest of the line is the register value
 	    start = output;
 	    output = strchr(output,'\n');
 	    if (output == 0)
 		output = start + strlen(start);
-	    value = QString::fromLatin1(start, output-start).simplified();
+	    value += QString::fromLatin1(start, output-start).simplified();
+
+	    /*
+	     * Look ahead: if the subsequent line is indented, it continues
+	     * the current register value.
+	     */
+	    if (output != 0 && isspace(output[1]))
+	    {
+		++output;
+		value += ' ';
+		goto continuation;
+	    }
 
 	    /*
 	     * We split the raw from the cooked values.
