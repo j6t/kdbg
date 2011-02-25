@@ -1,10 +1,10 @@
 # line items and other pictograms
 set(PICTOGRAMS
-	brkena.xpm
-	brkdis.xpm
-	brktmp.xpm
-	brkcond.xpm
-	brkorph.xpm
+	brkena.png
+	brkdis.png
+	brktmp.png
+	brkcond.png
+	brkorph.png
 	pcinner.xpm
 	pcup.xpm
 	regs.xpm

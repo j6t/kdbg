@@ -256,13 +256,13 @@ void BreakpointTable::initListAndIcons()
     m_ui.bpList->setColumnWidth(4, 200);
 
     // add pixmaps
-    QPixmap brkena = UserIcon("brkena.xpm");
-    QPixmap brkdis = UserIcon("brkdis.xpm");
+    QPixmap brkena = UserIcon("brkena");
+    QPixmap brkdis = UserIcon("brkdis");
     QPixmap watchena = UserIcon("watchena.xpm");
     QPixmap watchdis = UserIcon("watchdis.xpm");
-    QPixmap brktmp = UserIcon("brktmp.xpm");
-    QPixmap brkcond = UserIcon("brkcond.xpm");
-    QPixmap brkorph = UserIcon("brkorph.xpm");
+    QPixmap brktmp = UserIcon("brktmp");
+    QPixmap brkcond = UserIcon("brkcond");
+    QPixmap brkorph = UserIcon("brkorph");
 
     /*
      * There are 32 different pixmaps: The basic enabled or disabled
