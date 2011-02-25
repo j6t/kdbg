@@ -386,7 +386,7 @@ QString convertRaw(const RegisterInfo reg, RegisterDisplay mode)
     {
 	cooked = reg.cookedValue;
     }
-    if (cooked.at(0)!=' ' && cooked.at(0)!='-' && cooked.at(0)!='+')
+    if (!cooked.isEmpty() && cooked.at(0) != ' ' && cooked.at(0) != '-' && cooked.at(0) != '+')
 	cooked.prepend(" ");
     return cooked;
 }
