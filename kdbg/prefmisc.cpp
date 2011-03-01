@@ -22,7 +22,7 @@ PrefMisc::PrefMisc(QWidget* parent) :
 {
     m_popForeground.setText(i18n("&Pop into foreground when program stops"));
     m_popForeground.setMinimumSize(m_popForeground.sizeHint());
-    m_grid.addWidget(&m_popForeground, 0, 0, 2, 1);
+    m_grid.addWidget(&m_popForeground, 0, 0, 1, 2);
     m_grid.addItem(new QSpacerItem(0, m_popForeground.sizeHint().height()), 0, 0);
 
     m_backTimeoutLabel.setText(i18n("Time until window goes &back (in milliseconds):"));
