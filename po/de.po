@@ -2,13 +2,13 @@
 # KDbg - Debugger GUI for gdb
 # Copyright (C) Johannes Sixt <j6t@kdbg.org>, 1998-2009.
 #
-# Johannes Sixt <j6t@kdbg.org>, 2005, 2006, 2007, 2009.
+# Johannes Sixt <j6t@kdbg.org>, 2005, 2006, 2007, 2009, 2011.
 msgid ""
 msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-01 22:35+0100\n"
-"PO-Revision-Date: 2009-07-19 23:09+0200\n"
+"PO-Revision-Date: 2011-03-01 22:59+0100\n"
 "Last-Translator: Johannes Sixt <j6t@kdbg.org>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "MIME-Version: 1.0\n"
@@ -235,14 +235,12 @@ msgid ": Global options"
 msgstr ": Globale Einstellungen"
 
 #: dbgmainwnd.cpp:841 pgmsettings.cpp:107
-#, fuzzy
 msgid "Debugger"
-msgstr "&Debugger"
+msgstr "Debugger"
 
 #: dbgmainwnd.cpp:842
-#, fuzzy
 msgid "Miscellaneous"
-msgstr "&Verschiedenes"
+msgstr "Verschiedenes"
 
 #: dbgmainwnd.cpp:980
 msgid ": Program output"
@@ -266,7 +264,7 @@ msgstr "*|Alle Dateien"
 
 #: dbgmainwnd.cpp:1165
 msgid "Open"
-msgstr ""
+msgstr "Öffnen"
 
 #: dbgmainwnd.cpp:1183
 msgid "Select the executable to debug"
@@ -281,7 +279,7 @@ msgid ""
 "%1 exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
-"%1 wurde unerwartet beendet\n"
+"%1 wurde unerwartet beendet.\n"
 "Sie müssen die Sitzung neu starten (z.B. mit Datei|Programm)."
 
 #: debugger.cpp:841
@@ -315,7 +313,7 @@ msgstr "Neues Arbeitsverzeichnis: "
 
 #: main.cpp:23
 msgid "KDbg"
-msgstr ""
+msgstr "KDbg"
 
 #: main.cpp:25
 msgid "A Debugger"
@@ -323,15 +321,15 @@ msgstr "Ein Debugger"
 
 #: main.cpp:27
 msgid "(c) 1998-2011 Johannes Sixt"
-msgstr ""
+msgstr "(c) 1998-2011 Johannes Sixt"
 
 #: main.cpp:31
 msgid "Johannes Sixt"
-msgstr ""
+msgstr "Johannes Sixt"
 
 #: main.cpp:32
 msgid "Keith Isdale"
-msgstr ""
+msgstr "Keith Isdale"
 
 #: main.cpp:33
 msgid "XSLT debugging"
@@ -339,7 +337,7 @@ msgstr "XSLT debuggen"
 
 #: main.cpp:35
 msgid "Daniel Kristjansson"
-msgstr ""
+msgstr "Daniel Kristjansson"
 
 #: main.cpp:36
 msgid "Register groups and formatting"
@@ -347,11 +345,11 @@ msgstr "Registergruppen und -formatierung"
 
 #: main.cpp:38
 msgid "David Edmundson"
-msgstr ""
+msgstr "David Edmundson"
 
 #: main.cpp:39
 msgid "KDE4 porting"
-msgstr ""
+msgstr "Portierung nach KDE4"
 
 #: main.cpp:44
 msgid "transcript of conversation with the debugger"
@@ -537,11 +535,11 @@ msgstr "Geben Sie die Prozessnummer ein:"
 
 #: procattach.cpp:302
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: procattach.cpp:307
 msgid "Cancel"
-msgstr ""
+msgstr "Abbrechen"
 
 #: regwnd.cpp:73
 msgid "&GDB default"
@@ -627,7 +625,7 @@ msgstr "&Rückwärts"
 
 #: winstack.cpp:396
 msgid "Close"
-msgstr ""
+msgstr "Schließen"
 
 #: xsldbgdriver.cpp:1385
 msgid "No memory dump available"
@@ -637,7 +635,7 @@ msgstr "Speicherinhalt nicht verfügbar"
 #. i18n: ectx: property (windowTitle), widget (QWidget, BrkPtBase)
 #: rc.cpp:3
 msgid "Form"
-msgstr ""
+msgstr "Form"
 
 #. i18n: file: brkptbase.ui:42
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
@@ -673,7 +671,7 @@ msgstr "&Watchpoint"
 #. i18n: ectx: property (text), widget (QPushButton, btRemove)
 #: rc.cpp:27
 msgid "&Remove"
-msgstr ""
+msgstr "&Entfernen"
 
 #. i18n: file: brkptbase.ui:92
 #. i18n: ectx: property (text), widget (QPushButton, btViewCode)
@@ -691,7 +689,7 @@ msgstr "&Bedingt..."
 #. i18n: ectx: property (windowTitle), widget (QDialog, BrkPtCondition)
 #: rc.cpp:39
 msgid "Dialog"
-msgstr ""
+msgstr "Dialog"
 
 #. i18n: file: brkptcondition.ui:27
 #. i18n: ectx: property (text), widget (QLabel, label)
@@ -709,21 +707,19 @@ msgstr "Ignoriere &nächste Treffer:"
 #. i18n: ectx: property (specialValueText), widget (QSpinBox, ignoreCount)
 #: rc.cpp:48
 msgid "do not ignore"
-msgstr ""
+msgstr "nicht ignorieren"
 
 #. i18n: file: kdbgui.rc:4
 #. i18n: ectx: Menu (file)
 #: rc.cpp:51
-#, fuzzy
 msgid "&File"
-msgstr "&Deaktivieren"
+msgstr "&Datei"
 
 #. i18n: file: kdbgui.rc:11
 #. i18n: ectx: Menu (view)
 #: rc.cpp:54
-#, fuzzy
 msgid "&View"
-msgstr "&Code anzeigen"
+msgstr "&Ansicht"
 
 #. i18n: file: kdbgui.rc:25
 #. i18n: ectx: Menu (execution)
@@ -740,9 +736,8 @@ msgstr "Halte&punkt"
 #. i18n: file: kdbgui.rc:47
 #. i18n: ectx: Menu (settings)
 #: rc.cpp:63
-#, fuzzy
 msgid "&Settings"
-msgstr "&Zeichenketten"
+msgstr "&Einstellungen"
 
 #. i18n: file: pgmargsbase.ui:13
 #. i18n: ectx: property (windowTitle), widget (QDialog, PgmArgsBase)
@@ -921,7 +916,7 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QPushButton, buttonModify)
 #: rc.cpp:133
 msgid "&Modify"
-msgstr ""
+msgstr "&Ändern"
 
 #. i18n: file: pgmargsbase.ui:252
 #. i18n: ectx: property (shortcut), widget (QPushButton, buttonModify)
@@ -943,7 +938,7 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QPushButton, buttonDelete)
 #: rc.cpp:142
 msgid "&Delete"
-msgstr ""
+msgstr "&Löschen"
 
 #. i18n: file: pgmargsbase.ui:293
 #. i18n: ectx: attribute (title), widget (QWidget, xsldbgOptionsPage)
@@ -1029,31 +1024,3 @@ msgstr "Diese Schaltfläche aktualisiert die Anzeige."
 msgid "&Refresh"
 msgstr "&Aktualisieren"
 
-#~ msgid "F1"
-#~ msgstr "F1"
-
-#~ msgid "..."
-#~ msgstr "..."
-
-#~ msgid "Clear filter"
-#~ msgstr "Filter löschen"
-
-#~ msgid ""
-#~ "Use this button to clear the filter text so that all processes are "
-#~ "displayed."
-#~ msgstr ""
-#~ "Mit dieser Schaltfläche können Sie die Filtereingabe löschen, sodass alle "
-#~ "Prozesse angezeigt werden."
-
-#~ msgid ""
-#~ "You must select a process from the list. Then click the <b>OK</b> button "
-#~ "to attach to that process."
-#~ msgstr ""
-#~ "Sie müssenen einen Prozess in der Liste auswählen. Dann klicken Sie "
-#~ "<b>OK</b>, um den Prozess zu attachen."
-
-#~ msgid "Source"
-#~ msgstr "Quellcode"
-
-#~ msgid "&Find"
-#~ msgstr "&Suche"
