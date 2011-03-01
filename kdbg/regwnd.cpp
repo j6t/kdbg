@@ -6,10 +6,8 @@
 
 #include "regwnd.h"
 #include "dbgdriver.h"
-#include <QPixmap>
 #include <kglobalsettings.h>
 #include <klocale.h>			/* i18n */
-#include <kiconloader.h>
 #include <QMenu>
 #include <QRegExp>
 #include <QStringList>
@@ -414,19 +412,10 @@ RegisterView::RegisterView(QWidget* parent) :
 {
     setFont(KGlobalSettings::fixedFont());
 
-    QPixmap iconRegs = UserIcon("regs.xpm");
-    QPixmap iconWatchcoded = UserIcon("watchcoded.xpm");
-    QPixmap iconWatch = UserIcon("watch.xpm");
-
     QTreeWidgetItem* header = headerItem();
     header->setText(0, i18n("Register"));
-    header->setIcon(0, QIcon(iconRegs));
-
     header->setText(1, i18n("Value"));
-    header->setIcon(1, QIcon(iconWatchcoded));
-
     header->setText(2, i18n("Decoded value"));
-    header->setIcon(2, QIcon(iconWatch));
 
     setAllColumnsShowFocus(true);
 

@@ -7,9 +7,6 @@ set(PICTOGRAMS
 	brkorph.png
 	pcinner.png
 	pcup.png
-	regs.xpm
-	watch.xpm
-	watchcoded.xpm
 	watchena.png
 	watchdis.png
 	pointer.xpm)
