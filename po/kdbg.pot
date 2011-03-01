@@ -1,17 +1,20 @@
-# KDbg Polish translation file.
-# Main translation work:
-#       Jacek Wojdel <wojdel@kbs.twi.tudelft.nl>
+# SOME DESCRIPTIVE TITLE.
+# Copyright (C) YEAR THE PACKAGE'S COPYRIGHT HOLDER
+# This file is distributed under the same license as the PACKAGE package.
+# FIRST AUTHOR <EMAIL@ADDRESS>, YEAR.
+#
+#, fuzzy
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 1.0\n"
+"Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-01 22:35+0100\n"
-"PO-Revision-Date: 2002-03-03 16:12MDT\n"
-"Last-Translator: Jacek Wojdel <wojdel@kbs.twi.tudelft.nl>\n"
+"PO-Revision-Date: YEAR-MO-DA HO:MI+ZONE\n"
+"Last-Translator: FULL NAME <EMAIL@ADDRESS>\n"
+"Language-Team: LANGUAGE <LL@li.org>\n"
 "MIME-Version: 1.0\n"
-"Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: iso-8859-2\n"
-"X-Generator: KBabel 0.9.5\n"
+"Content-Type: text/plain; charset=CHARSET\n"
+"Content-Transfer-Encoding: 8bit\n"
 
 #. i18n: file: brkptbase.ui:85
 #. i18n: ectx: property (text), widget (QPushButton, btEnaDis)
@@ -25,11 +28,11 @@ msgstr ""
 
 #: brkpt.cpp:363
 msgid ": Conditional breakpoint"
-msgstr ": Warunkowy punkt zatrzymania"
+msgstr ""
 
 #: dbgmainwnd.cpp:71
 msgid "active"
-msgstr "aktywny"
+msgstr ""
 
 #: dbgmainwnd.cpp:78
 msgid "Stack"
@@ -40,22 +43,20 @@ msgid "Locals"
 msgstr ""
 
 #: dbgmainwnd.cpp:82
-#, fuzzy
 msgid "Variable"
-msgstr "Wartość"
+msgstr ""
 
 #: dbgmainwnd.cpp:84
 msgid "Watches"
 msgstr ""
 
 #: dbgmainwnd.cpp:87
-#, fuzzy
 msgid "Registers"
-msgstr "Restartuj"
+msgstr ""
 
 #: dbgmainwnd.cpp:90
 msgid "Breakpoints"
-msgstr "Punkty zatrzymania"
+msgstr ""
 
 #: dbgmainwnd.cpp:93 pgmsettings.cpp:108
 msgid "Output"
@@ -71,24 +72,23 @@ msgstr ""
 
 #: dbgmainwnd.cpp:251
 msgid "&Open Source..."
-msgstr "&Otwórz źródła..."
+msgstr ""
 
 #: dbgmainwnd.cpp:253
 msgid "&Reload Source"
-msgstr "P&rzeładuj źródła..."
+msgstr ""
 
 #: dbgmainwnd.cpp:255
 msgid "&Executable..."
-msgstr "Plik &wykonywalny..."
+msgstr ""
 
 #: dbgmainwnd.cpp:261
-#, fuzzy
 msgid "Recent E&xecutables"
-msgstr "Plik wykonywalny"
+msgstr ""
 
 #: dbgmainwnd.cpp:262
 msgid "&Core dump..."
-msgstr "&Zrzut rdzenia..."
+msgstr ""
 
 #: dbgmainwnd.cpp:267
 msgid "This &Program..."
@@ -96,7 +96,7 @@ msgstr ""
 
 #: dbgmainwnd.cpp:269
 msgid "&Global Options..."
-msgstr "Opcje o&gólne..."
+msgstr ""
 
 #: dbgmainwnd.cpp:279
 msgid "Source &code"
@@ -115,14 +115,12 @@ msgid "&Watched expressions"
 msgstr ""
 
 #: dbgmainwnd.cpp:284
-#, fuzzy
 msgid "&Registers"
-msgstr "Restartuj"
+msgstr ""
 
 #: dbgmainwnd.cpp:285
-#, fuzzy
 msgid "&Breakpoints"
-msgstr "Punkty zatrzymania"
+msgstr ""
 
 #: dbgmainwnd.cpp:286
 msgid "T&hreads"
@@ -138,23 +136,23 @@ msgstr ""
 
 #: dbgmainwnd.cpp:298
 msgid "&Run"
-msgstr "U&ruchom"
+msgstr ""
 
 #: dbgmainwnd.cpp:302
 msgid "Step &into"
-msgstr "Wejdź &w"
+msgstr ""
 
 #: dbgmainwnd.cpp:306
 msgid "Step &over"
-msgstr "Przejdź &przez"
+msgstr ""
 
 #: dbgmainwnd.cpp:310
 msgid "Step o&ut"
-msgstr "Wyjdź &z"
+msgstr ""
 
 #: dbgmainwnd.cpp:314
 msgid "Run to &cursor"
-msgstr "Uruchom do &kursora"
+msgstr ""
 
 #: dbgmainwnd.cpp:318
 msgid "Step i&nto by instruction"
@@ -170,7 +168,7 @@ msgstr ""
 
 #: dbgmainwnd.cpp:329
 msgid "&Break"
-msgstr "&Zatrzymaj"
+msgstr ""
 
 #: dbgmainwnd.cpp:331
 msgid "&Kill"
@@ -178,49 +176,47 @@ msgstr ""
 
 #: dbgmainwnd.cpp:333
 msgid "Re&start"
-msgstr "Re&startuj"
+msgstr ""
 
 #: dbgmainwnd.cpp:335
 msgid "A&ttach..."
-msgstr "&Podłącz..."
+msgstr ""
 
 #: dbgmainwnd.cpp:337
 msgid "&Arguments..."
-msgstr "&Argumenty..."
+msgstr ""
 
 #: dbgmainwnd.cpp:341
 msgid "Set/Clear &breakpoint"
-msgstr "Ustaw/usuń punkt &zatrzymania"
+msgstr ""
 
 #: dbgmainwnd.cpp:343
 msgid "Set &temporary breakpoint"
-msgstr "Us&taw chwilowy punkt zatrzymania"
+msgstr ""
 
 #: dbgmainwnd.cpp:345
 msgid "&Enable/Disable breakpoint"
-msgstr "&Włącz/wyłącz punkt zatrzymania"
+msgstr ""
 
 #: dbgmainwnd.cpp:349
 msgid "Watch Expression"
 msgstr ""
 
 #: dbgmainwnd.cpp:351
-#, fuzzy
 msgid "Edit Value"
-msgstr "Wartość"
+msgstr ""
 
 #: dbgmainwnd.cpp:379
 msgid "Restart"
-msgstr "Restartuj"
+msgstr ""
 
 #: dbgmainwnd.cpp:380
 msgid "Core dump"
-msgstr "Zrzut rdzenia"
+msgstr ""
 
 #: dbgmainwnd.cpp:623
-#, fuzzy
 msgid "`%1' is not a file or does not exist"
-msgstr "%1' nie jest plikiem lub nie istnieje"
+msgstr ""
 
 #: dbgmainwnd.cpp:691
 msgid "Don't know how to debug language `%1'"
@@ -234,7 +230,7 @@ msgstr ""
 
 #: dbgmainwnd.cpp:826
 msgid ": Global options"
-msgstr ": Ogólne opcje"
+msgstr ""
 
 #: dbgmainwnd.cpp:841 pgmsettings.cpp:107
 msgid "Debugger"
@@ -246,17 +242,15 @@ msgstr ""
 
 #: dbgmainwnd.cpp:980
 msgid ": Program output"
-msgstr ": Wyniki działania programu"
+msgstr ""
 
 #: dbgmainwnd.cpp:1070
-#, fuzzy
 msgid "|All source files\n"
-msgstr "Przeładuj plik źródłowy"
+msgstr ""
 
 #: dbgmainwnd.cpp:1071
-#, fuzzy
 msgid "|Source files\n"
-msgstr "Otwórz plik źródłowy"
+msgstr ""
 
 #: dbgmainwnd.cpp:1072
 msgid "|Header files\n"
@@ -272,19 +266,17 @@ msgstr ""
 
 #: dbgmainwnd.cpp:1183
 msgid "Select the executable to debug"
-msgstr "Wybierz plik wykonywalny do debugowania"
+msgstr ""
 
 #: dbgmainwnd.cpp:1196
 msgid "Select core dump"
-msgstr "Wybierz zrzut rdzenia"
+msgstr ""
 
 #: debugger.cpp:650
 msgid ""
 "%1 exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
-"%1 niespodziewanie zakończył pracę.\n"
-"Uruchom sesję ponownie (np. używając Plik|Plik wykonywalny)."
 
 #: debugger.cpp:841
 msgid ""
@@ -297,7 +289,7 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QTreeWidget, envList)
 #: exprwnd.cpp:312 regwnd.cpp:417 rc.cpp:127
 msgid "Value"
-msgstr "Wartość"
+msgstr ""
 
 #: gdbdriver.cpp:911
 msgid "<anonymous struct or union>"
@@ -309,7 +301,7 @@ msgstr ""
 
 #: gdbdriver.cpp:2084 xsldbgdriver.cpp:1287
 msgid "New working directory: "
-msgstr "Nowy katalog roboczy: "
+msgstr ""
 
 #: main.cpp:23
 msgid "KDbg"
@@ -376,9 +368,8 @@ msgid "specify PID of process to debug"
 msgstr ""
 
 #: main.cpp:50
-#, fuzzy
 msgid "path of executable to debug"
-msgstr "Wybierz plik wykonywalny do debugowania"
+msgstr ""
 
 #: main.cpp:51
 msgid "a core file to use"
@@ -386,7 +377,7 @@ msgstr ""
 
 #: main.cpp:114
 msgid "Cannot start debugger."
-msgstr "Nie udało się uruchomić debugera."
+msgstr ""
 
 #. i18n: file: brkptbase.ui:37
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
@@ -443,9 +434,8 @@ msgid "&Floatingpoint"
 msgstr ""
 
 #: memwindow.cpp:84
-#, fuzzy
 msgid "&Strings"
-msgstr "&Wyszukaj..."
+msgstr ""
 
 #: memwindow.cpp:86
 msgid "&Instructions"
@@ -483,11 +473,11 @@ msgstr ""
 
 #: prefdebugger.cpp:20
 msgid "To revert to the default settings, clear the entries."
-msgstr "Wyczyść pola by przywrócić domyślne ustawienia."
+msgstr ""
 
 #: prefdebugger.cpp:24
 msgid "How to invoke &GDB:"
-msgstr "Jak uruchomić &GDB:"
+msgstr ""
 
 #: prefdebugger.cpp:31
 msgid ""
@@ -495,13 +485,10 @@ msgid ""
 "%C will be replaced by a Bourne shell script that\n"
 "keeps the terminal window open."
 msgstr ""
-"%T zostanie zastąpione tekstem tytułowym,\n"
-"%C zostanie zastąpione przez skrypt w Bourne shell,\n"
-"który spowoduje pozostawienie otwartego okna terminala."
 
 #: prefdebugger.cpp:37
 msgid "&Terminal for program output:"
-msgstr "&Terminal dla wyników programu:"
+msgstr ""
 
 #: prefmisc.cpp:23
 msgid "&Pop into foreground when program stops"
@@ -516,9 +503,8 @@ msgid "&Tabstop every (characters):"
 msgstr ""
 
 #: prefmisc.cpp:37
-#, fuzzy
 msgid "File filter for &source files:"
-msgstr "Przeładuj plik źródłowy"
+msgstr ""
 
 #: prefmisc.cpp:39
 msgid "File filter for &header files:"
@@ -526,11 +512,11 @@ msgstr ""
 
 #: procattach.cpp:290
 msgid ": Attach to process"
-msgstr ": Podłącz do procesu"
+msgstr ""
 
 #: procattach.cpp:294
 msgid "Specify the process number to attach to:"
-msgstr "Podaj numer procesu do podłączenia się:"
+msgstr ""
 
 #: procattach.cpp:302
 msgid "OK"
@@ -561,9 +547,8 @@ msgid "&Real (g)"
 msgstr ""
 
 #: regwnd.cpp:416
-#, fuzzy
 msgid "Register"
-msgstr "Restartuj"
+msgstr ""
 
 #: regwnd.cpp:418
 msgid "Decoded value"
@@ -589,7 +574,7 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
 #: threadlist.cpp:42 rc.cpp:6
 msgid "Location"
-msgstr "Lokacja"
+msgstr ""
 
 #: ttywnd.cpp:214
 msgid "&Clear"
@@ -597,32 +582,31 @@ msgstr ""
 
 #: watchwindow.cpp:17
 msgid " Add "
-msgstr " Dodaj "
+msgstr ""
 
 #: watchwindow.cpp:18
 msgid " Del "
-msgstr " Usuń "
+msgstr ""
 
 #: watchwindow.cpp:19
-#, fuzzy
 msgid "Expression"
-msgstr "&Wykonywanie"
+msgstr ""
 
 #: winstack.cpp:384
 msgid ": Search"
-msgstr ": Wyszukaj"
+msgstr ""
 
 #: winstack.cpp:391
 msgid "&Case sensitive"
-msgstr "&Rozróżniaj wielkie/małe"
+msgstr ""
 
 #: winstack.cpp:393
 msgid "&Forward"
-msgstr "&Do przodu"
+msgstr ""
 
 #: winstack.cpp:395
 msgid "&Backward"
-msgstr "&Wstecz"
+msgstr ""
 
 #: winstack.cpp:396
 msgid "Close"
@@ -642,7 +626,7 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
 #: rc.cpp:12
 msgid "Hits"
-msgstr "Trafienia"
+msgstr ""
 
 #. i18n: file: brkptbase.ui:47
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
@@ -654,14 +638,13 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
 #: rc.cpp:18
 msgid "Condition"
-msgstr "Warunek"
+msgstr ""
 
 #. i18n: file: brkptbase.ui:64
 #. i18n: ectx: property (text), widget (QPushButton, btAddBP)
 #: rc.cpp:21
-#, fuzzy
 msgid "Add &Breakpoint"
-msgstr "Punkt &zatrzymania"
+msgstr ""
 
 #. i18n: file: brkptbase.ui:71
 #. i18n: ectx: property (text), widget (QPushButton, btAddWP)
@@ -679,13 +662,13 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QPushButton, btViewCode)
 #: rc.cpp:33
 msgid "&View Code"
-msgstr "&Pokaż kod"
+msgstr ""
 
 #. i18n: file: brkptbase.ui:99
 #. i18n: ectx: property (text), widget (QPushButton, btConditional)
 #: rc.cpp:36
 msgid "&Conditional..."
-msgstr "&Warunkowy..."
+msgstr ""
 
 #. i18n: file: brkptcondition.ui:13
 #. i18n: ectx: property (windowTitle), widget (QDialog, BrkPtCondition)
@@ -697,13 +680,13 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: rc.cpp:42
 msgid "&Condition:"
-msgstr "&Warunek:"
+msgstr ""
 
 #. i18n: file: brkptcondition.ui:40
 #. i18n: ectx: property (text), widget (QLabel, label_2)
 #: rc.cpp:45
 msgid "Ignore &next hits:"
-msgstr "Ignoruj &następne trafienia:"
+msgstr ""
 
 #. i18n: file: brkptcondition.ui:50
 #. i18n: ectx: property (specialValueText), widget (QSpinBox, ignoreCount)
@@ -714,56 +697,51 @@ msgstr ""
 #. i18n: file: kdbgui.rc:4
 #. i18n: ectx: Menu (file)
 #: rc.cpp:51
-#, fuzzy
 msgid "&File"
-msgstr "&Okno"
+msgstr ""
 
 #. i18n: file: kdbgui.rc:11
 #. i18n: ectx: Menu (view)
 #: rc.cpp:54
-#, fuzzy
 msgid "&View"
-msgstr "&Pokaż kod"
+msgstr ""
 
 #. i18n: file: kdbgui.rc:25
 #. i18n: ectx: Menu (execution)
 #: rc.cpp:57
 msgid "E&xecution"
-msgstr "&Wykonywanie"
+msgstr ""
 
 #. i18n: file: kdbgui.rc:42
 #. i18n: ectx: Menu (breakpoint)
 #: rc.cpp:60
 msgid "&Breakpoint"
-msgstr "Punkt &zatrzymania"
+msgstr ""
 
 #. i18n: file: kdbgui.rc:47
 #. i18n: ectx: Menu (settings)
 #: rc.cpp:63
-#, fuzzy
 msgid "&Settings"
-msgstr "&Wyszukaj..."
+msgstr ""
 
 #. i18n: file: pgmargsbase.ui:13
 #. i18n: ectx: property (windowTitle), widget (QDialog, PgmArgsBase)
 #: rc.cpp:66
-#, fuzzy
 msgid "Program Arguments"
-msgstr ": Argumenty programu"
+msgstr ""
 
 #. i18n: file: pgmargsbase.ui:26
 #. i18n: ectx: attribute (title), widget (QWidget, argsPage)
 #: rc.cpp:69
-#, fuzzy
 msgid "&Arguments"
-msgstr "&Argumenty..."
+msgstr ""
 
 #. i18n: file: pgmargsbase.ui:34
 #. i18n: ectx: property (text), widget (QLabel, labelArgs)
 #: rc.cpp:73
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Run <i>%1</i> with these arguments:"
-msgstr "Uruchom %1 z tymi argumentami:"
+msgstr ""
 
 #. i18n: file: pgmargsbase.ui:47
 #. i18n: ectx: property (whatsThis), widget (QLineEdit, programArgs)
@@ -820,9 +798,8 @@ msgstr ""
 #. i18n: file: pgmargsbase.ui:119
 #. i18n: ectx: attribute (title), widget (QWidget, wdPage)
 #: rc.cpp:97
-#, fuzzy
 msgid "&Working Directory"
-msgstr "Katalog roboczy:"
+msgstr ""
 
 #. i18n: file: pgmargsbase.ui:127
 #. i18n: ectx: property (whatsThis), widget (QLineEdit, wdEdit)
@@ -839,9 +816,8 @@ msgstr ""
 #. i18n: file: pgmargsbase.ui:139
 #. i18n: ectx: property (text), widget (QPushButton, wdBrowse)
 #: rc.cpp:106
-#, fuzzy
 msgid "&Browse..."
-msgstr "&Więcej..."
+msgstr ""
 
 #. i18n: file: pgmargsbase.ui:142
 #. i18n: ectx: property (shortcut), widget (QPushButton, wdBrowse)
@@ -858,9 +834,8 @@ msgstr ""
 #. i18n: file: pgmargsbase.ui:196
 #. i18n: ectx: property (text), widget (QLabel, envLabel)
 #: rc.cpp:115
-#, fuzzy
 msgid "Environment variables (<tt>NAME=value</tt>):"
-msgstr "Zmienne środowiskowe (NAZWA=wartość):"
+msgstr ""
 
 #. i18n: file: pgmargsbase.ui:209
 #. i18n: ectx: property (whatsThis), widget (QLineEdit, envVar)
@@ -926,16 +901,14 @@ msgstr ""
 #. i18n: file: pgmargsbase.ui:293
 #. i18n: ectx: attribute (title), widget (QWidget, xsldbgOptionsPage)
 #: rc.cpp:148
-#, fuzzy
 msgid "&xsldbg Options"
-msgstr "Opcje o&gólne..."
+msgstr ""
 
 #. i18n: file: procattachbase.ui:14
 #. i18n: ectx: property (windowTitle), widget (QDialog, ProcAttachBase)
 #: rc.cpp:151
-#, fuzzy
 msgid "Attach to Process"
-msgstr ": Podłącz do procesu"
+msgstr ""
 
 #. i18n: file: procattachbase.ui:25
 #. i18n: ectx: property (text), widget (QLabel, filterLabel)
@@ -995,40 +968,3 @@ msgstr ""
 #: rc.cpp:175
 msgid "&Refresh"
 msgstr ""
-
-#, fuzzy
-#~ msgid "Source"
-#~ msgstr "P&rzeładuj źródła..."
-
-#~ msgid "Toggle &Toolbar"
-#~ msgstr "Pasek &narzędzi"
-
-#~ msgid "Toggle &Statusbar"
-#~ msgstr "Pasek &stanu"
-
-#~ msgid "Executable"
-#~ msgstr "Plik wykonywalny"
-
-#~ msgid "Open a source file"
-#~ msgstr "Otwórz plik źródłowy"
-
-#~ msgid "Reload source file"
-#~ msgstr "Przeładuj plik źródłowy"
-
-#~ msgid "Run/Continue"
-#~ msgstr "Uruchom/kontynuuj"
-
-#~ msgid "Step into"
-#~ msgstr "Wejdź w"
-
-#~ msgid "Step over"
-#~ msgstr "Przejdź przez"
-
-#~ msgid "Step out"
-#~ msgstr "Wyjdź z"
-
-#~ msgid "Breakpoint"
-#~ msgstr "Punkt zatrzymania"
-
-#~ msgid "Search"
-#~ msgstr "Wyszukaj"

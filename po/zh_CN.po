@@ -8,7 +8,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: zh_CN\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-07-19 22:57+0200\n"
+"POT-Creation-Date: 2011-03-01 22:35+0100\n"
 "PO-Revision-Date: 2008-04-18 18:27+0800\n"
 "Last-Translator: Moligaloo <moligaloo@163.com>\n"
 "Language-Team:  <zh@li.org>\n"
@@ -17,134 +17,263 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: exprwnd.cpp:314 rc.cpp:75 regwnd.cpp:428
-#, no-c-format
-msgid "Value"
-msgstr "值"
-
-#: memwindow.cpp:55 brkpt.cpp:317
-msgid "Address"
-msgstr "地址"
-
-#: memwindow.cpp:70
-msgid "B&ytes"
-msgstr "字节"
-
-#: memwindow.cpp:71
-msgid "Halfwords (&2 Bytes)"
-msgstr "半字"
-
-#: memwindow.cpp:72
-msgid "Words (&4 Bytes)"
-msgstr "字"
-
-#: memwindow.cpp:73
-msgid "Giantwords (&8 Bytes)"
-msgstr "双字"
-
-#: memwindow.cpp:75 regwnd.cpp:79
-msgid "He&xadecimal"
-msgstr "十六进制"
-
-#: memwindow.cpp:76
-msgid "Signed &decimal"
-msgstr "有符号整数"
-
-#: memwindow.cpp:77
-msgid "&Unsigned decimal"
-msgstr "无符号整数"
-
-#: memwindow.cpp:78 regwnd.cpp:77
-msgid "&Octal"
-msgstr "八进制"
-
-#: memwindow.cpp:79 regwnd.cpp:76
-msgid "&Binary"
-msgstr "二进制"
-
-#: memwindow.cpp:80
-msgid "&Addresses"
-msgstr "地址"
-
-#: memwindow.cpp:81
-msgid "&Character"
-msgstr "字符"
-
-#: memwindow.cpp:82
-msgid "&Floatingpoint"
-msgstr "浮点数"
-
-#: memwindow.cpp:83
-msgid "&Strings"
-msgstr "字符串"
-
-#: memwindow.cpp:84
-msgid "&Instructions"
-msgstr "指令"
-
-#: brkpt.cpp:63
-msgid "Add &Breakpoint"
-msgstr "添加断点"
-
-#: brkpt.cpp:67
-msgid "Add &Watchpoint"
-msgstr "添加监视点"
-
-#: brkpt.cpp:76 brkpt.cpp:235
+#. i18n: file: brkptbase.ui:85
+#. i18n: ectx: property (text), widget (QPushButton, btEnaDis)
+#: brkpt.cpp:179 rc.cpp:30
 msgid "&Disable"
 msgstr "启用"
 
-#: brkpt.cpp:81 brkpt.cpp:237
+#: brkpt.cpp:181
 msgid "&Enable"
 msgstr "禁用"
 
-#: brkpt.cpp:91
-msgid "&View Code"
-msgstr "查看代码"
-
-#: brkpt.cpp:95
-msgid "&Conditional..."
-msgstr "条件..."
-
-#: brkpt.cpp:316 threadlist.cpp:42
-msgid "Location"
-msgstr "位置"
-
-#: brkpt.cpp:318
-msgid "Hits"
-msgstr "提示"
-
-#: brkpt.cpp:319
-msgid "Ignore"
-msgstr "忽略"
-
-#: brkpt.cpp:320
-msgid "Condition"
-msgstr "状态"
-
-#: brkpt.cpp:443
+#: brkpt.cpp:363
 msgid ": Conditional breakpoint"
 msgstr ":条件断点"
 
-#: brkpt.cpp:446
-msgid "&Condition:"
-msgstr "条件:"
+#: dbgmainwnd.cpp:71
+msgid "active"
+msgstr "激活"
 
-#: brkpt.cpp:448
-msgid "Ignore &next hits:"
-msgstr "忽略下一个提示"
+#: dbgmainwnd.cpp:78
+msgid "Stack"
+msgstr "堆栈"
 
-#: gdbdriver.cpp:894
-msgid "<anonymous struct or union>"
-msgstr "<匿名结构体或共用体>"
+#: dbgmainwnd.cpp:81
+msgid "Locals"
+msgstr "局部变量"
 
-#: gdbdriver.cpp:1488
-msgid "<additional entries of the array suppressed>"
-msgstr "<被抑制数组的额外条目>"
+#: dbgmainwnd.cpp:82
+msgid "Variable"
+msgstr "变量"
 
-#: gdbdriver.cpp:2041 xsldbgdriver.cpp:1334
-msgid "New working directory: "
-msgstr "新的工作目录："
+#: dbgmainwnd.cpp:84
+msgid "Watches"
+msgstr "监视点"
+
+#: dbgmainwnd.cpp:87
+msgid "Registers"
+msgstr "寄存器"
+
+#: dbgmainwnd.cpp:90
+msgid "Breakpoints"
+msgstr "断点"
+
+#: dbgmainwnd.cpp:93 pgmsettings.cpp:108
+msgid "Output"
+msgstr "输出"
+
+#: dbgmainwnd.cpp:96
+msgid "Threads"
+msgstr "线程"
+
+#: dbgmainwnd.cpp:99
+msgid "Memory"
+msgstr "内存"
+
+#: dbgmainwnd.cpp:251
+msgid "&Open Source..."
+msgstr "打开源文件..."
+
+#: dbgmainwnd.cpp:253
+msgid "&Reload Source"
+msgstr "再载入源程序"
+
+#: dbgmainwnd.cpp:255
+msgid "&Executable..."
+msgstr "可执行程序..."
+
+#: dbgmainwnd.cpp:261
+msgid "Recent E&xecutables"
+msgstr "最近的可执行程序"
+
+#: dbgmainwnd.cpp:262
+msgid "&Core dump..."
+msgstr "核心转储"
+
+#: dbgmainwnd.cpp:267
+msgid "This &Program..."
+msgstr "这个程序..."
+
+#: dbgmainwnd.cpp:269
+msgid "&Global Options..."
+msgstr "全局选项"
+
+#: dbgmainwnd.cpp:279
+msgid "Source &code"
+msgstr "源代码"
+
+#: dbgmainwnd.cpp:281
+msgid "Stac&k"
+msgstr "堆栈"
+
+#: dbgmainwnd.cpp:282
+msgid "&Locals"
+msgstr "局部变量"
+
+#: dbgmainwnd.cpp:283
+msgid "&Watched expressions"
+msgstr "被监视的表达式"
+
+#: dbgmainwnd.cpp:284
+msgid "&Registers"
+msgstr "寄存器"
+
+#: dbgmainwnd.cpp:285
+msgid "&Breakpoints"
+msgstr "断点"
+
+#: dbgmainwnd.cpp:286
+msgid "T&hreads"
+msgstr "线程"
+
+#: dbgmainwnd.cpp:287
+msgid "&Output"
+msgstr "输出"
+
+#: dbgmainwnd.cpp:288
+msgid "&Memory"
+msgstr "内存"
+
+#: dbgmainwnd.cpp:298
+msgid "&Run"
+msgstr "执行"
+
+#: dbgmainwnd.cpp:302
+msgid "Step &into"
+msgstr "跳入"
+
+#: dbgmainwnd.cpp:306
+msgid "Step &over"
+msgstr "跳过"
+
+#: dbgmainwnd.cpp:310
+msgid "Step o&ut"
+msgstr "跳出"
+
+#: dbgmainwnd.cpp:314
+msgid "Run to &cursor"
+msgstr "运行到光标"
+
+#: dbgmainwnd.cpp:318
+msgid "Step i&nto by instruction"
+msgstr "跳入到汇编指令"
+
+#: dbgmainwnd.cpp:322
+msgid "Step o&ver by instruction"
+msgstr "从汇编指令中跳出"
+
+#: dbgmainwnd.cpp:326
+msgid "&Program counter to current line"
+msgstr "到当前行的程序计数"
+
+#: dbgmainwnd.cpp:329
+msgid "&Break"
+msgstr "断开"
+
+#: dbgmainwnd.cpp:331
+msgid "&Kill"
+msgstr "杀死"
+
+#: dbgmainwnd.cpp:333
+msgid "Re&start"
+msgstr "重启"
+
+#: dbgmainwnd.cpp:335
+msgid "A&ttach..."
+msgstr "连接"
+
+#: dbgmainwnd.cpp:337
+msgid "&Arguments..."
+msgstr "参数"
+
+#: dbgmainwnd.cpp:341
+msgid "Set/Clear &breakpoint"
+msgstr "设置/清除断点"
+
+#: dbgmainwnd.cpp:343
+msgid "Set &temporary breakpoint"
+msgstr "设置临时断点"
+
+#: dbgmainwnd.cpp:345
+msgid "&Enable/Disable breakpoint"
+msgstr "启用/禁用断点"
+
+#: dbgmainwnd.cpp:349
+msgid "Watch Expression"
+msgstr "监视表达式"
+
+#: dbgmainwnd.cpp:351
+msgid "Edit Value"
+msgstr "编辑值"
+
+#: dbgmainwnd.cpp:379
+msgid "Restart"
+msgstr "重启"
+
+#: dbgmainwnd.cpp:380
+msgid "Core dump"
+msgstr "核心转储"
+
+#: dbgmainwnd.cpp:623
+msgid "`%1' is not a file or does not exist"
+msgstr "`%1'不是一个文件或者文件不存在"
+
+#: dbgmainwnd.cpp:691
+msgid "Don't know how to debug language `%1'"
+msgstr "不能调试的语言:%1"
+
+#: dbgmainwnd.cpp:704
+msgid ""
+"Could not start the debugger process.\n"
+"Please shut down KDbg and resolve the problem."
+msgstr "无法启动调试器进程"
+
+#: dbgmainwnd.cpp:826
+msgid ": Global options"
+msgstr ":全局选项"
+
+#: dbgmainwnd.cpp:841 pgmsettings.cpp:107
+#, fuzzy
+msgid "Debugger"
+msgstr "调试器"
+
+#: dbgmainwnd.cpp:842
+#, fuzzy
+msgid "Miscellaneous"
+msgstr "杂项"
+
+#: dbgmainwnd.cpp:980
+msgid ": Program output"
+msgstr ":程序输出"
+
+#: dbgmainwnd.cpp:1070
+msgid "|All source files\n"
+msgstr "|所有源文件\n"
+
+#: dbgmainwnd.cpp:1071
+msgid "|Source files\n"
+msgstr "|源文件\n"
+
+#: dbgmainwnd.cpp:1072
+msgid "|Header files\n"
+msgstr "|头文件\n"
+
+#: dbgmainwnd.cpp:1073
+msgid "*|All files"
+msgstr "*|所有文件"
+
+#: dbgmainwnd.cpp:1165
+msgid "Open"
+msgstr ""
+
+#: dbgmainwnd.cpp:1183
+msgid "Select the executable to debug"
+msgstr "选择要调试的可执行程序"
+
+#: dbgmainwnd.cpp:1196
+msgid "Select core dump"
+msgstr "选择核心转储"
 
 #: debugger.cpp:650
 msgid ""
@@ -154,7 +283,7 @@ msgstr ""
 "gdb非预期中止\n"
 "请重启会话，返回代码为%1"
 
-#: debugger.cpp:833
+#: debugger.cpp:841
 msgid ""
 "The settings for this program specify the following debugger command:\n"
 "%1\n"
@@ -163,105 +292,203 @@ msgstr ""
 "这个程序的设置指定了下面的调试命令：\n"
 "%1 使用这个命令吗？"
 
-#: mainwndbase.cpp:43
-msgid " Add "
-msgstr "添加"
+#. i18n: file: pgmargsbase.ui:234
+#. i18n: ectx: property (text), widget (QTreeWidget, envList)
+#: exprwnd.cpp:312 regwnd.cpp:417 rc.cpp:127
+msgid "Value"
+msgstr "值"
 
-#: mainwndbase.cpp:44
-msgid " Del "
-msgstr "删除"
+#: gdbdriver.cpp:911
+msgid "<anonymous struct or union>"
+msgstr "<匿名结构体或共用体>"
 
-#: mainwndbase.cpp:45
-msgid "Expression"
-msgstr "表达式"
+#: gdbdriver.cpp:1526
+msgid "<additional entries of the array suppressed>"
+msgstr "<被抑制数组的额外条目>"
 
-#: mainwndbase.cpp:135
-msgid "active"
-msgstr "激活"
+#: gdbdriver.cpp:2084 xsldbgdriver.cpp:1287
+msgid "New working directory: "
+msgstr "新的工作目录："
 
-#: mainwndbase.cpp:301
-msgid "Don't know how to debug language `%1'"
-msgstr "不能调试的语言:%1"
+#: main.cpp:23
+msgid "KDbg"
+msgstr ""
 
-#: mainwndbase.cpp:314
-msgid ""
-"Could not start the debugger process.\n"
-"Please shut down KDbg and resolve the problem."
-msgstr "无法启动调试器进程"
-
-#: mainwndbase.cpp:418
-msgid ": Global options"
-msgstr ":全局选项"
-
-#: mainwndbase.cpp:435 pgmsettings.cpp:111
-msgid "&Debugger"
-msgstr "调试器"
-
-#: mainwndbase.cpp:436
-msgid "&Miscellaneous"
-msgstr "杂项"
-
-#: mainwndbase.cpp:506
-msgid ": Program output"
-msgstr ":程序输出"
-
-#: main.cpp:38
+#: main.cpp:25
 msgid "A Debugger"
 msgstr "一个基于GDB的图形界面调试器"
 
-#: main.cpp:46
+#: main.cpp:27
+msgid "(c) 1998-2011 Johannes Sixt"
+msgstr ""
+
+#: main.cpp:31
+msgid "Johannes Sixt"
+msgstr ""
+
+#: main.cpp:32
+msgid "Keith Isdale"
+msgstr ""
+
+#: main.cpp:33
 msgid "XSLT debugging"
 msgstr "XSLT调试"
 
-#: main.cpp:49
+#: main.cpp:35
+msgid "Daniel Kristjansson"
+msgstr ""
+
+#: main.cpp:36
 msgid "Register groups and formatting"
 msgstr "寄存器组与格式化"
 
-#: main.cpp:54
+#: main.cpp:38
+msgid "David Edmundson"
+msgstr ""
+
+#: main.cpp:39
+msgid "KDE4 porting"
+msgstr ""
+
+#: main.cpp:44
 msgid "transcript of conversation with the debugger"
 msgstr "与调试器会话的副本"
 
-#: main.cpp:55
+#: main.cpp:45
 msgid "remote debugging via <device>"
 msgstr "通过<device>进行远程调试"
 
-#: main.cpp:56
+#: main.cpp:46
 msgid "specify language: C, XSLT"
 msgstr "指定语言：C,XSLT "
 
-#: main.cpp:57
+#: main.cpp:47
 msgid "use language XSLT (deprecated)"
 msgstr "使用语言XSLT(过时)"
 
-#: main.cpp:58
+#: main.cpp:48
 msgid "specify arguments of debugged executable"
 msgstr ""
 
-#: main.cpp:59
+#: main.cpp:49
 msgid "specify PID of process to debug"
 msgstr "指定要调试进程的PID"
 
-#: main.cpp:60
+#: main.cpp:50
 msgid "path of executable to debug"
 msgstr "可执行程序的路径"
 
-#: main.cpp:61
+#: main.cpp:51
 msgid "a core file to use"
 msgstr "要使用的核心转储"
 
-#: main.cpp:126
+#: main.cpp:114
 msgid "Cannot start debugger."
 msgstr "不能启动调试器"
 
-#: prefdebugger.cpp:21
+#. i18n: file: brkptbase.ui:37
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+#: memwindow.cpp:32 rc.cpp:9
+msgid "Address"
+msgstr "地址"
+
+#: memwindow.cpp:59
+msgid "B&ytes"
+msgstr "字节"
+
+#: memwindow.cpp:61
+msgid "Halfwords (&2 Bytes)"
+msgstr "半字"
+
+#: memwindow.cpp:63
+msgid "Words (&4 Bytes)"
+msgstr "字"
+
+#: memwindow.cpp:65
+msgid "Giantwords (&8 Bytes)"
+msgstr "双字"
+
+#: memwindow.cpp:68 regwnd.cpp:77
+msgid "He&xadecimal"
+msgstr "十六进制"
+
+#: memwindow.cpp:70
+msgid "Signed &decimal"
+msgstr "有符号整数"
+
+#: memwindow.cpp:72
+msgid "&Unsigned decimal"
+msgstr "无符号整数"
+
+#: memwindow.cpp:74 regwnd.cpp:75
+msgid "&Octal"
+msgstr "八进制"
+
+#: memwindow.cpp:76 regwnd.cpp:74
+msgid "&Binary"
+msgstr "二进制"
+
+#: memwindow.cpp:78
+msgid "&Addresses"
+msgstr "地址"
+
+#: memwindow.cpp:80
+msgid "&Character"
+msgstr "字符"
+
+#: memwindow.cpp:82
+msgid "&Floatingpoint"
+msgstr "浮点数"
+
+#: memwindow.cpp:84
+msgid "&Strings"
+msgstr "字符串"
+
+#: memwindow.cpp:86
+msgid "&Instructions"
+msgstr "指令"
+
+#: pgmargs.cpp:198
+msgid "Select a file name to insert as program argument"
+msgstr "选择一个文件名作为程序参数"
+
+#: pgmargs.cpp:212
+msgid "Select a directory to insert as program argument"
+msgstr "选择一个目录作为程序参数"
+
+#: pgmsettings.cpp:25
+msgid ""
+"How to invoke &GDB - leave empty to use\n"
+"the default from the global options:"
+msgstr ""
+"怎样启动GDB\n"
+"默认与全局选项相同。"
+
+#: pgmsettings.cpp:59
+msgid "&No input and output"
+msgstr "没有输入和输出"
+
+#: pgmsettings.cpp:63
+msgid "&Only output, simple terminal emulation"
+msgstr "只有输出，简单终端的模拟"
+
+#: pgmsettings.cpp:67
+msgid "&Full terminal emulation"
+msgstr "全终端模拟"
+
+#: pgmsettings.cpp:104
+msgid "%1: Settings for %2"
+msgstr "%1：%2的设置"
+
+#: prefdebugger.cpp:20
 msgid "To revert to the default settings, clear the entries."
 msgstr "恢复默认设置清除条目"
 
-#: prefdebugger.cpp:25
+#: prefdebugger.cpp:24
 msgid "How to invoke &GDB:"
 msgstr "怎样调用GDB"
 
-#: prefdebugger.cpp:32
+#: prefdebugger.cpp:31
 msgid ""
 "%T will be replaced with a title string,\n"
 "%C will be replaced by a Bourne shell script that\n"
@@ -271,529 +498,9 @@ msgstr ""
 "%C会替换为了一个Bourne shell脚本\n"
 "以保持终端窗口打开"
 
-#: prefdebugger.cpp:38
+#: prefdebugger.cpp:37
 msgid "&Terminal for program output:"
 msgstr "程序输出的终端"
-
-#: procattach.cpp:271
-msgid ": Attach to process"
-msgstr ":连接到进程"
-
-#: procattach.cpp:275
-msgid "Specify the process number to attach to:"
-msgstr "指定要连接的进程号"
-
-#: pgmsettings.cpp:26
-msgid ""
-"How to invoke &GDB - leave empty to use\n"
-"the default from the global options:"
-msgstr ""
-"怎样启动GDB\n"
-"默认与全局选项相同。"
-
-#: pgmsettings.cpp:61
-msgid "&No input and output"
-msgstr "没有输入和输出"
-
-#: pgmsettings.cpp:66
-msgid "&Only output, simple terminal emulation"
-msgstr "只有输出，简单终端的模拟"
-
-#: pgmsettings.cpp:71
-msgid "&Full terminal emulation"
-msgstr "全终端模拟"
-
-#: pgmsettings.cpp:105
-msgid "%1: Settings for %2"
-msgstr "%1：%2的设置"
-
-#: pgmsettings.cpp:112 dbgmainwnd.cpp:221
-msgid "&Output"
-msgstr "输出"
-
-#: winstack.cpp:390
-msgid ": Search"
-msgstr ":搜索"
-
-#: winstack.cpp:396
-msgid "&Case sensitive"
-msgstr "区分大小写"
-
-#: winstack.cpp:398
-msgid "&Forward"
-msgstr "前进"
-
-#: winstack.cpp:400
-msgid "&Backward"
-msgstr "后退"
-
-#: rc.cpp:9
-#, no-c-format
-msgid "E&xecution"
-msgstr "执行"
-
-#: rc.cpp:12
-#, no-c-format
-msgid "&Breakpoint"
-msgstr "断点"
-
-#: rc.cpp:18
-#, no-c-format
-msgid "Program Arguments"
-msgstr "程序参数"
-
-#: rc.cpp:21
-#, no-c-format
-msgid "&Arguments"
-msgstr "参数"
-
-#: rc.cpp:24
-#, no-c-format
-msgid "Run <i>%1</i> with these arguments:"
-msgstr "以下列参数运行<b>%1</b>"
-
-#: rc.cpp:27
-#, no-c-format
-msgid ""
-"Specify the arguments with which the program shall be invoked for this "
-"debugging session. You specify the arguments just as you would on the "
-"command line, that is, you can even use quotes and environment variables, "
-"for example:<p><tt>--message 'start in: ' $HOME</tt>"
-msgstr ""
-"指定程序启动的参数，就像你从命令行中启动一样。\n"
-"同样，你甚至可以用引号和环境变量,例如:\n"
-"<p><tt>--message 'start in: ' $HOME</tt>"
-
-#: rc.cpp:30
-#, no-c-format
-msgid "Insert &file name..."
-msgstr "插入文件名"
-
-#: rc.cpp:33
-#, no-c-format
-msgid "Alt+F"
-msgstr "Alt+F"
-
-#: rc.cpp:36
-#, no-c-format
-msgid ""
-"Browse for a file; the full path name will be inserted at the current cursor "
-"location in the edit box above."
-msgstr "浏览一个文件,它完整的路径将会插入到当前光标所在行"
-
-#: rc.cpp:39
-#, no-c-format
-msgid "Insert &directory name..."
-msgstr "插入目录名"
-
-#: rc.cpp:42 rc.cpp:93
-#, no-c-format
-msgid "Alt+D"
-msgstr "Alt+D"
-
-#: rc.cpp:45
-#, no-c-format
-msgid ""
-"Browse for a directory; the full path name will be inserted at the current "
-"cursor location in the edit box above."
-msgstr "浏览一个目录。它完整的路径名将会被插入到当前光标的位置"
-
-#: rc.cpp:48
-#, no-c-format
-msgid "&Working Directory"
-msgstr "工作目录"
-
-#: rc.cpp:51
-#, no-c-format
-msgid "Specify here the initial working directory where the program is run."
-msgstr "指定程序运行的初始目录"
-
-#: rc.cpp:54
-#, no-c-format
-msgid "&Browse..."
-msgstr "浏览"
-
-#: rc.cpp:57
-#, no-c-format
-msgid "Alt+B"
-msgstr "Alt+B"
-
-#: rc.cpp:60
-#, no-c-format
-msgid "Browse for the initial working directory where the program is run."
-msgstr "浏览程序运行的初始工作目录"
-
-#: rc.cpp:63
-#, no-c-format
-msgid "&Environment"
-msgstr "环境"
-
-#: rc.cpp:66
-#, no-c-format
-msgid "Environment variables (<tt>NAME=value</tt>):"
-msgstr "环境变量(变量名=值)："
-
-#: rc.cpp:69
-#, no-c-format
-msgid ""
-"To add a new environment variable or to modify one, specify it here in the "
-"form <tt>NAME=value</tt> and click <b>Modify</b>."
-msgstr ""
-"添加一个环境变量或者修改已有的，用这个形式去指定：\n"
-"<tt>变量名=值</tt>，然后点击<b>修改</b>"
-
-#: rc.cpp:72
-#, no-c-format
-msgid "Name"
-msgstr "名称"
-
-#: rc.cpp:78
-#, no-c-format
-msgid ""
-"Environment variables that are set <i>in addition</i> to those that are "
-"inherited are listed in this table. To add new environment variables, "
-"specify them as <tt>NAME=value</tt> in the edit box above and click "
-"<b>Modify</b>. To modify a value, select it in this list and click "
-"<b>Modify</b>. To delete an environment variable, select it in this list and "
-"click <b>Delete</b>."
-msgstr ""
-"环境变量设置：<i>添加</i>到表格中，以<tt>变量名=值</tt>指定 <b>修改</b>一个"
-"值，从列表中选择，然后点击<b>修改</b按钮 删除一个环境变量,从列表中选择，然后"
-"选择<b>删除</b>"
-
-#: rc.cpp:84
-#, no-c-format
-msgid "Alt+M"
-msgstr "Alt+M"
-
-#: rc.cpp:87
-#, no-c-format
-msgid ""
-"Enters the environment variable that is currently specified in the edit box "
-"into the list. If the named variable is already in the list, it receives a "
-"new value; otherwise, a new entry is created."
-msgstr "输入环境变量的值，如果它的名字在列表中，则修改之，反之则创建之"
-
-#: rc.cpp:96
-#, no-c-format
-msgid ""
-"Deletes the selected environment variable from the list. This cannot be used "
-"to delete environment variables that are inherited."
-msgstr "从列表中删除选择的环境变量,这不能用来删除那些继承的环境变量"
-
-#: rc.cpp:99
-#, no-c-format
-msgid "&xsldbg Options"
-msgstr "xsldbg选项"
-
-#: rc.cpp:105
-#, no-c-format
-msgid "F1"
-msgstr "F1"
-
-#: rc.cpp:116
-#, no-c-format
-msgid "Attach to Process"
-msgstr "连接到进程"
-
-#: rc.cpp:119
-#, no-c-format
-msgid "&Filter or PID:"
-msgstr "过滤文本或者PID"
-
-#: rc.cpp:122
-#, no-c-format
-msgid ""
-"Type the name of the process or its process ID (PID) here to reduce the "
-"number of entries in the list."
-msgstr "在这里输入进程的名字或ID以减少列表中的进程数"
-
-#: rc.cpp:125
-#, no-c-format
-msgid "..."
-msgstr "..."
-
-#: rc.cpp:128
-#, no-c-format
-msgid "Clear filter"
-msgstr "清除过滤"
-
-#: rc.cpp:131
-#, no-c-format
-msgid ""
-"Use this button to clear the filter text so that all processes are displayed."
-msgstr "用这个按钮来清除过滤文本，这样就可以显示所有的进程"
-
-#: rc.cpp:134
-#, no-c-format
-msgid "Command"
-msgstr "命令"
-
-#: rc.cpp:137
-#, no-c-format
-msgid "PID"
-msgstr "PID"
-
-#: rc.cpp:140
-#, no-c-format
-msgid "PPID"
-msgstr "PPID"
-
-#: rc.cpp:143
-#, no-c-format
-msgid ""
-"<p>This list displays all processes that are currently running. You must "
-"select the process that you want KDbg to attach to. Use the <b>Filter or "
-"PID</b> edit box to reduce the number of entries in this list.<p>The text in "
-"the <i>Command</i> column is usually, but not always, the command that was "
-"used to start the process. The <i>PID</i> column shows the process ID. The "
-"<i>PPID</i> column shows the process ID of the parent process. Additional "
-"columns show more information about the processes that is also available via "
-"the system's <i>ps</i> command.</p><p>The list is not updated automatically. "
-"Use the <b>Refresh</b> button to update it.</p>"
-msgstr ""
-"<p>这个列表显示了所有当前运行的进程,你得从中选择一个以连接调试,使用<b>过滤名"
-"或进程ID</b>可以减少当前的条目<p> <p>在<i>命令</i>栏中的文字通常是（但并不总"
-"是）启动进程的命令。<i>PID</i>栏显示了进程ID<i>PPID</i>栏显示的父进程的PID. "
-"额外栏显示了这个进程的更多信息。这个列表并不会自动更新，请用<b>刷新</b>按钮以"
-"更新。"
-
-#: rc.cpp:146
-#, no-c-format
-msgid "&Refresh"
-msgstr "刷新"
-
-#: rc.cpp:149
-#, no-c-format
-msgid "This button updates the list of processes."
-msgstr "这个按钮更新这个进程表"
-
-#: rc.cpp:156
-#, no-c-format
-msgid ""
-"You must select a process from the list. Then click the <b>OK</b> button to "
-"attach to that process."
-msgstr "你必须从下面的列表中选择一个进程,然后点击<b>确定</b>按钮连接那个进程"
-
-#: threadlist.cpp:41
-msgid "Thread ID"
-msgstr "线程ID"
-
-#: dbgmainwnd.cpp:46
-msgid "Source"
-msgstr "源文件"
-
-#: dbgmainwnd.cpp:54 dbgmainwnd.cpp:388
-msgid "Stack"
-msgstr "堆栈"
-
-#: dbgmainwnd.cpp:57 dbgmainwnd.cpp:389
-msgid "Locals"
-msgstr "局部变量"
-
-#: dbgmainwnd.cpp:58
-msgid "Variable"
-msgstr "变量"
-
-#: dbgmainwnd.cpp:60 dbgmainwnd.cpp:390
-msgid "Watches"
-msgstr "监视点"
-
-#: dbgmainwnd.cpp:63 dbgmainwnd.cpp:391
-msgid "Registers"
-msgstr "寄存器"
-
-#: dbgmainwnd.cpp:66 dbgmainwnd.cpp:392
-msgid "Breakpoints"
-msgstr "断点"
-
-#: dbgmainwnd.cpp:69 dbgmainwnd.cpp:394
-msgid "Output"
-msgstr "输出"
-
-#: dbgmainwnd.cpp:72 dbgmainwnd.cpp:393
-msgid "Threads"
-msgstr "线程"
-
-#: dbgmainwnd.cpp:75 dbgmainwnd.cpp:395
-msgid "Memory"
-msgstr "内存"
-
-#: dbgmainwnd.cpp:181
-msgid "&Open Source..."
-msgstr "打开源文件..."
-
-#: dbgmainwnd.cpp:183
-msgid "&Reload Source"
-msgstr "再载入源程序"
-
-#: dbgmainwnd.cpp:186
-msgid "&Executable..."
-msgstr "可执行程序..."
-
-#: dbgmainwnd.cpp:189
-msgid "Recent E&xecutables"
-msgstr "最近的可执行程序"
-
-#: dbgmainwnd.cpp:192
-msgid "&Core dump..."
-msgstr "核心转储"
-
-#: dbgmainwnd.cpp:197
-msgid "This &Program..."
-msgstr "这个程序..."
-
-#: dbgmainwnd.cpp:200
-msgid "&Global Options..."
-msgstr "全局选项"
-
-#: dbgmainwnd.cpp:207
-msgid "&Find"
-msgstr "查找"
-
-#: dbgmainwnd.cpp:213
-msgid "Source &code"
-msgstr "源代码"
-
-#: dbgmainwnd.cpp:215
-msgid "Stac&k"
-msgstr "堆栈"
-
-#: dbgmainwnd.cpp:216
-msgid "&Locals"
-msgstr "局部变量"
-
-#: dbgmainwnd.cpp:217
-msgid "&Watched expressions"
-msgstr "被监视的表达式"
-
-#: dbgmainwnd.cpp:218
-msgid "&Registers"
-msgstr "寄存器"
-
-#: dbgmainwnd.cpp:219
-msgid "&Breakpoints"
-msgstr "断点"
-
-#: dbgmainwnd.cpp:220
-msgid "T&hreads"
-msgstr "线程"
-
-#: dbgmainwnd.cpp:222
-msgid "&Memory"
-msgstr "内存"
-
-#: dbgmainwnd.cpp:232
-msgid "&Run"
-msgstr "执行"
-
-#: dbgmainwnd.cpp:235
-msgid "Step &into"
-msgstr "跳入"
-
-#: dbgmainwnd.cpp:239
-msgid "Step &over"
-msgstr "跳过"
-
-#: dbgmainwnd.cpp:243
-msgid "Step o&ut"
-msgstr "跳出"
-
-#: dbgmainwnd.cpp:247
-msgid "Run to &cursor"
-msgstr "运行到光标"
-
-#: dbgmainwnd.cpp:251
-msgid "Step i&nto by instruction"
-msgstr "跳入到汇编指令"
-
-#: dbgmainwnd.cpp:255
-msgid "Step o&ver by instruction"
-msgstr "从汇编指令中跳出"
-
-#: dbgmainwnd.cpp:259
-msgid "&Program counter to current line"
-msgstr "到当前行的程序计数"
-
-#: dbgmainwnd.cpp:262
-msgid "&Break"
-msgstr "断开"
-
-#: dbgmainwnd.cpp:265
-msgid "&Kill"
-msgstr "杀死"
-
-#: dbgmainwnd.cpp:268
-msgid "Re&start"
-msgstr "重启"
-
-#: dbgmainwnd.cpp:271
-msgid "A&ttach..."
-msgstr "连接"
-
-#: dbgmainwnd.cpp:274
-msgid "&Arguments..."
-msgstr "参数"
-
-#: dbgmainwnd.cpp:279
-msgid "Set/Clear &breakpoint"
-msgstr "设置/清除断点"
-
-#: dbgmainwnd.cpp:282
-msgid "Set &temporary breakpoint"
-msgstr "设置临时断点"
-
-#: dbgmainwnd.cpp:285
-msgid "&Enable/Disable breakpoint"
-msgstr "启用/禁用断点"
-
-#: dbgmainwnd.cpp:290
-msgid "Watch Expression"
-msgstr "监视表达式"
-
-#: dbgmainwnd.cpp:293
-msgid "Edit Value"
-msgstr "编辑值"
-
-#: dbgmainwnd.cpp:322
-msgid "Restart"
-msgstr "重启"
-
-#: dbgmainwnd.cpp:323
-msgid "Core dump"
-msgstr "核心转储"
-
-#: dbgmainwnd.cpp:588
-msgid "`%1' is not a file or does not exist"
-msgstr "`%1'不是一个文件或者文件不存在"
-
-#: dbgmainwnd.cpp:702
-msgid "|All source files\n"
-msgstr "|所有源文件\n"
-
-#: dbgmainwnd.cpp:703
-msgid "|Source files\n"
-msgstr "|源文件\n"
-
-#: dbgmainwnd.cpp:704
-msgid "|Header files\n"
-msgstr "|头文件\n"
-
-#: dbgmainwnd.cpp:705
-msgid "*|All files"
-msgstr "*|所有文件"
-
-#: dbgmainwnd.cpp:800
-msgid "Select the executable to debug"
-msgstr "选择要调试的可执行程序"
-
-#: dbgmainwnd.cpp:813
-msgid "Select core dump"
-msgstr "选择核心转储"
-
-#: xsldbgdriver.cpp:1441
-msgid "No memory dump available"
-msgstr "没有可用的内存映像"
 
 #: prefmisc.cpp:23
 msgid "&Pop into foreground when program stops"
@@ -815,54 +522,503 @@ msgstr "源文件过滤"
 msgid "File filter for &header files:"
 msgstr "头文件过滤"
 
-#: ttywnd.cpp:229
-msgid "&Clear"
-msgstr "清除"
+#: procattach.cpp:290
+msgid ": Attach to process"
+msgstr ":连接到进程"
 
-#: pgmargs.cpp:216
-msgid "Select a file name to insert as program argument"
-msgstr "选择一个文件名作为程序参数"
+#: procattach.cpp:294
+msgid "Specify the process number to attach to:"
+msgstr "指定要连接的进程号"
 
-#: pgmargs.cpp:230
-msgid "Select a directory to insert as program argument"
-msgstr "选择一个目录作为程序参数"
+#: procattach.cpp:302
+msgid "OK"
+msgstr ""
 
-#: regwnd.cpp:75
+#: procattach.cpp:307
+msgid "Cancel"
+msgstr ""
+
+#: regwnd.cpp:73
 msgid "&GDB default"
 msgstr "GDB默认"
 
-#: regwnd.cpp:78
+#: regwnd.cpp:76
 msgid "&Decimal"
 msgstr "十进制数"
 
-#: regwnd.cpp:80
+#: regwnd.cpp:78
 msgid "Real (&e)"
 msgstr "实数(e)"
 
-#: regwnd.cpp:81
+#: regwnd.cpp:79
 msgid "Real (&f)"
 msgstr "实数(f)"
 
-#: regwnd.cpp:82
+#: regwnd.cpp:80
 msgid "&Real (g)"
 msgstr "实数(g)"
 
-#: regwnd.cpp:427
+#: regwnd.cpp:416
 msgid "Register"
 msgstr "寄存器"
 
-#: regwnd.cpp:429
+#: regwnd.cpp:418
 msgid "Decoded value"
 msgstr "编码值"
 
-#: regwnd.cpp:462
-msgid "x86/x87 segment"
-msgstr "x86/x87段"
+#: regwnd.cpp:434
+msgid "GP and others"
+msgstr "GP和其它"
 
-#: regwnd.cpp:465
+#: regwnd.cpp:436
 msgid "Flags"
 msgstr "标志位"
 
-#: regwnd.cpp:468
-msgid "GP and others"
-msgstr "GP和其它"
+#: regwnd.cpp:439
+msgid "x86/x87 segment"
+msgstr "x86/x87段"
+
+#: threadlist.cpp:42
+msgid "Thread ID"
+msgstr "线程ID"
+
+#. i18n: file: brkptbase.ui:32
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+#: threadlist.cpp:42 rc.cpp:6
+msgid "Location"
+msgstr "位置"
+
+#: ttywnd.cpp:214
+msgid "&Clear"
+msgstr "清除"
+
+#: watchwindow.cpp:17
+msgid " Add "
+msgstr "添加"
+
+#: watchwindow.cpp:18
+msgid " Del "
+msgstr "删除"
+
+#: watchwindow.cpp:19
+msgid "Expression"
+msgstr "表达式"
+
+#: winstack.cpp:384
+msgid ": Search"
+msgstr ":搜索"
+
+#: winstack.cpp:391
+msgid "&Case sensitive"
+msgstr "区分大小写"
+
+#: winstack.cpp:393
+msgid "&Forward"
+msgstr "前进"
+
+#: winstack.cpp:395
+msgid "&Backward"
+msgstr "后退"
+
+#: winstack.cpp:396
+msgid "Close"
+msgstr ""
+
+#: xsldbgdriver.cpp:1385
+msgid "No memory dump available"
+msgstr "没有可用的内存映像"
+
+#. i18n: file: brkptbase.ui:13
+#. i18n: ectx: property (windowTitle), widget (QWidget, BrkPtBase)
+#: rc.cpp:3
+msgid "Form"
+msgstr ""
+
+#. i18n: file: brkptbase.ui:42
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+#: rc.cpp:12
+msgid "Hits"
+msgstr "提示"
+
+#. i18n: file: brkptbase.ui:47
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+#: rc.cpp:15
+msgid "Ignore"
+msgstr "忽略"
+
+#. i18n: file: brkptbase.ui:52
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+#: rc.cpp:18
+msgid "Condition"
+msgstr "状态"
+
+#. i18n: file: brkptbase.ui:64
+#. i18n: ectx: property (text), widget (QPushButton, btAddBP)
+#: rc.cpp:21
+msgid "Add &Breakpoint"
+msgstr "添加断点"
+
+#. i18n: file: brkptbase.ui:71
+#. i18n: ectx: property (text), widget (QPushButton, btAddWP)
+#: rc.cpp:24
+msgid "Add &Watchpoint"
+msgstr "添加监视点"
+
+#. i18n: file: brkptbase.ui:78
+#. i18n: ectx: property (text), widget (QPushButton, btRemove)
+#: rc.cpp:27
+msgid "&Remove"
+msgstr ""
+
+#. i18n: file: brkptbase.ui:92
+#. i18n: ectx: property (text), widget (QPushButton, btViewCode)
+#: rc.cpp:33
+msgid "&View Code"
+msgstr "查看代码"
+
+#. i18n: file: brkptbase.ui:99
+#. i18n: ectx: property (text), widget (QPushButton, btConditional)
+#: rc.cpp:36
+msgid "&Conditional..."
+msgstr "条件..."
+
+#. i18n: file: brkptcondition.ui:13
+#. i18n: ectx: property (windowTitle), widget (QDialog, BrkPtCondition)
+#: rc.cpp:39
+msgid "Dialog"
+msgstr ""
+
+#. i18n: file: brkptcondition.ui:27
+#. i18n: ectx: property (text), widget (QLabel, label)
+#: rc.cpp:42
+msgid "&Condition:"
+msgstr "条件:"
+
+#. i18n: file: brkptcondition.ui:40
+#. i18n: ectx: property (text), widget (QLabel, label_2)
+#: rc.cpp:45
+msgid "Ignore &next hits:"
+msgstr "忽略下一个提示"
+
+#. i18n: file: brkptcondition.ui:50
+#. i18n: ectx: property (specialValueText), widget (QSpinBox, ignoreCount)
+#: rc.cpp:48
+msgid "do not ignore"
+msgstr ""
+
+#. i18n: file: kdbgui.rc:4
+#. i18n: ectx: Menu (file)
+#: rc.cpp:51
+#, fuzzy
+msgid "&File"
+msgstr "启用"
+
+#. i18n: file: kdbgui.rc:11
+#. i18n: ectx: Menu (view)
+#: rc.cpp:54
+#, fuzzy
+msgid "&View"
+msgstr "查看代码"
+
+#. i18n: file: kdbgui.rc:25
+#. i18n: ectx: Menu (execution)
+#: rc.cpp:57
+msgid "E&xecution"
+msgstr "执行"
+
+#. i18n: file: kdbgui.rc:42
+#. i18n: ectx: Menu (breakpoint)
+#: rc.cpp:60
+msgid "&Breakpoint"
+msgstr "断点"
+
+#. i18n: file: kdbgui.rc:47
+#. i18n: ectx: Menu (settings)
+#: rc.cpp:63
+#, fuzzy
+msgid "&Settings"
+msgstr "字符串"
+
+#. i18n: file: pgmargsbase.ui:13
+#. i18n: ectx: property (windowTitle), widget (QDialog, PgmArgsBase)
+#: rc.cpp:66
+msgid "Program Arguments"
+msgstr "程序参数"
+
+#. i18n: file: pgmargsbase.ui:26
+#. i18n: ectx: attribute (title), widget (QWidget, argsPage)
+#: rc.cpp:69
+msgid "&Arguments"
+msgstr "参数"
+
+#. i18n: file: pgmargsbase.ui:34
+#. i18n: ectx: property (text), widget (QLabel, labelArgs)
+#: rc.cpp:73
+#, no-c-format
+msgid "Run <i>%1</i> with these arguments:"
+msgstr "以下列参数运行<b>%1</b>"
+
+#. i18n: file: pgmargsbase.ui:47
+#. i18n: ectx: property (whatsThis), widget (QLineEdit, programArgs)
+#: rc.cpp:76
+msgid ""
+"Specify the arguments with which the program shall be invoked for this "
+"debugging session. You specify the arguments just as you would on the "
+"command line, that is, you can even use quotes and environment variables, "
+"for example:<p><tt>--message 'start in: ' $HOME</tt>"
+msgstr ""
+"指定程序启动的参数，就像你从命令行中启动一样。\n"
+"同样，你甚至可以用引号和环境变量,例如:\n"
+"<p><tt>--message 'start in: ' $HOME</tt>"
+
+#. i18n: file: pgmargsbase.ui:56
+#. i18n: ectx: property (whatsThis), widget (QPushButton, insertFile)
+#: rc.cpp:79
+msgid ""
+"Browse for a file; the full path name will be inserted at the current cursor "
+"location in the edit box above."
+msgstr "浏览一个文件,它完整的路径将会插入到当前光标所在行"
+
+#. i18n: file: pgmargsbase.ui:59
+#. i18n: ectx: property (text), widget (QPushButton, insertFile)
+#: rc.cpp:82
+msgid "Insert &file name..."
+msgstr "插入文件名"
+
+#. i18n: file: pgmargsbase.ui:62
+#. i18n: ectx: property (shortcut), widget (QPushButton, insertFile)
+#: rc.cpp:85
+msgid "Alt+F"
+msgstr "Alt+F"
+
+#. i18n: file: pgmargsbase.ui:69
+#. i18n: ectx: property (whatsThis), widget (QPushButton, insertDir)
+#: rc.cpp:88
+msgid ""
+"Browse for a directory; the full path name will be inserted at the current "
+"cursor location in the edit box above."
+msgstr "浏览一个目录。它完整的路径名将会被插入到当前光标的位置"
+
+#. i18n: file: pgmargsbase.ui:72
+#. i18n: ectx: property (text), widget (QPushButton, insertDir)
+#: rc.cpp:91
+msgid "Insert &directory name..."
+msgstr "插入目录名"
+
+#. i18n: file: pgmargsbase.ui:75
+#. i18n: ectx: property (shortcut), widget (QPushButton, insertDir)
+#. i18n: file: pgmargsbase.ui:265
+#. i18n: ectx: property (shortcut), widget (QPushButton, buttonDelete)
+#: rc.cpp:94 rc.cpp:145
+msgid "Alt+D"
+msgstr "Alt+D"
+
+#. i18n: file: pgmargsbase.ui:119
+#. i18n: ectx: attribute (title), widget (QWidget, wdPage)
+#: rc.cpp:97
+msgid "&Working Directory"
+msgstr "工作目录"
+
+#. i18n: file: pgmargsbase.ui:127
+#. i18n: ectx: property (whatsThis), widget (QLineEdit, wdEdit)
+#: rc.cpp:100
+msgid "Specify here the initial working directory where the program is run."
+msgstr "指定程序运行的初始目录"
+
+#. i18n: file: pgmargsbase.ui:136
+#. i18n: ectx: property (whatsThis), widget (QPushButton, wdBrowse)
+#: rc.cpp:103
+msgid "Browse for the initial working directory where the program is run."
+msgstr "浏览程序运行的初始工作目录"
+
+#. i18n: file: pgmargsbase.ui:139
+#. i18n: ectx: property (text), widget (QPushButton, wdBrowse)
+#: rc.cpp:106
+msgid "&Browse..."
+msgstr "浏览"
+
+#. i18n: file: pgmargsbase.ui:142
+#. i18n: ectx: property (shortcut), widget (QPushButton, wdBrowse)
+#: rc.cpp:109
+msgid "Alt+B"
+msgstr "Alt+B"
+
+#. i18n: file: pgmargsbase.ui:186
+#. i18n: ectx: attribute (title), widget (QWidget, envPage)
+#: rc.cpp:112
+msgid "&Environment"
+msgstr "环境"
+
+#. i18n: file: pgmargsbase.ui:196
+#. i18n: ectx: property (text), widget (QLabel, envLabel)
+#: rc.cpp:115
+msgid "Environment variables (<tt>NAME=value</tt>):"
+msgstr "环境变量(变量名=值)："
+
+#. i18n: file: pgmargsbase.ui:209
+#. i18n: ectx: property (whatsThis), widget (QLineEdit, envVar)
+#: rc.cpp:118
+msgid ""
+"To add a new environment variable or to modify one, specify it here in the "
+"form <tt>NAME=value</tt> and click <b>Modify</b>."
+msgstr ""
+"添加一个环境变量或者修改已有的，用这个形式去指定：\n"
+"<tt>变量名=值</tt>，然后点击<b>修改</b>"
+
+#. i18n: file: pgmargsbase.ui:216
+#. i18n: ectx: property (whatsThis), widget (QTreeWidget, envList)
+#: rc.cpp:121
+msgid ""
+"Environment variables that are set <i>in addition</i> to those that are "
+"inherited are listed in this table. To add new environment variables, "
+"specify them as <tt>NAME=value</tt> in the edit box above and click "
+"<b>Modify</b>. To modify a value, select it in this list and click "
+"<b>Modify</b>. To delete an environment variable, select it in this list and "
+"click <b>Delete</b>."
+msgstr ""
+"环境变量设置：<i>添加</i>到表格中，以<tt>变量名=值</tt>指定 <b>修改</b>一个"
+"值，从列表中选择，然后点击<b>修改</b按钮 删除一个环境变量,从列表中选择，然后"
+"选择<b>删除</b>"
+
+#. i18n: file: pgmargsbase.ui:229
+#. i18n: ectx: property (text), widget (QTreeWidget, envList)
+#: rc.cpp:124
+msgid "Name"
+msgstr "名称"
+
+#. i18n: file: pgmargsbase.ui:246
+#. i18n: ectx: property (whatsThis), widget (QPushButton, buttonModify)
+#: rc.cpp:130
+msgid ""
+"Enters the environment variable that is currently specified in the edit box "
+"into the list. If the named variable is already in the list, it receives a "
+"new value; otherwise, a new entry is created."
+msgstr "输入环境变量的值，如果它的名字在列表中，则修改之，反之则创建之"
+
+#. i18n: file: pgmargsbase.ui:249
+#. i18n: ectx: property (text), widget (QPushButton, buttonModify)
+#: rc.cpp:133
+msgid "&Modify"
+msgstr ""
+
+#. i18n: file: pgmargsbase.ui:252
+#. i18n: ectx: property (shortcut), widget (QPushButton, buttonModify)
+#: rc.cpp:136
+msgid "Alt+M"
+msgstr "Alt+M"
+
+#. i18n: file: pgmargsbase.ui:259
+#. i18n: ectx: property (whatsThis), widget (QPushButton, buttonDelete)
+#: rc.cpp:139
+msgid ""
+"Deletes the selected environment variable from the list. This cannot be used "
+"to delete environment variables that are inherited."
+msgstr "从列表中删除选择的环境变量,这不能用来删除那些继承的环境变量"
+
+#. i18n: file: pgmargsbase.ui:262
+#. i18n: ectx: property (text), widget (QPushButton, buttonDelete)
+#: rc.cpp:142
+msgid "&Delete"
+msgstr ""
+
+#. i18n: file: pgmargsbase.ui:293
+#. i18n: ectx: attribute (title), widget (QWidget, xsldbgOptionsPage)
+#: rc.cpp:148
+msgid "&xsldbg Options"
+msgstr "xsldbg选项"
+
+#. i18n: file: procattachbase.ui:14
+#. i18n: ectx: property (windowTitle), widget (QDialog, ProcAttachBase)
+#: rc.cpp:151
+msgid "Attach to Process"
+msgstr "连接到进程"
+
+#. i18n: file: procattachbase.ui:25
+#. i18n: ectx: property (text), widget (QLabel, filterLabel)
+#: rc.cpp:154
+msgid "&Filter or PID:"
+msgstr "过滤文本或者PID"
+
+#. i18n: file: procattachbase.ui:38
+#. i18n: ectx: property (whatsThis), widget (KLineEdit, filterEdit)
+#: rc.cpp:157
+msgid ""
+"Type the name of the process or its process ID (PID) here to reduce the "
+"number of entries in the list."
+msgstr "在这里输入进程的名字或ID以减少列表中的进程数"
+
+#. i18n: file: procattachbase.ui:56
+#. i18n: ectx: property (whatsThis), widget (QTreeWidget, processList)
+#: rc.cpp:160
+msgid ""
+"<p>This list displays all processes that are currently running. You must "
+"select the process that you want KDbg to attach to. Use the <b>Filter or "
+"PID</b> edit box to reduce the number of entries in this list.<p>The text in "
+"the <i>Command</i> column is usually, but not always, the command that was "
+"used to start the process. The <i>PID</i> column shows the process ID. The "
+"<i>PPID</i> column shows the process ID of the parent process. Additional "
+"columns show more information about the processes that is also available via "
+"the system's <i>ps</i> command.</p><p>The list is not updated automatically. "
+"Use the <b>Refresh</b> button to update it.</p>"
+msgstr ""
+"<p>这个列表显示了所有当前运行的进程,你得从中选择一个以连接调试,使用<b>过滤名"
+"或进程ID</b>可以减少当前的条目<p> <p>在<i>命令</i>栏中的文字通常是（但并不总"
+"是）启动进程的命令。<i>PID</i>栏显示了进程ID<i>PPID</i>栏显示的父进程的PID. "
+"额外栏显示了这个进程的更多信息。这个列表并不会自动更新，请用<b>刷新</b>按钮以"
+"更新。"
+
+#. i18n: file: procattachbase.ui:66
+#. i18n: ectx: property (text), widget (QTreeWidget, processList)
+#: rc.cpp:163
+msgid "Command"
+msgstr "命令"
+
+#. i18n: file: procattachbase.ui:71
+#. i18n: ectx: property (text), widget (QTreeWidget, processList)
+#: rc.cpp:166
+msgid "PID"
+msgstr "PID"
+
+#. i18n: file: procattachbase.ui:76
+#. i18n: ectx: property (text), widget (QTreeWidget, processList)
+#: rc.cpp:169
+msgid "PPID"
+msgstr "PPID"
+
+#. i18n: file: procattachbase.ui:92
+#. i18n: ectx: property (whatsThis), widget (QPushButton, buttonRefresh)
+#: rc.cpp:172
+msgid "This button updates the list of processes."
+msgstr "这个按钮更新这个进程表"
+
+#. i18n: file: procattachbase.ui:95
+#. i18n: ectx: property (text), widget (QPushButton, buttonRefresh)
+#: rc.cpp:175
+msgid "&Refresh"
+msgstr "刷新"
+
+#~ msgid "F1"
+#~ msgstr "F1"
+
+#~ msgid "..."
+#~ msgstr "..."
+
+#~ msgid "Clear filter"
+#~ msgstr "清除过滤"
+
+#~ msgid ""
+#~ "Use this button to clear the filter text so that all processes are "
+#~ "displayed."
+#~ msgstr "用这个按钮来清除过滤文本，这样就可以显示所有的进程"
+
+#~ msgid ""
+#~ "You must select a process from the list. Then click the <b>OK</b> button "
+#~ "to attach to that process."
+#~ msgstr ""
+#~ "你必须从下面的列表中选择一个进程,然后点击<b>确定</b>按钮连接那个进程"
+
+#~ msgid "Source"
+#~ msgstr "源文件"
+
+#~ msgid "&Find"
+#~ msgstr "查找"

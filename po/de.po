@@ -7,7 +7,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: de\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2009-07-19 22:57+0200\n"
+"POT-Creation-Date: 2011-03-01 22:35+0100\n"
 "PO-Revision-Date: 2009-07-19 23:09+0200\n"
 "Last-Translator: Johannes Sixt <j6t@kdbg.org>\n"
 "Language-Team: Deutsch <de@li.org>\n"
@@ -16,134 +16,265 @@ msgstr ""
 "Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 1.11.4\n"
 
-#: exprwnd.cpp:314 rc.cpp:75 regwnd.cpp:428
-#, no-c-format
-msgid "Value"
-msgstr "Wert"
-
-#: memwindow.cpp:55 brkpt.cpp:317
-msgid "Address"
-msgstr "Adresse"
-
-#: memwindow.cpp:70
-msgid "B&ytes"
-msgstr "B&ytes"
-
-#: memwindow.cpp:71
-msgid "Halfwords (&2 Bytes)"
-msgstr "Halbwörter (&2 Bytes)"
-
-#: memwindow.cpp:72
-msgid "Words (&4 Bytes)"
-msgstr "Wörter (&4 Bytes)"
-
-#: memwindow.cpp:73
-msgid "Giantwords (&8 Bytes)"
-msgstr "Doppelwörter (&8 Bytes)"
-
-#: memwindow.cpp:75 regwnd.cpp:79
-msgid "He&xadecimal"
-msgstr "He&xadezimal"
-
-#: memwindow.cpp:76
-msgid "Signed &decimal"
-msgstr "&Dezimal mit Vorzeichen"
-
-#: memwindow.cpp:77
-msgid "&Unsigned decimal"
-msgstr "D&ezimal ohne Vorzeichen"
-
-#: memwindow.cpp:78 regwnd.cpp:77
-msgid "&Octal"
-msgstr "&Oktal"
-
-#: memwindow.cpp:79 regwnd.cpp:76
-msgid "&Binary"
-msgstr "&Binär"
-
-#: memwindow.cpp:80
-msgid "&Addresses"
-msgstr "&Adressen"
-
-#: memwindow.cpp:81
-msgid "&Character"
-msgstr "&Zeichen"
-
-#: memwindow.cpp:82
-msgid "&Floatingpoint"
-msgstr "&Fließkomma"
-
-#: memwindow.cpp:83
-msgid "&Strings"
-msgstr "&Zeichenketten"
-
-#: memwindow.cpp:84
-msgid "&Instructions"
-msgstr "D&isassembliert"
-
-#: brkpt.cpp:63
-msgid "Add &Breakpoint"
-msgstr "&Haltepunkt"
-
-#: brkpt.cpp:67
-msgid "Add &Watchpoint"
-msgstr "&Watchpoint"
-
-#: brkpt.cpp:76 brkpt.cpp:235
+#. i18n: file: brkptbase.ui:85
+#. i18n: ectx: property (text), widget (QPushButton, btEnaDis)
+#: brkpt.cpp:179 rc.cpp:30
 msgid "&Disable"
 msgstr "&Deaktivieren"
 
-#: brkpt.cpp:81 brkpt.cpp:237
+#: brkpt.cpp:181
 msgid "&Enable"
 msgstr "&Aktivieren"
 
-#: brkpt.cpp:91
-msgid "&View Code"
-msgstr "&Code anzeigen"
-
-#: brkpt.cpp:95
-msgid "&Conditional..."
-msgstr "&Bedingt..."
-
-#: brkpt.cpp:316 threadlist.cpp:42
-msgid "Location"
-msgstr "Ort"
-
-#: brkpt.cpp:318
-msgid "Hits"
-msgstr "Stops"
-
-#: brkpt.cpp:319
-msgid "Ignore"
-msgstr "Ignorieren"
-
-#: brkpt.cpp:320
-msgid "Condition"
-msgstr "Bedingung"
-
-#: brkpt.cpp:443
+#: brkpt.cpp:363
 msgid ": Conditional breakpoint"
 msgstr ": Bedingten Haltepunkt setzen"
 
-#: brkpt.cpp:446
-msgid "&Condition:"
-msgstr "&Bedingung:"
+#: dbgmainwnd.cpp:71
+msgid "active"
+msgstr "aktiv"
 
-#: brkpt.cpp:448
-msgid "Ignore &next hits:"
-msgstr "Ignoriere &nächste Treffer:"
+#: dbgmainwnd.cpp:78
+msgid "Stack"
+msgstr "Stack"
 
-#: gdbdriver.cpp:894
-msgid "<anonymous struct or union>"
-msgstr "<anonyme struct oder union>"
+#: dbgmainwnd.cpp:81
+msgid "Locals"
+msgstr "Lokale Variablen"
 
-#: gdbdriver.cpp:1488
-msgid "<additional entries of the array suppressed>"
-msgstr "<weitere Einträge unterdrückt>"
+#: dbgmainwnd.cpp:82
+msgid "Variable"
+msgstr "Variable"
 
-#: gdbdriver.cpp:2041 xsldbgdriver.cpp:1334
-msgid "New working directory: "
-msgstr "Neues Arbeitsverzeichnis: "
+#: dbgmainwnd.cpp:84
+msgid "Watches"
+msgstr "Ausdrücke"
+
+#: dbgmainwnd.cpp:87
+msgid "Registers"
+msgstr "Register"
+
+#: dbgmainwnd.cpp:90
+msgid "Breakpoints"
+msgstr "Haltepunkte"
+
+#: dbgmainwnd.cpp:93 pgmsettings.cpp:108
+msgid "Output"
+msgstr "Ausgabe"
+
+#: dbgmainwnd.cpp:96
+msgid "Threads"
+msgstr "Threads"
+
+#: dbgmainwnd.cpp:99
+msgid "Memory"
+msgstr "Speicher"
+
+#: dbgmainwnd.cpp:251
+msgid "&Open Source..."
+msgstr "Quellcode Ö&ffnen..."
+
+#: dbgmainwnd.cpp:253
+msgid "&Reload Source"
+msgstr "E&rneut laden"
+
+#: dbgmainwnd.cpp:255
+msgid "&Executable..."
+msgstr "&Programm..."
+
+#: dbgmainwnd.cpp:261
+msgid "Recent E&xecutables"
+msgstr "&Zuletzt geöffnete Programme"
+
+#: dbgmainwnd.cpp:262
+msgid "&Core dump..."
+msgstr "&Core dump..."
+
+#: dbgmainwnd.cpp:267
+msgid "This &Program..."
+msgstr "Dieses &Programm"
+
+#: dbgmainwnd.cpp:269
+msgid "&Global Options..."
+msgstr "&Globale Einstellungen..."
+
+#: dbgmainwnd.cpp:279
+msgid "Source &code"
+msgstr "&Quellcode"
+
+#: dbgmainwnd.cpp:281
+msgid "Stac&k"
+msgstr "Stac&k"
+
+#: dbgmainwnd.cpp:282
+msgid "&Locals"
+msgstr "&Lokale Variablen"
+
+#: dbgmainwnd.cpp:283
+msgid "&Watched expressions"
+msgstr "&Ausdrücke"
+
+#: dbgmainwnd.cpp:284
+msgid "&Registers"
+msgstr "&Register"
+
+#: dbgmainwnd.cpp:285
+msgid "&Breakpoints"
+msgstr "&Haltepunkte"
+
+#: dbgmainwnd.cpp:286
+msgid "T&hreads"
+msgstr "&Threads"
+
+#: dbgmainwnd.cpp:287
+msgid "&Output"
+msgstr "&Ausgabe"
+
+#: dbgmainwnd.cpp:288
+msgid "&Memory"
+msgstr "&Speicher"
+
+#: dbgmainwnd.cpp:298
+msgid "&Run"
+msgstr "Aus&führen"
+
+#: dbgmainwnd.cpp:302
+msgid "Step &into"
+msgstr "&In Funktion"
+
+#: dbgmainwnd.cpp:306
+msgid "Step &over"
+msgstr "Ü&ber Funktion"
+
+#: dbgmainwnd.cpp:310
+msgid "Step o&ut"
+msgstr "&Aus Funktion"
+
+#: dbgmainwnd.cpp:314
+msgid "Run to &cursor"
+msgstr "&Zum Cursor"
+
+#: dbgmainwnd.cpp:318
+msgid "Step i&nto by instruction"
+msgstr "I&nstruktion - in Funktion"
+
+#: dbgmainwnd.cpp:322
+msgid "Step o&ver by instruction"
+msgstr "In&struktion - über Funktion"
+
+#: dbgmainwnd.cpp:326
+msgid "&Program counter to current line"
+msgstr "&Programmzähler auf aktuelle Zeile"
+
+#: dbgmainwnd.cpp:329
+msgid "&Break"
+msgstr "&Unterbrechen"
+
+#: dbgmainwnd.cpp:331
+msgid "&Kill"
+msgstr "Been&den"
+
+#: dbgmainwnd.cpp:333
+msgid "Re&start"
+msgstr "&Erneut ausführen"
+
+#: dbgmainwnd.cpp:335
+msgid "A&ttach..."
+msgstr "A&ttachen..."
+
+#: dbgmainwnd.cpp:337
+msgid "&Arguments..."
+msgstr "Argu&mente..."
+
+#: dbgmainwnd.cpp:341
+msgid "Set/Clear &breakpoint"
+msgstr "&Setzen/entfernen"
+
+#: dbgmainwnd.cpp:343
+msgid "Set &temporary breakpoint"
+msgstr "&Temporären Haltepunkt setzen"
+
+#: dbgmainwnd.cpp:345
+msgid "&Enable/Disable breakpoint"
+msgstr "&Aktiv/inaktiv"
+
+#: dbgmainwnd.cpp:349
+msgid "Watch Expression"
+msgstr "Ausdruck beobachten"
+
+#: dbgmainwnd.cpp:351
+msgid "Edit Value"
+msgstr "Wert bearbeiten"
+
+#: dbgmainwnd.cpp:379
+msgid "Restart"
+msgstr "Erneut ausführen"
+
+#: dbgmainwnd.cpp:380
+msgid "Core dump"
+msgstr "Core dump"
+
+#: dbgmainwnd.cpp:623
+msgid "`%1' is not a file or does not exist"
+msgstr "`%1' ist keine Datei oder existiert nicht"
+
+#: dbgmainwnd.cpp:691
+msgid "Don't know how to debug language `%1'"
+msgstr "Sprache `%1' unbekannt"
+
+#: dbgmainwnd.cpp:704
+msgid ""
+"Could not start the debugger process.\n"
+"Please shut down KDbg and resolve the problem."
+msgstr ""
+"Konnte den Debugger nicht starten.\n"
+"Bitte beenden Sie KDbg und beheben Sie das Problem."
+
+#: dbgmainwnd.cpp:826
+msgid ": Global options"
+msgstr ": Globale Einstellungen"
+
+#: dbgmainwnd.cpp:841 pgmsettings.cpp:107
+#, fuzzy
+msgid "Debugger"
+msgstr "&Debugger"
+
+#: dbgmainwnd.cpp:842
+#, fuzzy
+msgid "Miscellaneous"
+msgstr "&Verschiedenes"
+
+#: dbgmainwnd.cpp:980
+msgid ": Program output"
+msgstr ": Programmausgabe"
+
+#: dbgmainwnd.cpp:1070
+msgid "|All source files\n"
+msgstr "|Alle Quellcodedateien\n"
+
+#: dbgmainwnd.cpp:1071
+msgid "|Source files\n"
+msgstr "|Quellcodedateien\n"
+
+#: dbgmainwnd.cpp:1072
+msgid "|Header files\n"
+msgstr "|Header-Dateien\n"
+
+#: dbgmainwnd.cpp:1073
+msgid "*|All files"
+msgstr "*|Alle Dateien"
+
+#: dbgmainwnd.cpp:1165
+msgid "Open"
+msgstr ""
+
+#: dbgmainwnd.cpp:1183
+msgid "Select the executable to debug"
+msgstr "Ausführbares Programm zum Debuggen wählen"
+
+#: dbgmainwnd.cpp:1196
+msgid "Select core dump"
+msgstr "Core dump wählen"
 
 #: debugger.cpp:650
 msgid ""
@@ -153,7 +284,7 @@ msgstr ""
 "%1 wurde unerwartet beendet\n"
 "Sie müssen die Sitzung neu starten (z.B. mit Datei|Programm)."
 
-#: debugger.cpp:833
+#: debugger.cpp:841
 msgid ""
 "The settings for this program specify the following debugger command:\n"
 "%1\n"
@@ -164,107 +295,203 @@ msgstr ""
 "%1\n"
 "Soll diese Anweisung benutzt werden?"
 
-#: mainwndbase.cpp:43
-msgid " Add "
-msgstr " Neu "
+#. i18n: file: pgmargsbase.ui:234
+#. i18n: ectx: property (text), widget (QTreeWidget, envList)
+#: exprwnd.cpp:312 regwnd.cpp:417 rc.cpp:127
+msgid "Value"
+msgstr "Wert"
 
-#: mainwndbase.cpp:44
-msgid " Del "
-msgstr " Entf "
+#: gdbdriver.cpp:911
+msgid "<anonymous struct or union>"
+msgstr "<anonyme struct oder union>"
 
-#: mainwndbase.cpp:45
-msgid "Expression"
-msgstr "Ausdruck"
+#: gdbdriver.cpp:1526
+msgid "<additional entries of the array suppressed>"
+msgstr "<weitere Einträge unterdrückt>"
 
-#: mainwndbase.cpp:135
-msgid "active"
-msgstr "aktiv"
+#: gdbdriver.cpp:2084 xsldbgdriver.cpp:1287
+msgid "New working directory: "
+msgstr "Neues Arbeitsverzeichnis: "
 
-#: mainwndbase.cpp:301
-msgid "Don't know how to debug language `%1'"
-msgstr "Sprache `%1' unbekannt"
-
-#: mainwndbase.cpp:314
-msgid ""
-"Could not start the debugger process.\n"
-"Please shut down KDbg and resolve the problem."
+#: main.cpp:23
+msgid "KDbg"
 msgstr ""
-"Konnte den Debugger nicht starten.\n"
-"Bitte beenden Sie KDbg und beheben Sie das Problem."
 
-#: mainwndbase.cpp:418
-msgid ": Global options"
-msgstr ": Globale Einstellungen"
-
-#: mainwndbase.cpp:435 pgmsettings.cpp:111
-msgid "&Debugger"
-msgstr "&Debugger"
-
-#: mainwndbase.cpp:436
-msgid "&Miscellaneous"
-msgstr "&Verschiedenes"
-
-#: mainwndbase.cpp:506
-msgid ": Program output"
-msgstr ": Programmausgabe"
-
-#: main.cpp:38
+#: main.cpp:25
 msgid "A Debugger"
 msgstr "Ein Debugger"
 
-#: main.cpp:46
+#: main.cpp:27
+msgid "(c) 1998-2011 Johannes Sixt"
+msgstr ""
+
+#: main.cpp:31
+msgid "Johannes Sixt"
+msgstr ""
+
+#: main.cpp:32
+msgid "Keith Isdale"
+msgstr ""
+
+#: main.cpp:33
 msgid "XSLT debugging"
 msgstr "XSLT debuggen"
 
-#: main.cpp:49
+#: main.cpp:35
+msgid "Daniel Kristjansson"
+msgstr ""
+
+#: main.cpp:36
 msgid "Register groups and formatting"
 msgstr "Registergruppen und -formatierung"
 
-#: main.cpp:54
+#: main.cpp:38
+msgid "David Edmundson"
+msgstr ""
+
+#: main.cpp:39
+msgid "KDE4 porting"
+msgstr ""
+
+#: main.cpp:44
 msgid "transcript of conversation with the debugger"
 msgstr "Mitschrift der Kommunikation zw. KDbg und gdb"
 
-#: main.cpp:55
+#: main.cpp:45
 msgid "remote debugging via <device>"
 msgstr "entferntes Debuggen über <device>"
 
-#: main.cpp:56
+#: main.cpp:46
 msgid "specify language: C, XSLT"
 msgstr "Programmiersprache: C, XSLT"
 
-#: main.cpp:57
+#: main.cpp:47
 msgid "use language XSLT (deprecated)"
 msgstr "verwende XSLT (überholt, verwende -l stattdessen)"
 
-#: main.cpp:58
+#: main.cpp:48
 msgid "specify arguments of debugged executable"
 msgstr "gibt Argumente für das Programm an"
 
-#: main.cpp:59
+#: main.cpp:49
 msgid "specify PID of process to debug"
 msgstr "gibt den PID des zu debuggenden Prozesses an"
 
-#: main.cpp:60
+#: main.cpp:50
 msgid "path of executable to debug"
 msgstr "Pfad zum zu debuggenden Programm"
 
-#: main.cpp:61
+#: main.cpp:51
 msgid "a core file to use"
 msgstr "ein zu verwendender Core-Dump"
 
-#: main.cpp:126
+#: main.cpp:114
 msgid "Cannot start debugger."
 msgstr "Kann Debugger nicht ausführen."
 
-#: prefdebugger.cpp:21
+#. i18n: file: brkptbase.ui:37
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+#: memwindow.cpp:32 rc.cpp:9
+msgid "Address"
+msgstr "Adresse"
+
+#: memwindow.cpp:59
+msgid "B&ytes"
+msgstr "B&ytes"
+
+#: memwindow.cpp:61
+msgid "Halfwords (&2 Bytes)"
+msgstr "Halbwörter (&2 Bytes)"
+
+#: memwindow.cpp:63
+msgid "Words (&4 Bytes)"
+msgstr "Wörter (&4 Bytes)"
+
+#: memwindow.cpp:65
+msgid "Giantwords (&8 Bytes)"
+msgstr "Doppelwörter (&8 Bytes)"
+
+#: memwindow.cpp:68 regwnd.cpp:77
+msgid "He&xadecimal"
+msgstr "He&xadezimal"
+
+#: memwindow.cpp:70
+msgid "Signed &decimal"
+msgstr "&Dezimal mit Vorzeichen"
+
+#: memwindow.cpp:72
+msgid "&Unsigned decimal"
+msgstr "D&ezimal ohne Vorzeichen"
+
+#: memwindow.cpp:74 regwnd.cpp:75
+msgid "&Octal"
+msgstr "&Oktal"
+
+#: memwindow.cpp:76 regwnd.cpp:74
+msgid "&Binary"
+msgstr "&Binär"
+
+#: memwindow.cpp:78
+msgid "&Addresses"
+msgstr "&Adressen"
+
+#: memwindow.cpp:80
+msgid "&Character"
+msgstr "&Zeichen"
+
+#: memwindow.cpp:82
+msgid "&Floatingpoint"
+msgstr "&Fließkomma"
+
+#: memwindow.cpp:84
+msgid "&Strings"
+msgstr "&Zeichenketten"
+
+#: memwindow.cpp:86
+msgid "&Instructions"
+msgstr "D&isassembliert"
+
+#: pgmargs.cpp:198
+msgid "Select a file name to insert as program argument"
+msgstr "Als Programmargument einzusetzende Datei wählen"
+
+#: pgmargs.cpp:212
+msgid "Select a directory to insert as program argument"
+msgstr "Als Programmargument einzusetzendes Verzeichnis wählen"
+
+#: pgmsettings.cpp:25
+msgid ""
+"How to invoke &GDB - leave empty to use\n"
+"the default from the global options:"
+msgstr ""
+"Aufruf von &GDB - wenn Sie dieses Feld leer lassen,\n"
+"wird die globale Einstellung übernommen:"
+
+#: pgmsettings.cpp:59
+msgid "&No input and output"
+msgstr "&Keine Ein- und Ausgabe"
+
+#: pgmsettings.cpp:63
+msgid "&Only output, simple terminal emulation"
+msgstr "Nur &Ausgabe, einfache Terminalemulation"
+
+#: pgmsettings.cpp:67
+msgid "&Full terminal emulation"
+msgstr "&Volle Terminalemulation"
+
+#: pgmsettings.cpp:104
+msgid "%1: Settings for %2"
+msgstr "%1: Einstellungen für %2"
+
+#: prefdebugger.cpp:20
 msgid "To revert to the default settings, clear the entries."
 msgstr "Wenn die Einträge leer sind, werden Standardeinstellungen verwendet."
 
-#: prefdebugger.cpp:25
+#: prefdebugger.cpp:24
 msgid "How to invoke &GDB:"
 msgstr "Aufruf von &GDB:"
 
-#: prefdebugger.cpp:32
+#: prefdebugger.cpp:31
 msgid ""
 "%T will be replaced with a title string,\n"
 "%C will be replaced by a Bourne shell script that\n"
@@ -274,559 +501,9 @@ msgstr ""
 "%C wird durch eine Bourne-Shell-Skript ersetzt, das\n"
 "das Terminal-Fenster offen hält."
 
-#: prefdebugger.cpp:38
+#: prefdebugger.cpp:37
 msgid "&Terminal for program output:"
 msgstr "&Terminal für die Programmausgabe"
-
-#: procattach.cpp:271
-msgid ": Attach to process"
-msgstr ": An Prozess attachen"
-
-#: procattach.cpp:275
-msgid "Specify the process number to attach to:"
-msgstr "Geben Sie die Prozessnummer ein:"
-
-#: pgmsettings.cpp:26
-msgid ""
-"How to invoke &GDB - leave empty to use\n"
-"the default from the global options:"
-msgstr ""
-"Aufruf von &GDB - wenn Sie dieses Feld leer lassen,\n"
-"wird die globale Einstellung übernommen:"
-
-#: pgmsettings.cpp:61
-msgid "&No input and output"
-msgstr "&Keine Ein- und Ausgabe"
-
-#: pgmsettings.cpp:66
-msgid "&Only output, simple terminal emulation"
-msgstr "Nur &Ausgabe, einfache Terminalemulation"
-
-#: pgmsettings.cpp:71
-msgid "&Full terminal emulation"
-msgstr "&Volle Terminalemulation"
-
-#: pgmsettings.cpp:105
-msgid "%1: Settings for %2"
-msgstr "%1: Einstellungen für %2"
-
-#: pgmsettings.cpp:112 dbgmainwnd.cpp:221
-msgid "&Output"
-msgstr "&Ausgabe"
-
-#: winstack.cpp:390
-msgid ": Search"
-msgstr ": Suche"
-
-#: winstack.cpp:396
-msgid "&Case sensitive"
-msgstr "&Groß-/Kleinschreibung"
-
-#: winstack.cpp:398
-msgid "&Forward"
-msgstr "&Vorwärts"
-
-#: winstack.cpp:400
-msgid "&Backward"
-msgstr "&Rückwärts"
-
-#: rc.cpp:9
-#, no-c-format
-msgid "E&xecution"
-msgstr "A&usführung"
-
-#: rc.cpp:12
-#, no-c-format
-msgid "&Breakpoint"
-msgstr "Halte&punkt"
-
-#: rc.cpp:18
-#, no-c-format
-msgid "Program Arguments"
-msgstr "Programmargumente"
-
-#: rc.cpp:21
-#, no-c-format
-msgid "&Arguments"
-msgstr "&Argumente"
-
-#: rc.cpp:24
-#, no-c-format
-msgid "Run <i>%1</i> with these arguments:"
-msgstr "<i>%1</i> mit folgenden Argumenten ausführen:"
-
-#: rc.cpp:27
-#, no-c-format
-msgid ""
-"Specify the arguments with which the program shall be invoked for this "
-"debugging session. You specify the arguments just as you would on the "
-"command line, that is, you can even use quotes and environment variables, "
-"for example:<p><tt>--message 'start in: ' $HOME</tt>"
-msgstr ""
-"Geben Sie hier die Argumente an, mit denen das Programm in dieser Debug-"
-"Sitzung ausgeführt werden soll. Sie geben die Argumente genau so an, wie Sie "
-"das auch auf der Kommandozeile angeben würden; d.h. Sie können auch "
-"Anführungszeichen und Umgebungsvariablen verwenden, z.B.:<p><tt>--message "
-"'start in: ' $HOME</tt>"
-
-#: rc.cpp:30
-#, no-c-format
-msgid "Insert &file name..."
-msgstr "&Dateinamen einfügen..."
-
-#: rc.cpp:33
-#, no-c-format
-msgid "Alt+F"
-msgstr "Alt+D"
-
-#: rc.cpp:36
-#, no-c-format
-msgid ""
-"Browse for a file; the full path name will be inserted at the current cursor "
-"location in the edit box above."
-msgstr ""
-"Suchen Sie nach einer Datei; der komplette Dateiname wird an der "
-"Cursorposition im obigen Feld eingefügt."
-
-#: rc.cpp:39
-#, no-c-format
-msgid "Insert &directory name..."
-msgstr "&Verzeichnis einfügen..."
-
-#: rc.cpp:42 rc.cpp:93
-#, no-c-format
-msgid "Alt+D"
-msgstr "Alt+V"
-
-#: rc.cpp:45
-#, no-c-format
-msgid ""
-"Browse for a directory; the full path name will be inserted at the current "
-"cursor location in the edit box above."
-msgstr ""
-"Suchen Sie nach einem Verzeichnis;der komplette Verzeichnisname wird an der "
-"Cursorposition im obigen Feld eingefügt."
-
-#: rc.cpp:48
-#, no-c-format
-msgid "&Working Directory"
-msgstr "Arbeitsverzeichnis"
-
-#: rc.cpp:51
-#, no-c-format
-msgid "Specify here the initial working directory where the program is run."
-msgstr ""
-"Geben Sie hier das Arbeitsverzeichnis an, in dem das Program ausgeführt "
-"werden soll."
-
-#: rc.cpp:54
-#, no-c-format
-msgid "&Browse..."
-msgstr "&Durchsuchen..."
-
-#: rc.cpp:57
-#, no-c-format
-msgid "Alt+B"
-msgstr "Alt+D"
-
-#: rc.cpp:60
-#, no-c-format
-msgid "Browse for the initial working directory where the program is run."
-msgstr ""
-"Hiermit suchen Sie das Arbeitsverzeichnis, in dem das Programm ausgeführt "
-"werden soll."
-
-#: rc.cpp:63
-#, no-c-format
-msgid "&Environment"
-msgstr "&Umgebungsvariablen"
-
-#: rc.cpp:66
-#, no-c-format
-msgid "Environment variables (<tt>NAME=value</tt>):"
-msgstr "Umgebungsvariablen (<tt>NAME=Wert</tt>):"
-
-#: rc.cpp:69
-#, no-c-format
-msgid ""
-"To add a new environment variable or to modify one, specify it here in the "
-"form <tt>NAME=value</tt> and click <b>Modify</b>."
-msgstr ""
-"Um eine neue Umgebungsvariable anzulegen oder eine vorhandene zu verändern, "
-"geben Sie sie hier in der Form <tt>NAME=Wert</tt> an und wählen Sie "
-"<b>Ändern</b>."
-
-#: rc.cpp:72
-#, no-c-format
-msgid "Name"
-msgstr "Name"
-
-#: rc.cpp:78
-#, no-c-format
-msgid ""
-"Environment variables that are set <i>in addition</i> to those that are "
-"inherited are listed in this table. To add new environment variables, "
-"specify them as <tt>NAME=value</tt> in the edit box above and click "
-"<b>Modify</b>. To modify a value, select it in this list and click "
-"<b>Modify</b>. To delete an environment variable, select it in this list and "
-"click <b>Delete</b>."
-msgstr ""
-"Die Umgebungsvariablen in dieser Liste werden <i>zusätzlich</i> zu den "
-"vererbten gesetzt. Um eine neue Umgebungsvariable anzulegen, geben Sie sie "
-"in der Form <tt>NAME=Wert</tt> im Eingebefeld an und wählen <b>Ändern</b>. "
-"Um den Wert zu verändern, wählen Sie die Variable in der Liste aus und "
-"wählen <b>Ändern</b>. Mit <b>Löschen</b> wird die ausgewählte Variable aus "
-"der Liste entfernt."
-
-#: rc.cpp:84
-#, no-c-format
-msgid "Alt+M"
-msgstr "Alt+Ä"
-
-#: rc.cpp:87
-#, no-c-format
-msgid ""
-"Enters the environment variable that is currently specified in the edit box "
-"into the list. If the named variable is already in the list, it receives a "
-"new value; otherwise, a new entry is created."
-msgstr ""
-"Fügt die Umgebungsvariable, die gerade im Eingabefeld angegeben ist, zu der "
-"Liste hinzu. Wenn die genannte Variable schon vorhanden ist, wird ihr Wert "
-"geändert."
-
-#: rc.cpp:96
-#, no-c-format
-msgid ""
-"Deletes the selected environment variable from the list. This cannot be used "
-"to delete environment variables that are inherited."
-msgstr ""
-"Entfernt die ausgewählte Umgebungsvariable aus der Liste. Diese Funktion "
-"kann nicht verwendet werden, um vererbte Variablen zu entfernen."
-
-#: rc.cpp:99
-#, no-c-format
-msgid "&xsldbg Options"
-msgstr "&xsldbg-Einstellungen"
-
-#: rc.cpp:105
-#, no-c-format
-msgid "F1"
-msgstr "F1"
-
-#: rc.cpp:116
-#, no-c-format
-msgid "Attach to Process"
-msgstr "An Prozess attachen"
-
-#: rc.cpp:119
-#, no-c-format
-msgid "&Filter or PID:"
-msgstr "&Filter oder PID:"
-
-#: rc.cpp:122
-#, no-c-format
-msgid ""
-"Type the name of the process or its process ID (PID) here to reduce the "
-"number of entries in the list."
-msgstr ""
-"Geben Sie hier den Programmnamen oder die Prozess-ID (PID) an, sodass "
-"weniger Einträge in der Tabelle aufscheinen."
-
-#: rc.cpp:125
-#, no-c-format
-msgid "..."
-msgstr "..."
-
-#: rc.cpp:128
-#, no-c-format
-msgid "Clear filter"
-msgstr "Filter löschen"
-
-#: rc.cpp:131
-#, no-c-format
-msgid "Use this button to clear the filter text so that all processes are displayed."
-msgstr ""
-"Mit dieser Schaltfläche können Sie die Filtereingabe löschen, sodass alle "
-"Prozesse angezeigt werden."
-
-#: rc.cpp:134
-#, no-c-format
-msgid "Command"
-msgstr "Befehlszeile"
-
-#: rc.cpp:137
-#, no-c-format
-msgid "PID"
-msgstr "PID"
-
-#: rc.cpp:140
-#, no-c-format
-msgid "PPID"
-msgstr "PPID"
-
-#: rc.cpp:143
-#, no-c-format
-msgid ""
-"<p>This list displays all processes that are currently running. You must "
-"select the process that you want KDbg to attach to. Use the <b>Filter or "
-"PID</b> edit box to reduce the number of entries in this list.<p>The text in "
-"the <i>Command</i> column is usually, but not always, the command that was "
-"used to start the process. The <i>PID</i> column shows the process ID. The "
-"<i>PPID</i> column shows the process ID of the parent process. Additional "
-"columns show more information about the processes that is also available via "
-"the system's <i>ps</i> command.</p><p>The list is not updated automatically. "
-"Use the <b>Refresh</b> button to update it.</p>"
-msgstr ""
-"<p>Diese Tabelle zeigt alle Prozesse an, die gerade auf dem System laufen. "
-"Sie müssen einen Prozess auswählen, an den sich KDbg attachen soll. Geben "
-"Sie in <b>Filter oder PID</b> den Programmnamen oder die Prozess-ID ein; "
-"damit wird die Tabelle kürzer.<p>Der Text in der Spalte <i>Befehlszeile</i> "
-"ist normalerweise (aber nicht immer) der Befehl, mit dem der Prozess "
-"gestartet wurde. Die Spalte <i>PID</i> zeigt die Prozess-ID. Die Spalte "
-"<i>PPID</i> zeigt die Prozess-ID des Vater-Prozesses. In den weiteren "
-"Spalten stehen zusätzliche Informationen über die Prozesse, die auch mit dem "
-"Systembefehl <i>ps</i> angezeigt werden können.</p><p>Die Tabelle wird nicht "
-"automatisch aktualisiert. Benutzen Sie dazu die Schaltfläche "
-"<b>Aktualisieren</b>.</p>"
-
-#: rc.cpp:146
-#, no-c-format
-msgid "&Refresh"
-msgstr "&Aktualisieren"
-
-#: rc.cpp:149
-#, no-c-format
-msgid "This button updates the list of processes."
-msgstr "Diese Schaltfläche aktualisiert die Anzeige."
-
-#: rc.cpp:156
-#, no-c-format
-msgid ""
-"You must select a process from the list. Then click the <b>OK</b> button to "
-"attach to that process."
-msgstr ""
-"Sie müssenen einen Prozess in der Liste auswählen. Dann klicken Sie <b>OK</"
-"b>, um den Prozess zu attachen."
-
-#: threadlist.cpp:41
-msgid "Thread ID"
-msgstr "Thread-ID"
-
-#: dbgmainwnd.cpp:46
-msgid "Source"
-msgstr "Quellcode"
-
-#: dbgmainwnd.cpp:54 dbgmainwnd.cpp:388
-msgid "Stack"
-msgstr "Stack"
-
-#: dbgmainwnd.cpp:57 dbgmainwnd.cpp:389
-msgid "Locals"
-msgstr "Lokale Variablen"
-
-#: dbgmainwnd.cpp:58
-msgid "Variable"
-msgstr "Variable"
-
-#: dbgmainwnd.cpp:60 dbgmainwnd.cpp:390
-msgid "Watches"
-msgstr "Ausdrücke"
-
-#: dbgmainwnd.cpp:63 dbgmainwnd.cpp:391
-msgid "Registers"
-msgstr "Register"
-
-#: dbgmainwnd.cpp:66 dbgmainwnd.cpp:392
-msgid "Breakpoints"
-msgstr "Haltepunkte"
-
-#: dbgmainwnd.cpp:69 dbgmainwnd.cpp:394
-msgid "Output"
-msgstr "Ausgabe"
-
-#: dbgmainwnd.cpp:72 dbgmainwnd.cpp:393
-msgid "Threads"
-msgstr "Threads"
-
-#: dbgmainwnd.cpp:75 dbgmainwnd.cpp:395
-msgid "Memory"
-msgstr "Speicher"
-
-#: dbgmainwnd.cpp:181
-msgid "&Open Source..."
-msgstr "Quellcode Ö&ffnen..."
-
-#: dbgmainwnd.cpp:183
-msgid "&Reload Source"
-msgstr "E&rneut laden"
-
-#: dbgmainwnd.cpp:186
-msgid "&Executable..."
-msgstr "&Programm..."
-
-#: dbgmainwnd.cpp:189
-msgid "Recent E&xecutables"
-msgstr "&Zuletzt geöffnete Programme"
-
-#: dbgmainwnd.cpp:192
-msgid "&Core dump..."
-msgstr "&Core dump..."
-
-#: dbgmainwnd.cpp:197
-msgid "This &Program..."
-msgstr "Dieses &Programm"
-
-#: dbgmainwnd.cpp:200
-msgid "&Global Options..."
-msgstr "&Globale Einstellungen..."
-
-#: dbgmainwnd.cpp:207
-msgid "&Find"
-msgstr "&Suche"
-
-#: dbgmainwnd.cpp:213
-msgid "Source &code"
-msgstr "&Quellcode"
-
-#: dbgmainwnd.cpp:215
-msgid "Stac&k"
-msgstr "Stac&k"
-
-#: dbgmainwnd.cpp:216
-msgid "&Locals"
-msgstr "&Lokale Variablen"
-
-#: dbgmainwnd.cpp:217
-msgid "&Watched expressions"
-msgstr "&Ausdrücke"
-
-#: dbgmainwnd.cpp:218
-msgid "&Registers"
-msgstr "&Register"
-
-#: dbgmainwnd.cpp:219
-msgid "&Breakpoints"
-msgstr "&Haltepunkte"
-
-#: dbgmainwnd.cpp:220
-msgid "T&hreads"
-msgstr "&Threads"
-
-#: dbgmainwnd.cpp:222
-msgid "&Memory"
-msgstr "&Speicher"
-
-#: dbgmainwnd.cpp:232
-msgid "&Run"
-msgstr "Aus&führen"
-
-#: dbgmainwnd.cpp:235
-msgid "Step &into"
-msgstr "&In Funktion"
-
-#: dbgmainwnd.cpp:239
-msgid "Step &over"
-msgstr "Ü&ber Funktion"
-
-#: dbgmainwnd.cpp:243
-msgid "Step o&ut"
-msgstr "&Aus Funktion"
-
-#: dbgmainwnd.cpp:247
-msgid "Run to &cursor"
-msgstr "&Zum Cursor"
-
-#: dbgmainwnd.cpp:251
-msgid "Step i&nto by instruction"
-msgstr "I&nstruktion - in Funktion"
-
-#: dbgmainwnd.cpp:255
-msgid "Step o&ver by instruction"
-msgstr "In&struktion - über Funktion"
-
-#: dbgmainwnd.cpp:259
-msgid "&Program counter to current line"
-msgstr "&Programmzähler auf aktuelle Zeile"
-
-#: dbgmainwnd.cpp:262
-msgid "&Break"
-msgstr "&Unterbrechen"
-
-#: dbgmainwnd.cpp:265
-msgid "&Kill"
-msgstr "Been&den"
-
-#: dbgmainwnd.cpp:268
-msgid "Re&start"
-msgstr "&Erneut ausführen"
-
-#: dbgmainwnd.cpp:271
-msgid "A&ttach..."
-msgstr "A&ttachen..."
-
-#: dbgmainwnd.cpp:274
-msgid "&Arguments..."
-msgstr "Argu&mente..."
-
-#: dbgmainwnd.cpp:279
-msgid "Set/Clear &breakpoint"
-msgstr "&Setzen/entfernen"
-
-#: dbgmainwnd.cpp:282
-msgid "Set &temporary breakpoint"
-msgstr "&Temporären Haltepunkt setzen"
-
-#: dbgmainwnd.cpp:285
-msgid "&Enable/Disable breakpoint"
-msgstr "&Aktiv/inaktiv"
-
-#: dbgmainwnd.cpp:290
-msgid "Watch Expression"
-msgstr "Ausdruck beobachten"
-
-#: dbgmainwnd.cpp:293
-msgid "Edit Value"
-msgstr "Wert bearbeiten"
-
-#: dbgmainwnd.cpp:322
-msgid "Restart"
-msgstr "Erneut ausführen"
-
-#: dbgmainwnd.cpp:323
-msgid "Core dump"
-msgstr "Core dump"
-
-#: dbgmainwnd.cpp:588
-msgid "`%1' is not a file or does not exist"
-msgstr "`%1' ist keine Datei oder existiert nicht"
-
-#: dbgmainwnd.cpp:702
-msgid "|All source files\n"
-msgstr "|Alle Quellcodedateien\n"
-
-#: dbgmainwnd.cpp:703
-msgid "|Source files\n"
-msgstr "|Quellcodedateien\n"
-
-#: dbgmainwnd.cpp:704
-msgid "|Header files\n"
-msgstr "|Header-Dateien\n"
-
-#: dbgmainwnd.cpp:705
-msgid "*|All files"
-msgstr "*|Alle Dateien"
-
-#: dbgmainwnd.cpp:800
-msgid "Select the executable to debug"
-msgstr "Ausführbares Programm zum Debuggen wählen"
-
-#: dbgmainwnd.cpp:813
-msgid "Select core dump"
-msgstr "Core dump wählen"
-
-#: xsldbgdriver.cpp:1441
-msgid "No memory dump available"
-msgstr "Speicherinhalt nicht verfügbar"
 
 #: prefmisc.cpp:23
 msgid "&Pop into foreground when program stops"
@@ -850,55 +527,533 @@ msgstr "Dateifilter für &Quellcodedateien:"
 msgid "File filter for &header files:"
 msgstr "Dateifilter für &Header-Dateien:"
 
-#: ttywnd.cpp:229
-msgid "&Clear"
-msgstr "&Löschen"
+#: procattach.cpp:290
+msgid ": Attach to process"
+msgstr ": An Prozess attachen"
 
-#: pgmargs.cpp:216
-msgid "Select a file name to insert as program argument"
-msgstr "Als Programmargument einzusetzende Datei wählen"
+#: procattach.cpp:294
+msgid "Specify the process number to attach to:"
+msgstr "Geben Sie die Prozessnummer ein:"
 
-#: pgmargs.cpp:230
-msgid "Select a directory to insert as program argument"
-msgstr "Als Programmargument einzusetzendes Verzeichnis wählen"
+#: procattach.cpp:302
+msgid "OK"
+msgstr ""
 
-#: regwnd.cpp:75
+#: procattach.cpp:307
+msgid "Cancel"
+msgstr ""
+
+#: regwnd.cpp:73
 msgid "&GDB default"
 msgstr "&GDB-Standard"
 
-#: regwnd.cpp:78
+#: regwnd.cpp:76
 msgid "&Decimal"
 msgstr "&Dezimal"
 
-#: regwnd.cpp:80
+#: regwnd.cpp:78
 msgid "Real (&e)"
 msgstr "Reell (&e)"
 
-#: regwnd.cpp:81
+#: regwnd.cpp:79
 msgid "Real (&f)"
 msgstr "Reell (&f)"
 
-#: regwnd.cpp:82
+#: regwnd.cpp:80
 msgid "&Real (g)"
 msgstr "&Reell (g)"
 
-#: regwnd.cpp:427
+#: regwnd.cpp:416
 msgid "Register"
 msgstr "Register"
 
-#: regwnd.cpp:429
+#: regwnd.cpp:418
 msgid "Decoded value"
 msgstr "Dekodierter Wert"
 
-#: regwnd.cpp:462
-msgid "x86/x87 segment"
-msgstr "x86/x87 Segment"
-
-#: regwnd.cpp:465
-msgid "Flags"
-msgstr "Schalter"
-
-#: regwnd.cpp:468
+#: regwnd.cpp:434
 msgid "GP and others"
 msgstr "Allgemein u.a."
 
+#: regwnd.cpp:436
+msgid "Flags"
+msgstr "Schalter"
+
+#: regwnd.cpp:439
+msgid "x86/x87 segment"
+msgstr "x86/x87 Segment"
+
+#: threadlist.cpp:42
+msgid "Thread ID"
+msgstr "Thread-ID"
+
+#. i18n: file: brkptbase.ui:32
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+#: threadlist.cpp:42 rc.cpp:6
+msgid "Location"
+msgstr "Ort"
+
+#: ttywnd.cpp:214
+msgid "&Clear"
+msgstr "&Löschen"
+
+#: watchwindow.cpp:17
+msgid " Add "
+msgstr " Neu "
+
+#: watchwindow.cpp:18
+msgid " Del "
+msgstr " Entf "
+
+#: watchwindow.cpp:19
+msgid "Expression"
+msgstr "Ausdruck"
+
+#: winstack.cpp:384
+msgid ": Search"
+msgstr ": Suche"
+
+#: winstack.cpp:391
+msgid "&Case sensitive"
+msgstr "&Groß-/Kleinschreibung"
+
+#: winstack.cpp:393
+msgid "&Forward"
+msgstr "&Vorwärts"
+
+#: winstack.cpp:395
+msgid "&Backward"
+msgstr "&Rückwärts"
+
+#: winstack.cpp:396
+msgid "Close"
+msgstr ""
+
+#: xsldbgdriver.cpp:1385
+msgid "No memory dump available"
+msgstr "Speicherinhalt nicht verfügbar"
+
+#. i18n: file: brkptbase.ui:13
+#. i18n: ectx: property (windowTitle), widget (QWidget, BrkPtBase)
+#: rc.cpp:3
+msgid "Form"
+msgstr ""
+
+#. i18n: file: brkptbase.ui:42
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+#: rc.cpp:12
+msgid "Hits"
+msgstr "Stops"
+
+#. i18n: file: brkptbase.ui:47
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+#: rc.cpp:15
+msgid "Ignore"
+msgstr "Ignorieren"
+
+#. i18n: file: brkptbase.ui:52
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+#: rc.cpp:18
+msgid "Condition"
+msgstr "Bedingung"
+
+#. i18n: file: brkptbase.ui:64
+#. i18n: ectx: property (text), widget (QPushButton, btAddBP)
+#: rc.cpp:21
+msgid "Add &Breakpoint"
+msgstr "&Haltepunkt"
+
+#. i18n: file: brkptbase.ui:71
+#. i18n: ectx: property (text), widget (QPushButton, btAddWP)
+#: rc.cpp:24
+msgid "Add &Watchpoint"
+msgstr "&Watchpoint"
+
+#. i18n: file: brkptbase.ui:78
+#. i18n: ectx: property (text), widget (QPushButton, btRemove)
+#: rc.cpp:27
+msgid "&Remove"
+msgstr ""
+
+#. i18n: file: brkptbase.ui:92
+#. i18n: ectx: property (text), widget (QPushButton, btViewCode)
+#: rc.cpp:33
+msgid "&View Code"
+msgstr "&Code anzeigen"
+
+#. i18n: file: brkptbase.ui:99
+#. i18n: ectx: property (text), widget (QPushButton, btConditional)
+#: rc.cpp:36
+msgid "&Conditional..."
+msgstr "&Bedingt..."
+
+#. i18n: file: brkptcondition.ui:13
+#. i18n: ectx: property (windowTitle), widget (QDialog, BrkPtCondition)
+#: rc.cpp:39
+msgid "Dialog"
+msgstr ""
+
+#. i18n: file: brkptcondition.ui:27
+#. i18n: ectx: property (text), widget (QLabel, label)
+#: rc.cpp:42
+msgid "&Condition:"
+msgstr "&Bedingung:"
+
+#. i18n: file: brkptcondition.ui:40
+#. i18n: ectx: property (text), widget (QLabel, label_2)
+#: rc.cpp:45
+msgid "Ignore &next hits:"
+msgstr "Ignoriere &nächste Treffer:"
+
+#. i18n: file: brkptcondition.ui:50
+#. i18n: ectx: property (specialValueText), widget (QSpinBox, ignoreCount)
+#: rc.cpp:48
+msgid "do not ignore"
+msgstr ""
+
+#. i18n: file: kdbgui.rc:4
+#. i18n: ectx: Menu (file)
+#: rc.cpp:51
+#, fuzzy
+msgid "&File"
+msgstr "&Deaktivieren"
+
+#. i18n: file: kdbgui.rc:11
+#. i18n: ectx: Menu (view)
+#: rc.cpp:54
+#, fuzzy
+msgid "&View"
+msgstr "&Code anzeigen"
+
+#. i18n: file: kdbgui.rc:25
+#. i18n: ectx: Menu (execution)
+#: rc.cpp:57
+msgid "E&xecution"
+msgstr "A&usführung"
+
+#. i18n: file: kdbgui.rc:42
+#. i18n: ectx: Menu (breakpoint)
+#: rc.cpp:60
+msgid "&Breakpoint"
+msgstr "Halte&punkt"
+
+#. i18n: file: kdbgui.rc:47
+#. i18n: ectx: Menu (settings)
+#: rc.cpp:63
+#, fuzzy
+msgid "&Settings"
+msgstr "&Zeichenketten"
+
+#. i18n: file: pgmargsbase.ui:13
+#. i18n: ectx: property (windowTitle), widget (QDialog, PgmArgsBase)
+#: rc.cpp:66
+msgid "Program Arguments"
+msgstr "Programmargumente"
+
+#. i18n: file: pgmargsbase.ui:26
+#. i18n: ectx: attribute (title), widget (QWidget, argsPage)
+#: rc.cpp:69
+msgid "&Arguments"
+msgstr "&Argumente"
+
+#. i18n: file: pgmargsbase.ui:34
+#. i18n: ectx: property (text), widget (QLabel, labelArgs)
+#: rc.cpp:73
+#, no-c-format
+msgid "Run <i>%1</i> with these arguments:"
+msgstr "<i>%1</i> mit folgenden Argumenten ausführen:"
+
+#. i18n: file: pgmargsbase.ui:47
+#. i18n: ectx: property (whatsThis), widget (QLineEdit, programArgs)
+#: rc.cpp:76
+msgid ""
+"Specify the arguments with which the program shall be invoked for this "
+"debugging session. You specify the arguments just as you would on the "
+"command line, that is, you can even use quotes and environment variables, "
+"for example:<p><tt>--message 'start in: ' $HOME</tt>"
+msgstr ""
+"Geben Sie hier die Argumente an, mit denen das Programm in dieser Debug-"
+"Sitzung ausgeführt werden soll. Sie geben die Argumente genau so an, wie Sie "
+"das auch auf der Kommandozeile angeben würden; d.h. Sie können auch "
+"Anführungszeichen und Umgebungsvariablen verwenden, z.B.:<p><tt>--message "
+"'start in: ' $HOME</tt>"
+
+#. i18n: file: pgmargsbase.ui:56
+#. i18n: ectx: property (whatsThis), widget (QPushButton, insertFile)
+#: rc.cpp:79
+msgid ""
+"Browse for a file; the full path name will be inserted at the current cursor "
+"location in the edit box above."
+msgstr ""
+"Suchen Sie nach einer Datei; der komplette Dateiname wird an der "
+"Cursorposition im obigen Feld eingefügt."
+
+#. i18n: file: pgmargsbase.ui:59
+#. i18n: ectx: property (text), widget (QPushButton, insertFile)
+#: rc.cpp:82
+msgid "Insert &file name..."
+msgstr "&Dateinamen einfügen..."
+
+#. i18n: file: pgmargsbase.ui:62
+#. i18n: ectx: property (shortcut), widget (QPushButton, insertFile)
+#: rc.cpp:85
+msgid "Alt+F"
+msgstr "Alt+D"
+
+#. i18n: file: pgmargsbase.ui:69
+#. i18n: ectx: property (whatsThis), widget (QPushButton, insertDir)
+#: rc.cpp:88
+msgid ""
+"Browse for a directory; the full path name will be inserted at the current "
+"cursor location in the edit box above."
+msgstr ""
+"Suchen Sie nach einem Verzeichnis;der komplette Verzeichnisname wird an der "
+"Cursorposition im obigen Feld eingefügt."
+
+#. i18n: file: pgmargsbase.ui:72
+#. i18n: ectx: property (text), widget (QPushButton, insertDir)
+#: rc.cpp:91
+msgid "Insert &directory name..."
+msgstr "&Verzeichnis einfügen..."
+
+#. i18n: file: pgmargsbase.ui:75
+#. i18n: ectx: property (shortcut), widget (QPushButton, insertDir)
+#. i18n: file: pgmargsbase.ui:265
+#. i18n: ectx: property (shortcut), widget (QPushButton, buttonDelete)
+#: rc.cpp:94 rc.cpp:145
+msgid "Alt+D"
+msgstr "Alt+V"
+
+#. i18n: file: pgmargsbase.ui:119
+#. i18n: ectx: attribute (title), widget (QWidget, wdPage)
+#: rc.cpp:97
+msgid "&Working Directory"
+msgstr "Arbeitsverzeichnis"
+
+#. i18n: file: pgmargsbase.ui:127
+#. i18n: ectx: property (whatsThis), widget (QLineEdit, wdEdit)
+#: rc.cpp:100
+msgid "Specify here the initial working directory where the program is run."
+msgstr ""
+"Geben Sie hier das Arbeitsverzeichnis an, in dem das Program ausgeführt "
+"werden soll."
+
+#. i18n: file: pgmargsbase.ui:136
+#. i18n: ectx: property (whatsThis), widget (QPushButton, wdBrowse)
+#: rc.cpp:103
+msgid "Browse for the initial working directory where the program is run."
+msgstr ""
+"Hiermit suchen Sie das Arbeitsverzeichnis, in dem das Programm ausgeführt "
+"werden soll."
+
+#. i18n: file: pgmargsbase.ui:139
+#. i18n: ectx: property (text), widget (QPushButton, wdBrowse)
+#: rc.cpp:106
+msgid "&Browse..."
+msgstr "&Durchsuchen..."
+
+#. i18n: file: pgmargsbase.ui:142
+#. i18n: ectx: property (shortcut), widget (QPushButton, wdBrowse)
+#: rc.cpp:109
+msgid "Alt+B"
+msgstr "Alt+D"
+
+#. i18n: file: pgmargsbase.ui:186
+#. i18n: ectx: attribute (title), widget (QWidget, envPage)
+#: rc.cpp:112
+msgid "&Environment"
+msgstr "&Umgebungsvariablen"
+
+#. i18n: file: pgmargsbase.ui:196
+#. i18n: ectx: property (text), widget (QLabel, envLabel)
+#: rc.cpp:115
+msgid "Environment variables (<tt>NAME=value</tt>):"
+msgstr "Umgebungsvariablen (<tt>NAME=Wert</tt>):"
+
+#. i18n: file: pgmargsbase.ui:209
+#. i18n: ectx: property (whatsThis), widget (QLineEdit, envVar)
+#: rc.cpp:118
+msgid ""
+"To add a new environment variable or to modify one, specify it here in the "
+"form <tt>NAME=value</tt> and click <b>Modify</b>."
+msgstr ""
+"Um eine neue Umgebungsvariable anzulegen oder eine vorhandene zu verändern, "
+"geben Sie sie hier in der Form <tt>NAME=Wert</tt> an und wählen Sie "
+"<b>Ändern</b>."
+
+#. i18n: file: pgmargsbase.ui:216
+#. i18n: ectx: property (whatsThis), widget (QTreeWidget, envList)
+#: rc.cpp:121
+msgid ""
+"Environment variables that are set <i>in addition</i> to those that are "
+"inherited are listed in this table. To add new environment variables, "
+"specify them as <tt>NAME=value</tt> in the edit box above and click "
+"<b>Modify</b>. To modify a value, select it in this list and click "
+"<b>Modify</b>. To delete an environment variable, select it in this list and "
+"click <b>Delete</b>."
+msgstr ""
+"Die Umgebungsvariablen in dieser Liste werden <i>zusätzlich</i> zu den "
+"vererbten gesetzt. Um eine neue Umgebungsvariable anzulegen, geben Sie sie "
+"in der Form <tt>NAME=Wert</tt> im Eingebefeld an und wählen <b>Ändern</b>. "
+"Um den Wert zu verändern, wählen Sie die Variable in der Liste aus und "
+"wählen <b>Ändern</b>. Mit <b>Löschen</b> wird die ausgewählte Variable aus "
+"der Liste entfernt."
+
+#. i18n: file: pgmargsbase.ui:229
+#. i18n: ectx: property (text), widget (QTreeWidget, envList)
+#: rc.cpp:124
+msgid "Name"
+msgstr "Name"
+
+#. i18n: file: pgmargsbase.ui:246
+#. i18n: ectx: property (whatsThis), widget (QPushButton, buttonModify)
+#: rc.cpp:130
+msgid ""
+"Enters the environment variable that is currently specified in the edit box "
+"into the list. If the named variable is already in the list, it receives a "
+"new value; otherwise, a new entry is created."
+msgstr ""
+"Fügt die Umgebungsvariable, die gerade im Eingabefeld angegeben ist, zu der "
+"Liste hinzu. Wenn die genannte Variable schon vorhanden ist, wird ihr Wert "
+"geändert."
+
+#. i18n: file: pgmargsbase.ui:249
+#. i18n: ectx: property (text), widget (QPushButton, buttonModify)
+#: rc.cpp:133
+msgid "&Modify"
+msgstr ""
+
+#. i18n: file: pgmargsbase.ui:252
+#. i18n: ectx: property (shortcut), widget (QPushButton, buttonModify)
+#: rc.cpp:136
+msgid "Alt+M"
+msgstr "Alt+Ä"
+
+#. i18n: file: pgmargsbase.ui:259
+#. i18n: ectx: property (whatsThis), widget (QPushButton, buttonDelete)
+#: rc.cpp:139
+msgid ""
+"Deletes the selected environment variable from the list. This cannot be used "
+"to delete environment variables that are inherited."
+msgstr ""
+"Entfernt die ausgewählte Umgebungsvariable aus der Liste. Diese Funktion "
+"kann nicht verwendet werden, um vererbte Variablen zu entfernen."
+
+#. i18n: file: pgmargsbase.ui:262
+#. i18n: ectx: property (text), widget (QPushButton, buttonDelete)
+#: rc.cpp:142
+msgid "&Delete"
+msgstr ""
+
+#. i18n: file: pgmargsbase.ui:293
+#. i18n: ectx: attribute (title), widget (QWidget, xsldbgOptionsPage)
+#: rc.cpp:148
+msgid "&xsldbg Options"
+msgstr "&xsldbg-Einstellungen"
+
+#. i18n: file: procattachbase.ui:14
+#. i18n: ectx: property (windowTitle), widget (QDialog, ProcAttachBase)
+#: rc.cpp:151
+msgid "Attach to Process"
+msgstr "An Prozess attachen"
+
+#. i18n: file: procattachbase.ui:25
+#. i18n: ectx: property (text), widget (QLabel, filterLabel)
+#: rc.cpp:154
+msgid "&Filter or PID:"
+msgstr "&Filter oder PID:"
+
+#. i18n: file: procattachbase.ui:38
+#. i18n: ectx: property (whatsThis), widget (KLineEdit, filterEdit)
+#: rc.cpp:157
+msgid ""
+"Type the name of the process or its process ID (PID) here to reduce the "
+"number of entries in the list."
+msgstr ""
+"Geben Sie hier den Programmnamen oder die Prozess-ID (PID) an, sodass "
+"weniger Einträge in der Tabelle aufscheinen."
+
+#. i18n: file: procattachbase.ui:56
+#. i18n: ectx: property (whatsThis), widget (QTreeWidget, processList)
+#: rc.cpp:160
+msgid ""
+"<p>This list displays all processes that are currently running. You must "
+"select the process that you want KDbg to attach to. Use the <b>Filter or "
+"PID</b> edit box to reduce the number of entries in this list.<p>The text in "
+"the <i>Command</i> column is usually, but not always, the command that was "
+"used to start the process. The <i>PID</i> column shows the process ID. The "
+"<i>PPID</i> column shows the process ID of the parent process. Additional "
+"columns show more information about the processes that is also available via "
+"the system's <i>ps</i> command.</p><p>The list is not updated automatically. "
+"Use the <b>Refresh</b> button to update it.</p>"
+msgstr ""
+"<p>Diese Tabelle zeigt alle Prozesse an, die gerade auf dem System laufen. "
+"Sie müssen einen Prozess auswählen, an den sich KDbg attachen soll. Geben "
+"Sie in <b>Filter oder PID</b> den Programmnamen oder die Prozess-ID ein; "
+"damit wird die Tabelle kürzer.<p>Der Text in der Spalte <i>Befehlszeile</i> "
+"ist normalerweise (aber nicht immer) der Befehl, mit dem der Prozess "
+"gestartet wurde. Die Spalte <i>PID</i> zeigt die Prozess-ID. Die Spalte "
+"<i>PPID</i> zeigt die Prozess-ID des Vater-Prozesses. In den weiteren "
+"Spalten stehen zusätzliche Informationen über die Prozesse, die auch mit dem "
+"Systembefehl <i>ps</i> angezeigt werden können.</p><p>Die Tabelle wird nicht "
+"automatisch aktualisiert. Benutzen Sie dazu die Schaltfläche "
+"<b>Aktualisieren</b>.</p>"
+
+#. i18n: file: procattachbase.ui:66
+#. i18n: ectx: property (text), widget (QTreeWidget, processList)
+#: rc.cpp:163
+msgid "Command"
+msgstr "Befehlszeile"
+
+#. i18n: file: procattachbase.ui:71
+#. i18n: ectx: property (text), widget (QTreeWidget, processList)
+#: rc.cpp:166
+msgid "PID"
+msgstr "PID"
+
+#. i18n: file: procattachbase.ui:76
+#. i18n: ectx: property (text), widget (QTreeWidget, processList)
+#: rc.cpp:169
+msgid "PPID"
+msgstr "PPID"
+
+#. i18n: file: procattachbase.ui:92
+#. i18n: ectx: property (whatsThis), widget (QPushButton, buttonRefresh)
+#: rc.cpp:172
+msgid "This button updates the list of processes."
+msgstr "Diese Schaltfläche aktualisiert die Anzeige."
+
+#. i18n: file: procattachbase.ui:95
+#. i18n: ectx: property (text), widget (QPushButton, buttonRefresh)
+#: rc.cpp:175
+msgid "&Refresh"
+msgstr "&Aktualisieren"
+
+#~ msgid "F1"
+#~ msgstr "F1"
+
+#~ msgid "..."
+#~ msgstr "..."
+
+#~ msgid "Clear filter"
+#~ msgstr "Filter löschen"
+
+#~ msgid ""
+#~ "Use this button to clear the filter text so that all processes are "
+#~ "displayed."
+#~ msgstr ""
+#~ "Mit dieser Schaltfläche können Sie die Filtereingabe löschen, sodass alle "
+#~ "Prozesse angezeigt werden."
+
+#~ msgid ""
+#~ "You must select a process from the list. Then click the <b>OK</b> button "
+#~ "to attach to that process."
+#~ msgstr ""
+#~ "Sie müssenen einen Prozess in der Liste auswählen. Dann klicken Sie "
+#~ "<b>OK</b>, um den Prozess zu attachen."
+
+#~ msgid "Source"
+#~ msgstr "Quellcode"
+
+#~ msgid "&Find"
+#~ msgstr "&Suche"
