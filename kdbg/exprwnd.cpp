@@ -38,17 +38,19 @@ VarTree::VarTree(VarTree* parent, ExprValue* v) :
     setExpanded(v->m_initiallyExpanded);
 }
 
-VarTree::VarTree(ExprWnd* parent, const QString& name) :
+VarTree::VarTree(ExprWnd* parent, ExprValue* v) :
 	QTreeWidgetItem(parent),
 	m_varKind(VKsimple),
 	m_nameKind(VarTree::NKplain),
 	m_type(0),
 	m_exprIndex(0),
 	m_exprIndexUseGuard(false),
+	m_baseValue(v->m_value),
 	m_baseChanged(false),
 	m_structChanged(false)
 {
-    setText(name);
+    setText(v->m_name);
+    updateValueText();
 }
 
 VarTree::~VarTree()
@@ -340,7 +342,7 @@ QStringList ExprWnd::exprList() const
 VarTree* ExprWnd::insertExpr(ExprValue* expr, ProgramTypeTable& typeTable)
 {
     // append a new dummy expression
-    VarTree* display = new VarTree(this, expr->m_name);
+    VarTree* display = new VarTree(this, expr);
 
     // replace it right away
     updateExpr(display, expr, typeTable);

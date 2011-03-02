@@ -37,7 +37,7 @@ public:
     QString m_partialValue;		//!< while struct value update is in progress
 
     VarTree(VarTree* parent, ExprValue* v);
-    VarTree(ExprWnd* parent, const QString& name);
+    VarTree(ExprWnd* parent, ExprValue* v);
     virtual ~VarTree();
 public:
     QString computeExpr() const;
