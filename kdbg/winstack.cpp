@@ -377,9 +377,7 @@ FindDialog::FindDialog() :
 	m_caseCheck(this),
 	m_buttonForward(this),
 	m_buttonBackward(this),
-	m_buttonClose(this),
-	m_layout(this),
-	m_buttons(this)
+	m_buttonClose(this)
 {
     setWindowTitle(KGlobal::caption() + i18n(": Search"));
 
