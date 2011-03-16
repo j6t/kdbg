@@ -364,7 +364,7 @@ void DebuggerMainWnd::initAnimation()
     m_animation = new KAnimatedButton(toolbar);
     toolbar->addWidget(m_animation);
     m_animation->setIcons("pulse");
-    connect(m_animation, SIGNAL(triggered(QAction*)), m_debugger, SLOT(programBreak()));
+    connect(m_animation, SIGNAL(clicked(bool)), m_debugger, SLOT(programBreak()));
     m_animRunning = false;
 }
 
