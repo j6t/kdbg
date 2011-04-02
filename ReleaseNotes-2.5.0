@@ -1,0 +1,22 @@
+KDbg Release Notes for version 2.5.0
+====================================
+
+This release is based on KDE4 and Qt4.
+
+
+Changes since 2.2.2
+-------------------
+
+- A number of icons were exchanged with Oxygen icons. These are not part
+  of KDbg's source code.
+
+- Session state per debugged program is now stored in a section in $KDEHOME
+  rather than in a .kdbgrc file in the program's directory. This allows to
+  debug programs that are located in unwritable directories. But this also
+  means that earlier session information is disregarded.
+
+- More accurate parsing of GDB responses of various commands fixed bugs in
+  certain areas, in particular, temporary breakpoints, register values,
+  truncated struct values, disassembly (again).
+
+- "View Code" from the breakpoint list can open the source code in more cases.

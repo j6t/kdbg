@@ -3,9 +3,12 @@ KDE, the K Desktop Environment.
 
 To install:
 
-	./configure
+	cmake -DCMAKE_INSTALL_PREFIX=/opt/kde4 .
 	make
-	make install
+	sudo make install
+
+(Make sure your KDE is installed in /opt/kde4; adjust the path
+to suit your system. On some systems it is /usr.)
 
 Problem reports as well as success stories are welcome!
 
