@@ -49,7 +49,7 @@ SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorChanged()));
 
     // add a syntax highlighter
-    if (QRegExp("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h)?|HH?)$").indexIn(m_fileName) >= 0)
+    if (QRegExp("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h|pp)?|HH?)$").indexIn(m_fileName) >= 0)
     {
 	m_highlighter = new HighlightCpp(this);
     }
