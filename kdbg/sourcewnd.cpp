@@ -391,9 +391,11 @@ void SourceWindow::keyPressEvent(QKeyEvent* ev)
 	actionCollapseRow(textCursor().blockNumber());
 	return;
     case Qt::Key_Up:
+    case Qt::Key_K:
 	moveCursor(QTextCursor::PreviousBlock);
 	return;
     case Qt::Key_Down:
+    case Qt::Key_J:
 	moveCursor(QTextCursor::NextBlock);
 	return;
     case Qt::Key_Home:
