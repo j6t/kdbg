@@ -1032,6 +1032,10 @@ static bool isNumberish(const char ch)
 
 void skipString(const char*& p)
 {
+    // wchar_t strings begin with L
+    if (*p == 'L')
+	++p;
+
 moreStrings:
     // opening quote
     char quote = *p++;
@@ -1066,7 +1070,7 @@ moreStrings:
 	    }
 	}
     }
-    // is the string continued?
+    // Is the string continued? If so, there is no L in wchar_t strings
     if (*p == ',')
     {
 	// look ahead for another quote
@@ -1326,6 +1330,10 @@ repeat:
 	    checkMultiPart = *p == '\'';
 	    // found a string
 	    skipString(p);
+	} else if (*p == 'L' && (p[1] == '"' || p[1] == '\'')) {
+	    // ditto for wchar_t strings
+	    checkMultiPart = p[1] == '\'';
+	    skipString(p);
 	} else if (*p == '&') {
 	    // function pointer
 	    p++;
@@ -1380,6 +1388,8 @@ repeat:
 	    
 	    if (*p == '"' || *p == '\'') {
 		skipString(p);
+	    } else if (*p == 'L' && (p[1] == '"' || p[1] == '\'')) {
+		skipString(p);	// wchar_t string
 	    } else if (*p == '<') {
 		// if this value is part of an array, it might be followed
 		// by <repeats 15 times>, which we don't skip here

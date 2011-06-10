@@ -16,7 +16,10 @@ int main()
    const wchar_t* str2 = L"def";
    const char* shortStr = "12345";
 
-   wchar_t wstr[64] = L"Some string", *wstrPtr = wstr;
+   wchar_t wstr[64] = { 0 },		// L'\0' <repeats...>
+	*wstrPtr = wstr;
+   wcscpy(wstr, L"Some string");	// L"str", '\0' <repeats...>
+   wchar_t wc = wstr[0];
 
    WChar s = { 0, wstr };
    s.cwstr = s.wstr;
