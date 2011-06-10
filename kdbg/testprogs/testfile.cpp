@@ -5,7 +5,9 @@
 #include <qdir.h>
 #include <math.h>
 
-enum E { red, green, blue, yellow };
+namespace {
+    enum E { red, green, blue, yellow };
+}
 struct S { int x, y; S* s; };
 
 struct emptyBase { };
@@ -44,8 +46,10 @@ namespace {
 namespace B {
 namespace {
 namespace {
+	enum Depth { flat, shallow, deep };
 void g()
 {
+	Depth d = shallow;
 	S s1, s2;
 	s1.x = 85;
 	s2.y = 17;

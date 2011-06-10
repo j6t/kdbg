@@ -1353,12 +1353,17 @@ repeat:
 		p = e+1;
 	    }
 	} else {
+	moreEnum:
 	    // must be an enumeration value
 	    skipName(p);
-	    // hmm, not necessarily: nan (floating point Not a Number)
-	    // is followed by a number in ()
-	    if (*p == '(')
+	    // nan (floating point Not a Number) is followed by a number in ()
+	    // enum values can look like A::(anonymous namespace)::blue
+	    if (*p == '(') {
+		bool isAnonNS = strncmp(p+1, "anonymous namespace)", 20) == 0;
 		skipNested(p, '(', ')');
+		if (isAnonNS)
+		    goto moreEnum;
+	    }
 	}
 	variable->m_value += QString::fromLatin1(start, p - start);
 
