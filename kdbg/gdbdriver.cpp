@@ -1892,11 +1892,14 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 {
     std::list<ThreadInfo> threads;
-    if (strcmp(output, "\n") == 0 || strncmp(output, "No stack.", 9) == 0) {
+    if (strcmp(output, "\n") == 0 ||
+	strncmp(output, "No stack.", 9) == 0 ||
+	strncmp(output, "No threads.", 11) == 0) {
 	// no threads
 	return threads;
     }
 
+    bool newFormat = false;
     const char* p = output;
     while (*p != '\0') {
 	ThreadInfo thr;
@@ -1904,6 +1907,16 @@ std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 	thr.hasFocus = false;
 	while (isspace(*p))		/* may be \n from prev line: see "No stack" below */
 	    p++;
+
+	// recent GDBs write a header line; skip it
+	if (threads.empty() && strncmp(p, "Id   Target", 11) == 0) {
+	    p = strchr(p, '\n');
+	    if (p == NULL)
+		break;
+	    newFormat = true;
+	    continue;	// next line please, '\n' is skipped above
+	}
+
 	if (*p == '*') {
 	    thr.hasFocus = true;
 	    p++;
@@ -1924,12 +1937,47 @@ std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 	    p++;
 
 	/*
-	 * Now follows the thread's SYSTAG. It is terminated by two blanks.
+	 * Now follows the thread's SYSTAG.
 	 */
-	end = strstr(p, "  ");
-	if (end == 0) {
-	    // syntax error; bail out
-	    return threads;
+	if (!newFormat) {
+	    // In the old format, it is terminated by two blanks.
+	    end = strstr(p, "  ");
+	    if (end == 0) {
+		// syntax error; bail out
+		return threads;
+	    }
+	} else {
+	    // In the new format lies crazyness: there is no definitive
+	    // end marker. At best we can guess when the SYSTAG ends.
+	    // A typical thread list on Linux looks like this:
+	    //
+	    //   Id   Target Id         Frame
+	    //   2    Thread 0x7ffff7854700 (LWP 10827) "thrserver" 0x00007ffff7928631 in clone () from /lib64/libc.so.6
+	    // * 1    Thread 0x7ffff7fcc700 (LWP 10808) "thrserver" main () at thrserver.c:84
+	    //
+	    // Looking at GDB's code, the Target Id ends in tokens that
+	    // are bracketed by parentheses or quotes. Therefore,
+	    // we skip (at most) two tokens ('Thread' and the address),
+	    // and then all parts that are in parentheses or quotes.
+	    int n = 0;
+	    end = p;
+	    while (*end) {
+		if (*end == '"') {
+		    skipString(end);
+		    n = 2;
+		} else if (*end == '(') {
+		    skipNested(end, '(', ')');
+		    n = 2;
+		} else if (n < 2) {
+		    while (*end && !isspace(*end))
+			++end;
+		    ++n;
+		} else {
+		    break;
+		}
+		while (isspace(*end))
+		    ++end;
+	    }
 	}
 	thr.threadName = QString::fromLatin1(p, end-p);
 	p = end+2;
