@@ -2193,7 +2193,10 @@ uint GdbDriver::parseProgramStopped(const char* output, QString& message)
     // "Program terminated with wignal SIGSEGV"
     // "Program received signal SIGINT" or other signal
     // "Breakpoint..."
-    
+    // GDB since 7.3 prints
+    // "[Inferior 1 (process 13400) exited normally]"
+    // "[Inferior 1 (process 14698) exited with code 01]"
+
     // go through the output, line by line, checking what we have
     const char* start = output - 1;
     uint flags = SFprogramActive;
@@ -2222,6 +2225,26 @@ uint GdbDriver::parseProgramStopped(const char* output, QString& message)
 	    if (endOfMessage == 0)
 		endOfMessage = start + strlen(start);
 	    message = QString::fromLatin1(start, endOfMessage-start);
+	} else if (strncmp(start, "[Inferior ", 10) == 0) {
+	    const char* p = start + 10;
+	    // skip number and space
+	    while (*p && !isspace(*p))
+		++p;
+	    while (isspace(*p))
+		++p;
+	    if (*p == '(') {
+		skipNested(p, '(', ')');
+		if (strncmp(p, " exited ", 8) == 0) {
+		    flags &= ~SFprogramActive;
+
+		    // set message
+		    const char* end = strchr(p, '\n');
+		    if (end == 0)
+			end = p + strlen(p);
+		    // strip [] from the message
+		    message = QString::fromLatin1(start+1, end-start-2);
+		}
+	    }
 	} else if (strncmp(start, "Breakpoint ", 11) == 0) {
 	    /*
 	     * We stopped at a (permanent) breakpoint (gdb doesn't tell us
