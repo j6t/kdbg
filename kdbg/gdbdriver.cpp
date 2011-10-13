@@ -234,6 +234,11 @@ bool GdbDriver::startup(QString cmdStr)
 	"set print static-members off\n"
 	"set print asm-demangle on\n"
 	/*
+	 * Sometimes, gdb prints [New Thread ...] during 'info threads';
+	 * we will not look at thread events anyway, so turn them off.
+	 */
+	"set print thread-events off\n"
+	/*
 	 * Don't assume that program functions invoked from a watch expression
 	 * always succeed.
 	 */
