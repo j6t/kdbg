@@ -150,6 +150,7 @@ bool KDebugger::debugProgram(const QString& name,
     if (!m_remoteDevice.isEmpty()) {
 	m_d->executeCmd(DCtargetremote, m_remoteDevice);
 	m_d->queueCmd(DCbt, DebuggerDriver::QMoverride);
+	m_d->queueCmd(DCinfothreads, DebuggerDriver::QMoverride);
 	m_d->queueCmd(DCframe, 0, DebuggerDriver::QMnormal);
 	m_programActive = true;
 	m_haveExecutable = true;
