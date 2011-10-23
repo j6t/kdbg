@@ -1,0 +1,21 @@
+KDbg Release Notes for version 2.5.1
+====================================
+
+Changes since 2.5.0
+-------------------
+
+Minor feature enhancements
+
+- .hpp files undergo syntax highlighting.
+
+- Keys j and k can be used to move the cursor position in the source code.
+
+Bug fixes
+
+- Cooperation with newer GDB (7.2 and 7.3) is improved:
+
+  . wchar_t strings as printed by GDB 7.2 are recognized;
+  . the thread list was missing with GDB 7.3;
+  . program exit was not detected (also GDB 7.3).
+
+- Enum values in anonymous namespaces are now recognized.
