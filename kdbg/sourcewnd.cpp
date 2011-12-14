@@ -164,8 +164,10 @@ void SourceWindow::drawLineInfoArea(QPainter* p, QPaintEvent* event)
 	    continue;
 
 	QRect r = blockBoundingGeometry(block).translated(contentOffset()).toRect();
-	if (r.top() > event->rect().bottom() || r.bottom() < event->rect().top())
-	    continue;
+	if (r.bottom() < event->rect().top())
+	    continue; // skip blocks that are higher than the region being updated
+	else if (r.top() > event->rect().bottom())
+	    break;    // all the following blocks are lower then the region being updated
 
 	int row = block.blockNumber();
 	uchar item = m_lineItems[row];
