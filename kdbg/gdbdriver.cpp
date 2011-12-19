@@ -688,6 +688,9 @@ static bool isErrorExpr(const char* output)
 static bool parseErrorMessage(const char*& output,
 			      ExprValue*& variable, bool wantErrorValue)
 {
+    while (isspace(*output))
+        output++;
+
     // skip warnings
     while (strncmp(output, "warning:", 8) == 0)
     {
@@ -696,6 +699,8 @@ static bool parseErrorMessage(const char*& output,
 	    output += strlen(output);
 	else
 	    output = end+1;
+        while (isspace(*output))
+            output++;
     }
 
     if (isErrorExpr(output))
