@@ -83,6 +83,7 @@ enum DbgCommand {
 	DCprintDeref,
 	DCprintStruct,
 	DCprintQStringStruct,
+	DCprintPopup,
 	DCframe,
 	DCfindType,
 	DCinfosharedlib,
@@ -155,6 +156,8 @@ struct CmdQueueItem
     int m_existingBrkpt;
     // whether command was emitted due to direct user request (only set when relevant)
     bool m_byUser;
+    // used to store the expression to print in case of DCprintPopup is executed
+    QString m_popupExpr;
 
     CmdQueueItem(DbgCommand cmd, const QString& str) :
     	m_cmd(cmd),

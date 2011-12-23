@@ -1102,6 +1102,9 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCprint:
 	handlePrint(cmd, output);
 	break;
+    case DCprintPopup:
+	handlePrintPopup(cmd, output);
+	break;
     case DCprintDeref:
 	handlePrintDeref(cmd, output);
 	break;
@@ -1429,6 +1432,21 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
     }
 
     evalExpressions();			/* enqueue dereferenced pointers */
+
+    return true;
+}
+
+bool KDebugger::handlePrintPopup(CmdQueueItem* cmd, const char* output)
+{
+    ExprValue* value = m_d->parsePrintExpr(output, false);
+    if (value == 0)
+	return false;
+
+    TRACE("<" + cmd->m_popupExpr + "> = " + value->m_value);
+
+    // construct the tip, m_popupExpr contains the variable name
+    QString tip = cmd->m_popupExpr + " = " + formatPopupValue(value);
+    emit valuePopup(tip);
 
     return true;
 }
@@ -2056,7 +2074,11 @@ void KDebugger::slotValuePopup(const QString& expr)
 	    if (v != 0)
 		v = ExprWnd::ptrMemberByName(v, expr);
 	    if (v == 0) {
-		// nothing found; do nothing
+		// nothing found, try printing variable in gdb
+
+                CmdQueueItem *cmd = m_d->executeCmd(DCprintPopup, expr, false);
+                cmd->m_popupExpr = expr;
+
 		return;
 	    }
 	}

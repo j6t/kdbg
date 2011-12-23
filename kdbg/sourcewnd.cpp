@@ -428,6 +428,38 @@ void SourceWindow::keyPressEvent(QKeyEvent* ev)
     }
 }
 
+QString SourceWindow::extendExpr(const QString &plainText,
+                                 int            wordStart,
+                                 int            wordEnd)
+{
+    QString document = plainText.left(wordEnd);
+    QString word     = plainText.mid(wordStart, wordEnd - wordStart);
+    QRegExp regex    = QRegExp("(::)?([A-Za-z_]{1}\\w*\\s*(->|\\.|::)\\s*)*" + word + "$");
+
+    #define IDENTIFIER_MAX_SIZE 256
+    // cut the document to reduce size of string to scan
+    // because of this only identifiefs of length <= IDENTIFIER_MAX_SIZE are supported
+    if (document.length() > IDENTIFIER_MAX_SIZE) {
+        document.right(IDENTIFIER_MAX_SIZE);
+    }
+
+    const int index = regex.indexIn(document);
+
+    if (index == -1)
+    {
+        TRACE("No match, returning " + word);
+    }
+    else
+    {
+        const int length = regex.matchedLength();
+
+        word = plainText.mid(index, length);
+        TRACE("Matched, returning " + word);
+    }
+
+    return word;
+}
+
 bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 {
     QTextCursor cursor = cursorForPosition(viewport()->mapFrom(this, p));
@@ -441,10 +473,31 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 	return false;
 
     // keep only letters and digits
-    QRegExp w("[\\dA-Za-z_]+");
+    QRegExp w("[A-Za-z_]{1}[\\dA-Za-z_]*");
     if (w.indexIn(word) < 0)
 	return false;
+
     word = w.cap();
+
+    if (m_highlighter)
+    {
+        // if cpp highlighter is enabled - c/c++ file is being displayed
+
+        // check that word is not a c/c++ keyword
+        if (m_highlighter->isCppKeyword(word))
+            return false;
+
+        // TODO check that cursor is on top of a string literal
+        //      and don't display any tooltips in this case
+
+        // try to extend selected word under the cursor to get a full variable name
+        word = extendExpr(cursor.document()->toPlainText(),
+                          cursor.selectionStart(),
+                          cursor.selectionEnd());
+
+        if (word.isEmpty())
+            return false;
+    }
 
     r = QRect(p, p);
     r.adjust(-5,-5,5,5);
@@ -916,8 +969,7 @@ int HighlightCpp::highlight(const QString& text, int state)
 		    break;
 	    }
 	    state = 0;
-	    if (std::binary_search(ckw, ckw + sizeof(ckw)/sizeof(ckw[0]),
-			text.mid(start, end-start)))
+	    if (isCppKeyword(text.mid(start, end-start)))
 	    {
 		setFormat(start, end-start, identFont);
 	    } else {
@@ -957,6 +1009,11 @@ int HighlightCpp::highlight(const QString& text, int state)
 	start = end;
     }
     return state;
+}
+
+bool HighlightCpp::isCppKeyword(const QString& word)
+{
+    return std::binary_search(ckw, ckw + sizeof(ckw)/sizeof(ckw[0]), word);
 }
 
 #include "sourcewnd.moc"
