@@ -15,6 +15,7 @@ PROGS = \
 	std \
 	templates \
 	testfile \
+	tooltips \
 	widechar
 
 all: $(PROGS)
@@ -48,6 +49,9 @@ templates: templates.cpp
 
 testfile: testfile.cpp
 	g++ -o $@ $(CXXFLAGS) $^ $(QT3INC) $(QT3LIB)
+
+tooltips: tooltips.cpp
+	g++ -o $@ $(CXXFLAGS) $^
 
 widechar: widechar.cpp
 	g++ -o $@ $(CXXFLAGS) $^
