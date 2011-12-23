@@ -24,6 +24,36 @@
 #include <algorithm>
 #include "mydebug.h"
 
+/**
+ * Returns expression value for a tooltip.
+ */
+template <class T>
+QString formatPopupValue(const T* v)
+{
+    QString tip;
+
+    if (!v->value().isEmpty())
+    {
+        tip += v->value();
+    }
+    else
+    {
+	// no value: we use some hint
+        switch (v->m_varKind) {
+        case VarTree::VKstruct:
+            tip += "{...}";
+            break;
+        case VarTree::VKarray:
+            tip += "[...]";
+            break;
+        default:
+            tip += "?""?""?";	// 2 question marks in a row would be a trigraph
+            break;
+        }
+    }
+
+    return tip;
+}
 
 KDebugger::KDebugger(QWidget* parent,
 		     ExprWnd* localVars,
@@ -2033,26 +2063,7 @@ void KDebugger::slotValuePopup(const QString& expr)
     }
 
     // construct the tip
-    QString tip = v->getText() + " = ";
-    if (!v->value().isEmpty())
-    {
-	tip += v->value();
-    }
-    else
-    {
-	// no value: we use some hint
-	switch (v->m_varKind) {
-	case VarTree::VKstruct:
-	    tip += "{...}";
-	    break;
-	case VarTree::VKarray:
-	    tip += "[...]";
-	    break;
-	default:
-	    tip += "?""?""?";	// 2 question marks in a row would be a trigraph
-	    break;
-	}
-    }
+    QString tip = v->getText() + " = " + formatPopupValue(v);
     emit valuePopup(tip);
 }
 
