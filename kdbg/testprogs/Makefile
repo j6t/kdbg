@@ -6,6 +6,7 @@ QT3LIB = $(QT3)/lib64/libqt-mt.so
 
 PROGS = \
 	anonstruct \
+	lambda \
 	locals \
 	longdouble \
 	maths \
@@ -21,6 +22,9 @@ all: $(PROGS)
 
 anonstruct: anonstruct.cpp
 	g++ -o $@ $(CXXFLAGS) $^
+
+lambda: lambda.cpp
+	g++ --std=c++0x -o $@ $(CXXFLAGS) $^
 
 locals: locals.cpp
 	g++ -o $@ $(CXXFLAGS) $^
