@@ -1104,6 +1104,23 @@ moreStrings:
 	    }
 	}
     }
+    /*
+     * There's a bug in gdb where it prints the beginning of the string
+     * continuation and the comma-blank in the wrong order if the new string
+     * begins with an incomplete multi-byte character. For now, let's check
+     * for this in a very narrow condition, particularly, where the next
+     * character is given in octal notation. Example:
+     *     'a' <repeats 20 times>"\240, b"
+     */
+    if (*p == '"' && p[1] == '\\' && isdigit(p[2])) {
+	int i = 3;
+	while (isdigit(p[i]))
+	    ++i;
+	if (p[i] == ',' && p[i+1] == ' ') {
+	    // just treat everything beginning at the dquote as string
+	    goto moreStrings;
+	}
+    }
     /* very long strings are followed by `...' */
     if (*p == '.' && p[1] == '.' && p[2] == '.') {
 	p += 3;

@@ -1,5 +1,6 @@
 // test <repeats 30 times> in arrays
 
+#include <iostream>
 #include <qstring.h>
 
 struct Big {
@@ -13,6 +14,16 @@ static void f(int)
 {
 }
 
+
+static void IncompleteCharTest()
+{
+    // this string triggers a bug in gdb's string dumping routine
+    char s1[] = "abbbbbbbbbbbbbbbbbbbb\240ccc";
+    char s2[] = "abbbbbbbbbbbbbbbbbbbb\240\240\240\240\240\240\240\240\240\240\240\240\240\240\240\240\240\240\240\240ccc";
+    // this variable should be visible in the Local Variables window
+    int n = 2;
+    std::cout << s1 << s2 << n << std::endl;
+}
 
 int main()
 {
@@ -37,5 +48,6 @@ int main()
     for (int i = 0; i < 300; i++)
 	    many[i] = i;
 
+    IncompleteCharTest();
     return 0;
 }
