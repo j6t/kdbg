@@ -87,6 +87,7 @@ static XsldbgCmdInfo cmds[] = {
     {DCprintDeref, "print 'print (*%s)'\n", XsldbgCmdInfo::argString},
     {DCprintStruct, "print 'print %s'\n", XsldbgCmdInfo::argString},
     {DCprintQStringStruct, "print 'print %s'\n", XsldbgCmdInfo::argString},
+    {DCprintPopup, "print %s\n", XsldbgCmdInfo::argString},
     {DCframe, "frame %d\n", XsldbgCmdInfo::argNum},
     {DCfindType, "print 'whatis %s'\n", XsldbgCmdInfo::argString},
     {DCinfosharedlib, "stylesheets\n", XsldbgCmdInfo::argNone},

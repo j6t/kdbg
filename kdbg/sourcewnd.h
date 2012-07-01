@@ -54,6 +54,9 @@ public:
 
     void activeLine(int& lineNo, DbgAddr& address);
 
+    static QString extendExpr(const QString &plainText,
+                              int            wordStart,
+                              int            wordEnd);
 protected:
     void drawLineInfoArea(QPainter* p, QPaintEvent* event);
     void infoMousePress(QMouseEvent* ev);
@@ -134,6 +137,8 @@ public:
     HighlightCpp(SourceWindow* srcWnd);
     virtual void highlightBlock(const QString& text);
     int highlight(const QString& text, int state);
+
+    static bool isCppKeyword(const QString& word);
 };
 
 #endif // SOURCEWND_H

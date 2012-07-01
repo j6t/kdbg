@@ -86,6 +86,10 @@ struct ExprValue
     ExprValue(const QString& name, VarTree::NameKind kind);
     ~ExprValue();
 
+    const QString& value() const {
+        return m_value;
+    }
+
     void appendChild(ExprValue* newChild);
     int childCount() const;
 };

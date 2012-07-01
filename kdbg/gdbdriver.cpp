@@ -108,6 +108,7 @@ static GdbCmdInfo cmds[] = {
     { DCprintDeref, "print *(%s)\n", GdbCmdInfo::argString },
     { DCprintStruct, "print %s\n", GdbCmdInfo::argString },
     { DCprintQStringStruct, printQStringStructFmt, GdbCmdInfo::argString},
+    { DCprintPopup, "print %s\n", GdbCmdInfo::argString },
     { DCframe, "frame %d\n", GdbCmdInfo::argNum },
     { DCfindType, "whatis %s\n", GdbCmdInfo::argString },
     { DCinfosharedlib, "info sharedlibrary\n", GdbCmdInfo::argNone },

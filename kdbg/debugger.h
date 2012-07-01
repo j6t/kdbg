@@ -369,6 +369,7 @@ protected:
     void parseLocals(const char* output, std::list<ExprValue*>& newVars);
     void handleLocals(const char* output);
     bool handlePrint(CmdQueueItem* cmd, const char* output);
+    bool handlePrintPopup(CmdQueueItem* cmd, const char* output);
     bool handlePrintDeref(CmdQueueItem* cmd, const char* output);
     void handleBacktrace(const char* output);
     void handleFrameChange(const char* output);
