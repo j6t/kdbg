@@ -2187,8 +2187,10 @@ bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
      * Lines starting with the following do not indicate errors:
      *     Using host libthread_db
      *     (no debugging symbols found)
+     *     Reading symbols from
      */
-    while (strncmp(output, "Using host libthread_db", 23) == 0 ||
+    while (strncmp(output, "Reading symbols from", 20) == 0 ||
+	   strncmp(output, "Using host libthread_db", 23) == 0 ||
 	   strncmp(output, "(no debugging symbols found)", 28) == 0)
     {
 	// this line is good, go to the next one
