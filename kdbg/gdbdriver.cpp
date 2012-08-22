@@ -1973,6 +1973,7 @@ std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 		// syntax error; bail out
 		return threads;
 	    }
+	    end += 2;
 	} else {
 	    // In the new format lies crazyness: there is no definitive
 	    // end marker. At best we can guess when the SYSTAG ends.
@@ -2006,8 +2007,8 @@ std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 		    ++end;
 	    }
 	}
-	thr.threadName = QString::fromLatin1(p, end-p);
-	p = end+2;
+	thr.threadName = QString::fromLatin1(p, end-p).trimmed();
+	p = end;
 
 	/*
 	 * Now follows a standard stack frame. Sometimes, however, gdb
