@@ -1974,6 +1974,7 @@ std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 		// syntax error; bail out
 		return threads;
 	    }
+	    end += 2;
 	} else {
 	    // In the new format lies crazyness: there is no definitive
 	    // end marker. At best we can guess when the SYSTAG ends.
@@ -2007,8 +2008,8 @@ std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 		    ++end;
 	    }
 	}
-	thr.threadName = QString::fromLatin1(p, end-p);
-	p = end+2;
+	thr.threadName = QString::fromLatin1(p, end-p).trimmed();
+	p = end;
 
 	/*
 	 * Now follows a standard stack frame. Sometimes, however, gdb
@@ -2188,8 +2189,10 @@ bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
      * Lines starting with the following do not indicate errors:
      *     Using host libthread_db
      *     (no debugging symbols found)
+     *     Reading symbols from
      */
-    while (strncmp(output, "Using host libthread_db", 23) == 0 ||
+    while (strncmp(output, "Reading symbols from", 20) == 0 ||
+	   strncmp(output, "Using host libthread_db", 23) == 0 ||
 	   strncmp(output, "(no debugging symbols found)", 28) == 0)
     {
 	// this line is good, go to the next one
