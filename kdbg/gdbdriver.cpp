@@ -2035,25 +2035,25 @@ static bool parseNewWatchpoint(const char* o, int& id,
 bool GdbDriver::parseBreakpoint(const char* output, int& id,
 				QString& file, int& lineNo, QString& address)
 {
-    const char* o = output;
     // skip lines of that begin with "(Cannot find"
-    while (strncmp(o, "(Cannot find", 12) == 0) {
-	o = strchr(o, '\n');
-	if (o == 0)
+    while (strncmp(output, "(Cannot find", 12) == 0)
+    {
+	output = strchr(output, '\n');
+	if (output == 0)
 	    return false;
-	o++;				/* skip newline */
+	output++;			/* skip newline */
     }
 
-    if (strncmp(o, "Breakpoint ", 11) == 0) {
+    if (strncmp(output, "Breakpoint ", 11) == 0) {
 	output += 11;			/* skip "Breakpoint " */
 	return ::parseNewBreakpoint(output, id, file, lineNo, address);
-    } else if (strncmp(o, "Temporary breakpoint ", 21) == 0) {
+    } else if (strncmp(output, "Temporary breakpoint ", 21) == 0) {
 	output += 21;
 	return ::parseNewBreakpoint(output, id, file, lineNo, address);
-    } else if (strncmp(o, "Hardware watchpoint ", 20) == 0) {
+    } else if (strncmp(output, "Hardware watchpoint ", 20) == 0) {
 	output += 20;
 	return ::parseNewWatchpoint(output, id, address);
-    } else if (strncmp(o, "Watchpoint ", 11) == 0) {
+    } else if (strncmp(output, "Watchpoint ", 11) == 0) {
 	output += 11;
 	return ::parseNewWatchpoint(output, id, address);
     }
