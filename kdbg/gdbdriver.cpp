@@ -2036,7 +2036,8 @@ bool GdbDriver::parseBreakpoint(const char* output, int& id,
 				QString& file, int& lineNo, QString& address)
 {
     // skip lines of that begin with "(Cannot find"
-    while (strncmp(output, "(Cannot find", 12) == 0)
+    while (strncmp(output, "(Cannot find", 12) == 0 ||
+	   strncmp(output, "Note: breakpoint", 16) == 0)
     {
 	output = strchr(output, '\n');
 	if (output == 0)
