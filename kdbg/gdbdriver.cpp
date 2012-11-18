@@ -1822,24 +1822,32 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 	// get Num
 	bp.id = strtol(p, &dummy, 10);	/* don't care about overflows */
 	p = dummy;
-	// get Type
-	while (isspace(*p))
-	    p++;
-	if (strncmp(p, "breakpoint", 10) == 0) {
-	    p += 10;
-	} else if (strncmp(p, "hw watchpoint", 13) == 0) {
-	    bp.type = Breakpoint::watchpoint;
-	    p += 13;
-	} else if (strncmp(p, "watchpoint", 10) == 0) {
-	    bp.type = Breakpoint::watchpoint;
-	    p += 10;
+	// check for continued <MULTIPLE> breakpoint
+	if (*p == '.' && isdigit(p[1]))
+	{
+	    // continuation: skip type and disposition
 	}
-	while (isspace(*p))
-	    p++;
-	if (*p == '\0')
-	    break;
-	// get Disp
-	bp.temporary = *p++ == 'd';
+	else
+	{
+	    // get Type
+	    while (isspace(*p))
+		p++;
+	    if (strncmp(p, "breakpoint", 10) == 0) {
+		p += 10;
+	    } else if (strncmp(p, "hw watchpoint", 13) == 0) {
+		bp.type = Breakpoint::watchpoint;
+		p += 13;
+	    } else if (strncmp(p, "watchpoint", 10) == 0) {
+		bp.type = Breakpoint::watchpoint;
+		p += 10;
+	    }
+	    while (isspace(*p))
+		p++;
+	    if (*p == '\0')
+		break;
+	    // get Disp
+	    bp.temporary = *p++ == 'd';
+	}
 	while (*p != '\0' && !isspace(*p))	/* "keep" or "del" */
 	    p++;
 	while (isspace(*p))
@@ -1873,7 +1881,9 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 	    bp.location = p;
 	    p += bp.location.length();
 	} else {
-	    bp.location = QString::fromLatin1(p, end-p).trimmed();
+	    // location of a <MULTIPLE> filled in from subsequent breakpoints
+	    if (strncmp(p, "<MULTIPLE>", 10) != 0)
+		bp.location = QString::fromLatin1(p, end-p).trimmed();
 	    p = end+1;			/* skip over \n */
 	}
 
@@ -1911,7 +1921,20 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 	    if (*p != '\0')
 		p++;			/* skip '\n' */
 	}
-	brks.push_back(bp);
+
+	if (brks.empty() || brks.back().id != bp.id) {
+	    brks.push_back(bp);
+	} else {
+	    // this is a continuation; fill in location if not yet set
+	    // otherwise, drop this breakpoint
+	    Breakpoint& mbp = brks.back();
+	    if (mbp.location.isEmpty() && !bp.location.isEmpty()) {
+		mbp.location = bp.location;
+		mbp.address = bp.address;
+	    } else if (mbp.address.isEmpty() && !bp.address.isEmpty()) {
+		mbp.address = bp.address;
+	    }
+	}
     }
     return true;
 }
