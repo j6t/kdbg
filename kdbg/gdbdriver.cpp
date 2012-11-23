@@ -2101,17 +2101,38 @@ static bool parseNewBreakpoint(const char* o, int& id,
 	    ++p;
 	address = QString::fromLatin1(start, p-start);
     }
-    
-    // file name
+
+    /*
+     * Mostly, GDB responds with this syntax:
+     *
+     * Breakpoint 1 at 0x400b94: file multibrkpt.cpp, line 9. (2 locations)
+     *
+     * but sometimes it uses this syntax:
+     *
+     * Breakpoint 4 at 0x804f158: lotto739.cpp:95. (3 locations)
+     */
+    char* fileEnd, *numStart = 0;
     char* fileStart = strstr(p, "file ");
-    if (fileStart == 0)
-	return !address.isEmpty();     /* parse error only if there's no address */
-    fileStart += 5;
-    
-    // line number
-    char* numStart = strstr(fileStart, ", line ");
-    QString fileName = QString::fromLatin1(fileStart, numStart-fileStart);
-    numStart += 7;
+    if (fileStart != 0)
+    {
+	fileStart += 5;
+	fileEnd = strstr(fileStart, ", line ");
+	if (fileEnd != 0)
+	    numStart = fileEnd + 7;
+    }
+    if (numStart == 0 && p[0] == ':' && p[1] == ' ')
+    {
+	fileStart = p+2;
+	while (isspace(*fileStart))
+	    ++fileStart;
+	fileEnd = strchr(fileStart, ':');
+	if (fileEnd != 0)
+	    numStart = fileEnd + 1;
+    }
+    if (numStart == 0)
+	return !address.isEmpty();	/* parse error only if there's no address */
+
+    QString fileName = QString::fromLatin1(fileStart, fileEnd-fileStart);
     int line = strtoul(numStart, &p, 10);
     if (numStart == p)
 	return false;
