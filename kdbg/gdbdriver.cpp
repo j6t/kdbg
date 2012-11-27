@@ -1823,24 +1823,32 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 	// get Num
 	bp.id = strtol(p, &dummy, 10);	/* don't care about overflows */
 	p = dummy;
-	// get Type
-	while (isspace(*p))
-	    p++;
-	if (strncmp(p, "breakpoint", 10) == 0) {
-	    p += 10;
-	} else if (strncmp(p, "hw watchpoint", 13) == 0) {
-	    bp.type = Breakpoint::watchpoint;
-	    p += 13;
-	} else if (strncmp(p, "watchpoint", 10) == 0) {
-	    bp.type = Breakpoint::watchpoint;
-	    p += 10;
+	// check for continued <MULTIPLE> breakpoint
+	if (*p == '.' && isdigit(p[1]))
+	{
+	    // continuation: skip type and disposition
 	}
-	while (isspace(*p))
-	    p++;
-	if (*p == '\0')
-	    break;
-	// get Disp
-	bp.temporary = *p++ == 'd';
+	else
+	{
+	    // get Type
+	    while (isspace(*p))
+		p++;
+	    if (strncmp(p, "breakpoint", 10) == 0) {
+		p += 10;
+	    } else if (strncmp(p, "hw watchpoint", 13) == 0) {
+		bp.type = Breakpoint::watchpoint;
+		p += 13;
+	    } else if (strncmp(p, "watchpoint", 10) == 0) {
+		bp.type = Breakpoint::watchpoint;
+		p += 10;
+	    }
+	    while (isspace(*p))
+		p++;
+	    if (*p == '\0')
+		break;
+	    // get Disp
+	    bp.temporary = *p++ == 'd';
+	}
 	while (*p != '\0' && !isspace(*p))	/* "keep" or "del" */
 	    p++;
 	while (isspace(*p))
@@ -1874,7 +1882,9 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 	    bp.location = p;
 	    p += bp.location.length();
 	} else {
-	    bp.location = QString::fromLatin1(p, end-p).trimmed();
+	    // location of a <MULTIPLE> filled in from subsequent breakpoints
+	    if (strncmp(p, "<MULTIPLE>", 10) != 0)
+		bp.location = QString::fromLatin1(p, end-p).trimmed();
 	    p = end+1;			/* skip over \n */
 	}
 
@@ -1912,7 +1922,20 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 	    if (*p != '\0')
 		p++;			/* skip '\n' */
 	}
-	brks.push_back(bp);
+
+	if (brks.empty() || brks.back().id != bp.id) {
+	    brks.push_back(bp);
+	} else {
+	    // this is a continuation; fill in location if not yet set
+	    // otherwise, drop this breakpoint
+	    Breakpoint& mbp = brks.back();
+	    if (mbp.location.isEmpty() && !bp.location.isEmpty()) {
+		mbp.location = bp.location;
+		mbp.address = bp.address;
+	    } else if (mbp.address.isEmpty() && !bp.address.isEmpty()) {
+		mbp.address = bp.address;
+	    }
+	}
     }
     return true;
 }
@@ -2036,25 +2059,26 @@ static bool parseNewWatchpoint(const char* o, int& id,
 bool GdbDriver::parseBreakpoint(const char* output, int& id,
 				QString& file, int& lineNo, QString& address)
 {
-    const char* o = output;
     // skip lines of that begin with "(Cannot find"
-    while (strncmp(o, "(Cannot find", 12) == 0) {
-	o = strchr(o, '\n');
-	if (o == 0)
+    while (strncmp(output, "(Cannot find", 12) == 0 ||
+	   strncmp(output, "Note: breakpoint", 16) == 0)
+    {
+	output = strchr(output, '\n');
+	if (output == 0)
 	    return false;
-	o++;				/* skip newline */
+	output++;			/* skip newline */
     }
 
-    if (strncmp(o, "Breakpoint ", 11) == 0) {
+    if (strncmp(output, "Breakpoint ", 11) == 0) {
 	output += 11;			/* skip "Breakpoint " */
 	return ::parseNewBreakpoint(output, id, file, lineNo, address);
-    } else if (strncmp(o, "Temporary breakpoint ", 21) == 0) {
+    } else if (strncmp(output, "Temporary breakpoint ", 21) == 0) {
 	output += 21;
 	return ::parseNewBreakpoint(output, id, file, lineNo, address);
-    } else if (strncmp(o, "Hardware watchpoint ", 20) == 0) {
+    } else if (strncmp(output, "Hardware watchpoint ", 20) == 0) {
 	output += 20;
 	return ::parseNewWatchpoint(output, id, address);
-    } else if (strncmp(o, "Watchpoint ", 11) == 0) {
+    } else if (strncmp(output, "Watchpoint ", 11) == 0) {
 	output += 11;
 	return ::parseNewWatchpoint(output, id, address);
     }
@@ -2078,17 +2102,38 @@ static bool parseNewBreakpoint(const char* o, int& id,
 	    ++p;
 	address = QString::fromLatin1(start, p-start);
     }
-    
-    // file name
+
+    /*
+     * Mostly, GDB responds with this syntax:
+     *
+     * Breakpoint 1 at 0x400b94: file multibrkpt.cpp, line 9. (2 locations)
+     *
+     * but sometimes it uses this syntax:
+     *
+     * Breakpoint 4 at 0x804f158: lotto739.cpp:95. (3 locations)
+     */
+    char* fileEnd, *numStart = 0;
     char* fileStart = strstr(p, "file ");
-    if (fileStart == 0)
-	return !address.isEmpty();     /* parse error only if there's no address */
-    fileStart += 5;
-    
-    // line number
-    char* numStart = strstr(fileStart, ", line ");
-    QString fileName = QString::fromLatin1(fileStart, numStart-fileStart);
-    numStart += 7;
+    if (fileStart != 0)
+    {
+	fileStart += 5;
+	fileEnd = strstr(fileStart, ", line ");
+	if (fileEnd != 0)
+	    numStart = fileEnd + 7;
+    }
+    if (numStart == 0 && p[0] == ':' && p[1] == ' ')
+    {
+	fileStart = p+2;
+	while (isspace(*fileStart))
+	    ++fileStart;
+	fileEnd = strchr(fileStart, ':');
+	if (fileEnd != 0)
+	    numStart = fileEnd + 1;
+    }
+    if (numStart == 0)
+	return !address.isEmpty();	/* parse error only if there's no address */
+
+    QString fileName = QString::fromLatin1(fileStart, fileEnd-fileStart);
     int line = strtoul(numStart, &p, 10);
     if (numStart == p)
 	return false;

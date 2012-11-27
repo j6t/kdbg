@@ -10,6 +10,7 @@ PROGS = \
 	locals \
 	longdouble \
 	maths \
+	multibrkpt \
 	nestedclass \
 	qt \
 	repeats \
@@ -34,6 +35,9 @@ longdouble: longdouble.c
 	gcc -o $@ $(CXXFLAGS) $^
 
 maths: maths.cpp
+	g++ -o $@ $(CXXFLAGS) $^
+
+multibrkpt: multibrkpt.cpp
 	g++ -o $@ $(CXXFLAGS) $^
 
 nestedclass: nestedclass.cpp

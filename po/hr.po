@@ -2,33 +2,34 @@
 # Copyright (C) 1998,1999 Johannes Sixt
 # Johannes Sixt <j6t@kdbg.org>, 1999
 # Vladimir Vuksan <vuksan@veus.hr>, 1998.
+# Luka Hranjec <lhranjec@gmail.com>, 2012.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.0\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2011-03-01 22:35+0100\n"
-"PO-Revision-Date: 2002-03-03 16:17MDT\n"
-"Last-Translator: Vladimir Vuksan <vuksan@veus.hr>\n"
-"Language-Team: Croatian <hr@li.org>\n"
+"PO-Revision-Date: 2012-11-26 15:52+0100\n"
+"Last-Translator: Luka Hranjec <lhranjec@gmail.com>\n"
+"Language-Team: Croatian <>\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: KBabel 0.9.5\n"
+"X-Generator: Gtranslator 2.91.5\n"
 
 #. i18n: file: brkptbase.ui:85
 #. i18n: ectx: property (text), widget (QPushButton, btEnaDis)
 #: brkpt.cpp:179 rc.cpp:30
 msgid "&Disable"
-msgstr ""
+msgstr "O&nemogući"
 
 #: brkpt.cpp:181
 msgid "&Enable"
-msgstr ""
+msgstr "&Omogući"
 
 #: brkpt.cpp:363
 msgid ": Conditional breakpoint"
-msgstr ""
+msgstr ": Uvjetni breakpoint"
 
 #: dbgmainwnd.cpp:71
 msgid "active"
@@ -36,39 +37,39 @@ msgstr "aktivan"
 
 #: dbgmainwnd.cpp:78
 msgid "Stack"
-msgstr ""
+msgstr "Stog"
 
 #: dbgmainwnd.cpp:81
 msgid "Locals"
-msgstr ""
+msgstr "Lokalni"
 
 #: dbgmainwnd.cpp:82
 msgid "Variable"
-msgstr ""
+msgstr "Varijabla"
 
 #: dbgmainwnd.cpp:84
 msgid "Watches"
-msgstr ""
+msgstr "Nadgledanja"
 
 #: dbgmainwnd.cpp:87
 msgid "Registers"
-msgstr ""
+msgstr "Registri"
 
 #: dbgmainwnd.cpp:90
 msgid "Breakpoints"
-msgstr "Mjesto prekida"
+msgstr "Breakpointovi"
 
 #: dbgmainwnd.cpp:93 pgmsettings.cpp:108
 msgid "Output"
-msgstr ""
+msgstr "Izlaz"
 
 #: dbgmainwnd.cpp:96
 msgid "Threads"
-msgstr ""
+msgstr "Niti"
 
 #: dbgmainwnd.cpp:99
 msgid "Memory"
-msgstr ""
+msgstr "Memorija"
 
 #: dbgmainwnd.cpp:251
 msgid "&Open Source..."
@@ -76,65 +77,63 @@ msgstr "&Otvori izvorni kod..."
 
 #: dbgmainwnd.cpp:253
 msgid "&Reload Source"
-msgstr ""
+msgstr "&Ponovno učitaj kod"
 
 #: dbgmainwnd.cpp:255
 msgid "&Executable..."
-msgstr "&Izvršni program..."
+msgstr "&Izvršna datoteka..."
 
 #: dbgmainwnd.cpp:261
-#, fuzzy
 msgid "Recent E&xecutables"
-msgstr "Izvršni program..."
+msgstr "&Nedavne datoteke..."
 
 #: dbgmainwnd.cpp:262
 msgid "&Core dump..."
-msgstr ""
+msgstr "&Core dump..."
 
 #: dbgmainwnd.cpp:267
 msgid "This &Program..."
-msgstr ""
+msgstr "Ovaj &Progam"
 
 #: dbgmainwnd.cpp:269
 msgid "&Global Options..."
-msgstr ""
+msgstr "&Globalne Postavke..."
 
 #: dbgmainwnd.cpp:279
 msgid "Source &code"
-msgstr ""
+msgstr "Izvorni &Kod"
 
 #: dbgmainwnd.cpp:281
 msgid "Stac&k"
-msgstr ""
+msgstr "&Stog"
 
 #: dbgmainwnd.cpp:282
 msgid "&Locals"
-msgstr ""
+msgstr "&Lokalni"
 
 #: dbgmainwnd.cpp:283
 msgid "&Watched expressions"
-msgstr ""
+msgstr "&Promatrani izrazi"
 
 #: dbgmainwnd.cpp:284
 msgid "&Registers"
-msgstr ""
+msgstr "&Registri"
 
 #: dbgmainwnd.cpp:285
-#, fuzzy
 msgid "&Breakpoints"
-msgstr "Mjesto prekida"
+msgstr "&Breakpoints"
 
 #: dbgmainwnd.cpp:286
 msgid "T&hreads"
-msgstr ""
+msgstr "&Niti"
 
 #: dbgmainwnd.cpp:287
 msgid "&Output"
-msgstr ""
+msgstr "&Izlaz"
 
 #: dbgmainwnd.cpp:288
 msgid "&Memory"
-msgstr ""
+msgstr "&Memorija"
 
 #: dbgmainwnd.cpp:298
 msgid "&Run"
@@ -142,15 +141,15 @@ msgstr "Pok&reni"
 
 #: dbgmainwnd.cpp:302
 msgid "Step &into"
-msgstr ""
+msgstr "&Uskoči"
 
 #: dbgmainwnd.cpp:306
 msgid "Step &over"
-msgstr ""
+msgstr "&Preskoči"
 
 #: dbgmainwnd.cpp:310
 msgid "Step o&ut"
-msgstr ""
+msgstr "&Iskorači"
 
 #: dbgmainwnd.cpp:314
 msgid "Run to &cursor"
@@ -158,15 +157,15 @@ msgstr "Izvrši do poka&zivača"
 
 #: dbgmainwnd.cpp:318
 msgid "Step i&nto by instruction"
-msgstr ""
+msgstr "Uskoči u &instrukciju"
 
 #: dbgmainwnd.cpp:322
 msgid "Step o&ver by instruction"
-msgstr ""
+msgstr "&Preskoči za instrukciju"
 
 #: dbgmainwnd.cpp:326
 msgid "&Program counter to current line"
-msgstr ""
+msgstr "&Programski brojač do trenutne linije"
 
 #: dbgmainwnd.cpp:329
 msgid "&Break"
@@ -174,15 +173,15 @@ msgstr "&Prekid"
 
 #: dbgmainwnd.cpp:331
 msgid "&Kill"
-msgstr ""
+msgstr "&Ubij"
 
 #: dbgmainwnd.cpp:333
 msgid "Re&start"
-msgstr ""
+msgstr "&Restart"
 
 #: dbgmainwnd.cpp:335
 msgid "A&ttach..."
-msgstr ""
+msgstr "&Prikači"
 
 #: dbgmainwnd.cpp:337
 msgid "&Arguments..."
@@ -190,31 +189,31 @@ msgstr "&Argumenti..."
 
 #: dbgmainwnd.cpp:341
 msgid "Set/Clear &breakpoint"
-msgstr "Postavi/Obriši mjesta &prekida"
+msgstr "Postavi/Obriši &breakpoint"
 
 #: dbgmainwnd.cpp:343
 msgid "Set &temporary breakpoint"
-msgstr "Postavi pri&vremena mjesta prekida"
+msgstr "Postavi pri&vremeni breakpoint"
 
 #: dbgmainwnd.cpp:345
 msgid "&Enable/Disable breakpoint"
-msgstr "&Uklj./isklj. mjesta prekida"
+msgstr "&Uključi/Isključi breakpoint"
 
 #: dbgmainwnd.cpp:349
 msgid "Watch Expression"
-msgstr ""
+msgstr "Promatrani Izrazi"
 
 #: dbgmainwnd.cpp:351
 msgid "Edit Value"
-msgstr ""
+msgstr "Uredi Vrijednost"
 
 #: dbgmainwnd.cpp:379
 msgid "Restart"
-msgstr ""
+msgstr "Restart"
 
 #: dbgmainwnd.cpp:380
 msgid "Core dump"
-msgstr ""
+msgstr "Core dump"
 
 #: dbgmainwnd.cpp:623
 msgid "`%1' is not a file or does not exist"
@@ -222,51 +221,51 @@ msgstr "`%1' nije datoteka ili ne postoji"
 
 #: dbgmainwnd.cpp:691
 msgid "Don't know how to debug language `%1'"
-msgstr ""
+msgstr "Ne znam kako debagirati jezik `%1'"
 
 #: dbgmainwnd.cpp:704
 msgid ""
 "Could not start the debugger process.\n"
 "Please shut down KDbg and resolve the problem."
 msgstr ""
+"Ne mogu započeti proces otklanjanja pogrešaka\n"
+"Molim zatvorite KDbg i popravite grešku"
 
 #: dbgmainwnd.cpp:826
 msgid ": Global options"
-msgstr ""
+msgstr ": Globalne opcije"
 
 #: dbgmainwnd.cpp:841 pgmsettings.cpp:107
 msgid "Debugger"
-msgstr ""
+msgstr "Debuger"
 
 #: dbgmainwnd.cpp:842
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Razno"
 
 #: dbgmainwnd.cpp:980
 msgid ": Program output"
 msgstr ": Izlaz programa"
 
 #: dbgmainwnd.cpp:1070
-#, fuzzy
 msgid "|All source files\n"
-msgstr "Otvori datoteku sa izvornim kodom"
+msgstr "|Sve datoteteke izvornog koda\n"
 
 #: dbgmainwnd.cpp:1071
-#, fuzzy
 msgid "|Source files\n"
-msgstr "Otvori datoteku sa izvornim kodom"
+msgstr "|Izvorne datoteka\n"
 
 #: dbgmainwnd.cpp:1072
 msgid "|Header files\n"
-msgstr ""
+msgstr "|Zaglavne datoteke\n"
 
 #: dbgmainwnd.cpp:1073
 msgid "*|All files"
-msgstr ""
+msgstr "*|Sve datoteke"
 
 #: dbgmainwnd.cpp:1165
 msgid "Open"
-msgstr ""
+msgstr "Otvori"
 
 #: dbgmainwnd.cpp:1183
 msgid "Select the executable to debug"
@@ -274,13 +273,15 @@ msgstr "Izaberite izvršni program za debugiranje"
 
 #: dbgmainwnd.cpp:1196
 msgid "Select core dump"
-msgstr ""
+msgstr "Izaberi core dump"
 
 #: debugger.cpp:650
 msgid ""
 "%1 exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
+"%1 neočekivani izlaz.\n"
+"Restartaj sezonu (npr. Datoteka|Izvršna datoteka)."
 
 #: debugger.cpp:841
 msgid ""
@@ -288,202 +289,205 @@ msgid ""
 "%1\n"
 "Shall this command be used?"
 msgstr ""
+"Postavke ovog programa daju sljedeću naredbu:\n"
+"%1\n"
+"Koristiti datu naredbu?"
 
 #. i18n: file: pgmargsbase.ui:234
 #. i18n: ectx: property (text), widget (QTreeWidget, envList)
 #: exprwnd.cpp:312 regwnd.cpp:417 rc.cpp:127
 msgid "Value"
-msgstr ""
+msgstr "Vrijednost"
 
 #: gdbdriver.cpp:911
 msgid "<anonymous struct or union>"
-msgstr ""
+msgstr "<anonimna struktura ili unija>"
 
 #: gdbdriver.cpp:1526
 msgid "<additional entries of the array suppressed>"
-msgstr ""
+msgstr "<dodatni clanovi polja nisu prikazani>"
 
 #: gdbdriver.cpp:2084 xsldbgdriver.cpp:1287
 msgid "New working directory: "
-msgstr ""
+msgstr "Novi radni direktorij:"
 
 #: main.cpp:23
 msgid "KDbg"
-msgstr ""
+msgstr "KDbg"
 
 #: main.cpp:25
 msgid "A Debugger"
-msgstr ""
+msgstr "Debuger"
 
 #: main.cpp:27
 msgid "(c) 1998-2011 Johannes Sixt"
-msgstr ""
+msgstr "(c) 1998-2012 Johannes Sixt"
 
 #: main.cpp:31
 msgid "Johannes Sixt"
-msgstr ""
+msgstr "Johannes Sixt"
 
 #: main.cpp:32
 msgid "Keith Isdale"
-msgstr ""
+msgstr "Keith Isdale"
 
 #: main.cpp:33
 msgid "XSLT debugging"
-msgstr ""
+msgstr "XSLT debagiranje"
 
 #: main.cpp:35
 msgid "Daniel Kristjansson"
-msgstr ""
+msgstr "Daniel Kristjansson"
 
 #: main.cpp:36
 msgid "Register groups and formatting"
-msgstr ""
+msgstr "Grupe registra i formatiranje"
 
 #: main.cpp:38
 msgid "David Edmundson"
-msgstr ""
+msgstr "David Edmundson"
 
 #: main.cpp:39
 msgid "KDE4 porting"
-msgstr ""
+msgstr "KDE4 inačica"
 
 #: main.cpp:44
 msgid "transcript of conversation with the debugger"
-msgstr ""
+msgstr "transkript komunikacije s debagerom"
 
 #: main.cpp:45
 msgid "remote debugging via <device>"
-msgstr ""
+msgstr "daljinsko debagiranje putem <device>"
 
 #: main.cpp:46
 msgid "specify language: C, XSLT"
-msgstr ""
+msgstr "odredi jezik: C, XSLT"
 
 #: main.cpp:47
 msgid "use language XSLT (deprecated)"
-msgstr ""
+msgstr "koristi XSLT jezik (zastarjelo)"
 
 #: main.cpp:48
 msgid "specify arguments of debugged executable"
-msgstr ""
+msgstr "odredi argumente izvršne datoteka"
 
 #: main.cpp:49
 msgid "specify PID of process to debug"
-msgstr ""
+msgstr "odredi PID procesa za otklanjanje grešaka"
 
 #: main.cpp:50
-#, fuzzy
 msgid "path of executable to debug"
-msgstr "Izaberite izvršni program za debugiranje"
+msgstr "putanja do datoteke za debagiranje"
 
 #: main.cpp:51
 msgid "a core file to use"
-msgstr ""
+msgstr "core datoteka za korištenje"
 
 #: main.cpp:114
 msgid "Cannot start debugger."
-msgstr "Ne mogu pokrenuti debugger."
+msgstr "Ne mogu pokrenuti debager."
 
 #. i18n: file: brkptbase.ui:37
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
 #: memwindow.cpp:32 rc.cpp:9
 msgid "Address"
-msgstr ""
+msgstr "Adresa"
 
 #: memwindow.cpp:59
 msgid "B&ytes"
-msgstr ""
+msgstr "B&yteovi"
 
 #: memwindow.cpp:61
 msgid "Halfwords (&2 Bytes)"
-msgstr ""
+msgstr "Halfwords (&2 Bytea)"
 
 #: memwindow.cpp:63
 msgid "Words (&4 Bytes)"
-msgstr ""
+msgstr "Words (&4 Byteova)"
 
 #: memwindow.cpp:65
 msgid "Giantwords (&8 Bytes)"
-msgstr ""
+msgstr "Giantwords (&8 Byteova)"
 
 #: memwindow.cpp:68 regwnd.cpp:77
 msgid "He&xadecimal"
-msgstr ""
+msgstr "&Heksadecimalni"
 
 #: memwindow.cpp:70
 msgid "Signed &decimal"
-msgstr ""
+msgstr "&Decimalni s predznakom"
 
 #: memwindow.cpp:72
 msgid "&Unsigned decimal"
-msgstr ""
+msgstr "Decimalni &bez predznaka"
 
 #: memwindow.cpp:74 regwnd.cpp:75
 msgid "&Octal"
-msgstr ""
+msgstr "&Oktalni"
 
 #: memwindow.cpp:76 regwnd.cpp:74
 msgid "&Binary"
-msgstr ""
+msgstr "&Binarni"
 
 #: memwindow.cpp:78
 msgid "&Addresses"
-msgstr ""
+msgstr "&Adrese"
 
 #: memwindow.cpp:80
 msgid "&Character"
-msgstr ""
+msgstr "&Slovo"
 
 #: memwindow.cpp:82
 msgid "&Floatingpoint"
-msgstr ""
+msgstr "&Pomičan zarez"
 
 #: memwindow.cpp:84
-#, fuzzy
 msgid "&Strings"
-msgstr "&Lista..."
+msgstr "&String"
 
 #: memwindow.cpp:86
 msgid "&Instructions"
-msgstr ""
+msgstr "&Instrukcija"
 
 #: pgmargs.cpp:198
 msgid "Select a file name to insert as program argument"
-msgstr ""
+msgstr "Izaberi ime datoteke koja će biti argument programa"
 
 #: pgmargs.cpp:212
 msgid "Select a directory to insert as program argument"
-msgstr ""
+msgstr "Izaberi direktorij kao argument programa"
 
 #: pgmsettings.cpp:25
 msgid ""
 "How to invoke &GDB - leave empty to use\n"
 "the default from the global options:"
 msgstr ""
+"Kako pozvati &GDB - ostaviti prazno\n"
+"za korištenje zadanih globalnih opcija"
 
 #: pgmsettings.cpp:59
 msgid "&No input and output"
-msgstr ""
+msgstr "&Nema ulaza ni izlaza"
 
 #: pgmsettings.cpp:63
 msgid "&Only output, simple terminal emulation"
-msgstr ""
+msgstr "&Samo izlaz, jednostavna emulacija terminala"
 
 #: pgmsettings.cpp:67
 msgid "&Full terminal emulation"
-msgstr ""
+msgstr "&Potpuna emulacija terminala"
 
 #: pgmsettings.cpp:104
 msgid "%1: Settings for %2"
-msgstr ""
+msgstr "%1: Postavke za %2"
 
 #: prefdebugger.cpp:20
 msgid "To revert to the default settings, clear the entries."
-msgstr ""
+msgstr "Vrati prethodne postavke, obriši unose"
 
 #: prefdebugger.cpp:24
 msgid "How to invoke &GDB:"
-msgstr ""
+msgstr "Kako pozvati &DGB"
 
 #: prefdebugger.cpp:31
 msgid ""
@@ -491,101 +495,103 @@ msgid ""
 "%C will be replaced by a Bourne shell script that\n"
 "keeps the terminal window open."
 msgstr ""
+"%T string reprezentira naslov\n"
+"%C reprezentira Bourne shell skriptu koja\n"
+"održava prozor terminala otvorenim"
 
 #: prefdebugger.cpp:37
-#, fuzzy
 msgid "&Terminal for program output:"
-msgstr ": Izlaz programa"
+msgstr "&Terminal za izlazne vrijednosti programa"
 
 #: prefmisc.cpp:23
 msgid "&Pop into foreground when program stops"
-msgstr ""
+msgstr "&Iskoči u prvi plan kod prekida programa"
 
 #: prefmisc.cpp:28
 msgid "Time until window goes &back (in milliseconds):"
-msgstr ""
+msgstr "Vrijeme (u milisekundama) kad se prozor &vraća:"
 
 #: prefmisc.cpp:35
 msgid "&Tabstop every (characters):"
-msgstr ""
+msgstr "&Tabstop (znakova):"
 
 #: prefmisc.cpp:37
 msgid "File filter for &source files:"
-msgstr ""
+msgstr "Filter datoteka &izvornog koda:"
 
 #: prefmisc.cpp:39
 msgid "File filter for &header files:"
-msgstr ""
+msgstr "Filter &zaglavnih datoteka"
 
 #: procattach.cpp:290
 msgid ": Attach to process"
-msgstr ""
+msgstr ": Prikači na proces"
 
 #: procattach.cpp:294
 msgid "Specify the process number to attach to:"
-msgstr ""
+msgstr "Unesi broj procesa za prikačiti se na:"
 
 #: procattach.cpp:302
 msgid "OK"
-msgstr ""
+msgstr "OK"
 
 #: procattach.cpp:307
 msgid "Cancel"
-msgstr ""
+msgstr "Otkaži"
 
 #: regwnd.cpp:73
 msgid "&GDB default"
-msgstr ""
+msgstr "&GDB zadano"
 
 #: regwnd.cpp:76
 msgid "&Decimal"
-msgstr ""
+msgstr "&Decimalni"
 
 #: regwnd.cpp:78
 msgid "Real (&e)"
-msgstr ""
+msgstr "Realni (&e)"
 
 #: regwnd.cpp:79
 msgid "Real (&f)"
-msgstr ""
+msgstr "Realni (&f)"
 
 #: regwnd.cpp:80
 msgid "&Real (g)"
-msgstr ""
+msgstr "&Realni (g)"
 
 #: regwnd.cpp:416
 msgid "Register"
-msgstr ""
+msgstr "Register"
 
 #: regwnd.cpp:418
 msgid "Decoded value"
-msgstr ""
+msgstr "Dekodirana vrijednost"
 
 #: regwnd.cpp:434
 msgid "GP and others"
-msgstr ""
+msgstr "GP i ostalo"
 
 #: regwnd.cpp:436
 msgid "Flags"
-msgstr ""
+msgstr "Flags"
 
 #: regwnd.cpp:439
 msgid "x86/x87 segment"
-msgstr ""
+msgstr "x86/x87 segment"
 
 #: threadlist.cpp:42
 msgid "Thread ID"
-msgstr ""
+msgstr "ID Niti"
 
 #. i18n: file: brkptbase.ui:32
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
 #: threadlist.cpp:42 rc.cpp:6
 msgid "Location"
-msgstr "Mjesto"
+msgstr "Lokacija"
 
 #: ttywnd.cpp:214
 msgid "&Clear"
-msgstr ""
+msgstr "&Očisti"
 
 #: watchwindow.cpp:17
 msgid " Add "
@@ -596,76 +602,74 @@ msgid " Del "
 msgstr " Obriši "
 
 #: watchwindow.cpp:19
-#, fuzzy
 msgid "Expression"
-msgstr "I&zvršavanje"
+msgstr "Izraz"
 
 #: winstack.cpp:384
 msgid ": Search"
-msgstr ""
+msgstr ": Pretraga"
 
 #: winstack.cpp:391
 msgid "&Case sensitive"
-msgstr ""
+msgstr "&Razlikuj mala i velika slova"
 
 #: winstack.cpp:393
 msgid "&Forward"
-msgstr ""
+msgstr "&Naprijed"
 
 #: winstack.cpp:395
 msgid "&Backward"
-msgstr ""
+msgstr "&Natrag"
 
 #: winstack.cpp:396
 msgid "Close"
-msgstr ""
+msgstr "Zatvori"
 
 #: xsldbgdriver.cpp:1385
 msgid "No memory dump available"
-msgstr ""
+msgstr "Ispisa memorije nije dostupan"
 
 #. i18n: file: brkptbase.ui:13
 #. i18n: ectx: property (windowTitle), widget (QWidget, BrkPtBase)
 #: rc.cpp:3
 msgid "Form"
-msgstr ""
+msgstr "Forma"
 
 #. i18n: file: brkptbase.ui:42
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
 #: rc.cpp:12
 msgid "Hits"
-msgstr ""
+msgstr "Prolaza"
 
 #. i18n: file: brkptbase.ui:47
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
 #: rc.cpp:15
 msgid "Ignore"
-msgstr ""
+msgstr "Ignoriraj"
 
 #. i18n: file: brkptbase.ui:52
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
 #: rc.cpp:18
 msgid "Condition"
-msgstr ""
+msgstr "Uvjet"
 
 #. i18n: file: brkptbase.ui:64
 #. i18n: ectx: property (text), widget (QPushButton, btAddBP)
 #: rc.cpp:21
-#, fuzzy
 msgid "Add &Breakpoint"
-msgstr "&Mjesta prekida"
+msgstr "Dodaj &Breakpoint"
 
 #. i18n: file: brkptbase.ui:71
 #. i18n: ectx: property (text), widget (QPushButton, btAddWP)
 #: rc.cpp:24
 msgid "Add &Watchpoint"
-msgstr ""
+msgstr "Dodaj &Watchpoint"
 
 #. i18n: file: brkptbase.ui:78
 #. i18n: ectx: property (text), widget (QPushButton, btRemove)
 #: rc.cpp:27
 msgid "&Remove"
-msgstr ""
+msgstr "&Ukloni"
 
 #. i18n: file: brkptbase.ui:92
 #. i18n: ectx: property (text), widget (QPushButton, btViewCode)
@@ -677,45 +681,43 @@ msgstr "&Gledaj kod"
 #. i18n: ectx: property (text), widget (QPushButton, btConditional)
 #: rc.cpp:36
 msgid "&Conditional..."
-msgstr ""
+msgstr "&Uvijetni.."
 
 #. i18n: file: brkptcondition.ui:13
 #. i18n: ectx: property (windowTitle), widget (QDialog, BrkPtCondition)
 #: rc.cpp:39
 msgid "Dialog"
-msgstr ""
+msgstr "Dialog"
 
 #. i18n: file: brkptcondition.ui:27
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: rc.cpp:42
 msgid "&Condition:"
-msgstr ""
+msgstr "&Uvijet"
 
 #. i18n: file: brkptcondition.ui:40
 #. i18n: ectx: property (text), widget (QLabel, label_2)
 #: rc.cpp:45
 msgid "Ignore &next hits:"
-msgstr ""
+msgstr "Ignoriraj &sljedećih prolaza:"
 
 #. i18n: file: brkptcondition.ui:50
 #. i18n: ectx: property (specialValueText), widget (QSpinBox, ignoreCount)
 #: rc.cpp:48
 msgid "do not ignore"
-msgstr ""
+msgstr "ne ignoriraj"
 
 #. i18n: file: kdbgui.rc:4
 #. i18n: ectx: Menu (file)
 #: rc.cpp:51
-#, fuzzy
 msgid "&File"
-msgstr "&Prozor"
+msgstr "&Datoteka"
 
 #. i18n: file: kdbgui.rc:11
 #. i18n: ectx: Menu (view)
 #: rc.cpp:54
-#, fuzzy
 msgid "&View"
-msgstr "&Gledaj kod"
+msgstr "&Pregled"
 
 #. i18n: file: kdbgui.rc:25
 #. i18n: ectx: Menu (execution)
@@ -727,35 +729,32 @@ msgstr "I&zvršavanje"
 #. i18n: ectx: Menu (breakpoint)
 #: rc.cpp:60
 msgid "&Breakpoint"
-msgstr "&Mjesta prekida"
+msgstr "&Breakpoint"
 
 #. i18n: file: kdbgui.rc:47
 #. i18n: ectx: Menu (settings)
 #: rc.cpp:63
-#, fuzzy
 msgid "&Settings"
-msgstr "&Lista..."
+msgstr "&Postavke"
 
 #. i18n: file: pgmargsbase.ui:13
 #. i18n: ectx: property (windowTitle), widget (QDialog, PgmArgsBase)
 #: rc.cpp:66
-#, fuzzy
 msgid "Program Arguments"
-msgstr ": Argumenti programa"
+msgstr "Argumenti Programa"
 
 #. i18n: file: pgmargsbase.ui:26
 #. i18n: ectx: attribute (title), widget (QWidget, argsPage)
 #: rc.cpp:69
-#, fuzzy
 msgid "&Arguments"
-msgstr "&Argumenti..."
+msgstr "&Argumenti"
 
 #. i18n: file: pgmargsbase.ui:34
 #. i18n: ectx: property (text), widget (QLabel, labelArgs)
 #: rc.cpp:73
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Run <i>%1</i> with these arguments:"
-msgstr "Pokreni %1 sa ovim argumentima:"
+msgstr "Pokreni <i>%1</i> sa ovim argumentima:"
 
 #. i18n: file: pgmargsbase.ui:47
 #. i18n: ectx: property (whatsThis), widget (QLineEdit, programArgs)
@@ -766,6 +765,10 @@ msgid ""
 "command line, that is, you can even use quotes and environment variables, "
 "for example:<p><tt>--message 'start in: ' $HOME</tt>"
 msgstr ""
+"Odredi argumente s kojima će program biti pokrenut za ovu sezonu "
+"debagiranja. Unesi listu argumenata na isti način kao što bi u komandnoj "
+"liniji; dozvoljeno je korištenje navodnika i environment varijabli, npr: "
+"<p><tt>--message 'start in: ' $HOME</tt>"
 
 #. i18n: file: pgmargsbase.ui:56
 #. i18n: ectx: property (whatsThis), widget (QPushButton, insertFile)
@@ -774,18 +777,20 @@ msgid ""
 "Browse for a file; the full path name will be inserted at the current cursor "
 "location in the edit box above."
 msgstr ""
+"Pretraga datoteka; cijela putanja će biti ubačena na trenutnu lokaciju "
+"pokazivača u gornjem edit box-u"
 
 #. i18n: file: pgmargsbase.ui:59
 #. i18n: ectx: property (text), widget (QPushButton, insertFile)
 #: rc.cpp:82
 msgid "Insert &file name..."
-msgstr ""
+msgstr "Unesi ime &datoteke..."
 
 #. i18n: file: pgmargsbase.ui:62
 #. i18n: ectx: property (shortcut), widget (QPushButton, insertFile)
 #: rc.cpp:85
 msgid "Alt+F"
-msgstr ""
+msgstr "Alt+F"
 
 #. i18n: file: pgmargsbase.ui:69
 #. i18n: ectx: property (whatsThis), widget (QPushButton, insertDir)
@@ -794,12 +799,14 @@ msgid ""
 "Browse for a directory; the full path name will be inserted at the current "
 "cursor location in the edit box above."
 msgstr ""
+"Pretraga za direktorijem; cijela putanja će biti ubačena na trenutnu "
+"poziciju kursora u gornjem edit box-u."
 
 #. i18n: file: pgmargsbase.ui:72
 #. i18n: ectx: property (text), widget (QPushButton, insertDir)
 #: rc.cpp:91
 msgid "Insert &directory name..."
-msgstr ""
+msgstr "Unesi ime &direktorija..."
 
 #. i18n: file: pgmargsbase.ui:75
 #. i18n: ectx: property (shortcut), widget (QPushButton, insertDir)
@@ -807,50 +814,49 @@ msgstr ""
 #. i18n: ectx: property (shortcut), widget (QPushButton, buttonDelete)
 #: rc.cpp:94 rc.cpp:145
 msgid "Alt+D"
-msgstr ""
+msgstr "Alt+D"
 
 #. i18n: file: pgmargsbase.ui:119
 #. i18n: ectx: attribute (title), widget (QWidget, wdPage)
 #: rc.cpp:97
 msgid "&Working Directory"
-msgstr ""
+msgstr "&Radni Direktorij"
 
 #. i18n: file: pgmargsbase.ui:127
 #. i18n: ectx: property (whatsThis), widget (QLineEdit, wdEdit)
 #: rc.cpp:100
 msgid "Specify here the initial working directory where the program is run."
-msgstr ""
+msgstr "Ovdje unesi početni radni direktorij iz kojeg se izvršava program"
 
 #. i18n: file: pgmargsbase.ui:136
 #. i18n: ectx: property (whatsThis), widget (QPushButton, wdBrowse)
 #: rc.cpp:103
 msgid "Browse for the initial working directory where the program is run."
-msgstr ""
+msgstr "Pretraži početni radni direktorij iz kojeg izvršiti datoteku."
 
 #. i18n: file: pgmargsbase.ui:139
 #. i18n: ectx: property (text), widget (QPushButton, wdBrowse)
 #: rc.cpp:106
-#, fuzzy
 msgid "&Browse..."
-msgstr "&Još..."
+msgstr "&Pretraži..."
 
 #. i18n: file: pgmargsbase.ui:142
 #. i18n: ectx: property (shortcut), widget (QPushButton, wdBrowse)
 #: rc.cpp:109
 msgid "Alt+B"
-msgstr ""
+msgstr "Alt+B"
 
 #. i18n: file: pgmargsbase.ui:186
 #. i18n: ectx: attribute (title), widget (QWidget, envPage)
 #: rc.cpp:112
 msgid "&Environment"
-msgstr ""
+msgstr "&Okruženje"
 
 #. i18n: file: pgmargsbase.ui:196
 #. i18n: ectx: property (text), widget (QLabel, envLabel)
 #: rc.cpp:115
 msgid "Environment variables (<tt>NAME=value</tt>):"
-msgstr ""
+msgstr "Environment varijable (<tt>IME=vrijednost</tt>):"
 
 #. i18n: file: pgmargsbase.ui:209
 #. i18n: ectx: property (whatsThis), widget (QLineEdit, envVar)
@@ -859,6 +865,8 @@ msgid ""
 "To add a new environment variable or to modify one, specify it here in the "
 "form <tt>NAME=value</tt> and click <b>Modify</b>."
 msgstr ""
+"Da biste dodali ili izmjenili postojeću environment varijablu, unesi ju "
+"ovdje u obliku <tt>IME=vrijednost</tt> i klikni <b>Izmijeni</b>"
 
 #. i18n: file: pgmargsbase.ui:216
 #. i18n: ectx: property (whatsThis), widget (QTreeWidget, envList)
@@ -871,12 +879,18 @@ msgid ""
 "<b>Modify</b>. To delete an environment variable, select it in this list and "
 "click <b>Delete</b>."
 msgstr ""
+"Environment varijable koje postavljate <i>UZ</i> one koje se nasljeđuju "
+"izlistane su u ovoj tablici. Da biste dodali nove environment varijable, "
+"unesite ih u formatu <tt>IME=vrijednost</tt> u edit box iznad i potom "
+"kliknite <b>Izmjeni</b>. Da biste izmjenili vrijednost, označite ju u listi "
+"i kliknite <b>Izmjeni</b>. Kako biste obrisali environment varijablu, "
+"izaberite ju u ovoj listi i kliknite na <b>Obriši</b>"
 
 #. i18n: file: pgmargsbase.ui:229
 #. i18n: ectx: property (text), widget (QTreeWidget, envList)
 #: rc.cpp:124
 msgid "Name"
-msgstr ""
+msgstr "Ime"
 
 #. i18n: file: pgmargsbase.ui:246
 #. i18n: ectx: property (whatsThis), widget (QPushButton, buttonModify)
@@ -886,18 +900,21 @@ msgid ""
 "into the list. If the named variable is already in the list, it receives a "
 "new value; otherwise, a new entry is created."
 msgstr ""
+"Unosi environment varijablu koja je trenutno prikazana u edit box-u u listu. "
+"Ako je ime varijable već u listi, ona poprima novu vrijednost; u protivnom "
+"kreira se novi zapis."
 
 #. i18n: file: pgmargsbase.ui:249
 #. i18n: ectx: property (text), widget (QPushButton, buttonModify)
 #: rc.cpp:133
 msgid "&Modify"
-msgstr ""
+msgstr "&Izmijeni"
 
 #. i18n: file: pgmargsbase.ui:252
 #. i18n: ectx: property (shortcut), widget (QPushButton, buttonModify)
 #: rc.cpp:136
 msgid "Alt+M"
-msgstr ""
+msgstr "Alt+M"
 
 #. i18n: file: pgmargsbase.ui:259
 #. i18n: ectx: property (whatsThis), widget (QPushButton, buttonDelete)
@@ -906,30 +923,32 @@ msgid ""
 "Deletes the selected environment variable from the list. This cannot be used "
 "to delete environment variables that are inherited."
 msgstr ""
+"Briše označenu environment varijablu iz liste. Ne može se koristiti za "
+"brisanje environment varijabli koje su nasljeđene."
 
 #. i18n: file: pgmargsbase.ui:262
 #. i18n: ectx: property (text), widget (QPushButton, buttonDelete)
 #: rc.cpp:142
 msgid "&Delete"
-msgstr ""
+msgstr "&Obriši"
 
 #. i18n: file: pgmargsbase.ui:293
 #. i18n: ectx: attribute (title), widget (QWidget, xsldbgOptionsPage)
 #: rc.cpp:148
 msgid "&xsldbg Options"
-msgstr ""
+msgstr "&xsldbg Opcije"
 
 #. i18n: file: procattachbase.ui:14
 #. i18n: ectx: property (windowTitle), widget (QDialog, ProcAttachBase)
 #: rc.cpp:151
 msgid "Attach to Process"
-msgstr ""
+msgstr "Prikači na Proces"
 
 #. i18n: file: procattachbase.ui:25
 #. i18n: ectx: property (text), widget (QLabel, filterLabel)
 #: rc.cpp:154
 msgid "&Filter or PID:"
-msgstr ""
+msgstr "&Filter ili PID:"
 
 #. i18n: file: procattachbase.ui:38
 #. i18n: ectx: property (whatsThis), widget (KLineEdit, filterEdit)
@@ -938,6 +957,8 @@ msgid ""
 "Type the name of the process or its process ID (PID) here to reduce the "
 "number of entries in the list."
 msgstr ""
+"Unesi ime procesa ili pripadnog proces ID-a (PID) kako bi se reduciro broj "
+"unosa u listi."
 
 #. i18n: file: procattachbase.ui:56
 #. i18n: ectx: property (whatsThis), widget (QTreeWidget, processList)
@@ -953,36 +974,44 @@ msgid ""
 "the system's <i>ps</i> command.</p><p>The list is not updated automatically. "
 "Use the <b>Refresh</b> button to update it.</p>"
 msgstr ""
+"<p>Ova lista prikazuje sve procese koji su trenutno pokrenuti. Izaberite "
+"proces koji želite debagirati putem KDbg-a. Koristeći <b>Filter ili PID</b> "
+"edit box možete reducirati broj unosa u ovoj listi.</p><p>Tekst u "
+"<i>Naredba</i> koloni je obično (ne i nužno) naredba kojom je pokrenuti "
+"proces. <i>PID</i> kolona prikazuje ID roditeljskog procesa. Ostale kolone "
+"prikazuju dodatne informacije o procesu koje su dostupne putem naredbe "
+"<i>ps</i>.</p><p>Ta lista se ne osviježava automatski nego treba pritisnuti "
+"<b>Osviježi</b> gumb.</p>"
 
 #. i18n: file: procattachbase.ui:66
 #. i18n: ectx: property (text), widget (QTreeWidget, processList)
 #: rc.cpp:163
 msgid "Command"
-msgstr ""
+msgstr "Naredba"
 
 #. i18n: file: procattachbase.ui:71
 #. i18n: ectx: property (text), widget (QTreeWidget, processList)
 #: rc.cpp:166
 msgid "PID"
-msgstr ""
+msgstr "PID"
 
 #. i18n: file: procattachbase.ui:76
 #. i18n: ectx: property (text), widget (QTreeWidget, processList)
 #: rc.cpp:169
 msgid "PPID"
-msgstr ""
+msgstr "PPID"
 
 #. i18n: file: procattachbase.ui:92
 #. i18n: ectx: property (whatsThis), widget (QPushButton, buttonRefresh)
 #: rc.cpp:172
 msgid "This button updates the list of processes."
-msgstr ""
+msgstr "Ovaj gumb osviježava listu procesa."
 
 #. i18n: file: procattachbase.ui:95
 #. i18n: ectx: property (text), widget (QPushButton, buttonRefresh)
 #: rc.cpp:175
 msgid "&Refresh"
-msgstr ""
+msgstr "&Osviježi"
 
 #~ msgid "Toggle &Toolbar"
 #~ msgstr "Uklj./isklj. &traku sa alatima"
