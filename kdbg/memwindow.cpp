@@ -202,7 +202,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	for (int i = 0; i < sl.count(); i++)
 	{
 	    bool changed =
-		tmplist.count() > 0 &&
+		i < tmplist.count() &&
 		sl[i] != tmplist[i];
 	    line->setForeground(i+1, changed ? QBrush(QColor(Qt::red)) : palette().text());
 	}
