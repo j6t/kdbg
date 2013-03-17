@@ -1,13 +1,13 @@
 # KDbg - Debugger GUI for gdb
 # Copyright (C) 1998,1999 Johannes Sixt
-# Johannes Sixt <j6t@kdbg.org>, 1999
+# Johannes Sixt <j6t@kdbg.org>, 1999, 2013.
 #
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 22:35+0100\n"
-"PO-Revision-Date: 1998-08-06 16:10+MET\n"
+"POT-Creation-Date: 2013-03-16 16:29+0100\n"
+"PO-Revision-Date: 2013-03-16 18:38+0100\n"
 "Last-Translator: Ilmar Habibulin <ilmar@ints.ru>\n"
 "Language-Team: ru@li.org\n"
 "MIME-Version: 1.0\n"
@@ -18,11 +18,11 @@ msgstr ""
 #. i18n: ectx: property (text), widget (QPushButton, btEnaDis)
 #: brkpt.cpp:179 rc.cpp:30
 msgid "&Disable"
-msgstr ""
+msgstr "&Отключить"
 
 #: brkpt.cpp:181
 msgid "&Enable"
-msgstr ""
+msgstr "&Включить"
 
 #: brkpt.cpp:363
 msgid ": Conditional breakpoint"
@@ -34,25 +34,23 @@ msgstr "активный"
 
 #: dbgmainwnd.cpp:78
 msgid "Stack"
-msgstr ""
+msgstr "Стек"
 
 #: dbgmainwnd.cpp:81
 msgid "Locals"
-msgstr ""
+msgstr "Локальные переменные"
 
 #: dbgmainwnd.cpp:82
-#, fuzzy
 msgid "Variable"
-msgstr "Значение"
+msgstr "Переменная"
 
 #: dbgmainwnd.cpp:84
 msgid "Watches"
-msgstr ""
+msgstr "Список наблюдений"
 
 #: dbgmainwnd.cpp:87
-#, fuzzy
 msgid "Registers"
-msgstr "Перезапустить"
+msgstr "Регистры"
 
 #: dbgmainwnd.cpp:90
 msgid "Breakpoints"
@@ -60,15 +58,15 @@ msgstr "Точки останова"
 
 #: dbgmainwnd.cpp:93 pgmsettings.cpp:108
 msgid "Output"
-msgstr ""
+msgstr "Вывод"
 
 #: dbgmainwnd.cpp:96
 msgid "Threads"
-msgstr ""
+msgstr "Потоки"
 
 #: dbgmainwnd.cpp:99
 msgid "Memory"
-msgstr ""
+msgstr "Память"
 
 #: dbgmainwnd.cpp:251
 msgid "&Open Source..."
@@ -83,9 +81,8 @@ msgid "&Executable..."
 msgstr "&Исполняемый модуль..."
 
 #: dbgmainwnd.cpp:261
-#, fuzzy
 msgid "Recent E&xecutables"
-msgstr "Исполняемый модуль"
+msgstr "По&следние файлы"
 
 #: dbgmainwnd.cpp:262
 msgid "&Core dump..."
@@ -93,7 +90,7 @@ msgstr "&Образ памяти..."
 
 #: dbgmainwnd.cpp:267
 msgid "This &Program..."
-msgstr ""
+msgstr "Параметры п&рограммы..."
 
 #: dbgmainwnd.cpp:269
 msgid "&Global Options..."
@@ -101,41 +98,39 @@ msgstr "Глобальные &Параметры..."
 
 #: dbgmainwnd.cpp:279
 msgid "Source &code"
-msgstr ""
+msgstr "Исходный &текст"
 
 #: dbgmainwnd.cpp:281
 msgid "Stac&k"
-msgstr ""
+msgstr "Сте&к"
 
 #: dbgmainwnd.cpp:282
 msgid "&Locals"
-msgstr ""
+msgstr "&Локальные переменные"
 
 #: dbgmainwnd.cpp:283
 msgid "&Watched expressions"
-msgstr ""
+msgstr "&Наблюдаемые выражения"
 
 #: dbgmainwnd.cpp:284
-#, fuzzy
 msgid "&Registers"
-msgstr "Перезапустить"
+msgstr "&Регистры"
 
 #: dbgmainwnd.cpp:285
-#, fuzzy
 msgid "&Breakpoints"
-msgstr "Точки останова"
+msgstr "&Точки останова"
 
 #: dbgmainwnd.cpp:286
 msgid "T&hreads"
-msgstr ""
+msgstr "П&отоки"
 
 #: dbgmainwnd.cpp:287
 msgid "&Output"
-msgstr ""
+msgstr "&Вывод"
 
 #: dbgmainwnd.cpp:288
 msgid "&Memory"
-msgstr ""
+msgstr "&Память"
 
 #: dbgmainwnd.cpp:298
 msgid "&Run"
@@ -159,23 +154,23 @@ msgstr "Исполнять до &курсора"
 
 #: dbgmainwnd.cpp:318
 msgid "Step i&nto by instruction"
-msgstr ""
+msgstr "Шаг со в&ходом в инструкцию"
 
 #: dbgmainwnd.cpp:322
 msgid "Step o&ver by instruction"
-msgstr ""
+msgstr "Шаг в о&бход инструкции"
 
 #: dbgmainwnd.cpp:326
 msgid "&Program counter to current line"
-msgstr ""
+msgstr "&Установить счётчик команд на текущую строку"
 
 #: dbgmainwnd.cpp:329
 msgid "&Break"
-msgstr "&Останов"
+msgstr "&Приостановить"
 
 #: dbgmainwnd.cpp:331
 msgid "&Kill"
-msgstr ""
+msgstr "&Останов"
 
 #: dbgmainwnd.cpp:333
 msgid "Re&start"
@@ -203,12 +198,11 @@ msgstr "&Вкл/Выкл точку останова"
 
 #: dbgmainwnd.cpp:349
 msgid "Watch Expression"
-msgstr ""
+msgstr "Добавить наблюдение"
 
 #: dbgmainwnd.cpp:351
-#, fuzzy
 msgid "Edit Value"
-msgstr "Значение"
+msgstr "Изменить"
 
 #: dbgmainwnd.cpp:379
 msgid "Restart"
@@ -219,19 +213,20 @@ msgid "Core dump"
 msgstr "Образ памяти процесса"
 
 #: dbgmainwnd.cpp:623
-#, fuzzy
 msgid "`%1' is not a file or does not exist"
-msgstr "`%s' не файл или не существует"
+msgstr "`%s' – не файл или не существует"
 
 #: dbgmainwnd.cpp:691
 msgid "Don't know how to debug language `%1'"
-msgstr ""
+msgstr "Не знаю как отлаживать программу на языке `%1'"
 
 #: dbgmainwnd.cpp:704
 msgid ""
 "Could not start the debugger process.\n"
 "Please shut down KDbg and resolve the problem."
 msgstr ""
+"Не удалось запустить процесс отладчика.\n"
+"Пожалуйста, закройте KDbg и устраните проблему."
 
 #: dbgmainwnd.cpp:826
 msgid ": Global options"
@@ -239,37 +234,35 @@ msgstr ": Глобальные параметры"
 
 #: dbgmainwnd.cpp:841 pgmsettings.cpp:107
 msgid "Debugger"
-msgstr ""
+msgstr "Отладчик"
 
 #: dbgmainwnd.cpp:842
 msgid "Miscellaneous"
-msgstr ""
+msgstr "Разное"
 
 #: dbgmainwnd.cpp:980
 msgid ": Program output"
 msgstr ": Вывод программы"
 
 #: dbgmainwnd.cpp:1070
-#, fuzzy
 msgid "|All source files\n"
-msgstr "Перезагрузить файл исходных текстов"
+msgstr "|Все файлы исходников\n"
 
 #: dbgmainwnd.cpp:1071
-#, fuzzy
 msgid "|Source files\n"
-msgstr "Открыть файл исходных текстов"
+msgstr "|Исходные тексты\n"
 
 #: dbgmainwnd.cpp:1072
 msgid "|Header files\n"
-msgstr ""
+msgstr "|Заголовочные файлы\n"
 
 #: dbgmainwnd.cpp:1073
 msgid "*|All files"
-msgstr ""
+msgstr "*|Все файлы"
 
 #: dbgmainwnd.cpp:1165
 msgid "Open"
-msgstr ""
+msgstr "Открыть"
 
 #: dbgmainwnd.cpp:1183
 msgid "Select the executable to debug"
@@ -279,37 +272,39 @@ msgstr "Выберите исполняемый модуль для отладк
 msgid "Select core dump"
 msgstr "Выберите сохраненный образ памяти процесса"
 
-#: debugger.cpp:650
-#, fuzzy
+#: debugger.cpp:681
 msgid ""
 "%1 exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
 msgstr ""
-"gdb неожиданно завершился\n"
-"Перезапустите сессию (например, через Файл|Исполняемый модуль."
+"%1 неожиданно завершился\n"
+"Перезапустите сессию (например, через Файл|Исполняемый модуль)."
 
-#: debugger.cpp:841
+#: debugger.cpp:872
 msgid ""
 "The settings for this program specify the following debugger command:\n"
 "%1\n"
 "Shall this command be used?"
 msgstr ""
+"В параметрах программы указан следующий отладчик:\n"
+"%1\n"
+"Должна ли использоваться эта команда?"
 
 #. i18n: file: pgmargsbase.ui:234
 #. i18n: ectx: property (text), widget (QTreeWidget, envList)
-#: exprwnd.cpp:312 regwnd.cpp:417 rc.cpp:127
+#: exprwnd.cpp:314 regwnd.cpp:417 rc.cpp:127
 msgid "Value"
 msgstr "Значение"
 
-#: gdbdriver.cpp:911
+#: gdbdriver.cpp:922
 msgid "<anonymous struct or union>"
-msgstr ""
+msgstr "<анонимная структура или объединение>"
 
-#: gdbdriver.cpp:1526
+#: gdbdriver.cpp:1569
 msgid "<additional entries of the array suppressed>"
-msgstr ""
+msgstr "<остальные элементы массива скрыты>"
 
-#: gdbdriver.cpp:2084 xsldbgdriver.cpp:1287
+#: gdbdriver.cpp:2221 xsldbgdriver.cpp:1288
 msgid "New working directory: "
 msgstr "Новая рабочая директория: "
 
@@ -319,10 +314,10 @@ msgstr ""
 
 #: main.cpp:25
 msgid "A Debugger"
-msgstr ""
+msgstr "Отладчик"
 
 #: main.cpp:27
-msgid "(c) 1998-2011 Johannes Sixt"
+msgid "(c) 1998-2012 Johannes Sixt"
 msgstr ""
 
 #: main.cpp:31
@@ -335,7 +330,7 @@ msgstr ""
 
 #: main.cpp:33
 msgid "XSLT debugging"
-msgstr ""
+msgstr "Отладка XSLT"
 
 #: main.cpp:35
 msgid "Daniel Kristjansson"
@@ -343,7 +338,7 @@ msgstr ""
 
 #: main.cpp:36
 msgid "Register groups and formatting"
-msgstr ""
+msgstr "Группы регистров и форматирование"
 
 #: main.cpp:38
 msgid "David Edmundson"
@@ -351,40 +346,39 @@ msgstr ""
 
 #: main.cpp:39
 msgid "KDE4 porting"
-msgstr ""
+msgstr "Перенос на KDE4"
 
 #: main.cpp:44
 msgid "transcript of conversation with the debugger"
-msgstr ""
+msgstr "журнал взаимодействия с отладчиком"
 
 #: main.cpp:45
 msgid "remote debugging via <device>"
-msgstr ""
+msgstr "удалённая отладка через <device>"
 
 #: main.cpp:46
 msgid "specify language: C, XSLT"
-msgstr ""
+msgstr "укажите язык: C, XSLT"
 
 #: main.cpp:47
 msgid "use language XSLT (deprecated)"
-msgstr ""
+msgstr "использовать язык XSLT (устарело)"
 
 #: main.cpp:48
 msgid "specify arguments of debugged executable"
-msgstr ""
+msgstr "укажите аргументы отлаживаемой программы"
 
 #: main.cpp:49
 msgid "specify PID of process to debug"
-msgstr ""
+msgstr "укажите PID процесса для отладки"
 
 #: main.cpp:50
-#, fuzzy
 msgid "path of executable to debug"
-msgstr "Выберите исполняемый модуль для отладки"
+msgstr "путь исполняемого модуля для отладки"
 
 #: main.cpp:51
 msgid "a core file to use"
-msgstr ""
+msgstr "использовать дамп памяти"
 
 #: main.cpp:114
 msgid "Cannot start debugger."
@@ -394,94 +388,95 @@ msgstr "Невозможно запустить отладчик."
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
 #: memwindow.cpp:32 rc.cpp:9
 msgid "Address"
-msgstr ""
+msgstr "Адрес"
 
 #: memwindow.cpp:59
 msgid "B&ytes"
-msgstr ""
+msgstr "Б&айты"
 
 #: memwindow.cpp:61
 msgid "Halfwords (&2 Bytes)"
-msgstr ""
+msgstr "Слова (&2 байта)"
 
 #: memwindow.cpp:63
 msgid "Words (&4 Bytes)"
-msgstr ""
+msgstr "Двойные слова (&4 байта)"
 
 #: memwindow.cpp:65
 msgid "Giantwords (&8 Bytes)"
-msgstr ""
+msgstr "Учетверённые слова (&8 байт)"
 
 #: memwindow.cpp:68 regwnd.cpp:77
 msgid "He&xadecimal"
-msgstr ""
+msgstr "&Шестнадцатеричное"
 
 #: memwindow.cpp:70
 msgid "Signed &decimal"
-msgstr ""
+msgstr "Десятичное со &знаком"
 
 #: memwindow.cpp:72
 msgid "&Unsigned decimal"
-msgstr ""
+msgstr "Десятичное &без знака"
 
 #: memwindow.cpp:74 regwnd.cpp:75
 msgid "&Octal"
-msgstr ""
+msgstr "&Восьмеричное"
 
 #: memwindow.cpp:76 regwnd.cpp:74
 msgid "&Binary"
-msgstr ""
+msgstr "&Двоичное"
 
 #: memwindow.cpp:78
 msgid "&Addresses"
-msgstr ""
+msgstr "&Адреса"
 
 #: memwindow.cpp:80
 msgid "&Character"
-msgstr ""
+msgstr "&Символ"
 
 #: memwindow.cpp:82
 msgid "&Floatingpoint"
-msgstr ""
+msgstr "С плавающей &запятой"
 
 #: memwindow.cpp:84
-#, fuzzy
 msgid "&Strings"
-msgstr "Искать..."
+msgstr "&Строки"
 
 #: memwindow.cpp:86
 msgid "&Instructions"
-msgstr ""
+msgstr "&Инструкции"
 
 #: pgmargs.cpp:198
 msgid "Select a file name to insert as program argument"
-msgstr ""
+msgstr "Выберите файл – аргумент программы"
 
 #: pgmargs.cpp:212
 msgid "Select a directory to insert as program argument"
-msgstr ""
+msgstr "Выберите папку – аргумент программы"
 
 #: pgmsettings.cpp:25
 msgid ""
 "How to invoke &GDB - leave empty to use\n"
 "the default from the global options:"
 msgstr ""
+"Как вызывать &GDB - оставьте пустым, чтобы использовать\n"
+"вариант по умолчанию из глобальных параметров:"
 
 #: pgmsettings.cpp:59
 msgid "&No input and output"
-msgstr ""
+msgstr "&Без ввода/вывода"
 
 #: pgmsettings.cpp:63
 msgid "&Only output, simple terminal emulation"
-msgstr ""
+msgstr "Только в&ывод, простая эмуляция терминала"
 
 #: pgmsettings.cpp:67
 msgid "&Full terminal emulation"
-msgstr ""
+msgstr "&Полная эмуляция терминала"
 
 #: pgmsettings.cpp:104
 msgid "%1: Settings for %2"
-msgstr ""
+msgstr "%1: Параметры %2"
 
 #: prefdebugger.cpp:20
 msgid "To revert to the default settings, clear the entries."
@@ -502,30 +497,28 @@ msgstr ""
 "будет держать терминальное окно открытым."
 
 #: prefdebugger.cpp:37
-#, fuzzy
 msgid "&Terminal for program output:"
-msgstr ": Вывод программы"
+msgstr "Программа &терминала для вывода:"
 
 #: prefmisc.cpp:23
 msgid "&Pop into foreground when program stops"
-msgstr ""
+msgstr "&Показать окно при остановке программы"
 
 #: prefmisc.cpp:28
 msgid "Time until window goes &back (in milliseconds):"
-msgstr ""
+msgstr "Время до &скрытия окна (в миллисекундах):"
 
 #: prefmisc.cpp:35
 msgid "&Tabstop every (characters):"
-msgstr ""
+msgstr "Размер &табуляции (в символах):"
 
 #: prefmisc.cpp:37
-#, fuzzy
 msgid "File filter for &source files:"
-msgstr "Перезагрузить файл исходных текстов"
+msgstr "Маска для &исходных текстов:"
 
 #: prefmisc.cpp:39
 msgid "File filter for &header files:"
-msgstr ""
+msgstr "Маска для &заголовочных файлов:"
 
 #: procattach.cpp:290
 msgid ": Attach to process"
@@ -541,52 +534,51 @@ msgstr ""
 
 #: procattach.cpp:307
 msgid "Cancel"
-msgstr ""
+msgstr "Отмена"
 
 #: regwnd.cpp:73
 msgid "&GDB default"
-msgstr ""
+msgstr "Умолчания &GDB"
 
 #: regwnd.cpp:76
 msgid "&Decimal"
-msgstr ""
+msgstr "Де&сятичное"
 
 #: regwnd.cpp:78
 msgid "Real (&e)"
-msgstr ""
+msgstr "Вещественное (&e)"
 
 #: regwnd.cpp:79
 msgid "Real (&f)"
-msgstr ""
+msgstr "Вещественное (&f)"
 
 #: regwnd.cpp:80
 msgid "&Real (g)"
-msgstr ""
+msgstr "&Вещественное (g)"
 
 #: regwnd.cpp:416
-#, fuzzy
 msgid "Register"
-msgstr "Перезапустить"
+msgstr "Регистр"
 
 #: regwnd.cpp:418
 msgid "Decoded value"
-msgstr ""
+msgstr "Декодированное значение"
 
 #: regwnd.cpp:434
 msgid "GP and others"
-msgstr ""
+msgstr "GP и другие"
 
 #: regwnd.cpp:436
 msgid "Flags"
-msgstr ""
+msgstr "Флаги"
 
 #: regwnd.cpp:439
 msgid "x86/x87 segment"
-msgstr ""
+msgstr "Сегмент x86/x87"
 
 #: threadlist.cpp:42
 msgid "Thread ID"
-msgstr ""
+msgstr "ID потока"
 
 #. i18n: file: brkptbase.ui:32
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
@@ -596,7 +588,7 @@ msgstr "Расположение"
 
 #: ttywnd.cpp:214
 msgid "&Clear"
-msgstr ""
+msgstr "&Очистить"
 
 #: watchwindow.cpp:17
 msgid " Add "
@@ -607,39 +599,38 @@ msgid " Del "
 msgstr " Удалить "
 
 #: watchwindow.cpp:19
-#, fuzzy
 msgid "Expression"
-msgstr "&Исполнение"
+msgstr "Выражение"
 
-#: winstack.cpp:384
+#: winstack.cpp:382
 msgid ": Search"
 msgstr ": Поиск"
 
-#: winstack.cpp:391
+#: winstack.cpp:389
 msgid "&Case sensitive"
 msgstr "&Учитывать регистр"
 
-#: winstack.cpp:393
+#: winstack.cpp:391
 msgid "&Forward"
 msgstr "&Переадресация"
 
-#: winstack.cpp:395
+#: winstack.cpp:393
 msgid "&Backward"
 msgstr "&Назад"
 
-#: winstack.cpp:396
+#: winstack.cpp:394
 msgid "Close"
-msgstr ""
+msgstr "Закрыть"
 
-#: xsldbgdriver.cpp:1385
+#: xsldbgdriver.cpp:1386
 msgid "No memory dump available"
-msgstr ""
+msgstr "Нет дампа памяти"
 
 #. i18n: file: brkptbase.ui:13
 #. i18n: ectx: property (windowTitle), widget (QWidget, BrkPtBase)
 #: rc.cpp:3
 msgid "Form"
-msgstr ""
+msgstr "Форма"
 
 #. i18n: file: brkptbase.ui:42
 #. i18n: ectx: property (text), widget (QTreeWidget, bpList)
@@ -662,21 +653,20 @@ msgstr "Условие"
 #. i18n: file: brkptbase.ui:64
 #. i18n: ectx: property (text), widget (QPushButton, btAddBP)
 #: rc.cpp:21
-#, fuzzy
 msgid "Add &Breakpoint"
-msgstr "&Точки останова"
+msgstr "Добавить &точку останова"
 
 #. i18n: file: brkptbase.ui:71
 #. i18n: ectx: property (text), widget (QPushButton, btAddWP)
 #: rc.cpp:24
 msgid "Add &Watchpoint"
-msgstr ""
+msgstr "Добавить точку &наблюдения"
 
 #. i18n: file: brkptbase.ui:78
 #. i18n: ectx: property (text), widget (QPushButton, btRemove)
 #: rc.cpp:27
 msgid "&Remove"
-msgstr ""
+msgstr "&Удалить"
 
 #. i18n: file: brkptbase.ui:92
 #. i18n: ectx: property (text), widget (QPushButton, btViewCode)
@@ -694,7 +684,7 @@ msgstr "&Условный..."
 #. i18n: ectx: property (windowTitle), widget (QDialog, BrkPtCondition)
 #: rc.cpp:39
 msgid "Dialog"
-msgstr ""
+msgstr "Диалоговое окно"
 
 #. i18n: file: brkptcondition.ui:27
 #. i18n: ectx: property (text), widget (QLabel, label)
@@ -712,21 +702,19 @@ msgstr "Игнорировать &следующее попадание:"
 #. i18n: ectx: property (specialValueText), widget (QSpinBox, ignoreCount)
 #: rc.cpp:48
 msgid "do not ignore"
-msgstr ""
+msgstr "не игнорировать"
 
 #. i18n: file: kdbgui.rc:4
 #. i18n: ectx: Menu (file)
 #: rc.cpp:51
-#, fuzzy
 msgid "&File"
-msgstr "Искать..."
+msgstr "&Файл"
 
 #. i18n: file: kdbgui.rc:11
 #. i18n: ectx: Menu (view)
 #: rc.cpp:54
-#, fuzzy
 msgid "&View"
-msgstr "&Посмотреть код"
+msgstr "&Вид"
 
 #. i18n: file: kdbgui.rc:25
 #. i18n: ectx: Menu (execution)
@@ -743,30 +731,27 @@ msgstr "&Точки останова"
 #. i18n: file: kdbgui.rc:47
 #. i18n: ectx: Menu (settings)
 #: rc.cpp:63
-#, fuzzy
 msgid "&Settings"
-msgstr "Искать..."
+msgstr "&Настройка"
 
 #. i18n: file: pgmargsbase.ui:13
 #. i18n: ectx: property (windowTitle), widget (QDialog, PgmArgsBase)
 #: rc.cpp:66
-#, fuzzy
 msgid "Program Arguments"
-msgstr ": Аргументы программы"
+msgstr "Аргументы программы"
 
 #. i18n: file: pgmargsbase.ui:26
 #. i18n: ectx: attribute (title), widget (QWidget, argsPage)
 #: rc.cpp:69
-#, fuzzy
 msgid "&Arguments"
-msgstr "&Аргументы..."
+msgstr "&Аргументы"
 
 #. i18n: file: pgmargsbase.ui:34
 #. i18n: ectx: property (text), widget (QLabel, labelArgs)
 #: rc.cpp:73
-#, fuzzy, no-c-format
+#, no-c-format
 msgid "Run <i>%1</i> with these arguments:"
-msgstr "Запустить %s со следующими аргументами:"
+msgstr "Запустить <i>%1</i> со следующими аргументами:"
 
 #. i18n: file: pgmargsbase.ui:47
 #. i18n: ectx: property (whatsThis), widget (QLineEdit, programArgs)
@@ -777,6 +762,9 @@ msgid ""
 "command line, that is, you can even use quotes and environment variables, "
 "for example:<p><tt>--message 'start in: ' $HOME</tt>"
 msgstr ""
+"Укажите аргументы программы для этого сеанса. Можно вводить аргументы как в "
+"командной строке, в том числе используя кавычки и переменные окружения, "
+"например:<p><tt>--message 'мы в: ' $HOME</tt>"
 
 #. i18n: file: pgmargsbase.ui:56
 #. i18n: ectx: property (whatsThis), widget (QPushButton, insertFile)
@@ -784,13 +772,13 @@ msgstr ""
 msgid ""
 "Browse for a file; the full path name will be inserted at the current cursor "
 "location in the edit box above."
-msgstr ""
+msgstr "Выберите файл; полное имя будет вставлено у курсора в поле ввода."
 
 #. i18n: file: pgmargsbase.ui:59
 #. i18n: ectx: property (text), widget (QPushButton, insertFile)
 #: rc.cpp:82
 msgid "Insert &file name..."
-msgstr ""
+msgstr "Вставить имя &файла..."
 
 #. i18n: file: pgmargsbase.ui:62
 #. i18n: ectx: property (shortcut), widget (QPushButton, insertFile)
@@ -804,13 +792,13 @@ msgstr ""
 msgid ""
 "Browse for a directory; the full path name will be inserted at the current "
 "cursor location in the edit box above."
-msgstr ""
+msgstr "Выберите папку; полный путь будет вставлен у курсора в поле ввода."
 
 #. i18n: file: pgmargsbase.ui:72
 #. i18n: ectx: property (text), widget (QPushButton, insertDir)
 #: rc.cpp:91
 msgid "Insert &directory name..."
-msgstr ""
+msgstr "Вставить имя &папки..."
 
 #. i18n: file: pgmargsbase.ui:75
 #. i18n: ectx: property (shortcut), widget (QPushButton, insertDir)
@@ -823,28 +811,26 @@ msgstr ""
 #. i18n: file: pgmargsbase.ui:119
 #. i18n: ectx: attribute (title), widget (QWidget, wdPage)
 #: rc.cpp:97
-#, fuzzy
 msgid "&Working Directory"
-msgstr "Рабочая директория:"
+msgstr "&Рабочая директория:"
 
 #. i18n: file: pgmargsbase.ui:127
 #. i18n: ectx: property (whatsThis), widget (QLineEdit, wdEdit)
 #: rc.cpp:100
 msgid "Specify here the initial working directory where the program is run."
-msgstr ""
+msgstr "Укажите изначальную рабочую директорию откуда запускается программа."
 
 #. i18n: file: pgmargsbase.ui:136
 #. i18n: ectx: property (whatsThis), widget (QPushButton, wdBrowse)
 #: rc.cpp:103
 msgid "Browse for the initial working directory where the program is run."
-msgstr ""
+msgstr "Выберите изначальную рабочую директорию откуда запускается программа."
 
 #. i18n: file: pgmargsbase.ui:139
 #. i18n: ectx: property (text), widget (QPushButton, wdBrowse)
 #: rc.cpp:106
-#, fuzzy
 msgid "&Browse..."
-msgstr "&Дальше..."
+msgstr "&Обзор..."
 
 #. i18n: file: pgmargsbase.ui:142
 #. i18n: ectx: property (shortcut), widget (QPushButton, wdBrowse)
@@ -856,14 +842,13 @@ msgstr ""
 #. i18n: ectx: attribute (title), widget (QWidget, envPage)
 #: rc.cpp:112
 msgid "&Environment"
-msgstr ""
+msgstr "&Окружение"
 
 #. i18n: file: pgmargsbase.ui:196
 #. i18n: ectx: property (text), widget (QLabel, envLabel)
 #: rc.cpp:115
-#, fuzzy
 msgid "Environment variables (<tt>NAME=value</tt>):"
-msgstr "Переменные окружения (ИМЯ=значение):"
+msgstr "Переменные окружения (<tt>ИМЯ=значение</tt>):"
 
 #. i18n: file: pgmargsbase.ui:209
 #. i18n: ectx: property (whatsThis), widget (QLineEdit, envVar)
@@ -872,6 +857,8 @@ msgid ""
 "To add a new environment variable or to modify one, specify it here in the "
 "form <tt>NAME=value</tt> and click <b>Modify</b>."
 msgstr ""
+"Чтобы добавить или изменить переменную окружения, укажите её в виде <tt>"
+"ИМЯ=значение</tt> и нажмите <b>Изменить</b>."
 
 #. i18n: file: pgmargsbase.ui:216
 #. i18n: ectx: property (whatsThis), widget (QTreeWidget, envList)
@@ -884,6 +871,12 @@ msgid ""
 "<b>Modify</b>. To delete an environment variable, select it in this list and "
 "click <b>Delete</b>."
 msgstr ""
+"Переменные окружения, заданные <i>в дополнение</i> к унаследованным, "
+"перечислены в таблице. Чтобы добавить новые переменные, укажите их в виде <"
+"tt>ИМЯ=значение</tt> и нажмите <b>Изменить</b>. Чтобы изменить значение, "
+"выберите его в списке и нажмите"
+"<b>Изменить</b>. Чтобы удалить переменную, выберите её в списке и нажмите <b>"
+"Удалить</b>. "
 
 #. i18n: file: pgmargsbase.ui:229
 #. i18n: ectx: property (text), widget (QTreeWidget, envList)
@@ -899,6 +892,8 @@ msgid ""
 "into the list. If the named variable is already in the list, it receives a "
 "new value; otherwise, a new entry is created."
 msgstr ""
+"Добавляет введённую переменную окружения в список. Если переменная уже "
+"существует, значение перезаписывается."
 
 #. i18n: file: pgmargsbase.ui:249
 #. i18n: ectx: property (text), widget (QPushButton, buttonModify)
@@ -919,32 +914,32 @@ msgid ""
 "Deletes the selected environment variable from the list. This cannot be used "
 "to delete environment variables that are inherited."
 msgstr ""
+"Удаляет выбранную переменную окружения. Унаследованную переменную удалить "
+"нельзя."
 
 #. i18n: file: pgmargsbase.ui:262
 #. i18n: ectx: property (text), widget (QPushButton, buttonDelete)
 #: rc.cpp:142
 msgid "&Delete"
-msgstr ""
+msgstr "&Удалить"
 
 #. i18n: file: pgmargsbase.ui:293
 #. i18n: ectx: attribute (title), widget (QWidget, xsldbgOptionsPage)
 #: rc.cpp:148
-#, fuzzy
 msgid "&xsldbg Options"
-msgstr "Глобальные &Параметры..."
+msgstr "Параметры &xsldbg"
 
 #. i18n: file: procattachbase.ui:14
 #. i18n: ectx: property (windowTitle), widget (QDialog, ProcAttachBase)
 #: rc.cpp:151
-#, fuzzy
 msgid "Attach to Process"
-msgstr ": Подсоединиться к процессу"
+msgstr "Подсоединиться к процессу"
 
 #. i18n: file: procattachbase.ui:25
 #. i18n: ectx: property (text), widget (QLabel, filterLabel)
 #: rc.cpp:154
 msgid "&Filter or PID:"
-msgstr ""
+msgstr "&Фильтр или PID"
 
 #. i18n: file: procattachbase.ui:38
 #. i18n: ectx: property (whatsThis), widget (KLineEdit, filterEdit)
@@ -952,7 +947,7 @@ msgstr ""
 msgid ""
 "Type the name of the process or its process ID (PID) here to reduce the "
 "number of entries in the list."
-msgstr ""
+msgstr "Введите имя или ID процесса, чтобы отфильтровать список."
 
 #. i18n: file: procattachbase.ui:56
 #. i18n: ectx: property (whatsThis), widget (QTreeWidget, processList)
@@ -968,12 +963,21 @@ msgid ""
 "the system's <i>ps</i> command.</p><p>The list is not updated automatically. "
 "Use the <b>Refresh</b> button to update it.</p>"
 msgstr ""
+"<p>Список содержит все запущенные процессы. Вы должны выбрать процесс, к "
+"которому нужно подсоединиться KDbg. Используйте поле <b>Фильтр или PID</b>, "
+"чтобы сократить список.<p>Текст в колонке <i>Командная строка</i> обычно, но "
+"не всегда, содержит команду запуска данного процесса. Колонка <i>PID</i> "
+"показывает ID процесса. Колонка <i>PPID</i> показывает ID родительского "
+"процесса. Другие колонки показывают дополнительную информацию о процессах, "
+"доступную через команду <i>ps</i>.</p><p>Список автоматически не обновляется."
+" "
+"Используйте кнопку <b>Обновить</b> для этой цели.</p>"
 
 #. i18n: file: procattachbase.ui:66
 #. i18n: ectx: property (text), widget (QTreeWidget, processList)
 #: rc.cpp:163
 msgid "Command"
-msgstr ""
+msgstr "Командная строка"
 
 #. i18n: file: procattachbase.ui:71
 #. i18n: ectx: property (text), widget (QTreeWidget, processList)
@@ -991,13 +995,13 @@ msgstr ""
 #. i18n: ectx: property (whatsThis), widget (QPushButton, buttonRefresh)
 #: rc.cpp:172
 msgid "This button updates the list of processes."
-msgstr ""
+msgstr "Эта кнопка обновляет список процессов."
 
 #. i18n: file: procattachbase.ui:95
 #. i18n: ectx: property (text), widget (QPushButton, buttonRefresh)
 #: rc.cpp:175
 msgid "&Refresh"
-msgstr ""
+msgstr "&Обновить"
 
 #, fuzzy
 #~ msgid "Source"
