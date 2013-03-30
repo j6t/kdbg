@@ -51,6 +51,13 @@ bool DebuggerDriver::startup(QString cmdStr)
 	return false;
     QString pgm = cmd.takeFirst();
 
+#if QT_VERSION >= QT_VERSION_CHECK(4, 6, 0)
+    QProcessEnvironment env = QProcessEnvironment::systemEnvironment();
+    env.insert(QLatin1String("LC_ALL"), QLatin1String("C"));
+    env.remove(QLatin1String("LANG"));
+    setProcessEnvironment(env);
+#endif
+
     setProcessChannelMode(MergedChannels);
     start(pgm, cmd);
     if (!waitForStarted(-1))
