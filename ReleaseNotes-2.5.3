@@ -1,0 +1,19 @@
+KDbg Release Notes for version 2.5.3
+====================================
+
+Changes since 2.5.2
+-------------------
+
+Bug fixes
+
+- Duplicated and <MULTIPLE> breakpoints do not increase the list of
+  breakpoints each time a session is started
+
+- Communication with a localized GDB works; this is achieved by setting
+  LC_ALL=C, which is also propagated to the program being debugged. If
+  The program needs a different locale, set it in Execution->Arguments,
+  page Environment.
+
+- Fixed a crash in the memory window
+
+- Updates of the Russian and Croatian translations.
