@@ -2236,6 +2236,9 @@ bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
      *     Reading symbols from
      */
     while (strncmp(output, "Reading symbols from", 20) == 0 ||
+	   strncmp(output, "done.", 5) == 0 ||
+	   strncmp(output, "Missing separate debuginfo", 26) == 0 ||
+	   strncmp(output, "Try: ", 5) == 0 ||
 	   strncmp(output, "Using host libthread_db", 23) == 0 ||
 	   strncmp(output, "(no debugging symbols found)", 28) == 0)
     {
