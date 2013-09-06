@@ -17,7 +17,7 @@ struct emptyVBase { virtual ~emptyVBase(){} };
 struct emptyVDerived : S { virtual ~emptyVDerived(){} };
 struct emptyVNested : emptyVBase { };
 
-int globalvar = 1234;
+S globalvar = { 1234, -18, &globalvar };
 
 class Cl
 {

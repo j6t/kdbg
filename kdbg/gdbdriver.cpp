@@ -1411,12 +1411,16 @@ repeat:
 	    while (isspace(*p))
 		p++;
 	    // may be followed by a string or <...>
+	    // if this was a pointer with a string,
+	    // reset that pointer flag since we have now a value
 	    start = p;
-	    
+
 	    if (*p == '"' || *p == '\'') {
 		skipString(p);
+		variable->m_varKind = VarTree::VKsimple;
 	    } else if (*p == 'L' && (p[1] == '"' || p[1] == '\'')) {
 		skipString(p);	// wchar_t string
+		variable->m_varKind = VarTree::VKsimple;
 	    } else if (*p == '<') {
 		// if this value is part of an array, it might be followed
 		// by <repeats 15 times>, which we don't skip here
@@ -1427,9 +1431,6 @@ repeat:
 		// there is always a blank before the string,
 		// which we will include in the final string value
 		variable->m_value += QString::fromLatin1(start-1, (p - start)+1);
-		// if this was a pointer, reset that flag since we 
-		// now got the value
-		variable->m_varKind = VarTree::VKsimple;
 	    }
 	}
 
