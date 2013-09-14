@@ -18,6 +18,7 @@ struct emptyVDerived : S { virtual ~emptyVDerived(){} };
 struct emptyVNested : emptyVBase { };
 
 S globalvar = { 1234, -18, &globalvar };
+static const char globarstr[] = "test";
 
 class Cl
 {
@@ -39,6 +40,7 @@ public:
 	int operator()(const QString& x, int& y) const;
 	operator const char*() { return 0; }
 	operator PtrFunc*();
+	void takeACStr(const char* cstr);
 };
 
 namespace A {
@@ -183,6 +185,7 @@ int main(int argc, char* argv[])
 	int n = 83;
 	d1(strref, n);
 	PtrFunc* ppf = d1;
+	d1.takeACStr(globarstr);
 }
 
 Cl::Cl(int r) :
@@ -222,4 +225,9 @@ int Dl::operator()(const QString& x, int& y) const
 Dl::operator PtrFunc*()
 {
     return 0;
+}
+
+void Dl::takeACStr(const char* cstr)
+{
+	const char filespec[20] = "more test";
 }

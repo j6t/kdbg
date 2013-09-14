@@ -1266,6 +1266,7 @@ repeat:
 	//  10 '\n'
 	//  <optimized out>
 	//  0x823abc <Array<int> virtual table>
+	//  0x40240f <globarstr> "test"
 	//  (void (*)()) 0x8048480 <f(E *, char)>
 	//  (E *) 0xbffff450
 	//  red
@@ -1406,7 +1407,7 @@ repeat:
 	// string values never contain a literal line break
 	variable->m_value.replace('\n', ' ');
 
-	if (checkMultiPart) {
+	while (checkMultiPart) {
 	    // white space
 	    while (isspace(*p))
 		p++;
@@ -1414,6 +1415,7 @@ repeat:
 	    // if this was a pointer with a string,
 	    // reset that pointer flag since we have now a value
 	    start = p;
+	    checkMultiPart = false;
 
 	    if (*p == '"' || *p == '\'') {
 		skipString(p);
@@ -1424,8 +1426,10 @@ repeat:
 	    } else if (*p == '<') {
 		// if this value is part of an array, it might be followed
 		// by <repeats 15 times>, which we don't skip here
-		if (strncmp(p, "<repeats ", 9) != 0)
+		if (strncmp(p, "<repeats ", 9) != 0) {
 		    skipNestedAngles(p);
+		    checkMultiPart = true;
+		}
 	    }
 	    if (p != start) {
 		// there is always a blank before the string,
