@@ -32,6 +32,9 @@ SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
 	m_widthLineNo(30),
 	m_lineInfoArea(new LineInfoArea(this))
 {
+    // Center the cursor when moving it into view
+    setCenterOnScroll(true);
+
     // load pixmaps
     m_pcinner = UserIcon("pcinner");
     m_pcup = UserIcon("pcup");
