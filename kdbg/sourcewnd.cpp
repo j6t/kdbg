@@ -1014,6 +1014,21 @@ int HighlightCpp::highlight(const QString& text, int state)
 
 bool HighlightCpp::isCppKeyword(const QString& word)
 {
+#ifndef NDEBUG
+    // std::binary_search requires the search list to be sorted
+    static bool keyword_order_verified = false;
+    if (!keyword_order_verified) {
+	for (size_t i = 1; i < sizeof(ckw)/sizeof(ckw[0]); ++i) {
+	    if (ckw[i-1] > ckw[i]) {
+		qDebug("\"%s\" > \"%s\"",
+		       qPrintable(ckw[i-1]), qPrintable(ckw[i]));
+		assert(0);
+	    }
+	}
+	keyword_order_verified = true;
+    }
+#endif
+
     return std::binary_search(ckw, ckw + sizeof(ckw)/sizeof(ckw[0]), word);
 }
 
