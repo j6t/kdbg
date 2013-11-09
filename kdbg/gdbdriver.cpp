@@ -1267,6 +1267,7 @@ repeat:
 	//  10 '\n'
 	//  <optimized out>
 	//  0x823abc <Array<int> virtual table>
+	//  0x40240f <globarstr> "test"
 	//  (void (*)()) 0x8048480 <f(E *, char)>
 	//  (E *) 0xbffff450
 	//  red
@@ -1407,30 +1408,34 @@ repeat:
 	// string values never contain a literal line break
 	variable->m_value.replace('\n', ' ');
 
-	if (checkMultiPart) {
+	while (checkMultiPart) {
 	    // white space
 	    while (isspace(*p))
 		p++;
 	    // may be followed by a string or <...>
+	    // if this was a pointer with a string,
+	    // reset that pointer flag since we have now a value
 	    start = p;
-	    
+	    checkMultiPart = false;
+
 	    if (*p == '"' || *p == '\'') {
 		skipString(p);
+		variable->m_varKind = VarTree::VKsimple;
 	    } else if (*p == 'L' && (p[1] == '"' || p[1] == '\'')) {
 		skipString(p);	// wchar_t string
+		variable->m_varKind = VarTree::VKsimple;
 	    } else if (*p == '<') {
 		// if this value is part of an array, it might be followed
 		// by <repeats 15 times>, which we don't skip here
-		if (strncmp(p, "<repeats ", 9) != 0)
+		if (strncmp(p, "<repeats ", 9) != 0) {
 		    skipNestedAngles(p);
+		    checkMultiPart = true;
+		}
 	    }
 	    if (p != start) {
 		// there is always a blank before the string,
 		// which we will include in the final string value
 		variable->m_value += QString::fromLatin1(start-1, (p - start)+1);
-		// if this was a pointer, reset that flag since we 
-		// now got the value
-		variable->m_varKind = VarTree::VKsimple;
 	    }
 	}
 
@@ -2237,6 +2242,9 @@ bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
      *     Reading symbols from
      */
     while (strncmp(output, "Reading symbols from", 20) == 0 ||
+	   strncmp(output, "done.", 5) == 0 ||
+	   strncmp(output, "Missing separate debuginfo", 26) == 0 ||
+	   strncmp(output, "Try: ", 5) == 0 ||
 	   strncmp(output, "Using host libthread_db", 23) == 0 ||
 	   strncmp(output, "(no debugging symbols found)", 28) == 0)
     {

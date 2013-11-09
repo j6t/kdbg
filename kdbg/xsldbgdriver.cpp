@@ -699,7 +699,6 @@ static ExprValue *
 parseVar(const char *&s)
 {
     const char *p = s;
-    bool foundLocalVar = false;
     ExprValue *variable = 0L;
     QString name;
 
@@ -714,7 +713,6 @@ parseVar(const char *&s)
     }
 
     if (strncmp(p, " Local", 6) == 0) {
-        foundLocalVar = true;
         /* skip " Local" */
         p = p + 6;
         TRACE("Found local variable");

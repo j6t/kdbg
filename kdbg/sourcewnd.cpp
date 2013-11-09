@@ -172,7 +172,6 @@ void SourceWindow::drawLineInfoArea(QPainter* p, QPaintEvent* event)
 	int row = block.blockNumber();
 	uchar item = m_lineItems[row];
 
-	QPoint pt = r.topLeft();
 	int h = r.height();
 	p->save();
 	p->translate(0, r.top());
