@@ -1,0 +1,18 @@
+KDbg Release Notes for version 2.5.4
+====================================
+
+Changes since 2.5.3
+-------------------
+
+Bug fixes
+
+- Source file names with international characters are handled better.
+
+- When an executable is loaded, GDBs of different vintage print different
+  text, some of which were treated as error text incorrectly, leading to
+  failed debugging sessions. More of these texts are now ignored.
+
+- Variables pointing to some global variable lacked the ability to be
+  expanded with recent GDBs.
+
+- Parsing of string values residing in global variables was fixed.
