@@ -320,11 +320,13 @@ static long double extractNumber(const QString& hex)
 
 static QString toFloat(const QString& hex, char p)
 {
-    uint bits;
     int prec=6;
-    if (hex.length()<=10) { bits=32; prec=6; }
-    else if (hex.length()<=18) { bits=64; prec=17; }
-    else { bits=80; prec=20; }
+    if (hex.length() <= 10)
+	prec = 6;
+    else if (hex.length() <= 18)
+	prec = 17;
+    else
+	prec = 20;
 
     char fmt[8] = "%.*Lf";
     fmt[4] = p;
