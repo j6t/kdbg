@@ -434,7 +434,7 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg)
     }
 
     QString cmdString;
-    cmdString.sprintf(cmds[cmd].fmt, strArg.toLatin1().constData());
+    cmdString.sprintf(cmds[cmd].fmt, strArg.toUtf8().constData());
     return cmdString;
 }
 
@@ -540,11 +540,11 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
 	    // must split off file name part
 	    strArg = QFileInfo(strArg).fileName();
 	}
-	cmdString.sprintf(cmds[cmd].fmt, strArg.toLatin1().constData(), intArg);
+	cmdString.sprintf(cmds[cmd].fmt, strArg.toUtf8().constData(), intArg);
     }
     else
     {
-	cmdString.sprintf(cmds[cmd].fmt, intArg, strArg.toLatin1().constData());
+	cmdString.sprintf(cmds[cmd].fmt, intArg, strArg.toUtf8().constData());
     }
     return cmdString;
 }
@@ -559,8 +559,8 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg1, QString strArg
 
     QString cmdString;
     cmdString.sprintf(cmds[cmd].fmt,
-		      strArg1.toLatin1().constData(),
-		      strArg2.toLatin1().constData());
+		      strArg1.toUtf8().constData(),
+		      strArg2.toUtf8().constData());
     return cmdString;
 }
 

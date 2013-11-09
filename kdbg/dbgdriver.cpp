@@ -202,7 +202,7 @@ void DebuggerDriver::writeCommand()
 
     // write also to log file
     if (m_logFile.isOpen()) {
-	m_logFile.write(str, cmd->m_cmdString.length());
+	m_logFile.write(str);
 	m_logFile.flush();
     }
 
