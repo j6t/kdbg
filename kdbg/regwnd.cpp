@@ -111,7 +111,8 @@ public:
 	ModeItem(parent, name), matcher(pattern), gmode(mode)
     {
 	setExpanded(true);
-    } 
+	setFirstColumnSpanned(true);
+    }
 
     bool matchName(const QString& str) const
     {
