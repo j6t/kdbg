@@ -179,6 +179,7 @@ signals:
 public slots:
     virtual void updateUI();
     virtual void updateLineItems();
+    void updateToolButtonStyle(Qt::ToolButtonStyle);
     void slotAddWatch();
     void slotAddWatch(const QString& text);
     void slotNewFileLoaded();

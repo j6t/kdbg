@@ -360,14 +360,24 @@ void DebuggerMainWnd::initKAction()
     }
 }
 
+void DebuggerMainWnd::updateToolButtonStyle(Qt::ToolButtonStyle style)
+{
+    m_animation->setToolButtonStyle(style);
+}
+
 void DebuggerMainWnd::initAnimation()
 {
     KToolBar* toolbar = toolBar("mainToolBar");
     m_animation = new KAnimatedButton(toolbar);
+    updateToolButtonStyle(toolbar->toolButtonStyle());
     toolbar->addWidget(m_animation);
     m_animation->setAnimationPath(KIconLoader::global()->moviePath("pulse", KIconLoader::Toolbar));
     connect(m_animation, SIGNAL(clicked(bool)), m_debugger, SLOT(programBreak()));
     m_animRunning = false;
+
+    // Force tool button style to get updated, since it's added manually
+    connect(toolbar, SIGNAL(toolButtonStyleChanged(Qt::ToolButtonStyle)),
+	    SLOT(updateToolButtonStyle(Qt::ToolButtonStyle)));
 }
 
 void DebuggerMainWnd::initStatusBar()
@@ -527,13 +537,23 @@ void DebuggerMainWnd::updateUI()
 
     // animation
     if (m_debugger->isIdle()) {
-	if (m_animRunning && m_animation) {
+	if (m_animation) {
 	    m_animation->stop();
+	    m_animation->setText(i18n("Idle"));
+	    QFont f(m_animation->font());
+	    f.setItalic(true);
+	    m_animation->setFont(f);
+	    m_animation->setToolTip(i18n("Idle"));
 	    m_animRunning = false;
 	}
     } else {
-	if (!m_animRunning && m_animation) {
+	if (m_animation) {
 	    m_animation->start();
+	    m_animation->setText(i18n("Break"));
+	    QFont f(m_animation->font());
+	    f.setItalic(false);
+	    m_animation->setFont(f);
+	    m_animation->setToolTip(i18n("Busy/Running - Click to Break"));
 	    m_animRunning = true;
 	}
     }
