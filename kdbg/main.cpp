@@ -24,7 +24,7 @@ int main(int argc, char** argv)
 			 KDBG_VERSION,
 			 ki18n("A Debugger"),
 			 KAboutData::License_GPL, 
-			 ki18n("(c) 1998-2013 Johannes Sixt"),
+			 ki18n("(c) 1998-2014 Johannes Sixt"),
 			 KLocalizedString(),	/* any text */
 			 "http://www.kdbg.org/",
 			 "j6t@kdbg.org");
