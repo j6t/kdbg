@@ -67,7 +67,6 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	m_tabWidth(0),
 	m_sourceFilter(defaultSourceFilter),
 	m_headerFilter(defaultHeaderFilter),
-	m_animation(0),
 	m_statusActive(i18n("active"))
 {
     setDockNestingEnabled(true);
