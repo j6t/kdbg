@@ -135,6 +135,11 @@ public slots:
     void programKill();
 
     /**
+     * Detach the program (continues exection outside debugger).
+     */
+    void programDetach();
+
+    /**
      * Interrupts the program if it is currently running.
      */
     void programBreak();

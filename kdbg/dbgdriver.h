@@ -70,6 +70,7 @@ enum DbgCommand {
 	DCfinish,
 	DCuntil,			/* line number is zero-based! */
 	DCkill,
+	DCdetach,
 	DCbreaktext,
 	DCbreakline,			/* line number is zero-based! */
 	DCtbreakline,			/* line number is zero-based! */

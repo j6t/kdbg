@@ -95,6 +95,7 @@ static GdbCmdInfo cmds[] = {
     { DCfinish, "finish\n", GdbCmdInfo::argNone },
     { DCuntil, "until %s:%d\n", GdbCmdInfo::argStringNum },
     { DCkill, "kill\n", GdbCmdInfo::argNone },
+    { DCdetach, "detach\n", GdbCmdInfo::argNone },
     { DCbreaktext, "break %s\n", GdbCmdInfo::argString },
     { DCbreakline, "break %s:%d\n", GdbCmdInfo::argStringNum },
     { DCtbreakline, "tbreak %s:%d\n", GdbCmdInfo::argStringNum },

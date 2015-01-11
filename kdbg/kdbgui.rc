@@ -36,6 +36,7 @@
     <Action name="exec_kill"/>
     <Action name="exec_restart"/>
     <Action name="exec_attach"/>
+    <Action name="exec_detach"/>
     <Separator/>
     <Action name="exec_arguments"/>
   </Menu>

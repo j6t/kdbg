@@ -333,6 +333,8 @@ void DebuggerMainWnd::initKAction()
 			m_debugger, SLOT(programRunAgain()), "exec_restart");
     m_attachAction = createAction(i18n("A&ttach..."), 0,
 			this, SLOT(slotExecAttach()), "exec_attach");
+    m_detachAction = createAction(i18n("&Detach"), 0,
+			m_debugger, SLOT(programDetach()), "exec_detach");
     m_argumentsAction = createAction(i18n("&Arguments..."), 0,
 			this, SLOT(slotExecArgs()), "exec_arguments");
 
@@ -515,6 +517,7 @@ void DebuggerMainWnd::updateUI()
     m_execMovePCAction->setEnabled(m_debugger->canSingleStep());
     m_restartAction->setEnabled(m_debugger->canSingleStep());
     m_attachAction->setEnabled(m_debugger->isReady());
+    m_detachAction->setEnabled(m_debugger->canSingleStep());
     m_runAction->setEnabled(m_debugger->canStart() || m_debugger->canSingleStep());
     m_killAction->setEnabled(m_debugger->haveExecutable() && m_debugger->isProgramActive());
     m_breakAction->setEnabled(m_debugger->isProgramRunning());

@@ -310,6 +310,18 @@ void KDebugger::programKill()
     }
 }
 
+void KDebugger::programDetach()
+{
+    if (haveExecutable() && isProgramActive()) {
+	if (m_programRunning) {
+	    m_d->interruptInferior();
+	}
+	// this is an emergency command; flush queues
+	m_d->flushCommands(true);
+	m_d->executeCmd(DCdetach, true);
+    }
+}
+
 bool KDebugger::runUntil(const QString& fileName, int lineNo)
 {
     if (isReady() && m_programActive && !m_programRunning) {
@@ -1123,6 +1135,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	handleRunCommands(output);
 	break;
     case DCkill:
+    case DCdetach:
 	m_programRunning = m_programActive = false;
 	// erase PC
 	emit updatePC(QString(), -1, DbgAddr(), 0);

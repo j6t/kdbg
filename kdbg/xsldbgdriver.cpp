@@ -74,6 +74,7 @@ static XsldbgCmdInfo cmds[] = {
     {DCfinish, "stepup\n", XsldbgCmdInfo::argNone},
     {DCuntil, "continue %s:%d\n", XsldbgCmdInfo::argStringNum},
     {DCkill, "quit\n", XsldbgCmdInfo::argNone},
+    {DCdetach, "quit\n", XsldbgCmdInfo::argNone},
     {DCbreaktext, "break %s\n", XsldbgCmdInfo::argString},
     {DCbreakline, "break -l %s %d\n", XsldbgCmdInfo::argStringNum},
     {DCtbreakline, "break -l %s %d\n", XsldbgCmdInfo::argStringNum },

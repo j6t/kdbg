@@ -105,6 +105,7 @@ protected:
     QAction* m_killAction;
     QAction* m_restartAction;
     QAction* m_attachAction;
+    QAction* m_detachAction;
     QAction* m_argumentsAction;
     QAction* m_bpSetAction;
     QAction* m_bpSetTempAction;
