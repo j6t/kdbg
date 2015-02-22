@@ -1,7 +1,8 @@
 %define name kdbg
-%define version 2.0.0
-%define release 1.kde2
+%define version 2.5.4
+%define release 1.kde4
 %define prefix /usr
+%define src_dir %{name}-%{version}
 
 %define builddir $RPM_BUILD_DIR/%{name}-%{version}
 
@@ -11,7 +12,7 @@ Version: %{version}
 Release: %{release}
 Prefix: %{prefix}
 Group: X11/KDE/Development
-Copyright: GPL
+License: GPL
 Distribution: RedHat 7.0
 Vendor: Johannes Sixt <j6t@kdbg.org>
 Packager: Ullrich von Bassewitz <uz@musoftware.de>
@@ -33,20 +34,19 @@ rm -rf %{builddir}
 touch `find . -type f`
 
 %build
-if [ -z "$KDEDIR" ]; then
-        export KDEDIR=%{prefix}
-fi
-CXXFLAGS="$RPM_OPT_FLAGS" CFLAGS="$RPM_OPT_FLAGS" ./configure \
-	--prefix=$KDEDIR
-make
+
+rm -f CMakeCache.txt
+cmake . -DCMAKE_INSTALL_PREFIX=/usr
+make -j4
 
 
 %install
+
 if [ -z "$KDEDIR" ]; then
 	export KDEDIR=%{prefix}
 fi
 rm -rf $RPM_BUILD_ROOT
-make DESTDIR=$RPM_BUILD_ROOT install-strip
+make DESTDIR=$RPM_BUILD_ROOT install
 
 cd $RPM_BUILD_ROOT
 find . -type d | sed '1,2d;s,^\.,\%attr(-\,root\,root) \%dir ,' > \

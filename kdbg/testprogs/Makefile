@@ -63,3 +63,7 @@ tooltips: tooltips.cpp
 
 widechar: widechar.cpp
 	g++ -o $@ $(CXXFLAGS) $^
+
+
+clean:
+	$(RM) $(PROGS)

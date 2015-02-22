@@ -240,6 +240,16 @@ bool GdbDriver::startup(QString cmdStr)
 	 */
 	"set print thread-events off\n"
 	/*
+	 * We do not want Python pretty printer support, because their
+	 * output is unpredictable, and we cannot parse it.
+	 */
+	"set auto-load python off\n"
+	/*
+	 * Nevertheless, some Python messages get through, for example,
+	 * when a backtrace is printed without the Python gdb module loaded.
+	 */
+	"set python print-stack none\n"
+	/*
 	 * Don't assume that program functions invoked from a watch expression
 	 * always succeed.
 	 */
@@ -649,8 +659,13 @@ CmdQueueItem* GdbDriver::queueCmd(DbgCommand cmd, QString strArg1, QString strAr
 
 void GdbDriver::terminate()
 {
-    ::kill(pid(), SIGTERM);
-    m_state = DSidle;
+    if (m_state != DSidle)
+    {
+	::kill(pid(), SIGINT);
+	m_state = DSinterrupted;
+    }
+    flushCommands();
+    closeWriteChannel();
 }
 
 void GdbDriver::detachAndTerminate()

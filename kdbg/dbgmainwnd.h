@@ -7,6 +7,7 @@
 #ifndef DBGMAINWND_H
 #define DBGMAINWND_H
 
+#include <QPointer>
 #include <QTimer>
 #include <kxmlguiwindow.h>
 #include "regwnd.h"
@@ -161,7 +162,7 @@ protected:
 
     // to avoid flicker when the status bar is updated,
     // we store the last string that we put there
-    KAnimatedButton* m_animation;
+    QPointer<KAnimatedButton> m_animation;
     QString m_lastActiveStatusText;
     bool m_animRunning;
 

@@ -1,0 +1,18 @@
+KDbg Release Notes for version 2.5.5
+====================================
+
+Changes since 2.5.4
+-------------------
+
+Bug fixes
+
+- A crash when the hotkey settings are changed was fixed.
+
+- The animation button was regenerated to avoid a crash with modern Qt.
+  Thanks to Armin Felder for the initial fix.
+
+- Pretty-printers and GDB Python extensions were disabled, because they
+  would interfere with the output parser.
+
+- Recent GDBs do not terminate on receipt of SIGTERM, keeping KDbg
+  running for 20 seconds. This was fixed.
