@@ -658,8 +658,13 @@ CmdQueueItem* GdbDriver::queueCmd(DbgCommand cmd, QString strArg1, QString strAr
 
 void GdbDriver::terminate()
 {
-    ::kill(pid(), SIGTERM);
-    m_state = DSidle;
+    if (m_state != DSidle)
+    {
+	::kill(pid(), SIGINT);
+	m_state = DSinterrupted;
+    }
+    flushCommands();
+    closeWriteChannel();
 }
 
 void GdbDriver::detachAndTerminate()
