@@ -1470,6 +1470,10 @@ void KDebugger::handleBacktrace(const char* output)
 
 void KDebugger::gotoFrame(int frame)
 {
+    // frame is negative when the backtrace list is cleared
+    // ignore this event
+    if (frame < 0)
+	return;
     m_d->executeCmd(DCframe, frame);
 }
 
