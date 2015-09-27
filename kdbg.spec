@@ -49,10 +49,8 @@ rm -rf $RPM_BUILD_ROOT
 make DESTDIR=$RPM_BUILD_ROOT install
 
 cd $RPM_BUILD_ROOT
-find . -type d | sed '1,2d;s,^\.,\%attr(-\,root\,root) \%dir ,' > \
-	$RPM_BUILD_DIR/file.list.%{name}
 find . -type f | sed -e 's,^\.,\%attr(-\,root\,root) ,' \
-	-e '/\/config\//s|^|%config|' >> \
+	-e '/\/config\//s|^|%config|' > \
 	$RPM_BUILD_DIR/file.list.%{name}
 find . -type l | sed 's,^\.,\%attr(-\,root\,root) ,' >> \
 	$RPM_BUILD_DIR/file.list.%{name}
