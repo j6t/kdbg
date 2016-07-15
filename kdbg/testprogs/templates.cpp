@@ -87,6 +87,15 @@ void indirect(T f, const char* s)
 	f(s);
 }
 
+template<class... Args>
+void varargs(const char* sep, Args&&... args)
+{
+	long vals[] = { args... };
+	for (auto v: vals)
+		cout << v << sep;
+	cout << endl;
+}
+
 int main()
 {
 	S s1, s2;
@@ -114,4 +123,6 @@ int main()
 	templS<int> tSi;
 	(tSi.*pm2)(1);
 	tSi.operator<(1);
+
+	varargs(" : ", 1, short(-2), 4U, '3');
 }

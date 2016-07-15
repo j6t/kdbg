@@ -52,7 +52,7 @@ std: std.cpp
 	g++ -o $@ $(CXXFLAGS) $^
 
 templates: templates.cpp
-	g++ -o $@ $(CXXFLAGS) $^
+	g++ -std=c++0x -o $@ $(CXXFLAGS) $^
 
 testfile: testfile.cpp
 	g++ -o $@ $(CXXFLAGS) $^ $(QT3INC) $(QT3LIB)
