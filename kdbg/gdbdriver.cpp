@@ -1286,6 +1286,7 @@ repeat:
 	//  Variable "x" is not available.
 	//  The value of variable 'x' is distributed...
 	//  -nan(0xfffff081defa0)
+	//  @0x100400f08: <error reading variable>
 
 	const char*p = s;
     
@@ -1431,7 +1432,15 @@ repeat:
 	    } else if (*p == '<') {
 		// if this value is part of an array, it might be followed
 		// by <repeats 15 times>, which we don't skip here
-		if (strncmp(p, "<repeats ", 9) != 0) {
+		if (strncmp(p, "<repeats ", 9) == 0)
+		    ;
+		// sometimes, a reference is followed by an error message:
+		//  @0x100400f08: <error reading variable>
+		// in this case, we do not skip the text here, but leave it
+		// for the subsequent parsing pass induced by the reference
+		else if (reference && strncmp(p, "<error reading", 14) == 0)
+		    ;
+		else {
 		    skipNestedAngles(p);
 		    checkMultiPart = true;
 		}
