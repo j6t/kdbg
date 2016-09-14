@@ -262,6 +262,13 @@ const TypeInfo* VarTree::inferTypeFromBaseClass()
     return 0;
 }
 
+QVariant VarTree::data(int column, int role) const
+{
+    if (role != Qt::ToolTipRole || column != 1)
+	return QTreeWidgetItem::data(column, role);
+    return QVariant(value());
+}
+
 ExprValue::ExprValue(const QString& name, VarTree::NameKind aKind) :
 	m_name(name),
 	m_varKind(VarTree::VKsimple),
