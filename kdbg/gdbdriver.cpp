@@ -694,6 +694,12 @@ static bool isErrorExpr(const char* output)
 	strncmp(output, "Internal error: ", 16) == 0;
 }
 
+static void skipSpace(const char*& p)
+{
+    while (isspace(*p))
+	p++;
+}
+
 /**
  * Returns true if the output is an error message. If wantErrorValue is
  * true, a new ExprValue object is created and filled with the error message.
@@ -703,8 +709,7 @@ static bool isErrorExpr(const char* output)
 static bool parseErrorMessage(const char*& output,
 			      ExprValue*& variable, bool wantErrorValue)
 {
-    while (isspace(*output))
-        output++;
+    skipSpace(output);
 
     // skip warnings
     while (strncmp(output, "warning:", 8) == 0)
@@ -714,8 +719,7 @@ static bool parseErrorMessage(const char*& output,
 	    output += strlen(output);
 	else
 	    output = end+1;
-        while (isspace(*output))
-            output++;
+        skipSpace(output);
     }
 
     if (isErrorExpr(output))
@@ -762,8 +766,7 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
      * Parse off white space. gdb sometimes prints white space first if the
      * printed array leaded to an error.
      */
-    while (isspace(*output))
-	output++;
+    skipSpace(output);
 
     // special case: empty string (0 repetitions)
     if (strncmp(output, "Invalid number 0 of repetitions", 31) == 0)
@@ -785,10 +788,8 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
     if (p == 0) {
 	goto error;
     }
-    // skip white space
-    do {
-	p++;
-    } while (isspace(*p));
+    p++;
+    skipSpace(p);
 
     if (*p == '{')
     {
@@ -914,10 +915,8 @@ error:
 static ExprValue* parseVar(const char*& s)
 {
     const char* p = s;
-    
-    // skip whitespace
-    while (isspace(*p))
-	p++;
+
+    skipSpace(p);
 
     QString name;
     VarTree::NameKind kind;
@@ -943,16 +942,14 @@ static ExprValue* parseVar(const char*& s)
 	}
 
 	// go for '='
-	while (isspace(*p))
-	    p++;
+	skipSpace(p);
 	if (*p != '=') {
 	    TRACE("parse error: = not found after " + name);
 	    return 0;
 	}
 	// skip the '=' and more whitespace
 	p++;
-	while (isspace(*p))
-	    p++;
+	skipSpace(p);
     }
 
     ExprValue* variable = new ExprValue(name, kind);
@@ -1084,8 +1081,7 @@ moreStrings:
     if (quote == '\'') {
 	// look ahaead for <repeats 123 times>
 	const char* q = p+1;
-	while (isspace(*q))
-	    q++;
+	skipSpace(q);
 	if (strncmp(q, "<repeats ", 9) == 0) {
 	    p = q+9;
 	    while (*p != '\0' && *p != '>')
@@ -1100,8 +1096,7 @@ moreStrings:
     {
 	// look ahead for another quote
 	const char* q = p+1;
-	while (isspace(*q))
-	    q++;
+	skipSpace(q);
 	if (*q == '"' || *q == '\'') {
 	    // yes!
 	    p = q;
@@ -1205,8 +1200,7 @@ static bool parseName(const char*& s, QString& name, VarTree::NameKind& kind)
 	    kind = VarTree::NKstatic;
 
 	    // its a static variable, name comes now
-	    while (isspace(*p))
-		p++;
+	    skipSpace(p);
 	    s = p;
 	    skipName(p);
 	    if (p == s) {
@@ -1240,8 +1234,7 @@ repeat:
 	    skipNested(s, '{', '}');
 	    variable->m_value = QString::fromLatin1(start, s-start);
 	    variable->m_value += ' ';	// add only a single space
-	    while (isspace(*s))
-		s++;
+	    skipSpace(s);
 	    goto repeat;
 	}
 	else
@@ -1257,8 +1250,7 @@ repeat:
 	    }
 	    s++;
 	    // final white space
-	    while (isspace(*s))
-		s++;
+	    skipSpace(s);
 	}
     }
     // Sometimes we find a warning; it ends at the next LF
@@ -1266,8 +1258,7 @@ repeat:
 	const char* end = strchr(s, '\n');
 	s = end ? end : s+strlen(s);
 	// skip space at start of next line
-	while (isspace(*s))
-	    s++;
+	skipSpace(s);
 	goto repeat;
     } else {
 	// examples of leaf values (cannot be the empty string):
@@ -1297,8 +1288,7 @@ repeat:
 	if (*p == '(') {
 	    skipNested(p, '(', ')');
 
-	    while (isspace(*p))
-		p++;
+	    skipSpace(p);
 	    variable->m_value = QString::fromLatin1(s, p - s);
 	}
 
@@ -1381,9 +1371,7 @@ repeat:
 	    // function pointer
 	    p++;
 	    skipName(p);
-	    while (isspace(*p)) {
-		p++;
-	    }
+	    skipSpace(p);
 	    if (*p == '(') {
 		skipNested(p, '(', ')');
 	    }
@@ -1424,8 +1412,7 @@ repeat:
 
 	while (checkMultiPart) {
 	    // white space
-	    while (isspace(*p))
-		p++;
+	    skipSpace(p);
 	    // may be followed by a string or <...>
 	    // if this was a pointer with a string,
 	    // reset that pointer flag since we have now a value
@@ -1459,8 +1446,7 @@ repeat:
 	}
 
 	// final white space
-	while (isspace(*p))
-	    p++;
+	skipSpace(p);
 	s = p;
 
 	/*
@@ -1478,8 +1464,7 @@ repeat:
 static bool parseNested(const char*& s, ExprValue* variable)
 {
     // could be a structure or an array
-    while (isspace(*s))
-	s++;
+    skipSpace(s);
 
     const char* p = s;
     bool isStruct = false;
@@ -1494,8 +1479,7 @@ static bool parseNested(const char*& s, ExprValue* variable)
     } else if (isalpha(*p) || *p == '_' || *p == '$') {
 	// look ahead for a comma after the name
 	skipName(p);
-	while (isspace(*p))
-	    p++;
+	skipSpace(p);
 	if (*p == '=') {
 	    isStruct = true;
 	}
@@ -1537,8 +1521,7 @@ static bool parseVarSeq(const char*& s, ExprValue* variable)
 	    break;
 	// skip the comma and whitespace
 	s++;
-	while (isspace(*s))
-	    s++;
+	skipSpace(s);
     }
     return var != 0;
 }
@@ -1575,8 +1558,7 @@ static bool parseValueSeq(const char*& s, ExprValue* variable)
 	    // skip " times>" and space
 	    s = end+7;
 	    // possible final space
-	    while (isspace(*s))
-		s++;
+	    skipSpace(s);
 	} else {
 	    index++;
 	}
@@ -1594,8 +1576,7 @@ static bool parseValueSeq(const char*& s, ExprValue* variable)
 	}
 	// skip the comma and whitespace
 	s++;
-	while (isspace(*s))
-	    s++;
+	skipSpace(s);
 	// sometimes there is a closing brace after a comma
 //	if (*s == '}')
 //	    break;
@@ -1689,13 +1670,11 @@ static void parseFrameInfo(const char*& s, QString& func,
      */
     do {
 	skipNestedWithString(p, '(', ')');
-	while (isspace(*p))
-	    p++;
+	skipSpace(p);
 	// skip "const"
 	if (strncmp(p, "const", 5) == 0) {
 	    p += 5;
-	    while (isspace(*p))
-		p++;
+	    skipSpace(p);
 	}
     } while (*p == '(');
 
@@ -1850,8 +1829,7 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 	else
 	{
 	    // get Type
-	    while (isspace(*p))
-		p++;
+	    skipSpace(p);
 	    if (strncmp(p, "breakpoint", 10) == 0) {
 		p += 10;
 	    } else if (strncmp(p, "hw watchpoint", 13) == 0) {
@@ -1861,8 +1839,7 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 		bp.type = Breakpoint::watchpoint;
 		p += 10;
 	    }
-	    while (isspace(*p))
-		p++;
+	    skipSpace(p);
 	    if (*p == '\0')
 		break;
 	    // get Disp
@@ -1870,16 +1847,14 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 	}
 	while (*p != '\0' && !isspace(*p))	/* "keep" or "del" */
 	    p++;
-	while (isspace(*p))
-	    p++;
+	skipSpace(p);
 	if (*p == '\0')
 	    break;
 	// get Enb
 	bp.enabled = *p++ == 'y';
 	while (*p != '\0' && !isspace(*p))	/* "y" or "n" */
 	    p++;
-	while (isspace(*p))
-	    p++;
+	skipSpace(p);
 	if (*p == '\0')
 	    break;
 	// the address, if present
@@ -1910,8 +1885,7 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 	// may be continued in next line
 	while (isspace(*p)) {	/* p points to beginning of line */
 	    // skip white space at beginning of line
-	    while (isspace(*p))
-		p++;
+	    skipSpace(p);
 
 	    // seek end of line
 	    end = strchr(p, '\n');
@@ -1975,8 +1949,7 @@ std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 	ThreadInfo thr;
 	// seach look for thread id, watching out for  the focus indicator
 	thr.hasFocus = false;
-	while (isspace(*p))		/* may be \n from prev line: see "No stack" below */
-	    p++;
+	skipSpace(p);			/* may be \n from prev line: see "No stack" below */
 
 	// recent GDBs write a header line; skip it
 	if (threads.empty() && strncmp(p, "Id   Target", 11) == 0) {
@@ -2002,9 +1975,7 @@ std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 	}
 	p = end;
 
-	// skip space
-	while (isspace(*p))
-	    p++;
+	skipSpace(p);
 
 	/*
 	 * Now follows the thread's SYSTAG.
@@ -2046,8 +2017,7 @@ std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 		} else {
 		    break;
 		}
-		while (isspace(*end))
-		    ++end;
+		skipSpace(end);
 	    }
 	}
 	thr.threadName = QString::fromLatin1(p, end-p).trimmed();
@@ -2131,8 +2101,8 @@ static bool parseNewBreakpoint(const char* o, int& id,
      *
      * Breakpoint 4 at 0x804f158: lotto739.cpp:95. (3 locations)
      */
-    char* fileEnd, *numStart = 0;
-    char* fileStart = strstr(p, "file ");
+    const char* fileEnd, *numStart = 0;
+    const char* fileStart = strstr(p, "file ");
     if (fileStart != 0)
     {
 	fileStart += 5;
@@ -2143,8 +2113,7 @@ static bool parseNewBreakpoint(const char* o, int& id,
     if (numStart == 0 && p[0] == ':' && p[1] == ' ')
     {
 	fileStart = p+2;
-	while (isspace(*fileStart))
-	    ++fileStart;
+	skipSpace(fileStart);
 	fileEnd = strchr(fileStart, ':');
 	if (fileEnd != 0)
 	    numStart = fileEnd + 1;
@@ -2189,8 +2158,7 @@ void GdbDriver::parseLocals(const char* output, std::list<ExprValue*>& newVars)
     }
 
     while (*output != '\0') {
-	while (isspace(*output))
-	    output++;
+	skipSpace(output);
 	if (*output == '\0')
 	    break;
 	// skip occurrences of "No locals" and "No args"
@@ -2328,8 +2296,7 @@ uint GdbDriver::parseProgramStopped(const char* output, QString& message)
 	    // skip number and space
 	    while (*p && !isspace(*p))
 		++p;
-	    while (isspace(*p))
-		++p;
+	    skipSpace(p);
 	    if (*p == '(') {
 		skipNested(p, '(', ')');
 		if (strncmp(p, " exited ", 8) == 0) {
@@ -2389,9 +2356,7 @@ QStringList GdbDriver::parseSharedLibs(const char* output)
 	    while (*output != '\0' && !isspace(*output)) {	/* non-space */
 		output++;
 	    }
-	    while (isspace(*output)) {	/* space */
-		output++;
-	    }
+	    skipSpace(output);		/* space */
 	}
 	if (*output == '\0')
 	    return shlibs;
@@ -2440,8 +2405,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
     {
 	RegisterInfo reg;
 	// skip space at the start of the line
-	while (isspace(*output))
-	    output++;
+	skipSpace(output);
 
 	// register name
 	const char* start = output;
@@ -2451,9 +2415,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 	    break;
 	reg.regName = QString::fromLatin1(start, output-start);
 
-	// skip space
-	while (isspace(*output))
-	    output++;
+	skipSpace(output);
 
 	QString value;
 
@@ -2705,8 +2667,7 @@ QString GdbDriver::parseMemoryDump(const char* output, std::list<MemoryDump>& me
 	md.address = QString::fromLatin1(start, p-start);
 	if (*p != ':') {
 	    // parse function offset
-	    while (isspace(*p))
-		p++;
+	    skipSpace(p);
 	    start = p;
 	    while (*p != '\0' && !(*p == ':' && isspace(p[1])))
 		p++;
@@ -2715,8 +2676,7 @@ QString GdbDriver::parseMemoryDump(const char* output, std::list<MemoryDump>& me
 	if (*p == ':')
 	    p++;
 	// skip space; this may skip a new-line char!
-	while (isspace(*p))
-	    p++;
+	skipSpace(p);
 	// everything to the end of the line is the memory dump
 	const char* end = strchr(p, '\n');
 	if (end != 0) {
@@ -2742,8 +2702,7 @@ QString GdbDriver::editableValue(VarTree* value)
     if (*s == '(') {
 	skipNested(s, '(', ')');
 	// skip space
-	while (isspace(*s))
-	    ++s;
+	skipSpace(s);
     }
 
 repeat:
@@ -2767,8 +2726,7 @@ repeat:
 	// a pointer
 	// if it's a pointer to a string, remove the string
 	const char* end = s;
-	while (isspace(*s))
-	    ++s;
+	skipSpace(s);
 	if (*s == '"') {
 	    // a string
 	    return QString::fromLatin1(start, end-start);
