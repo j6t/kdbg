@@ -700,6 +700,12 @@ static void skipSpace(const char*& p)
 	p++;
 }
 
+static void skipDecimal(const char*& p)
+{
+    while (isdigit(*p))
+	p++;
+}
+
 /**
  * Returns true if the output is an error message. If wantErrorValue is
  * true, a new ExprValue object is created and filled with the error message.
@@ -1332,16 +1338,14 @@ repeat:
 	    checkMultiPart = true;
 	} else if (isdigit(*p)) {
 	    // parse decimal number, possibly a float
-	    while (isdigit(*p))
-		p++;
+	    skipDecimal(p);
 	    if (*p == '.') {		/* TODO: obey i18n? */
 		// In long arrays an integer may be followed by '...'.
 		// We test for this situation and don't gobble the '...'.
 		if (p[1] != '.' || p[0] != '.') {
 		    // fractional part
 		    p++;
-		    while (isdigit(*p))
-			p++;
+		    skipDecimal(p);
 		}
 	    }
 	    if (*p == 'e' || *p == 'E') {
@@ -1349,8 +1353,7 @@ repeat:
 		// exponent
 		if (*p == '-' || *p == '+')
 		    p++;
-		while (isdigit(*p))
-		    p++;
+		skipDecimal(p);
 	    }
 
 	    // for char variables there is the char, eg. 10 '\n'
@@ -1769,8 +1772,7 @@ static bool parseFrame(const char*& s, int& frameNo, QString& func,
 
     // frame number
     frameNo = atoi(s);
-    while (isdigit(*s))
-	s++;
+    skipDecimal(s);
     // space and comma
     while (isspace(*s) || *s == ',')
 	s++;
