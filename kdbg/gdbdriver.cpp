@@ -1287,6 +1287,7 @@ repeat:
 	//  The value of variable 'x' is distributed...
 	//  -nan(0xfffff081defa0)
 	//  @0x100400f08: <error reading variable>
+	//  (void (Templated<double>::*)(Templated<double> * const)) 0x400d74 <MostDerived::PrintV()>, this adjustment -16
 
 	const char*p = s;
     
@@ -1444,6 +1445,16 @@ repeat:
 		    skipNestedAngles(p);
 		    checkMultiPart = true;
 		}
+	    } else if (strncmp(p, ", this adjustment ", 18) == 0) {
+		// pointers-to-member are sometimes followed by
+		// a "this adjustment" hint
+		p += 18;
+		if (*p == '-')
+		    p++;
+		skipDecimal(p);
+		// we know that this is not a dereferencable pointer
+		variable->m_varKind = VarTree::VKsimple;
+		++start;	// skip ',', will be picked up below
 	    }
 	    if (p != start) {
 		// there is always a blank before the string,

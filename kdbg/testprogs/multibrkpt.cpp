@@ -33,5 +33,15 @@ struct MostDerived : Templated<int>, Templated<double>
 int main()
 {
 	MostDerived bothobj;
+
+	// test "this adjustment"
+	void (Templated<int>::*pmf1)();
+	void (Templated<double>::*pmf2)();
+	void (MostDerived::*pmf3)();
+	pmf1 = static_cast<void (Templated<int>::*)()>(&MostDerived::PrintV);
+	// the following has a non-trivial "this adjustment"
+	pmf2 = static_cast<void (Templated<double>::*)()>(&MostDerived::PrintV);
+	pmf3 = &Templated<double>::PrintV;
+
 	bothobj.PrintV();
 }
