@@ -14,6 +14,9 @@ struct Templated
 	void PrintV() {
 		cout << __func__ << " val=" << val << endl;
 	}
+	virtual void PrintName(int,int) const {
+		cout << __func__ << endl;
+	}
 };
 
 struct MostDerived : Templated<int>, Templated<double>
@@ -28,6 +31,9 @@ struct MostDerived : Templated<int>, Templated<double>
 		Templated<int>::PrintV();
 		Templated<double>::PrintV();
 	}
+	virtual void PrintName(int,int) const {
+		cout << __func__ << endl;
+	}
 };
 
 int main()
@@ -38,10 +44,13 @@ int main()
 	void (Templated<int>::*pmf1)();
 	void (Templated<double>::*pmf2)();
 	void (MostDerived::*pmf3)();
+	void (MostDerived::*pmf4)(int,int) const;
 	pmf1 = static_cast<void (Templated<int>::*)()>(&MostDerived::PrintV);
 	// the following has a non-trivial "this adjustment"
 	pmf2 = static_cast<void (Templated<double>::*)()>(&MostDerived::PrintV);
 	pmf3 = &Templated<double>::PrintV;
+	pmf4 = &Templated<double>::PrintName;
 
 	bothobj.PrintV();
+	(bothobj.*pmf4)(2, -5);
 }

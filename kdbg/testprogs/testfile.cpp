@@ -38,9 +38,10 @@ public:
 	Dl(int r);
 	virtual int f(int x);
 	int operator()(const QString& x, int& y) const;
-	operator const char*() { return 0; }
+	virtual operator const char*() const { return 0; }
 	operator PtrFunc*();
 	void takeACStr(const char* cstr);
+	double m;
 };
 
 namespace A {
@@ -185,6 +186,8 @@ int main(int argc, char* argv[])
 	int n = 83;
 	d1(strref, n);
 	PtrFunc* ppf = d1;
+	const char* (Dl::*pmf)() const = &Dl::operator const char*;
+	double (Dl::*pmv) = &Dl::m;
 	d1.takeACStr(globarstr);
 }
 

@@ -1171,11 +1171,51 @@ static void skipNestedWithString(const char*& s, char opening, char closing)
     s = p;
 }
 
-inline void skipName(const char*& p)
+static void skipName(const char*& p)
 {
     // allow : (for enumeration values) and $ and . (for _vtbl.)
     while (isalnum(*p) || *p == '_' || *p == ':' || *p == '$' || *p == '.')
 	p++;
+}
+
+static void skipFunctionName(const char*& p)
+{
+    while (*p)
+    {
+	if (*p == '<') {
+	    // skip template parameter list
+	    skipNestedAngles(p);
+	} else if (*p == '(') {
+	    // this skips "(anonymous namespace)" as well as the formal
+	    // parameter list of the containing function if this is a member
+	    // of a nested class
+	    skipNestedWithString(p, '(', ')');
+	} else if (isalnum(*p) || *p == '_' || *p == ':') {
+	    const char* start = p;
+	    skipName(p);
+	    // check for operator
+	    if (p-start >= 8 &&
+		strncmp(p-8, "operator", 8) == 0 &&
+		// do  not mistake this as the tail of some identifier
+		(p-start == 8 || !(isalnum(p[-9]) || p[-9] == '_')))
+	    {
+		// skip forward until we find the opening parenthesis
+		// this catches both operator()(...) as well as
+		// type conversion operators, e.g.
+		//  operator char const*() const
+		//  operator void(*)()
+		while (*p && *p != '(')
+		    p++;
+	    }
+	} else if (strncmp(p, " const", 6) == 0 &&
+		    // must not mistake "const" as the beginning of
+		    // a subequent identifier
+		    !isalnum(p[6]) &&  p[6] != '_') {
+	    p += 6;
+	} else {
+	    break;
+	}
+    }
 }
 
 static bool parseName(const char*& s, QString& name, VarTree::NameKind& kind)
@@ -1283,6 +1323,8 @@ repeat:
 	//  (E *) 0xbffff450
 	//  red
 	//  &parseP (HTMLClueV *, char *)
+	//  &virtual table offset 0, this adjustment 140737488346016
+	//  &virtual Dl::operator char const*() const
 	//  Variable "x" is not available.
 	//  The value of variable 'x' is distributed...
 	//  -nan(0xfffff081defa0)
@@ -1373,12 +1415,23 @@ repeat:
 	    checkMultiPart = p[1] == '\'';
 	    skipString(p);
 	} else if (*p == '&') {
-	    // function pointer
 	    p++;
-	    skipName(p);
-	    skipSpace(p);
-	    if (*p == '(') {
-		skipNested(p, '(', ')');
+	    if (strncmp(p, "virtual ", 8) == 0) {
+		p += 8;
+		if (strncmp(p, "table offset ", 13) == 0) {
+		    p += 13;
+		    skipDecimal(p);
+		    checkMultiPart = true;
+		} else {
+		    skipFunctionName(p);
+		}
+	    } else {
+		// function pointer
+		skipName(p);
+		skipSpace(p);
+		if (*p == '(') {
+		    skipNested(p, '(', ')');
+		}
 	    }
 	} else if (strncmp(p, "Variable \"", 10) == 0) {
 	    // Variable "x" is not available.
