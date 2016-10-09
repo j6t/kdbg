@@ -4,6 +4,7 @@ add_subdirectory(typetables)
 
 include_directories(${KDE4_INCLUDES} ${KDE4_INCLUDE_DIR} ${QT_INCLUDES} )
 include(CheckFunctionExists)
+include(CheckIncludeFiles)
 
 CHECK_INCLUDE_FILES(pty.h HAVE_PTY_H)
 CHECK_INCLUDE_FILES(libutil.h HAVE_LIBUTIL_H)

@@ -62,6 +62,8 @@ public:
     QString value() const { return m_baseValue; }
     VarTree* child(int i) const { return static_cast<VarTree*>(QTreeWidgetItem::child(i)); }
 
+    virtual QVariant data(int column, int role) const;
+
 private:
     void updateValueText();
     QString m_baseValue;	//!< The "normal value" that the driver reported
