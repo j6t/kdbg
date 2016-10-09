@@ -327,7 +327,7 @@ msgid "A Debugger"
 msgstr "Un débogueur"
 
 #: main.cpp:27
-msgid "(c) 1998-2015 Johannes Sixt"
+msgid "(c) 1998-2016 Johannes Sixt"
 msgstr ""
 
 #: main.cpp:31
