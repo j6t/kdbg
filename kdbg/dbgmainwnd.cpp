@@ -813,7 +813,7 @@ void DebuggerMainWnd::setAttachPid(const QString& pid)
 void DebuggerMainWnd::slotNewStatusMsg()
 {
     QString msg = m_debugger->statusMessage();
-    statusBar()->changeItem(msg, ID_STATUS_MSG);
+    statusBar()->changeItem(msg.trimmed(), ID_STATUS_MSG);
 }
 
 void DebuggerMainWnd::slotFileGlobalSettings()
