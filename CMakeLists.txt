@@ -1,16 +1,27 @@
-cmake_minimum_required(VERSION 2.6)
+cmake_minimum_required(VERSION 3.3)
+set(QT_MIN_VERSION "5.3.0")
+set(KF5_MIN_VERSION "5.2.0")
 
 set(KDBG_VERSION 2.5.6)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kdbg/version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/kdbg/version.h)
 
-find_package(KDE4 REQUIRED)
+find_package(ECM REQUIRED NO_MODULE)
+set(CMAKE_MODULE_PATH ${ECM_MODULE_PATH} ${ECM_KDE_MODULE_DIR})
 
-add_definitions(${QT_DEFINITIONS} ${KDE4_DEFINITIONS})
+find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
+    Core Widgets
+)
 
-include(KDE4Defaults)
-include(MacroLibrary)
-#include(ManualStuff.cmake)
-#include(ConfigureChecks.cmake)
+find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS
+    CoreAddons I18n WidgetsAddons KDELibs4Support
+)
+
+include(KDEInstallDirs)
+include(KDECompilerSettings)
+include(KDECMakeSettings)
+include(FeatureSummary)
 
 add_subdirectory(kdbg)
 add_subdirectory(po)
+
+feature_summary(WHAT ALL FATAL_ON_MISSING_REQUIRED_PACKAGES)

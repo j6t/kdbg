@@ -10,7 +10,7 @@
 #include <kglobal.h>
 #include <kstandarddirs.h>
 #include <kcmdlineargs.h> 
-#include <kaboutdata.h>
+#include <k4aboutdata.h>
 #include "dbgmainwnd.h"
 #include "typetable.h"
 #include "version.h"
@@ -20,10 +20,10 @@
 
 int main(int argc, char** argv)
 {
-    KAboutData aboutData("kdbg", "kdbg", ki18n("KDbg"),
+    K4AboutData aboutData("kdbg", "kdbg", ki18n("KDbg"),
 			 KDBG_VERSION,
 			 ki18n("A Debugger"),
-			 KAboutData::License_GPL, 
+			 K4AboutData::License_GPL,
 			 ki18n("(c) 1998-2016 Johannes Sixt"),
 			 KLocalizedString(),	/* any text */
 			 "http://www.kdbg.org/",

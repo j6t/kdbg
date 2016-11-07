@@ -9,7 +9,6 @@
 #include <kmessagebox.h>
 #include <kconfig.h>
 #include <kconfiggroup.h>
-#include <kstatusbar.h>
 #include <kicon.h>
 #include <kiconloader.h>
 #include <kstandardaction.h>
@@ -33,6 +32,7 @@
 #include <QList>
 #include <QDockWidget>
 #include <QProcess>
+#include <QStatusBar>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "winstack.h"
@@ -366,14 +366,14 @@ void DebuggerMainWnd::initAnimation()
     KToolBar* toolbar = toolBar("mainToolBar");
     m_animation = new KAnimatedButton(toolbar);
     toolbar->addWidget(m_animation);
-    m_animation->setIcons("pulse");
+    m_animation->setAnimationPath(KIconLoader::global()->moviePath("pulse", KIconLoader::Toolbar));
     connect(m_animation, SIGNAL(clicked(bool)), m_debugger, SLOT(programBreak()));
     m_animRunning = false;
 }
 
 void DebuggerMainWnd::initStatusBar()
 {
-    KStatusBar* statusbar = statusBar();
+    QStatusBar* statusbar = statusBar();
     m_statusActiveLabel = new KSqueezedTextLabel(statusbar);
     m_statusActiveLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     statusbar->addPermanentWidget(m_statusActiveLabel);
