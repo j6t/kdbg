@@ -102,7 +102,7 @@ ProgramSettings::ProgramSettings(QWidget* parent, QString exeName) :
     QFileInfo fi(exeName);
     QString cap = KGlobal::caption();
     QString title = i18n("%1: Settings for %2");
-    setCaption(title.arg(cap, fi.fileName()));
+    setWindowTitle(title.arg(cap, fi.fileName()));
 
     addPage(&m_chooseDriver, i18n("Debugger"));
     addPage(&m_output, i18n("Output"));

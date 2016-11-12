@@ -826,7 +826,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
     KPageDialog dlg(this);
     QString title = KGlobal::caption();
     title += i18n(": Global options");
-    dlg.setCaption(title);
+    dlg.setWindowTitle(title);
 
     PrefDebugger prefDebugger(&dlg);
     prefDebugger.setDebuggerCmd(m_debuggerCmdStr.isEmpty()  ?
@@ -1145,7 +1145,7 @@ static QString myGetFileName(QString caption,
     QString filename;
     KFileDialog dlg(dir, filter, parent);
 
-    dlg.setCaption(caption);
+    dlg.setWindowTitle(caption);
 
     if (dlg.exec() == QDialog::Accepted)
 	filename = dlg.selectedFile();
