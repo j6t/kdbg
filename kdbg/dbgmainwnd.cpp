@@ -23,7 +23,6 @@
 #include <kwindowsystem.h>
 #include <ksqueezedtextlabel.h>
 #include <ktoolbar.h>
-#include <kurl.h>
 #include <kxmlguifactory.h>
 #include <KPageDialog>
 #include <QListWidget>
@@ -33,6 +32,7 @@
 #include <QDockWidget>
 #include <QProcess>
 #include <QStatusBar>
+#include <QUrl>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "winstack.h"
@@ -256,7 +256,7 @@ void DebuggerMainWnd::initKAction()
     m_fileExecAction = createAction(i18n("&Executable..."),
 			"document-open-executable", 0,
 			this, SLOT(slotFileExe()), "file_executable");
-    m_recentExecAction = KStandardAction::openRecent(this, SLOT(slotRecentExec(const KUrl&)),
+    m_recentExecAction = KStandardAction::openRecent(this, SLOT(slotRecentExec(const QUrl&)),
 		      actionCollection());
     m_recentExecAction->setObjectName("file_executable_recent");
     m_recentExecAction->setText(i18n("Recent E&xecutables"));
@@ -642,7 +642,7 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
 
     if (success)
     {
-	m_recentExecAction->addUrl(KUrl(fi.absoluteFilePath()));
+	m_recentExecAction->addUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
 
 	// keep the directory
 	m_lastDirectory = fi.absolutePath();
@@ -654,7 +654,7 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
     }
     else
     {
-	m_recentExecAction->removeUrl(KUrl(fi.absoluteFilePath()));
+	m_recentExecAction->removeUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
     }
 
     return success;
@@ -1070,9 +1070,9 @@ void DebuggerMainWnd::slotBackTimer()
     lower();
 }
 
-void DebuggerMainWnd::slotRecentExec(const KUrl& url)
+void DebuggerMainWnd::slotRecentExec(const QUrl& url)
 {
-    QString exe = url.path();
+    QString exe = url.toLocalFile();
     debugProgram(exe, "");
 }
 
