@@ -1,5 +1,5 @@
 [Desktop Entry]
-Exec=kdbg -caption "%c" %i
+Exec=kdbg -qwindowtitle "%c"
 Icon=kdbg
 Type=Application
 X-DocPath=kdbg/index.html
