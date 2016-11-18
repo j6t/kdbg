@@ -297,31 +297,31 @@ void DebuggerMainWnd::initKAction()
     m_runAction = createAction(i18n("&Run"),
 			"debug-run", Qt::Key_F5,
 			m_debugger, SLOT(programRun()), "exec_run");
-    connect(m_runAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    connect(m_runAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
     m_stepIntoAction = createAction(i18n("Step &into"),
 			"debug-step-into", Qt::Key_F8,
 			m_debugger, SLOT(programStep()), "exec_step_into");
-    connect(m_stepIntoAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    connect(m_stepIntoAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
     m_stepOverAction = createAction(i18n("Step &over"),
 			"debug-step-over", Qt::Key_F10,
 			m_debugger, SLOT(programNext()), "exec_step_over");
-    connect(m_stepOverAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    connect(m_stepOverAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
     m_stepOutAction = createAction(i18n("Step o&ut"),
 			"debug-step-out", Qt::Key_F6,
 			m_debugger, SLOT(programFinish()), "exec_step_out");
-    connect(m_stepOutAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    connect(m_stepOutAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
     m_toCursorAction = createAction(i18n("Run to &cursor"),
 			"debug-execute-to-cursor", Qt::Key_F7,
 			this, SLOT(slotExecUntil()), "exec_run_to_cursor");
-    connect(m_toCursorAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    connect(m_toCursorAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
     m_stepIntoIAction = createAction(i18n("Step i&nto by instruction"),
 			"debug-step-into-instruction", Qt::SHIFT+Qt::Key_F8,
 			m_debugger, SLOT(programStepi()), "exec_step_into_by_insn");
-    connect(m_stepIntoIAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    connect(m_stepIntoIAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
     m_stepOverIAction = createAction(i18n("Step o&ver by instruction"),
 			"debug-step-instruction", Qt::SHIFT+Qt::Key_F10,
 			m_debugger, SLOT(programNexti()), "exec_step_over_by_insn");
-    connect(m_stepOverIAction, SIGNAL(activated()), this, SLOT(intoBackground()));
+    connect(m_stepOverIAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
     m_execMovePCAction = createAction(i18n("&Program counter to current line"),
 			"debug-run-cursor", 0,
 			m_filesWindow, SLOT(slotMoveProgramCounter()), "exec_movepc");
@@ -355,7 +355,7 @@ void DebuggerMainWnd::initKAction()
     // all actions force an UI update
     QList<QAction*> actions = actionCollection()->actions();
     foreach(QAction* action, actions) {
-	connect(action, SIGNAL(activated()), this, SLOT(updateUI()));
+	connect(action, SIGNAL(triggered()), this, SLOT(updateUI()));
     }
 }
 
