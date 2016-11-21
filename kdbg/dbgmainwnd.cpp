@@ -226,7 +226,7 @@ QAction* DebuggerMainWnd::createAction(const QString& text, const char* icon,
     a->setText(text);
     a->setIcon(KIcon(icon));
     if (shortcut)
-	a->setShortcut(QKeySequence(shortcut));
+	actionCollection()->setDefaultShortcut(a, QKeySequence(shortcut));
     connect(a, SIGNAL(triggered()), receiver, slot);
     return a;
 }
@@ -238,7 +238,7 @@ QAction* DebuggerMainWnd::createAction(const QString& text,
     QAction* a = actionCollection()->addAction(name);
     a->setText(text);
     if (shortcut)
-	a->setShortcut(QKeySequence(shortcut));
+	actionCollection()->setDefaultShortcut(a, QKeySequence(shortcut));
     connect(a, SIGNAL(triggered()), receiver, slot);
     return a;
 }
