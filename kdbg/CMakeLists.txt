@@ -96,4 +96,4 @@ target_link_libraries(kdbg
 install(TARGETS kdbg ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES kdbg.desktop DESTINATION ${XDG_APPS_INSTALL_DIR})
 install(FILES kdbgrc DESTINATION ${CONFIG_INSTALL_DIR})
-install(FILES kdbgui.rc DESTINATION ${DATA_INSTALL_DIR}/kdbg)
+install(FILES kdbgui.rc DESTINATION ${KXMLGUI_INSTALL_DIR}/kdbg)
