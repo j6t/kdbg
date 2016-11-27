@@ -20,6 +20,7 @@
 #include <kshortcutsdialog.h>
 #include <kanimatedbutton.h>
 #include <kwindowsystem.h>
+#include <ksqueezedtextlabel.h>
 #include <ktoolbar.h>
 #include <kurl.h>
 #include <kxmlguifactory.h>
@@ -32,7 +33,6 @@
 #include <QProcess>
 #include "dbgmainwnd.h"
 #include "debugger.h"
-#include "commandids.h"
 #include "winstack.h"
 #include "brkpt.h"
 #include "threadlist.h"
@@ -372,9 +372,17 @@ void DebuggerMainWnd::initAnimation()
 void DebuggerMainWnd::initStatusBar()
 {
     KStatusBar* statusbar = statusBar();
-    statusbar->insertItem(m_statusActive, ID_STATUS_ACTIVE);
+    m_statusActiveLabel = new KSqueezedTextLabel(statusbar);
+    m_statusActiveLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    statusbar->addPermanentWidget(m_statusActiveLabel);
+    m_statusActiveLabel->show();
     m_lastActiveStatusText = m_statusActive;
-    statusbar->insertItem("", ID_STATUS_MSG);	/* message pane */
+
+    /* message pane */
+    m_statusMsgLabel = new KSqueezedTextLabel(statusbar);
+    m_statusMsgLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
+    statusbar->addPermanentWidget(m_statusMsgLabel);
+    m_statusMsgLabel->show();
 
     // reserve some translations
     i18n("Restart");
@@ -542,7 +550,7 @@ void DebuggerMainWnd::updateUI()
     if (m_debugger->isProgramActive())
 	newStatus = m_statusActive;
     if (newStatus != m_lastActiveStatusText) {
-	statusBar()->changeItem(newStatus, ID_STATUS_ACTIVE);
+	m_statusActiveLabel->setText(newStatus);
 	m_lastActiveStatusText = newStatus;
     }
 }
@@ -816,7 +824,7 @@ void DebuggerMainWnd::setAttachPid(const QString& pid)
 void DebuggerMainWnd::slotNewStatusMsg()
 {
     QString msg = m_debugger->statusMessage();
-    statusBar()->changeItem(msg.trimmed(), ID_STATUS_MSG);
+    m_statusMsgLabel->setText(msg.trimmed());
 }
 
 void DebuggerMainWnd::slotFileGlobalSettings()

@@ -16,6 +16,7 @@ class QDockWidget;
 class QProcess;
 class KAnimatedButton;
 class KRecentFilesAction;
+class KSqueezedTextLabel;
 class KUrl;
 class WinStack;
 class QListWidget;
@@ -168,7 +169,9 @@ protected:
     bool m_animRunning;
 
     // statusbar texts
+    KSqueezedTextLabel* m_statusActiveLabel;
     QString m_statusActive;
+    KSqueezedTextLabel* m_statusMsgLabel;
 
 signals:
     void setTabWidth(int tabWidth);
