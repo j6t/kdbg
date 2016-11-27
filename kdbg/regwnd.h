@@ -26,14 +26,14 @@ public:
     ~RegisterView();
 
 protected:
-    void contextMenuEvent(QContextMenuEvent*);
+    virtual void contextMenuEvent(QContextMenuEvent*);
+    virtual void changeEvent(QEvent* ev);
 
 protected slots:
     void slotModeChange(QAction*);
     void updateRegisters(const std::list<RegisterInfo>&);
 
 private:
-    void paletteChange(const QPalette& oldPal);
     void updateGroupVisibility();
     GroupingViewItem* findMatchingGroup(const QString& regName);
     GroupingViewItem* findGroup(const QString& groupName);

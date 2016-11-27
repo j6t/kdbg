@@ -505,10 +505,17 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
     return true;
 }
 
-void SourceWindow::paletteChange(const QPalette& oldPal)
+void SourceWindow::changeEvent(QEvent* ev)
 {
-    setFont(KGlobalSettings::fixedFont());
-    QPlainTextEdit::paletteChange(oldPal);
+    switch (ev->type()) {
+    case QEvent::ApplicationFontChange:
+    case QEvent::FontChange:
+	setFont(KGlobalSettings::fixedFont());
+	break;
+    default:
+	break;
+    }
+    QPlainTextEdit::changeEvent(ev);
 }
 
 /*

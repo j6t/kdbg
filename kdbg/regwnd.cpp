@@ -604,9 +604,17 @@ void RegisterView::slotModeChange(QAction* action)
     }
 }
 
-void RegisterView::paletteChange(const QPalette&)
+void RegisterView::changeEvent(QEvent* ev)
 {
-    setFont(KGlobalSettings::fixedFont());
+    switch (ev->type()) {
+    case QEvent::ApplicationFontChange:
+    case QEvent::FontChange:
+	setFont(KGlobalSettings::fixedFont());
+	break;
+    default:
+	break;
+    }
+    QTreeWidget::changeEvent(ev);
 }
 
 #include "regwnd.moc"

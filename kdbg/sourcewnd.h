@@ -63,7 +63,7 @@ protected:
     virtual void resizeEvent(QResizeEvent* e);
     virtual void contextMenuEvent(QContextMenuEvent* e);
     virtual void keyPressEvent(QKeyEvent* ev);
-    virtual void paletteChange(const QPalette&);
+    virtual void changeEvent(QEvent* ev);
     void expandRow(int row);
     void collapseRow(int row);
     void scrollToRow(int row);
