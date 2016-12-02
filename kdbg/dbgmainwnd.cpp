@@ -14,7 +14,6 @@
 #include <kiconloader.h>
 #include <kstandardaction.h>
 #include <kstandardshortcut.h>
-#include <kaction.h>
 #include <kactioncollection.h>
 #include <krecentfilesaction.h>
 #include <ktoggleaction.h>
@@ -223,11 +222,11 @@ QAction* DebuggerMainWnd::createAction(const QString& text, const char* icon,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name)
 {
-    KAction* a = actionCollection()->addAction(name);
+    QAction* a = actionCollection()->addAction(name);
     a->setText(text);
     a->setIcon(KIcon(icon));
     if (shortcut)
-	a->setShortcut(KShortcut(shortcut));
+	a->setShortcut(QKeySequence(shortcut));
     connect(a, SIGNAL(triggered()), receiver, slot);
     return a;
 }
@@ -236,10 +235,10 @@ QAction* DebuggerMainWnd::createAction(const QString& text,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name)
 {
-    KAction* a = actionCollection()->addAction(name);
+    QAction* a = actionCollection()->addAction(name);
     a->setText(text);
     if (shortcut)
-	a->setShortcut(KShortcut(shortcut));
+	a->setShortcut(QKeySequence(shortcut));
     connect(a, SIGNAL(triggered()), receiver, slot);
     return a;
 }
@@ -248,7 +247,7 @@ QAction* DebuggerMainWnd::createAction(const QString& text,
 void DebuggerMainWnd::initKAction()
 {
     // file menu
-    KAction* open = KStandardAction::open(this, SLOT(slotFileOpen()),
+    QAction* open = KStandardAction::open(this, SLOT(slotFileOpen()),
                       actionCollection());
     open->setText(i18n("&Open Source..."));
     m_closeAction = KStandardAction::close(m_filesWindow, SLOT(slotClose()), actionCollection());
