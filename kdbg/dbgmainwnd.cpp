@@ -8,8 +8,10 @@
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
 #include <kconfig.h>
+#include <kconfiggroup.h>
 #include <kstatusbar.h>
 #include <kicon.h>
+#include <kiconloader.h>
 #include <kstandardaction.h>
 #include <kstandardshortcut.h>
 #include <kaction.h>
@@ -17,6 +19,7 @@
 #include <krecentfilesaction.h>
 #include <ktoggleaction.h>
 #include <kfiledialog.h>
+#include <kglobal.h>
 #include <kshortcutsdialog.h>
 #include <kanimatedbutton.h>
 #include <kwindowsystem.h>

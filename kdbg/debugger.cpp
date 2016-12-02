@@ -15,6 +15,7 @@
 #include <QApplication>
 #include <QCryptographicHash>
 #include <kconfig.h>
+#include <kconfiggroup.h>
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
 #include <kstandarddirs.h>

@@ -9,6 +9,7 @@
 
 #include <QPointer>
 #include <QTimer>
+#include <ksharedconfig.h>
 #include <kxmlguiwindow.h>
 #include "regwnd.h"
 
