@@ -724,7 +724,7 @@ void ExprWnd::editValue(VarTree* item, const QString& text)
      * the text, scroll this widget so that half of it shows the text (or
      * less than half of it if the text is shorter).
      */
-    QFontMetrics metr = m_edit->font();
+    QFontMetrics metr(m_edit->font());
     int wMin = metr.width("88888");
     if (w < wMin)
 	w = wMin;
