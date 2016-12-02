@@ -106,10 +106,9 @@ static XsldbgCmdInfo cmds[] = {
 #define MAX_FMTLEN 200
 
 XsldbgDriver::XsldbgDriver():
-	DebuggerDriver()
+	DebuggerDriver(),
+	m_haveDataFile(false)
 {
-    m_haveDataFile = FALSE;
-
 #ifndef NDEBUG
     // check command info array
     const char *perc;
