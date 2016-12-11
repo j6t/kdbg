@@ -54,7 +54,6 @@ int main(int argc, char** argv)
     KApplication app;
 
     KGlobal::dirs()->addResourceType("types", "data", "kdbg/types");
-    KGlobal::dirs()->addResourceType("sessions", "data", "kdbg/sessions");
 
     DebuggerMainWnd* debugger = new DebuggerMainWnd;
     debugger->setObjectName("mainwindow");

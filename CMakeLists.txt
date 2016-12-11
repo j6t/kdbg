@@ -1,5 +1,5 @@
 cmake_minimum_required(VERSION 3.3)
-set(QT_MIN_VERSION "5.3.0")
+set(QT_MIN_VERSION "5.4.0")
 set(KF5_MIN_VERSION "5.2.0")
 
 set(KDBG_VERSION 2.5.6)
