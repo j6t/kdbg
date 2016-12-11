@@ -2094,10 +2094,10 @@ void KDebugger::slotValuePopup(const QString& expr)
 		v = ExprWnd::ptrMemberByName(v, expr);
 	    if (v == 0) {
 		// nothing found, try printing variable in gdb
-
-                CmdQueueItem *cmd = m_d->executeCmd(DCprintPopup, expr, false);
-                cmd->m_popupExpr = expr;
-
+		if (m_d) {
+		    CmdQueueItem *cmd = m_d->executeCmd(DCprintPopup, expr, false);
+		    cmd->m_popupExpr = expr;
+		}
 		return;
 	    }
 	}
