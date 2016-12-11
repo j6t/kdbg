@@ -7,8 +7,6 @@
 #include <kapplication.h>
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
-#include <kglobal.h>
-#include <kstandarddirs.h>
 #include <kcmdlineargs.h> 
 #include <k4aboutdata.h>
 #include "dbgmainwnd.h"
@@ -52,8 +50,6 @@ int main(int argc, char** argv)
     KCmdLineArgs::addCmdLineOptions(opts);
 
     KApplication app;
-
-    KGlobal::dirs()->addResourceType("types", "data", "kdbg/types");
 
     DebuggerMainWnd* debugger = new DebuggerMainWnd;
     debugger->setObjectName("mainwindow");

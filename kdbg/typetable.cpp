@@ -5,9 +5,9 @@
  */
 
 #include "typetable.h"
+#include <QDir>
 #include <QFileInfo>
-#include <kglobal.h>
-#include <kstandarddirs.h>
+#include <QStandardPaths>
 #include <kconfig.h>
 #include <kconfiggroup.h>
 #include <list>
@@ -37,17 +37,26 @@ void TypeTable::loadTypeTables()
 {
     typeTablesInited = true;
 
-    const QStringList files = KGlobal::dirs()->findAllResources("types", "*.kdbgtt",
-			KStandardDirs::NoDuplicates);
-    
-    if (files.isEmpty()) {
+    std::map<QString,QString> files;
+    for (const QString& dir: QStandardPaths::locateAll(QStandardPaths::AppDataLocation, "types",
+					QStandardPaths::LocateDirectory))
+    {
+	for (const QString& file: QDir(dir).entryList(QStringList() << QStringLiteral("*.kdbgtt")))
+	{
+	    files.emplace(file, dir);
+	    // this did not insert the entry if the same file name occurred earlier
+	    // this is exactly what we want: earlier files have higher priority
+	}
+    }
+
+    if (files.empty()) {
 	TRACE("no type tables found");
 	return;
     }
 
-    for (QStringList::ConstIterator p = files.begin(); p != files.end(); ++p) {
+    for (const auto& file: files) {
 	typeTables.push_back(TypeTable());
-	typeTables.back().loadFromFile(*p);
+	typeTables.back().loadFromFile(file.second + '/' + file.first);
     }
 }
 
