@@ -9,7 +9,6 @@
 #include <QProcess>
 #include <QTreeWidget>
 #include <ctype.h>
-#include <kglobal.h>
 #include <kiconloader.h>
 #include <klocale.h>			/* i18n */
 #include "config.h"
@@ -286,10 +285,6 @@ ProcAttach::ProcAttach(QWidget* parent) :
 	m_layout(this),
 	m_buttons()
 {
-    QString title = KGlobal::caption();
-    title += i18n(": Attach to process");
-    setWindowTitle(title);
-
     m_label.setMinimumSize(330, 24);
     m_label.setText(i18n("Specify the process number to attach to:"));
 

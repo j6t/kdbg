@@ -11,7 +11,6 @@
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QToolTip>
-#include <kglobal.h>
 #include <kxmlguiwindow.h>
 #include <kxmlguifactory.h>
 #include <klocale.h>			/* i18n */
@@ -379,7 +378,7 @@ FindDialog::FindDialog() :
 	m_buttonBackward(this),
 	m_buttonClose(this)
 {
-    setWindowTitle(KGlobal::caption() + i18n(": Search"));
+    setWindowTitle(i18n("Search"));
 
     m_searchText.setMinimumSize(330, 24);
     m_searchText.setMaxLength(10000);

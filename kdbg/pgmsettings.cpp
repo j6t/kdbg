@@ -6,7 +6,6 @@
 
 #include "pgmsettings.h"
 #include <klocale.h>			/* i18n */
-#include <kglobal.h>
 #include <QFileInfo>
 #include <QLineEdit>
 #include <QLabel>
@@ -100,9 +99,8 @@ ProgramSettings::ProgramSettings(QWidget* parent, QString exeName) :
 {
     // construct title
     QFileInfo fi(exeName);
-    QString cap = KGlobal::caption();
-    QString title = i18n("%1: Settings for %2");
-    setWindowTitle(title.arg(cap, fi.fileName()));
+    QString title = i18n("Settings for %1");
+    setWindowTitle(title.arg(fi.fileName()));
 
     addPage(&m_chooseDriver, i18n("Debugger"));
     addPage(&m_output, i18n("Output"));

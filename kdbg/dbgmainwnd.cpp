@@ -834,9 +834,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
     int oldTabWidth = m_tabWidth;
 
     KPageDialog dlg(this);
-    QString title = KGlobal::caption();
-    title += i18n(": Global options");
-    dlg.setWindowTitle(title);
+    dlg.setWindowTitle(i18n("Global Options"));
 
     PrefDebugger prefDebugger(&dlg);
     prefDebugger.setDebuggerCmd(m_debuggerCmdStr.isEmpty()  ?
