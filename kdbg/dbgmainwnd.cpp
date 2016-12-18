@@ -28,6 +28,7 @@
 #include <QListWidget>
 #include <QFile>
 #include <QFileInfo>
+#include <QGuiApplication>
 #include <QList>
 #include <QDockWidget>
 #include <QProcess>
@@ -986,7 +987,7 @@ QString DebuggerMainWnd::createOutputWindow()
     shellScript.replace("%s", fifoName);
     TRACE("output window script is " + shellScript);
 
-    QString title = KGlobal::caption();
+    QString title = QGuiApplication::applicationDisplayName();
     title += i18n(": Program output");
 
     // parse the command line specified in the preferences
