@@ -98,7 +98,7 @@
       </widget>
      </item>
      <item>
-      <widget class="KDialogButtonBox" name="dialogButtons">
+      <widget class="QDialogButtonBox" name="dialogButtons">
        <property name="standardButtons">
         <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
        </property>
@@ -111,11 +111,6 @@
  <layoutdefault spacing="6" margin="10"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <customwidgets>
-  <customwidget>
-   <class>KDialogButtonBox</class>
-   <extends>QDialogButtonBox</extends>
-   <header>kdialogbuttonbox.h</header>
-  </customwidget>
   <customwidget>
    <class>KLineEdit</class>
    <extends>QLineEdit</extends>
@@ -135,12 +130,12 @@
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>420</x>
-     <y>400</y>
+     <x>258</x>
+     <y>391</y>
     </hint>
     <hint type="destinationlabel">
-     <x>399</x>
-     <y>415</y>
+     <x>219</x>
+     <y>228</y>
     </hint>
    </hints>
   </connection>
@@ -151,12 +146,12 @@
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>508</x>
-     <y>401</y>
+     <x>170</x>
+     <y>388</y>
     </hint>
     <hint type="destinationlabel">
-     <x>508</x>
-     <y>414</y>
+     <x>146</x>
+     <y>272</y>
     </hint>
    </hints>
   </connection>

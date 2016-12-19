@@ -306,7 +306,7 @@
     </widget>
    </item>
    <item>
-    <widget class="KDialogButtonBox" name="kdialogbuttonbox">
+    <widget class="QDialogButtonBox" name="dialogButtonBox">
      <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
@@ -316,13 +316,6 @@
  </widget>
  <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
- <customwidgets>
-  <customwidget>
-   <class>KDialogButtonBox</class>
-   <extends>QDialogButtonBox</extends>
-   <header>kdialogbuttonbox.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>programArgs</tabstop>
@@ -339,34 +332,34 @@
  <resources/>
  <connections>
   <connection>
-   <sender>kdialogbuttonbox</sender>
+   <sender>dialogButtonBox</sender>
    <signal>accepted()</signal>
    <receiver>PgmArgsBase</receiver>
    <slot>accept()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>440</x>
-     <y>575</y>
+     <x>176</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
-     <x>440</x>
-     <y>591</y>
+     <x>267</x>
+     <y>177</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>kdialogbuttonbox</sender>
+   <sender>dialogButtonBox</sender>
    <signal>rejected()</signal>
    <receiver>PgmArgsBase</receiver>
    <slot>reject()</slot>
    <hints>
     <hint type="sourcelabel">
-     <x>521</x>
-     <y>580</y>
+     <x>230</x>
+     <y>403</y>
     </hint>
     <hint type="destinationlabel">
-     <x>549</x>
-     <y>588</y>
+     <x>353</x>
+     <y>219</y>
     </hint>
    </hints>
   </connection>
