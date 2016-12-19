@@ -6,8 +6,8 @@
 
 #include "regwnd.h"
 #include "dbgdriver.h"
-#include <kglobalsettings.h>
 #include <klocale.h>			/* i18n */
+#include <QFontDatabase>
 #include <QMenu>
 #include <QRegExp>
 #include <QStringList>
@@ -412,7 +412,7 @@ void RegisterViewItem::setMode(RegisterDisplay mode)
 RegisterView::RegisterView(QWidget* parent) :
 	QTreeWidget(parent)
 {
-    setFont(KGlobalSettings::fixedFont());
+    setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 
     QTreeWidgetItem* header = headerItem();
     header->setText(0, i18n("Register"));
@@ -609,7 +609,7 @@ void RegisterView::changeEvent(QEvent* ev)
     switch (ev->type()) {
     case QEvent::ApplicationFontChange:
     case QEvent::FontChange:
-	setFont(KGlobalSettings::fixedFont());
+	setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 	break;
     default:
 	break;

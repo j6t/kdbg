@@ -11,12 +11,12 @@
 #include <QPainter>
 #include <QFile>
 #include <QFileInfo>
+#include <QFontDatabase>
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QKeyEvent>
 #include <QMouseEvent>
 #include <kiconloader.h>
-#include <kglobalsettings.h>
 #include <kxmlguiwindow.h>
 #include <kxmlguifactory.h>
 #include <algorithm>
@@ -40,7 +40,7 @@ SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
     m_brktmp = UserIcon("brktmp");
     m_brkcond = UserIcon("brkcond");
     m_brkorph = UserIcon("brkorph");
-    setFont(KGlobalSettings::fixedFont());
+    setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     setReadOnly(true);
     setViewportMargins(lineInfoAreaWidth(), 0, 0 ,0);
     setWordWrapMode(QTextOption::NoWrap);
@@ -510,7 +510,7 @@ void SourceWindow::changeEvent(QEvent* ev)
     switch (ev->type()) {
     case QEvent::ApplicationFontChange:
     case QEvent::FontChange:
-	setFont(KGlobalSettings::fixedFont());
+	setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
 	break;
     default:
 	break;
