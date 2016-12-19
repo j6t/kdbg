@@ -16,7 +16,6 @@
 #include <kactioncollection.h>
 #include <krecentfilesaction.h>
 #include <ktoggleaction.h>
-#include <kfiledialog.h>
 #include <kshortcutsdialog.h>
 #include <kanimatedbutton.h>
 #include <kwindowsystem.h>
@@ -26,6 +25,7 @@
 #include <KPageDialog>
 #include <QListWidget>
 #include <QFile>
+#include <QFileDialog>
 #include <QFileInfo>
 #include <QGuiApplication>
 #include <QList>
@@ -1077,10 +1077,10 @@ void DebuggerMainWnd::slotRecentExec(const QUrl& url)
 QString DebuggerMainWnd::makeSourceFilter()
 {
     QString f;
-    f = m_sourceFilter + " " + m_headerFilter + i18n("|All source files\n");
-    f += m_sourceFilter + i18n("|Source files\n");
-    f += m_headerFilter + i18n("|Header files\n");
-    f += i18n("*|All files");
+    f = i18n("All source files") + " (" + m_sourceFilter + " " + m_headerFilter + ")";
+    f += ";;" + i18n("Source files") + " (" + m_sourceFilter + ")";
+    f += ";;" + i18n("Header files") + " (" + m_headerFilter + ")";
+    f += ";;" + i18n("All files") + " (*)";
     return f;
 }
 
@@ -1145,22 +1145,6 @@ void DebuggerMainWnd::slotEditValue()
     }
 }
 
-// helper that gets a file name (it only differs in the caption of the dialog)
-static QString myGetFileName(QString caption,
-			     QString dir, QString filter,
-	 		     QWidget* parent)
-{
-    QString filename;
-    KFileDialog dlg(dir, filter, parent);
-
-    dlg.setWindowTitle(caption);
-
-    if (dlg.exec() == QDialog::Accepted)
-	filename = dlg.selectedFile();
-
-    return filename;
-}
-
 void DebuggerMainWnd::slotFileOpen()
 {
     // start browsing in the active file's directory
@@ -1172,9 +1156,8 @@ void DebuggerMainWnd::slotFileOpen()
 	dir = fi.path();
     }
 
-    fileName = myGetFileName(i18n("Open"),
-			     dir,
-			     makeSourceFilter(), this);
+    fileName = QFileDialog::getOpenFileName(this,
+			i18n("Open"), dir, makeSourceFilter());
 
     if (!fileName.isEmpty())
     {
@@ -1190,8 +1173,9 @@ void DebuggerMainWnd::slotFileExe()
     if (m_debugger->isIdle())
     {
 	// open a new executable
-	QString executable = myGetFileName(i18n("Select the executable to debug"),
-					   m_lastDirectory, 0, this);
+	QString executable = QFileDialog::getOpenFileName(this,
+				i18n("Select the Executable to Debug"),
+				m_lastDirectory);
 	if (executable.isEmpty())
 	    return;
 
@@ -1203,8 +1187,9 @@ void DebuggerMainWnd::slotFileCore()
 {
     if (m_debugger->canStart())
     {
-	QString corefile = myGetFileName(i18n("Select core dump"),
-					 m_lastDirectory, 0, this);
+	QString corefile = QFileDialog::getOpenFileName(this,
+				i18n("Select Core Dump"),
+				m_lastDirectory);
 	if (!corefile.isEmpty()) {
 	    m_debugger->useCoreFile(corefile, false);
 	}
