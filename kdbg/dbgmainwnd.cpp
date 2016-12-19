@@ -17,7 +17,6 @@
 #include <krecentfilesaction.h>
 #include <ktoggleaction.h>
 #include <kfiledialog.h>
-#include <kglobal.h>
 #include <kshortcutsdialog.h>
 #include <kanimatedbutton.h>
 #include <kwindowsystem.h>
@@ -180,7 +179,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 
     makeDefaultLayout();
     setupGUI(KXmlGuiWindow::Default, "kdbgui.rc");
-    restoreSettings(KGlobal::config());
+    restoreSettings(KSharedConfig::openConfig());
 
     // The animation button is not part of the restored window state.
     // We must create it after the toolbar was loaded.
@@ -192,7 +191,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 
 DebuggerMainWnd::~DebuggerMainWnd()
 {
-    saveSettings(KGlobal::config());
+    saveSettings(KSharedConfig::openConfig());
     // must delete m_debugger early since it references our windows
     delete m_debugger;
     m_debugger = 0;
