@@ -25,7 +25,7 @@
         </font>
        </property>
        <property name="text">
-        <string>&amp;Condition:</string>
+        <string>Condi&amp;tion:</string>
        </property>
        <property name="buddy">
         <cstring>condition</cstring>
@@ -33,7 +33,7 @@
       </widget>
      </item>
      <item row="0" column="1">
-      <widget class="KLineEdit" name="condition"/>
+      <widget class="QLineEdit" name="condition"/>
      </item>
      <item row="1" column="0">
       <widget class="QLabel" name="label_2">
@@ -78,13 +78,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>KLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>klineedit.h</header>
-  </customwidget>
- </customwidgets>
  <resources/>
  <connections>
   <connection>

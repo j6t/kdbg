@@ -34,11 +34,11 @@
       </widget>
      </item>
      <item>
-      <widget class="KLineEdit" name="filterEdit">
+      <widget class="QLineEdit" name="filterEdit">
        <property name="whatsThis">
         <string>Type the name of the process or its process ID (PID) here to reduce the number of entries in the list.</string>
        </property>
-       <property name="showClearButton" stdset="0">
+       <property name="clearButtonEnabled">
         <bool>true</bool>
        </property>
       </widget>
@@ -110,13 +110,6 @@
  </widget>
  <layoutdefault spacing="6" margin="10"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
- <customwidgets>
-  <customwidget>
-   <class>KLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>klineedit.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>processList</tabstop>
   <tabstop>buttonRefresh</tabstop>

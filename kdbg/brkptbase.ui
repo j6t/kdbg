@@ -17,8 +17,8 @@
    <item>
     <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="KLineEdit" name="bpEdit">
-       <property name="showClearButton" stdset="0">
+      <widget class="QLineEdit" name="bpEdit">
+       <property name="clearButtonEnabled">
         <bool>true</bool>
        </property>
       </widget>
@@ -118,13 +118,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>KLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>klineedit.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>bpEdit</tabstop>
   <tabstop>bpList</tabstop>
