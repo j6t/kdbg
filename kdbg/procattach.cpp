@@ -28,9 +28,9 @@ ProcAttachPS::ProcAttachPS(QWidget* parent) :
 	    this, SLOT(slotPSDone()));
 
     processList->setColumnWidth(0, 300);
-    processList->header()->setResizeMode(0, QHeaderView::Interactive);
-    processList->header()->setResizeMode(1, QHeaderView::ResizeToContents);
-    processList->header()->setResizeMode(2, QHeaderView::ResizeToContents);
+    processList->header()->setSectionResizeMode(0, QHeaderView::Interactive);
+    processList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    processList->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     processList->headerItem()->setTextAlignment(1, Qt::AlignRight);
     processList->headerItem()->setTextAlignment(2, Qt::AlignRight);
     processList->header()->setStretchLastSection(false);
@@ -148,7 +148,7 @@ void ProcAttachPS::pushLine()
 		// these columns are normally numbers
 		processList->headerItem()->setTextAlignment(i+1,
 					Qt::AlignRight);
-		processList->header()->setResizeMode(i+1,
+		processList->header()->setSectionResizeMode(i+1,
 					QHeaderView::ResizeToContents);
 	    }
 	}
