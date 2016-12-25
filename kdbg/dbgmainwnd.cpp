@@ -4,7 +4,6 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <kapplication.h>
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
 #include <kconfig.h>
@@ -262,7 +261,7 @@ void DebuggerMainWnd::initKAction()
     m_recentExecAction->setText(i18n("Recent E&xecutables"));
     m_coreDumpAction = createAction(i18n("&Core dump..."), 0,
 			this, SLOT(slotFileCore()), "file_core_dump");
-    KStandardAction::quit(kapp, SLOT(closeAllWindows()), actionCollection());
+    KStandardAction::quit(this, SLOT(close()), actionCollection());
 
     // settings menu
     m_settingsAction = createAction(i18n("This &Program..."), 0,
@@ -1119,7 +1118,7 @@ void DebuggerMainWnd::slotLocalsToWatch()
 void DebuggerMainWnd::slotEditValue()
 {
     // does one of the value trees have the focus
-    QWidget* f = kapp->focusWidget();
+    QWidget* f = QApplication::focusWidget();
     ExprWnd* wnd;
     if (f == m_localVariables) {
 	wnd = m_localVariables;
