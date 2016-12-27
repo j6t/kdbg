@@ -4,7 +4,7 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <kdebug.h>
+#include <QDebug>
 #include <assert.h>
 #include "config.h"
 
@@ -15,11 +15,11 @@
 #ifdef NDEBUG
 # define ASSERT(x) do {} while (0)
 #else
-# define ASSERT(x) kDebug(!(x)) << "assertion failed: " #x "\n"
+# define ASSERT(x) if (x) ; else void(qDebug() << "assertion failed: " #x "\n")
 #endif
 
 #ifdef WANT_TRACE_OUTPUT
-# define TRACE(x) kDebug() << (x)
+# define TRACE(x) qDebug() << (x)
 #else
 # define TRACE(x) do {} while (0)
 #endif
