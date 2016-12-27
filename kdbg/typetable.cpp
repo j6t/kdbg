@@ -103,7 +103,7 @@ void TypeTable::loadFromFile(const QString& fileName)
     m_enabledBuiltins = cf.readEntry(EnableBuiltin, QStringList());
 
     QString printQString = cf.readEntry(PrintQStringCmd);
-    m_printQStringDataCmd = printQString.toAscii();
+    m_printQStringDataCmd = printQString.toLatin1();
 
     /*
      * Get the types. We search for entries of kind Types1, Types2, etc.
