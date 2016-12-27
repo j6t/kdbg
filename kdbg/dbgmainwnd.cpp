@@ -8,7 +8,7 @@
 #include <kmessagebox.h>
 #include <kconfig.h>
 #include <kconfiggroup.h>
-#include <kicon.h>
+#include <kiconengine.h>
 #include <kiconloader.h>
 #include <kstandardaction.h>
 #include <kstandardshortcut.h>
@@ -27,6 +27,7 @@
 #include <QFileDialog>
 #include <QFileInfo>
 #include <QGuiApplication>
+#include <QIcon>
 #include <QList>
 #include <QDockWidget>
 #include <QProcess>
@@ -223,7 +224,7 @@ QAction* DebuggerMainWnd::createAction(const QString& text, const char* icon,
 {
     QAction* a = actionCollection()->addAction(name);
     a->setText(text);
-    a->setIcon(KIcon(icon));
+    a->setIcon(QIcon(new KIconEngine(icon, KIconLoader::global())));
     if (shortcut)
 	actionCollection()->setDefaultShortcut(a, QKeySequence(shortcut));
     connect(a, SIGNAL(triggered()), receiver, slot);
