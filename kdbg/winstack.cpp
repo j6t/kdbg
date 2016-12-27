@@ -19,7 +19,7 @@
 
 
 WinStack::WinStack(QWidget* parent) :
-	KTabWidget(parent),
+	QTabWidget(parent),
 	m_pcLine(-1),
 	m_tabWidth(0)
 {
@@ -243,7 +243,7 @@ void WinStack::slotFindBackward()
 bool WinStack::event(QEvent* evt)
 {
     if (evt->type() != QEvent::ToolTip)
-	return KTabWidget::event(evt);
+	return QTabWidget::event(evt);
 
     SourceWindow* w = activeWindow();
     if (w == 0)
@@ -365,7 +365,7 @@ void WinStack::slotClose()
     if (!w)
 	return;
 
-    removePage(w);
+    removeTab(currentIndex());
     delete w;
 }
 
