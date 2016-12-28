@@ -13,7 +13,11 @@ find_package(Qt5 ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
 )
 
 find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS
-    CoreAddons I18n WidgetsAddons KDELibs4Support
+    I18n
+    Config
+    IconThemes
+    XmlGui
+    WindowSystem
 )
 
 include(KDEInstallDirs)
