@@ -31,7 +31,6 @@ set(PICTOGRAMS
 install(FILES ${PICTOGRAMS} DESTINATION "${DATA_INSTALL_DIR}/kdbg/pics")
 
 ecm_install_icons(ICONS
-    16-apps-kdbg.png
     22-actions-pulse000000.png
     22-actions-pulse000001.png
     22-actions-pulse000002.png
@@ -61,10 +60,18 @@ ecm_install_icons(ICONS
     22-actions-pulse000026.png
     22-actions-pulse000027.png
     22-actions-pulse000028.png
-    32-apps-kdbg.png
-    48-apps-kdbg.png
     22-actions-pulse.mng
     DESTINATION "${DATA_INSTALL_DIR}/kdbg/icons"
+    THEME hicolor
+)
+ecm_install_icons(ICONS
+    16-apps-kdbg.png
+    32-apps-kdbg.png
+    48-apps-kdbg.png
+    64-apps-kdbg.png
+    128-apps-kdbg.png
+    ${CMAKE_CURRENT_BINARY_DIR}/sc-apps-kdbg.svgz
+    DESTINATION "${DATA_INSTALL_DIR}/icons"
     THEME hicolor
 )
 ecm_install_icons(ICONS
