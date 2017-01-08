@@ -24,13 +24,13 @@ Expr1=(%s)._M_stringbuf._M_string._M_dataplus._M_p
 
 [std::vector]
 Template=std::vector<*>
-Display={ size=% capcity=% }
+Display={ size=% capacity=% }
 Expr1=($vec=(%s)._M_impl)._M_finish-$vec._M_start
 Expr2=($vec=(%s)._M_impl)._M_end_of_storage-$vec._M_start
 
 [std::vector<bool>]
 Template=std::vector<bool,*>
-Display={ size=% capcity=% }
+Display={ size=% capacity=% }
 Expr1=(($vec=(%s)._M_impl)._M_finish._M_p-$vec._M_start._M_p)*sizeof(*$vec._M_end_of_storage)*8+$vec._M_finish._M_offset
 Expr2=(($vec=(%s)._M_impl)._M_end_of_storage-$vec._M_start._M_p)*sizeof(*$vec._M_end_of_storage)*8
 
