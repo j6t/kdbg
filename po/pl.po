@@ -320,7 +320,7 @@ msgid "A Debugger"
 msgstr ""
 
 #: main.cpp:27
-msgid "(c) 1998-2016 Johannes Sixt"
+msgid "(c) 1998-2017 Johannes Sixt"
 msgstr ""
 
 #: main.cpp:31
