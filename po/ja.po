@@ -4,7 +4,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: kdbg 1.1.7beta1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-08 21:47+0100\n"
 "PO-Revision-Date: 2000-05-12 20:54+0900\n"

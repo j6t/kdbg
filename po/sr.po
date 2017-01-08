@@ -5,7 +5,7 @@
 #
 msgid ""
 msgstr ""
-"Project-Id-Version: PACKAGE VERSION\n"
+"Project-Id-Version: kdbg 1.1.7beta1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-01-08 21:47+0100\n"
 "PO-Revision-Date: 2002-03-03 16:14MDT\n"
@@ -14,7 +14,7 @@ msgstr ""
 "Language: sr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
-"Content-Transfer-Encoding: ENCODING\n"
+"Content-Transfer-Encoding: 8bit\n"
 "X-Generator: KBabel 0.9.5\n"
 
 #. i18n: file: brkptbase.ui:85
