@@ -1,0 +1,28 @@
+KDbg Release Notes for version 2.9.0
+====================================
+
+Changes since 2.5.6
+-------------------
+
+Enhancements
+
+- A brand new application icon.
+
+- There is now a command to detach from a program being debugged.
+  Thanks to Daniel Black.
+
+- Pointing on a variable shows a value in a popup in more cases.
+  Thanks to Max Tomilov.
+
+- C++11 keywords are highlighted. Thanks to Michael Hansen.
+
+Bug fixes
+
+- Line breaks of status bar messages produced by GDB are now trimmed
+  to avoid that the text is only visible partially. Fix by Gilles Allard.
+
+- (Action and application) icons are installed in an application neutral
+  location because the launcher menu of modern KDE desktops does not show
+  the icon otherwise.
+
+- Fixed a typo in the pretty-printer of std::vector<>.

@@ -1,6 +1,6 @@
 cmake_minimum_required(VERSION 2.6)
 
-set(KDBG_VERSION 2.5.6)
+set(KDBG_VERSION 2.9.0)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kdbg/version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/kdbg/version.h)
 
 find_package(KDE4 REQUIRED)
