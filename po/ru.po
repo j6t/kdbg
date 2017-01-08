@@ -6,10 +6,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2013-03-16 16:29+0100\n"
+"POT-Creation-Date: 2017-01-08 21:47+0100\n"
 "PO-Revision-Date: 2013-03-16 18:38+0100\n"
 "Last-Translator: Ilmar Habibulin <ilmar@ints.ru>\n"
 "Language-Team: ru@li.org\n"
+"Language: \n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8-bit\n"
@@ -28,199 +29,203 @@ msgstr "&Включить"
 msgid ": Conditional breakpoint"
 msgstr ": Условная точка останова"
 
-#: dbgmainwnd.cpp:71
+#: dbgmainwnd.cpp:70
 msgid "active"
 msgstr "активный"
 
-#: dbgmainwnd.cpp:78
+#: dbgmainwnd.cpp:77
 msgid "Stack"
 msgstr "Стек"
 
-#: dbgmainwnd.cpp:81
+#: dbgmainwnd.cpp:80
 msgid "Locals"
 msgstr "Локальные переменные"
 
-#: dbgmainwnd.cpp:82
+#: dbgmainwnd.cpp:81
 msgid "Variable"
 msgstr "Переменная"
 
-#: dbgmainwnd.cpp:84
+#: dbgmainwnd.cpp:83
 msgid "Watches"
 msgstr "Список наблюдений"
 
-#: dbgmainwnd.cpp:87
+#: dbgmainwnd.cpp:86
 msgid "Registers"
 msgstr "Регистры"
 
-#: dbgmainwnd.cpp:90
+#: dbgmainwnd.cpp:89
 msgid "Breakpoints"
 msgstr "Точки останова"
 
-#: dbgmainwnd.cpp:93 pgmsettings.cpp:108
+#: dbgmainwnd.cpp:92 pgmsettings.cpp:108
 msgid "Output"
 msgstr "Вывод"
 
-#: dbgmainwnd.cpp:96
+#: dbgmainwnd.cpp:95
 msgid "Threads"
 msgstr "Потоки"
 
-#: dbgmainwnd.cpp:99
+#: dbgmainwnd.cpp:98
 msgid "Memory"
 msgstr "Память"
 
-#: dbgmainwnd.cpp:251
+#: dbgmainwnd.cpp:250
 msgid "&Open Source..."
 msgstr "&Открыть исходный текст..."
 
-#: dbgmainwnd.cpp:253
+#: dbgmainwnd.cpp:252
 msgid "&Reload Source"
 msgstr "&Перезагрузить исходный текст"
 
-#: dbgmainwnd.cpp:255
+#: dbgmainwnd.cpp:254
 msgid "&Executable..."
 msgstr "&Исполняемый модуль..."
 
-#: dbgmainwnd.cpp:261
+#: dbgmainwnd.cpp:260
 msgid "Recent E&xecutables"
 msgstr "По&следние файлы"
 
-#: dbgmainwnd.cpp:262
+#: dbgmainwnd.cpp:261
 msgid "&Core dump..."
 msgstr "&Образ памяти..."
 
-#: dbgmainwnd.cpp:267
+#: dbgmainwnd.cpp:266
 msgid "This &Program..."
 msgstr "Параметры п&рограммы..."
 
-#: dbgmainwnd.cpp:269
+#: dbgmainwnd.cpp:268
 msgid "&Global Options..."
 msgstr "Глобальные &Параметры..."
 
-#: dbgmainwnd.cpp:279
+#: dbgmainwnd.cpp:278
 msgid "Source &code"
 msgstr "Исходный &текст"
 
-#: dbgmainwnd.cpp:281
+#: dbgmainwnd.cpp:280
 msgid "Stac&k"
 msgstr "Сте&к"
 
-#: dbgmainwnd.cpp:282
+#: dbgmainwnd.cpp:281
 msgid "&Locals"
 msgstr "&Локальные переменные"
 
-#: dbgmainwnd.cpp:283
+#: dbgmainwnd.cpp:282
 msgid "&Watched expressions"
 msgstr "&Наблюдаемые выражения"
 
-#: dbgmainwnd.cpp:284
+#: dbgmainwnd.cpp:283
 msgid "&Registers"
 msgstr "&Регистры"
 
-#: dbgmainwnd.cpp:285
+#: dbgmainwnd.cpp:284
 msgid "&Breakpoints"
 msgstr "&Точки останова"
 
-#: dbgmainwnd.cpp:286
+#: dbgmainwnd.cpp:285
 msgid "T&hreads"
 msgstr "П&отоки"
 
-#: dbgmainwnd.cpp:287
+#: dbgmainwnd.cpp:286
 msgid "&Output"
 msgstr "&Вывод"
 
-#: dbgmainwnd.cpp:288
+#: dbgmainwnd.cpp:287
 msgid "&Memory"
 msgstr "&Память"
 
-#: dbgmainwnd.cpp:298
+#: dbgmainwnd.cpp:297
 msgid "&Run"
 msgstr "Запустить"
 
-#: dbgmainwnd.cpp:302
+#: dbgmainwnd.cpp:301
 msgid "Step &into"
 msgstr "Шаг &внутрь"
 
-#: dbgmainwnd.cpp:306
+#: dbgmainwnd.cpp:305
 msgid "Step &over"
 msgstr "Шаг &через"
 
-#: dbgmainwnd.cpp:310
+#: dbgmainwnd.cpp:309
 msgid "Step o&ut"
 msgstr "Шаг &изнутри"
 
-#: dbgmainwnd.cpp:314
+#: dbgmainwnd.cpp:313
 msgid "Run to &cursor"
 msgstr "Исполнять до &курсора"
 
-#: dbgmainwnd.cpp:318
+#: dbgmainwnd.cpp:317
 msgid "Step i&nto by instruction"
 msgstr "Шаг со в&ходом в инструкцию"
 
-#: dbgmainwnd.cpp:322
+#: dbgmainwnd.cpp:321
 msgid "Step o&ver by instruction"
 msgstr "Шаг в о&бход инструкции"
 
-#: dbgmainwnd.cpp:326
+#: dbgmainwnd.cpp:325
 msgid "&Program counter to current line"
 msgstr "&Установить счётчик команд на текущую строку"
 
-#: dbgmainwnd.cpp:329
+#: dbgmainwnd.cpp:328
 msgid "&Break"
 msgstr "&Приостановить"
 
-#: dbgmainwnd.cpp:331
+#: dbgmainwnd.cpp:330
 msgid "&Kill"
 msgstr "&Останов"
 
-#: dbgmainwnd.cpp:333
+#: dbgmainwnd.cpp:332
 msgid "Re&start"
 msgstr "Пере&запуск"
 
-#: dbgmainwnd.cpp:335
+#: dbgmainwnd.cpp:334
 msgid "A&ttach..."
 msgstr "Под&соединение..."
 
-#: dbgmainwnd.cpp:337
+#: dbgmainwnd.cpp:336
+msgid "&Detach"
+msgstr ""
+
+#: dbgmainwnd.cpp:338
 msgid "&Arguments..."
 msgstr "&Аргументы..."
 
-#: dbgmainwnd.cpp:341
+#: dbgmainwnd.cpp:342
 msgid "Set/Clear &breakpoint"
 msgstr "Установить/Снять &точку останова"
 
-#: dbgmainwnd.cpp:343
+#: dbgmainwnd.cpp:344
 msgid "Set &temporary breakpoint"
 msgstr "Установить &временную точку останова"
 
-#: dbgmainwnd.cpp:345
+#: dbgmainwnd.cpp:346
 msgid "&Enable/Disable breakpoint"
 msgstr "&Вкл/Выкл точку останова"
 
-#: dbgmainwnd.cpp:349
+#: dbgmainwnd.cpp:350
 msgid "Watch Expression"
 msgstr "Добавить наблюдение"
 
-#: dbgmainwnd.cpp:351
+#: dbgmainwnd.cpp:352
 msgid "Edit Value"
 msgstr "Изменить"
 
-#: dbgmainwnd.cpp:379
+#: dbgmainwnd.cpp:388
 msgid "Restart"
 msgstr "Перезапустить"
 
-#: dbgmainwnd.cpp:380
+#: dbgmainwnd.cpp:389
 msgid "Core dump"
 msgstr "Образ памяти процесса"
 
-#: dbgmainwnd.cpp:623
+#: dbgmainwnd.cpp:633
 msgid "`%1' is not a file or does not exist"
 msgstr "`%s' – не файл или не существует"
 
-#: dbgmainwnd.cpp:691
+#: dbgmainwnd.cpp:701
 msgid "Don't know how to debug language `%1'"
 msgstr "Не знаю как отлаживать программу на языке `%1'"
 
-#: dbgmainwnd.cpp:704
+#: dbgmainwnd.cpp:714
 msgid ""
 "Could not start the debugger process.\n"
 "Please shut down KDbg and resolve the problem."
@@ -228,51 +233,51 @@ msgstr ""
 "Не удалось запустить процесс отладчика.\n"
 "Пожалуйста, закройте KDbg и устраните проблему."
 
-#: dbgmainwnd.cpp:826
+#: dbgmainwnd.cpp:836
 msgid ": Global options"
 msgstr ": Глобальные параметры"
 
-#: dbgmainwnd.cpp:841 pgmsettings.cpp:107
+#: dbgmainwnd.cpp:851 pgmsettings.cpp:107
 msgid "Debugger"
 msgstr "Отладчик"
 
-#: dbgmainwnd.cpp:842
+#: dbgmainwnd.cpp:852
 msgid "Miscellaneous"
 msgstr "Разное"
 
-#: dbgmainwnd.cpp:980
+#: dbgmainwnd.cpp:990
 msgid ": Program output"
 msgstr ": Вывод программы"
 
-#: dbgmainwnd.cpp:1070
+#: dbgmainwnd.cpp:1080
 msgid "|All source files\n"
 msgstr "|Все файлы исходников\n"
 
-#: dbgmainwnd.cpp:1071
+#: dbgmainwnd.cpp:1081
 msgid "|Source files\n"
 msgstr "|Исходные тексты\n"
 
-#: dbgmainwnd.cpp:1072
+#: dbgmainwnd.cpp:1082
 msgid "|Header files\n"
 msgstr "|Заголовочные файлы\n"
 
-#: dbgmainwnd.cpp:1073
+#: dbgmainwnd.cpp:1083
 msgid "*|All files"
 msgstr "*|Все файлы"
 
-#: dbgmainwnd.cpp:1165
+#: dbgmainwnd.cpp:1175
 msgid "Open"
 msgstr "Открыть"
 
-#: dbgmainwnd.cpp:1183
+#: dbgmainwnd.cpp:1193
 msgid "Select the executable to debug"
 msgstr "Выберите исполняемый модуль для отладки"
 
-#: dbgmainwnd.cpp:1196
+#: dbgmainwnd.cpp:1206
 msgid "Select core dump"
 msgstr "Выберите сохраненный образ памяти процесса"
 
-#: debugger.cpp:681
+#: debugger.cpp:693
 msgid ""
 "%1 exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
@@ -280,7 +285,7 @@ msgstr ""
 "%1 неожиданно завершился\n"
 "Перезапустите сессию (например, через Файл|Исполняемый модуль)."
 
-#: debugger.cpp:872
+#: debugger.cpp:886
 msgid ""
 "The settings for this program specify the following debugger command:\n"
 "%1\n"
@@ -292,19 +297,19 @@ msgstr ""
 
 #. i18n: file: pgmargsbase.ui:234
 #. i18n: ectx: property (text), widget (QTreeWidget, envList)
-#: exprwnd.cpp:314 regwnd.cpp:417 rc.cpp:127
+#: exprwnd.cpp:321 regwnd.cpp:419 rc.cpp:127
 msgid "Value"
 msgstr "Значение"
 
-#: gdbdriver.cpp:922
+#: gdbdriver.cpp:943
 msgid "<anonymous struct or union>"
 msgstr "<анонимная структура или объединение>"
 
-#: gdbdriver.cpp:1569
+#: gdbdriver.cpp:1648
 msgid "<additional entries of the array suppressed>"
 msgstr "<остальные элементы массива скрыты>"
 
-#: gdbdriver.cpp:2221 xsldbgdriver.cpp:1288
+#: gdbdriver.cpp:2285 xsldbgdriver.cpp:1286
 msgid "New working directory: "
 msgstr "Новая рабочая директория: "
 
@@ -556,23 +561,23 @@ msgstr "Вещественное (&f)"
 msgid "&Real (g)"
 msgstr "&Вещественное (g)"
 
-#: regwnd.cpp:416
+#: regwnd.cpp:418
 msgid "Register"
 msgstr "Регистр"
 
-#: regwnd.cpp:418
+#: regwnd.cpp:420
 msgid "Decoded value"
 msgstr "Декодированное значение"
 
-#: regwnd.cpp:434
+#: regwnd.cpp:436
 msgid "GP and others"
 msgstr "GP и другие"
 
-#: regwnd.cpp:436
+#: regwnd.cpp:438
 msgid "Flags"
 msgstr "Флаги"
 
-#: regwnd.cpp:439
+#: regwnd.cpp:441
 msgid "x86/x87 segment"
 msgstr "Сегмент x86/x87"
 
@@ -622,7 +627,7 @@ msgstr "&Назад"
 msgid "Close"
 msgstr "Закрыть"
 
-#: xsldbgdriver.cpp:1386
+#: xsldbgdriver.cpp:1384
 msgid "No memory dump available"
 msgstr "Нет дампа памяти"
 
@@ -722,13 +727,13 @@ msgstr "&Вид"
 msgid "E&xecution"
 msgstr "&Исполнение"
 
-#. i18n: file: kdbgui.rc:42
+#. i18n: file: kdbgui.rc:43
 #. i18n: ectx: Menu (breakpoint)
 #: rc.cpp:60
 msgid "&Breakpoint"
 msgstr "&Точки останова"
 
-#. i18n: file: kdbgui.rc:47
+#. i18n: file: kdbgui.rc:48
 #. i18n: ectx: Menu (settings)
 #: rc.cpp:63
 msgid "&Settings"
@@ -857,8 +862,8 @@ msgid ""
 "To add a new environment variable or to modify one, specify it here in the "
 "form <tt>NAME=value</tt> and click <b>Modify</b>."
 msgstr ""
-"Чтобы добавить или изменить переменную окружения, укажите её в виде <tt>"
-"ИМЯ=значение</tt> и нажмите <b>Изменить</b>."
+"Чтобы добавить или изменить переменную окружения, укажите её в виде "
+"<tt>ИМЯ=значение</tt> и нажмите <b>Изменить</b>."
 
 #. i18n: file: pgmargsbase.ui:216
 #. i18n: ectx: property (whatsThis), widget (QTreeWidget, envList)
@@ -872,11 +877,10 @@ msgid ""
 "click <b>Delete</b>."
 msgstr ""
 "Переменные окружения, заданные <i>в дополнение</i> к унаследованным, "
-"перечислены в таблице. Чтобы добавить новые переменные, укажите их в виде <"
-"tt>ИМЯ=значение</tt> и нажмите <b>Изменить</b>. Чтобы изменить значение, "
-"выберите его в списке и нажмите"
-"<b>Изменить</b>. Чтобы удалить переменную, выберите её в списке и нажмите <b>"
-"Удалить</b>. "
+"перечислены в таблице. Чтобы добавить новые переменные, укажите их в виде "
+"<tt>ИМЯ=значение</tt> и нажмите <b>Изменить</b>. Чтобы изменить значение, "
+"выберите его в списке и нажмите<b>Изменить</b>. Чтобы удалить переменную, "
+"выберите её в списке и нажмите <b>Удалить</b>. "
 
 #. i18n: file: pgmargsbase.ui:229
 #. i18n: ectx: property (text), widget (QTreeWidget, envList)
@@ -969,9 +973,8 @@ msgstr ""
 "не всегда, содержит команду запуска данного процесса. Колонка <i>PID</i> "
 "показывает ID процесса. Колонка <i>PPID</i> показывает ID родительского "
 "процесса. Другие колонки показывают дополнительную информацию о процессах, "
-"доступную через команду <i>ps</i>.</p><p>Список автоматически не обновляется."
-" "
-"Используйте кнопку <b>Обновить</b> для этой цели.</p>"
+"доступную через команду <i>ps</i>.</p><p>Список автоматически не "
+"обновляется. Используйте кнопку <b>Обновить</b> для этой цели.</p>"
 
 #. i18n: file: procattachbase.ui:66
 #. i18n: ectx: property (text), widget (QTreeWidget, processList)

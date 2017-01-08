@@ -7,10 +7,11 @@ msgid ""
 msgstr ""
 "Project-Id-Version: PACKAGE VERSION\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 22:35+0100\n"
+"POT-Creation-Date: 2017-01-08 21:47+0100\n"
 "PO-Revision-Date: 2002-03-03 16:14MDT\n"
 "Last-Translator: Strahinja Radić <mr99164@alas.matf.bg.ac.yu>\n"
 "Language-Team: Serbian <LL@kde.org.yu>\n"
+"Language: sr\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: ENCODING\n"
@@ -30,256 +31,260 @@ msgstr ""
 msgid ": Conditional breakpoint"
 msgstr ": Uslovni prekid"
 
-#: dbgmainwnd.cpp:71
+#: dbgmainwnd.cpp:70
 msgid "active"
 msgstr "aktivan"
 
-#: dbgmainwnd.cpp:78
+#: dbgmainwnd.cpp:77
 msgid "Stack"
 msgstr ""
 
-#: dbgmainwnd.cpp:81
+#: dbgmainwnd.cpp:80
 msgid "Locals"
 msgstr ""
 
-#: dbgmainwnd.cpp:82
+#: dbgmainwnd.cpp:81
 #, fuzzy
 msgid "Variable"
 msgstr "Vrednost"
 
-#: dbgmainwnd.cpp:84
+#: dbgmainwnd.cpp:83
 msgid "Watches"
 msgstr ""
 
-#: dbgmainwnd.cpp:87
+#: dbgmainwnd.cpp:86
 #, fuzzy
 msgid "Registers"
 msgstr "Pokreni ponovo"
 
-#: dbgmainwnd.cpp:90
+#: dbgmainwnd.cpp:89
 msgid "Breakpoints"
 msgstr "Prekidi"
 
-#: dbgmainwnd.cpp:93 pgmsettings.cpp:108
+#: dbgmainwnd.cpp:92 pgmsettings.cpp:108
 msgid "Output"
 msgstr ""
 
-#: dbgmainwnd.cpp:96
+#: dbgmainwnd.cpp:95
 msgid "Threads"
 msgstr ""
 
-#: dbgmainwnd.cpp:99
+#: dbgmainwnd.cpp:98
 msgid "Memory"
 msgstr ""
 
-#: dbgmainwnd.cpp:251
+#: dbgmainwnd.cpp:250
 msgid "&Open Source..."
 msgstr "&Otvori izvorni kod..."
 
-#: dbgmainwnd.cpp:253
+#: dbgmainwnd.cpp:252
 msgid "&Reload Source"
 msgstr "&Ponovo učitaj izvorni kod"
 
-#: dbgmainwnd.cpp:255
+#: dbgmainwnd.cpp:254
 msgid "&Executable..."
 msgstr "&Program..."
 
-#: dbgmainwnd.cpp:261
+#: dbgmainwnd.cpp:260
 #, fuzzy
 msgid "Recent E&xecutables"
 msgstr "Program"
 
-#: dbgmainwnd.cpp:262
+#: dbgmainwnd.cpp:261
 msgid "&Core dump..."
 msgstr "&Core fajl..."
 
-#: dbgmainwnd.cpp:267
+#: dbgmainwnd.cpp:266
 msgid "This &Program..."
 msgstr ""
 
-#: dbgmainwnd.cpp:269
+#: dbgmainwnd.cpp:268
 msgid "&Global Options..."
 msgstr "&Globalna podešavanja..."
 
-#: dbgmainwnd.cpp:279
+#: dbgmainwnd.cpp:278
 msgid "Source &code"
 msgstr ""
 
-#: dbgmainwnd.cpp:281
+#: dbgmainwnd.cpp:280
 msgid "Stac&k"
 msgstr ""
 
-#: dbgmainwnd.cpp:282
+#: dbgmainwnd.cpp:281
 msgid "&Locals"
 msgstr ""
 
-#: dbgmainwnd.cpp:283
+#: dbgmainwnd.cpp:282
 msgid "&Watched expressions"
 msgstr ""
 
-#: dbgmainwnd.cpp:284
+#: dbgmainwnd.cpp:283
 msgid "&Registers"
 msgstr ""
 
-#: dbgmainwnd.cpp:285
+#: dbgmainwnd.cpp:284
 #, fuzzy
 msgid "&Breakpoints"
 msgstr "Prekidi"
 
-#: dbgmainwnd.cpp:286
+#: dbgmainwnd.cpp:285
 msgid "T&hreads"
 msgstr ""
 
-#: dbgmainwnd.cpp:287
+#: dbgmainwnd.cpp:286
 msgid "&Output"
 msgstr ""
 
-#: dbgmainwnd.cpp:288
+#: dbgmainwnd.cpp:287
 msgid "&Memory"
 msgstr ""
 
-#: dbgmainwnd.cpp:298
+#: dbgmainwnd.cpp:297
 msgid "&Run"
 msgstr "&Pokreni"
 
-#: dbgmainwnd.cpp:302
+#: dbgmainwnd.cpp:301
 msgid "Step &into"
 msgstr "Kroči &u"
 
-#: dbgmainwnd.cpp:306
+#: dbgmainwnd.cpp:305
 msgid "Step &over"
 msgstr "Kroči prek&o"
 
-#: dbgmainwnd.cpp:310
+#: dbgmainwnd.cpp:309
 msgid "Step o&ut"
 msgstr "Kroči &iz"
 
-#: dbgmainwnd.cpp:314
+#: dbgmainwnd.cpp:313
 msgid "Run to &cursor"
 msgstr "Izvrši do &kursora"
 
-#: dbgmainwnd.cpp:318
+#: dbgmainwnd.cpp:317
 msgid "Step i&nto by instruction"
 msgstr ""
 
-#: dbgmainwnd.cpp:322
+#: dbgmainwnd.cpp:321
 msgid "Step o&ver by instruction"
 msgstr ""
 
-#: dbgmainwnd.cpp:326
+#: dbgmainwnd.cpp:325
 msgid "&Program counter to current line"
 msgstr ""
 
-#: dbgmainwnd.cpp:329
+#: dbgmainwnd.cpp:328
 msgid "&Break"
 msgstr "P&rekid"
 
-#: dbgmainwnd.cpp:331
+#: dbgmainwnd.cpp:330
 msgid "&Kill"
 msgstr ""
 
-#: dbgmainwnd.cpp:333
+#: dbgmainwnd.cpp:332
 msgid "Re&start"
 msgstr "Po&novo pokreni"
 
-#: dbgmainwnd.cpp:335
+#: dbgmainwnd.cpp:334
 msgid "A&ttach..."
 msgstr "&Zakači..."
 
-#: dbgmainwnd.cpp:337
+#: dbgmainwnd.cpp:336
+msgid "&Detach"
+msgstr ""
+
+#: dbgmainwnd.cpp:338
 msgid "&Arguments..."
 msgstr "&Argumenti..."
 
-#: dbgmainwnd.cpp:341
+#: dbgmainwnd.cpp:342
 msgid "Set/Clear &breakpoint"
 msgstr "Postavi/očisti p&rekid"
 
-#: dbgmainwnd.cpp:343
+#: dbgmainwnd.cpp:344
 msgid "Set &temporary breakpoint"
 msgstr "Pos&tavi privremeni prekid"
 
-#: dbgmainwnd.cpp:345
+#: dbgmainwnd.cpp:346
 msgid "&Enable/Disable breakpoint"
 msgstr "Omogući/on&emogući prekid"
 
-#: dbgmainwnd.cpp:349
+#: dbgmainwnd.cpp:350
 msgid "Watch Expression"
 msgstr ""
 
-#: dbgmainwnd.cpp:351
+#: dbgmainwnd.cpp:352
 #, fuzzy
 msgid "Edit Value"
 msgstr "Vrednost"
 
-#: dbgmainwnd.cpp:379
+#: dbgmainwnd.cpp:388
 msgid "Restart"
 msgstr "Pokreni ponovo"
 
-#: dbgmainwnd.cpp:380
+#: dbgmainwnd.cpp:389
 msgid "Core dump"
 msgstr "Core fajl"
 
-#: dbgmainwnd.cpp:623
+#: dbgmainwnd.cpp:633
 msgid "`%1' is not a file or does not exist"
 msgstr "`%1' nije fajl ili ne postoji"
 
-#: dbgmainwnd.cpp:691
+#: dbgmainwnd.cpp:701
 msgid "Don't know how to debug language `%1'"
 msgstr ""
 
-#: dbgmainwnd.cpp:704
+#: dbgmainwnd.cpp:714
 msgid ""
 "Could not start the debugger process.\n"
 "Please shut down KDbg and resolve the problem."
 msgstr ""
 
-#: dbgmainwnd.cpp:826
+#: dbgmainwnd.cpp:836
 msgid ": Global options"
 msgstr ": Globalna podešavanja"
 
-#: dbgmainwnd.cpp:841 pgmsettings.cpp:107
+#: dbgmainwnd.cpp:851 pgmsettings.cpp:107
 msgid "Debugger"
 msgstr ""
 
-#: dbgmainwnd.cpp:842
+#: dbgmainwnd.cpp:852
 msgid "Miscellaneous"
 msgstr ""
 
-#: dbgmainwnd.cpp:980
+#: dbgmainwnd.cpp:990
 msgid ": Program output"
 msgstr ": Izlaz programa"
 
-#: dbgmainwnd.cpp:1070
+#: dbgmainwnd.cpp:1080
 #, fuzzy
 msgid "|All source files\n"
 msgstr "Ponovo učitaj izvorni kod"
 
-#: dbgmainwnd.cpp:1071
+#: dbgmainwnd.cpp:1081
 #, fuzzy
 msgid "|Source files\n"
 msgstr "Otvori izvorni kod"
 
-#: dbgmainwnd.cpp:1072
+#: dbgmainwnd.cpp:1082
 msgid "|Header files\n"
 msgstr ""
 
-#: dbgmainwnd.cpp:1073
+#: dbgmainwnd.cpp:1083
 msgid "*|All files"
 msgstr ""
 
-#: dbgmainwnd.cpp:1165
+#: dbgmainwnd.cpp:1175
 msgid "Open"
 msgstr ""
 
-#: dbgmainwnd.cpp:1183
+#: dbgmainwnd.cpp:1193
 msgid "Select the executable to debug"
 msgstr "Izaberite program za trebljenje"
 
-#: dbgmainwnd.cpp:1196
+#: dbgmainwnd.cpp:1206
 msgid "Select core dump"
 msgstr "Izaberite core fajl"
 
-#: debugger.cpp:650
+#: debugger.cpp:693
 msgid ""
 "%1 exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
@@ -287,7 +292,7 @@ msgstr ""
 "%1 je neočekivano izašao.\n"
 "Ponovo pokrenite seansu (npr. sa Fajl|Program)."
 
-#: debugger.cpp:841
+#: debugger.cpp:886
 msgid ""
 "The settings for this program specify the following debugger command:\n"
 "%1\n"
@@ -296,19 +301,19 @@ msgstr ""
 
 #. i18n: file: pgmargsbase.ui:234
 #. i18n: ectx: property (text), widget (QTreeWidget, envList)
-#: exprwnd.cpp:312 regwnd.cpp:417 rc.cpp:127
+#: exprwnd.cpp:321 regwnd.cpp:419 rc.cpp:127
 msgid "Value"
 msgstr "Vrednost"
 
-#: gdbdriver.cpp:911
+#: gdbdriver.cpp:943
 msgid "<anonymous struct or union>"
 msgstr ""
 
-#: gdbdriver.cpp:1526
+#: gdbdriver.cpp:1648
 msgid "<additional entries of the array suppressed>"
 msgstr ""
 
-#: gdbdriver.cpp:2084 xsldbgdriver.cpp:1287
+#: gdbdriver.cpp:2285 xsldbgdriver.cpp:1286
 msgid "New working directory: "
 msgstr "Novi radni direktorijum: "
 
@@ -560,24 +565,24 @@ msgstr ""
 msgid "&Real (g)"
 msgstr ""
 
-#: regwnd.cpp:416
+#: regwnd.cpp:418
 #, fuzzy
 msgid "Register"
 msgstr "Pokreni ponovo"
 
-#: regwnd.cpp:418
+#: regwnd.cpp:420
 msgid "Decoded value"
 msgstr ""
 
-#: regwnd.cpp:434
+#: regwnd.cpp:436
 msgid "GP and others"
 msgstr ""
 
-#: regwnd.cpp:436
+#: regwnd.cpp:438
 msgid "Flags"
 msgstr ""
 
-#: regwnd.cpp:439
+#: regwnd.cpp:441
 msgid "x86/x87 segment"
 msgstr ""
 
@@ -608,27 +613,27 @@ msgstr " Briši "
 msgid "Expression"
 msgstr "I&zvršavanje"
 
-#: winstack.cpp:384
+#: winstack.cpp:382
 msgid ": Search"
 msgstr ": Pretraga"
 
-#: winstack.cpp:391
+#: winstack.cpp:389
 msgid "&Case sensitive"
 msgstr "&Razlikuj velika i mala slova"
 
-#: winstack.cpp:393
+#: winstack.cpp:391
 msgid "&Forward"
 msgstr "&Napred"
 
-#: winstack.cpp:395
+#: winstack.cpp:393
 msgid "&Backward"
 msgstr "&Nazad"
 
-#: winstack.cpp:396
+#: winstack.cpp:394
 msgid "Close"
 msgstr ""
 
-#: xsldbgdriver.cpp:1385
+#: xsldbgdriver.cpp:1384
 msgid "No memory dump available"
 msgstr ""
 
@@ -731,13 +736,13 @@ msgstr "&Pregled koda"
 msgid "E&xecution"
 msgstr "I&zvršavanje"
 
-#. i18n: file: kdbgui.rc:42
+#. i18n: file: kdbgui.rc:43
 #. i18n: ectx: Menu (breakpoint)
 #: rc.cpp:60
 msgid "&Breakpoint"
 msgstr "&Prekid"
 
-#. i18n: file: kdbgui.rc:47
+#. i18n: file: kdbgui.rc:48
 #. i18n: ectx: Menu (settings)
 #: rc.cpp:63
 #, fuzzy

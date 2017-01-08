@@ -5,7 +5,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 1.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2011-03-01 22:35+0100\n"
+"POT-Creation-Date: 2017-01-08 21:47+0100\n"
 "PO-Revision-Date: 2002-03-03 16:12MDT\n"
 "Last-Translator: Jacek Wojdel <wojdel@kbs.twi.tudelft.nl>\n"
 "MIME-Version: 1.0\n"
@@ -27,258 +27,262 @@ msgstr ""
 msgid ": Conditional breakpoint"
 msgstr ": Warunkowy punkt zatrzymania"
 
-#: dbgmainwnd.cpp:71
+#: dbgmainwnd.cpp:70
 msgid "active"
 msgstr "aktywny"
 
-#: dbgmainwnd.cpp:78
+#: dbgmainwnd.cpp:77
 msgid "Stack"
 msgstr ""
 
-#: dbgmainwnd.cpp:81
+#: dbgmainwnd.cpp:80
 msgid "Locals"
 msgstr ""
 
-#: dbgmainwnd.cpp:82
+#: dbgmainwnd.cpp:81
 #, fuzzy
 msgid "Variable"
 msgstr "Wartość"
 
-#: dbgmainwnd.cpp:84
+#: dbgmainwnd.cpp:83
 msgid "Watches"
 msgstr ""
 
-#: dbgmainwnd.cpp:87
+#: dbgmainwnd.cpp:86
 #, fuzzy
 msgid "Registers"
 msgstr "Restartuj"
 
-#: dbgmainwnd.cpp:90
+#: dbgmainwnd.cpp:89
 msgid "Breakpoints"
 msgstr "Punkty zatrzymania"
 
-#: dbgmainwnd.cpp:93 pgmsettings.cpp:108
+#: dbgmainwnd.cpp:92 pgmsettings.cpp:108
 msgid "Output"
 msgstr ""
 
-#: dbgmainwnd.cpp:96
+#: dbgmainwnd.cpp:95
 msgid "Threads"
 msgstr ""
 
-#: dbgmainwnd.cpp:99
+#: dbgmainwnd.cpp:98
 msgid "Memory"
 msgstr ""
 
-#: dbgmainwnd.cpp:251
+#: dbgmainwnd.cpp:250
 msgid "&Open Source..."
 msgstr "&Otwórz źródła..."
 
-#: dbgmainwnd.cpp:253
+#: dbgmainwnd.cpp:252
 msgid "&Reload Source"
 msgstr "P&rzeładuj źródła..."
 
-#: dbgmainwnd.cpp:255
+#: dbgmainwnd.cpp:254
 msgid "&Executable..."
 msgstr "Plik &wykonywalny..."
 
-#: dbgmainwnd.cpp:261
+#: dbgmainwnd.cpp:260
 #, fuzzy
 msgid "Recent E&xecutables"
 msgstr "Plik wykonywalny"
 
-#: dbgmainwnd.cpp:262
+#: dbgmainwnd.cpp:261
 msgid "&Core dump..."
 msgstr "&Zrzut rdzenia..."
 
-#: dbgmainwnd.cpp:267
+#: dbgmainwnd.cpp:266
 msgid "This &Program..."
 msgstr ""
 
-#: dbgmainwnd.cpp:269
+#: dbgmainwnd.cpp:268
 msgid "&Global Options..."
 msgstr "Opcje o&gólne..."
 
-#: dbgmainwnd.cpp:279
+#: dbgmainwnd.cpp:278
 msgid "Source &code"
 msgstr ""
 
-#: dbgmainwnd.cpp:281
+#: dbgmainwnd.cpp:280
 msgid "Stac&k"
 msgstr ""
 
-#: dbgmainwnd.cpp:282
+#: dbgmainwnd.cpp:281
 msgid "&Locals"
 msgstr ""
 
-#: dbgmainwnd.cpp:283
+#: dbgmainwnd.cpp:282
 msgid "&Watched expressions"
 msgstr ""
 
-#: dbgmainwnd.cpp:284
+#: dbgmainwnd.cpp:283
 #, fuzzy
 msgid "&Registers"
 msgstr "Restartuj"
 
-#: dbgmainwnd.cpp:285
+#: dbgmainwnd.cpp:284
 #, fuzzy
 msgid "&Breakpoints"
 msgstr "Punkty zatrzymania"
 
-#: dbgmainwnd.cpp:286
+#: dbgmainwnd.cpp:285
 msgid "T&hreads"
 msgstr ""
 
-#: dbgmainwnd.cpp:287
+#: dbgmainwnd.cpp:286
 msgid "&Output"
 msgstr ""
 
-#: dbgmainwnd.cpp:288
+#: dbgmainwnd.cpp:287
 msgid "&Memory"
 msgstr ""
 
-#: dbgmainwnd.cpp:298
+#: dbgmainwnd.cpp:297
 msgid "&Run"
 msgstr "U&ruchom"
 
-#: dbgmainwnd.cpp:302
+#: dbgmainwnd.cpp:301
 msgid "Step &into"
 msgstr "Wejdź &w"
 
-#: dbgmainwnd.cpp:306
+#: dbgmainwnd.cpp:305
 msgid "Step &over"
 msgstr "Przejdź &przez"
 
-#: dbgmainwnd.cpp:310
+#: dbgmainwnd.cpp:309
 msgid "Step o&ut"
 msgstr "Wyjdź &z"
 
-#: dbgmainwnd.cpp:314
+#: dbgmainwnd.cpp:313
 msgid "Run to &cursor"
 msgstr "Uruchom do &kursora"
 
-#: dbgmainwnd.cpp:318
+#: dbgmainwnd.cpp:317
 msgid "Step i&nto by instruction"
 msgstr ""
 
-#: dbgmainwnd.cpp:322
+#: dbgmainwnd.cpp:321
 msgid "Step o&ver by instruction"
 msgstr ""
 
-#: dbgmainwnd.cpp:326
+#: dbgmainwnd.cpp:325
 msgid "&Program counter to current line"
 msgstr ""
 
-#: dbgmainwnd.cpp:329
+#: dbgmainwnd.cpp:328
 msgid "&Break"
 msgstr "&Zatrzymaj"
 
-#: dbgmainwnd.cpp:331
+#: dbgmainwnd.cpp:330
 msgid "&Kill"
 msgstr ""
 
-#: dbgmainwnd.cpp:333
+#: dbgmainwnd.cpp:332
 msgid "Re&start"
 msgstr "Re&startuj"
 
-#: dbgmainwnd.cpp:335
+#: dbgmainwnd.cpp:334
 msgid "A&ttach..."
 msgstr "&Podłącz..."
 
-#: dbgmainwnd.cpp:337
+#: dbgmainwnd.cpp:336
+msgid "&Detach"
+msgstr ""
+
+#: dbgmainwnd.cpp:338
 msgid "&Arguments..."
 msgstr "&Argumenty..."
 
-#: dbgmainwnd.cpp:341
+#: dbgmainwnd.cpp:342
 msgid "Set/Clear &breakpoint"
 msgstr "Ustaw/usuń punkt &zatrzymania"
 
-#: dbgmainwnd.cpp:343
+#: dbgmainwnd.cpp:344
 msgid "Set &temporary breakpoint"
 msgstr "Us&taw chwilowy punkt zatrzymania"
 
-#: dbgmainwnd.cpp:345
+#: dbgmainwnd.cpp:346
 msgid "&Enable/Disable breakpoint"
 msgstr "&Włącz/wyłącz punkt zatrzymania"
 
-#: dbgmainwnd.cpp:349
+#: dbgmainwnd.cpp:350
 msgid "Watch Expression"
 msgstr ""
 
-#: dbgmainwnd.cpp:351
+#: dbgmainwnd.cpp:352
 #, fuzzy
 msgid "Edit Value"
 msgstr "Wartość"
 
-#: dbgmainwnd.cpp:379
+#: dbgmainwnd.cpp:388
 msgid "Restart"
 msgstr "Restartuj"
 
-#: dbgmainwnd.cpp:380
+#: dbgmainwnd.cpp:389
 msgid "Core dump"
 msgstr "Zrzut rdzenia"
 
-#: dbgmainwnd.cpp:623
+#: dbgmainwnd.cpp:633
 #, fuzzy
 msgid "`%1' is not a file or does not exist"
 msgstr "%1' nie jest plikiem lub nie istnieje"
 
-#: dbgmainwnd.cpp:691
+#: dbgmainwnd.cpp:701
 msgid "Don't know how to debug language `%1'"
 msgstr ""
 
-#: dbgmainwnd.cpp:704
+#: dbgmainwnd.cpp:714
 msgid ""
 "Could not start the debugger process.\n"
 "Please shut down KDbg and resolve the problem."
 msgstr ""
 
-#: dbgmainwnd.cpp:826
+#: dbgmainwnd.cpp:836
 msgid ": Global options"
 msgstr ": Ogólne opcje"
 
-#: dbgmainwnd.cpp:841 pgmsettings.cpp:107
+#: dbgmainwnd.cpp:851 pgmsettings.cpp:107
 msgid "Debugger"
 msgstr ""
 
-#: dbgmainwnd.cpp:842
+#: dbgmainwnd.cpp:852
 msgid "Miscellaneous"
 msgstr ""
 
-#: dbgmainwnd.cpp:980
+#: dbgmainwnd.cpp:990
 msgid ": Program output"
 msgstr ": Wyniki działania programu"
 
-#: dbgmainwnd.cpp:1070
+#: dbgmainwnd.cpp:1080
 #, fuzzy
 msgid "|All source files\n"
 msgstr "Przeładuj plik źródłowy"
 
-#: dbgmainwnd.cpp:1071
+#: dbgmainwnd.cpp:1081
 #, fuzzy
 msgid "|Source files\n"
 msgstr "Otwórz plik źródłowy"
 
-#: dbgmainwnd.cpp:1072
+#: dbgmainwnd.cpp:1082
 msgid "|Header files\n"
 msgstr ""
 
-#: dbgmainwnd.cpp:1073
+#: dbgmainwnd.cpp:1083
 msgid "*|All files"
 msgstr ""
 
-#: dbgmainwnd.cpp:1165
+#: dbgmainwnd.cpp:1175
 msgid "Open"
 msgstr ""
 
-#: dbgmainwnd.cpp:1183
+#: dbgmainwnd.cpp:1193
 msgid "Select the executable to debug"
 msgstr "Wybierz plik wykonywalny do debugowania"
 
-#: dbgmainwnd.cpp:1196
+#: dbgmainwnd.cpp:1206
 msgid "Select core dump"
 msgstr "Wybierz zrzut rdzenia"
 
-#: debugger.cpp:650
+#: debugger.cpp:693
 msgid ""
 "%1 exited unexpectedly.\n"
 "Restart the session (e.g. with File|Executable)."
@@ -286,7 +290,7 @@ msgstr ""
 "%1 niespodziewanie zakończył pracę.\n"
 "Uruchom sesję ponownie (np. używając Plik|Plik wykonywalny)."
 
-#: debugger.cpp:841
+#: debugger.cpp:886
 msgid ""
 "The settings for this program specify the following debugger command:\n"
 "%1\n"
@@ -295,19 +299,19 @@ msgstr ""
 
 #. i18n: file: pgmargsbase.ui:234
 #. i18n: ectx: property (text), widget (QTreeWidget, envList)
-#: exprwnd.cpp:312 regwnd.cpp:417 rc.cpp:127
+#: exprwnd.cpp:321 regwnd.cpp:419 rc.cpp:127
 msgid "Value"
 msgstr "Wartość"
 
-#: gdbdriver.cpp:911
+#: gdbdriver.cpp:943
 msgid "<anonymous struct or union>"
 msgstr ""
 
-#: gdbdriver.cpp:1526
+#: gdbdriver.cpp:1648
 msgid "<additional entries of the array suppressed>"
 msgstr ""
 
-#: gdbdriver.cpp:2084 xsldbgdriver.cpp:1287
+#: gdbdriver.cpp:2285 xsldbgdriver.cpp:1286
 msgid "New working directory: "
 msgstr "Nowy katalog roboczy: "
 
@@ -560,24 +564,24 @@ msgstr ""
 msgid "&Real (g)"
 msgstr ""
 
-#: regwnd.cpp:416
+#: regwnd.cpp:418
 #, fuzzy
 msgid "Register"
 msgstr "Restartuj"
 
-#: regwnd.cpp:418
+#: regwnd.cpp:420
 msgid "Decoded value"
 msgstr ""
 
-#: regwnd.cpp:434
+#: regwnd.cpp:436
 msgid "GP and others"
 msgstr ""
 
-#: regwnd.cpp:436
+#: regwnd.cpp:438
 msgid "Flags"
 msgstr ""
 
-#: regwnd.cpp:439
+#: regwnd.cpp:441
 msgid "x86/x87 segment"
 msgstr ""
 
@@ -608,27 +612,27 @@ msgstr " Usuń "
 msgid "Expression"
 msgstr "&Wykonywanie"
 
-#: winstack.cpp:384
+#: winstack.cpp:382
 msgid ": Search"
 msgstr ": Wyszukaj"
 
-#: winstack.cpp:391
+#: winstack.cpp:389
 msgid "&Case sensitive"
 msgstr "&Rozróżniaj wielkie/małe"
 
-#: winstack.cpp:393
+#: winstack.cpp:391
 msgid "&Forward"
 msgstr "&Do przodu"
 
-#: winstack.cpp:395
+#: winstack.cpp:393
 msgid "&Backward"
 msgstr "&Wstecz"
 
-#: winstack.cpp:396
+#: winstack.cpp:394
 msgid "Close"
 msgstr ""
 
-#: xsldbgdriver.cpp:1385
+#: xsldbgdriver.cpp:1384
 msgid "No memory dump available"
 msgstr ""
 
@@ -731,13 +735,13 @@ msgstr "&Pokaż kod"
 msgid "E&xecution"
 msgstr "&Wykonywanie"
 
-#. i18n: file: kdbgui.rc:42
+#. i18n: file: kdbgui.rc:43
 #. i18n: ectx: Menu (breakpoint)
 #: rc.cpp:60
 msgid "&Breakpoint"
 msgstr "Punkt &zatrzymania"
 
-#. i18n: file: kdbgui.rc:47
+#. i18n: file: kdbgui.rc:48
 #. i18n: ectx: Menu (settings)
 #: rc.cpp:63
 #, fuzzy
