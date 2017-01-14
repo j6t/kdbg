@@ -15,6 +15,7 @@
 
 class KDebugger;
 class BreakpointItem;
+struct DbgAddr;
 
 
 class BreakpointTable : public QWidget

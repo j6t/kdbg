@@ -32,7 +32,7 @@ MemoryWindow::MemoryWindow(QWidget* parent) :
     m_memory.setHeaderLabel(i18n("Address"));
     for (int i = 1; i < 9; i++) {
 	m_memory.hideColumn(i);
-	m_memory.header()->setResizeMode(QHeaderView::ResizeToContents);
+	m_memory.header()->setSectionResizeMode(QHeaderView::ResizeToContents);
 	m_memory.headerItem()->setText(i, QString());
     }
     m_memory.header()->setStretchLastSection(false);
@@ -40,7 +40,7 @@ MemoryWindow::MemoryWindow(QWidget* parent) :
     m_memory.setSortingEnabled(false);		/* don't sort */
     m_memory.setAllColumnsShowFocus(true);
     m_memory.setRootIsDecorated(false);
-    m_memory.header()->setClickable(false);
+    m_memory.header()->setSectionsClickable(false);
     m_memory.setContextMenuPolicy(Qt::NoContextMenu);	// defer to parent
 
     // create layout

@@ -40,7 +40,7 @@ ThreadList::ThreadList(QWidget* parent) :
 	QTreeWidget(parent)
 {
     setHeaderLabels(QStringList() << i18n("Thread ID") << i18n("Location"));
-    header()->setResizeMode(1, QHeaderView::Interactive);
+    header()->setSectionResizeMode(1, QHeaderView::Interactive);
     setRootIsDecorated(false);
 
     // load pixmaps

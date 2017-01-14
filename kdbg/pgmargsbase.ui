@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>PgmArgsBase</class>
- <widget class="QDialog" name="PgmArgsBase" >
-  <property name="geometry" >
+ <widget class="QDialog" name="PgmArgsBase">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,82 +10,82 @@
     <height>410</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Program Arguments</string>
   </property>
-  <property name="sizeGripEnabled" >
+  <property name="sizeGripEnabled">
    <bool>true</bool>
   </property>
-  <layout class="QVBoxLayout" name="verticalLayout" >
+  <layout class="QVBoxLayout" name="verticalLayout">
    <item>
-    <widget class="QTabWidget" name="tabWidget" >
-     <property name="currentIndex" >
+    <widget class="QTabWidget" name="tabWidget">
+     <property name="currentIndex">
       <number>0</number>
      </property>
-     <widget class="QWidget" name="argsPage" >
-      <attribute name="title" >
+     <widget class="QWidget" name="argsPage">
+      <attribute name="title">
        <string>&amp;Arguments</string>
       </attribute>
-      <layout class="QHBoxLayout" >
+      <layout class="QHBoxLayout">
        <item>
-        <layout class="QVBoxLayout" >
+        <layout class="QVBoxLayout">
          <item>
-          <widget class="QLabel" name="labelArgs" >
-           <property name="text" >
-            <string>Run &lt;i>%1&lt;/i> with these arguments:</string>
+          <widget class="QLabel" name="labelArgs">
+           <property name="text">
+            <string>Run &lt;i&gt;%1&lt;/i&gt; with these arguments:</string>
            </property>
-           <property name="wordWrap" >
+           <property name="wordWrap">
             <bool>false</bool>
            </property>
-           <property name="buddy" >
+           <property name="buddy">
             <cstring>programArgs</cstring>
            </property>
           </widget>
          </item>
          <item>
-          <widget class="QLineEdit" name="programArgs" >
-           <property name="whatsThis" >
-            <string>Specify the arguments with which the program shall be invoked for this debugging session. You specify the arguments just as you would on the command line, that is, you can even use quotes and environment variables, for example:&lt;p>&lt;tt>--message 'start in: ' $HOME&lt;/tt></string>
+          <widget class="QLineEdit" name="programArgs">
+           <property name="whatsThis">
+            <string>Specify the arguments with which the program shall be invoked for this debugging session. You specify the arguments just as you would on the command line, that is, you can even use quotes and environment variables, for example:&lt;p&gt;&lt;tt&gt;--message 'start in: ' $HOME&lt;/tt&gt;</string>
            </property>
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" >
+          <layout class="QHBoxLayout">
            <item>
-            <widget class="QPushButton" name="insertFile" >
-             <property name="whatsThis" >
+            <widget class="QPushButton" name="insertFile">
+             <property name="whatsThis">
               <string>Browse for a file; the full path name will be inserted at the current cursor location in the edit box above.</string>
              </property>
-             <property name="text" >
+             <property name="text">
               <string>Insert &amp;file name...</string>
              </property>
-             <property name="shortcut" >
+             <property name="shortcut">
               <string>Alt+F</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="insertDir" >
-             <property name="whatsThis" >
+            <widget class="QPushButton" name="insertDir">
+             <property name="whatsThis">
               <string>Browse for a directory; the full path name will be inserted at the current cursor location in the edit box above.</string>
              </property>
-             <property name="text" >
+             <property name="text">
               <string>Insert &amp;directory name...</string>
              </property>
-             <property name="shortcut" >
+             <property name="shortcut">
               <string>Alt+D</string>
              </property>
             </widget>
            </item>
            <item>
-            <spacer name="spacer1" >
-             <property name="orientation" >
+            <spacer name="spacer1">
+             <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
-             <property name="sizeType" >
+             <property name="sizeType">
               <enum>QSizePolicy::Expanding</enum>
              </property>
-             <property name="sizeHint" stdset="0" >
+             <property name="sizeHint" stdset="0">
               <size>
                <width>61</width>
                <height>20</height>
@@ -95,14 +96,14 @@
           </layout>
          </item>
          <item>
-          <spacer name="spacer2" >
-           <property name="orientation" >
+          <spacer name="spacer2">
+           <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
-           <property name="sizeType" >
+           <property name="sizeType">
             <enum>QSizePolicy::Expanding</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>81</width>
              <height>180</height>
@@ -114,44 +115,44 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="wdPage" >
-      <attribute name="title" >
+     <widget class="QWidget" name="wdPage">
+      <attribute name="title">
        <string>&amp;Working Directory</string>
       </attribute>
-      <layout class="QHBoxLayout" >
+      <layout class="QHBoxLayout">
        <item>
-        <layout class="QVBoxLayout" >
+        <layout class="QVBoxLayout">
          <item>
-          <widget class="QLineEdit" name="wdEdit" >
-           <property name="whatsThis" >
+          <widget class="QLineEdit" name="wdEdit">
+           <property name="whatsThis">
             <string>Specify here the initial working directory where the program is run.</string>
            </property>
           </widget>
          </item>
          <item>
-          <layout class="QHBoxLayout" >
+          <layout class="QHBoxLayout">
            <item>
-            <widget class="QPushButton" name="wdBrowse" >
-             <property name="whatsThis" >
+            <widget class="QPushButton" name="wdBrowse">
+             <property name="whatsThis">
               <string>Browse for the initial working directory where the program is run.</string>
              </property>
-             <property name="text" >
+             <property name="text">
               <string>&amp;Browse...</string>
              </property>
-             <property name="shortcut" >
+             <property name="shortcut">
               <string>Alt+B</string>
              </property>
             </widget>
            </item>
            <item>
-            <spacer name="spacer4" >
-             <property name="orientation" >
+            <spacer name="spacer4">
+             <property name="orientation">
               <enum>Qt::Horizontal</enum>
              </property>
-             <property name="sizeType" >
+             <property name="sizeType">
               <enum>QSizePolicy::Expanding</enum>
              </property>
-             <property name="sizeHint" stdset="0" >
+             <property name="sizeHint" stdset="0">
               <size>
                <width>321</width>
                <height>31</height>
@@ -162,14 +163,14 @@
           </layout>
          </item>
          <item>
-          <spacer name="spacer5" >
-           <property name="orientation" >
+          <spacer name="spacer5">
+           <property name="orientation">
             <enum>Qt::Vertical</enum>
            </property>
-           <property name="sizeType" >
+           <property name="sizeType">
             <enum>QSizePolicy::Expanding</enum>
            </property>
-           <property name="sizeHint" stdset="0" >
+           <property name="sizeHint" stdset="0">
             <size>
              <width>111</width>
              <height>161</height>
@@ -181,56 +182,56 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="envPage" >
-      <attribute name="title" >
+     <widget class="QWidget" name="envPage">
+      <attribute name="title">
        <string>&amp;Environment</string>
       </attribute>
-      <layout class="QHBoxLayout" >
+      <layout class="QHBoxLayout">
        <item>
-        <layout class="QHBoxLayout" >
+        <layout class="QHBoxLayout">
          <item>
-          <layout class="QVBoxLayout" >
+          <layout class="QVBoxLayout">
            <item>
-            <widget class="QLabel" name="envLabel" >
-             <property name="text" >
-              <string>Environment variables (&lt;tt>NAME=value&lt;/tt>):</string>
+            <widget class="QLabel" name="envLabel">
+             <property name="text">
+              <string>Environment variables (&lt;tt&gt;NAME=value&lt;/tt&gt;):</string>
              </property>
-             <property name="wordWrap" >
+             <property name="wordWrap">
               <bool>false</bool>
              </property>
-             <property name="buddy" >
+             <property name="buddy">
               <cstring>envVar</cstring>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QLineEdit" name="envVar" >
-             <property name="whatsThis" >
-              <string>To add a new environment variable or to modify one, specify it here in the form &lt;tt>NAME=value&lt;/tt> and click &lt;b>Modify&lt;/b>.</string>
+            <widget class="QLineEdit" name="envVar">
+             <property name="whatsThis">
+              <string>To add a new environment variable or to modify one, specify it here in the form &lt;tt&gt;NAME=value&lt;/tt&gt; and click &lt;b&gt;Modify&lt;/b&gt;.</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QTreeWidget" name="envList" >
-             <property name="whatsThis" >
-              <string>Environment variables that are set &lt;i>in addition&lt;/i> to those that are inherited are listed in this table. To add new environment variables, specify them as &lt;tt>NAME=value&lt;/tt> in the edit box above and click &lt;b>Modify&lt;/b>. To modify a value, select it in this list and click &lt;b>Modify&lt;/b>. To delete an environment variable, select it in this list and click &lt;b>Delete&lt;/b>.</string>
+            <widget class="QTreeWidget" name="envList">
+             <property name="whatsThis">
+              <string>Environment variables that are set &lt;i&gt;in addition&lt;/i&gt; to those that are inherited are listed in this table. To add new environment variables, specify them as &lt;tt&gt;NAME=value&lt;/tt&gt; in the edit box above and click &lt;b&gt;Modify&lt;/b&gt;. To modify a value, select it in this list and click &lt;b&gt;Modify&lt;/b&gt;. To delete an environment variable, select it in this list and click &lt;b&gt;Delete&lt;/b&gt;.</string>
              </property>
-             <property name="rootIsDecorated" >
+             <property name="rootIsDecorated">
               <bool>false</bool>
              </property>
-             <property name="itemsExpandable" >
+             <property name="itemsExpandable">
               <bool>false</bool>
              </property>
-             <property name="allColumnsShowFocus" >
+             <property name="allColumnsShowFocus">
               <bool>true</bool>
              </property>
              <column>
-              <property name="text" >
+              <property name="text">
                <string>Name</string>
               </property>
              </column>
              <column>
-              <property name="text" >
+              <property name="text">
                <string>Value</string>
               </property>
              </column>
@@ -239,42 +240,42 @@
           </layout>
          </item>
          <item>
-          <layout class="QVBoxLayout" >
+          <layout class="QVBoxLayout">
            <item>
-            <widget class="QPushButton" name="buttonModify" >
-             <property name="whatsThis" >
+            <widget class="QPushButton" name="buttonModify">
+             <property name="whatsThis">
               <string>Enters the environment variable that is currently specified in the edit box into the list. If the named variable is already in the list, it receives a new value; otherwise, a new entry is created.</string>
              </property>
-             <property name="text" >
+             <property name="text">
               <string>&amp;Modify</string>
              </property>
-             <property name="shortcut" >
+             <property name="shortcut">
               <string>Alt+M</string>
              </property>
             </widget>
            </item>
            <item>
-            <widget class="QPushButton" name="buttonDelete" >
-             <property name="whatsThis" >
+            <widget class="QPushButton" name="buttonDelete">
+             <property name="whatsThis">
               <string>Deletes the selected environment variable from the list. This cannot be used to delete environment variables that are inherited.</string>
              </property>
-             <property name="text" >
+             <property name="text">
               <string>&amp;Delete</string>
              </property>
-             <property name="shortcut" >
+             <property name="shortcut">
               <string>Alt+D</string>
              </property>
             </widget>
            </item>
            <item>
-            <spacer name="spacer6" >
-             <property name="orientation" >
+            <spacer name="spacer6">
+             <property name="orientation">
               <enum>Qt::Vertical</enum>
              </property>
-             <property name="sizeType" >
+             <property name="sizeType">
               <enum>QSizePolicy::Expanding</enum>
              </property>
-             <property name="sizeHint" stdset="0" >
+             <property name="sizeHint" stdset="0">
               <size>
                <width>51</width>
                <height>141</height>
@@ -288,14 +289,14 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="xsldbgOptionsPage" >
-      <attribute name="title" >
+     <widget class="QWidget" name="xsldbgOptionsPage">
+      <attribute name="title">
        <string>&amp;xsldbg Options</string>
       </attribute>
-      <layout class="QHBoxLayout" >
+      <layout class="QHBoxLayout">
        <item>
-        <widget class="QListWidget" name="xsldbgOptions" >
-         <property name="selectionMode" >
+        <widget class="QListWidget" name="xsldbgOptions">
+         <property name="selectionMode">
           <enum>QAbstractItemView::MultiSelection</enum>
          </property>
         </widget>
@@ -305,23 +306,16 @@
     </widget>
    </item>
    <item>
-    <widget class="KDialogButtonBox" name="kdialogbuttonbox" >
-     <property name="standardButtons" >
+    <widget class="QDialogButtonBox" name="dialogButtonBox">
+     <property name="standardButtons">
       <set>QDialogButtonBox::Cancel|QDialogButtonBox::Ok</set>
      </property>
     </widget>
    </item>
   </layout>
  </widget>
- <layoutdefault spacing="6" margin="11" />
+ <layoutdefault spacing="6" margin="11"/>
  <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
- <customwidgets>
-  <customwidget>
-   <class>KDialogButtonBox</class>
-   <extends>QDialogButtonBox</extends>
-   <header>kdialogbuttonbox.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>tabWidget</tabstop>
   <tabstop>programArgs</tabstop>
@@ -338,34 +332,34 @@
  <resources/>
  <connections>
   <connection>
-   <sender>kdialogbuttonbox</sender>
+   <sender>dialogButtonBox</sender>
    <signal>accepted()</signal>
    <receiver>PgmArgsBase</receiver>
    <slot>accept()</slot>
    <hints>
-    <hint type="sourcelabel" >
-     <x>440</x>
-     <y>575</y>
+    <hint type="sourcelabel">
+     <x>176</x>
+     <y>403</y>
     </hint>
-    <hint type="destinationlabel" >
-     <x>440</x>
-     <y>591</y>
+    <hint type="destinationlabel">
+     <x>267</x>
+     <y>177</y>
     </hint>
    </hints>
   </connection>
   <connection>
-   <sender>kdialogbuttonbox</sender>
+   <sender>dialogButtonBox</sender>
    <signal>rejected()</signal>
    <receiver>PgmArgsBase</receiver>
    <slot>reject()</slot>
    <hints>
-    <hint type="sourcelabel" >
-     <x>521</x>
-     <y>580</y>
+    <hint type="sourcelabel">
+     <x>230</x>
+     <y>403</y>
     </hint>
-    <hint type="destinationlabel" >
-     <x>549</x>
-     <y>588</y>
+    <hint type="destinationlabel">
+     <x>353</x>
+     <y>219</y>
     </hint>
    </hints>
   </connection>

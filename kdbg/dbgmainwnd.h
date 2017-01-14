@@ -9,15 +9,16 @@
 
 #include <QPointer>
 #include <QTimer>
+#include <ksharedconfig.h>
 #include <kxmlguiwindow.h>
 #include "regwnd.h"
 
 class QDockWidget;
 class QProcess;
+class QUrl;
 class KAnimatedButton;
 class KRecentFilesAction;
 class KSqueezedTextLabel;
-class KUrl;
 class WinStack;
 class QListWidget;
 class ExprWnd;
@@ -188,7 +189,7 @@ public slots:
     void slotEnaDisBreak(const QString&, int, const DbgAddr&);
     void slotProgramStopped();
     void slotBackTimer();
-    void slotRecentExec(const KUrl& url);
+    void slotRecentExec(const QUrl& url);
     void slotLocalsPopup(const QPoint& pt);
     void slotLocalsToWatch();
     void slotEditValue();

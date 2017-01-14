@@ -4,33 +4,35 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <kapplication.h>
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
 #include <kconfig.h>
-#include <kstatusbar.h>
-#include <kicon.h>
+#include <kconfiggroup.h>
+#include <kiconengine.h>
+#include <kiconloader.h>
 #include <kstandardaction.h>
 #include <kstandardshortcut.h>
-#include <kaction.h>
 #include <kactioncollection.h>
 #include <krecentfilesaction.h>
 #include <ktoggleaction.h>
-#include <kfiledialog.h>
 #include <kshortcutsdialog.h>
 #include <kanimatedbutton.h>
 #include <kwindowsystem.h>
 #include <ksqueezedtextlabel.h>
 #include <ktoolbar.h>
-#include <kurl.h>
 #include <kxmlguifactory.h>
 #include <KPageDialog>
 #include <QListWidget>
 #include <QFile>
+#include <QFileDialog>
 #include <QFileInfo>
+#include <QGuiApplication>
+#include <QIcon>
 #include <QList>
 #include <QDockWidget>
 #include <QProcess>
+#include <QStatusBar>
+#include <QUrl>
 #include "dbgmainwnd.h"
 #include "debugger.h"
 #include "winstack.h"
@@ -177,7 +179,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 
     makeDefaultLayout();
     setupGUI(KXmlGuiWindow::Default, "kdbgui.rc");
-    restoreSettings(KGlobal::config());
+    restoreSettings(KSharedConfig::openConfig());
 
     // The animation button is not part of the restored window state.
     // We must create it after the toolbar was loaded.
@@ -189,7 +191,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 
 DebuggerMainWnd::~DebuggerMainWnd()
 {
-    saveSettings(KGlobal::config());
+    saveSettings(KSharedConfig::openConfig());
     // must delete m_debugger early since it references our windows
     delete m_debugger;
     m_debugger = 0;
@@ -220,11 +222,11 @@ QAction* DebuggerMainWnd::createAction(const QString& text, const char* icon,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name)
 {
-    KAction* a = actionCollection()->addAction(name);
+    QAction* a = actionCollection()->addAction(name);
     a->setText(text);
-    a->setIcon(KIcon(icon));
+    a->setIcon(QIcon(new KIconEngine(icon, KIconLoader::global())));
     if (shortcut)
-	a->setShortcut(KShortcut(shortcut));
+	actionCollection()->setDefaultShortcut(a, QKeySequence(shortcut));
     connect(a, SIGNAL(triggered()), receiver, slot);
     return a;
 }
@@ -233,10 +235,10 @@ QAction* DebuggerMainWnd::createAction(const QString& text,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name)
 {
-    KAction* a = actionCollection()->addAction(name);
+    QAction* a = actionCollection()->addAction(name);
     a->setText(text);
     if (shortcut)
-	a->setShortcut(KShortcut(shortcut));
+	actionCollection()->setDefaultShortcut(a, QKeySequence(shortcut));
     connect(a, SIGNAL(triggered()), receiver, slot);
     return a;
 }
@@ -245,7 +247,7 @@ QAction* DebuggerMainWnd::createAction(const QString& text,
 void DebuggerMainWnd::initKAction()
 {
     // file menu
-    KAction* open = KStandardAction::open(this, SLOT(slotFileOpen()),
+    QAction* open = KStandardAction::open(this, SLOT(slotFileOpen()),
                       actionCollection());
     open->setText(i18n("&Open Source..."));
     m_closeAction = KStandardAction::close(m_filesWindow, SLOT(slotClose()), actionCollection());
@@ -254,13 +256,13 @@ void DebuggerMainWnd::initKAction()
     m_fileExecAction = createAction(i18n("&Executable..."),
 			"document-open-executable", 0,
 			this, SLOT(slotFileExe()), "file_executable");
-    m_recentExecAction = KStandardAction::openRecent(this, SLOT(slotRecentExec(const KUrl&)),
+    m_recentExecAction = KStandardAction::openRecent(this, SLOT(slotRecentExec(const QUrl&)),
 		      actionCollection());
     m_recentExecAction->setObjectName("file_executable_recent");
     m_recentExecAction->setText(i18n("Recent E&xecutables"));
     m_coreDumpAction = createAction(i18n("&Core dump..."), 0,
 			this, SLOT(slotFileCore()), "file_core_dump");
-    KStandardAction::quit(kapp, SLOT(closeAllWindows()), actionCollection());
+    KStandardAction::quit(this, SLOT(close()), actionCollection());
 
     // settings menu
     m_settingsAction = createAction(i18n("This &Program..."), 0,
@@ -364,14 +366,14 @@ void DebuggerMainWnd::initAnimation()
     KToolBar* toolbar = toolBar("mainToolBar");
     m_animation = new KAnimatedButton(toolbar);
     toolbar->addWidget(m_animation);
-    m_animation->setIcons("pulse");
+    m_animation->setAnimationPath(KIconLoader::global()->moviePath("pulse", KIconLoader::Toolbar));
     connect(m_animation, SIGNAL(clicked(bool)), m_debugger, SLOT(programBreak()));
     m_animRunning = false;
 }
 
 void DebuggerMainWnd::initStatusBar()
 {
-    KStatusBar* statusbar = statusBar();
+    QStatusBar* statusbar = statusBar();
     m_statusActiveLabel = new KSqueezedTextLabel(statusbar);
     m_statusActiveLabel->setAlignment(Qt::AlignHCenter | Qt::AlignVCenter);
     statusbar->addPermanentWidget(m_statusActiveLabel);
@@ -640,7 +642,7 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
 
     if (success)
     {
-	m_recentExecAction->addUrl(KUrl(fi.absoluteFilePath()));
+	m_recentExecAction->addUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
 
 	// keep the directory
 	m_lastDirectory = fi.absolutePath();
@@ -652,7 +654,7 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
     }
     else
     {
-	m_recentExecAction->removeUrl(KUrl(fi.absoluteFilePath()));
+	m_recentExecAction->removeUrl(QUrl::fromLocalFile(fi.absoluteFilePath()));
     }
 
     return success;
@@ -832,9 +834,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
     int oldTabWidth = m_tabWidth;
 
     KPageDialog dlg(this);
-    QString title = KGlobal::caption();
-    title += i18n(": Global options");
-    dlg.setWindowTitle(title);
+    dlg.setWindowTitle(i18n("Global Options"));
 
     PrefDebugger prefDebugger(&dlg);
     prefDebugger.setDebuggerCmd(m_debuggerCmdStr.isEmpty()  ?
@@ -986,7 +986,7 @@ QString DebuggerMainWnd::createOutputWindow()
     shellScript.replace("%s", fifoName);
     TRACE("output window script is " + shellScript);
 
-    QString title = KGlobal::caption();
+    QString title = QGuiApplication::applicationDisplayName();
     title += i18n(": Program output");
 
     // parse the command line specified in the preferences
@@ -1068,19 +1068,19 @@ void DebuggerMainWnd::slotBackTimer()
     lower();
 }
 
-void DebuggerMainWnd::slotRecentExec(const KUrl& url)
+void DebuggerMainWnd::slotRecentExec(const QUrl& url)
 {
-    QString exe = url.path();
+    QString exe = url.toLocalFile();
     debugProgram(exe, "");
 }
 
 QString DebuggerMainWnd::makeSourceFilter()
 {
     QString f;
-    f = m_sourceFilter + " " + m_headerFilter + i18n("|All source files\n");
-    f += m_sourceFilter + i18n("|Source files\n");
-    f += m_headerFilter + i18n("|Header files\n");
-    f += i18n("*|All files");
+    f = i18n("All source files") + " (" + m_sourceFilter + " " + m_headerFilter + ")";
+    f += ";;" + i18n("Source files") + " (" + m_sourceFilter + ")";
+    f += ";;" + i18n("Header files") + " (" + m_headerFilter + ")";
+    f += ";;" + i18n("All files") + " (*)";
     return f;
 }
 
@@ -1119,7 +1119,7 @@ void DebuggerMainWnd::slotLocalsToWatch()
 void DebuggerMainWnd::slotEditValue()
 {
     // does one of the value trees have the focus
-    QWidget* f = kapp->focusWidget();
+    QWidget* f = QApplication::focusWidget();
     ExprWnd* wnd;
     if (f == m_localVariables) {
 	wnd = m_localVariables;
@@ -1145,22 +1145,6 @@ void DebuggerMainWnd::slotEditValue()
     }
 }
 
-// helper that gets a file name (it only differs in the caption of the dialog)
-static QString myGetFileName(QString caption,
-			     QString dir, QString filter,
-	 		     QWidget* parent)
-{
-    QString filename;
-    KFileDialog dlg(dir, filter, parent);
-
-    dlg.setWindowTitle(caption);
-
-    if (dlg.exec() == QDialog::Accepted)
-	filename = dlg.selectedFile();
-
-    return filename;
-}
-
 void DebuggerMainWnd::slotFileOpen()
 {
     // start browsing in the active file's directory
@@ -1172,9 +1156,8 @@ void DebuggerMainWnd::slotFileOpen()
 	dir = fi.path();
     }
 
-    fileName = myGetFileName(i18n("Open"),
-			     dir,
-			     makeSourceFilter(), this);
+    fileName = QFileDialog::getOpenFileName(this,
+			i18n("Open"), dir, makeSourceFilter());
 
     if (!fileName.isEmpty())
     {
@@ -1190,8 +1173,9 @@ void DebuggerMainWnd::slotFileExe()
     if (m_debugger->isIdle())
     {
 	// open a new executable
-	QString executable = myGetFileName(i18n("Select the executable to debug"),
-					   m_lastDirectory, 0, this);
+	QString executable = QFileDialog::getOpenFileName(this,
+				i18n("Select the Executable to Debug"),
+				m_lastDirectory);
 	if (executable.isEmpty())
 	    return;
 
@@ -1203,8 +1187,9 @@ void DebuggerMainWnd::slotFileCore()
 {
     if (m_debugger->canStart())
     {
-	QString corefile = myGetFileName(i18n("Select core dump"),
-					 m_lastDirectory, 0, this);
+	QString corefile = QFileDialog::getOpenFileName(this,
+				i18n("Select Core Dump"),
+				m_lastDirectory);
 	if (!corefile.isEmpty()) {
 	    m_debugger->useCoreFile(corefile, false);
 	}

@@ -11,7 +11,6 @@
 #include <QMenu>
 #include <QContextMenuEvent>
 #include <QToolTip>
-#include <kglobal.h>
 #include <kxmlguiwindow.h>
 #include <kxmlguifactory.h>
 #include <klocale.h>			/* i18n */
@@ -20,7 +19,7 @@
 
 
 WinStack::WinStack(QWidget* parent) :
-	KTabWidget(parent),
+	QTabWidget(parent),
 	m_pcLine(-1),
 	m_tabWidth(0)
 {
@@ -244,7 +243,7 @@ void WinStack::slotFindBackward()
 bool WinStack::event(QEvent* evt)
 {
     if (evt->type() != QEvent::ToolTip)
-	return KTabWidget::event(evt);
+	return QTabWidget::event(evt);
 
     SourceWindow* w = activeWindow();
     if (w == 0)
@@ -366,7 +365,7 @@ void WinStack::slotClose()
     if (!w)
 	return;
 
-    removePage(w);
+    removeTab(currentIndex());
     delete w;
 }
 
@@ -379,7 +378,7 @@ FindDialog::FindDialog() :
 	m_buttonBackward(this),
 	m_buttonClose(this)
 {
-    setWindowTitle(KGlobal::caption() + i18n(": Search"));
+    setWindowTitle(i18n("Search"));
 
     m_searchText.setMinimumSize(330, 24);
     m_searchText.setMaxLength(10000);

@@ -1,7 +1,8 @@
-<ui version="4.0" >
+<?xml version="1.0" encoding="UTF-8"?>
+<ui version="4.0">
  <class>BrkPtBase</class>
- <widget class="QWidget" name="BrkPtBase" >
-  <property name="geometry" >
+ <widget class="QWidget" name="BrkPtBase">
+  <property name="geometry">
    <rect>
     <x>0</x>
     <y>0</y>
@@ -9,46 +10,46 @@
     <height>300</height>
    </rect>
   </property>
-  <property name="windowTitle" >
+  <property name="windowTitle">
    <string>Form</string>
   </property>
-  <layout class="QHBoxLayout" name="horizontalLayout" >
+  <layout class="QHBoxLayout" name="horizontalLayout">
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout_2" >
+    <layout class="QVBoxLayout" name="verticalLayout_2">
      <item>
-      <widget class="KLineEdit" name="bpEdit" >
-       <property name="showClearButton" stdset="0" >
+      <widget class="QLineEdit" name="bpEdit">
+       <property name="clearButtonEnabled">
         <bool>true</bool>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QTreeWidget" name="bpList" >
-       <property name="rootIsDecorated" >
+      <widget class="QTreeWidget" name="bpList">
+       <property name="rootIsDecorated">
         <bool>false</bool>
        </property>
        <column>
-        <property name="text" >
+        <property name="text">
          <string>Location</string>
         </property>
        </column>
        <column>
-        <property name="text" >
+        <property name="text">
          <string>Address</string>
         </property>
        </column>
        <column>
-        <property name="text" >
+        <property name="text">
          <string>Hits</string>
         </property>
        </column>
        <column>
-        <property name="text" >
+        <property name="text">
          <string>Ignore</string>
         </property>
        </column>
        <column>
-        <property name="text" >
+        <property name="text">
          <string>Condition</string>
         </property>
        </column>
@@ -57,55 +58,55 @@
     </layout>
    </item>
    <item>
-    <layout class="QVBoxLayout" name="verticalLayout" >
+    <layout class="QVBoxLayout" name="verticalLayout">
      <item>
-      <widget class="QPushButton" name="btAddBP" >
-       <property name="text" >
+      <widget class="QPushButton" name="btAddBP">
+       <property name="text">
         <string>Add &amp;Breakpoint</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btAddWP" >
-       <property name="text" >
+      <widget class="QPushButton" name="btAddWP">
+       <property name="text">
         <string>Add &amp;Watchpoint</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btRemove" >
-       <property name="text" >
+      <widget class="QPushButton" name="btRemove">
+       <property name="text">
         <string>&amp;Remove</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btEnaDis" >
-       <property name="text" >
+      <widget class="QPushButton" name="btEnaDis">
+       <property name="text">
         <string>&amp;Disable</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btViewCode" >
-       <property name="text" >
+      <widget class="QPushButton" name="btViewCode">
+       <property name="text">
         <string>&amp;View Code</string>
        </property>
       </widget>
      </item>
      <item>
-      <widget class="QPushButton" name="btConditional" >
-       <property name="text" >
+      <widget class="QPushButton" name="btConditional">
+       <property name="text">
         <string>&amp;Conditional...</string>
        </property>
       </widget>
      </item>
      <item>
-      <spacer name="verticalSpacer" >
-       <property name="orientation" >
+      <spacer name="verticalSpacer">
+       <property name="orientation">
         <enum>Qt::Vertical</enum>
        </property>
-       <property name="sizeHint" stdset="0" >
+       <property name="sizeHint" stdset="0">
         <size>
          <width>20</width>
          <height>40</height>
@@ -117,13 +118,6 @@
    </item>
   </layout>
  </widget>
- <customwidgets>
-  <customwidget>
-   <class>KLineEdit</class>
-   <extends>QLineEdit</extends>
-   <header>klineedit.h</header>
-  </customwidget>
- </customwidgets>
  <tabstops>
   <tabstop>bpEdit</tabstop>
   <tabstop>bpList</tabstop>

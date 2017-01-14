@@ -14,10 +14,11 @@
 #include <QListWidget>
 #include <QApplication>
 #include <QCryptographicHash>
+#include <QStandardPaths>
 #include <kconfig.h>
+#include <kconfiggroup.h>
 #include <klocale.h>			/* i18n */
 #include <kmessagebox.h>
-#include <kstandarddirs.h>
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */
 #include <unistd.h>			/* sleep(3) */
@@ -723,10 +724,9 @@ QString KDebugger::getConfigForExe(const QString& name)
     dirDigest.addData(dir.toUtf8());
     QString hash = dirDigest.result().toBase64();
     hash.replace('/', QString());	// avoid directory separators
-    QString pgmConfigFile = hash.left(15) + "-" + fi.fileName();
-    pgmConfigFile = KStandardDirs::locateLocal("sessions", pgmConfigFile);
-    TRACE("program config file = " + pgmConfigFile);
-    return pgmConfigFile;
+    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
+		+ "/sessions/"
+		+ hash.left(15) + "-" + fi.fileName();
 }
 
 void KDebugger::openProgramConfig(const QString& name)
@@ -2094,10 +2094,10 @@ void KDebugger::slotValuePopup(const QString& expr)
 		v = ExprWnd::ptrMemberByName(v, expr);
 	    if (v == 0) {
 		// nothing found, try printing variable in gdb
-
-                CmdQueueItem *cmd = m_d->executeCmd(DCprintPopup, expr, false);
-                cmd->m_popupExpr = expr;
-
+		if (m_d) {
+		    CmdQueueItem *cmd = m_d->executeCmd(DCprintPopup, expr, false);
+		    cmd->m_popupExpr = expr;
+		}
 		return;
 	    }
 	}

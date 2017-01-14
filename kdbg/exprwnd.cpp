@@ -320,8 +320,8 @@ ExprWnd::ExprWnd(QWidget* parent, const QString& colHeader) :
     pHeaderItem->setText(0, colHeader);
     pHeaderItem->setText(1, i18n("Value"));
     setHeaderItem(pHeaderItem);
-    header()->setResizeMode(0, QHeaderView::Interactive);
-    header()->setResizeMode(1, QHeaderView::Interactive);
+    header()->setSectionResizeMode(0, QHeaderView::Interactive);
+    header()->setSectionResizeMode(1, QHeaderView::Interactive);
 
     setSortingEnabled(false);		// do not sort items
     setRootIsDecorated(true);
@@ -724,7 +724,7 @@ void ExprWnd::editValue(VarTree* item, const QString& text)
      * the text, scroll this widget so that half of it shows the text (or
      * less than half of it if the text is shorter).
      */
-    QFontMetrics metr = m_edit->font();
+    QFontMetrics metr(m_edit->font());
     int wMin = metr.width("88888");
     if (w < wMin)
 	w = wMin;

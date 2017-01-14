@@ -2,9 +2,10 @@ add_subdirectory(doc)
 add_subdirectory(pics)
 add_subdirectory(typetables)
 
-include_directories(${KDE4_INCLUDES} ${KDE4_INCLUDE_DIR} ${QT_INCLUDES} )
 include(CheckFunctionExists)
 include(CheckIncludeFiles)
+include(CheckLibraryExists)
+include(ECMAddAppIcon)
 
 CHECK_INCLUDE_FILES(pty.h HAVE_PTY_H)
 CHECK_INCLUDE_FILES(libutil.h HAVE_LIBUTIL_H)
@@ -77,19 +78,26 @@ set(kdbg_UI
     procattachbase.ui
 )
 
-kde4_add_ui_files(kdbg_SRCS ${kdbg_UI})
+ki18n_wrap_ui(kdbg_SRCS ${kdbg_UI})
 
-kde4_add_app_icon(kdbg_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/pics/hi*-app-kdbg.png")
-kde4_add_app_icon(kdbg_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/pics/lo*-app-kdbg.png")
-kde4_add_executable(kdbg ${kdbg_SRCS})
+file(GLOB ICONS_SRCS "${CMAKE_CURRENT_SOURCE_DIR}/pics/*-apps-kdbg.png")
+ecm_add_app_icon(kdbg_SRCS ICONS ${ICONS_SRCS})
+add_executable(kdbg ${kdbg_SRCS})
 
 IF (HAVE_LIB_UTIL)
     set(LIB_UTIL util)
 ENDIF (HAVE_LIB_UTIL)
 
-target_link_libraries(kdbg ${KDE4_KDECORE_LIBS} ${KDE4_KIO_LIBS} ${LIB_UTIL})
+target_link_libraries(kdbg
+    KF5::I18n
+    KF5::ConfigCore
+    KF5::IconThemes
+    KF5::XmlGui
+    KF5::WindowSystem
+    ${LIB_UTIL}
+)
 
 install(TARGETS kdbg ${INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES kdbg.desktop DESTINATION ${XDG_APPS_INSTALL_DIR})
 install(FILES kdbgrc DESTINATION ${CONFIG_INSTALL_DIR})
-install(FILES kdbgui.rc DESTINATION ${DATA_INSTALL_DIR}/kdbg)
+install(FILES kdbgui.rc DESTINATION ${KXMLGUI_INSTALL_DIR}/kdbg)

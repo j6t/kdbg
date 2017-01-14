@@ -15,7 +15,6 @@
 #include <QPushButton>
 #include <QVBoxLayout>
 #include <QHBoxLayout>
-#include <kdialog.h>
 #include <vector>
 
 

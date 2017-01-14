@@ -5,8 +5,8 @@
  */
 
 #include "pgmargs.h"
-#include <kfiledialog.h>
 #include <klocale.h>			/* i18n */
+#include <QFileDialog>
 #include "mydebug.h"
 
 PgmArgs::PgmArgs(QWidget* parent, const QString& pgm,
@@ -187,7 +187,7 @@ void PgmArgs::accept()
 void PgmArgs::on_wdBrowse_clicked()
 {
     // browse for the working directory
-    QString newDir = KFileDialog::getExistingDirectory(wd(), this);
+    QString newDir = QFileDialog::getExistingDirectory(this, {}, wd());
     if (!newDir.isEmpty()) {
 	setWd(newDir);
     }
@@ -199,8 +199,7 @@ void PgmArgs::on_insertFile_clicked()
 
     // use the selection as default
     QString f = programArgs->selectedText();
-    f = KFileDialog::getSaveFileName(f, QString::null,
-				     this, caption);
+    f = QFileDialog::getSaveFileName(this, caption, f);
     // don't clear the selection if no file was selected
     if (!f.isEmpty()) {
 	programArgs->insert(f);
@@ -213,7 +212,7 @@ void PgmArgs::on_insertDir_clicked()
 
     // use the selection as default
     QString f = programArgs->selectedText();
-    f = KFileDialog::getExistingDirectory(f, this, caption);
+    f = QFileDialog::getExistingDirectory(this, caption, f);
     // don't clear the selection if no file was selected
     if (!f.isEmpty()) {
 	programArgs->insert(f);

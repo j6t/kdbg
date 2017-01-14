@@ -9,8 +9,6 @@
 #include <QProcess>
 #include <QTreeWidget>
 #include <ctype.h>
-#include <kglobal.h>
-#include <kiconloader.h>
 #include <klocale.h>			/* i18n */
 #include "config.h"
 
@@ -30,9 +28,9 @@ ProcAttachPS::ProcAttachPS(QWidget* parent) :
 	    this, SLOT(slotPSDone()));
 
     processList->setColumnWidth(0, 300);
-    processList->header()->setResizeMode(0, QHeaderView::Interactive);
-    processList->header()->setResizeMode(1, QHeaderView::ResizeToContents);
-    processList->header()->setResizeMode(2, QHeaderView::ResizeToContents);
+    processList->header()->setSectionResizeMode(0, QHeaderView::Interactive);
+    processList->header()->setSectionResizeMode(1, QHeaderView::ResizeToContents);
+    processList->header()->setSectionResizeMode(2, QHeaderView::ResizeToContents);
     processList->headerItem()->setTextAlignment(1, Qt::AlignRight);
     processList->headerItem()->setTextAlignment(2, Qt::AlignRight);
     processList->header()->setStretchLastSection(false);
@@ -150,7 +148,7 @@ void ProcAttachPS::pushLine()
 		// these columns are normally numbers
 		processList->headerItem()->setTextAlignment(i+1,
 					Qt::AlignRight);
-		processList->header()->setResizeMode(i+1,
+		processList->header()->setSectionResizeMode(i+1,
 					QHeaderView::ResizeToContents);
 	    }
 	}
@@ -286,10 +284,6 @@ ProcAttach::ProcAttach(QWidget* parent) :
 	m_layout(this),
 	m_buttons()
 {
-    QString title = KGlobal::caption();
-    title += i18n(": Attach to process");
-    setWindowTitle(title);
-
     m_label.setMinimumSize(330, 24);
     m_label.setText(i18n("Specify the process number to attach to:"));
 

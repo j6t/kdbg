@@ -13,7 +13,7 @@
 #include <QPushButton>
 #include <QHBoxLayout>
 #include <QVBoxLayout>
-#include <ktabwidget.h>
+#include <QTabWidget>
 #include <list>
 
 // forward declarations
@@ -50,7 +50,7 @@ protected:
 };
 
 
-class WinStack : public KTabWidget
+class WinStack : public QTabWidget
 {
     Q_OBJECT
 public:

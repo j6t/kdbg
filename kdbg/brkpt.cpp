@@ -4,7 +4,6 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <kglobal.h>
 #include <klocale.h>			/* i18n */
 #include <kiconloader.h>
 #include <ksimpleconfig.h>
@@ -359,9 +358,6 @@ ConditionalDlg::ConditionalDlg(QWidget* parent) :
 	QDialog(parent)
 {
     m_ui.setupUi(this);
-    QString title = KGlobal::caption();
-    title += i18n(": Conditional breakpoint");
-    setWindowTitle(title);
 }
 
 ConditionalDlg::~ConditionalDlg()
