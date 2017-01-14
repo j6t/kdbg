@@ -23,12 +23,17 @@ WinStack::WinStack(QWidget* parent) :
 	m_pcLine(-1),
 	m_tabWidth(0)
 {
+    setTabsClosable(true);
+    setMovable(true);
+
     connect(&m_findDlg.m_buttonForward,
 	    SIGNAL(clicked()), SLOT(slotFindForward()));
     connect(&m_findDlg.m_buttonBackward,
 	    SIGNAL(clicked()), SLOT(slotFindBackward()));
 
     connect(this, SIGNAL(setTabWidth(int)), this, SLOT(slotSetTabWidth(int)));
+    connect(this, SIGNAL(tabCloseRequested(int)),
+	    this, SLOT(slotCloseTab(int)));
 }
 
 WinStack::~WinStack()
@@ -361,11 +366,16 @@ void WinStack::slotMoveProgramCounter()
 
 void WinStack::slotClose()
 {
-    QWidget* w = activeWindow();
+    slotCloseTab(currentIndex());
+}
+
+void WinStack::slotCloseTab(int tab)
+{
+    QWidget* w = widget(tab);
     if (!w)
 	return;
 
-    removeTab(currentIndex());
+    removeTab(tab);
     delete w;
 }
 
