@@ -79,7 +79,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
     QDockWidget* dw2 = createDockWidget("Locals", i18n("Locals"));
     m_localVariables = new ExprWnd(dw2, i18n("Variable"));
     dw2->setWidget(m_localVariables);
-    QDockWidget* dw3 = createDockWidget("Watches", i18n("Watches"));
+    QDockWidget* dw3 = createDockWidget("Watches", i18n("Watched Expressions"));
     m_watches = new WatchWindow(dw3);
     dw3->setWidget(m_watches);
     QDockWidget* dw4 = createDockWidget("Registers", i18n("Registers"));
