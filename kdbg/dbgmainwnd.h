@@ -157,7 +157,6 @@ protected:
 
     QDockWidget* createDockWidget(const char* name, const QString& title);
     QDockWidget* dockParent(QWidget* w);
-    bool isDockVisible(QWidget* w);
     void makeDefaultLayout();
 
     QString makeSourceFilter();
