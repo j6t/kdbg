@@ -14,7 +14,6 @@
 #include <kstandardshortcut.h>
 #include <kactioncollection.h>
 #include <krecentfilesaction.h>
-#include <ktoggleaction.h>
 #include <kshortcutsdialog.h>
 #include <kanimatedbutton.h>
 #include <kwindowsystem.h>
@@ -82,7 +81,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
     QDockWidget* dw2 = createDockWidget("Locals", i18n("Locals"));
     m_localVariables = new ExprWnd(dw2, i18n("Variable"));
     dw2->setWidget(m_localVariables);
-    QDockWidget* dw3 = createDockWidget("Watches", i18n("Watches"));
+    QDockWidget* dw3 = createDockWidget("Watches", i18n("Watched Expressions"));
     m_watches = new WatchWindow(dw3);
     dw3->setWidget(m_watches);
     QDockWidget* dw4 = createDockWidget("Registers", i18n("Registers"));
@@ -278,21 +277,21 @@ void DebuggerMainWnd::initKAction()
     KStandardAction::findPrev(m_filesWindow, SLOT(slotFindBackward()), actionCollection());
 
     i18n("Source &code");
-    struct { QString text; QWidget* w; QString id; QAction** act; } dw[] = {
-	{ i18n("Stac&k"), m_btWindow, "view_stack", &m_btWindowAction },
-	{ i18n("&Locals"), m_localVariables, "view_locals", &m_localVariablesAction },
-	{ i18n("&Watched expressions"), m_watches, "view_watched_expressions", &m_watchesAction },
-	{ i18n("&Registers"), m_registers, "view_registers", &m_registersAction },
-	{ i18n("&Breakpoints"), m_bpTable, "view_breakpoints", &m_bpTableAction },
-	{ i18n("T&hreads"), m_threads, "view_threads", &m_threadsAction },
-	{ i18n("&Output"), m_ttyWindow, "view_output", &m_ttyWindowAction },
-	{ i18n("&Memory"), m_memoryWindow, "view_memory", &m_memoryWindowAction }
+    struct { QWidget* w; QString id; QAction** act; } dw[] = {
+	{ m_btWindow, "view_stack", &m_btWindowAction },
+	{ m_localVariables, "view_locals", &m_localVariablesAction },
+	{ m_watches, "view_watched_expressions", &m_watchesAction },
+	{ m_registers, "view_registers", &m_registersAction },
+	{ m_bpTable, "view_breakpoints", &m_bpTableAction },
+	{ m_threads, "view_threads", &m_threadsAction },
+	{ m_ttyWindow, "view_output", &m_ttyWindowAction },
+	{ m_memoryWindow, "view_memory", &m_memoryWindowAction }
     };
     for (unsigned i = 0; i < sizeof(dw)/sizeof(dw[0]); i++) {
 	QDockWidget* d = dockParent(dw[i].w);
-	*dw[i].act = new KToggleAction(dw[i].text, actionCollection());
-	actionCollection()->addAction(dw[i].id, *dw[i].act);
-	connect(*dw[i].act, SIGNAL(triggered()), d, SLOT(show()));
+	QAction* action = d->toggleViewAction();
+	actionCollection()->addAction(dw[i].id, action);
+	*dw[i].act = action;
     }
 
     // execution menu
@@ -504,14 +503,6 @@ void DebuggerMainWnd::updateUI()
     m_bpSetAction->setEnabled(m_debugger->canChangeBreakpoints());
     m_bpSetTempAction->setEnabled(m_debugger->canChangeBreakpoints());
     m_bpEnableAction->setEnabled(m_debugger->canChangeBreakpoints());
-    m_bpTableAction->setChecked(isDockVisible(m_bpTable));
-    m_btWindowAction->setChecked(isDockVisible(m_btWindow));
-    m_localVariablesAction->setChecked(isDockVisible(m_localVariables));
-    m_watchesAction->setChecked(isDockVisible(m_watches));
-    m_registersAction->setChecked(isDockVisible(m_registers));
-    m_threadsAction->setChecked(isDockVisible(m_threads));
-    m_memoryWindowAction->setChecked(isDockVisible(m_memoryWindow));
-    m_ttyWindowAction->setChecked(isDockVisible(m_ttyWindow));
 
     m_fileExecAction->setEnabled(m_debugger->isIdle());
     m_settingsAction->setEnabled(m_debugger->haveExecutable());
@@ -591,12 +582,6 @@ QDockWidget* DebuggerMainWnd::dockParent(QWidget* w)
 	    return dock;
     }
     return 0;
-}
-
-bool DebuggerMainWnd::isDockVisible(QWidget* w)
-{
-    QDockWidget* d = dockParent(w);
-    return d != 0 && d->isVisible();
 }
 
 void DebuggerMainWnd::makeDefaultLayout()
