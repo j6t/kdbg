@@ -586,43 +586,38 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, int intArg1, int intArg2)
     return cmdString;
 }
 
-CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, bool clearLow)
+CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd)
 {
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == GdbCmdInfo::argNone);
 
-    return executeCmdString(cmd, cmds[cmd].fmt, clearLow);
+    return executeCmdString(cmd, cmds[cmd].fmt, false);
 }
 
-CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, QString strArg,
-				    bool clearLow)
+CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, QString strArg)
 {
-    return executeCmdString(cmd, makeCmdString(cmd, strArg), clearLow);
+    return executeCmdString(cmd, makeCmdString(cmd, strArg), false);
 }
 
-CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, int intArg,
-				    bool clearLow)
+CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, int intArg)
 {
 
-    return executeCmdString(cmd, makeCmdString(cmd, intArg), clearLow);
+    return executeCmdString(cmd, makeCmdString(cmd, intArg), false);
 }
 
-CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, QString strArg, int intArg,
-				    bool clearLow)
+CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, QString strArg, int intArg)
 {
-    return executeCmdString(cmd, makeCmdString(cmd, strArg, intArg), clearLow);
+    return executeCmdString(cmd, makeCmdString(cmd, strArg, intArg), false);
 }
 
-CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, QString strArg1, QString strArg2,
-				    bool clearLow)
+CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, QString strArg1, QString strArg2)
 {
-    return executeCmdString(cmd, makeCmdString(cmd, strArg1, strArg2), clearLow);
+    return executeCmdString(cmd, makeCmdString(cmd, strArg1, strArg2), false);
 }
 
-CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, int intArg1, int intArg2,
-				    bool clearLow)
+CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, int intArg1, int intArg2)
 {
-    return executeCmdString(cmd, makeCmdString(cmd, intArg1, intArg2), clearLow);
+    return executeCmdString(cmd, makeCmdString(cmd, intArg1, intArg2), false);
 }
 
 CmdQueueItem* GdbDriver::executeCmdOnce(DbgCommand cmd)

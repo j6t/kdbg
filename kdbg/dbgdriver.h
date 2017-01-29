@@ -326,18 +326,12 @@ public:
      * executed before any low-priority commands. No user interaction is
      * possible as long as there is a high-priority command in the queue.
      */
-    virtual CmdQueueItem* executeCmd(DbgCommand,
-				     bool clearLow = false) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg,
-				     bool clearLow = false) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, int intArg,
-				     bool clearLow = false) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg, int intArg,
-				     bool clearLow = false) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg1, QString strArg2,
-				     bool clearLow = false) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, int intArg1, int intArg2,
-				     bool clearLow = false) = 0;
+    virtual CmdQueueItem* executeCmd(DbgCommand) = 0;
+    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg) = 0;
+    virtual CmdQueueItem* executeCmd(DbgCommand, int intArg) = 0;
+    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg, int intArg) = 0;
+    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg1, QString strArg2) = 0;
+    virtual CmdQueueItem* executeCmd(DbgCommand, int intArg1, int intArg2) = 0;
     virtual CmdQueueItem* executeCmdOnce(DbgCommand) = 0;
     virtual CmdQueueItem* executeCmdOnce(DbgCommand, QString strArg, int intArg) = 0;
 

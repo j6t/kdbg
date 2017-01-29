@@ -507,49 +507,46 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, int intArg1, int intArg2)
 }
 
 CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, bool clearLow)
+XsldbgDriver::executeCmd(DbgCommand cmd)
 {
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == XsldbgCmdInfo::argNone);
 
-    return executeCmdString(cmd, cmds[cmd].fmt, clearLow);
+    return executeCmdString(cmd, cmds[cmd].fmt, false);
 }
 
 CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, QString strArg, bool clearLow)
+XsldbgDriver::executeCmd(DbgCommand cmd, QString strArg)
 {
-    return executeCmdString(cmd, makeCmdString(cmd, strArg), clearLow);
+    return executeCmdString(cmd, makeCmdString(cmd, strArg), false);
 }
 
 CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, int intArg, bool clearLow)
+XsldbgDriver::executeCmd(DbgCommand cmd, int intArg)
 {
 
-    return executeCmdString(cmd, makeCmdString(cmd, intArg), clearLow);
+    return executeCmdString(cmd, makeCmdString(cmd, intArg), false);
 }
 
 CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, QString strArg, int intArg,
-                         bool clearLow)
+XsldbgDriver::executeCmd(DbgCommand cmd, QString strArg, int intArg)
 {
     return executeCmdString(cmd, makeCmdString(cmd, strArg, intArg),
-                            clearLow);
+                            false);
 }
 
 CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, QString strArg1, QString strArg2,
-                         bool clearLow)
+XsldbgDriver::executeCmd(DbgCommand cmd, QString strArg1, QString strArg2)
 {
     return executeCmdString(cmd, makeCmdString(cmd, strArg1, strArg2),
-                            clearLow);
+                            false);
 }
 
 CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, int intArg1, int intArg2,
-                         bool clearLow)
+XsldbgDriver::executeCmd(DbgCommand cmd, int intArg1, int intArg2)
 {
     return executeCmdString(cmd, makeCmdString(cmd, intArg1, intArg2),
-                            clearLow);
+                            false);
 }
 
 CmdQueueItem *

@@ -22,18 +22,12 @@ class XsldbgDriver:public DebuggerDriver {
     virtual bool startup(QString cmdStr);
     virtual void commandFinished(CmdQueueItem * cmd);
 
-    virtual CmdQueueItem *executeCmd(DbgCommand, bool clearLow = false);
-    virtual CmdQueueItem *executeCmd(DbgCommand, QString strArg,
-                                     bool clearLow = false);
-    virtual CmdQueueItem *executeCmd(DbgCommand, int intArg,
-                                     bool clearLow = false);
-    virtual CmdQueueItem *executeCmd(DbgCommand, QString strArg,
-                                     int intArg, bool clearLow = false);
-    virtual CmdQueueItem *executeCmd(DbgCommand, QString strArg1,
-                                     QString strArg2, bool clearLow =
-                                     false);
-    virtual CmdQueueItem *executeCmd(DbgCommand, int intArg1, int intArg2,
-                                     bool clearLow = false);
+    virtual CmdQueueItem* executeCmd(DbgCommand);
+    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg);
+    virtual CmdQueueItem* executeCmd(DbgCommand, int intArg);
+    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg, int intArg);
+    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg1, QString strArg2);
+    virtual CmdQueueItem* executeCmd(DbgCommand, int intArg1, int intArg2);
     virtual CmdQueueItem* executeCmdOnce(DbgCommand);
     virtual CmdQueueItem* executeCmdOnce(DbgCommand, QString strArg, int intArg);
     virtual CmdQueueItem *queueCmd(DbgCommand, QueueMode mode);
