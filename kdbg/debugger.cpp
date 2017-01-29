@@ -1199,7 +1199,8 @@ void KDebugger::backgroundUpdate()
 
 void KDebugger::handleRunCommands(const char* output)
 {
-    uint flags = m_d->parseProgramStopped(output, m_statusMessage);
+    uint flags = m_d->parseProgramStopped(output, !m_corefile.isEmpty(),
+					  m_statusMessage);
     emit updateStatusMessage();
 
     m_programActive = flags & DebuggerDriver::SFprogramActive;

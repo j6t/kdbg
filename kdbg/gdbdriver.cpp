@@ -591,10 +591,6 @@ CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, bool clearLow)
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == GdbCmdInfo::argNone);
 
-    if (cmd == DCrun) {
-	m_haveCoreFile = false;
-    }
-
     return executeCmdString(cmd, cmds[cmd].fmt, clearLow);
 }
 
@@ -2292,8 +2288,6 @@ bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
 {
     message = output;
 
-    m_haveCoreFile = false;
-
     /*
      * Lines starting with the following do not indicate errors:
      *     Using host libthread_db
@@ -2324,11 +2318,11 @@ bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
 bool GdbDriver::parseCoreFile(const char* output)
 {
     // if command succeeded, gdb emits a line starting with "#0 "
-    m_haveCoreFile = strstr(output, "\n#0 ") != 0;
-    return m_haveCoreFile;
+    return strstr(output, "\n#0 ") != 0;
 }
 
-uint GdbDriver::parseProgramStopped(const char* output, QString& message)
+uint GdbDriver::parseProgramStopped(const char* output, bool haveCoreFile,
+				    QString& message)
 {
     // optionally: "program changed, rereading symbols",
     // followed by:
@@ -2357,7 +2351,7 @@ uint GdbDriver::parseProgramStopped(const char* output, QString& message)
 	     * "Program received signal"... when a signal happens.)
 	     */
 	    if (strncmp(start, "Program exited", 14) == 0 ||
-		(strncmp(start, "Program terminated", 18) == 0 && !m_haveCoreFile) ||
+		(strncmp(start, "Program terminated", 18) == 0 && !haveCoreFile) ||
 		strncmp(start, "ptrace: ", 8) == 0)
 	    {
 		flags &= ~SFprogramActive;

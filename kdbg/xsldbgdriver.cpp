@@ -512,10 +512,6 @@ XsldbgDriver::executeCmd(DbgCommand cmd, bool clearLow)
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == XsldbgCmdInfo::argNone);
 
-    if (cmd == DCrun) {
-        m_haveCoreFile = false;
-    }
-
     return executeCmdString(cmd, cmds[cmd].fmt, clearLow);
 }
 
@@ -1295,7 +1291,6 @@ XsldbgDriver::parseChangeExecutable(const char *output, QString & message)
 {
     message = output;
     TRACE(QString("XsldbgDriver::parseChangeExecutable :") + output);
-    m_haveCoreFile = false;
 
     if (strstr(output, "Load of source deferred. Use the run command") != 0) {
         TRACE("Parsed stylesheet executable");
@@ -1311,15 +1306,16 @@ XsldbgDriver::parseCoreFile(const char *output)
     TRACE(output);
 
     if (strstr(output, "Load of data file deferred. Use the run command") != 0) {
-        m_haveCoreFile = true;
         TRACE("Parsed data file name");
+	return true;
     }
 
-    return m_haveCoreFile;
+    return false;
 }
 
 uint
-XsldbgDriver::parseProgramStopped(const char *output, QString & message)
+XsldbgDriver::parseProgramStopped(const char *output, bool,
+				  QString & message)
 {
     /* Not sure about this function leave it here for the moment */
     /*

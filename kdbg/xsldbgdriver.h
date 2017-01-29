@@ -71,7 +71,7 @@ class XsldbgDriver:public DebuggerDriver {
     virtual bool parseChangeExecutable(const char *output,
                                        QString & message);
     virtual bool parseCoreFile(const char *output);
-    virtual uint parseProgramStopped(const char *output,
+    virtual uint parseProgramStopped(const char *output,  bool haveCoreFile,
                                      QString & message);
     virtual QStringList parseSharedLibs(const char *output);
     virtual bool parseFindType(const char *output, QString & type);
@@ -88,7 +88,6 @@ class XsldbgDriver:public DebuggerDriver {
     QString m_xslFile;		/* needed to display it initially */
     bool m_haveDataFile;       /* have we set the XML data file to use? */ 
     QString m_redirect;         /* redirection to /dev/null */
-    bool m_haveCoreFile;
 
     QString makeCmdString(DbgCommand cmd, QString strArg);
     QString makeCmdString(DbgCommand cmd, int intArg);

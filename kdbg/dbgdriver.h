@@ -486,9 +486,12 @@ public:
     };
     /**
      * Parses the output of commands that execute (a piece of) the program.
+     * \a haveCoreFile indicates whether the "stop" could be due to
+     * a core file being loaded.
      * @return The inclusive OR of zero or more of the StopFlags.
      */
-    virtual uint parseProgramStopped(const char* output, QString& message) = 0;
+    virtual uint parseProgramStopped(const char* output, bool haveCoreFile,
+				     QString& message) = 0;
 
     /**
      * Parses the output of the DCsharedlibs command.
