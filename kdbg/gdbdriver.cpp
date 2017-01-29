@@ -625,6 +625,19 @@ CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, int intArg1, int intArg2,
     return executeCmdString(cmd, makeCmdString(cmd, intArg1, intArg2), clearLow);
 }
 
+CmdQueueItem* GdbDriver::executeCmdOnce(DbgCommand cmd)
+{
+    assert(cmd >= 0 && cmd < NUM_CMDS);
+    assert(cmds[cmd].argsNeeded == GdbCmdInfo::argNone);
+
+    return executeCmdString(cmd, cmds[cmd].fmt, true);
+}
+
+CmdQueueItem* GdbDriver::executeCmdOnce(DbgCommand cmd, QString strArg, int intArg)
+{
+    return executeCmdString(cmd, makeCmdString(cmd, strArg, intArg), true);
+}
+
 CmdQueueItem* GdbDriver::queueCmd(DbgCommand cmd, QueueMode mode)
 {
     return queueCmdString(cmd, cmds[cmd].fmt, mode);

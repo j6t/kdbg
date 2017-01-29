@@ -36,6 +36,8 @@ public:
 				     bool clearLow = false);
     virtual CmdQueueItem* executeCmd(DbgCommand, int intArg1, int intArg2,
 				     bool clearLow = false);
+    virtual CmdQueueItem* executeCmdOnce(DbgCommand);
+    virtual CmdQueueItem* executeCmdOnce(DbgCommand, QString strArg, int intArg);
     virtual CmdQueueItem* queueCmd(DbgCommand,
 				   QueueMode mode);
     virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg,

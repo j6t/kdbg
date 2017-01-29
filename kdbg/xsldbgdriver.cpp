@@ -553,6 +553,22 @@ XsldbgDriver::executeCmd(DbgCommand cmd, int intArg1, int intArg2,
 }
 
 CmdQueueItem *
+XsldbgDriver::executeCmdOnce(DbgCommand cmd)
+{
+    assert(cmd >= 0 && cmd < NUM_CMDS);
+    assert(cmds[cmd].argsNeeded == XsldbgCmdInfo::argNone);
+
+    return executeCmdString(cmd, cmds[cmd].fmt, true);
+}
+
+CmdQueueItem *
+XsldbgDriver::executeCmdOnce(DbgCommand cmd, QString strArg, int intArg)
+{
+    return executeCmdString(cmd, makeCmdString(cmd, strArg, intArg),
+                            true);
+}
+
+CmdQueueItem *
 XsldbgDriver::queueCmd(DbgCommand cmd, QueueMode mode)
 {
     return queueCmdString(cmd, cmds[cmd].fmt, mode);

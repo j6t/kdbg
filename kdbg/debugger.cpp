@@ -228,10 +228,10 @@ void KDebugger::programRun()
     // otherwise run the program
     if (m_programActive && m_corefile.isEmpty()) {
 	// gdb command: continue
-	m_d->executeCmd(DCcont, true);
+	m_d->executeCmdOnce(DCcont);
     } else {
 	// gdb command: run
-	m_d->executeCmd(DCrun, true);
+	m_d->executeCmdOnce(DCrun);
 	m_corefile = QString();
 	m_programActive = true;
     }
@@ -253,7 +253,7 @@ void KDebugger::attachProgram(const QString& pid)
 void KDebugger::programRunAgain()
 {
     if (canSingleStep()) {
-	m_d->executeCmd(DCrun, true);
+	m_d->executeCmdOnce(DCrun);
 	m_corefile = QString();
 	m_programRunning = true;
     }
@@ -262,7 +262,7 @@ void KDebugger::programRunAgain()
 void KDebugger::programStep()
 {
     if (canSingleStep()) {
-	m_d->executeCmd(DCstep, true);
+	m_d->executeCmdOnce(DCstep);
 	m_programRunning = true;
     }
 }
@@ -270,7 +270,7 @@ void KDebugger::programStep()
 void KDebugger::programNext()
 {
     if (canSingleStep()) {
-	m_d->executeCmd(DCnext, true);
+	m_d->executeCmdOnce(DCnext);
 	m_programRunning = true;
     }
 }
@@ -278,7 +278,7 @@ void KDebugger::programNext()
 void KDebugger::programStepi()
 {
     if (canSingleStep()) {
-	m_d->executeCmd(DCstepi, true);
+	m_d->executeCmdOnce(DCstepi);
 	m_programRunning = true;
     }
 }
@@ -286,7 +286,7 @@ void KDebugger::programStepi()
 void KDebugger::programNexti()
 {
     if (canSingleStep()) {
-	m_d->executeCmd(DCnexti, true);
+	m_d->executeCmdOnce(DCnexti);
 	m_programRunning = true;
     }
 }
@@ -294,7 +294,7 @@ void KDebugger::programNexti()
 void KDebugger::programFinish()
 {
     if (canSingleStep()) {
-	m_d->executeCmd(DCfinish, true);
+	m_d->executeCmdOnce(DCfinish);
 	m_programRunning = true;
     }
 }
@@ -307,7 +307,7 @@ void KDebugger::programKill()
 	}
 	// this is an emergency command; flush queues
 	m_d->flushCommands(true);
-	m_d->executeCmd(DCkill, true);
+	m_d->executeCmdOnce(DCkill);
     }
 }
 
@@ -319,7 +319,7 @@ void KDebugger::programDetach()
 	}
 	// this is an emergency command; flush queues
 	m_d->flushCommands(true);
-	m_d->executeCmd(DCdetach, true);
+	m_d->executeCmdOnce(DCdetach);
     }
 }
 
@@ -328,7 +328,7 @@ bool KDebugger::runUntil(const QString& fileName, int lineNo)
     if (isReady() && m_programActive && !m_programRunning) {
 	// strip off directory part of file name
 	QFileInfo fi(fileName);
-	m_d->executeCmd(DCuntil, fi.fileName(), lineNo, true);
+	m_d->executeCmdOnce(DCuntil, fi.fileName(), lineNo);
 	m_programRunning = true;
 	return true;
     } else {
@@ -2096,7 +2096,7 @@ void KDebugger::slotValuePopup(const QString& expr)
 	    if (v == 0) {
 		// nothing found, try printing variable in gdb
 		if (m_d) {
-		    CmdQueueItem *cmd = m_d->executeCmd(DCprintPopup, expr, false);
+		    CmdQueueItem *cmd = m_d->executeCmd(DCprintPopup, expr);
 		    cmd->m_popupExpr = expr;
 		}
 		return;

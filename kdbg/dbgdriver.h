@@ -338,6 +338,8 @@ public:
 				     bool clearLow = false) = 0;
     virtual CmdQueueItem* executeCmd(DbgCommand, int intArg1, int intArg2,
 				     bool clearLow = false) = 0;
+    virtual CmdQueueItem* executeCmdOnce(DbgCommand) = 0;
+    virtual CmdQueueItem* executeCmdOnce(DbgCommand, QString strArg, int intArg) = 0;
 
     enum QueueMode {
 	QMnormal,			/* queues the command last */
