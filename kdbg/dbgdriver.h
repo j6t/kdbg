@@ -326,14 +326,18 @@ public:
      * executed before any low-priority commands. No user interaction is
      * possible as long as there is a high-priority command in the queue.
      */
-    virtual CmdQueueItem* executeCmd(DbgCommand) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, int intArg) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg, int intArg) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg1, QString strArg2) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, int intArg1, int intArg2) = 0;
-    virtual CmdQueueItem* executeCmdOnce(DbgCommand) = 0;
-    virtual CmdQueueItem* executeCmdOnce(DbgCommand, QString strArg, int intArg) = 0;
+    template<class... ARGS>
+    CmdQueueItem* executeCmd(DbgCommand cmd, ARGS&&... args)
+    {
+	return executeCmdString(cmd,
+			makeCmdString(cmd, std::forward<ARGS>(args)...), false);
+    }
+    template<class... ARGS>
+    CmdQueueItem* executeCmdOnce(DbgCommand cmd, ARGS&&... args)
+    {
+	return executeCmdString(cmd,
+			makeCmdString(cmd, std::forward<ARGS>(args)...), true);
+    }
 
     enum QueueMode {
 	QMnormal,			/* queues the command last */
@@ -349,23 +353,20 @@ public:
     template<class... ARGS>
     CmdQueueItem* queueCmdAgain(DbgCommand cmd, ARGS&&... args)
     {
-	return queueCmd(cmd, std::forward<ARGS>(args)..., QMnormal);
+	return queueCmdString(cmd,
+			makeCmdString(cmd, std::forward<ARGS>(args)...), QMnormal);
     }
 
     /**
-     * Enqueues a low-priority command. Low-priority commands are executed
-     * after any high-priority commands.
+     * Enqueues a low-priority command, unless it is already in the queue.
+     * Low-priority commands are executed after any high-priority commands.
      */
-    virtual CmdQueueItem* queueCmd(DbgCommand,
-				   QueueMode mode = QMoverride) = 0;
-    virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg,
-				   QueueMode mode = QMoverride) = 0;
-    virtual CmdQueueItem* queueCmd(DbgCommand, int intArg,
-				   QueueMode mode = QMoverride) = 0;
-    virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg, int intArg,
-				   QueueMode mode = QMoverride) = 0;
-    virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg1, QString strArg2,
-				   QueueMode mode = QMoverride) = 0;
+    template<class... ARGS>
+    CmdQueueItem* queueCmd(DbgCommand cmd, ARGS&&... args)
+    {
+	return queueCmdString(cmd,
+			makeCmdString(cmd, std::forward<ARGS>(args)...), QMoverride);
+    }
 
     /**
      * Enqueues a low-priority command in front of all other low-prority
@@ -375,7 +376,8 @@ public:
     template<class... ARGS>
     CmdQueueItem* queueCmdPrio(DbgCommand cmd, ARGS&&... args)
     {
-	return queueCmd(cmd, std::forward<ARGS>(args)..., QMoverrideMoreEqual);
+	return queueCmdString(cmd,
+			makeCmdString(cmd, std::forward<ARGS>(args)...), QMoverrideMoreEqual);
     }
 
    /**
@@ -583,6 +585,12 @@ protected:
 				   bool clearLow);
     void writeCommand();
     virtual void commandFinished(CmdQueueItem* cmd) = 0;
+    virtual QString makeCmdString(DbgCommand cmd) = 0;
+    virtual QString makeCmdString(DbgCommand cmd, QString strArg) = 0;
+    virtual QString makeCmdString(DbgCommand cmd, int intArg) = 0;
+    virtual QString makeCmdString(DbgCommand cmd, QString strArg, int intArg) = 0;
+    virtual QString makeCmdString(DbgCommand cmd, QString strArg1, QString strArg2) = 0;
+    virtual QString makeCmdString(DbgCommand cmd, int intArg1, int intArg2) = 0;
 
 protected:
     void processOutput(const QByteArray& data);

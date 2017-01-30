@@ -506,95 +506,13 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, int intArg1, int intArg2)
     return cmdString;
 }
 
-CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd)
+QString
+XsldbgDriver::makeCmdString(DbgCommand cmd)
 {
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == XsldbgCmdInfo::argNone);
 
-    return executeCmdString(cmd, cmds[cmd].fmt, false);
-}
-
-CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, QString strArg)
-{
-    return executeCmdString(cmd, makeCmdString(cmd, strArg), false);
-}
-
-CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, int intArg)
-{
-
-    return executeCmdString(cmd, makeCmdString(cmd, intArg), false);
-}
-
-CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, QString strArg, int intArg)
-{
-    return executeCmdString(cmd, makeCmdString(cmd, strArg, intArg),
-                            false);
-}
-
-CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, QString strArg1, QString strArg2)
-{
-    return executeCmdString(cmd, makeCmdString(cmd, strArg1, strArg2),
-                            false);
-}
-
-CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, int intArg1, int intArg2)
-{
-    return executeCmdString(cmd, makeCmdString(cmd, intArg1, intArg2),
-                            false);
-}
-
-CmdQueueItem *
-XsldbgDriver::executeCmdOnce(DbgCommand cmd)
-{
-    assert(cmd >= 0 && cmd < NUM_CMDS);
-    assert(cmds[cmd].argsNeeded == XsldbgCmdInfo::argNone);
-
-    return executeCmdString(cmd, cmds[cmd].fmt, true);
-}
-
-CmdQueueItem *
-XsldbgDriver::executeCmdOnce(DbgCommand cmd, QString strArg, int intArg)
-{
-    return executeCmdString(cmd, makeCmdString(cmd, strArg, intArg),
-                            true);
-}
-
-CmdQueueItem *
-XsldbgDriver::queueCmd(DbgCommand cmd, QueueMode mode)
-{
-    return queueCmdString(cmd, cmds[cmd].fmt, mode);
-}
-
-CmdQueueItem *
-XsldbgDriver::queueCmd(DbgCommand cmd, QString strArg, QueueMode mode)
-{
-    return queueCmdString(cmd, makeCmdString(cmd, strArg), mode);
-}
-
-CmdQueueItem *
-XsldbgDriver::queueCmd(DbgCommand cmd, int intArg, QueueMode mode)
-{
-    return queueCmdString(cmd, makeCmdString(cmd, intArg), mode);
-}
-
-CmdQueueItem *
-XsldbgDriver::queueCmd(DbgCommand cmd, QString strArg, int intArg,
-                       QueueMode mode)
-{
-    return queueCmdString(cmd, makeCmdString(cmd, strArg, intArg), mode);
-}
-
-CmdQueueItem *
-XsldbgDriver::queueCmd(DbgCommand cmd, QString strArg1, QString strArg2,
-                       QueueMode mode)
-{
-    return queueCmdString(cmd, makeCmdString(cmd, strArg1, strArg2), mode);
+    return cmds[cmd].fmt;
 }
 
 void
