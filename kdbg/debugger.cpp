@@ -180,9 +180,9 @@ bool KDebugger::debugProgram(const QString& name,
     // set remote target
     if (!m_remoteDevice.isEmpty()) {
 	m_d->executeCmd(DCtargetremote, m_remoteDevice);
-	m_d->queueCmd(DCbt, DebuggerDriver::QMoverride);
-	m_d->queueCmd(DCinfothreads, DebuggerDriver::QMoverride);
-	m_d->queueCmd(DCframe, 0, DebuggerDriver::QMnormal);
+	m_d->queueCmd(DCbt);
+	m_d->queueCmd(DCinfothreads);
+	m_d->queueCmdAgain(DCframe, 0);
 	m_programActive = true;
 	m_haveExecutable = true;
     }
@@ -446,7 +446,7 @@ CmdQueueItem* KDebugger::executeBreakpoint(const Breakpoint* bp, bool queueOnly)
 	QString file = QFileInfo(bp->fileName).fileName();
 	if (queueOnly) {
 	    cmd = m_d->queueCmd(bp->temporary ? DCtbreakline : DCbreakline,
-				file, bp->lineNo, DebuggerDriver::QMoverride);
+				file, bp->lineNo);
 	} else {
 	    cmd = m_d->executeCmd(bp->temporary ? DCtbreakline : DCbreakline,
 				  file, bp->lineNo);
@@ -456,7 +456,7 @@ CmdQueueItem* KDebugger::executeBreakpoint(const Breakpoint* bp, bool queueOnly)
     {
 	if (queueOnly) {
 	    cmd = m_d->queueCmd(bp->temporary ? DCtbreakaddr : DCbreakaddr,
-				bp->address.asString(), DebuggerDriver::QMoverride);
+				bp->address.asString());
 	} else {
 	    cmd = m_d->executeCmd(bp->temporary ? DCtbreakaddr : DCbreakaddr,
 				  bp->address.asString());
@@ -539,7 +539,7 @@ bool KDebugger::conditionalBreakpoint(BrkptIterator bp,
 	}
 	if (changed) {
 	    // get the changes
-	    m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
+	    m_d->queueCmd(DCinfobreak);
 	}
     } else {
 	bp->condition = condition;
@@ -997,7 +997,7 @@ void KDebugger::restoreBreakpoints(KConfig* config)
 	// the new breakpoint is disabled or conditionalized later
 	// in newBreakpoint()
     }
-    m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
+    m_d->queueCmd(DCinfobreak);
 }
 
 
@@ -1041,7 +1041,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	    }
 	    else if (!m_attachedPid.isEmpty())
 	    {
-		m_d->queueCmd(DCattach, m_attachedPid, DebuggerDriver::QMoverride);
+		m_d->queueCmd(DCattach, m_attachedPid);
 		m_programActive = true;
 		m_programRunning = true;
 	    }
@@ -1051,7 +1051,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	    }
 	    else
 	    {
-		m_d->queueCmd(DCinfolinemain, DebuggerDriver::QMnormal);
+		m_d->queueCmdAgain(DCinfolinemain);
 	    }
 	    if (!m_statusMessage.isEmpty())
 		emit updateStatusMessage();
@@ -1078,7 +1078,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 
 	    // if core file was loaded from command line, revert to info line main
 	    if (!cmd->m_byUser) {
-		m_d->queueCmd(DCinfolinemain, DebuggerDriver::QMnormal);
+		m_d->queueCmdAgain(DCinfolinemain);
 	    }
 	    m_corefile = QString();	/* core file not available any more */
 	}
@@ -1154,7 +1154,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCenable:
     case DCdisable:
 	// these commands need immediate response
-	m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverrideMoreEqual);
+	m_d->queueCmdPrio(DCinfobreak);
 	break;
     case DCinfobreak:
 	// note: this handler must not enqueue a command, since
@@ -1233,7 +1233,7 @@ void KDebugger::handleRunCommands(const char* output)
     if ((flags & (DebuggerDriver::SFrefreshBreak|DebuggerDriver::SFrefreshSource)) ||
 	stopMayChangeBreakList())
     {
-	m_d->queueCmd(DCinfobreak, DebuggerDriver::QMoverride);
+	m_d->queueCmd(DCinfobreak);
     }
 
     /*
@@ -1248,7 +1248,7 @@ void KDebugger::handleRunCommands(const char* output)
 
     // get the backtrace if the program is running
     if (m_programActive) {
-	m_d->queueCmd(DCbt, DebuggerDriver::QMoverride);
+	m_d->queueCmd(DCbt);
     } else {
 	// program finished: erase PC
 	emit updatePC(QString(), -1, DbgAddr(), 0);
@@ -1258,7 +1258,7 @@ void KDebugger::handleRunCommands(const char* output)
 
     /* Update threads list */
     if (m_programActive && (flags & DebuggerDriver::SFrefreshThreads)) {
-	m_d->queueCmd(DCinfothreads, DebuggerDriver::QMoverride);
+	m_d->queueCmd(DCinfothreads);
     }
 
     m_programRunning = false;
@@ -1276,10 +1276,10 @@ void KDebugger::updateAllExprs()
 	return;
 
     // retrieve local variables
-    m_d->queueCmd(DCinfolocals, DebuggerDriver::QMoverride);
+    m_d->queueCmd(DCinfolocals);
 
     // retrieve registers
-    m_d->queueCmd(DCinforegisters, DebuggerDriver::QMoverride);
+    m_d->queueCmd(DCinforegisters);
 
     // get new memory dump
     if (!m_memoryExpression.isEmpty()) {
@@ -1573,7 +1573,7 @@ void KDebugger::evalExpressions()
 	exprItem = m_watchVariables.topLevelExprByName(expr);
     }
     if (exprItem != 0) {
-	CmdQueueItem* cmd = m_d->queueCmd(DCprint, exprItem->getText(), DebuggerDriver::QMoverride);
+	CmdQueueItem* cmd = m_d->queueCmd(DCprint, exprItem->getText());
 	// remember which expr this was
 	cmd->m_expr = exprItem;
 	cmd->m_exprWnd = &m_watchVariables;
@@ -1636,9 +1636,9 @@ void KDebugger::dereferencePointer(ExprWnd* wnd, VarTree* exprItem,
     TRACE("dereferencing pointer: " + expr);
     CmdQueueItem* cmd;
     if (immediate) {
-	cmd = m_d->queueCmd(DCprintDeref, expr, DebuggerDriver::QMoverrideMoreEqual);
+	cmd = m_d->queueCmdPrio(DCprintDeref, expr);
     } else {
-	cmd = m_d->queueCmd(DCprintDeref, expr, DebuggerDriver::QMoverride);
+	cmd = m_d->queueCmd(DCprintDeref, expr);
     }
     // remember which expr this was
     cmd->m_expr = exprItem;
@@ -1652,7 +1652,7 @@ void KDebugger::determineType(ExprWnd* wnd, VarTree* exprItem)
     QString expr = exprItem->computeExpr();
     TRACE("get type of: " + expr);
     CmdQueueItem* cmd;
-    cmd = m_d->queueCmd(DCfindType, expr, DebuggerDriver::QMoverride);
+    cmd = m_d->queueCmd(DCfindType, expr);
 
     // remember which expr this was
     cmd->m_expr = exprItem;
@@ -1785,9 +1785,9 @@ void KDebugger::evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool imm
     {
 	var->m_exprIndexUseGuard = false;
 	QString expr = var->computeExpr();
-	CmdQueueItem* cmd = m_d->queueCmd(DCprintWChar, expr,
-				immediate  ?  DebuggerDriver::QMoverrideMoreEqual
-				: DebuggerDriver::QMoverride);
+	CmdQueueItem* cmd = immediate  ?
+				m_d->queueCmdPrio(DCprintWChar, expr)  :
+				m_d->queueCmd(DCprintWChar, expr)  ;
 	// remember which expression this was
 	cmd->m_expr = var;
 	cmd->m_exprWnd = wnd;
@@ -1832,9 +1832,9 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 	}
     }
     TRACE("evalStruct: " + expr + (var->m_exprIndexUseGuard ? " // guard" : " // real"));
-    CmdQueueItem* cmd = m_d->queueCmd(dbgCmd, expr,
-				      immediate  ?  DebuggerDriver::QMoverrideMoreEqual
-				      : DebuggerDriver::QMnormal);
+    CmdQueueItem* cmd = immediate  ?
+			m_d->queueCmdPrio(dbgCmd, expr)  :
+			m_d->queueCmd(dbgCmd, expr);
 
     // remember which expression this was
     cmd->m_expr = var;
@@ -1856,7 +1856,7 @@ void KDebugger::handleSharedLibs(const char* output)
 
 CmdQueueItem* KDebugger::loadCoreFile()
 {
-    return m_d->queueCmd(DCcorefile, m_corefile, DebuggerDriver::QMoverride);
+    return m_d->queueCmd(DCcorefile, m_corefile);
 }
 
 void KDebugger::slotExpanding(QTreeWidgetItem* item)
@@ -2112,8 +2112,7 @@ void KDebugger::slotValuePopup(const QString& expr)
 void KDebugger::slotDisassemble(const QString& fileName, int lineNo)
 {
     if (m_haveExecutable) {
-	CmdQueueItem* cmd = m_d->queueCmd(DCinfoline, fileName, lineNo,
-					  DebuggerDriver::QMoverrideMoreEqual);
+	CmdQueueItem* cmd = m_d->queueCmdPrio(DCinfoline, fileName, lineNo);
 	cmd->m_fileName = fileName;
 	cmd->m_lineNo = lineNo;
     }
@@ -2126,8 +2125,7 @@ void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 	// disassemble
 	if (m_d->parseInfoLine(output, addrFrom, addrTo)) {
 	    // got the address range, now get the real code
-	    CmdQueueItem* c = m_d->queueCmd(DCdisassemble, addrFrom, addrTo,
-					    DebuggerDriver::QMoverrideMoreEqual);
+	    CmdQueueItem* c = m_d->queueCmdPrio(DCdisassemble, addrFrom, addrTo);
 	    c->m_fileName = cmd->m_fileName;
 	    c->m_lineNo = cmd->m_lineNo;
 	} else {
@@ -2156,7 +2154,7 @@ void KDebugger::handleThreadList(const char* output)
 
 void KDebugger::setThread(int id)
 {
-    m_d->queueCmd(DCthread, id, DebuggerDriver::QMoverrideMoreEqual);
+    m_d->queueCmdPrio(DCthread, id);
 }
 
 void KDebugger::setMemoryExpression(const QString& memexpr)
@@ -2174,9 +2172,10 @@ void KDebugger::setMemoryExpression(const QString& memexpr)
 
 void KDebugger::queueMemoryDump(bool immediate)
 {
-    m_d->queueCmd(DCexamine, m_memoryExpression, m_memoryFormat,
-		  immediate ? DebuggerDriver::QMoverrideMoreEqual :
-			      DebuggerDriver::QMoverride);
+    if (immediate)
+	m_d->queueCmdPrio(DCexamine, m_memoryExpression, m_memoryFormat);
+    else
+	m_d->queueCmd(DCexamine, m_memoryExpression, m_memoryFormat);
 }
 
 void KDebugger::handleMemoryDump(const char* output)
@@ -2236,8 +2235,7 @@ void KDebugger::handleSetVariable(CmdQueueItem* cmd, const char* output)
 
     // get the new value
     QString expr = cmd->m_expr->computeExpr();
-    CmdQueueItem* printCmd =
-	m_d->queueCmd(DCprint, expr, DebuggerDriver::QMoverrideMoreEqual);
+    CmdQueueItem* printCmd = m_d->queueCmdPrio(DCprint, expr);
     printCmd->m_expr = cmd->m_expr;
     printCmd->m_exprWnd = cmd->m_exprWnd;
 }

@@ -342,21 +342,43 @@ public:
     };
 
     /**
+     * Enqueues a low-priority command irrespective of whether it as already
+     * in the queue.
+     * Low-priority commands are executed after any high-priority commands.
+     */
+    template<class... ARGS>
+    CmdQueueItem* queueCmdAgain(DbgCommand cmd, ARGS&&... args)
+    {
+	return queueCmd(cmd, std::forward<ARGS>(args)..., QMnormal);
+    }
+
+    /**
      * Enqueues a low-priority command. Low-priority commands are executed
      * after any high-priority commands.
      */
     virtual CmdQueueItem* queueCmd(DbgCommand,
-				   QueueMode mode) = 0;
+				   QueueMode mode = QMoverride) = 0;
     virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg,
-				   QueueMode mode) = 0;
+				   QueueMode mode = QMoverride) = 0;
     virtual CmdQueueItem* queueCmd(DbgCommand, int intArg,
-				   QueueMode mode) = 0;
+				   QueueMode mode = QMoverride) = 0;
     virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg, int intArg,
-				   QueueMode mode) = 0;
+				   QueueMode mode = QMoverride) = 0;
     virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg1, QString strArg2,
-				   QueueMode mode) = 0;
+				   QueueMode mode = QMoverride) = 0;
 
     /**
+     * Enqueues a low-priority command in front of all other low-prority
+     * commands.
+     * Low-priority commands are executed after any high-priority commands.
+     */
+    template<class... ARGS>
+    CmdQueueItem* queueCmdPrio(DbgCommand cmd, ARGS&&... args)
+    {
+	return queueCmd(cmd, std::forward<ARGS>(args)..., QMoverrideMoreEqual);
+    }
+
+   /**
      * Flushes the command queues.
      * @param hipriOnly if true, only the high priority queue is flushed.
      */
