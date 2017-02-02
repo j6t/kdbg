@@ -42,6 +42,7 @@ protected:
 
     virtual void contextMenuEvent(QContextMenuEvent* ev);
     void displayNewExpression(const QString& expr);
+    QString parseMemoryDumpLineToAscii(const QString& line);
 
 public slots:
     void slotNewExpression(const QString&);
