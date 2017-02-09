@@ -14,6 +14,7 @@
 #include <kconfiggroup.h>
 #include "debugger.h"
 
+const int COL_ADDR = 0;
 const int COL_DUMP_ASCII = 9;
 
 MemoryWindow::MemoryWindow(QWidget* parent) :
@@ -34,10 +35,13 @@ MemoryWindow::MemoryWindow(QWidget* parent) :
 
     m_memory.setColumnCount(10);
     m_memory.setHeaderLabel(i18n("Address"));
+    m_memory.header()->setSectionResizeMode(COL_ADDR, QHeaderView::Fixed);
     for (int i = 1; i < 10; i++) {
 	m_memory.hideColumn(i);
+	m_memory.header()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
 	m_memory.headerItem()->setText(i, QString());
     }
+    m_memory.header()->setSectionResizeMode(COL_DUMP_ASCII, QHeaderView::Fixed);
     m_memory.header()->setStretchLastSection(false);
 
     m_memory.setSortingEnabled(false);		/* don't sort */
@@ -222,10 +226,18 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 
     QMap<QString,QString> tmpMap;
 
+    QFontMetrics fm(font());
+    int maxWidthAddr = 0;
+    int maxWidthAscii = 0;
+
     for (; md != memdump.end(); ++md)
     {
 	QString addr = md->address.asString() + " " + md->address.fnoffs;
 	QStringList sl = md->dump.split( "\t" );
+
+	if (fm.width(addr) > maxWidthAddr) {
+	    maxWidthAddr = fm.width(addr);
+	}
 
 	// save memory
 	tmpMap[addr] = md->dump;
@@ -236,6 +248,10 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	if (showDumpAscii) {
 	    QString dumpAscii = parseMemoryDumpLineToAscii(md->dump);
 	    line->setText(COL_DUMP_ASCII, dumpAscii);
+	    line->setTextAlignment(COL_DUMP_ASCII, Qt::AlignRight);
+	    if (fm.width(dumpAscii) > maxWidthAscii) {
+		maxWidthAscii = fm.width(dumpAscii);
+	    }
 	}
 
 	QStringList tmplist;
@@ -252,6 +268,11 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	    line->setForeground(i+1, changed ? QBrush(QColor(Qt::red)) : palette().text());
 	}
     }
+
+    // resize to longest string and add padding to addr/dumpascii columns
+    int padding = 25;
+    m_memory.header()->resizeSection(COL_ADDR, maxWidthAddr + padding);
+    m_memory.header()->resizeSection(COL_DUMP_ASCII, maxWidthAscii + padding);
 
     m_old_memory.clear();
     m_old_memory = tmpMap;
