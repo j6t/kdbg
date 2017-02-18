@@ -270,6 +270,8 @@ bool GdbDriver::startup(QString cmdStr)
 	"list\n"
 	"info line\n"
 	"end\n"
+	// check endianness for memory dumps
+	"show endian\n"
 	// change prompt string and synchronize with gdb
 	"set prompt " PROMPT "\n"
 	;
@@ -319,6 +321,8 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
 		}
 	    }
 	    cmds[DCdisassemble].fmt = disass;
+
+	    m_littleendian = m_output.contains("little endian");
 	}
 	break;
     default:;
@@ -2763,6 +2767,7 @@ QString GdbDriver::parseMemoryDump(const char* output, std::list<MemoryDump>& me
 	    md.dump = QString::fromLatin1(p, strlen(p));
 	    p += strlen(p);
 	}
+	md.littleendian = m_littleendian;
 	memdump.push_back(md);
     }
     

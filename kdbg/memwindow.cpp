@@ -5,6 +5,7 @@
  */
 
 #include "memwindow.h"
+#include <QFontDatabase>
 #include <QHeaderView>
 #include <QMouseEvent>
 #include <QList>
@@ -13,6 +14,8 @@
 #include <kconfiggroup.h>
 #include "debugger.h"
 
+const int COL_ADDR = 0;
+const int COL_DUMP_ASCII = 9;
 
 MemoryWindow::MemoryWindow(QWidget* parent) :
 	QWidget(parent),
@@ -22,25 +25,31 @@ MemoryWindow::MemoryWindow(QWidget* parent) :
 	m_layout(QBoxLayout::TopToBottom, this),
 	m_format(MDTword | MDThex)
 {
+    setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
+
     m_expression.setEditable(true);
     QSize minSize = m_expression.sizeHint();
     m_expression.setMinimumSize(minSize);
     m_expression.setInsertPolicy(QComboBox::NoInsert);
     m_expression.setMaxCount(15);
 
-    m_memory.setColumnCount(9);
+    m_memory.setColumnCount(10);
     m_memory.setHeaderLabel(i18n("Address"));
-    for (int i = 1; i < 9; i++) {
+    m_memory.header()->setSectionResizeMode(COL_ADDR, QHeaderView::Fixed);
+    for (int i = 1; i < 10; i++) {
 	m_memory.hideColumn(i);
-	m_memory.header()->setSectionResizeMode(QHeaderView::ResizeToContents);
+	m_memory.header()->setSectionResizeMode(i, QHeaderView::ResizeToContents);
 	m_memory.headerItem()->setText(i, QString());
     }
+    m_memory.header()->setSectionResizeMode(COL_DUMP_ASCII, QHeaderView::Fixed);
     m_memory.header()->setStretchLastSection(false);
 
     m_memory.setSortingEnabled(false);		/* don't sort */
     m_memory.setAllColumnsShowFocus(true);
     m_memory.setRootIsDecorated(false);
+    m_memory.header()->setSectionResizeMode(QHeaderView::ResizeToContents);
     m_memory.header()->setSectionsClickable(false);
+    m_memory.header()->setSectionsMovable(false);  // don't move columns
     m_memory.setContextMenuPolicy(Qt::NoContextMenu);	// defer to parent
 
     // create layout
@@ -165,6 +174,42 @@ void MemoryWindow::slotTypeChange(QAction* action)
     displayNewExpression(expr);
 }
 
+QString MemoryWindow::parseMemoryDumpLineToAscii(const QString& line, bool littleendian)
+{
+    QStringList hexdata = line.split("\t");
+
+    // Get the size of value from hex str representation length
+    //               0x00 =   (4 - 2) / 2 -> 1 byte
+    //             0x0000 =   (6 - 2) / 2 -> 2 half-word
+    //         0x00000000 =  (10 - 2) / 2 -> 4 word
+    // 0x0000000000000000 =  (18 - 2) / 2 -> 8 giant word
+
+    int len = (hexdata[0].length()-2) / 2;
+    QString dumpAscii;
+    for (const auto& hex: hexdata)
+    {
+	bool ok;
+	unsigned long long parsedValue = hex.toULongLong(&ok, 16);
+	if (ok) {
+	    QByteArray dump;
+	    for (int s  = 0; s < len; s++)
+	    {
+		unsigned char b = parsedValue & 0xFF;
+		parsedValue >>= 8;
+		if (isprint(b)) {
+		    dump += b;
+		} else {
+		    dump += '.';
+		}
+	    }
+	    if (!littleendian)
+		std::reverse(dump.begin(), dump.end());
+	    dumpAscii += QString::fromLatin1(dump);
+	}
+    }
+    return dumpAscii;
+}
+
 void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryDump>& memdump)
 {
     m_memory.clear();
@@ -172,26 +217,46 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	new QTreeWidgetItem(&m_memory, QStringList() << QString() << msg);
 	return;
     }
+    bool showDumpAscii = (m_format & MDTformatmask) == MDThex;
 
     std::list<MemoryDump>::const_iterator md = memdump.begin();
 
     // show only needed columns
     QStringList sl = md->dump.split( "\t" );
-    for (int i = m_memory.columnCount()-1; i > 0; i--)
+    for (int i = COL_DUMP_ASCII-1; i > 0; i--)
 	m_memory.setColumnHidden(i, i > sl.count());
 
+    m_memory.setColumnHidden(COL_DUMP_ASCII, !showDumpAscii);
+
     QMap<QString,QString> tmpMap;
+
+    QFontMetrics fm(font());
+    int maxWidthAddr = 0;
+    int maxWidthAscii = 0;
 
     for (; md != memdump.end(); ++md)
     {
 	QString addr = md->address.asString() + " " + md->address.fnoffs;
 	QStringList sl = md->dump.split( "\t" );
 
+	if (fm.width(addr) > maxWidthAddr) {
+	    maxWidthAddr = fm.width(addr);
+	}
+
 	// save memory
 	tmpMap[addr] = md->dump;
 
 	QTreeWidgetItem* line =
 		new QTreeWidgetItem(&m_memory, QStringList(addr) << sl);
+
+	if (showDumpAscii) {
+	    QString dumpAscii = parseMemoryDumpLineToAscii(md->dump, md->littleendian);
+	    line->setText(COL_DUMP_ASCII, dumpAscii);
+	    line->setTextAlignment(COL_DUMP_ASCII, Qt::AlignRight);
+	    if (fm.width(dumpAscii) > maxWidthAscii) {
+		maxWidthAscii = fm.width(dumpAscii);
+	    }
+	}
 
 	QStringList tmplist;
 	QMap<QString,QString>::Iterator pos = m_old_memory.find( addr );
@@ -207,6 +272,11 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	    line->setForeground(i+1, changed ? QBrush(QColor(Qt::red)) : palette().text());
 	}
     }
+
+    // resize to longest string and add padding to addr/dumpascii columns
+    int padding = 25;
+    m_memory.header()->resizeSection(COL_ADDR, maxWidthAddr + padding);
+    m_memory.header()->resizeSection(COL_DUMP_ASCII, maxWidthAscii + padding);
 
     m_old_memory.clear();
     m_old_memory = tmpMap;
