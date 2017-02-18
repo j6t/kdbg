@@ -42,7 +42,7 @@ protected:
 
     virtual void contextMenuEvent(QContextMenuEvent* ev);
     void displayNewExpression(const QString& expr);
-    QString parseMemoryDumpLineToAscii(const QString& line);
+    QString parseMemoryDumpLineToAscii(const QString& line, bool littleendian);
 
 public slots:
     void slotNewExpression(const QString&);

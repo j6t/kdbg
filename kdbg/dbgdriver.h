@@ -265,6 +265,7 @@ struct MemoryDump
 {
     DbgAddr address;
     QString dump;
+    bool littleendian = true;
 };
 
 /**

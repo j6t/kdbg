@@ -78,6 +78,7 @@ protected:
     QString m_programWD;		/* just an intermediate storage */
     QString m_redirect;			/* redirection to /dev/null */
     bool m_haveCoreFile;
+    bool m_littleendian = true;		/* if gdb works with little endian or big endian */
     QString m_defaultCmd;		/* how to invoke gdb */
 
     QString makeCmdString(DbgCommand cmd, QString strArg);

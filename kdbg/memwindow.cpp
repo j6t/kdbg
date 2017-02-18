@@ -174,7 +174,7 @@ void MemoryWindow::slotTypeChange(QAction* action)
     displayNewExpression(expr);
 }
 
-QString MemoryWindow::parseMemoryDumpLineToAscii(const QString& line)
+QString MemoryWindow::parseMemoryDumpLineToAscii(const QString& line, bool littleendian)
 {
     QStringList hexdata = line.split("\t");
 
@@ -191,16 +191,20 @@ QString MemoryWindow::parseMemoryDumpLineToAscii(const QString& line)
 	bool ok;
 	unsigned long long parsedValue = hex.toULongLong(&ok, 16);
 	if (ok) {
+	    QByteArray dump;
 	    for (int s  = 0; s < len; s++)
 	    {
 		unsigned char b = parsedValue & 0xFF;
 		parsedValue >>= 8;
 		if (isprint(b)) {
-		    dumpAscii += b;
+		    dump += b;
 		} else {
-		    dumpAscii += '.';
+		    dump += '.';
 		}
 	    }
+	    if (!littleendian)
+		std::reverse(dump.begin(), dump.end());
+	    dumpAscii += QString::fromLatin1(dump);
 	}
     }
     return dumpAscii;
@@ -246,7 +250,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 		new QTreeWidgetItem(&m_memory, QStringList(addr) << sl);
 
 	if (showDumpAscii) {
-	    QString dumpAscii = parseMemoryDumpLineToAscii(md->dump);
+	    QString dumpAscii = parseMemoryDumpLineToAscii(md->dump, md->littleendian);
 	    line->setText(COL_DUMP_ASCII, dumpAscii);
 	    line->setTextAlignment(COL_DUMP_ASCII, Qt::AlignRight);
 	    if (fm.width(dumpAscii) > maxWidthAscii) {
