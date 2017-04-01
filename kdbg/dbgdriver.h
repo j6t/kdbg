@@ -327,18 +327,18 @@ public:
      * executed before any low-priority commands. No user interaction is
      * possible as long as there is a high-priority command in the queue.
      */
-    virtual CmdQueueItem* executeCmd(DbgCommand,
-				     bool clearLow = false) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg,
-				     bool clearLow = false) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, int intArg,
-				     bool clearLow = false) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg, int intArg,
-				     bool clearLow = false) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, QString strArg1, QString strArg2,
-				     bool clearLow = false) = 0;
-    virtual CmdQueueItem* executeCmd(DbgCommand, int intArg1, int intArg2,
-				     bool clearLow = false) = 0;
+    template<class... ARGS>
+    CmdQueueItem* executeCmd(DbgCommand cmd, ARGS&&... args)
+    {
+	return executeCmdString(cmd,
+			makeCmdString(cmd, std::forward<ARGS>(args)...), false);
+    }
+    template<class... ARGS>
+    CmdQueueItem* executeCmdOnce(DbgCommand cmd, ARGS&&... args)
+    {
+	return executeCmdString(cmd,
+			makeCmdString(cmd, std::forward<ARGS>(args)...), true);
+    }
 
     enum QueueMode {
 	QMnormal,			/* queues the command last */
@@ -347,21 +347,41 @@ public:
     };
 
     /**
-     * Enqueues a low-priority command. Low-priority commands are executed
-     * after any high-priority commands.
+     * Enqueues a low-priority command irrespective of whether it as already
+     * in the queue.
+     * Low-priority commands are executed after any high-priority commands.
      */
-    virtual CmdQueueItem* queueCmd(DbgCommand,
-				   QueueMode mode) = 0;
-    virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg,
-				   QueueMode mode) = 0;
-    virtual CmdQueueItem* queueCmd(DbgCommand, int intArg,
-				   QueueMode mode) = 0;
-    virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg, int intArg,
-				   QueueMode mode) = 0;
-    virtual CmdQueueItem* queueCmd(DbgCommand, QString strArg1, QString strArg2,
-				   QueueMode mode) = 0;
+    template<class... ARGS>
+    CmdQueueItem* queueCmdAgain(DbgCommand cmd, ARGS&&... args)
+    {
+	return queueCmdString(cmd,
+			makeCmdString(cmd, std::forward<ARGS>(args)...), QMnormal);
+    }
 
     /**
+     * Enqueues a low-priority command, unless it is already in the queue.
+     * Low-priority commands are executed after any high-priority commands.
+     */
+    template<class... ARGS>
+    CmdQueueItem* queueCmd(DbgCommand cmd, ARGS&&... args)
+    {
+	return queueCmdString(cmd,
+			makeCmdString(cmd, std::forward<ARGS>(args)...), QMoverride);
+    }
+
+    /**
+     * Enqueues a low-priority command in front of all other low-prority
+     * commands.
+     * Low-priority commands are executed after any high-priority commands.
+     */
+    template<class... ARGS>
+    CmdQueueItem* queueCmdPrio(DbgCommand cmd, ARGS&&... args)
+    {
+	return queueCmdString(cmd,
+			makeCmdString(cmd, std::forward<ARGS>(args)...), QMoverrideMoreEqual);
+    }
+
+   /**
      * Flushes the command queues.
      * @param hipriOnly if true, only the high priority queue is flushed.
      */
@@ -487,9 +507,12 @@ public:
     };
     /**
      * Parses the output of commands that execute (a piece of) the program.
+     * \a haveCoreFile indicates whether the "stop" could be due to
+     * a core file being loaded.
      * @return The inclusive OR of zero or more of the StopFlags.
      */
-    virtual uint parseProgramStopped(const char* output, QString& message) = 0;
+    virtual uint parseProgramStopped(const char* output, bool haveCoreFile,
+				     QString& message) = 0;
 
     /**
      * Parses the output of the DCsharedlibs command.
@@ -563,6 +586,12 @@ protected:
 				   bool clearLow);
     void writeCommand();
     virtual void commandFinished(CmdQueueItem* cmd) = 0;
+    virtual QString makeCmdString(DbgCommand cmd) = 0;
+    virtual QString makeCmdString(DbgCommand cmd, QString strArg) = 0;
+    virtual QString makeCmdString(DbgCommand cmd, int intArg) = 0;
+    virtual QString makeCmdString(DbgCommand cmd, QString strArg, int intArg) = 0;
+    virtual QString makeCmdString(DbgCommand cmd, QString strArg1, QString strArg2) = 0;
+    virtual QString makeCmdString(DbgCommand cmd, int intArg1, int intArg2) = 0;
 
 protected:
     void processOutput(const QByteArray& data);

@@ -590,76 +590,12 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, int intArg1, int intArg2)
     return cmdString;
 }
 
-CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, bool clearLow)
+QString GdbDriver::makeCmdString(DbgCommand cmd)
 {
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == GdbCmdInfo::argNone);
 
-    if (cmd == DCrun) {
-	m_haveCoreFile = false;
-    }
-
-    return executeCmdString(cmd, cmds[cmd].fmt, clearLow);
-}
-
-CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, QString strArg,
-				    bool clearLow)
-{
-    return executeCmdString(cmd, makeCmdString(cmd, strArg), clearLow);
-}
-
-CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, int intArg,
-				    bool clearLow)
-{
-
-    return executeCmdString(cmd, makeCmdString(cmd, intArg), clearLow);
-}
-
-CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, QString strArg, int intArg,
-				    bool clearLow)
-{
-    return executeCmdString(cmd, makeCmdString(cmd, strArg, intArg), clearLow);
-}
-
-CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, QString strArg1, QString strArg2,
-				    bool clearLow)
-{
-    return executeCmdString(cmd, makeCmdString(cmd, strArg1, strArg2), clearLow);
-}
-
-CmdQueueItem* GdbDriver::executeCmd(DbgCommand cmd, int intArg1, int intArg2,
-				    bool clearLow)
-{
-    return executeCmdString(cmd, makeCmdString(cmd, intArg1, intArg2), clearLow);
-}
-
-CmdQueueItem* GdbDriver::queueCmd(DbgCommand cmd, QueueMode mode)
-{
-    return queueCmdString(cmd, cmds[cmd].fmt, mode);
-}
-
-CmdQueueItem* GdbDriver::queueCmd(DbgCommand cmd, QString strArg,
-				  QueueMode mode)
-{
-    return queueCmdString(cmd, makeCmdString(cmd, strArg), mode);
-}
-
-CmdQueueItem* GdbDriver::queueCmd(DbgCommand cmd, int intArg,
-				  QueueMode mode)
-{
-    return queueCmdString(cmd, makeCmdString(cmd, intArg), mode);
-}
-
-CmdQueueItem* GdbDriver::queueCmd(DbgCommand cmd, QString strArg, int intArg,
-				  QueueMode mode)
-{
-    return queueCmdString(cmd, makeCmdString(cmd, strArg, intArg), mode);
-}
-
-CmdQueueItem* GdbDriver::queueCmd(DbgCommand cmd, QString strArg1, QString strArg2,
-				  QueueMode mode)
-{
-    return queueCmdString(cmd, makeCmdString(cmd, strArg1, strArg2), mode);
+    return cmds[cmd].fmt;
 }
 
 void GdbDriver::terminate()
@@ -2296,8 +2232,6 @@ bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
 {
     message = output;
 
-    m_haveCoreFile = false;
-
     /*
      * Lines starting with the following do not indicate errors:
      *     Using host libthread_db
@@ -2328,11 +2262,11 @@ bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
 bool GdbDriver::parseCoreFile(const char* output)
 {
     // if command succeeded, gdb emits a line starting with "#0 "
-    m_haveCoreFile = strstr(output, "\n#0 ") != 0;
-    return m_haveCoreFile;
+    return strstr(output, "\n#0 ") != 0;
 }
 
-uint GdbDriver::parseProgramStopped(const char* output, QString& message)
+uint GdbDriver::parseProgramStopped(const char* output, bool haveCoreFile,
+				    QString& message)
 {
     // optionally: "program changed, rereading symbols",
     // followed by:
@@ -2361,7 +2295,7 @@ uint GdbDriver::parseProgramStopped(const char* output, QString& message)
 	     * "Program received signal"... when a signal happens.)
 	     */
 	    if (strncmp(start, "Program exited", 14) == 0 ||
-		(strncmp(start, "Program terminated", 18) == 0 && !m_haveCoreFile) ||
+		(strncmp(start, "Program terminated", 18) == 0 && !haveCoreFile) ||
 		strncmp(start, "ptrace: ", 8) == 0)
 	    {
 		flags &= ~SFprogramActive;

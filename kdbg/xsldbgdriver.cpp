@@ -506,86 +506,13 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, int intArg1, int intArg2)
     return cmdString;
 }
 
-CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, bool clearLow)
+QString
+XsldbgDriver::makeCmdString(DbgCommand cmd)
 {
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == XsldbgCmdInfo::argNone);
 
-    if (cmd == DCrun) {
-        m_haveCoreFile = false;
-    }
-
-    return executeCmdString(cmd, cmds[cmd].fmt, clearLow);
-}
-
-CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, QString strArg, bool clearLow)
-{
-    return executeCmdString(cmd, makeCmdString(cmd, strArg), clearLow);
-}
-
-CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, int intArg, bool clearLow)
-{
-
-    return executeCmdString(cmd, makeCmdString(cmd, intArg), clearLow);
-}
-
-CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, QString strArg, int intArg,
-                         bool clearLow)
-{
-    return executeCmdString(cmd, makeCmdString(cmd, strArg, intArg),
-                            clearLow);
-}
-
-CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, QString strArg1, QString strArg2,
-                         bool clearLow)
-{
-    return executeCmdString(cmd, makeCmdString(cmd, strArg1, strArg2),
-                            clearLow);
-}
-
-CmdQueueItem *
-XsldbgDriver::executeCmd(DbgCommand cmd, int intArg1, int intArg2,
-                         bool clearLow)
-{
-    return executeCmdString(cmd, makeCmdString(cmd, intArg1, intArg2),
-                            clearLow);
-}
-
-CmdQueueItem *
-XsldbgDriver::queueCmd(DbgCommand cmd, QueueMode mode)
-{
-    return queueCmdString(cmd, cmds[cmd].fmt, mode);
-}
-
-CmdQueueItem *
-XsldbgDriver::queueCmd(DbgCommand cmd, QString strArg, QueueMode mode)
-{
-    return queueCmdString(cmd, makeCmdString(cmd, strArg), mode);
-}
-
-CmdQueueItem *
-XsldbgDriver::queueCmd(DbgCommand cmd, int intArg, QueueMode mode)
-{
-    return queueCmdString(cmd, makeCmdString(cmd, intArg), mode);
-}
-
-CmdQueueItem *
-XsldbgDriver::queueCmd(DbgCommand cmd, QString strArg, int intArg,
-                       QueueMode mode)
-{
-    return queueCmdString(cmd, makeCmdString(cmd, strArg, intArg), mode);
-}
-
-CmdQueueItem *
-XsldbgDriver::queueCmd(DbgCommand cmd, QString strArg1, QString strArg2,
-                       QueueMode mode)
-{
-    return queueCmdString(cmd, makeCmdString(cmd, strArg1, strArg2), mode);
+    return cmds[cmd].fmt;
 }
 
 void
@@ -1295,7 +1222,6 @@ XsldbgDriver::parseChangeExecutable(const char *output, QString & message)
 {
     message = output;
     TRACE(QString("XsldbgDriver::parseChangeExecutable :") + output);
-    m_haveCoreFile = false;
 
     if (strstr(output, "Load of source deferred. Use the run command") != 0) {
         TRACE("Parsed stylesheet executable");
@@ -1311,15 +1237,16 @@ XsldbgDriver::parseCoreFile(const char *output)
     TRACE(output);
 
     if (strstr(output, "Load of data file deferred. Use the run command") != 0) {
-        m_haveCoreFile = true;
         TRACE("Parsed data file name");
+	return true;
     }
 
-    return m_haveCoreFile;
+    return false;
 }
 
 uint
-XsldbgDriver::parseProgramStopped(const char *output, QString & message)
+XsldbgDriver::parseProgramStopped(const char *output, bool,
+				  QString & message)
 {
     /* Not sure about this function leave it here for the moment */
     /*
