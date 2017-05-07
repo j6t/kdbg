@@ -2671,11 +2671,18 @@ QString GdbDriver::parseMemoryDump(const char* output, std::list<MemoryDump>& me
     }
 
     const char* p = output;		/* save typing */
+    const char* end_output = p + strlen(p);
 
-    // the address
-    while (*p != 0) {
+    // check if there is end of memory region
+    const char* end_region = strstr(p, "Cannot access memory at address");
+    if (end_region)
+	end_output = end_region;
+
+    while (p < end_output)
+    {
 	MemoryDump md;
 
+	// the address
 	const char* start = p;
 	while (*p != '\0' && *p != ':' && !isspace(*p))
 	    p++;
@@ -2694,13 +2701,13 @@ QString GdbDriver::parseMemoryDump(const char* output, std::list<MemoryDump>& me
 	skipSpace(p);
 	// everything to the end of the line is the memory dump
 	const char* end = strchr(p, '\n');
-	if (end != 0) {
-	    md.dump = QString::fromLatin1(p, end-p);
-	    p = end+1;
-	} else {
-	    md.dump = QString::fromLatin1(p, strlen(p));
-	    p += strlen(p);
-	}
+	if (!end || (end_region && end > end_region))
+	    end = end_output;
+	md.dump = QString::fromLatin1(p, end-p);
+	p = end;
+	if (*p)
+	    ++p;	// skip '\n' or 'C' of "Cannot access..."
+
 	md.littleendian = m_littleendian;
 	memdump.push_back(md);
     }
