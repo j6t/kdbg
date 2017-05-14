@@ -266,6 +266,7 @@ struct MemoryDump
     DbgAddr address;
     QString dump;
     bool littleendian = true;
+    bool endOfDump = false;
 };
 
 /**
@@ -592,6 +593,7 @@ protected:
     virtual QString makeCmdString(DbgCommand cmd, QString strArg, int intArg) = 0;
     virtual QString makeCmdString(DbgCommand cmd, QString strArg1, QString strArg2) = 0;
     virtual QString makeCmdString(DbgCommand cmd, int intArg1, int intArg2) = 0;
+    virtual QString makeCmdString(DbgCommand cmd, QString strArg, int intArg1, int intArg2) = 0;
 
 protected:
     void processOutput(const QByteArray& data);

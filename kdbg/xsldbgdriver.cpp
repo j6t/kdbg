@@ -515,6 +515,14 @@ XsldbgDriver::makeCmdString(DbgCommand cmd)
     return cmds[cmd].fmt;
 }
 
+QString
+XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg1, int)
+{
+    assert(cmd == DCexamine);
+
+    return makeCmdString(cmd, strArg, intArg1);
+}
+
 void
 XsldbgDriver::terminate()
 {

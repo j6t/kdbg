@@ -31,10 +31,14 @@ protected:
     QComboBox m_expression;
 
     QTreeWidget m_memory;
-    QMap<QString,QString> m_old_memory;
+    QList<int> m_memoryColumnsWidth;
+    int m_memoryRowHeight = 0;
 
     QBoxLayout m_layout;
 
+    bool m_dumpMemRegionEnd = false;
+    DbgAddr m_dumpLastAddr;
+    unsigned m_dumpLength = 0;
     unsigned m_format;
     QMap<QString,unsigned> m_formatCache;
 
@@ -42,9 +46,12 @@ protected:
 
     virtual void contextMenuEvent(QContextMenuEvent* ev);
     void displayNewExpression(const QString& expr);
+    void requestMemoryDump(const QString &expr);
     QString parseMemoryDumpLineToAscii(const QString& line, bool littleendian);
 
 public slots:
+    void verticalScrollBarMoved(int);
+    void verticalScrollBarRangeChanged(int, int);
     void slotNewExpression(const QString&);
     void slotNewExpression();
     void slotTypeChange(QAction*);

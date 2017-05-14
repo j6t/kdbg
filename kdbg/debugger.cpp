@@ -63,6 +63,7 @@ KDebugger::KDebugger(QWidget* parent,
 	QObject(parent),
 	m_ttyLevel(ttyFull),
 	m_memoryFormat(MDTword | MDThex),
+	m_memoryLength(16),
 	m_haveExecutable(false),
 	m_programActive(false),
 	m_programRunning(false),
@@ -1282,8 +1283,8 @@ void KDebugger::updateAllExprs()
     m_d->queueCmd(DCinforegisters);
 
     // get new memory dump
-    if (!m_memoryExpression.isEmpty()) {
-	queueMemoryDump(false);
+    if (!m_memoryStartExpression.isEmpty()) {
+	queueMemoryDump(false, true);
     }
 
     // update watch expressions
@@ -2157,25 +2158,36 @@ void KDebugger::setThread(int id)
     m_d->queueCmdPrio(DCthread, id);
 }
 
-void KDebugger::setMemoryExpression(const QString& memexpr)
+void KDebugger::setMemoryExpression(const QString& start_memexpr, unsigned total_length,
+        const QString& current_memexpr, unsigned current_length)
 {
-    m_memoryExpression = memexpr;
+    m_memoryExpression = current_memexpr;
+    m_memoryLength = current_length;
+    m_memoryStartExpression = start_memexpr;
+    m_memoryTotalLength = total_length;
 
     // queue the new expression
     if (!m_memoryExpression.isEmpty() &&
 	isProgramActive() &&
 	!isProgramRunning())
     {
-	queueMemoryDump(true);
+	queueMemoryDump(true, false);
     }
 }
 
-void KDebugger::queueMemoryDump(bool immediate)
+void KDebugger::queueMemoryDump(bool immediate, bool update)
 {
-    if (immediate)
-	m_d->queueCmdPrio(DCexamine, m_memoryExpression, m_memoryFormat);
-    else
-	m_d->queueCmd(DCexamine, m_memoryExpression, m_memoryFormat);
+    if (update) {
+	if (immediate)
+	    m_d->queueCmdPrio(DCexamine, m_memoryStartExpression, m_memoryFormat, m_memoryTotalLength);
+	else
+	    m_d->queueCmd(DCexamine, m_memoryStartExpression, m_memoryFormat, m_memoryTotalLength);
+    } else {
+	if (immediate)
+	    m_d->queueCmdPrio(DCexamine, m_memoryExpression, m_memoryFormat, m_memoryLength);
+	else
+	    m_d->queueCmd(DCexamine, m_memoryExpression, m_memoryFormat, m_memoryLength);
+    }
 }
 
 void KDebugger::handleMemoryDump(const char* output)
