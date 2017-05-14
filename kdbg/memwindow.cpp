@@ -194,6 +194,7 @@ void MemoryWindow::slotNewExpression(const QString& newText)
 	}
     }
     m_expression.insertItem(0, text);
+    m_expression.setCurrentIndex(0);
 
     if (!text.isEmpty()) {
 	m_formatCache[text] = m_format;
