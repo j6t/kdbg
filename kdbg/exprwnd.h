@@ -60,6 +60,7 @@ public:
     void setText(const QString& t) { QTreeWidgetItem::setText(0, t); }
     void setPixmap(const QPixmap& p) { QTreeWidgetItem::setIcon(0, QIcon(p)); }
     QString value() const { return m_baseValue; }
+    QString displayedValue() const;
     VarTree* child(int i) const { return static_cast<VarTree*>(QTreeWidgetItem::child(i)); }
 
     virtual QVariant data(int column, int role) const;
