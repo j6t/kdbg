@@ -165,15 +165,19 @@ bool VarTree::updateStructValue(const QString& newValue)
     return m_structChanged || prevValueChanged;
 }
 
+QString VarTree::displayedValue() const
+{
+    QString text = m_baseValue;
+    if (text.isEmpty())
+	text = m_structValue;
+    else if (!m_structValue.isEmpty())
+	text += QLatin1String(" ") + m_structValue;
+    return text;
+}
+
 void VarTree::updateValueText()
 {
-    if (m_baseValue.isEmpty()) {
-	setText(1, m_structValue);
-    } else if (m_structValue.isEmpty()) {
-	setText(1, m_baseValue);
-    } else {
-	setText(1, m_baseValue + " " + m_structValue);
-    }
+    setText(1, displayedValue());
 }
 
 void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
@@ -266,7 +270,7 @@ QVariant VarTree::data(int column, int role) const
 {
     if (role != Qt::ToolTipRole || column != 1)
 	return QTreeWidgetItem::data(column, role);
-    return QVariant(value());
+    return QVariant(displayedValue());
 }
 
 ExprValue::ExprValue(const QString& name, VarTree::NameKind aKind) :

@@ -1,0 +1,9 @@
+[Type Table]
+Types1=QString
+LibDisplayName=libQt5Core 5.x
+ShlibRE=libQt5Core\\.so\\.5$
+EnableBuiltin=QString::Data,QCharIsShort
+PrintQStringCmd=print *(unsigned short*)((char*)($qstrdata=(%s))+$qstrdata->offset)@(($qstrlen=($qstrdata->size))>100?100:$qstrlen)\n
+[QString]
+Display={ % }
+Expr1=/QString::Data (%s).d
