@@ -74,6 +74,7 @@ class XsldbgDriver:public DebuggerDriver {
     virtual QString makeCmdString(DbgCommand cmd, QString strArg, int intArg);
     virtual QString makeCmdString(DbgCommand cmd, QString strArg1, QString strArg2);
     virtual QString makeCmdString(DbgCommand cmd, int intArg1, int intArg2);
+    virtual QString makeCmdString(DbgCommand cmd, QString strArg, int intArg1, int intArg2);
     virtual int findPrompt(const QByteArray& output) const;
     void parseMarker();
 };

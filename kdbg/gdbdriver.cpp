@@ -464,12 +464,44 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, int intArg)
     return cmdString;
 }
 
+QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg1, int intArg2)
+{
+    assert(cmd == DCexamine);
+
+    normalizeStringArg(strArg);
+
+    QString cmdString;
+
+    if (cmd == DCexamine) {
+	// make a format specifier from the intArg
+	static const char size[16] = {
+	    '\0', 'b', 'h', 'w', 'g'
+	};
+	static const char format[16] = {
+	    '\0', 'x', 'd', 'u', 'o', 't',
+	    'a',  'c', 'f', 's', 'i'
+	};
+	assert(MDTsizemask == 0xf);	/* lowest 4 bits */
+	assert(MDTformatmask == 0xf0);	/* next 4 bits */
+	int count = intArg2;			/* number of entities to print */
+	char sizeSpec = size[intArg1 & MDTsizemask];
+	char formatSpec = format[(intArg1 & MDTformatmask) >> 4];
+	assert(sizeSpec != '\0');
+	assert(formatSpec != '\0');
+
+	QString spec;
+	spec.sprintf("/%d%c%c", count, sizeSpec, formatSpec);
+	cmdString = makeCmdString(DCexamine, spec, strArg);
+    }
+
+    return cmdString;
+}
+
 QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
 {
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == GdbCmdInfo::argStringNum ||
 	   cmds[cmd].argsNeeded == GdbCmdInfo::argNumString ||
-	   cmd == DCexamine ||
 	   cmd == DCtty);
 
     normalizeStringArg(strArg);
@@ -502,45 +534,6 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
 	m_redirect = runRedir[intArg & 7];
 
 	return makeCmdString(DCtty, strArg);   /* note: no problem if strArg empty */
-    }
-
-    if (cmd == DCexamine) {
-	// make a format specifier from the intArg
-	static const char size[16] = {
-	    '\0', 'b', 'h', 'w', 'g'
-	};
-	static const char format[16] = {
-	    '\0', 'x', 'd', 'u', 'o', 't',
-	    'a',  'c', 'f', 's', 'i'
-	};
-	assert(MDTsizemask == 0xf);	/* lowest 4 bits */
-	assert(MDTformatmask == 0xf0);	/* next 4 bits */
-	int count = 16;			/* number of entities to print */
-	char sizeSpec = size[intArg & MDTsizemask];
-	char formatSpec = format[(intArg & MDTformatmask) >> 4];
-	assert(sizeSpec != '\0');
-	assert(formatSpec != '\0');
-	// adjust count such that 16 lines are printed
-	switch (intArg & MDTformatmask) {
-	case MDTstring: case MDTinsn:
-	    break;			/* no modification needed */
-	default:
-	    // all cases drop through:
-	    switch (intArg & MDTsizemask) {
-	    case MDTbyte:
-	    case MDThalfword:
-		count *= 2;
-	    case MDTword:
-		count *= 2;
-	    case MDTgiantword:
-		count *= 2;
-	    }
-	    break;
-	}
-	QString spec;
-	spec.sprintf("/%d%c%c", count, sizeSpec, formatSpec);
-
-	return makeCmdString(DCexamine, spec, strArg);
     }
 
     if (cmds[cmd].argsNeeded == GdbCmdInfo::argStringNum)
@@ -2683,10 +2676,14 @@ QString GdbDriver::parseMemoryDump(const char* output, std::list<MemoryDump>& me
 	MemoryDump md;
 
 	// the address
+	skipSpace(p);			/* remove leading space, detected on instructions output format */
+
 	const char* start = p;
+
 	while (*p != '\0' && *p != ':' && !isspace(*p))
 	    p++;
 	md.address = QString::fromLatin1(start, p-start);
+
 	if (*p != ':') {
 	    // parse function offset
 	    skipSpace(p);
@@ -2711,6 +2708,9 @@ QString GdbDriver::parseMemoryDump(const char* output, std::list<MemoryDump>& me
 	md.littleendian = m_littleendian;
 	memdump.push_back(md);
     }
+
+    if (end_region && !memdump.empty())
+	memdump.back().endOfDump = true;
     
     return QString();
 }

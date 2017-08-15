@@ -337,8 +337,11 @@ public:
     /**
      * The memory at that the expression evaluates to is watched. Can be
      * empty. Triggers a redisplay even if the expression did not change.
+     * Memory expression start and total length is used to update all bytes of memory when
+     * is necessary, to request new parts of memory is used current_memexpr and current_length
      */
-    void setMemoryExpression(const QString& memexpr);
+    void setMemoryExpression(const QString& start_memexpr, unsigned total_length,
+            const QString& current_memexpr, unsigned current_length);
 
     /**
      * Sets how the watched memory location is displayed.
@@ -362,6 +365,9 @@ protected:
     std::list<Breakpoint> m_brkpts;
     QString m_memoryExpression;		/* memory location to watch */
     unsigned m_memoryFormat;		/* how that output should look */
+    unsigned m_memoryLength;         /* memory length to watch */
+    QString m_memoryStartExpression; /* start memory location to watch */
+    unsigned m_memoryTotalLength;    /* memory total length to watch */
 
 protected slots:
     void parse(CmdQueueItem* cmd, const char* output);
@@ -393,7 +399,7 @@ protected:
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void dereferencePointer(ExprWnd* wnd, VarTree* var, bool immediate);
     void determineType(ExprWnd* wnd, VarTree* var);
-    void queueMemoryDump(bool immediate);
+    void queueMemoryDump(bool immediate, bool update);
     CmdQueueItem* loadCoreFile();
     void openProgramConfig(const QString& name);
 
