@@ -9,7 +9,7 @@
 #include <QProcess>
 #include <QTreeWidget>
 #include <ctype.h>
-#include <klocale.h>			/* i18n */
+#include <klocalizedstring.h>			/* i18n */
 #include "config.h"
 
 

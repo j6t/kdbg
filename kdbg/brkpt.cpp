@@ -4,9 +4,8 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <klocale.h>			/* i18n */
+#include <klocalizedstring.h>			/* i18n */
 #include <kiconloader.h>
-#include <ksimpleconfig.h>
 #include <QDialog>
 #include <QFileInfo>
 #include <QPainter>

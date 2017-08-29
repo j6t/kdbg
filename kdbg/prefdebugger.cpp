@@ -4,7 +4,7 @@
  * See the file COPYING in the toplevel directory of the source directory.
  */
 
-#include <klocale.h>			/* i18n */
+#include <klocalizedstring.h>			/* i18n */
 #include "prefdebugger.h"
 
 PrefDebugger::PrefDebugger(QWidget* parent) :

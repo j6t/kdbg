@@ -10,7 +10,7 @@
 #include <QMouseEvent>
 #include <QScrollBar>
 #include <QList>
-#include <klocale.h>
+#include <klocalizedstring.h>
 #include <kconfigbase.h>
 #include <kconfiggroup.h>
 #include "debugger.h"

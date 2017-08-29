@@ -13,7 +13,7 @@
 #include <QToolTip>
 #include <kxmlguiwindow.h>
 #include <kxmlguifactory.h>
-#include <klocale.h>			/* i18n */
+#include <klocalizedstring.h>			/* i18n */
 #include "mydebug.h"
 
 
