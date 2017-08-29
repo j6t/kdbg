@@ -5,7 +5,7 @@
  */
 
 #include "pgmargs.h"
-#include <klocale.h>			/* i18n */
+#include <klocalizedstring.h>		/* i18n */
 #include <QFileDialog>
 #include "mydebug.h"
 

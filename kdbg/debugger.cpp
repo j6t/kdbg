@@ -17,7 +17,7 @@
 #include <QStandardPaths>
 #include <kconfig.h>
 #include <kconfiggroup.h>
-#include <klocale.h>			/* i18n */
+#include <klocalizedstring.h>		/* i18n */
 #include <kmessagebox.h>
 #include <ctype.h>
 #include <stdlib.h>			/* strtol, atoi */

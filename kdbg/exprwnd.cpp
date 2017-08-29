@@ -15,7 +15,7 @@
 #include <QKeyEvent>
 #include <QScrollBar>
 #include <kiconloader.h>		/* icons */
-#include <klocale.h>			/* i18n */
+#include <klocalizedstring.h>		/* i18n */
 #include "mydebug.h"
 
 VarTree::VarTree(VarTree* parent, ExprValue* v) :

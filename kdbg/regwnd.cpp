@@ -6,7 +6,7 @@
 
 #include "regwnd.h"
 #include "dbgdriver.h"
-#include <klocale.h>			/* i18n */
+#include <klocalizedstring.h>		/* i18n */
 #include <QFontDatabase>
 #include <QMenu>
 #include <QRegExp>
