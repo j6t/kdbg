@@ -6,7 +6,7 @@
 
 #include "threadlist.h"
 #include "dbgdriver.h"
-#include <klocale.h>
+#include <klocalizedstring.h>
 #include <kiconloader.h>
 #include <QBitmap>
 #include <QHeaderView>

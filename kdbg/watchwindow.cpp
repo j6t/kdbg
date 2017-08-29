@@ -5,7 +5,7 @@
  */
 
 #include "watchwindow.h"
-#include <klocale.h>			/* i18n */
+#include <klocalizedstring.h>			/* i18n */
 #include <QDragEnterEvent>
 #include <QDropEvent>
 #include <QKeyEvent>

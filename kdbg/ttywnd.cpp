@@ -9,7 +9,7 @@
 #include <QContextMenuEvent>
 #include <QFontDatabase>
 #include <QMenu>
-#include <klocale.h>
+#include <klocalizedstring.h>
 
 #include "config.h"
 #include <fcntl.h>
