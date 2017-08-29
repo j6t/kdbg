@@ -6,7 +6,6 @@
 
 #include <klocalizedstring.h>			/* i18n */
 #include <kiconloader.h>
-#include <ksimpleconfig.h>
 #include <QDialog>
 #include <QFileInfo>
 #include <QPainter>
