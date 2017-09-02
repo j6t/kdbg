@@ -18,6 +18,7 @@ find_package(KF5 ${KF5_MIN_VERSION} REQUIRED COMPONENTS
     IconThemes
     XmlGui
     WindowSystem
+    KDELibs4Support
 )
 
 include(KDEInstallDirs)

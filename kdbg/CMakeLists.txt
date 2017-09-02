@@ -94,6 +94,7 @@ target_link_libraries(kdbg
     KF5::IconThemes
     KF5::XmlGui
     KF5::WindowSystem
+    KF5::KDELibs4Support
     ${LIB_UTIL}
 )
 
