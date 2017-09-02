@@ -693,7 +693,7 @@ void KDebugger::gdbExited()
 	TRACE(m_d->driverName() + " exited normally");
     } else {
 	QString msg = i18n("%1 exited unexpectedly.\n"
-			   "Restart the session (e.g. with File|Executable).");
+			   "Restart the session (e.g. with File|Load Executable).");
 	KMessageBox::error(parentWidget(), msg.arg(m_d->driverName()));
     }
 

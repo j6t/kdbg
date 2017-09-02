@@ -249,18 +249,18 @@ void DebuggerMainWnd::initKAction()
     // file menu
     QAction* open = KStandardAction::open(this, SLOT(slotFileOpen()),
                       actionCollection());
-    open->setText(i18n("&Open Source..."));
+    open->setText(i18n("&Open Source Code..."));
     m_closeAction = KStandardAction::close(m_filesWindow, SLOT(slotClose()), actionCollection());
-    m_reloadAction = createAction(i18n("&Reload Source"), "view-refresh", 0,
+    m_reloadAction = createAction(i18n("&Reload Source Code"), "view-refresh", 0,
 			m_filesWindow, SLOT(slotFileReload()), "file_reload");
-    m_fileExecAction = createAction(i18n("&Executable..."),
+    m_fileExecAction = createAction(i18n("&Load Executable..."),
 			"document-open-executable", 0,
 			this, SLOT(slotFileExe()), "file_executable");
     m_recentExecAction = KStandardAction::openRecent(this, SLOT(slotRecentExec(const QUrl&)),
 		      actionCollection());
     m_recentExecAction->setObjectName("file_executable_recent");
     m_recentExecAction->setText(i18n("Recent E&xecutables"));
-    m_coreDumpAction = createAction(i18n("&Core dump..."), 0,
+    m_coreDumpAction = createAction(i18n("&Core Dump..."), 0,
 			this, SLOT(slotFileCore()), "file_core_dump");
     KStandardAction::quit(this, SLOT(close()), actionCollection());
 
@@ -277,7 +277,6 @@ void DebuggerMainWnd::initKAction()
     KStandardAction::findNext(m_filesWindow, SLOT(slotFindForward()), actionCollection());
     KStandardAction::findPrev(m_filesWindow, SLOT(slotFindBackward()), actionCollection());
 
-    i18n("Source &code");
     struct { QWidget* w; QString id; QAction** act; } dw[] = {
 	{ m_btWindow, "view_stack", &m_btWindowAction },
 	{ m_localVariables, "view_locals", &m_localVariablesAction },
@@ -1146,7 +1145,7 @@ void DebuggerMainWnd::slotFileOpen()
     }
 
     fileName = QFileDialog::getOpenFileName(this,
-			i18n("Open"), dir, makeSourceFilter());
+			i18n("Open Source Code"), dir, makeSourceFilter());
 
     if (!fileName.isEmpty())
     {
