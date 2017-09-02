@@ -5,17 +5,17 @@
 # Johannes Sixt <j6t@kdbg.org>, 2005, 2006, 2007, 2009, 2011.
 msgid ""
 msgstr ""
-"Project-Id-Version: kdbg 2.5.6\n"
+"Project-Id-Version: kdbg 2.9.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-02 14:39+0200\n"
-"PO-Revision-Date: 2017-01-08 22:29+0100\n"
+"PO-Revision-Date: 2017-09-02 14:50+0200\n"
 "Last-Translator: Johannes Sixt <j6t@kdbg.org>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.5\n"
+"X-Generator: Poedit 1.8.9\n"
 
 #. i18n: file: brkptbase.ui:86
 #. i18n: ectx: property (text), widget (QPushButton, btEnaDis)
@@ -44,9 +44,8 @@ msgid "Variable"
 msgstr "Variable"
 
 #: dbgmainwnd.cpp:85
-#, fuzzy
 msgid "Watched Expressions"
-msgstr "&Ausdrücke"
+msgstr "&Beobachtete Ausdrücke"
 
 #: dbgmainwnd.cpp:88
 msgid "Registers"
@@ -69,28 +68,24 @@ msgid "Memory"
 msgstr "Speicher"
 
 #: dbgmainwnd.cpp:252
-#, fuzzy
 msgid "&Open Source Code..."
 msgstr "Quellcode Ö&ffnen..."
 
 #: dbgmainwnd.cpp:254
-#, fuzzy
 msgid "&Reload Source Code"
-msgstr "E&rneut laden"
+msgstr "Quellcode e&rneut laden"
 
 #: dbgmainwnd.cpp:256
-#, fuzzy
 msgid "&Load Executable..."
-msgstr "&Programm..."
+msgstr "&Programm laden..."
 
 #: dbgmainwnd.cpp:262
 msgid "Recent E&xecutables"
 msgstr "&Zuletzt geöffnete Programme"
 
 #: dbgmainwnd.cpp:263
-#, fuzzy
 msgid "&Core Dump..."
-msgstr "&Core dump..."
+msgstr "&Core-Dump..."
 
 #: dbgmainwnd.cpp:268
 msgid "This &Program..."
@@ -197,6 +192,8 @@ msgid ""
 "XSL debugging is no longer supported and will be removed in a future version "
 "of KDbg"
 msgstr ""
+"Der XSL-Modus wird nicht mehr unterstützt und wird in einer zukünftigen "
+"Version von KDbg entfernt werden."
 
 #: dbgmainwnd.cpp:704
 msgid ""
@@ -207,9 +204,8 @@ msgstr ""
 "Bitte beenden Sie KDbg und beheben Sie das Problem."
 
 #: dbgmainwnd.cpp:825
-#, fuzzy
 msgid "Global Options"
-msgstr "&Globale Einstellungen..."
+msgstr "Globale Einstellungen"
 
 #: dbgmainwnd.cpp:839 pgmsettings.cpp:105
 msgid "Debugger"
@@ -224,48 +220,40 @@ msgid ": Program output"
 msgstr ": Programmausgabe"
 
 #: dbgmainwnd.cpp:1068
-#, fuzzy
 msgid "All source files"
-msgstr "|Alle Quellcodedateien\n"
+msgstr "Alle Quellcodedateien"
 
 #: dbgmainwnd.cpp:1069
-#, fuzzy
 msgid "Source files"
-msgstr "|Quellcodedateien\n"
+msgstr "Quellcodedateien"
 
 #: dbgmainwnd.cpp:1070
-#, fuzzy
 msgid "Header files"
-msgstr "|Header-Dateien\n"
+msgstr "Header-Dateien"
 
 #: dbgmainwnd.cpp:1071
-#, fuzzy
 msgid "All files"
-msgstr "*|Alle Dateien"
+msgstr "Alle Dateien"
 
 #: dbgmainwnd.cpp:1148
-#, fuzzy
 msgid "Open Source Code"
-msgstr "&Quellcode"
+msgstr "Quellcode öffnen"
 
 #: dbgmainwnd.cpp:1165
-#, fuzzy
 msgid "Select the Executable to Debug"
-msgstr "Ausführbares Programm zum Debuggen wählen"
+msgstr "Programm zum Debuggen wählen"
 
 #: dbgmainwnd.cpp:1179
-#, fuzzy
 msgid "Select Core Dump"
-msgstr "Core dump wählen"
+msgstr "Core-Dump wählen"
 
 #: debugger.cpp:695
-#, fuzzy
 msgid ""
 "%1 exited unexpectedly.\n"
 "Restart the session (e.g. with File|Load Executable)."
 msgstr ""
 "%1 wurde unerwartet beendet.\n"
-"Sie müssen die Sitzung neu starten (z.B. mit Datei|Programm)."
+"Sie müssen die Sitzung neu starten (z.B. mit Datei|Programm laden)."
 
 #: debugger.cpp:887
 msgid ""
@@ -457,9 +445,8 @@ msgid "&Full terminal emulation"
 msgstr "&Volle Terminalemulation"
 
 #: pgmsettings.cpp:102
-#, fuzzy
 msgid "Settings for %1"
-msgstr "%1: Einstellungen für %2"
+msgstr "Einstellungen für %1"
 
 #: prefdebugger.cpp:20
 msgid "To revert to the default settings, clear the entries."
@@ -584,9 +571,8 @@ msgid "Expression"
 msgstr "Ausdruck"
 
 #: winstack.cpp:391
-#, fuzzy
 msgid "Search"
-msgstr ": Suche"
+msgstr "Suche"
 
 #: winstack.cpp:398
 msgid "&Case sensitive"
@@ -671,14 +657,12 @@ msgstr "&Bedingt..."
 #. i18n: file: brkptcondition.ui:14
 #. i18n: ectx: property (windowTitle), widget (QDialog, BrkPtCondition)
 #: rc.cpp:39
-#, fuzzy
 msgid "Conditional Breakpoint"
-msgstr ": Bedingten Haltepunkt setzen"
+msgstr "Bedingten Haltepunkt setzen"
 
 #. i18n: file: brkptcondition.ui:28
 #. i18n: ectx: property (text), widget (QLabel, label)
 #: rc.cpp:42
-#, fuzzy
 msgid "Condi&tion:"
 msgstr "&Bedingung:"
 
@@ -940,7 +924,6 @@ msgstr "An Prozess attachen"
 #. i18n: file: procattachbase.ui:26
 #. i18n: ectx: property (text), widget (QLabel, filterLabel)
 #: rc.cpp:154
-#, fuzzy
 msgid "Fi&lter or PID:"
 msgstr "&Filter oder PID:"
 
