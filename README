@@ -1,22 +1,22 @@
-This is KDbg, a graphical user interface around gdb using
+This is KDbg, a graphical user interface around GDB using
 KDE, the K Desktop Environment.
 
-To install:
+To build and install:
 
-	cmake -DCMAKE_INSTALL_PREFIX=/opt/kde4 .
+	cmake .
 	make
 	sudo make install
 
-(Make sure your KDE is installed in /opt/kde4; adjust the path
-to suit your system. On some systems it is /usr.)
+It may be necessary to tell the install location explicitly,
+then use, for example,
 
-Problem reports as well as success stories are welcome!
+	cmake -DCMAKE_INSTALL_PREFIX=/usr .
+
+The KDE header files libraries must be available. Make sure
+that the development packages are installed.
 
 The homepage is at
 
 	http://www.kdbg.org/
-
-You'll find the most recent version of KDbg there as well as
-other useful information concerning debugging.
 
 Johannes Sixt <j6t@kdbg.org>
