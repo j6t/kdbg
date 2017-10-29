@@ -9,27 +9,25 @@
 <p><a href="index.html">Contents</a></p>
 <h1>Invoking KDbg from the command line</h1>
 <p><pre>
-Usage: kdbg [Qt-options] [KDE-options] [options] [program] [core] 
-
-Generic options:
-  --help                    Show help about options
-  --help-qt                 Show Qt specific options
-  --help-kde                Show KDE specific options
-  --help-all                Show all options
-  --author                  Show author information
-  -v, --version             Show version information
-  --license                 Show license information
-  --                        End of options
+Usage: kdbg [options] [program] [core]
+A Debugger
 
 Options:
-  -t &lt;file&gt;                 transcript of conversation with the debugger
-  -r &lt;device&gt;               remote debugging via &lt;device&gt;
-  -l &lt;language&gt;             specify language: C, XSLT []
-  -a &lt;args&gt;                 specify arguments of debugged executable
-  -p &lt;pid&gt;                  specify PID of process to debug
+  -h, --help                 Displays this help.
+  -v, --version              Displays version information.
+  --author                   Show author information.
+  --license                  Show license information.
+  --desktopfile &lt;file name&gt;  The base file name of the desktop entry for this
+                             application.
+  -t &lt;file&gt;                  transcript of conversation with the debugger
+  -r &lt;device&gt;                remote debugging via &lt;device&gt;
+  -l &lt;language&gt;              specify language: C, XSLT
+  -x                         use language XSLT (deprecated)
+  -a &lt;args&gt;                  specify arguments of debugged executable
+  -p &lt;pid&gt;                   specify PID of process to debug
 
 Arguments:
-  program                   path of executable to debug
-  core                      a core file to use
+  [program]                  path of executable to debug
+  [core]                     a core file to use
 </pre></p></body>
 </html>

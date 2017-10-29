@@ -11,11 +11,6 @@
 The Threads Window</h1>
 <p>The threads window is displayed using <i>View|Threads</i>. The threads
 window lists the active threads of the program.</p>
-<p><b><i>Note:</i></b> Debugging threaded programs must be supported by
-the version of gdb that is used - it is not a feature of KDbg. For Linux
-systems this works best with gdb5 and later. However, at the time of this writing gdb
-still poorly supports threads on NPTL- (New Posix Threads Library) enabled
-systems (glibc 2.3.x and kernel 2.6.x).</p>
 <p>The contents of the threads window are updated every time the program
 is stopped by the debugger. (That is, the window does <em>not</em> reflect
 the state while the program is running.)</p>
@@ -32,7 +27,7 @@ The <a href="localvars.html">local variables</a> window displays the active
 thread's local variables.</li>
 
 <li>
-The <a href="watches.html">watch window</a> uses the active thread's local
+The <a href="watches.html">watched expressions window</a> uses the active thread's local
 variables to evaluate the expressions.</li>
 </ul>
 <p>By clicking a listed thread, the active thread is switched, and the corresponding

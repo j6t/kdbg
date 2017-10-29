@@ -32,15 +32,6 @@ In order to make them effective, the program must stop at a time when the shared
 library is loaded. For this it is usually sufficient to set a breakpoint in
 <tt>main()</tt>. At the time when this breakpoint is hit, the orphaned breakpoints
 in the shared library become effective.</li>
-
-<li>
-Debugging multi-threaded programs on NPTL-enabled Linux systems (kernel 2.6.x
-or later and glibc 2.3.x or later) may sometimes fails; gdb stops the program
-at unexpected instances. In this case the following may help (using bash):
-<pre>
-LD_ASSUME_KERNEL=2.4.19 kdbg myprogram
-</pre>I.e. you run KDbg from the command line such that the old
-Linuxthreads implementation is used.</li>
 </ul>
 
 </body>
