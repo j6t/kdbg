@@ -8,7 +8,7 @@ msgstr ""
 "Project-Id-Version: kdbg 2.9.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2017-09-02 14:39+0200\n"
-"PO-Revision-Date: 2017-09-02 14:50+0200\n"
+"PO-Revision-Date: 2017-11-07 22:18+0100\n"
 "Last-Translator: Johannes Sixt <j6t@kdbg.org>\n"
 "Language-Team: Deutsch <de@li.org>\n"
 "Language: de\n"
@@ -69,7 +69,7 @@ msgstr "Speicher"
 
 #: dbgmainwnd.cpp:252
 msgid "&Open Source Code..."
-msgstr "Quellcode Ö&ffnen..."
+msgstr "Quellcode ö&ffnen..."
 
 #: dbgmainwnd.cpp:254
 msgid "&Reload Source Code"
