@@ -28,7 +28,7 @@ Inhalt</h2>
 <a href="#TipsTricks">Tipps und so weiter</a></li>
 
 <li>
-F&uuml;r Fortgeschrittene: <a href="../../en/kdbg/types.html">Typentabellen</a>
+Für Fortgeschrittene: <a href="../../en/kdbg/types.html">Typentabellen</a>
 (nur Englisch)</li>
 
 <li>
@@ -38,53 +38,53 @@ F&uuml;r Fortgeschrittene: <a href="../../en/kdbg/types.html">Typentabellen</a>
 <hr>
 <h2>
 <a NAME="Introduction"></a>Einleitung</h2>
-KDbg ist eine grafische Benutzeroberfl&auml;che f&uuml;r <tt>gdb</tt>,
+KDbg ist eine grafische Benutzeroberfläche für <tt>gdb</tt>,
 den GNU-Debugger.
 <p>Das bedeutet, dass KDbg selbst nicht der Debugger ist. Vielmehr kommuniziert
 KDbg mit <tt>gdb</tt>, indem Befehlszeilen and diesen geschickt werden
 und die Ausgabe, wie z.B. Variablenwerte, entgegengenommen werden. Die
-Men&uuml;befehle und Mausklicks werden in <tt>gdb</tt>-Befehle umgesetzt,
+Menübefehle und Mausklicks werden in <tt>gdb</tt>-Befehle umgesetzt,
 und die Ausgabe von <tt>gdb</tt> wird in (mehr oder weniger) sichtbare
 Information umgesetzt, wie zum Beispiel die Struktur von Variablen.
-<p>Eine Folge davon ist, dass KDbg vollst&auml;ndig von den F&auml;higkeiten
-des verwendeten Befehlszeilendebuggers, <tt>gdb</tt>, abh&auml;ngig ist.
+<p>Eine Folge davon ist, dass KDbg vollständig von den Fähigkeiten
+des verwendeten Befehlszeilendebuggers, <tt>gdb</tt>, abhängig ist.
 KDbg kann nicht mehr als <tt>gdb</tt> leisten. Wenn Sie zum Beispiel einen
 <tt>gdb</tt>
-haben, der Programme mit Threads nicht unterst&uuml;tzt, dann kann auch
+haben, der Programme mit Threads nicht unterstützt, dann kann auch
 KDbg das nicht (obwohl ein Threads-Fenster vorhanden ist).
 <h2>
 <a NAME="UsingKDbg"></a>Mit KDbg arbeiten</h2>
 Bevor Sie mit der Arbeit beginnen, sollten Sie die <a href="globaloptions.html">globalen
-Einstellungen</a> pr&uuml;fen, indem Sie <i>Datei|Globale Einstellungen</i>
+Einstellungen</a> prüfen, indem Sie <i>Datei|Globale Einstellungen</i>
 aufrufen.
 <h4>
 Ein zu debuggendes Program angeben</h4>
-Um ein Programm zu debuggen, w&auml;hlen Sie <i>Datei|Programm</i>. Wenn
-Sie das Programm schon einmal debuggt haben, k&ouml;nnen Sie es auch aus
-der Liste unter <i>Datei|Zuletzt g&ouml;ffnete Programme</i> w&auml;hlen.
+Um ein Programm zu debuggen, wählen Sie <i>Datei|Programm</i>. Wenn
+Sie das Programm schon einmal debuggt haben, können Sie es auch aus
+der Liste unter <i>Datei|Zuletzt göffnete Programme</i> wählen.
 Das Programm wird jetzt geladen.
-<p>Wenn Sie einen Core-Dump verwenden wollen, m&uuml;ssen Sie zuerst das
-Programm, das den Core-Dump erzeugt hat wie gerade erw&auml;hnt laden,
-dann w&auml;hlen Sie <i>Datei|Core dump</i> aus dem Men&uuml;. KDbg zeigt
+<p>Wenn Sie einen Core-Dump verwenden wollen, müssen Sie zuerst das
+Programm, das den Core-Dump erzeugt hat wie gerade erwähnt laden,
+dann wählen Sie <i>Datei|Core dump</i> aus dem Menü. KDbg zeigt
 die Stelle an, die den Core-Dump verursacht hat.
-<p>Sie k&ouml;nnen nun Haltepunkte setzen, indem Sie die Eintr&auml;ge
-im Men&uuml; <i>Haltepunkt</i> oder im Rechte-Maus-Men&uuml; oder in der
+<p>Sie können nun Haltepunkte setzen, indem Sie die Einträge
+im Menü <i>Haltepunkt</i> oder im Rechte-Maus-Menü oder in der
 <a href="breakptlist.html">Liste
 der Haltepunkte</a> verwenden.
-<p>Sie k&ouml;nnen auch <a href="pgmsettings.html">programmspezifische
-Einstellungen</a> vornehmen, indem Sie <i>Datei|Einstellungen</i> w&auml;hlen.
+<p>Sie können auch <a href="pgmsettings.html">programmspezifische
+Einstellungen</a> vornehmen, indem Sie <i>Datei|Einstellungen</i> wählen.
 <h4>
-Das Programm ausf&uuml;hren</h4>
-Nun f&uuml;hren Sie das Programm aus, indem Sie <i>Ausf&uuml;hrung|Ausf&uuml;hren</i>
-w&auml;hlen. Das Programm arbeitet nun wie gew&ouml;hnlich, bis es beendet
-wird, auf einen Haltepunkt oder Watchpoint trifft, oder ein Signal empf&auml;ngt.
-<p>Sie k&ouml;nnen das Programm mit Argumenten ausf&uuml;hren, ein Arbeitsverzeichnis
-festlegen und auch Umgebungsvariablen definieren. Dazu w&auml;hlen Sie
-<i>Ausf&uuml;hrung|Argumente</i>
+Das Programm ausführen</h4>
+Nun führen Sie das Programm aus, indem Sie <i>Ausführung|Ausführen</i>
+wählen. Das Programm arbeitet nun wie gewöhnlich, bis es beendet
+wird, auf einen Haltepunkt oder Watchpoint trifft, oder ein Signal empfängt.
+<p>Sie können das Programm mit Argumenten ausführen, ein Arbeitsverzeichnis
+festlegen und auch Umgebungsvariablen definieren. Dazu wählen Sie
+<i>Ausführung|Argumente</i>
 und machen Ihre Angaben im <a href="argspwdenv.html">Programmargumente-Dialog</a>.
-<p>Weiters k&ouml;nnen Sie sich in ein Programm einh&auml;ngen (<i>attachen</i>),
-das bereits ausgef&uuml;hrt wird. Dazu laden Sie das Programm zuerst wie
-oben beschrieben, dann w&auml;hlen Sie <i>Ausf&uuml;hrung|Attachen</i>.
+<p>Weiters können Sie sich in ein Programm einhängen (<i>attachen</i>),
+das bereits ausgeführt wird. Dazu laden Sie das Programm zuerst wie
+oben beschrieben, dann wählen Sie <i>Ausführung|Attachen</i>.
 Geben Sie die Prozessnummer an und klicken Sie <i>OK</i>. Das Programm
 wird jetzt angehalten (aber nicht beendet), und der derzeitige Stand des
 Programms wird im <a href="sourcecode.html">Quellcode-Fenster</a> angezeigt.
@@ -92,40 +92,40 @@ Programms wird im <a href="sourcecode.html">Quellcode-Fenster</a> angezeigt.
 Das Programm wurde angehalten - was nun?</h4>
 Wenn das Programm an einem Haltepunkt, Watchpoint oder wegen eines Signals
 angehalten wird, zeigt das <a href="sourcecode.html">Quellcode-Fenster</a>
-die Zeile, in der das Programm gerade arbeitete. Es passiert h&auml;ufig,
+die Zeile, in der das Programm gerade arbeitete. Es passiert häufig,
 dass das Programm wegen eine Signals (oftmals <tt>SIGSEGV</tt>, Speicherzugriffsfehler)
 in einer Funktion angehalten wird, die sich nicht in jenem Programmteil
 befindet, den Sie geschrieben haben. In diesem Fall betrachten Sie das
 <a href="stack.html">Stack-Fenster</a>
 genauer: Suchen Sie nach einer Funktion, die Sie geschrieben haben (beginnen
 Sie am oberen Ende) und klicken Sie darauf. Das bringt Sie an eine Stelle,
-an der Sie mit der Suche nach dem tats&auml;chlichen Programmfehler beginnen
-k&ouml;nnen.
-<p>Im Men&uuml; <i>Ausf&uuml;hrung</i> finden Sie Befehle, die Sie zum
-Ausf&uuml;hren und schrittweisen Abarbeiten des Programms verwenden. Weiters
-k&ouml;nnen Sie das laufende Programm unterbrechen. Die wichtigen Befehle
-k&ouml;nnen auch mit Funktionstasten gegeben werden. Zum effizienten Arbeiten
-empfehle ich, dass Sie sich diese Tasten eingew&ouml;hnen.
-Sie k&ouml;nnen <i>Einstellungen|Kurzbefehle festlegen</i> verwenden, falls
+an der Sie mit der Suche nach dem tatsächlichen Programmfehler beginnen
+können.
+<p>Im Menü <i>Ausführung</i> finden Sie Befehle, die Sie zum
+Ausführen und schrittweisen Abarbeiten des Programms verwenden. Weiters
+können Sie das laufende Programm unterbrechen. Die wichtigen Befehle
+können auch mit Funktionstasten gegeben werden. Zum effizienten Arbeiten
+empfehle ich, dass Sie sich diese Tasten eingewöhnen.
+Sie können <i>Einstellungen|Kurzbefehle festlegen</i> verwenden, falls
 Sie die Funktionen anderen Tasten zuweisen wollen.
-<p>Im Men&uuml; <i>Haltepunkt</i> finden Sie Befehle zum Setzen, Entfernen,
-Aktivieren und Inaktivieren von permanenten und tempor&auml;ren Haltepunkten.
-Nat&uuml;rlich k&ouml;nnen Sie auch eine <a href="breakptlist.html">Liste
-der Haltepunkte</a> anzeigen. Sie k&ouml;nnen einen Haltepunkt auch setzen,
+<p>Im Menü <i>Haltepunkt</i> finden Sie Befehle zum Setzen, Entfernen,
+Aktivieren und Inaktivieren von permanenten und temporären Haltepunkten.
+Natürlich können Sie auch eine <a href="breakptlist.html">Liste
+der Haltepunkte</a> anzeigen. Sie können einen Haltepunkt auch setzen,
 indem Sie mit der Maus in den Freiraum links der entsprechenden Quellcode-Zeile
-klicken (mit der linken Maustaste); weiters k&ouml;nnen sie einen vorhandenen
+klicken (mit der linken Maustaste); weiters können sie einen vorhandenen
 Haltepunkt mit der mittleren Maustaste aktivieren und deaktivieren.
-<p>Die Animation in der Werkzeugleiste zeigt an, ob das Programm gerade l&auml;uft.
+<p>Die Animation in der Werkzeugleiste zeigt an, ob das Programm gerade läuft.
 Sie bleibt stehen, sobald das Programm an einem Haltepunkt oder aus einem
 anderen Grund angehalten wird oder sobald es beendet wird.
-Ein Klick auf die Animation hat die Funktion von <i>Ausf&uuml;hrung|Unterbrechen</i>.
+Ein Klick auf die Animation hat die Funktion von <i>Ausführung|Unterbrechen</i>.
 <h2>
 <a NAME="InfoWindows"></a>Die Informationsfenster von KDbg</h2>
-KDbg zeigt Information in einer Reihe verschiedener Fenster an. Im Men&uuml;
+KDbg zeigt Information in einer Reihe verschiedener Fenster an. Im Menü
 <i>Ansicht</i>
-finden Sie die Befehle, die diese Fenster anzeigen und schlie&szlig;en. Es handelt
+finden Sie die Befehle, die diese Fenster anzeigen und schließen. Es handelt
 sich dabei um <i>dockende</i> Fenster, sodass Sie deren Anordnung beliebig
-ver&auml;ndern k&ouml;nnen.
+verändern können.
 <ul>
 <li>
 <a href="sourcecode.html">Das Quellcode-Fenster</a></li>
@@ -137,7 +137,7 @@ ver&auml;ndern k&ouml;nnen.
 <a href="stack.html">Der Programm-Stack</a></li>
 
 <li>
-<a href="watches.html">Ausdr&uuml;cke (<i>Watches</i>)</a></li>
+<a href="watches.html">Ausdrücke (<i>Watches</i>)</a></li>
 
 <li>
 <a href="breakptlist.html">Die Liste der Haltepunkte</a></li>
