@@ -2,36 +2,38 @@
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
    <meta name="Author" content="Johannes Sixt">
    <title>KDbg - Benutzerhandbuch - Argumente, Arbeitsverzeichnis, Umgebungsvariablen</title>
 </head>
-<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
-<a href="index.html">Inhalt</a>
+<body text="#000000" bgcolor="#FFFFFF">
+<p><a href="index.html">Inhalt</a></p>
 <h3>
-<a NAME="Environment"></a>Programmargumente, Arbeitsverzeichnis, Umgebungsvariablen
+Programmargumente, Arbeitsverzeichnis, Umgebungsvariablen
 setzen</h3>
-Mit <i>Ausführen|Argumente</i> öffnen Sie einen Dialog, in dem
+<p>Mit <i>Ausführen|Argumente</i> öffnen Sie einen Dialog, in dem
 Sie Programmargumente, das Arbeitsverzeichnis sowie Umgebungsvariablen
-setzen können.
+setzen können.</p>
 <h3>
-Programmargumente</h3>
-In der obersten Eingabezeile können Sie die Programmargumente eingeben,
-die an das Programm übergeben werden sollen. Diese werden beim nächsten
-Programmstart verwendet.
+Register Argumente</h3>
+<p>In dem Eingabefeld können Sie die Programmargumente eingeben,
+die an das Programm übergeben werden sollen.
+Mittels <i>Dateinamen einfügen</i> können Sie nach einer Datei suchen und an
+der aktuellen Position <i>einfügen</i>. Analog können Sie mit
+<i>Verzeichnis einfügen</i> nach einem Verzeichnis suchen.</p>
+<p>Diese geänderten Argumente werden beim nächsten Programmstart verwendet.</p>
 <h3>
-Arbeitsverzeichnis</h3>
-Im Eingabefeld darunter können Sie das Arbeitsverzeichnis angeben.
+<a name="WorkingDir"></a>Register Arbeitsverzeichnis</h3>
+<p>Im dem Eingabefeld können Sie das Arbeitsverzeichnis angeben.
 Dieses wird sofort an gdb übergeben, sobald Sie <i>OK</i> drücken.
 Das Programm verwendet das neue Arbeitsverzeichnis allerdings erst beim
-nächsten Start.
+nächsten Start.</p>
 <p>Das Arbeitsverzeichnis gilt auch für gdb selbst! Das angegebene
 Arbeitsverzeichnis wird sofort an gdb weitergegeben, d.h. gdb wird die
 neue Einstellung verwenden, sobald Sie <i>OK</i> drücken. Das kann
-einen Einfluss darauf haben, ob gdb Quellcodedateien findet.
+einen Einfluss darauf haben, ob gdb Quellcodedateien findet.</p>
 <h3>
-Umgebungsvariablen</h3>
-Im Bereich für Umgebungsvariablen können Sie einen Ausdruck in
+<a name="Environment"></a>Register Umgebungsvariablen</h3>
+<p>Im Register Umgebungsvariablen können Sie einen Ausdruck in
 der Form
 <tt>VARIABLE=Wert</tt> eingeben und dann <i>Ändern</i> klicken,
 um der Umgebungsvariablen <tt>VARIABLE</tt> einen <tt>Wert</tt> zuzuweisen.
@@ -40,11 +42,6 @@ darunter aus und klicken dan <i>Löschen</i>. Um einen Wert zu ändern,
 geben Sie einfach den neuen Wert ein und klicken <i>Ändern</i>. Wenn
 Sie den Namen der Variable ändern und <i>Ändern</i> clicken,
 erzeugen Sie eine neue Variable! Die neuen Umgebungsvariablen werden erst
-beim nächsten Programmstart verwendet.
-<p>Wenn Sie glibc2 unter Linux verwenden, ist es sehr wichtig, dass Sie
-der Umgebungsvariablen <tt>LD_BIND_NOW</tt> den Wert <tt>1</tt> zuweisen.
-Wenn diese Variable nicht gesetzt ist, können solche Funktionen nicht
-betreten werden, die von der Bibliothek <tt>libc</tt> und anderen Shared
-Libraries importiert werden.
+beim nächsten Programmstart verwendet.</p>
 </body>
 </html>

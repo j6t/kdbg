@@ -2,24 +2,28 @@
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-   <meta name="GENERATOR" content="Mozilla/4.76 [en] (X11; U; Linux 2.2.18-SMP i686) [Netscape]">
    <meta name="Author" content="Johannes Sixt">
    <title>KDbg - Benutzerhandbuch - Lokale Variablen</title>
 </head>
-<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
-<a href="index.html">Inhalt</a>
+<body text="#000000" bgcolor="#FFFFFF">
+<p><a href="index.html">Inhalt</a></p>
 <h1>
 Lokale Variablen</h1>
-Mittels <i>Ansicht|Lokale Variablen</i> wird das Fenster für die lokalen
+<p>Mittels <i>Ansicht|Lokale Variablen</i> wird das Fenster für die lokalen
 Variablen angezeigt. Darin wird der Inhalt der lokalen Variablen des aktiven
-Stack-Frames angezeigt.
+Stack-Frames angezeigt.</p>
 <p>Das im <a href="stack.html">Stack-Fenster</a> ausgewählte Frame
-bestimmt die lokalen Variablen, die hier angezeigt werden.
+bestimmt die lokalen Variablen, die hier angezeigt werden.</p>
 <p>Sobald das Programm angehalten wird (z.B. durch einen Haltepunkt), wird
 die Anzeige aktualisiert. Variablenwerte, die sich seit dem letzten Anhalten
-geändert haben, werden rot hervorgehoben.
+geändert haben, werden rot hervorgehoben.</p>
+<p>Die Werte der meisten Variable können modifiziert werden. Dazu setzen Sie
+den Fokus auf das Fenster und drücken F2 oder wählen Sie <i>Wert bearbeiten</i>
+im Kontextmenü. Nun können Sie den Wert bearbeiten.
+Beachten Sie, dass eine Zeichenketten nicht bearbeitet werden kann, die bei
+einer Zeigervariablen angezeigt wird, lediglich den Zeigerwert selbst.</p>
 <p>Sie können die ausgewählte Variable oder Struktur-Member in
-das <a href="watches.html">Ausdrückefenster</a> kopieren, indem Sie
-mittels der rechten Maustaste das kleine Kontextmenü aufrufen.
+<a href="watches.html">Beobachtete Ausdrücke</a> kopieren, indem Sie
+mittels der rechten Maustaste das kleine Kontextmenü aufrufen.</p>
 </body>
 </html>

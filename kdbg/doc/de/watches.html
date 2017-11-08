@@ -2,26 +2,29 @@
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-   <meta name="GENERATOR" content="Mozilla/4.76 [en] (X11; U; Linux 2.2.18-SMP i686) [Netscape]">
    <meta name="Author" content="Johannes Sixt">
    <title>KDbg - Benutzerhandbuch - Ausdrücke</title>
 </head>
-<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
-<a href="index.html">Inhalt</a>
+<body text="#000000" bgcolor="#FFFFFF">
+<p><a href="index.html">Inhalt</a></p>
 <h1>
-Ausdrücke (Watches)</h1>
-Das Watches-Fenster wird mittels <i>Ansicht|Ausdrücke</i> angezeigt.
-Dieses zeigt beliebige Ausdrücke an (diese bezeichnet man auch als
-<i>Watches</i>).
+Beobachtete Ausdrücke</h1>
+<p>Das Watches-Fenster wird mittels <i>Ansicht|Beobachtete Ausdrücke</i> angezeigt.
+Dieses zeigt beliebige Ausdrücke an.</p>
 <p>Ein neuer Ausdruck wird hinzugefügt, indem dieser im Eingabefeld
 eingegeben wird und dann auf <i>Neu</i> geklickt wird. Um einen Ausdruck
 zu entfernen, klicken Sie diesen an (an der Wurzel des entsprechenden Baums)
-und klicken dann auf <i>Entf</i>.
+und klicken dann auf <i>Entf</i>.</p>
 <p>Sie können auch eine Variable oder einen Struktur-Member aus dem
 <a href="localvars.html">Lokale-Variablen-Fenster</a> herüberkopieren,
-indem Sie das dortige Kontextmenü zuhilfe nehmen.
-<p>Die eingegeben Ausdrücke werden zwischen Sitzungen gespeichert.
+indem Sie das dortige Kontextmenü zuhilfe nehmen.</p>
+<p>Die Werte der meisten Variable können modifiziert werden. Dazu setzen Sie
+den Fokus auf das Fenster und drücken F2 oder wählen Sie <i>Wert bearbeiten</i>
+im Kontextmenü. Nun können Sie den Wert bearbeiten.
+Beachten Sie, dass eine Zeichenketten nicht bearbeitet werden kann, die bei
+einer Zeigervariablen angezeigt wird, lediglich den Zeigerwert selbst.</p>
+<p>Die beobachteten Ausdrücke werden zwischen Sitzungen gespeichert.
 Wir empfehlen, Ausdrücke zu entfernen, die nicht mehr benötigt,
-weil das die Arbeitsgeschwindigkeit von KDbg steigert.
+weil das die Arbeitsgeschwindigkeit von KDbg steigert.</p>
 </body>
 </html>

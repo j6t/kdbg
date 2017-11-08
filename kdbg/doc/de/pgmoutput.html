@@ -2,32 +2,31 @@
 <html>
 <head>
    <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
-   <meta name="GENERATOR" content="Mozilla/4.74 [en] (X11; U; Linux 2.2.16-SMP i686) [Netscape]">
    <meta name="Author" content="Johannes Sixt">
    <title>KDbg - Benutzerhandbuch - Programmausgabe</title>
 </head>
-<body text="#000000" bgcolor="#FFFFFF" link="#0000EF" vlink="#51188E" alink="#FF0000">
-<a href="index.html">Inhalt</a>
+<body text="#000000" bgcolor="#FFFFFF">
+<p><a href="index.html">Inhalt</a></p>
 <h1>
 Das Programmausgabefenster</h1>
-Das Programmausgabefenster wird mit <i>Ansicht|Ausgabe</i> geöffnet.
+<p>Das Programmausgabefenster wird mit <i>Ansicht|Ausgabe</i> geöffnet.
 Das Ausgabefenster zeichnet den Text auf, den das Programm auf <tt>stdout</tt>
-und <tt>stderr</tt> ausgibt.
+und <tt>stderr</tt> ausgibt.</p>
 <p>Das Ausgabefenster lässt keine Eingabe zu und unterstützt
 nur eine äußerst minimale Terminalemulation: Lediglich <tt>\n</tt>
 (Zeilenvorschub, line-feed), <tt>\t</tt> (horizontaler Tabulator) und
 <tt>\r</tt> (Wagenrücklauf, carriage-return) werden behandelt.
 Das reicht im Allgemeinen für Programme mit grafischer Benutzeroberfläche
-aus, die nur Debug-Ausgaben schreiben.
+aus, die nur Debug-Ausgaben schreiben.</p>
 <p>Wenn ein Programm zum ersten Mal in KDbg geladen wird, wird dieses Ausgabefenster
 <i>nicht</i> benutzt. Der Grund dafür ist, dass KDbg nicht wissen
 kann, ob das Programm eine ausgefeilte Terminalemulation benötigt
 oder ob es Eingaben über das Terminal erwartet. Deshalb wird standardmässig
 ein Terminalemulator verwendet. Um die Ausgaben in das Ausgabefenster umzuleiten,
-gehen sie wie folgt vor:
+gehen sie wie folgt vor:</p>
 <ol>
 <li>
-Rufen Sie mittels <i>Datei|Einstellungen</i> die <a href="pgmsettings.html">programmspezifischen
+Rufen Sie mittels <i>Einstellungen|Dieses Programm</i> die <a href="pgmsettings.html">programmspezifischen
 Einstellungen</a> auf.</li>
 
 <li>
@@ -41,12 +40,12 @@ Sie <i>OK</i>.</li>
 Laden Sie das Programm erneut, indem Sie es aus der Liste unter <i>Datei|Zuletzt
 geöffnete Programme</i> wählen.</li>
 </ol>
-Sie können den Inhalt des Fensters jederzeit löschen, indem Sie
+<p>Sie können den Inhalt des Fensters jederzeit löschen, indem Sie
 <i>Löschen</i> aus dem Popup-Menü wählen, das Sie mit der
-rechten Maustaste aufrufen können.
+rechten Maustaste aufrufen können.</p>
 <p>Falls die letzte Zeile des Ausgabefensters sichtbar ist, verschiebt
 sich der Fensterinhalt automatisch, sodass die letzte Zeile immer sichtbar
 bleibt, wenn neuer Text ankommt. Wenn Sie hingegen den Fensterinhalt verschieben,
-sodass die letzte Zeile nicht sichtbar ist, bleibt der sichtbare Teil unverändert.
+sodass die letzte Zeile nicht sichtbar ist, bleibt der sichtbare Teil unverändert.</p>
 </body>
 </html>
