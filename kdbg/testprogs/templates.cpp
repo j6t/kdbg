@@ -75,6 +75,12 @@ void operator<(T&, U)
 	cout << __PRETTY_FUNCTION__ << endl;
 }
 
+// user-defined literal
+void operator"" _print ( const char* str )
+{
+	cout << str;
+}
+
 void f(const char* s)
 {
 	A::g();
@@ -125,4 +131,7 @@ int main()
 	tSi.operator<(1);
 
 	varargs(" : ", 1, short(-2), 4U, '3');
+
+	0x123ABC_print;
+	cout << endl;
 }
