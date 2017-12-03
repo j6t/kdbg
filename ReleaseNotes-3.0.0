@@ -1,0 +1,31 @@
+KDbg Release Notes for version 3.0.0
+====================================
+
+Changes since 2.9.1
+-------------------
+
+Deprecation notice
+
+- XSL debugging support is no longer maintained and is now deprecated.
+  It will be removed in a future release.
+
+Enhancements
+
+- Ported to KDE Frameowork 5.
+
+- The memory dump window shows an ASCII representation when the display
+  is set to "hexadecimal".
+
+- The displayed memory dump is extended automatically when the window is
+  scrolled to the end of the currently visible dump.
+
+- Source code tab windows can be closed with a close button.
+
+- When the current line is updated due to a debugger step command, it is
+  centered in the window.
+
+- Group headers in the Registers window use the available window width.
+
+Bug fixes
+
+- Outdated texts were removed from the manual.
