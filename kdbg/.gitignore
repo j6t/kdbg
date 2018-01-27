@@ -1,0 +1,8 @@
+*.moc
+config.h
+kdbg
+kdbg_automoc.cpp
+moc_*.cpp
+ui_*.h
+version.h
+pics/sc-*.svgz
