@@ -197,13 +197,20 @@ void PgmArgs::on_insertFile_clicked()
 {
     QString caption = i18n("Select a file name to insert as program argument");
 
-    // use the selection as default
-    QString f = programArgs->selectedText();
-    f = QFileDialog::getSaveFileName(this, caption, f);
+    QFileDialog dlg(this, caption);
+    dlg.setFileMode(QFileDialog::AnyFile);
+    dlg.setLabelText(QFileDialog::Accept,
+		// i18n: replacement text for the "Open" button in a file dialog
+		// the selected file name will be inserted in a text box
+		i18nc("@action:button file name into text box", "Insert"));
+
+    if (dlg.exec() != QDialog::Accepted)
+	return;
+
+    auto names = dlg.selectedFiles();
     // don't clear the selection if no file was selected
-    if (!f.isEmpty()) {
-	programArgs->insert(f);
-    }
+    if (names.count() > 0)
+	programArgs->insert(names.first());
 }
 
 void PgmArgs::on_insertDir_clicked()
