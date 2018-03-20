@@ -1,7 +1,7 @@
 // test <repeats 30 times> in arrays
 
 #include <iostream>
-#include <qstring.h>
+#include <QtCore/QString>
 
 struct Big {
     struct bog {

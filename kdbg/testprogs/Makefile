@@ -1,8 +1,7 @@
 CXXFLAGS=-O0 -g
 
-QT3 = /usr/lib64/qt3
-QT3INC = -I$(QT3)/include
-QT3LIB = $(QT3)/lib64/libqt-mt.so
+QT5INC = -I/usr/include/qt5 -fPIC
+QT5LIB = /usr/lib64/libQt5Core.so
 
 PROGS = \
 	anonstruct \
@@ -49,10 +48,10 @@ nestedclass: nestedclass.cpp
 	g++ -o $@ $(CXXFLAGS) $^
 
 qt: qt.cpp
-	g++ -o $@ $(CXXFLAGS) $^ $(QT3INC) $(QT3LIB)
+	g++ -o $@ $(CXXFLAGS) $^ $(QT5INC) $(QT5LIB)
 
 repeats: repeats.cpp
-	g++ -o $@ $(CXXFLAGS) $^ $(QT3INC) $(QT3LIB)
+	g++ -o $@ $(CXXFLAGS) $^ $(QT5INC) $(QT5LIB)
 
 std: std.cpp
 	g++ -o $@ $(CXXFLAGS) $^
@@ -61,7 +60,7 @@ templates: templates.cpp
 	g++ -std=c++0x -o $@ $(CXXFLAGS) $^
 
 testfile: testfile.cpp
-	g++ -o $@ $(CXXFLAGS) $^ $(QT3INC) $(QT3LIB)
+	g++ -o $@ $(CXXFLAGS) $^ $(QT5INC) $(QT5LIB)
 
 tooltips: tooltips.cpp
 	g++ -o $@ $(CXXFLAGS) $^

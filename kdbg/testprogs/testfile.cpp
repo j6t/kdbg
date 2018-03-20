@@ -1,8 +1,8 @@
 #include <iostream>
-#include <qstring.h>
-#include <qfile.h>
-#include <qfileinfo.h>
-#include <qdir.h>
+#include <QtCore/QString>
+#include <QtCore/QFile>
+#include <QtCore/QFileInfo>
+#include <QtCore/QDir>
 #include <math.h>
 
 namespace {
@@ -167,17 +167,17 @@ int main(int argc, char* argv[])
 
 	const QString& strref = s;
 
-	templated_strtest(strtest, s);
+	templated_strtest(strtest, s.toLatin1());
 	s = "asbcxxxxxxxxxxxxxxxxxxxxxxxxxxx";
-	strtest(s);
+	strtest(s.toLatin1());
 	s += "iiiiiiiiiiiiiiiiiiiiiiiiiiiiiii";
-	strtest(s);
+	strtest(s.toLatin1());
 	s += "rst";
-	strtest(s);
+	strtest(s.toLatin1());
 	s = "xxxxxxxxxxxxxxxxxxxxxxxxxxx";
-	strtest(s);
+	strtest(s.toLatin1());
 	s += "rst";
-	strtest(s);
+	strtest(s.toLatin1());
 	s = "";
 
 	Cl c1(13);
