@@ -1,5 +1,6 @@
 [Type Table]
 Types1=QString
+Types2=QPoint,QRect
 LibDisplayName=libQt5Core 5.x
 ShlibRE=libQt5Core\\.so\\.5$
 EnableBuiltin=QString::Data,QCharIsShort
@@ -7,3 +8,15 @@ PrintQStringCmd=print *(unsigned short*)((char*)($qstrdata=(%s))+$qstrdata->offs
 [QString]
 Display={ % }
 Expr1=/QString::Data (%s).d
+
+[QPoint]
+Display={ %,% }
+Expr1=(%s).xp
+Expr2=(%s).yp
+
+[QRect]
+Display={ tl=(%,%) br=(%,%) }
+Expr1=(%s).x1
+Expr2=(%s).y1
+Expr3=(%s).x2
+Expr4=(%s).y2
