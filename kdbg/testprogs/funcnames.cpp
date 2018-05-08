@@ -1,4 +1,4 @@
-// test C++11 lambdas
+// test lambdas and other function names
 
 #include <algorithm>
 #include <initializer_list>
@@ -24,10 +24,22 @@ struct X
 		for_each(m_v.begin(), m_v.end(), f);
 	}
 	std::vector<T> m_v;
+
+	int refqual() const &
+	{
+		return 3;
+	}
+	int refqual() &&
+	{
+		return 4;
+	}
 };
 
 int main()
 {
 	X<unsigned> x{ 1, 1, 2, 3,  5, 8 };
 	x.outmult(3);
+
+	std::cout << x.refqual() << std::endl;
+	std::cout << X<int>().refqual() << std::endl;
 }
