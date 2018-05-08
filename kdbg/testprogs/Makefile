@@ -5,8 +5,8 @@ QT5LIB = /usr/lib64/libQt5Core.so
 
 PROGS = \
 	anonstruct \
+	funcnames \
 	helloworld \
-	lambda \
 	locals \
 	longdouble \
 	maths \
@@ -25,12 +25,12 @@ all: $(PROGS)
 anonstruct: anonstruct.cpp
 	g++ -o $@ $(CXXFLAGS) $^
 
+funcnames: funcnames.cpp
+	g++ --std=c++11 -o $@ $(CXXFLAGS) $^
+
 helloworld: helloworld.asm
 	nasm -f elf64 -F dwarf -g $^ -o $(^:.asm=.o)
 	ld -g -o $@ $(^:.asm=.o)
-
-lambda: lambda.cpp
-	g++ --std=c++0x -o $@ $(CXXFLAGS) $^
 
 locals: locals.cpp
 	g++ -o $@ $(CXXFLAGS) $^
