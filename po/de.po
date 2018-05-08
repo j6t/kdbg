@@ -293,8 +293,8 @@ msgid "A Debugger"
 msgstr "Ein Debugger"
 
 #: main.cpp:31
-msgid "(c) 1998-2017 Johannes Sixt"
-msgstr "(c) 1998-2017 Johannes Sixt"
+msgid "(c) 1998-2018 Johannes Sixt"
+msgstr "(c) 1998-2018 Johannes Sixt"
 
 #: main.cpp:35
 msgid "Johannes Sixt"
