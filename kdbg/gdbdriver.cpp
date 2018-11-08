@@ -1108,8 +1108,10 @@ static void skipNestedWithString(const char*& s, char opening, char closing)
 
 static void skipName(const char*& p)
 {
-    // allow : (for enumeration values) and $ and . (for _vtbl.)
-    while (isalnum(*p) || *p == '_' || *p == ':' || *p == '$' || *p == '.')
+    while (isalnum(*p) || *p == '_'
+		|| *p == ':'			// enumeration values
+		|| *p == '$' || *p == '.'	// _vtlb.
+		|| *p == '#')			// param name in variadic templ
 	p++;
 }
 
