@@ -444,7 +444,7 @@ QString SourceWindow::extendExpr(const QString &plainText,
     // cut the document to reduce size of string to scan
     // because of this only identifiefs of length <= IDENTIFIER_MAX_SIZE are supported
     if (document.length() > IDENTIFIER_MAX_SIZE) {
-        document.right(IDENTIFIER_MAX_SIZE);
+	document = document.right(IDENTIFIER_MAX_SIZE);
     }
 
     const int index = regex.indexIn(document);
@@ -457,7 +457,7 @@ QString SourceWindow::extendExpr(const QString &plainText,
     {
         const int length = regex.matchedLength();
 
-        word = plainText.mid(index, length);
+	word = document.mid(index, length);
         TRACE("Matched, returning " + word);
     }
 
