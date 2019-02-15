@@ -31,35 +31,6 @@ set(PICTOGRAMS
 install(FILES ${PICTOGRAMS} DESTINATION "${DATA_INSTALL_DIR}/kdbg/pics")
 
 ecm_install_icons(ICONS
-    22-actions-pulse000000.png
-    22-actions-pulse000001.png
-    22-actions-pulse000002.png
-    22-actions-pulse000003.png
-    22-actions-pulse000004.png
-    22-actions-pulse000005.png
-    22-actions-pulse000006.png
-    22-actions-pulse000007.png
-    22-actions-pulse000008.png
-    22-actions-pulse000009.png
-    22-actions-pulse000010.png
-    22-actions-pulse000011.png
-    22-actions-pulse000012.png
-    22-actions-pulse000013.png
-    22-actions-pulse000014.png
-    22-actions-pulse000015.png
-    22-actions-pulse000016.png
-    22-actions-pulse000017.png
-    22-actions-pulse000018.png
-    22-actions-pulse000019.png
-    22-actions-pulse000020.png
-    22-actions-pulse000021.png
-    22-actions-pulse000022.png
-    22-actions-pulse000023.png
-    22-actions-pulse000024.png
-    22-actions-pulse000025.png
-    22-actions-pulse000026.png
-    22-actions-pulse000027.png
-    22-actions-pulse000028.png
     22-actions-pulse.mng
     DESTINATION "${DATA_INSTALL_DIR}/kdbg/icons"
     THEME hicolor
