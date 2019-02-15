@@ -446,11 +446,14 @@ XsldbgDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
                 switch (intArg & MDTsizemask) {
                     case MDTbyte:
                     case MDThalfword:
-                        count *= 2;
+			count *= 8;
+			break;
                     case MDTword:
-                        count *= 2;
+			count *= 4;
+			break;
                     case MDTgiantword:
-                        count *= 2;
+			count *= 2;
+			break;
                 }
                 break;
         }

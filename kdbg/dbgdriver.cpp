@@ -148,7 +148,7 @@ CmdQueueItem* DebuggerDriver::queueCmdString(DbgCommand cmd,
 	    }
 	    break;
 	} // else none found, so add it
-	// drop through
+	// fall through
     case QMnormal:
 	cmdItem = new CmdQueueItem(cmd, cmdString);
 	m_lopriCmdQueue.push_back(cmdItem);
