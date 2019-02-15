@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 			 KDBG_VERSION,
 			 i18n("A Debugger"),
 			 KAboutLicense::GPL_V2,
-			 i18n("(c) 1998-2018 Johannes Sixt"),
+			 i18n("(c) 1998-2019 Johannes Sixt"),
 			 {},	/* any text */
 			 "http://www.kdbg.org/",
 			 "j6t@kdbg.org");
