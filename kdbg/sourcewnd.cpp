@@ -777,12 +777,22 @@ void SourceWindow::setTabWidth(int numChars)
     setTabStopWidth(w);
 }
 
+QColor SourceWindow::lineSelectionColor() const
+{
+    QColor c = palette().color(QPalette::Text);
+
+    if (c.lightness() < 100)	// Breeze light 24, Breeze dark 240
+	return "#E7E7E7";
+    else
+	return "#191919";
+}
+
 void SourceWindow::cursorChanged()
 {
     QList<QTextEdit::ExtraSelection> extraSelections;
     QTextEdit::ExtraSelection selection;
 
-    selection.format.setBackground(QColor("#E7E7E7"));
+    selection.format.setBackground(lineSelectionColor());
     selection.format.setProperty(QTextFormat::FullWidthSelection, true);
     selection.cursor = textCursor();
     selection.cursor.clearSelection();

@@ -70,6 +70,7 @@ protected:
     /** translates (0-based) line number plus a code address into a row number */
     int lineToRow(int row, const DbgAddr& address);
     int lineInfoAreaWidth() const;
+    QColor lineSelectionColor() const;
 
     void actionExpandRow(int row);
     void actionCollapseRow(int row);
