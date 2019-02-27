@@ -993,10 +993,15 @@ static bool isNumberish(const char ch)
     return (ch>='0' && ch<='9') || ch=='.' || ch=='x'; 
 }
 
-void skipString(const char*& p)
+static bool isStringPrefix(char c)
 {
-    // wchar_t strings begin with L
-    if (*p == 'L')
+    return c == 'L' || c == 'u' || c == 'U';
+}
+
+static void skipString(const char*& p)
+{
+    // strings can have a prefix
+    if (isStringPrefix(*p))
 	++p;
 
 moreStrings:
@@ -1347,7 +1352,7 @@ repeat:
 	    checkMultiPart = *p == '\'';
 	    // found a string
 	    skipString(p);
-	} else if (*p == 'L' && (p[1] == '"' || p[1] == '\'')) {
+	} else if (isStringPrefix(*p) && (p[1] == '"' || p[1] == '\'')) {
 	    // ditto for wchar_t strings
 	    checkMultiPart = p[1] == '\'';
 	    skipString(p);
@@ -1417,7 +1422,7 @@ repeat:
 	    if (*p == '"' || *p == '\'') {
 		skipString(p);
 		variable->m_varKind = VarTree::VKsimple;
-	    } else if (*p == 'L' && (p[1] == '"' || p[1] == '\'')) {
+	    } else if (isStringPrefix(*p) && (p[1] == '"' || p[1] == '\'')) {
 		skipString(p);	// wchar_t string
 		variable->m_varKind = VarTree::VKsimple;
 	    } else if (*p == '<') {
