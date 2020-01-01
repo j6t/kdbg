@@ -26,8 +26,8 @@ public:
     ~RegisterView();
 
 protected:
-    virtual void contextMenuEvent(QContextMenuEvent*);
-    virtual void changeEvent(QEvent* ev);
+    void contextMenuEvent(QContextMenuEvent*) override;
+    void changeEvent(QEvent* ev) override;
 
 protected slots:
     void slotModeChange(QAction*);

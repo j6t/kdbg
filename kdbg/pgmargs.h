@@ -22,7 +22,7 @@ public:
     PgmArgs(QWidget* parent, const QString& pgm,
 	    const std::map<QString,QString>& envVars,
 	    const QStringList& allOptions);
-    virtual ~PgmArgs();
+    ~PgmArgs();
 
     void setArgs(const QString& text) { programArgs->setText(text); }
     QString args() const { return programArgs->text(); }
@@ -37,7 +37,7 @@ protected:
 
     void parseEnvInput(QString& name, QString& value);
     void modifyVar(bool resurrect);
-    virtual void accept();
+    void accept() override;
 
 protected slots:
     void on_buttonModify_clicked();

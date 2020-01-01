@@ -32,7 +32,7 @@ public:
 
     bool caseSensitive() const { return m_caseCheck.isChecked(); }
     QString searchText() const { return m_searchText.text(); }
-    virtual void done(int result);
+    void done(int result) override;
 
     QLineEdit m_searchText;
     QCheckBox m_caseCheck;
@@ -44,7 +44,7 @@ signals:
     void closed();
 
 protected:
-    virtual void closeEvent(QCloseEvent* ev);
+    void closeEvent(QCloseEvent* ev) override;
     QVBoxLayout m_layout;
     QHBoxLayout m_buttons;
 };
@@ -55,7 +55,7 @@ class WinStack : public QTabWidget
     Q_OBJECT
 public:
     WinStack(QWidget* parent);
-    virtual ~WinStack();
+    ~WinStack();
 
     /**
      * Slot activate also looks in this directory when the specified file is
@@ -70,7 +70,7 @@ public:
     SourceWindow* activeWindow() const;
     SourceWindow* windowAt(int i) const;
 
-    virtual QSize sizeHint() const;
+    QSize sizeHint() const override;
 
 signals:
     void toggleBreak(const QString&, int, const DbgAddr&, bool);
@@ -112,8 +112,8 @@ public slots:
 protected:
     bool activatePath(QString pathname, int lineNo, const DbgAddr& address);
     virtual bool activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& address);	/* -1 doesnt change line */
-    virtual void contextMenuEvent(QContextMenuEvent* e);
-    virtual bool event(QEvent* event);
+    void contextMenuEvent(QContextMenuEvent* e) override;
+    bool event(QEvent* event) override;
     void setPC(bool set, const QString& fileName, int lineNo,
 	       const DbgAddr& address, int frameNo);
     SourceWindow* findByFileName(const QString& fileName) const;

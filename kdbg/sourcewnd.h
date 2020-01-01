@@ -60,10 +60,10 @@ public:
 protected:
     void drawLineInfoArea(QPainter* p, QPaintEvent* event);
     void infoMousePress(QMouseEvent* ev);
-    virtual void resizeEvent(QResizeEvent* e);
-    virtual void contextMenuEvent(QContextMenuEvent* e);
-    virtual void keyPressEvent(QKeyEvent* ev);
-    virtual void changeEvent(QEvent* ev);
+    void resizeEvent(QResizeEvent* e) override;
+    void contextMenuEvent(QContextMenuEvent* e) override;
+    void keyPressEvent(QKeyEvent* ev) override;
+    void changeEvent(QEvent* ev) override;
     void expandRow(int row);
     void collapseRow(int row);
     void scrollToRow(int row);
@@ -125,9 +125,9 @@ class LineInfoArea : public QWidget
 {
 public:
     LineInfoArea(QWidget* parent) : QWidget(parent) { }
-    virtual void paintEvent(QPaintEvent* e);
-    virtual void mousePressEvent(QMouseEvent* ev);
-    virtual void contextMenuEvent(QContextMenuEvent* e);
+    void paintEvent(QPaintEvent* e) override;
+    void mousePressEvent(QMouseEvent* ev) override;
+    void contextMenuEvent(QContextMenuEvent* e) override;
 };
 
 class HighlightCpp : public QSyntaxHighlighter
@@ -136,7 +136,7 @@ class HighlightCpp : public QSyntaxHighlighter
 
 public:
     HighlightCpp(SourceWindow* srcWnd);
-    virtual void highlightBlock(const QString& text);
+    void highlightBlock(const QString& text) override;
     int highlight(const QString& text, int state);
 
     static bool isCppKeyword(const QString& word);

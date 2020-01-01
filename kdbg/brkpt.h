@@ -36,7 +36,7 @@ protected:
 			  int hits = 0, uint ignoreCount = 0,
 			  QString condition = QString());
     void initListAndIcons();
-    virtual bool eventFilter(QObject* ob, QEvent* ev);
+    bool eventFilter(QObject* ob, QEvent* ev) override;
 
     friend class BreakpointItem;
     

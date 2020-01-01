@@ -44,7 +44,7 @@ protected:
 
     QMenu m_popup;
 
-    virtual void contextMenuEvent(QContextMenuEvent* ev);
+    void contextMenuEvent(QContextMenuEvent* ev) override;
     void displayNewExpression(const QString& expr);
     void requestMemoryDump(const QString &expr);
     QString parseMemoryDumpLineToAscii(const QString& line, bool littleendian);

@@ -32,9 +32,9 @@ protected:
     QVBoxLayout m_watchV;
     QHBoxLayout m_watchH;
 
-    virtual bool eventFilter(QObject* ob, QEvent* ev);
-    virtual void dragEnterEvent(QDragEnterEvent* event);
-    virtual void dropEvent(QDropEvent* event);
+    bool eventFilter(QObject* ob, QEvent* ev) override;
+    void dragEnterEvent(QDragEnterEvent* event) override;
+    void dropEvent(QDropEvent* event) override;
 
 signals:
     void addWatch();

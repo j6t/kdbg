@@ -38,7 +38,7 @@ public:
 
     VarTree(VarTree* parent, ExprValue* v);
     VarTree(ExprWnd* parent, ExprValue* v);
-    virtual ~VarTree();
+    ~VarTree();
 public:
     QString computeExpr() const;
     bool isToplevelExpr() const;
@@ -63,7 +63,7 @@ public:
     QString displayedValue() const;
     VarTree* child(int i) const { return static_cast<VarTree*>(QTreeWidgetItem::child(i)); }
 
-    virtual QVariant data(int column, int role) const;
+    QVariant data(int column, int role) const override;
 
 private:
     void updateValueText();
@@ -109,9 +109,9 @@ public:
     VarTree* m_item;
     bool m_finished;
 protected:
-    void keyPressEvent(QKeyEvent *e);
-    void focusOutEvent(QFocusEvent* ev);
-    void paintEvent(QPaintEvent* e);
+    void keyPressEvent(QKeyEvent *e) override;
+    void focusOutEvent(QFocusEvent* ev) override;
+    void paintEvent(QPaintEvent* e) override;
 public slots:
     void slotSelectionChanged();
 signals:

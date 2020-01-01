@@ -56,8 +56,8 @@ public:
 
 protected:
     // session properties
-    virtual void saveProperties(KConfigGroup& cg);
-    virtual void readProperties(const KConfigGroup& cg);
+    void saveProperties(KConfigGroup& cg) override;
+    void readProperties(const KConfigGroup& cg) override;
     // settings
     void saveSettings(KSharedConfigPtr);
     void restoreSettings(KSharedConfigPtr);
@@ -116,7 +116,7 @@ protected:
     QString m_lastDirectory;		/* the dir of the most recently opened file */
 
 protected:
-    virtual bool queryClose();
+    bool queryClose() override;
     QAction* createAction(const QString& text, const char* icon,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name);

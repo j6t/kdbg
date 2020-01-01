@@ -119,7 +119,7 @@ public:
         return matcher.exactMatch(str);
     }
 
-    virtual void setMode(RegisterDisplay mode)
+    void setMode(RegisterDisplay mode) override
     {
 	gmode=mode; 
 	for(int i = 0; i < childCount(); i++)
@@ -128,7 +128,7 @@ public:
 	}
     }
 
-    virtual RegisterDisplay mode()
+    RegisterDisplay mode() override
     {
         return gmode;
     }
@@ -146,8 +146,8 @@ public:
     ~RegisterViewItem();
 
     void setValue(const RegisterInfo& regInfo);
-    virtual void setMode(RegisterDisplay mode);
-    virtual RegisterDisplay mode() { return m_mode; }
+    void setMode(RegisterDisplay mode) override;
+    RegisterDisplay mode() override { return m_mode; }
     RegisterInfo m_reg;
     RegisterDisplay m_mode;		/* display mode */
     bool m_changes;
