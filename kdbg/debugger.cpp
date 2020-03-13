@@ -2225,7 +2225,7 @@ void KDebugger::slotValueEdited(VarTree* expr, const QString& text)
 
     ExprWnd* wnd = static_cast<ExprWnd*>(expr->treeWidget());
     TRACE(QString().sprintf("Changing %s to ",
-			    wnd->name()) + text);
+			    wnd->exprList().join(" ")) + text);
 
     // determine the lvalue to edit
     QString lvalue = expr->computeExpr();
