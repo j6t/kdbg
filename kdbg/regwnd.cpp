@@ -274,11 +274,12 @@ static char* toRaw(const QString& hex, uint& length)
     static bool littleendian=(*testChar==1);
 
     length=((hex.length()-2)%2)+((hex.length()-2)/2);
+    if (hex.length()<=2) return 0;
+
     char* data=new char[length];
 
     if (littleendian) {
 	uint j=0;
-	if (hex.length()<=2) return 0;
 	for (int i=hex.length()-1; i>=2; ) {
 	    if (j%2==0)
 		data[j/2]=hexCharToDigit(hex[i].toLatin1());
@@ -288,7 +289,6 @@ static char* toRaw(const QString& hex, uint& length)
 	}
     } else { // big endian
 	uint j=0;
-	if (hex.length()<=2) return 0;
 	for (int i=2; i<hex.length(); ) {
 	    if (j%2==0)
 		data[j/2]=hexCharToDigit(hex[i].toLatin1())<<4;
