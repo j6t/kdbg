@@ -36,13 +36,13 @@ SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
     setCenterOnScroll(true);
 
     // load pixmaps
-    m_pcinner = UserIcon("pcinner");
-    m_pcup = UserIcon("pcup");
-    m_brkena = UserIcon("brkena");
-    m_brkdis = UserIcon("brkdis");
-    m_brktmp = UserIcon("brktmp");
-    m_brkcond = UserIcon("brkcond");
-    m_brkorph = UserIcon("brkorph");
+    m_pcinner = KIconLoader::global()->loadIcon("pcinner", KIconLoader::User);
+    m_pcup = KIconLoader::global()->loadIcon("pcup", KIconLoader::User);
+    m_brkena = KIconLoader::global()->loadIcon("brkena", KIconLoader::User);
+    m_brkdis = KIconLoader::global()->loadIcon("brkdis", KIconLoader::User);
+    m_brktmp = KIconLoader::global()->loadIcon("brktmp", KIconLoader::User);
+    m_brkcond = KIconLoader::global()->loadIcon("brkcond", KIconLoader::User);
+    m_brkorph = KIconLoader::global()->loadIcon("brkorph", KIconLoader::User);
     setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     setReadOnly(true);
     setViewportMargins(lineInfoAreaWidth(), 0, 0 ,0);

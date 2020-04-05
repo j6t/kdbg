@@ -331,7 +331,7 @@ ExprWnd::ExprWnd(QWidget* parent, const QString& colHeader) :
     setRootIsDecorated(true);
     setAllColumnsShowFocus(true);
 
-    m_pixPointer = UserIcon("pointer.xpm");
+    m_pixPointer = KIconLoader::global()->loadIcon("pointer.xpm", KIconLoader::User);
     if (m_pixPointer.isNull())
 	TRACE("Can't load pointer.xpm");
 }
