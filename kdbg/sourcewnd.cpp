@@ -247,7 +247,7 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
 	if (m_lineItems[i] & liBPany) {
 	    // check if this breakpoint still exists
 	    int line = rowToLine(i);
-	    TRACE(QString().sprintf("checking for bp at %d", line));
+	    TRACE(QString::asprintf("checking for bp at %d", line));
 	    KDebugger::BrkptROIterator bp = dbg->breakpointsBegin();
 	    for (; bp != dbg->breakpointsEnd(); ++bp)
 	    {
@@ -372,12 +372,12 @@ void SourceWindow::infoMousePress(QMouseEvent* ev)
 
     switch (ev->button()) {
     case Qt::LeftButton:
-	TRACE(QString().sprintf("left-clicked line %d", line));
+	TRACE(QString::asprintf("left-clicked line %d", line));
 	emit clickedLeft(m_fileName, line, address,
  			 (ev->modifiers() & Qt::ShiftModifier) != 0);
 	break;
     case Qt::MidButton:
-	TRACE(QString().sprintf("mid-clicked row %d", line));
+	TRACE(QString::asprintf("mid-clicked row %d", line));
 	emit clickedMid(m_fileName, line, address);
 	break;
     default:;

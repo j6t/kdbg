@@ -40,7 +40,7 @@ int main()
     QString s[300];
 
     for (int i = 0; i < 300; i++)
-	s[i].sprintf("String %d", i);
+	s[i] = QString::asprintf("String %d", i);
 
     s[21] = s[48];
 

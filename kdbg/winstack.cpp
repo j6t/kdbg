@@ -207,7 +207,7 @@ void WinStack::setPC(bool set, const QString& fileName, int lineNo,
 		     const DbgAddr& address, int frameNo)
 {
     TRACE((set ? "set PC: " : "clear PC: ") + fileName +
-	  QString().sprintf(":%d#%d ", lineNo, frameNo) + address.asString());
+	  QString::asprintf(":%d#%d ", lineNo, frameNo) + address.asString());
     SourceWindow* fw = findByFileName(fileName);
     if (fw)
 	fw->setPC(set, lineNo, address, frameNo);

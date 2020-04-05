@@ -346,7 +346,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	     */
 	    int dumpAsciiFixedLen = ((m_format & MDTsizemask) == MDTbyte) ? 8:16;
 	    if (dumpAscii.size() < dumpAsciiFixedLen) {
-		dumpAscii += QString().sprintf("%*c", dumpAsciiFixedLen- dumpAscii.size(), ' ');
+		dumpAscii += QString::asprintf("%*c", dumpAsciiFixedLen- dumpAscii.size(), ' ');
 	    }
 		line->setText(COL_DUMP_ASCII, dumpAscii);
 	    line->setTextAlignment(COL_DUMP_ASCII, Qt::AlignRight);
@@ -382,8 +382,8 @@ void MemoryWindow::saveProgramSpecific(KConfigBase* config)
     for (int i = 0; i < numEntries;) {
 	QString text = m_expression.itemText(i);
 	i++;				/* entries are counted 1-based */
-	exprEntry.sprintf(ExpressionFmt, i);
-	fmtEntry.sprintf(FormatFmt, i);
+	exprEntry = QString::asprintf(ExpressionFmt, i);
+	fmtEntry = QString::asprintf(FormatFmt, i);
 	g.writeEntry(exprEntry, text);
 	QMap<QString,unsigned>::iterator pFormat = m_formatCache.find(text);
 	unsigned fmt = pFormat != m_formatCache.end()  ?  *pFormat  :  MDTword | MDThex;
@@ -410,8 +410,8 @@ void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
     QString fmtEntry;
     // entries are counted 1-based
     for (int i = 1; i <= numEntries; i++) {
-	exprEntry.sprintf(ExpressionFmt, i);
-	fmtEntry.sprintf(FormatFmt, i);
+	exprEntry = QString::asprintf(ExpressionFmt, i);
+	fmtEntry = QString::asprintf(FormatFmt, i);
 	QString expr = g.readEntry(exprEntry, QString());
 	unsigned fmt = g.readEntry(fmtEntry, MDTword | MDThex);
 	m_expression.addItem(expr);

@@ -449,9 +449,7 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg)
 	strArg = m_redirect + " " + strArg;
     }
 
-    QString cmdString;
-    cmdString.sprintf(cmds[cmd].fmt, strArg.toUtf8().constData());
-    return cmdString;
+    return QString::asprintf(cmds[cmd].fmt, strArg.toUtf8().constData());
 }
 
 QString GdbDriver::makeCmdString(DbgCommand cmd, int intArg)
@@ -459,9 +457,7 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, int intArg)
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == GdbCmdInfo::argNum);
 
-    QString cmdString;
-    cmdString.sprintf(cmds[cmd].fmt, intArg);
-    return cmdString;
+    return QString::asprintf(cmds[cmd].fmt, intArg);
 }
 
 QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg1, int intArg2)
@@ -489,8 +485,7 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg1, in
 	assert(sizeSpec != '\0');
 	assert(formatSpec != '\0');
 
-	QString spec;
-	spec.sprintf("/%d%c%c", count, sizeSpec, formatSpec);
+	QString spec = QString::asprintf("/%d%c%c", count, sizeSpec, formatSpec);
 	cmdString = makeCmdString(DCexamine, spec, strArg);
     }
 
@@ -549,11 +544,11 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
 	    // must split off file name part
 	    strArg = QFileInfo(strArg).fileName();
 	}
-	cmdString.sprintf(cmds[cmd].fmt, strArg.toUtf8().constData(), intArg);
+	cmdString = QString::asprintf(cmds[cmd].fmt, strArg.toUtf8().constData(), intArg);
     }
     else
     {
-	cmdString.sprintf(cmds[cmd].fmt, intArg, strArg.toUtf8().constData());
+	cmdString = QString::asprintf(cmds[cmd].fmt, intArg, strArg.toUtf8().constData());
     }
     return cmdString;
 }
@@ -566,11 +561,9 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg1, QString strArg
     normalizeStringArg(strArg1);
     normalizeStringArg(strArg2);
 
-    QString cmdString;
-    cmdString.sprintf(cmds[cmd].fmt,
+    return QString::asprintf(cmds[cmd].fmt,
 		      strArg1.toUtf8().constData(),
 		      strArg2.toUtf8().constData());
-    return cmdString;
 }
 
 QString GdbDriver::makeCmdString(DbgCommand cmd, int intArg1, int intArg2)
@@ -578,9 +571,7 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, int intArg1, int intArg2)
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == GdbCmdInfo::argNum2);
 
-    QString cmdString;
-    cmdString.sprintf(cmds[cmd].fmt, intArg1, intArg2);
-    return cmdString;
+    return QString::asprintf(cmds[cmd].fmt, intArg1, intArg2);
 }
 
 QString GdbDriver::makeCmdString(DbgCommand cmd)
@@ -923,7 +914,7 @@ static void skipNested(const char*& s, char opening, char closing)
 	p++;
     }
     if (nest != 0) {
-	TRACE(QString().sprintf("parse error: mismatching %c%c at %-20.20s", opening, closing, s));
+	TRACE(QString::asprintf("parse error: mismatching %c%c at %-20.20s", opening, closing, s));
     }
     s = p;
 }
@@ -966,7 +957,7 @@ static void skipNestedAngles(const char*& s)
 	p++;
     }
     if (nest != 0) {
-	TRACE(QString().sprintf("parse error: mismatching <> at %-20.20s", s));
+	TRACE(QString::asprintf("parse error: mismatching <> at %-20.20s", s));
     }
     s = p;
 }
@@ -1106,7 +1097,7 @@ static void skipNestedWithString(const char*& s, char opening, char closing)
 	p++;
     }
     if (nest > 0) {
-	TRACE(QString().sprintf("parse error: mismatching %c%c at %-20.20s", opening, closing, s));
+	TRACE(QString::asprintf("parse error: mismatching %c%c at %-20.20s", opening, closing, s));
     }
     s = p;
 }
@@ -1180,7 +1171,7 @@ static bool parseName(const char*& s, QString& name, VarTree::NameKind& kind)
 	// name, which might be "static"; allow dot for "_vtbl."
 	skipName(p);
 	if (p == s) {
-	    TRACE(QString().sprintf("parse error: not a name %-20.20s", s));
+	    TRACE(QString::asprintf("parse error: not a name %-20.20s", s));
 	    return false;
 	}
 	int len = p - s;
@@ -1192,7 +1183,7 @@ static bool parseName(const char*& s, QString& name, VarTree::NameKind& kind)
 	    s = p;
 	    skipName(p);
 	    if (p == s) {
-		TRACE(QString().sprintf("parse error: not a name after static %-20.20s", s));
+		TRACE(QString::asprintf("parse error: not a name after static %-20.20s", s));
 		return false;
 	    }
 	    len = p - s;
@@ -1550,8 +1541,7 @@ static bool parseValueSeq(const char*& s, ExprValue* variable)
     int index = 0;
     bool good;
     for (;;) {
-	QString name;
-	name.sprintf("[%d]", index);
+	QString name = QString::asprintf("[%d]", index);
 	ExprValue* var = new ExprValue(name, VarTree::NKplain);
 	good = parseValue(s, var);
 	if (!good) {
@@ -1568,9 +1558,9 @@ static bool parseValueSeq(const char*& s, ExprValue* variable)
 		delete var;
 		return false;
 	    }
-	    TRACE(QString().sprintf("found <repeats %d times> in array", l));
+	    TRACE(QString::asprintf("found <repeats %d times> in array", l));
 	    // replace name and advance index
-	    name.sprintf("[%d .. %d]", index, index+l-1);
+	    name = QString::asprintf("[%d .. %d]", index, index+l-1);
 	    var->m_name = name;
 	    index += l;
 	    // skip " times>" and space

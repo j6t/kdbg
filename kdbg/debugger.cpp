@@ -778,8 +778,8 @@ void KDebugger::saveProgramSettings()
     int i = 0;
     for (std::map<QString,QString>::iterator it = m_envVars.begin(); it != m_envVars.end(); ++it, ++i)
     {
-	varName.sprintf(Variable, i);
-	varValue.sprintf(Value, i);
+	varName = QString::asprintf(Variable, i);
+	varValue = QString::asprintf(Value, i);
 	eg.writeEntry(varName, it->first);
 	eg.writeEntry(varValue, it->second);
     }
@@ -793,7 +793,7 @@ void KDebugger::saveProgramSettings()
     KConfigGroup wg = m_programConfig->group(WatchGroup);
     int watchNum = 0;
     foreach (QString expr, m_watchVariables.exprList()) {
-	varName.sprintf(ExprFmt, watchNum++);
+	varName = QString::asprintf(ExprFmt, watchNum++);
 	wg.writeEntry(varName, expr);
     }
 
@@ -830,8 +830,8 @@ void KDebugger::restoreProgramSettings()
     QString varName;
     QString varValue;
     for (int i = 0;; ++i) {
-	varName.sprintf(Variable, i);
-	varValue.sprintf(Value, i);
+	varName = QString::asprintf(Variable, i);
+	varValue = QString::asprintf(Value, i);
 	if (!eg.hasKey(varName)) {
 	    /* entry not present, assume that we've hit them all */
 	    break;
@@ -854,7 +854,7 @@ void KDebugger::restoreProgramSettings()
     KConfigGroup wg = m_programConfig->group(WatchGroup);
     m_watchVariables.clear();
     for (int i = 0;; ++i) {
-	varName.sprintf(ExprFmt, i);
+	varName = QString::asprintf(ExprFmt, i);
 	if (!wg.hasKey(varName)) {
 	    /* entry not present, assume that we've hit them all */
 	    break;
@@ -918,7 +918,7 @@ void KDebugger::saveBreakpoints(KConfig* config)
     {
 	if (bp->type == Breakpoint::watchpoint)
 	    continue;			/* don't save watchpoints */
-	groupName.sprintf(BPGroup, i++);
+	groupName = QString::asprintf(BPGroup, i++);
 
 	/* remove remmants */
 	config->deleteGroup(groupName);
@@ -951,7 +951,7 @@ void KDebugger::saveBreakpoints(KConfig* config)
     // delete remaining groups
     // we recognize that a group is present if there is an Enabled entry
     for (;; i++) {
-	groupName.sprintf(BPGroup, i);
+	groupName = QString::asprintf(BPGroup, i);
 	if (!config->group(groupName).hasKey(Enabled)) {
 	    /* group not present, assume that we've hit them all */
 	    break;
@@ -968,7 +968,7 @@ void KDebugger::restoreBreakpoints(KConfig* config)
      * present.
      */
     for (int i = 0;; i++) {
-	groupName.sprintf(BPGroup, i);
+	groupName = QString::asprintf(BPGroup, i);
 	KConfigGroup g = config->group(groupName);
 	if (!g.hasKey(Enabled)) {
 	    /* group not present, assume that we've hit them all */
@@ -2224,7 +2224,7 @@ void KDebugger::slotValueEdited(VarTree* expr, const QString& text)
 	return;			       /* no text entered: ignore request */
 
     ExprWnd* wnd = static_cast<ExprWnd*>(expr->treeWidget());
-    TRACE(QString().sprintf("Changing %s to ",
+    TRACE(QString::asprintf("Changing %s to ",
 			    wnd->exprList().join(" ")) + text);
 
     // determine the lvalue to edit

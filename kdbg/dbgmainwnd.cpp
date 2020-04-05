@@ -935,8 +935,7 @@ void DebuggerMainWnd::slotEnaDisBreak(const QString& fileName, int lineNo,
 QString DebuggerMainWnd::createOutputWindow()
 {
     // create a name for a fifo
-    QString fifoName;
-    fifoName.sprintf("/tmp/kdbgttywin%05d", ::getpid());
+    QString fifoName = QString::asprintf("/tmp/kdbgttywin%05d", ::getpid());
 
     // create a fifo that will pass in the tty name
     QFile::remove(fifoName);		// remove remnants

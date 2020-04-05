@@ -114,7 +114,7 @@ void TypeTable::loadFromFile(const QString& fileName)
     for (int i = 1; ; i++) {
 	// next bunch of types
 	KConfigGroup cf = confFile.group(TypeTableGroup);
-	typesEntry.sprintf(TypesEntryFmt, i);
+	typesEntry = QString::asprintf(TypesEntryFmt, i);
 	if (!cf.hasKey(typesEntry))
 	    break;
 
@@ -161,11 +161,11 @@ void TypeTable::readType(const KConfigGroup& cf, const QString& type)
     QString funcGuardEntry;
     for (int j = 0; j < info.m_numExprs; j++)
     {
-	exprEntry.sprintf(ExprEntryFmt, j+1);
+	exprEntry = QString::asprintf(ExprEntryFmt, j+1);
 	expr = cf.readEntry(exprEntry);
 	info.m_exprStrings[j] = expr;
 
-	funcGuardEntry.sprintf(FunctionGuardEntryFmt, j+1);
+	funcGuardEntry = QString::asprintf(FunctionGuardEntryFmt, j+1);
 	expr = cf.readEntry(funcGuardEntry);
 	info.m_guardStrings[j] = expr;
     }
@@ -175,7 +175,7 @@ void TypeTable::readType(const KConfigGroup& cf, const QString& type)
 	m_typeDict.insert(std::make_pair(type, info));
     else
 	m_templates.insert(std::make_pair(type, info));
-    TRACE(type + QString().sprintf(": %d exprs", info.m_numExprs));
+    TRACE(type + QString::asprintf(": %d exprs", info.m_numExprs));
 }
 
 void TypeTable::copyTypes(TypeInfoRefMap& dict)

@@ -99,7 +99,7 @@ CmdQueueItem* DebuggerDriver::executeCmdString(DbgCommand cmd,
 	    m_state = DSinterrupted;
 	    ::kill(pid(), SIGINT);
 	    ASSERT(m_activeCmd != 0);
-	    TRACE(QString().sprintf("interrupted the command %d",
+	    TRACE(QString::asprintf("interrupted the command %d",
 		  (m_activeCmd ? m_activeCmd->m_cmd : -1)));
 	    delete m_activeCmd;
 	    m_activeCmd = 0;
