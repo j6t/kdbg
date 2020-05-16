@@ -1,0 +1,63 @@
+body {
+	background: white;
+	color: black;
+	font-size: 11pt;
+	font-family: 'Open Sans', sans-serif;
+}
+
+a {
+	color: #0000ee;
+}
+a:visited {
+	color: #551a8b;
+}
+p.cmd {
+	font-family: monospace;
+	margin-left: 2em;
+}
+
+span.code {
+	font-family: monospace;
+}
+span.tip-tty {
+	color: darkred;
+}
+span.tip-prog {
+	color: darkblue;
+}
+
+div.title-line {
+	padding: 1em;
+	background: #ddd;
+}
+img.title-logo {
+	margin-right: 3em;
+	height: 200px;
+	float: left;
+}
+p.title {
+	font-size: 5em;
+	font-weight: bold;
+	margin: 0.3em 0;
+}
+p.subtitle {
+	font-size: 2.5em;
+	margin: 0.5em 0 0.1em;
+}
+h1 {
+	border-bottom: 1px solid darkgray;
+	padding-bottom: 0.4em;
+	margin-top: 1.2em;
+}
+
+td.printfmt {
+	width: 2em;
+	padding-left: 1em;
+	font-family: monospace;
+}
+
+p.menu a {
+	text-decoration: none;
+	padding-left: 0.5em;
+	padding-right: 0.5em;
+}

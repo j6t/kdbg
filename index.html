@@ -1,0 +1,334 @@
+<!DOCTYPE html PUBLIC "-//W3C//DTD XHTML 1.0 Strict//EN" "http://www.w3.org/TR/xhtml1/DTD/xhtml1-strict.dtd">
+<html xmlns="http://www.w3.org/1999/xhtml" xml:lang="en" lang="en">
+<head>
+	<meta http-equiv="content-type" content="text/html; charset=UTF-8"/>
+	<title>KDbg - A Graphical Debugger Interface</title>
+	<meta NAME="DESCRIPTION" CONTENT="KDbg is a graphical user interface to gdb, the GNU debugger.It provides an intuitive interface for setting breakpoints,inspecting variables, and stepping through code."/>
+	<meta NAME="KEYWORDS" CONTENT="KDbg graphical debugger interface gdb breakpoint"/>
+	<link rel="apple-touch-icon" sizes="180x180" href="/apple-touch-icon.png"/>
+	<link rel="icon" type="image/png" href="/favicon-32x32.png" sizes="32x32"/>
+	<link rel="icon" type="image/png" href="/favicon-16x16.png" sizes="16x16"/>
+	<link rel="manifest" href="/manifest.json"/>
+	<link rel="mask-icon" href="/safari-pinned-tab.svg" color="#5bbad5"/>
+	<meta name="theme-color" content="#ffffff"/>
+	<link href="https://fonts.googleapis.com/css?family=Open+Sans:400,400i,700,700i" rel="stylesheet">
+<link rel='stylesheet' type='text/css' href='kdbg.css'/>
+</head>
+<body>
+<div class="title-line">
+<img class="title-logo" src="kdbg-logo-320.png" name="KDbg - A Graphical Debugger Interface"/>
+<p class="title">KDbg</p>
+<p class="subtitle">A Graphical Debugger Interface</p>
+</div>
+<p class="menu"><a href="#screenshots">Screenshots</a><a href="#download">Download</a><a href="#changes">Recent Changes</a><a href="#tips">Tips &amp; Tricks</a><a href="#todo">Todo</a><a href="manual/">Manual</a><a href="https://lists.sourceforge.net/mailman/listinfo/kdbg-l">Mailing List</a>
+Latest release: <a href="#download">3.0.1</a></p>
+<h1>What is KDbg?</h1>
+<p>KDbg is a graphical user interface to gdb, the GNU debugger. It
+provides an intuitive interface for setting breakpoints, inspecting
+variables, and stepping through code.
+</p>
+<p>KDbg requires KDE, the <a href="https://www.kde.org/">K Desktop
+Environment</a>, but you can of course debug any program.
+</p>
+<h2>Features</h2>
+<ul>
+	<li><p style="margin-bottom: 0cm">Inspection of variable values in a
+	tree structure.
+	</p></li>
+	<li><p style="margin-bottom: 0cm"><I>Direct member</I>: For certain
+	compound data types the most important member values are displayed
+	next to the variable name, so that it is not necessary to expand the
+	subtree of that variable in order to see the member value. For
+	example, you don't need to go into a variable of type <span class="code">QString</span>
+	if you want to see the string that the variable holds. (BTW, this is
+	of course not hardcoded, but can be extended to new types.) KDbg can
+	even <B>display Qt's QString values</B>, which are Unicode
+	strings.
+	</p></li>
+	<li><p style="margin-bottom: 0cm">Debugger at your finger tips: The
+	basic debugger functions (step, next, run, finish, until,
+	set/clear/enable/disable breakpoint) are bound to function keys <span class="code">F5</span>
+	through <span class="code">F10</span>. Quick and easy.
+	</p></li>
+	<li><p style="margin-bottom: 0cm">Of course, lots of other basic
+	functions: View source code, search text, set program arguments and
+	environment variables, display arbitrary expressions. Everything you
+	need to debug a program!
+	</p></li>
+	<li><p style="margin-bottom: 0cm">Debugging of core dumps, attaching
+	to running processes is possible.
+	</p>
+	<li><p>Conditional breakpoints.
+	</p></li>
+</ul>
+<p>If you are missing your favorite feature, see the <a href="#todo">todo-list</a>
+whether I plan to add it.
+<script language="JavaScript">
+  document.write("<a href=\"mailt");
+  document.write("o:j6");
+  document.write("t@k");
+  document.write("dbg.org\">");
+</script>Drop me a note<script language="JavaScript">
+  document.write("</a>");
+</script>
+if you can't find it!
+</p>
+<h2>Author</h2>
+<p>KDbg is authored by Johannes Sixt.</p>
+
+<h1><a name="screenshots"></a>Screenshots</h1>
+<h2>
+The Main Window</h2>
+<p><a href="kdbgtotal.png"><img src="kdbgtotalsm.png" alt="Main Window" width="208" height="180" border="0"/></a></p>
+<p>The largest subwindow of the this screenshot is the source code.
+Below the breakpoint list is visible.
+The right column shows local variables, watched expressions, and the thread list
+(from top to bottom).</p>
+<p>To the left of the lines of source code the breakpoints
+as well as the current point of execution are indicated. You see different
+kinds of breakpoints: normal, disabled, temporary.</p>
+<!--<p>Observe that the value of local variables can be inspected by pointing
+the mouse over it; a "balloon" window appears and shows the value.</p> -->
+<p>Clicking the small '+' signs in front of the source code lines will
+display the machine code of the source line.</p>
+<h2>
+Variables and Watches</h2>
+<p><a href="kdbglocalswatches.png"><img src="kdbglocalswatchessm.png" alt="Local variables and watched expressions" width="239" height="180" border="0"></img></a></p>
+<p>This screen shot shows the local variables (of the current stack frame)
+and arbitrary watch expressions side by side. Notice that the contents
+of certain class members are displayed next to the variable, in this case
+of type QString, although the variable is not expanded. Variables
+that have changed since the last stop are indicated in red color.</p>
+
+<h1><a name="download"></a>Download</h1>
+
+<h2>Download Source Code</h2>
+<p>Click here to <a href="https://sourceforge.net/projects/kdbg/files/Source%20Code/3.0.1/kdbg-3.0.1.tar.gz/download">download
+the source code of <b>KDbg 3.0.1 - stable version</b></a> (from SourceForge.net).
+</p>
+<p>Consider joining the <a href="https://lists.sourceforge.net/mailman/listinfo/kdbg-l">KDbg
+mailing list</a>.
+</p>
+<h2></a>Download via git</h2>
+<p>KDbg development uses <a href="https://git-scm.com/">git</a>.
+To clone the git repository, do this, which you need to do only once:
+</p>
+<p class="cmd">git clone -b maint https://github.com/j6t/kdbg.git
+</p>
+<p>This will create a new directory <span class="code">kdbg</span> in your current directory
+that contains the entire development history.
+It will follow the stable branch of KDbg. If you already have done this in the past,
+you can download the latest stable version with this command:
+</p>
+<p class="cmd">git pull origin maint
+</p>
+<p>You can also <a href="https://github.com/j6t/kdbg/commits/maint">browse
+the project history</a>.</p>
+<h2><a name="compile"></a>Compile and Install</h2>
+<p>Compiling is straight forward. Extract the source archive, then go
+to the newly created directory and type:
+</p>
+<p class="cmd">cmake .<br/>
+make<br/>sudo make install
+</p>
+<p>It is necessary that you have the KDE header files and libraries
+installed. Some distributions do not automatically install the header
+files. Please make sure that you installed them. It may also be
+necessary to explicitly tell the location of KDE, e.g.:
+</p>
+<p class="cmd">cmake -DCMAKE_INSTALL_PREFIX=/opt/kde4 .
+</p>
+<h2>Download Binaries</h2>
+<p>Official Debian packages are available from
+<a href="https://packages.debian.org/kdbg">https://packages.debian.org/kdbg</a>.
+(Special thanks go to Ana Guerrero!)
+</p>
+<h2>Development version</h2>
+<p>A new development cycle is maintained in the GIT repository, in the branch <span class="code">master</span>.
+To download it, you need <a href="https://git-scm.com/">git</a>.
+To clone this branch of the git repository, do this, which you need to do only once:
+</p>
+<p class="cmd">git clone https://github.com/j6t/kdbg.git
+</p>
+<p>This will automatically set up your working directory to follow the development
+branch <span class="code">master</span>. If you already have done this in the past,
+you can download the development version with this command:
+</p>
+<p class="cmd">git pull
+</p>
+<h2>Contributing</h2>
+<p>Contributions are, of course, always welcome.
+If you have a favorite patch, just send it to me (see footer for email address).
+But if you have a more voluminous change that you want to have included,
+you better use <a href="https://git-scm.com/">git</a>.
+Please fork the repository at <a href="https://github.com/j6t/kdbg">Github</a>
+and file a pull request.
+</p>
+<h1><a name="changes"></a>Recent Changes</h1>
+<p><a href="https://github.com/j6t/kdbg/blob/master/ReleaseNotes-3.0.1" target="_blank">Release notes for version 3.0.1</a>.</p>
+<p><a href="https://github.com/j6t/kdbg/blob/master/ReleaseNotes-3.0.0" target="_blank">Release notes for version 3.0.0</a>.</p>
+<p><a href="https://github.com/j6t/kdbg/blob/master/ReleaseNotes-2.9.1" target="_blank">Release notes for version 2.9.1</a>.</p>
+<p><a href="https://github.com/j6t/kdbg/blob/master/ReleaseNotes-2.9.0" target="_blank">Release notes for version 2.9.0</a>.</p>
+<p><a href="https://github.com/j6t/kdbg/blob/master/ReleaseNotes-2.5.6" target="_blank">Release notes for version 2.5.6</a>.</p>
+<p><a href="https://github.com/j6t/kdbg/blob/master/ReleaseNotes-2.5.5" target="_blank">Release notes for version 2.5.5</a>.</p>
+<p><a href="https://github.com/j6t/kdbg/blob/master/ReleaseNotes-2.5.4" target="_blank">Release notes for version 2.5.4</a>.</p>
+<p><a href="https://github.com/j6t/kdbg/blob/master/ReleaseNotes-2.5.3" target="_blank">Release notes for version 2.5.3</a>.</p>
+<p><a href="https://github.com/j6t/kdbg/blob/master/ReleaseNotes-2.5.2" target="_blank">Release notes for version 2.5.2</a>.</p>
+<p><a href="https://github.com/j6t/kdbg/blob/master/ReleaseNotes-2.5.1" target="_blank">Release notes for version 2.5.1</a>.</p>
+<p><a href="https://github.com/j6t/kdbg/blob/master/ReleaseNotes-2.5.0" target="_blank">Release notes for version 2.5.0</a>.</p>
+
+<h1><a name="tips"></a>Tips &amp; Tricks</h1>
+
+<p>For more tips see the <a href="manual/tips.html">online documentation</a>.</p>
+<h2><a NAME="displayfmts"></a>Displaying variable values in different formats</h2>
+<p>You can use gdb's format specifiers for displaying values in the expression
+watch window in different formats. Just prefix the expression to display
+by the format specifier. Example: <span class="code">/x foo->bar</span> will display the
+value of <span class="code">foo->bar</span> in hexadecimal notation. Here is a list of gdb's
+format specifiers:</p>
+
+<table>
+<tr>
+<td class="printfmt">/x</td>
+<td>hexadecimal</td>
+
+<td class="printfmt">/f</td>
+<td>float</td>
+</tr>
+
+<tr>
+<td class="printfmt">/o</td>
+<td>octal</td>
+
+<td class="printfmt">/a</td>
+<td>address</td>
+</tr>
+
+<tr>
+<td class="printfmt">/d</td>
+<td>decimal</td>
+
+<td class="printfmt">/i</td>
+<td>instruction</td>
+</tr>
+
+<tr>
+<td class="printfmt">/u</td>
+<td>unsigned decimal</td>
+
+<td class="printfmt">/c</td>
+<td>char</td>
+</tr>
+
+<tr>
+<td class="printfmt">/t</td>
+<td>binary</td>
+
+<td class="printfmt">/s</td>
+<td>string</td>
+</tr>
+</table>
+
+<h2><a name="brkdyn"></a>Setting breakpoints in dynamically loaded modules</h2>
+<p>The problem with dynamically loaded modules is that the debugger doesn't
+know about the symbol information until the module has been loaded by <span class="code">dlopen()</span>.
+This is extremely annoying if you want to debug constructors that are run
+for static variables. The following trick works on systems that use glibc2.</p>
+<ol>
+<li>
+Set a breakpoint that the program will hit before it loads the dynamic
+module, e.g. in <span class="code">main</span>.</li>
+
+<li>
+Run the program until it stops at this breakpoint.</li>
+
+<li>
+Now you can set a breakpoint in the function <span class="code">_dl_debug_state</span>.
+For this, open the breakpoint list (<i>View|Breakpoints</i>),
+Type <span class="code">_dl_debug_state</span> in the edit box and click
+<i>Add</i>.</li>
+
+<li>
+Continue the program until it stops at this breakpoint, which happens somewhere
+inside <span class="code">dlopen()</span>! At this time, the symbols of the dynamic module
+are already available, but the constructors are not yet executed.</li>
+
+<li>
+Now you can set a breakpoint in your constructor.</li>
+</ol>
+Be prepared
+that the breakpoint at <span class="code">_dl_debug_state</span> will be hit several times
+while <span class="code">dlopen()</span> does its work.
+<p>Note that the <i>orphaned breakpoints</i> feature
+does not really help. The reason is that orphaned breakpoints are not tried to be
+installed until the program stops. For this reason it is still required to set
+the breakpoint in <span class="code">_dl_debug_state</span>. However, the breakpoints are
+preserved and can be set at any time, even before the program starts.</p>
+
+<h2><a name="remote"></a>Remote debugging</h2>
+<p>There's a hack so you can do remote debugging.&nbsp; Invoke kdbg like
+this:
+<p class="cmd">kdbg -r <span class="tip-tty">/dev/ttya</span> <span class="tip-prog">proggy</span></p>
+Then KDbg issues the following gdb commands, in effect, it allows you to
+debug a remote target:
+<p class="cmd">target remote <span class="tip-tty">/dev/ttya</span><br/>
+file <span class="tip-prog">proggy</span></p>
+<p>
+As you see, you could also do remote debugging through TCP/IP connection
+like this:</p>
+<p class="cmd">kdbg -r <span class="tip-tty">flaky:12345</span> <span class="tip-prog">proggy</span></p>
+<p>assuming host <i>flaky</i> is running <span class="code">gdbserver</span> with proggy on port 12345.</p>
+<p>Note that you can set a program specific gdb command
+using the <i>Settings|This Program</i> menu.</p>
+
+<h1><a name="todo"></a>To do</h1>
+<p>The following is a list of things that I intend to build in some day. They
+are roughly sorted most important first. You can influence the order by
+<script language="JavaScript">
+  document.write("<a href=\"mailt");
+  document.write("o:j6");
+  document.write("t@k");
+  document.write("dbg.org\">");
+</script>dropping me a note<script language="JavaScript">
+  document.write("</a>");
+</script>
+or by building it in yourself and sending me the patch :-).
+There is also a TODO file in the source code which lists many more items.</p>
+<ol>
+<li>
+Display a list of files that the program is built from.</li>
+
+<li>
+Manipulating signals and how gdb handles them.</li>
+
+<li>
+Remember which structures were expanded.</li>
+</ol>
+
+<p>The following is a list of things that are not very likely ever to find
+their way into KDbg.</p>
+<ul>
+<li>
+Direct access to gdb. That is, you can't type in a gdb command and submit
+it to gdb. The most direct access you get is the argument to a <span class="code">print</span>
+command: through the variable watches. The idea is that every feature of
+gdb is accessible by some user interface element.</li>
+
+<li>
+A graphical display like <a href="https://www.gnu.org/software/ddd/">DDD</a>
+has.</li>
+</ul>
+
+<hr/>
+<div style="float: right;"><a href="https://sourceforge.net/projects/kdbg"><img src="https://sflogo.sourceforge.net/sflogo.php?group_id=3736&amp;type=13" width="120" height="30" alt="Get KDbg at SourceForge.net. Fast, secure and Free Open Source software downloads" /></a></div>
+<p>
+    Last modified January 1, 2020
+<br/>
+<script language="JavaScript">
+  document.write("<a href=\"mailt");
+  document.write("o:j6");
+  document.write("t@k");
+  document.write("dbg.org\">Johannes Sixt</a>");
+</script></p>
+</body>
+</html>
