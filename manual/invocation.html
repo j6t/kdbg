@@ -1,0 +1,33 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - Invocation</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF">
+<p><a href="index.html">Contents</a></p>
+<h1>Invoking KDbg from the command line</h1>
+<p><pre>
+Usage: kdbg [options] [program] [core]
+A Debugger
+
+Options:
+  -h, --help                 Displays this help.
+  -v, --version              Displays version information.
+  --author                   Show author information.
+  --license                  Show license information.
+  --desktopfile &lt;file name&gt;  The base file name of the desktop entry for this
+                             application.
+  -t &lt;file&gt;                  transcript of conversation with the debugger
+  -r &lt;device&gt;                remote debugging via &lt;device&gt;
+  -l &lt;language&gt;              specify language: C, XSLT
+  -x                         use language XSLT (deprecated)
+  -a &lt;args&gt;                  specify arguments of debugged executable
+  -p &lt;pid&gt;                   specify PID of process to debug
+
+Arguments:
+  [program]                  path of executable to debug
+  [core]                     a core file to use
+</pre></p></body>
+</html>

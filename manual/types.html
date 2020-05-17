@@ -1,0 +1,183 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - User's Manual - Type Tables</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF">
+<p><a href="index.html">Contents</a></p>
+<h1>
+KDbg's Type Table</h1>
+<p>KDbg can display a short description of structured types, so
+that it is not necessary to expand the variable in the <a href="localvars.html">local
+variables window</a> or <a href="watches.html">watched expressions window</a>.
+The information which member variable is displayed is stored in <em>type
+tables</em>. There is generally one type table per shared library.</p>
+
+<p>KDbg's default type tables are located under <tt>$prefix/share/apps/kdbg/types</tt>.
+User defined type tables can be placed in <tt>${KDEHOME}/share/apps/kdbg/types</tt>, where
+<tt>${KDEHOME}</tt> is <tt>~/.kde</tt> if it is not a defined environment variable.
+The file names end with <tt>.kdbgtt</tt>. Example: The type table for <tt>libqt.so</tt>
+is named <tt>qt.kdbgtt</tt>.
+User defined type tables override the type tables provided by the system.</p>
+<p>A type table file obeys the regular KDE configuration file syntax. The
+file has the following groups:</p>
+<ul>
+<li>
+A group <tt>[Type Table]</tt> which lists the types and information how
+the debugger can identify whether the program is linked against the library.</li>
+
+<li>
+A group for each type which has information about how the value of such
+a type is displayed by KDbg.</li>
+</ul>
+<p>In order to determine which type tables apply to the program being debugged
+KDbg lists the shared libraries it is linked to. Then it matches the names
+against the <tt>ShlibRE</tt> entries of all type tables. Those that match
+are used. If a type appears in several type tables, it is unspecified which
+one will be used.</p>
+<p>KDbg's type recognition only works for libraries that are linked dynamically
+to the program being debugged.</p>
+<h2>
+The <tt>[Type Table]</tt> group</h2>
+<p>This group contains the following entries:</p>
+<ul>
+<li>
+<tt>Types1</tt>, <tt>Types2</tt>, etc. These entries name the types,
+separated by commas.
+Each of the entries can list any number of types. The entries must be numbered
+consecutively (KDbg stops reading at the first gap), although an entry may be
+empty (i.e. contain no type at all).
+Sometimes the order in which the names are listed is important
+(see <tt>Alias</tt> types below).</li>
+
+<li>
+<tt>ShlibRE</tt>. KDbg uses this entry to determine if the type table applies
+to the program being debugged. For this purpose KDbg determines the shared
+libraries to which the program is linked. If any of the libraries matches
+this entry, the type table applies. The entry is a <a href="http://doc.trolltech.com/4.0/qregexp.html#introduction">Qt regular
+expression</a>.
+Note that back-slashes must be doubled because the back-slash is an escape
+character in the configuration file syntax.</li>
+
+<li>
+<tt>LibDisplayName</tt>. This entry is used in lists where the available
+type tables are listed to identify this type table.
+
+<br><font size=-1>This is not used currently.</font></li>
+
+<li>
+<tt>EnableBuiltin</tt> lists extensions that must be enabled if this
+library is used. Currently, two builtins are supported:
+<ul>
+<li>
+<tt>QString::Data</tt> is used to display unicode strings of Qt's <tt>QString</tt>
+class. See below.</li>
+<li><tt>QCharIsShort</tt> is used only in connection with <tt>QString::Data</tt>
+to specify that a unicode character is stored in an object of type <tt>short</tt>.
+See <tt>qt3.kdbgtt</tt> for examples.</li></ul></li>
+</ul>
+
+<p>In the case of regular types the names of types should follow the output of the
+<tt>whatis</tt> gdb command less any <tt>const</tt>, <i>spaces</i>, or trailing
+<tt>&</tt>.
+If the type contains a a comma in its name, it must be escaped with a backslash.
+But note that the comma should not be escaped in the type's group (which is described
+in the next section).
+</p>
+<p>In the case of template types the name can be arbitrary because the type's group
+will mention the template name and a type parameter list.</p>
+
+<h2>
+The type's group</h2>
+<p>There is one group for each type that is named exactly as the type.
+Each group contains the following entries:</p>
+<ul>
+<li>An optional <tt>Template</tt> entry that specifies the exact template type
+name as it is reported by gdb's <tt>whatis</tt> command. However, it is
+possible to replace template parameter types at the top-most level by an
+asterisk&nbsp;<tt>*</tt>, which acts as a wildcard: It matches <b>one</b>
+template type argument that is reported by <tt>whatis</tt> (except that an
+asterisk in the last position matches all remaining template type arguments).
+</li>
+<li>
+<tt>Display</tt> determines how the value of the type is displayed by KDbg.
+The string must contain 1 to 5 percent characters '<tt>%</tt>'. These are
+replaced by the results of the expressions printed by the <tt>Expr</tt><i>x</i>
+entries.</li>
+
+<li>
+One or more of <tt>Expr1</tt>, <tt>Expr2</tt>, etc. Each of them must contain
+one or more <tt>%s</tt> sequence, which will be replaced by the expression
+whose value is investigated. The so constructed expression is submitted
+to gdb, and the result substituted back for the corresponding percent character
+in the <tt>Display</tt> string.</li>
+
+<li>
+An optional <tt>FunctionGuard</tt><i>x</i> that is associated with the corresponding <tt>Expr</tt><i>x</i>.
+If the evaluation of the resulting gdb expression returns an error, the corresponding expression from <tt>Expr</tt><i>x</i> is not evaluated. (This is used to guard function calls.)
+<li>
+<tt>Alias</tt> names an alias type. If this entry is present, the type
+is treated like the specified type. That alias type must appear before
+this type in the <tt>Types</tt><i>x</i> entries in the <tt>Type Table</tt>.</li>
+</ul>
+<p><font size=-1>Currently the number of expressions per type is limited to
+5. This can easily be changed if it's too restrictive, but I recommend
+not to go to that limit at all - it will slow down the debugging process.</font></p>
+<p>KDbg recognizes a special extension that is used to display Qt 2.x's and Qt 3.x's
+unicode strings: If an <tt>Expr</tt><i>x</i> is prepended with <tt>/QString::Data</tt>,
+it is assumed that the result of the expression is a pointer to a <tt>QString::Data</tt>.
+The value displayed is the unicode string that this instance of <tt>QString::Data</tt>
+represents (which can be <tt>QString::null</tt> if it is Qt's well-defined
+null string or <tt>(null)</tt> if the <tt>unicode</tt> member is the null
+pointer). See <tt>qt2.kdbgtt</tt> for examples.</p>
+<p>Tip: It is not necessary to define derived types if they ought to be
+treated the same as the base class - KDbg can deduce derived types and
+uses the type specification of the (leftmost) base class. You can use the
+<tt>Alias</tt>
+entry to quickly specify that a type should be treated like a non-leftmost
+base class for a multiple-inheritance class.</p>
+<h2>
+An example</h2>
+<p>The example shows how <tt>QString</tt> and <tt>QRect</tt> are defined
+in <tt>qt3.kdbgtt</tt>. Furthermore, the template type <tt>QValueVector</tt>
+is defined. This example applies to Qt 3.x, which is located in shared library
+whose name ends in <tt>libqt-mt.so.3</tt>.</p>
+<pre>[Type Table]
+Types1=QString,QRect
+Types2=QValueVector
+LibDisplayName=libqt 3.x
+ShlibRE=libqt-mt\\.so\\.3$
+EnableBuiltin=QString::Data,QCharIsShort
+
+[QString]
+Display={ % }
+Expr1=/QString::Data (%s).d
+
+[QValueVector]
+Template=QValueVector<*>
+Display={ size=% shared=% capacity=% }
+Expr1=($tmp=(%s).sh)->finish-$tmp->start
+Expr2=(%s).sh->count
+Expr3=($tmp=(%s).sh)->end-$tmp->start
+
+[QRect]
+Display={ tl=(%,%) br=(%,%) }
+Expr1=(%s).x1
+Expr2=(%s).y1
+Expr3=(%s).x2
+Expr4=(%s).y2</pre>
+<p>This example shows these features:</p>
+<ul>
+<li>The name of the template type, <tt>QValueVector</tt> is irrelevant.
+The exact type name is specified under the <tt>Template=</tt> entry.
+It specifies a single wildcard so that it applies to all specializations.
+</li>
+<li>In order to evaluate the expression that was supplied in the <tt>%s</tt>
+only once, the result is stored in a temporary gdb variable and reused later in
+the same expression.</li>
+<li>Note that it is safer to wrap the <tt>%s</tt> in parentheses.</li>
+</ul>
+</body>
+</html>

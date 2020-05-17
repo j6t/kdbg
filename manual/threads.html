@@ -1,0 +1,37 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - User's Manual - Threads</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF">
+<p><a href="index.html">Contents</a></p>
+<h1>
+The Threads Window</h1>
+<p>The threads window is displayed using <i>View|Threads</i>. The threads
+window lists the active threads of the program.</p>
+<p>The contents of the threads window are updated every time the program
+is stopped by the debugger. (That is, the window does <em>not</em> reflect
+the state while the program is running.)</p>
+<p>The first column shows the thread ID, the second column identifies the
+location where the thread currently executes.</p>
+<p>The marker in front of the line tells which thread currently is <em>active</em>:</p>
+<ul>
+<li>
+The <a href="stack.html">stack window</a> displays the active threads's
+backtrace.</li>
+
+<li>
+The <a href="localvars.html">local variables</a> window displays the active
+thread's local variables.</li>
+
+<li>
+The <a href="watches.html">watched expressions window</a> uses the active thread's local
+variables to evaluate the expressions.</li>
+</ul>
+<p>By clicking a listed thread, the active thread is switched, and the corresponding
+windows are updated. In particular, the <a href="sourcecode.html">source
+window</a> displays the location where the active thread is currently halted.</p>
+</body>
+</html>

@@ -1,0 +1,42 @@
+<!DOCTYPE HTML PUBLIC "-//W3C//DTD HTML 4.01 Transitional//EN" "http://www.w3.org/TR/html4/loose.dtd">
+<html>
+<head>
+   <meta http-equiv="Content-Type" content="text/html; charset=UTF-8">
+   <meta name="Author" content="Johannes Sixt">
+   <title>KDbg - User's Manual - Arguments, Environment</title>
+</head>
+<body text="#000000" bgcolor="#FFFFFF">
+<p><a href="index.html">Contents</a></p>
+<h1>
+Specifying program arguments, working directory, environment variables</h1>
+<p>Choose <i>Execution|Arguments</i> to open a dialog where you can set program
+arguments, the working directory for your program, and environment variables.</p>
+<h2><a name="PgmArgs"></a>Tab Arguments</h2>
+<p>In the edit box enter the arguments that shall be passed on to your
+program. <i>Insert file name</i> lets you browse for a file;
+the file name will be <em>inserted</em> in the edit box (at the cursor position).</p>
+<p>Next time the program is started, the new arguments will be used.</p>
+<h2><a name="WorkingDir"></a>Tab Working Directory</h2>
+<p>In the edit box you can specify the working directory for your program.
+<i>Browse</i> lets you browse for a directory.
+Your program will use the new directory only when it is run the next time.</p>
+<p>The working directory also applies to gdb itself! The directory that
+you specify will be passed to gdb immediately, i.e. gdb will work with
+the new setting as soon as you press <i>OK</i>. This can influence whether
+source code files are found.</p>
+<h2><a name="Environment"></a>Tab Environment</h2>
+<p>In the Environment tab you can set environment variables that the program
+sees in addition to those that it inherits.
+In the edit box type in an expression of the form <tt>VARIABLE=value</tt>
+to set the environment variable <tt>VARIABLE</tt> to the value <tt>value</tt>,
+and click <i>Modify</i>. To remove a variable, select it from the list
+below and click <i>Delete</i>. To change the value, edit the value in the
+edit field and click <i>Modify</i>. If you change the name of the variable
+and click <i>Modify</i>, you add a new variable! The new environment variables
+will be used by your program the next time it is run.</p>
+<h2>Tab xsldbg Settings</h2>
+<p>This tab is only available when a <a href="xslt.html">XSLT script is
+debugged</a>. Here you can specify various flags that influence the
+XSL translation and XSLDBG.</p>
+</body>
+</html>
