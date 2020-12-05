@@ -119,13 +119,13 @@ void templated_strtest(F f, const char* t)
 		char is[4];
 	};
 	unsigned char a[4] = {',', 020, 021, 0325};
-	incomplete_seq_intern b = { 1, {',', 020, 021, 0325}, 2 };
-	incomplete_seq_end c = { 1, {',', 020, 021, 0325} };
+	incomplete_seq_intern b = { 1, {',', 020, 021, char(0325)}, 2 };
+	incomplete_seq_end c = { 1, {',', 020, 021, char(0325)} };
 	unsigned char d[30][4] = { {',', 020, 021, 0325}, };
 	for (int i = 1; i < 30; i++)
 		memcpy(d[i], d[0], 4);
-	incomplete_seq_intern ba[30] = { { 1, {',', 020, 021, 0325}, 2 } };
-	incomplete_seq_end ca[30] = { { 1, {',', 020, 021, 0325} } };
+	incomplete_seq_intern ba[30] = { { 1, {',', 020, 021, char(0325)}, 2 } };
+	incomplete_seq_end ca[30] = { { 1, {',', 020, 021, char(0325)} } };
 
 	f(t);
 }
