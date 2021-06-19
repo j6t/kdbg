@@ -109,7 +109,6 @@
   </layout>
  </widget>
  <layoutdefault spacing="6" margin="10"/>
- <pixmapfunction>qPixmapFromMimeSource</pixmapfunction>
  <tabstops>
   <tabstop>processList</tabstop>
   <tabstop>buttonRefresh</tabstop>
