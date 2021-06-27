@@ -67,6 +67,8 @@ public:
     bool activeLine(QString& filename, int& lineNo, DbgAddr& address);
     bool hasWindows() const { return count() > 0; }
     QString activeFileName() const;
+    void setFlavor(const QString flavor);
+    QString flavor() const;
     SourceWindow* activeWindow() const;
     SourceWindow* windowAt(int i) const;
 
@@ -80,6 +82,7 @@ signals:
     void disassemble(const QString&, int);
     void setTabWidth(int numChars);
     void moveProgramCounter(const QString&, int, const DbgAddr&);
+    void asmFlavorChangedForTarget(const QString& s, const QString& t);
 
 public slots:
     virtual void slotFindForward();
@@ -109,6 +112,15 @@ public slots:
     // Updates line items after expanding/collapsing disassembled code
     void slotExpandCollapse(int lineNo);
 
+    /*!
+     * `slotFlavorChanged` handles changes in flavor (for now).
+     * Based on the current target and the if default settings were asked,
+     * it decides whether it should call `reloadAllFiles` to update the view.
+     * \param flavor is the flavor the user asked.
+     * \sa `void reloadAllFiles()`
+     */
+    void slotFlavorChanged(const QString& flavor, const QString& target);
+
 protected:
     bool activatePath(QString pathname, int lineNo, const DbgAddr& address);
     virtual bool activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& address);	/* -1 doesnt change line */
@@ -118,7 +130,10 @@ protected:
 	       const DbgAddr& address, int frameNo);
     SourceWindow* findByFileName(const QString& fileName) const;
     QString m_lastOpenDir;		/* where user opened last file */
-    
+
+    QString m_flavor;			/*!< current flavor */
+    QString m_target;			/*!< file type based on `info target` */
+
     // program counter
     QString m_pcFile;
     int m_pcLine;			/* -1 if no PC */

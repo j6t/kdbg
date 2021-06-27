@@ -296,7 +296,7 @@ void DebuggerDriver::processOutput(const QByteArray& data)
 	m_logFile.write(data);
 	m_logFile.flush();
     }
-    
+
     /*
      * gdb sometimes produces stray output while it's idle. This happens if
      * it receives a signal, most prominently a SIGCONT after a SIGTSTP:
@@ -312,7 +312,7 @@ void DebuggerDriver::processOutput(const QByteArray& data)
     ASSERT(m_activeCmd != 0 || m_state == DSinterrupted);
 
     // collect output until next prompt string is found
-    
+
     // accumulate it
     m_output += data;
 

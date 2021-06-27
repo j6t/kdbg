@@ -7,6 +7,7 @@
 #ifndef PREFDEBUGGER_H
 #define PREFDEBUGGER_H
 
+#include <QComboBox>
 #include <QLineEdit>
 #include <QLabel>
 #include <QGridLayout>
@@ -35,9 +36,17 @@ protected:
     QLabel m_terminalHint;
     QLabel m_terminalLabel;
     QLineEdit m_terminal;
+
+    QLabel m_disassLabel;
+    QComboBox m_disassCombo;
+    QString m_target;			//!< Target name of the loaded file
+    bool m_isX86;			//!< Are we targeting the x86 architecture?
 public:
     QString terminal() const { return m_terminal.text(); }
     void setTerminal(const QString& t) { m_terminal.setText(t); }
+
+    QString globalDisassemblyFlavor() { return m_disassCombo.currentText(); }
+    void setGlobalDisassemblyFlavor(const QString& f) { m_disassCombo.setCurrentText(f); }
 };
 
 #endif // PREFDEBUGGER_H

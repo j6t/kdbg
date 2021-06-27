@@ -25,7 +25,7 @@ class SourceWindow : public QPlainTextEdit
 public:
     SourceWindow(const QString& fileName, QWidget* parent);
     ~SourceWindow();
-    
+
     bool loadFile();
     void reloadFile();
     bool fileNameMatches(const QString& other);
@@ -72,8 +72,27 @@ protected:
     int lineInfoAreaWidth() const;
     QColor lineSelectionColor() const;
 
+    /**
+     * A line just expanded, keep track of it's value
+     */
+    void storeLineToVec(int line);
+    /**
+     * A line just collapsed, delete it from vector
+     */
+    void deleteLineFromVec(int line);
+
     void actionExpandRow(int row);
     void actionCollapseRow(int row);
+
+    /*!
+     * This function restores the previous expanded asm that was visible, before
+     * the user changed the disassembly flavor of the debugger. This way, the asm
+     * is updated on-the-fly, because a vector is keeping track of the expanded/
+     * collapsed lines. We iterate over this vector and re-expand the previously
+     * expanded '+' marks. First, `WinStack::reloadAllFiles` must be executed.
+     * \sa `void WinStack::slotHandleAdvancedSett(const QString& flavor)`
+     */
+    void restorePrevDisass();
 
 signals:
     void clickedLeft(const QString&, int, const DbgAddr& address, bool);
@@ -96,13 +115,14 @@ protected:
     struct SourceLine {
 	std::vector<QString> disass;		/* its disassembled code */
 	std::vector<DbgAddr> disassAddr;	/* the addresses thereof */
-	bool canDisass;			/* if line can be disassembled */
+	bool canDisass;				/* if line can be disassembled */
 	SourceLine() : canDisass(true) { }
 	int findAddressRowOffset(const DbgAddr& address) const;
     };
     std::vector<SourceLine> m_sourceCode;
     HighlightCpp* m_highlighter;
 
+    std::vector<int> m_expandedLines;	//!< Keep track of expanded line numbers
     std::vector<int> m_rowToLine;	//!< The source line number for each row
     std::vector<uchar> m_lineItems;	//!< Icons displayed on the line
     QPixmap m_pcinner;			/* PC at innermost frame */

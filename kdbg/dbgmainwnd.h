@@ -153,6 +153,19 @@ protected:
     int m_tabWidth;			/* tab width in characters (can be 0) */
     QString m_sourceFilter;
     QString m_headerFilter;
+
+    /*
+     * These variables help us work with 2 distinct cases for disassembly:
+     * A) The assembly for Intel architectures which comes in 2 flavors and
+     * B) all the others
+     * Since it doesn't make any sense to ask for disassembly flavor on AVR,
+     * we must be able to tell which is which and disable the functionality.
+     */
+
+    QString m_asmGlobalFlavor;		/* Value of disassembly flavor (valid on x86) */
+    QString m_target;			/* What cpu is the executable for */
+
+    bool isTargetX86() const;
     void setTerminalCmd(const QString& cmd);
     void setDebuggerCmdStr(const QString& cmd);
 
@@ -204,6 +217,9 @@ public slots:
     void slotExecArgs();
     void intoBackground();
     void slotConfigureKeys();
+
+    // Update m_target when signal is emitted
+    void slotTargetChanged(const QString& target);
 };
 
 #endif // DBGMAINWND_H

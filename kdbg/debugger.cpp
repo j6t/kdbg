@@ -25,6 +25,8 @@
 #include <algorithm>
 #include "mydebug.h"
 
+static const char DisassemblyFlavor[] = "DisassemblyFlavor";
+
 /**
  * Returns expression value for a tooltip.
  */
@@ -108,8 +110,6 @@ void KDebugger::saveSettings(KConfig* /*config*/)
 void KDebugger::restoreSettings(KConfig* /*config*/)
 {
 }
-
-
 //////////////////////////////////////////////////////////////////////
 // external interface
 
@@ -193,6 +193,11 @@ bool KDebugger::debugProgram(const QString& name,
     m_sharedLibsListed = false;
 
     emit updateUI();
+
+    m_d->executeCmd(DCinfotarget);
+    // After KDebugger is constructed, set the global flavor and
+    // let the user override it from "This program" settings later
+    m_d->executeCmd(DCsetdisassflavor, m_tmpFlavor);
 
     return true;
 }
@@ -344,6 +349,11 @@ void KDebugger::programBreak()
     }
 }
 
+bool KDebugger::isTargetX86() const
+{
+    return m_target.indexOf(QLatin1String("86")) >= 0;
+}
+
 void KDebugger::programArgs(QWidget* parent)
 {
     if (m_haveExecutable) {
@@ -364,14 +374,30 @@ void KDebugger::programSettings(QWidget* parent)
     if (!m_haveExecutable)
 	return;
 
-    ProgramSettings dlg(parent, m_executable);
+    bool isX86 = isTargetX86();
 
+    ProgramSettings dlg(parent, m_executable);
     dlg.m_chooseDriver.setDebuggerCmd(m_debuggerCmd);
+    dlg.m_chooseDriver.setDisassemblyFlavor(m_tmpFlavor);
+    dlg.m_chooseDriver.setIsX86(isX86);
     dlg.m_output.setTTYLevel(m_ttyLevel);
 
     if (dlg.exec() == QDialog::Accepted)
     {
 	m_debuggerCmd = dlg.m_chooseDriver.debuggerCmd();
+	QString flavor = dlg.m_chooseDriver.disassemblyFlavor();
+
+	/*
+	 * If the user selected "Default" in "This program.." then
+	 * use as flavor what is globally saved from Global Settings
+	 */
+	if (flavor != m_tmpFlavor) {
+	    if (flavor == DefaultGenericFlavor) {
+		flavor = m_globalFlavor;
+	    }
+	    setDisassemblyFlavor(flavor);
+	}
+
 	m_ttyLevel = TTYLevel(dlg.m_output.ttyLevel());
     }
 }
@@ -588,7 +614,7 @@ bool KDebugger::canStart()
     return isReady() && !m_programActive;
 }
 
-bool KDebugger::isReady() const 
+bool KDebugger::isReady() const
 {
     return m_haveExecutable &&
 	m_d != 0 && m_d->canExecuteImmediately();
@@ -1103,8 +1129,14 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCinfoline:
 	handleInfoLine(cmd, output);
 	break;
+    case DCinfotarget:
+	handleInfoTarget(output);
+	break;
     case DCdisassemble:
 	handleDisassemble(cmd, output);
+	break;
+    case DCsetdisassflavor:
+	handleSetDisassFlavor(output);
 	break;
     case DCframe:
 	handleFrameChange(output);
@@ -2119,6 +2151,39 @@ void KDebugger::slotDisassemble(const QString& fileName, int lineNo)
     }
 }
 
+void KDebugger::setDisassemblyFlavor(QString flavor)
+{
+    // DefaultGenericFlavor -> "default"
+    if (flavor == DefaultGenericFlavor) {
+        flavor = m_globalFlavor;
+    }
+
+    if(m_tmpFlavor != flavor){
+	m_tmpFlavor = flavor;
+	m_d->executeCmd(DCsetdisassflavor, flavor);
+    }
+}
+
+void KDebugger::setDefaultFlavor(QString defFlavor)
+{
+    m_globalFlavor = defFlavor;
+
+    /*
+     * To specify a flavor for this program first read the global default.
+     * debugProgram will later set the (global) flavor. The user can later
+     * override the global flavor for this program. If the user reloaded a
+     * binary, `reloaded` is true and the current flavor is set forcefully
+     * to the global.
+     */
+    if (m_globalFlavor.isEmpty() && m_tmpFlavor.isEmpty()) {
+	m_tmpFlavor = DefaultX86Flavor;
+    } else if (m_tmpFlavor.isEmpty() ) {
+	m_tmpFlavor = m_globalFlavor;
+    }
+
+    setDisassemblyFlavor(m_tmpFlavor);
+}
+
 void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 {
     QString addrFrom, addrTo;
@@ -2140,6 +2205,18 @@ void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 	    m_d->executeCmd(DCsetpc, addrFrom);
 	}
     }
+}
+
+void KDebugger::handleInfoTarget(const char* output)
+{
+    // At this moment the regex in parseInfoTarget should
+    // return only the file type of the executable
+    QString msg = m_d->parseInfoTarget(output);
+
+    m_target = msg;
+
+    // emit nonetheless to update some properties
+    emit targetChanged(m_target);
 }
 
 void KDebugger::handleDisassemble(CmdQueueItem* cmd, const char* output)
@@ -2206,6 +2283,22 @@ void KDebugger::setProgramCounter(const QString& file, int line, const DbgAddr& 
     } else {
 	// move the program counter to that address
 	m_d->executeCmd(DCsetpc, addr.asString());
+    }
+}
+
+void KDebugger::handleSetDisassFlavor(const char* output)
+{
+    QString res = m_d->parseSetDisassFlavor(output);
+
+    if (!res.isEmpty()) {
+	m_statusMessage = i18n("Setting the disassembly flavor failed");
+	emit updateStatusMessage();
+	return;
+    }
+
+    bool isX86 = isTargetX86();
+    if (isX86) {
+	emit asmFlavorChangedForTarget(m_tmpFlavor, m_target);
     }
 }
 
