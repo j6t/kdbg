@@ -170,7 +170,7 @@ public:
     /**
      * DebuggerMainWnd's wrapper for setting the disassembly-flavor in KDebugger
      */
-    void setDisassemblyFlavor(QString flavor);
+    void submitDisassemblyFlavor();
 
     /**
      * DebuggerMainWnd's wrapper for setting the global disassembly-flavor in KDebugger.
@@ -446,8 +446,8 @@ protected:
     QString m_programArgs;
     QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
-    QString m_target;
-    QString m_tmpFlavor;		/* temporary flavor to override the global one */
+    QString m_target;			/* name of the target */
+    QString m_flavor;			/* temporary flavor to override the global one */
     QString m_globalFlavor;		/* which flavor is saved globally? */
     std::map<QString,QString> m_envVars;	/* environment variables set by user */
     QSet<QString> m_boolOptions;	/* boolean options */

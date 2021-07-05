@@ -570,7 +570,7 @@ public:
     virtual QString parseSetDisassFlavor(const char* output) = 0;
 
     /**
-     * Parse the output of the DCinfoline command.
+     * Parse the output of the DCinfotarget command.
      */
     virtual QString parseInfoTarget(const char* output) = 0;
 

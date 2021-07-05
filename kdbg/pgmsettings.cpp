@@ -36,7 +36,7 @@ ChooseDriver::ChooseDriver(QWidget* parent) :
 
     // setup flavor-related functionality
     layout->addLayout(gridLayout, 1);
-    QStringList flavorList = {"intel", "att", "default"};
+    QStringList flavorList = {"intel", "att", "use global setting"};
     m_disassComboBox->insertItems(0, flavorList);
     QLabel* disassLabel = new QLabel(i18n("Disassembly flavor:"), this);
     disassLabel->setMinimumSize(disassLabel->sizeHint());

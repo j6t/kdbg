@@ -25,7 +25,8 @@
 #include <algorithm>
 #include "mydebug.h"
 
-static const char DisassemblyFlavor[] = "DisassemblyFlavor";
+static const char DefaultDbgX86Flavor[] = "att";
+static const char DefaultDbgGenericFlavor[] = "use global setting";
 
 /**
  * Returns expression value for a tooltip.
@@ -197,7 +198,7 @@ bool KDebugger::debugProgram(const QString& name,
     m_d->executeCmd(DCinfotarget);
     // After KDebugger is constructed, set the global flavor and
     // let the user override it from "This program" settings later
-    m_d->executeCmd(DCsetdisassflavor, m_tmpFlavor);
+    m_d->executeCmd(DCsetdisassflavor, m_flavor);
 
     return true;
 }
@@ -378,7 +379,7 @@ void KDebugger::programSettings(QWidget* parent)
 
     ProgramSettings dlg(parent, m_executable);
     dlg.m_chooseDriver.setDebuggerCmd(m_debuggerCmd);
-    dlg.m_chooseDriver.setDisassemblyFlavor(m_tmpFlavor);
+    dlg.m_chooseDriver.setDisassemblyFlavor(m_flavor);
     dlg.m_chooseDriver.setIsX86(isX86);
     dlg.m_output.setTTYLevel(m_ttyLevel);
 
@@ -391,11 +392,12 @@ void KDebugger::programSettings(QWidget* parent)
 	 * If the user selected "Default" in "This program.." then
 	 * use as flavor what is globally saved from Global Settings
 	 */
-	if (flavor != m_tmpFlavor) {
-	    if (flavor == DefaultGenericFlavor) {
+	if (flavor != m_flavor) {
+	    if (flavor == DefaultDbgGenericFlavor) {
 		flavor = m_globalFlavor;
 	    }
-	    setDisassemblyFlavor(flavor);
+	    m_flavor = flavor;
+	    submitDisassemblyFlavor();
 	}
 
 	m_ttyLevel = TTYLevel(dlg.m_output.ttyLevel());
@@ -2151,17 +2153,9 @@ void KDebugger::slotDisassemble(const QString& fileName, int lineNo)
     }
 }
 
-void KDebugger::setDisassemblyFlavor(QString flavor)
+void KDebugger::submitDisassemblyFlavor()
 {
-    // DefaultGenericFlavor -> "default"
-    if (flavor == DefaultGenericFlavor) {
-        flavor = m_globalFlavor;
-    }
-
-    if(m_tmpFlavor != flavor){
-	m_tmpFlavor = flavor;
-	m_d->executeCmd(DCsetdisassflavor, flavor);
-    }
+    m_d->executeCmd(DCsetdisassflavor, m_flavor);
 }
 
 void KDebugger::setDefaultFlavor(QString defFlavor)
@@ -2175,13 +2169,18 @@ void KDebugger::setDefaultFlavor(QString defFlavor)
      * binary, `reloaded` is true and the current flavor is set forcefully
      * to the global.
      */
-    if (m_globalFlavor.isEmpty() && m_tmpFlavor.isEmpty()) {
-	m_tmpFlavor = DefaultX86Flavor;
-    } else if (m_tmpFlavor.isEmpty() ) {
-	m_tmpFlavor = m_globalFlavor;
+    if (m_globalFlavor.isEmpty() && m_flavor.isEmpty()) {
+	m_flavor = DefaultDbgX86Flavor;
+    } else if (m_flavor.isEmpty() ) {
+	m_flavor = m_globalFlavor;
     }
 
-    setDisassemblyFlavor(m_tmpFlavor);
+    /*
+     * Flavor can't be submitted to NULL debugger pointer
+     */
+    if(m_d != 0){
+	submitDisassemblyFlavor();
+    }
 }
 
 void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
@@ -2209,11 +2208,13 @@ void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 
 void KDebugger::handleInfoTarget(const char* output)
 {
-    // At this moment the regex in parseInfoTarget should
-    // return only the file type of the executable
-    QString msg = m_d->parseInfoTarget(output);
+    /*
+     * At this moment parseInfoTarget should return only the file
+     * type of the executable (ie "elf64-x86-64" or "elf64-littleriscv")
+     */
+    QString target = m_d->parseInfoTarget(output);
 
-    m_target = msg;
+    m_target = target;
 
     // emit nonetheless to update some properties
     emit targetChanged(m_target);
@@ -2298,7 +2299,7 @@ void KDebugger::handleSetDisassFlavor(const char* output)
 
     bool isX86 = isTargetX86();
     if (isX86) {
-	emit asmFlavorChangedForTarget(m_tmpFlavor, m_target);
+	emit asmFlavorChangedForTarget(m_flavor, m_target);
     }
 }
 
