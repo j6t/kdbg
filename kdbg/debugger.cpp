@@ -118,6 +118,7 @@ const char GeneralGroup[] = "General";
 const char DebuggerCmdStr[] = "DebuggerCmdStr";
 const char TTYLevelEntry[] = "TTYLevel";
 const char KDebugger::DriverNameEntry[] = "DriverName";
+const char ThisFlavor[] = "ThisFlavor";
 
 bool KDebugger::debugProgram(const QString& name,
 			     DebuggerDriver* driver)
@@ -196,9 +197,6 @@ bool KDebugger::debugProgram(const QString& name,
     emit updateUI();
 
     m_d->executeCmd(DCinfotarget);
-    // After KDebugger is constructed, set the global flavor and
-    // let the user override it from "This program" settings later
-    m_d->executeCmd(DCsetdisassflavor, m_flavor);
 
     return true;
 }
@@ -793,6 +791,8 @@ void KDebugger::saveProgramSettings()
     gg.writeEntry(OptionsSelected, m_boolOptions.toList());
     gg.writeEntry(DebuggerCmdStr, m_debuggerCmd);
     gg.writeEntry(TTYLevelEntry, int(m_ttyLevel));
+    gg.writeEntry(ThisFlavor, m_flavor);
+
     QString driverName;
     if (m_d != 0)
 	driverName = m_d->driverName();
@@ -850,6 +850,7 @@ void KDebugger::restoreProgramSettings()
     QString pgmWd = gg.readEntry(WorkingDirectory);
     QSet<QString> boolOptions = QSet<QString>::fromList(gg.readEntry(OptionsSelected, QStringList()));
     m_boolOptions.clear();
+    m_flavor = gg.readEntry(ThisFlavor);
 
     // read environment variables
     KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
@@ -873,6 +874,9 @@ void KDebugger::restoreProgramSettings()
 	var->value = eg.readEntry(varValue, QString());
 	var->status = EnvVar::EVnew;
     }
+
+    // Now that some options are set, update early what should be updated
+    submitDisassemblyFlavor();
 
     updateProgEnvironment(pgmArgs, pgmWd, pgmVars, boolOptions);
 
@@ -2155,30 +2159,43 @@ void KDebugger::slotDisassemble(const QString& fileName, int lineNo)
 
 void KDebugger::submitDisassemblyFlavor()
 {
+    /*
+     * If m_flavor is empty (ie this program is loaded for the first time),
+     * read m_globalFlavor and act accordingly.
+     */
+    if (m_flavor.isEmpty()) {
+	if (m_globalFlavor.isEmpty()
+	    || m_globalFlavor == DefaultGenericFlavor
+	    || m_globalFlavor == DefaultX86Flavor) {
+	    m_flavor = DefaultX86Flavor;
+	} else {
+	    m_flavor = m_globalFlavor;
+	}
+    }
+
     m_d->executeCmd(DCsetdisassflavor, m_flavor);
 }
 
-void KDebugger::setDefaultFlavor(QString defFlavor)
+void KDebugger::setDefaultFlavor(QString defFlavor, bool updateView)
 {
+    /*
+     * Global default uses "default" while This Program uses
+     * "use global setting". This leads to the wrong string being
+     * stored for This program's configuration and broken logic
+     * for m_flavor. Make sure that when "default" is globally
+     * selected, KDebugger will see "use global setting" for it's
+     * purposes.
+     */
+    if (defFlavor == DefaultGenericFlavor) {
+	defFlavor = DefaultDbgGenericFlavor;
+    }
     m_globalFlavor = defFlavor;
 
     /*
-     * To specify a flavor for this program first read the global default.
-     * debugProgram will later set the (global) flavor. The user can later
-     * override the global flavor for this program. If the user reloaded a
-     * binary, `reloaded` is true and the current flavor is set forcefully
-     * to the global.
+     * Check if we should update the view. Also flavor can't be submitted
+     * to NULL debugger pointer.
      */
-    if (m_globalFlavor.isEmpty() && m_flavor.isEmpty()) {
-	m_flavor = DefaultDbgX86Flavor;
-    } else if (m_flavor.isEmpty() ) {
-	m_flavor = m_globalFlavor;
-    }
-
-    /*
-     * Flavor can't be submitted to NULL debugger pointer
-     */
-    if(m_d != 0){
+    if (updateView && m_d != 0) {
 	submitDisassemblyFlavor();
     }
 }

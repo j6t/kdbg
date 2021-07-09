@@ -174,8 +174,11 @@ public:
 
     /**
      * DebuggerMainWnd's wrapper for setting the global disassembly-flavor in KDebugger.
+     * \param defFlavor The (global) default flavor.
+     * \param updateView When setDefaultFlavor is called and a file is loaded,
+     * don't update the view till the next restart.
      */
-    void setDefaultFlavor(QString defFlavor);
+    void setDefaultFlavor(QString defFlavor, bool updateView = true);
 
     /**
      * Setup remote debugging device
@@ -447,7 +450,7 @@ protected:
     QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
     QString m_target;			/* name of the target */
-    QString m_flavor;			/* temporary flavor to override the global one */
+    QString m_flavor;			/* flavor to override the global one */
     QString m_globalFlavor;		/* which flavor is saved globally? */
     std::map<QString,QString> m_envVars;	/* environment variables set by user */
     QSet<QString> m_boolOptions;	/* boolean options */

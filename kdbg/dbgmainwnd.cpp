@@ -884,10 +884,13 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 	if (m_asmGlobalFlavor != oldGlobalFlavor) {
 	    if (m_debugger != 0) {
 		/*
-		 * When a valid debugger is set, run this. If not,
-		 * this function will run again at debugProgram
+		 * When a valid debugger is set, run this. If not, this
+		 * function will run again at debugProgram. Also, don't
+		 * update the disassembly view (if any) since global flavor
+		 * shouldn't affect immediately the current flavor.
 		 */
-		m_debugger->setDefaultFlavor(m_asmGlobalFlavor);
+		bool updateTheView = false;
+		m_debugger->setDefaultFlavor(m_asmGlobalFlavor, updateTheView);
 	    }
 	}
 
