@@ -876,21 +876,10 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 	m_tabWidth = prefMisc.tabWidth();
 	m_sourceFilter = prefMisc.sourceFilter();
 
-	/*
-	 * Changing the m_asmGlobalFlavor doesn't trigger a reload.
-	 * It will be the default flavor the next time KDbg is started.
-	 */
 	m_asmGlobalFlavor = prefDebugger.globalDisassemblyFlavor();
 	if (m_asmGlobalFlavor != oldGlobalFlavor) {
 	    if (m_debugger != 0) {
-		/*
-		 * When a valid debugger is set, run this. If not, this
-		 * function will run again at debugProgram. Also, don't
-		 * update the disassembly view (if any) since global flavor
-		 * shouldn't affect immediately the current flavor.
-		 */
-		bool updateTheView = false;
-		m_debugger->setDefaultFlavor(m_asmGlobalFlavor, updateTheView);
+		m_debugger->setDefaultFlavor(m_asmGlobalFlavor);
 	    }
 	}
 

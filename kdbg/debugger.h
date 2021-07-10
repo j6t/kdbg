@@ -168,17 +168,15 @@ public:
     void programSettings(QWidget* parent);
 
     /**
-     * DebuggerMainWnd's wrapper for setting the disassembly-flavor in KDebugger
+     * Wrapper for setting the disassembly-flavor in KDebugger
      */
     void submitDisassemblyFlavor();
 
     /**
      * DebuggerMainWnd's wrapper for setting the global disassembly-flavor in KDebugger.
      * \param defFlavor The (global) default flavor.
-     * \param updateView When setDefaultFlavor is called and a file is loaded,
-     * don't update the view till the next restart.
      */
-    void setDefaultFlavor(QString defFlavor, bool updateView = true);
+    void setDefaultFlavor(QString defFlavor);
 
     /**
      * Setup remote debugging device
