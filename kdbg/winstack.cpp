@@ -10,12 +10,13 @@
 #include <QFileInfo>
 #include <QMenu>
 #include <QContextMenuEvent>
+#include <QRegularExpression>
 #include <QToolTip>
 #include <kxmlguiwindow.h>
 #include <kxmlguifactory.h>
+#include <ksharedconfig.h>
 #include <klocalizedstring.h>		/* i18n */
 #include "mydebug.h"
-
 
 
 WinStack::WinStack(QWidget* parent) :
@@ -34,6 +35,8 @@ WinStack::WinStack(QWidget* parent) :
     connect(this, SIGNAL(setTabWidth(int)), this, SLOT(slotSetTabWidth(int)));
     connect(this, SIGNAL(tabCloseRequested(int)),
 	    this, SLOT(slotCloseTab(int)));
+
+    connect(this, &WinStack::asmFlavorChangedForTarget, this, &WinStack::slotFlavorChanged);
 }
 
 WinStack::~WinStack()
@@ -166,7 +169,7 @@ bool WinStack::activeLine(QString& fileName, int& lineNo, DbgAddr& address)
     if (activeWindow() == 0) {
 	return false;
     }
-    
+
     fileName = activeFileName();
     activeWindow()->activeLine(lineNo, address);
     return true;
@@ -201,6 +204,11 @@ SourceWindow* WinStack::findByFileName(const QString& fileName) const
 	}
     }
     return 0;
+}
+
+QString WinStack::flavor() const
+{
+    return m_flavor;
 }
 
 void WinStack::setPC(bool set, const QString& fileName, int lineNo,
@@ -275,6 +283,11 @@ bool WinStack::event(QEvent* evt)
     return true;
 }
 
+void WinStack::setFlavor(const QString flavor)
+{
+    m_flavor = flavor;
+}
+
 void WinStack::slotShowValueTip(const QString& tipText)
 {
     QToolTip::showText(m_tipLocation, tipText, this, m_tipRegion);
@@ -305,6 +318,16 @@ void WinStack::slotExpandCollapse(int)
     }
 }
 
+void WinStack::slotFlavorChanged(const QString& flavor, const QString& target)
+{
+    m_flavor = flavor;
+    bool isX86 = target.indexOf(QLatin1String("86")) >= 0;
+
+    //Don't reload for-non x86 targets
+    if (isX86) {
+        reloadAllFiles();
+    }
+}
 
 void WinStack::slotSetTabWidth(int numChars)
 {

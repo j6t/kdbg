@@ -13,13 +13,54 @@
 #include <queue>
 #include <list>
 
-
 class VarTree;
 class ExprValue;
 class ExprWnd;
 class KDebugger;
 class QStringList;
+enum class FlavorEnum;
+using tripleKey = std::tuple<FlavorEnum, QString, QString>;
 
+enum class FlavorEnum { Default, ATT, Intel };
+
+/*
+ * Now, flavors can be represented by many ways:
+ * As enum values when passing around between functions
+ * In the QComboboxes they can be represented as we like, without caring
+ * about how the flavor is interpreted for gdb
+ * And of course the actual flavor string for gdb.
+ *
+ * So, define a global static tuple that contains the possible values.
+ */
+static const tripleKey flavorsTuple[3]
+{
+    std::make_tuple( FlavorEnum::Default, "Default", "att"),
+    std::make_tuple( FlavorEnum::ATT, "ATT", "att"),
+    std::make_tuple( FlavorEnum::Intel, "Intel", "intel")
+};
+
+/*************************************************/
+/*
+ * The following two functions help us to manipulate
+ * enum values for flavors to strings and vice versa.
+ */
+inline QString enumToFlavor(const FlavorEnum fenum)
+{
+    int i = static_cast<int>(fenum);
+    return std::get<2>(flavorsTuple[i]);
+}
+
+inline FlavorEnum flavorToEnum(const QString& flavor)
+{
+    FlavorEnum fenum;
+    for (auto i = 0; i < 3; i++) {
+	if (flavor == std::get<2>(flavorsTuple[i])) {
+	    fenum = static_cast<FlavorEnum>(i);
+	}
+   }
+   return fenum;
+}
+/************************************************/
 
 /**
  * A type representing an address.
@@ -54,7 +95,9 @@ enum DbgCommand {
 	DCinforegisters,
 	DCexamine,
 	DCinfoline,
+	DCinfotarget,
 	DCdisassemble,
+	DCsetdisassflavor,
 	DCsetargs,
 	DCsetenv,
 	DCunsetenv,
@@ -300,7 +343,7 @@ public:
 
 protected:
     QString m_runCmd;
-    
+
     enum DebuggerState {
 	DSidle,				/* gdb waits for input */
 	DSinterrupted,			/* a command was interrupted */
@@ -557,6 +600,17 @@ public:
     virtual QString parseSetVariable(const char* output) = 0;
 
     /**
+     * Parses the ouput of the DCsetdisassflavor commnad. If the string
+     * is empty the command was successfull.
+     */
+    virtual QString parseSetDisassFlavor(const char* output) = 0;
+
+    /**
+     * Parse the output of the DCinfotarget command.
+     */
+    virtual QString parseInfoTarget(const char* output) = 0;
+
+    /**
      * Returns a value that the user can edit.
      */
     virtual QString editableValue(VarTree* value);
@@ -616,7 +670,7 @@ protected slots:
     virtual void slotReceiveOutput();
     virtual void slotCommandRead();
     virtual void slotExited();
-    
+
 signals:
     /**
      * This signal is emitted when the output of a command has been fully
@@ -652,6 +706,12 @@ signals:
      * consumed and no more commands are in the queues.
      */
     void enterIdleState();
+
+    /**
+     * This signal is emitted when the disassembly flavor on x86 platforms
+     * change.
+     */
+    void disassFlavorChanged(const QString& flavor);
 };
 
 #endif // DBGDRIVER_H

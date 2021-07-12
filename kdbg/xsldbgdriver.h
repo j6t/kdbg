@@ -20,6 +20,7 @@ class XsldbgDriver:public DebuggerDriver {
     QStringList boolOptionList() const override;
     static QString defaultXsldbg();
     bool startup(QString cmdStr) override;
+
     void commandFinished(CmdQueueItem * cmd) override;
 
     void terminate() override;
@@ -53,6 +54,8 @@ class XsldbgDriver:public DebuggerDriver {
     uint parseProgramStopped(const char *output,  bool haveCoreFile,
                                      QString & message) override;
     QStringList parseSharedLibs(const char *output) override;
+    QString parseInfoTarget(const char* output) override;
+    QString parseSetDisassFlavor(const char* output) override;
     bool parseFindType(const char *output, QString & type) override;
     std::list<RegisterInfo> parseRegisters(const char *output) override;
     bool parseInfoLine(const char *output, QString & addrFrom,

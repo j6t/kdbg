@@ -108,8 +108,6 @@ void KDebugger::saveSettings(KConfig* /*config*/)
 void KDebugger::restoreSettings(KConfig* /*config*/)
 {
 }
-
-
 //////////////////////////////////////////////////////////////////////
 // external interface
 
@@ -117,6 +115,7 @@ const char GeneralGroup[] = "General";
 const char DebuggerCmdStr[] = "DebuggerCmdStr";
 const char TTYLevelEntry[] = "TTYLevel";
 const char KDebugger::DriverNameEntry[] = "DriverName";
+const char DisassemblyFlavor[] = "DisassemblyFlavor";
 
 bool KDebugger::debugProgram(const QString& name,
 			     DebuggerDriver* driver)
@@ -193,6 +192,8 @@ bool KDebugger::debugProgram(const QString& name,
     m_sharedLibsListed = false;
 
     emit updateUI();
+
+    m_d->executeCmd(DCinfotarget);
 
     return true;
 }
@@ -344,6 +345,11 @@ void KDebugger::programBreak()
     }
 }
 
+bool KDebugger::isTargetX86() const
+{
+    return m_target.indexOf(QLatin1String("86")) >= 0;
+}
+
 void KDebugger::programArgs(QWidget* parent)
 {
     if (m_haveExecutable) {
@@ -364,14 +370,20 @@ void KDebugger::programSettings(QWidget* parent)
     if (!m_haveExecutable)
 	return;
 
-    ProgramSettings dlg(parent, m_executable);
+    bool isX86 = isTargetX86();
 
+    ProgramSettings dlg(parent, m_executable);
     dlg.m_chooseDriver.setDebuggerCmd(m_debuggerCmd);
+    dlg.m_chooseDriver.setDisassemblyFlavor(m_flavor);
+    dlg.m_chooseDriver.setIsX86(isX86);
     dlg.m_output.setTTYLevel(m_ttyLevel);
 
     if (dlg.exec() == QDialog::Accepted)
     {
 	m_debuggerCmd = dlg.m_chooseDriver.debuggerCmd();
+	m_flavor = dlg.m_chooseDriver.disassemblyFlavor();
+	submitDisassemblyFlavor();
+
 	m_ttyLevel = TTYLevel(dlg.m_output.ttyLevel());
     }
 }
@@ -588,7 +600,7 @@ bool KDebugger::canStart()
     return isReady() && !m_programActive;
 }
 
-bool KDebugger::isReady() const 
+bool KDebugger::isReady() const
 {
     return m_haveExecutable &&
 	m_d != 0 && m_d->canExecuteImmediately();
@@ -765,6 +777,8 @@ void KDebugger::saveProgramSettings()
     gg.writeEntry(OptionsSelected, m_boolOptions.toList());
     gg.writeEntry(DebuggerCmdStr, m_debuggerCmd);
     gg.writeEntry(TTYLevelEntry, int(m_ttyLevel));
+    gg.writeEntry(DisassemblyFlavor, (int)m_flavor);
+
     QString driverName;
     if (m_d != 0)
 	driverName = m_d->driverName();
@@ -822,6 +836,7 @@ void KDebugger::restoreProgramSettings()
     QString pgmWd = gg.readEntry(WorkingDirectory);
     QSet<QString> boolOptions = QSet<QString>::fromList(gg.readEntry(OptionsSelected, QStringList()));
     m_boolOptions.clear();
+    m_flavor = (FlavorEnum)gg.readEntry(DisassemblyFlavor, (int)FlavorEnum::Default);
 
     // read environment variables
     KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
@@ -845,6 +860,9 @@ void KDebugger::restoreProgramSettings()
 	var->value = eg.readEntry(varValue, QString());
 	var->status = EnvVar::EVnew;
     }
+
+    // Now that some options are set, update early what should be updated
+    submitDisassemblyFlavor();
 
     updateProgEnvironment(pgmArgs, pgmWd, pgmVars, boolOptions);
 
@@ -1103,8 +1121,14 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCinfoline:
 	handleInfoLine(cmd, output);
 	break;
+    case DCinfotarget:
+	handleInfoTarget(output);
+	break;
     case DCdisassemble:
 	handleDisassemble(cmd, output);
+	break;
+    case DCsetdisassflavor:
+	handleSetDisassFlavor(cmd, output);
 	break;
     case DCframe:
 	handleFrameChange(output);
@@ -2119,6 +2143,28 @@ void KDebugger::slotDisassemble(const QString& fileName, int lineNo)
     }
 }
 
+void KDebugger::submitDisassemblyFlavor()
+{
+    QString flavor;
+
+    if (m_flavor == FlavorEnum::Default) {
+	flavor = enumToFlavor(m_globalFlavor);
+    } else {
+	flavor = enumToFlavor(m_flavor);
+    }
+
+    m_d->executeCmd(DCsetdisassflavor, flavor);
+}
+
+void KDebugger::setDefaultFlavor(FlavorEnum defFlavor)
+{
+    m_globalFlavor = defFlavor;
+
+    if (m_d != 0) {
+	submitDisassemblyFlavor();
+    }
+}
+
 void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 {
     QString addrFrom, addrTo;
@@ -2140,6 +2186,20 @@ void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 	    m_d->executeCmd(DCsetpc, addrFrom);
 	}
     }
+}
+
+void KDebugger::handleInfoTarget(const char* output)
+{
+    /*
+     * At this moment parseInfoTarget should return only the file
+     * type of the executable (ie "elf64-x86-64" or "elf64-littleriscv")
+     */
+    QString target = m_d->parseInfoTarget(output);
+
+    m_target = target;
+
+    // emit nonetheless to update some properties
+    emit targetChanged(m_target);
 }
 
 void KDebugger::handleDisassemble(CmdQueueItem* cmd, const char* output)
@@ -2206,6 +2266,23 @@ void KDebugger::setProgramCounter(const QString& file, int line, const DbgAddr& 
     } else {
 	// move the program counter to that address
 	m_d->executeCmd(DCsetpc, addr.asString());
+    }
+}
+
+void KDebugger::handleSetDisassFlavor(CmdQueueItem* cmd, const char* output)
+{
+    //TODO Maybe reading from cmd->m_cmdString and searching for att/intel could help us avoid the signal?
+
+    QString res = m_d->parseSetDisassFlavor(output);
+
+    if (!res.isEmpty()) {
+	m_statusMessage = i18n("Setting the disassembly flavor failed");
+	emit updateStatusMessage();
+	return;
+    }
+
+    if (isTargetX86()) {
+	emit asmFlavorChangedForTarget(enumToFlavor(m_flavor), m_target);
     }
 }
 
