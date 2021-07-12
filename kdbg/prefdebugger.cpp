@@ -47,7 +47,10 @@ PrefDebugger::PrefDebugger(QWidget* parent) :
     m_disassLabel.setMinimumSize(m_disassLabel.sizeHint());
     m_disassLabel.setBuddy(&m_disassCombo);
 
-    m_disassCombo.insertItems(0, { "intel", "att", "default" });
+    for(size_t i = 0; i < 3; ++i) {
+	m_disassCombo.insertItem(i, std::get<1>(flavorsTuple[i]));
+    }
+
     m_disassCombo.setMinimumSize(m_disassCombo.sizeHint());
     m_disassCombo.setMinimumHeight(m_disassCombo.sizeHint().height());
     m_disassCombo.setToolTip(i18n("Setting the flavor makes a difference only for x86 executables"));

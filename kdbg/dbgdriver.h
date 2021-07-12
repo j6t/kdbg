@@ -13,18 +13,54 @@
 #include <queue>
 #include <list>
 
-
 class VarTree;
 class ExprValue;
 class ExprWnd;
 class KDebugger;
 class QStringList;
+enum class FlavorEnum;
+using tripleKey = std::tuple<FlavorEnum, QString, QString>;
 
-/**
- * Initialize some constants, usefull for many places.
+enum class FlavorEnum { Default, ATT, Intel };
+
+/*
+ * Now, flavors can be represented by many ways:
+ * As enum values when passing around between functions
+ * In the QComboboxes they can be represented as we like, without caring
+ * about how the flavor is interpreted for gdb
+ * And of course the actual flavor string for gdb.
+ *
+ * So, define a global static tuple that contains the possible values.
  */
-static const char DefaultX86Flavor[] = "att";
-static const char DefaultGenericFlavor[] = "default";
+static const tripleKey flavorsTuple[3]
+{
+    std::make_tuple( FlavorEnum::Default, "Default", "att"),
+    std::make_tuple( FlavorEnum::ATT, "ATT", "att"),
+    std::make_tuple( FlavorEnum::Intel, "Intel", "intel")
+};
+
+/*************************************************/
+/*
+ * The following two functions help us to manipulate
+ * enum values for flavors to strings and vice versa.
+ */
+inline QString enumToFlavor(const FlavorEnum fenum)
+{
+    int i = static_cast<int>(fenum);
+    return std::get<2>(flavorsTuple[i]);
+}
+
+inline FlavorEnum flavorToEnum(const QString& flavor)
+{
+    FlavorEnum fenum;
+    for (auto i = 0; i < 3; i++) {
+	if (flavor == std::get<2>(flavorsTuple[i])) {
+	    fenum = static_cast<FlavorEnum>(i);
+	}
+   }
+   return fenum;
+}
+/************************************************/
 
 /**
  * A type representing an address.

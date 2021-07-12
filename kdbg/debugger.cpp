@@ -381,19 +381,8 @@ void KDebugger::programSettings(QWidget* parent)
     if (dlg.exec() == QDialog::Accepted)
     {
 	m_debuggerCmd = dlg.m_chooseDriver.debuggerCmd();
-	QString flavor = dlg.m_chooseDriver.disassemblyFlavor();
-
-	/*
-	 * If the user selected "use global setting" in "This program.."
-	 * then use as flavor what is globally saved from Global Settings
-	 */
-	if (flavor != m_flavor) {
-	    if (flavor == DefaultGenericFlavor) {
-		flavor = m_globalFlavor;
-	    }
-	    m_flavor = flavor;
-	    submitDisassemblyFlavor();
-	}
+	m_flavor = dlg.m_chooseDriver.disassemblyFlavor();
+	submitDisassemblyFlavor();
 
 	m_ttyLevel = TTYLevel(dlg.m_output.ttyLevel());
     }
@@ -788,7 +777,7 @@ void KDebugger::saveProgramSettings()
     gg.writeEntry(OptionsSelected, m_boolOptions.toList());
     gg.writeEntry(DebuggerCmdStr, m_debuggerCmd);
     gg.writeEntry(TTYLevelEntry, int(m_ttyLevel));
-    gg.writeEntry(DisassemblyFlavor, m_flavor);
+    gg.writeEntry(DisassemblyFlavor, (int)m_flavor);
 
     QString driverName;
     if (m_d != 0)
@@ -847,7 +836,7 @@ void KDebugger::restoreProgramSettings()
     QString pgmWd = gg.readEntry(WorkingDirectory);
     QSet<QString> boolOptions = QSet<QString>::fromList(gg.readEntry(OptionsSelected, QStringList()));
     m_boolOptions.clear();
-    m_flavor = gg.readEntry(DisassemblyFlavor, m_flavor);
+    m_flavor = (FlavorEnum)gg.readEntry(DisassemblyFlavor, (int)FlavorEnum::Default);
 
     // read environment variables
     KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
@@ -1139,7 +1128,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	handleDisassemble(cmd, output);
 	break;
     case DCsetdisassflavor:
-	handleSetDisassFlavor(output);
+	handleSetDisassFlavor(cmd, output);
 	break;
     case DCframe:
 	handleFrameChange(output);
@@ -2156,35 +2145,23 @@ void KDebugger::slotDisassemble(const QString& fileName, int lineNo)
 
 void KDebugger::submitDisassemblyFlavor()
 {
-    /*
-     * If m_flavor is empty (ie this program is loaded for the first time),
-     * read m_globalFlavor and act accordingly.
-     */
-    if (m_flavor.isEmpty()) {
-	if (m_globalFlavor.isEmpty()
-	    || m_globalFlavor == DefaultGenericFlavor
-	    || m_globalFlavor == DefaultX86Flavor) {
-	    m_flavor = DefaultX86Flavor;
-	} else {
-	    m_flavor = m_globalFlavor;
-	}
-    } else if (m_flavor == DefaultGenericFlavor) {
-	m_flavor = m_globalFlavor;
+    QString flavor;
+
+    if (m_flavor == FlavorEnum::Default) {
+	flavor = enumToFlavor(m_globalFlavor);
+    } else {
+	flavor = enumToFlavor(m_flavor);
     }
 
-    m_d->executeCmd(DCsetdisassflavor, m_flavor);
+    m_d->executeCmd(DCsetdisassflavor, flavor);
 }
 
-void KDebugger::setDefaultFlavor(QString defFlavor)
+void KDebugger::setDefaultFlavor(FlavorEnum defFlavor)
 {
     m_globalFlavor = defFlavor;
 
-    bool updateView = m_flavor == DefaultGenericFlavor;
-    if (updateView) {
-	m_flavor = m_globalFlavor;
-	if (m_d != 0) {
-	    submitDisassemblyFlavor();
-	}
+    if (m_d != 0) {
+	submitDisassemblyFlavor();
     }
 }
 
@@ -2292,8 +2269,10 @@ void KDebugger::setProgramCounter(const QString& file, int line, const DbgAddr& 
     }
 }
 
-void KDebugger::handleSetDisassFlavor(const char* output)
+void KDebugger::handleSetDisassFlavor(CmdQueueItem* cmd, const char* output)
 {
+    //TODO Maybe reading from cmd->m_cmdString and searching for att/intel could help us avoid the signal?
+
     QString res = m_d->parseSetDisassFlavor(output);
 
     if (!res.isEmpty()) {
@@ -2302,9 +2281,8 @@ void KDebugger::handleSetDisassFlavor(const char* output)
 	return;
     }
 
-    bool isX86 = isTargetX86();
-    if (isX86) {
-	emit asmFlavorChangedForTarget(m_flavor, m_target);
+    if (isTargetX86()) {
+	emit asmFlavorChangedForTarget(enumToFlavor(m_flavor), m_target);
     }
 }
 

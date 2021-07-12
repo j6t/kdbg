@@ -13,6 +13,7 @@
 #include <map>
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
+#include "dbgdriver.h"
 
 class ExprWnd;
 class VarTree;
@@ -176,7 +177,7 @@ public:
      * DebuggerMainWnd's wrapper for setting the global disassembly-flavor in KDebugger.
      * \param defFlavor The (global) default flavor.
      */
-    void setDefaultFlavor(QString defFlavor);
+    void setDefaultFlavor(FlavorEnum defFlavor);
 
     /**
      * Setup remote debugging device
@@ -411,7 +412,7 @@ protected:
     void handleThreadList(const char* output);
     void handleSetPC(const char* output);
     void handleSetVariable(CmdQueueItem* cmd, const char* output);
-    void handleSetDisassFlavor(const char* output);
+    void handleSetDisassFlavor(CmdQueueItem* cmd, const char* output);
     void evalExpressions();
     void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
@@ -448,8 +449,8 @@ protected:
     QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
     QString m_target;			/* name of the target */
-    QString m_flavor;			/* flavor to override the global one */
-    QString m_globalFlavor;		/* which flavor is saved globally? */
+    FlavorEnum m_flavor;		/* flavor to override the global one */
+    FlavorEnum m_globalFlavor;		/* which flavor is saved globally? */
     std::map<QString,QString> m_envVars;	/* environment variables set by user */
     QSet<QString> m_boolOptions;	/* boolean options */
     QStringList m_sharedLibs;		/* shared libraries used by program */

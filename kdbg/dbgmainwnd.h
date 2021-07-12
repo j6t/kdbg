@@ -12,6 +12,7 @@
 #include <ksharedconfig.h>
 #include <kxmlguiwindow.h>
 #include "regwnd.h"
+#include "dbgdriver.h"
 
 class QDockWidget;
 class QProcess;
@@ -162,7 +163,7 @@ protected:
      * we must be able to tell which is which and disable the functionality.
      */
 
-    QString m_asmGlobalFlavor;		/* Value of disassembly flavor (valid on x86) */
+    FlavorEnum m_asmGlobalFlavor;	/* Value of disassembly flavor (valid on x86) */
     QString m_target;			/* What cpu is the executable for */
 
     bool isTargetX86() const;

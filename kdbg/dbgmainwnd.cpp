@@ -466,7 +466,7 @@ void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
     pg.writeEntry(TabWidth, m_tabWidth);
     pg.writeEntry(SourceFileFilter, m_sourceFilter);
     pg.writeEntry(HeaderFileFilter, m_headerFilter);
-    pg.writeEntry(DisassemblyFlavor, m_asmGlobalFlavor);
+    pg.writeEntry(DisassemblyFlavor, (int)m_asmGlobalFlavor);
 }
 
 void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
@@ -504,15 +504,14 @@ void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
     m_sourceFilter = pg.readEntry(SourceFileFilter, m_sourceFilter);
     m_headerFilter = pg.readEntry(HeaderFileFilter, m_headerFilter);
 
-    // Read the global flavor and inform the debugger for it
-    m_asmGlobalFlavor = pg.readEntry(DisassemblyFlavor, m_asmGlobalFlavor);
+    /*
+     * Read the global flavor and inform the debugger for it
+     * and use casts to make peace with the moc compiler
+     */
+    m_asmGlobalFlavor = (FlavorEnum)pg.readEntry(DisassemblyFlavor, (int)FlavorEnum::Default);
     if (m_debugger != 0) {
 	m_debugger->setDefaultFlavor(m_asmGlobalFlavor);
     }
-
-    // If the setting entry is empty, set an initial value
-    if (m_asmGlobalFlavor.isEmpty())
-	m_asmGlobalFlavor = DefaultGenericFlavor;
 
     emit setTabWidth(m_tabWidth);
 }
@@ -845,7 +844,7 @@ void DebuggerMainWnd::slotNewStatusMsg()
 void DebuggerMainWnd::slotFileGlobalSettings()
 {
     int oldTabWidth = m_tabWidth;
-    QString oldGlobalFlavor = m_asmGlobalFlavor;
+    FlavorEnum oldGlobalFlavor = m_asmGlobalFlavor;
 
     KPageDialog dlg(this);
     dlg.setWindowTitle(i18n("Global Options"));
@@ -855,7 +854,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 				GdbDriver::defaultGdb()  :  m_debuggerCmdStr);
     prefDebugger.setTerminal(m_outputTermCmdStr);
     // Set the (x86)flavor for all targets, it is ignored
-    prefDebugger.setGlobalDisassemblyFlavor(m_asmGlobalFlavor);
+    prefDebugger.setGlobalDisassemblyFlavor( m_asmGlobalFlavor );
 
     PrefMisc prefMisc(&dlg);
     prefMisc.setPopIntoForeground(m_popForeground);

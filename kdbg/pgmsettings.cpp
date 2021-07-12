@@ -36,8 +36,11 @@ ChooseDriver::ChooseDriver(QWidget* parent) :
 
     // setup flavor-related functionality
     layout->addLayout(gridLayout, 1);
-    QStringList flavorList = {"intel", "att", "default"};
-    m_disassComboBox->insertItems(0, flavorList);
+
+    for (size_t i = 0; i < 3; ++i) {
+	m_disassComboBox->insertItem(i, std::get<1>(flavorsTuple[i]));
+    }
+
     QLabel* disassLabel = new QLabel(i18n("Disassembly flavor:"), this);
     disassLabel->setMinimumSize(disassLabel->sizeHint());
     m_disassComboBox->setMinimumSize(m_disassComboBox->sizeHint());
@@ -60,9 +63,9 @@ QString ChooseDriver::debuggerCmd() const
     return m_debuggerCmd->text();
 }
 
-QString ChooseDriver::disassemblyFlavor() const
+FlavorEnum ChooseDriver::disassemblyFlavor() const
 {
-    return m_disassComboBox->currentText();
+    return (FlavorEnum)m_disassComboBox->currentIndex();
 }
 
 void ChooseDriver::setIsX86(bool isX86)
@@ -75,9 +78,9 @@ void ChooseDriver::setIsX86(bool isX86)
     m_disassComboBox->setEnabled(isX86);
 }
 
-void ChooseDriver::setDisassemblyFlavor(const QString flavor)
+void ChooseDriver::setDisassemblyFlavor(const FlavorEnum fenum)
 {
-    m_disassComboBox->setCurrentText(flavor);
+    m_disassComboBox->setCurrentIndex((int)fenum);
 }
 
 OutputSettings::OutputSettings(QWidget* parent) :

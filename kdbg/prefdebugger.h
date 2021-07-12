@@ -12,6 +12,8 @@
 #include <QLabel>
 #include <QGridLayout>
 
+#include "dbgdriver.h"
+
 class PrefDebugger : public QWidget
 {
 public:
@@ -45,8 +47,8 @@ public:
     QString terminal() const { return m_terminal.text(); }
     void setTerminal(const QString& t) { m_terminal.setText(t); }
 
-    QString globalDisassemblyFlavor() { return m_disassCombo.currentText(); }
-    void setGlobalDisassemblyFlavor(const QString& f) { m_disassCombo.setCurrentText(f); }
+    FlavorEnum globalDisassemblyFlavor() { return (FlavorEnum)m_disassCombo.currentIndex(); }
+    void setGlobalDisassemblyFlavor(const FlavorEnum fenum) { m_disassCombo.setCurrentIndex((int)fenum); }
 };
 
 #endif // PREFDEBUGGER_H

@@ -61,9 +61,7 @@ protected:
     QString m_redirect;			/* redirection to /dev/null */
     bool m_littleendian = true;		/* if gdb works with little endian or big endian */
     QString m_defaultCmd;		/* how to invoke gdb */
-    QString m_architecture;		/* Architecture that gdb is set to work with*/
     QString m_target;
-    QString m_flavor;			/* Which disassembly flavor is used */
 
     QString makeCmdString(DbgCommand cmd) override;
     QString makeCmdString(DbgCommand cmd, QString strArg) override;
