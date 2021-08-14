@@ -55,6 +55,7 @@ enum DbgCommand {
 	DCexamine,
 	DCinfoline,
 	DCdisassemble,
+	DCsetdisassflavor,
 	DCsetargs,
 	DCsetenv,
 	DCunsetenv,
@@ -560,6 +561,12 @@ public:
      * Returns a value that the user can edit.
      */
     virtual QString editableValue(VarTree* value);
+
+    /**
+     * Parses the ouput of the DCsetdisassflavor command. If the string
+     * is empty the command was successfull.
+     */
+    virtual QString parseSetDisassFlavor(const char* output) = 0;
 
 protected:
     /** Removes all commands from the low-priority queue. */

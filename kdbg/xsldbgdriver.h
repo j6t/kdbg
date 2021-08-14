@@ -61,6 +61,7 @@ class XsldbgDriver:public DebuggerDriver {
     QString parseMemoryDump(const char *output,
                                     std::list < MemoryDump > &memdump) override;
     QString parseSetVariable(const char* output) override;
+    QString parseSetDisassFlavor(const char* output) override;
 
   protected:
     QString m_programWD;        /* just an intermediate storage */

@@ -163,6 +163,11 @@ public:
     void programSettings(QWidget* parent);
 
     /**
+     * Notify GDB about a new disassembly flavor
+     */
+    void submitDisassemblyFlavor();
+
+    /**
      * Setup remote debugging device
      */
     void setRemoteDevice(const QString& remoteDevice) { m_remoteDevice = remoteDevice; }
@@ -394,6 +399,7 @@ protected:
     void handleThreadList(const char* output);
     void handleSetPC(const char* output);
     void handleSetVariable(CmdQueueItem* cmd, const char* output);
+    void handleSetDisassFlavor(const char* output);
     void evalExpressions();
     void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
@@ -429,6 +435,7 @@ protected:
     QString m_programArgs;
     QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
+    QString m_flavor;			/* program-specific disassembly flavor */
     std::map<QString,QString> m_envVars;	/* environment variables set by user */
     QSet<QString> m_boolOptions;	/* boolean options */
     QStringList m_sharedLibs;		/* shared libraries used by program */

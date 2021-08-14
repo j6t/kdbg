@@ -80,6 +80,7 @@ static GdbCmdInfo cmds[] = {
     { DCexamine, "x %s %s\n", GdbCmdInfo::argString2 },
     { DCinfoline, "info line %s:%d\n", GdbCmdInfo::argStringNum },
     { DCdisassemble, "disassemble %s %s\n", GdbCmdInfo::argString2 },
+    { DCsetdisassflavor, "set disassembly-flavor %s\n", GdbCmdInfo::argString},
     { DCsetargs, "set args %s\n", GdbCmdInfo::argString },
     { DCsetenv, "set env %s %s\n", GdbCmdInfo::argString2 },
     { DCunsetenv, "unset env %s\n", GdbCmdInfo::argString },
@@ -2777,5 +2778,10 @@ QString GdbDriver::parseSetVariable(const char* output)
     return msg.trimmed();
 }
 
+QString GdbDriver::parseSetDisassFlavor(const char* output)
+{
+    // if there is any output, it is an error message
+    return output;
+}
 
 #include "gdbdriver.moc"

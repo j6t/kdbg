@@ -117,6 +117,7 @@ const char GeneralGroup[] = "General";
 const char DebuggerCmdStr[] = "DebuggerCmdStr";
 const char TTYLevelEntry[] = "TTYLevel";
 const char KDebugger::DriverNameEntry[] = "DriverName";
+const char DisassemblyFlavor[] = "DisassemblyFlavor";
 
 bool KDebugger::debugProgram(const QString& name,
 			     DebuggerDriver* driver)
@@ -765,6 +766,8 @@ void KDebugger::saveProgramSettings()
     gg.writeEntry(OptionsSelected, m_boolOptions.toList());
     gg.writeEntry(DebuggerCmdStr, m_debuggerCmd);
     gg.writeEntry(TTYLevelEntry, int(m_ttyLevel));
+    gg.writeEntry(DisassemblyFlavor, m_flavor);
+
     QString driverName;
     if (m_d != 0)
 	driverName = m_d->driverName();
@@ -822,6 +825,7 @@ void KDebugger::restoreProgramSettings()
     QString pgmWd = gg.readEntry(WorkingDirectory);
     QSet<QString> boolOptions = QSet<QString>::fromList(gg.readEntry(OptionsSelected, QStringList()));
     m_boolOptions.clear();
+    m_flavor = gg.readEntry(DisassemblyFlavor, QString{});
 
     // read environment variables
     KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
@@ -845,6 +849,8 @@ void KDebugger::restoreProgramSettings()
 	var->value = eg.readEntry(varValue, QString());
 	var->status = EnvVar::EVnew;
     }
+
+    submitDisassemblyFlavor();
 
     updateProgEnvironment(pgmArgs, pgmWd, pgmVars, boolOptions);
 
@@ -1105,6 +1111,9 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	break;
     case DCdisassemble:
 	handleDisassemble(cmd, output);
+	break;
+    case DCsetdisassflavor:
+	handleSetDisassFlavor(output);
 	break;
     case DCframe:
 	handleFrameChange(output);
@@ -2119,6 +2128,12 @@ void KDebugger::slotDisassemble(const QString& fileName, int lineNo)
     }
 }
 
+void KDebugger::submitDisassemblyFlavor()
+{
+    if (!m_flavor.isEmpty())
+	m_d->executeCmd(DCsetdisassflavor, m_flavor);
+}
+
 void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 {
     QString addrFrom, addrTo;
@@ -2206,6 +2221,16 @@ void KDebugger::setProgramCounter(const QString& file, int line, const DbgAddr& 
     } else {
 	// move the program counter to that address
 	m_d->executeCmd(DCsetpc, addr.asString());
+    }
+}
+
+void KDebugger::handleSetDisassFlavor(const char* output)
+{
+    QString res = m_d->parseSetDisassFlavor(output);
+
+    if (!res.isEmpty()) {
+	m_statusMessage = i18n("Setting the disassembly flavor failed.");
+	emit updateStatusMessage();
     }
 }
 

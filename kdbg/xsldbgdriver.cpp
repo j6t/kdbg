@@ -58,6 +58,7 @@ static XsldbgCmdInfo cmds[] = {
     {DCexamine, "print 'x %s %s'\n", XsldbgCmdInfo::argString2},
     {DCinfoline, "print 'templates %s:%d'\n", XsldbgCmdInfo::argStringNum},
     {DCdisassemble, "print 'disassemble %s %s'\n", XsldbgCmdInfo::argString2},
+    {DCsetdisassflavor, "print 'set disassembly-flavor %s'\n", XsldbgCmdInfo::argString},
     {DCsetargs, "data %s\n", XsldbgCmdInfo::argString},
     {DCsetenv, "addparam %s %s\n", XsldbgCmdInfo::argString2},
     {DCunsetenv, "unset env %s\n", XsldbgCmdInfo::argString},
@@ -1329,5 +1330,10 @@ XsldbgDriver::parseSetVariable(const char */*output*/)
     return msg;
 }
 
+QString
+XsldbgDriver::parseSetDisassFlavor(const char* /*output*/)
+{
+    return QString();
+}
 
 #include "xsldbgdriver.moc"
