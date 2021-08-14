@@ -173,6 +173,11 @@ public:
     void submitDisassemblyFlavor();
 
     /**
+     * Sets the fallback disassembly-flavor if there is no program-specific setting.
+     */
+    void setDefaultFlavor(const QString& defFlavor);
+
+    /**
      * Setup remote debugging device
      */
     void setRemoteDevice(const QString& remoteDevice) { m_remoteDevice = remoteDevice; }
@@ -443,6 +448,7 @@ protected:
     QString m_programWD;		/* working directory of gdb */
     QString m_cpuTarget;		/* name of the target */
     QString m_flavor;			/* program-specific disassembly flavor */
+    QString m_globalFlavor;		/* which flavor is saved globally? */
     std::map<QString,QString> m_envVars;	/* environment variables set by user */
     QSet<QString> m_boolOptions;	/* boolean options */
     QStringList m_sharedLibs;		/* shared libraries used by program */

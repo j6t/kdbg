@@ -2145,8 +2145,19 @@ void KDebugger::slotDisassemble(const QString& fileName, int lineNo)
 
 void KDebugger::submitDisassemblyFlavor()
 {
-    if (!m_flavor.isEmpty())
-	m_d->executeCmd(DCsetdisassflavor, m_flavor);
+    QString flavor = m_flavor;
+
+    if (m_flavor.isEmpty()) {
+	flavor = m_globalFlavor;
+    }
+
+    if (!flavor.isEmpty())
+	m_d->executeCmd(DCsetdisassflavor, flavor);
+}
+
+void KDebugger::setDefaultFlavor(const QString& defFlavor)
+{
+    m_globalFlavor = defFlavor;
 }
 
 void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)

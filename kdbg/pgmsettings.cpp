@@ -37,7 +37,7 @@ ChooseDriver::ChooseDriver(QWidget* parent) :
     layout->addLayout(gridLayout, 1);
 
     m_disassComboBox = new QComboBox(this);
-    m_disassComboBox->addItem(i18n("Use default"), "");
+    m_disassComboBox->addItem(i18n("Global Setting"), "");
     m_disassComboBox->addItem(i18n("ATT"), "att");
     m_disassComboBox->addItem(i18n("Intel"), "intel");
 
