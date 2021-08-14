@@ -15,7 +15,9 @@ PrefDebugger::PrefDebugger(QWidget* parent) :
 	m_debuggerCCpp(this),
 	m_terminalHint(this),
 	m_terminalLabel(this),
-	m_terminal(this)
+	m_terminal(this),
+	m_disassLabel(this),
+	m_disassCombo(this)
 {
     m_defaultHint.setText(i18n("To revert to the default settings, clear the entries."));
     m_defaultHint.setMinimumHeight(m_defaultHint.sizeHint().height());
@@ -40,6 +42,18 @@ PrefDebugger::PrefDebugger(QWidget* parent) :
     m_terminal.setMinimumSize(m_terminal.sizeHint());
     m_grid.addWidget(&m_terminalLabel, 3, 0);
     m_grid.addWidget(&m_terminal, 3, 1);
+
+    m_disassLabel.setText(i18n("Disassembly Flavor:"));
+    m_disassLabel.setMinimumSize(m_disassLabel.sizeHint());
+    m_disassLabel.setBuddy(&m_disassCombo);
+
+    m_disassCombo.insertItems(0, {"Default", "ATT", "Intel"});
+    m_disassCombo.setMinimumSize(m_disassCombo.sizeHint());
+    m_disassCombo.setMinimumHeight(m_disassCombo.sizeHint().height());
+    m_disassCombo.setToolTip(i18n("Setting the flavor makes a difference only for x86 executables"));
+    m_grid.addWidget(&m_disassLabel, 4, 0);
+    m_grid.addWidget(&m_disassCombo, 4, 1);
+    m_grid.addItem(new QSpacerItem(0, m_disassCombo.sizeHint().height()), 5, 0);
 
     m_grid.setColumnStretch(1, 10);
     // last (empty) row gets all the vertical stretch

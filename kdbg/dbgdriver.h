@@ -13,13 +13,11 @@
 #include <queue>
 #include <list>
 
-
 class VarTree;
 class ExprValue;
 class ExprWnd;
 class KDebugger;
 class QStringList;
-
 
 /**
  * A type representing an address.
@@ -54,7 +52,9 @@ enum DbgCommand {
 	DCinforegisters,
 	DCexamine,
 	DCinfoline,
+	DCinfotarget,
 	DCdisassemble,
+	DCsetdisassflavor,
 	DCsetargs,
 	DCsetenv,
 	DCunsetenv,
@@ -300,7 +300,7 @@ public:
 
 protected:
     QString m_runCmd;
-    
+
     enum DebuggerState {
 	DSidle,				/* gdb waits for input */
 	DSinterrupted,			/* a command was interrupted */
@@ -557,6 +557,17 @@ public:
     virtual QString parseSetVariable(const char* output) = 0;
 
     /**
+     * Parses the ouput of the DCsetdisassflavor commnad. If the string
+     * is empty the command was successfull.
+     */
+    virtual QString parseSetDisassFlavor(const char* output) = 0;
+
+    /**
+     * Parse the output of the DCinfotarget command.
+     */
+    virtual QString parseInfoTarget(const char* output) = 0;
+
+    /**
      * Returns a value that the user can edit.
      */
     virtual QString editableValue(VarTree* value);
@@ -616,7 +627,7 @@ protected slots:
     virtual void slotReceiveOutput();
     virtual void slotCommandRead();
     virtual void slotExited();
-    
+
 signals:
     /**
      * This signal is emitted when the output of a command has been fully
@@ -652,6 +663,12 @@ signals:
      * consumed and no more commands are in the queues.
      */
     void enterIdleState();
+
+    /**
+     * This signal is emitted when the disassembly flavor on x86 platforms
+     * change.
+     */
+    void disassFlavorChanged(const QString& flavor);
 };
 
 #endif // DBGDRIVER_H

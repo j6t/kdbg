@@ -79,7 +79,9 @@ static GdbCmdInfo cmds[] = {
     { DCinforegisters, "info all-registers\n", GdbCmdInfo::argNone},
     { DCexamine, "x %s %s\n", GdbCmdInfo::argString2 },
     { DCinfoline, "info line %s:%d\n", GdbCmdInfo::argStringNum },
+    { DCinfotarget, "info target\n", GdbCmdInfo::argNone},
     { DCdisassemble, "disassemble %s %s\n", GdbCmdInfo::argString2 },
+    { DCsetdisassflavor, "set disassembly-flavor %s\n", GdbCmdInfo::argString},
     { DCsetargs, "set args %s\n", GdbCmdInfo::argString },
     { DCsetenv, "set env %s %s\n", GdbCmdInfo::argString2 },
     { DCunsetenv, "unset env %s\n", GdbCmdInfo::argString },
@@ -2594,6 +2596,26 @@ bool GdbDriver::parseInfoLine(const char* output, QString& addrFrom, QString& ad
     return true;
 }
 
+QString GdbDriver::parseInfoTarget(const char* output)
+{
+    auto p = strstr(output, "file type ");
+    if (p) {
+	p += 10;
+	auto start = p;
+	p = strchr(p, '.');
+	if (p){
+	    int i = 0;
+	    int str_len = p - start;
+	    while(i < str_len){
+		m_target[i] = start[i];
+		i++;
+	    }
+	}
+    }
+
+    return m_target;
+}
+
 std::list<DisassembledCode> GdbDriver::parseDisassemble(const char* output)
 {
     std::list<DisassembledCode> code;
@@ -2718,7 +2740,7 @@ QString GdbDriver::parseMemoryDump(const char* output, std::list<MemoryDump>& me
 
     if (end_region && !memdump.empty())
 	memdump.back().endOfDump = true;
-    
+
     return QString();
 }
 
@@ -2777,5 +2799,18 @@ QString GdbDriver::parseSetVariable(const char* output)
     return msg.trimmed();
 }
 
+QString GdbDriver::parseSetDisassFlavor(const char* output)
+{
+    QString msg;
+
+    // Handle the case where an invalid flavor somehow got here
+    if (msg.contains("Undefined item") || msg.contains("Requires an argument")) {
+	msg = "Error";	// Non-empty string indicates an error
+    } else {
+	msg = output;	// This should be empty ie the command succeeded
+    }
+
+    return msg;
+}
 
 #include "gdbdriver.moc"

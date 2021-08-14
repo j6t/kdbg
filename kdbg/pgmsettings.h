@@ -8,19 +8,27 @@
 #define PGMSETTINGS_H
 
 #include <KPageDialog>
+#include "dbgdriver.h"
 
 class QButtonGroup;
+class QComboBox;
+class QLabel;
 class QLineEdit;
 
 
 class ChooseDriver : public QWidget
 {
+    Q_OBJECT
 public:
     ChooseDriver(QWidget* parent);
     void setDebuggerCmd(const QString& cmd);
     QString debuggerCmd() const;
+    void setDisassemblyFlavor(const QString& flavor);
+    QString disassemblyFlavor() const;
+    void setIsX86(bool isX86);
 protected:
     QLineEdit* m_debuggerCmd;
+    QComboBox* m_disassComboBox;
 };
 
 

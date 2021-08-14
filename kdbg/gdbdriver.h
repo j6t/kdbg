@@ -16,7 +16,7 @@ class GdbDriver : public DebuggerDriver
 public:
     GdbDriver();
     ~GdbDriver();
-    
+
     QString driverName() const override;
     QString defaultInvocation() const override;
     QStringList boolOptionList() const override;
@@ -45,6 +45,8 @@ public:
     uint parseProgramStopped(const char* output, bool haveCoreFile,
 				     QString& message) override;
     QStringList parseSharedLibs(const char* output) override;
+    QString parseInfoTarget(const char* output) override;
+    QString parseSetDisassFlavor(const char* output) override;
     bool parseFindType(const char* output, QString& type) override;
     std::list<RegisterInfo> parseRegisters(const char* output) override;
     bool parseInfoLine(const char* output,
@@ -52,12 +54,14 @@ public:
     std::list<DisassembledCode> parseDisassemble(const char* output) override;
     QString parseMemoryDump(const char* output, std::list<MemoryDump>& memdump) override;
     QString parseSetVariable(const char* output) override;
+
     QString editableValue(VarTree* value) override;
 protected:
     QString m_programWD;		/* just an intermediate storage */
     QString m_redirect;			/* redirection to /dev/null */
     bool m_littleendian = true;		/* if gdb works with little endian or big endian */
     QString m_defaultCmd;		/* how to invoke gdb */
+    QString m_target;
 
     QString makeCmdString(DbgCommand cmd) override;
     QString makeCmdString(DbgCommand cmd, QString strArg) override;

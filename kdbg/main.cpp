@@ -105,7 +105,7 @@ int main(int argc, char** argv)
     QString lang = parser.value("l");
 
     // deprecated option; overrides -l
-    if (parser.isSet("x")){
+    if (parser.isSet("x")) {
          /* run in xsldbg mode  */
          lang = "xslt";
     }

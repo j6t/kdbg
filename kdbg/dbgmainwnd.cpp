@@ -50,7 +50,6 @@
 #include <sys/stat.h>			/* mknod(2) */
 #include <unistd.h>			/* getpid */
 
-
 static const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
 static const char defaultSourceFilter[] = "*.c *.cc *.cpp *.c++ *.C *.CC";
 static const char defaultHeaderFilter[] = "*.h *.hh *.hpp *.h++";
@@ -143,6 +142,11 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	    m_filesWindow, SLOT(slotDisassembled(const QString&,int,const std::list<DisassembledCode>&)));
     connect(m_filesWindow, SIGNAL(moveProgramCounter(const QString&,int,const DbgAddr&)),
 	    m_debugger, SLOT(setProgramCounter(const QString&,int,const DbgAddr&)));
+
+    // When the debugger changes the flavor the widgets should be informed
+    connect(m_debugger, &KDebugger::asmFlavorChangedForTarget, m_filesWindow, &WinStack::asmFlavorChangedForTarget);
+    connect(m_debugger, &KDebugger::targetChanged, this, &DebuggerMainWnd::slotTargetChanged);
+
     // program stopped
     connect(m_debugger, SIGNAL(programStopped()), SLOT(slotProgramStopped()));
     connect(&m_backTimer, SIGNAL(timeout()), SLOT(slotBackTimer()));
@@ -390,6 +394,11 @@ void DebuggerMainWnd::initStatusBar()
     i18n("Core dump");
 }
 
+bool DebuggerMainWnd::isTargetX86() const
+{
+    return m_target.indexOf(QLatin1String("86")) >= 0;
+}
+
 bool DebuggerMainWnd::queryClose()
 {
     if (m_debugger != 0) {
@@ -435,6 +444,8 @@ static const char TabWidth[] = "TabWidth";
 static const char SourceFileFilter[] = "SourceFileFilter";
 static const char HeaderFileFilter[] = "HeaderFileFilter";
 
+static const char GlobalDisassemblyFlavor[] = "DisassemblyFlavor";
+
 void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
 {
     m_recentExecAction->saveEntries(config->group(RecentExecutables));
@@ -456,6 +467,7 @@ void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
     pg.writeEntry(TabWidth, m_tabWidth);
     pg.writeEntry(SourceFileFilter, m_sourceFilter);
     pg.writeEntry(HeaderFileFilter, m_headerFilter);
+    pg.writeEntry(GlobalDisassemblyFlavor, m_asmGlobalFlavor);
 }
 
 void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
@@ -492,6 +504,7 @@ void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
     m_tabWidth = pg.readEntry(TabWidth, 0);
     m_sourceFilter = pg.readEntry(SourceFileFilter, m_sourceFilter);
     m_headerFilter = pg.readEntry(HeaderFileFilter, m_headerFilter);
+    m_asmGlobalFlavor = pg.readEntry(GlobalDisassemblyFlavor, m_asmGlobalFlavor);
 
     emit setTabWidth(m_tabWidth);
 }
@@ -705,6 +718,11 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 			   "Please shut down KDbg and resolve the problem.");
 	KMessageBox::sorry(this, msg);
     }
+    else // Set early the default flavor so that ChooseDriver widget can be updated.
+    {
+	m_debugger->setDefaultFlavor(m_asmGlobalFlavor);
+	m_debugger->submitDisassemblyFlavor();
+    }
 
     return success;
 }
@@ -820,6 +838,7 @@ void DebuggerMainWnd::slotNewStatusMsg()
 void DebuggerMainWnd::slotFileGlobalSettings()
 {
     int oldTabWidth = m_tabWidth;
+    auto oldGlobalFlavor = m_asmGlobalFlavor;
 
     KPageDialog dlg(this);
     dlg.setWindowTitle(i18n("Global Options"));
@@ -828,6 +847,8 @@ void DebuggerMainWnd::slotFileGlobalSettings()
     prefDebugger.setDebuggerCmd(m_debuggerCmdStr.isEmpty()  ?
 				GdbDriver::defaultGdb()  :  m_debuggerCmdStr);
     prefDebugger.setTerminal(m_outputTermCmdStr);
+    // Set the (x86)flavor for all targets, it is ignored
+    prefDebugger.setGlobalDisassemblyFlavor( m_asmGlobalFlavor );
 
     PrefMisc prefMisc(&dlg);
     prefMisc.setPopIntoForeground(m_popForeground);
@@ -838,6 +859,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 
     dlg.addPage(&prefDebugger, i18n("Debugger"));
     dlg.addPage(&prefMisc, i18n("Miscellaneous"));
+
     if (dlg.exec() == QDialog::Accepted)
     {
 	setDebuggerCmdStr(prefDebugger.debuggerCmd());
@@ -846,9 +868,20 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 	m_backTimeout = prefMisc.backTimeout();
 	m_tabWidth = prefMisc.tabWidth();
 	m_sourceFilter = prefMisc.sourceFilter();
+
+	m_asmGlobalFlavor = prefDebugger.globalDisassemblyFlavor();
+	if (m_asmGlobalFlavor != oldGlobalFlavor) {
+	    if (m_debugger != 0) {
+		m_debugger->setDefaultFlavor(m_asmGlobalFlavor);
+		m_debugger->submitDisassemblyFlavor();
+	    }
+	}
+
 	if (m_sourceFilter.isEmpty())
 	    m_sourceFilter = defaultSourceFilter;
+
 	m_headerFilter = prefMisc.headerFilter();
+
 	if (m_headerFilter.isEmpty())
 	    m_headerFilter = defaultHeaderFilter;
     }
@@ -921,6 +954,11 @@ void DebuggerMainWnd::slotToggleBreak(const QString& fileName, int lineNo,
     if (m_debugger != 0) {
 	m_debugger->setBreakpoint(fileName, lineNo, address, temp);
     }
+}
+
+void DebuggerMainWnd::slotTargetChanged(const QString& target)
+{
+    m_target = target;
 }
 
 void DebuggerMainWnd::slotEnaDisBreak(const QString& fileName, int lineNo,

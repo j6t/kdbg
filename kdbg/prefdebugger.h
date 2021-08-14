@@ -7,9 +7,12 @@
 #ifndef PREFDEBUGGER_H
 #define PREFDEBUGGER_H
 
+#include <QComboBox>
 #include <QLineEdit>
 #include <QLabel>
 #include <QGridLayout>
+
+#include "dbgdriver.h"
 
 class PrefDebugger : public QWidget
 {
@@ -35,9 +38,35 @@ protected:
     QLabel m_terminalHint;
     QLabel m_terminalLabel;
     QLineEdit m_terminal;
+
+    QLabel m_disassLabel;
+    QComboBox m_disassCombo;
+    QString m_target;			//!< Target name of the loaded file
 public:
     QString terminal() const { return m_terminal.text(); }
     void setTerminal(const QString& t) { m_terminal.setText(t); }
+
+    QString globalDisassemblyFlavor() {
+	QString f = m_disassCombo.currentText();
+
+	if (f.contains("Default"))
+	    f = "att";
+	else f = f.toLower();
+
+	return f;
+    }
+
+    void setGlobalDisassemblyFlavor(const QString& flavor) {
+	QString f;
+
+	if (flavor == "intel")
+	    f = "Intel";
+	else if (flavor == "att")
+	    f = "ATT";
+	else f = "Default";
+
+	m_disassCombo.setCurrentText(f);
+    }
 };
 
 #endif // PREFDEBUGGER_H

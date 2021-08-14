@@ -13,6 +13,7 @@
 #include <map>
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
+#include "dbgdriver.h"
 
 class ExprWnd;
 class VarTree;
@@ -152,6 +153,11 @@ public slots:
 
 public:
     /**
+     * Returns whether the debuggee is for x86 platforms
+     */
+    bool isTargetX86() const;
+
+    /**
      * Queries the user for program arguments.
      */
     void programArgs(QWidget* parent);
@@ -161,6 +167,17 @@ public:
      * emulator.
      */
     void programSettings(QWidget* parent);
+
+    /**
+     * Wrapper for setting the disassembly-flavor in KDebugger
+     */
+    void submitDisassemblyFlavor();
+
+    /**
+     * DebuggerMainWnd's wrapper for setting the global disassembly-flavor in KDebugger.
+     * \param defFlavor The (global) default flavor.
+     */
+    void setDefaultFlavor(const QString& defFlavor);
 
     /**
      * Setup remote debugging device
@@ -360,7 +377,7 @@ protected:
     bool startDriver();
     void stopDriver();
     void writeCommand();
-    
+
     std::list<QString> m_watchEvalExpr;	/* exprs to evaluate for watch window */
     std::list<Breakpoint> m_brkpts;
     QString m_memoryExpression;		/* memory location to watch */
@@ -390,10 +407,13 @@ protected:
     void handleRegisters(const char* output);
     void handleMemoryDump(const char* output);
     void handleInfoLine(CmdQueueItem* cmd, const char* output);
+    void handleInfoTarget(const char* output);
     void handleDisassemble(CmdQueueItem* cmd, const char* output);
     void handleThreadList(const char* output);
     void handleSetPC(const char* output);
     void handleSetVariable(CmdQueueItem* cmd, const char* output);
+    void handleSetDisassFlavor(const char* output);
+    void handleShowDisassFlavor(const char* output);
     void evalExpressions();
     void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
@@ -429,6 +449,10 @@ protected:
     QString m_programArgs;
     QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
+    QString m_target;			/* name of the target */
+    QString m_flavor;			/* flavor to override the global one */
+    QString m_effectiveFlavor;		/* the actual flavor as reported from the debugger */
+    QString m_globalFlavor;		/* which flavor is saved globally? */
     std::map<QString,QString> m_envVars;	/* environment variables set by user */
     QSet<QString> m_boolOptions;	/* boolean options */
     QStringList m_sharedLibs;		/* shared libraries used by program */
@@ -539,6 +563,16 @@ signals:
      * line number (zero-based).
      */
     void disassembled(const QString& file, int line, const std::list<DisassembledCode>& code);
+
+    /**
+     * This informs any listener that a change occured in asm flavor
+     */
+    void asmFlavorChangedForTarget(const QString& s, const QString& t);
+
+    /**
+     * This informs any listener that a change occured in info target command
+     */
+    void targetChanged(const QString& t);
 
     /**
      * Indicates that the program has stopped for any reason: by a
