@@ -22,6 +22,7 @@ public:
     QString debuggerCmd() const;
     void setDisassemblyFlavor(const QString& flavor);
     QString disassemblyFlavor() const;
+    void setIsX86(bool isX86);
 protected:
     QLineEdit* m_debuggerCmd;
     QComboBox* m_disassComboBox;

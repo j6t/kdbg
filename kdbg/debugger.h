@@ -152,6 +152,11 @@ public slots:
 
 public:
     /**
+     * Returns whether the debuggee is for x86 platforms
+     */
+    bool isCpuTargetX86() const;
+
+    /**
      * Queries the user for program arguments.
      */
     void programArgs(QWidget* parent);
@@ -395,6 +400,7 @@ protected:
     void handleRegisters(const char* output);
     void handleMemoryDump(const char* output);
     void handleInfoLine(CmdQueueItem* cmd, const char* output);
+    void handleInfoTarget(const char* output);
     void handleDisassemble(CmdQueueItem* cmd, const char* output);
     void handleThreadList(const char* output);
     void handleSetPC(const char* output);
@@ -435,6 +441,7 @@ protected:
     QString m_programArgs;
     QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
+    QString m_cpuTarget;		/* name of the target */
     QString m_flavor;			/* program-specific disassembly flavor */
     std::map<QString,QString> m_envVars;	/* environment variables set by user */
     QSet<QString> m_boolOptions;	/* boolean options */

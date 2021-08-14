@@ -179,6 +179,8 @@ bool KDebugger::debugProgram(const QString& name,
     m_d->executeCmd(DCexecutable, name);
     m_executable = name;
 
+    m_d->executeCmd(DCinfotarget);
+
     // set remote target
     if (!m_remoteDevice.isEmpty()) {
 	m_d->executeCmd(DCtargetremote, m_remoteDevice);
@@ -345,6 +347,11 @@ void KDebugger::programBreak()
     }
 }
 
+bool KDebugger::isCpuTargetX86() const
+{
+    return m_cpuTarget.indexOf(QLatin1String("86")) >= 0;
+}
+
 void KDebugger::programArgs(QWidget* parent)
 {
     if (m_haveExecutable) {
@@ -369,6 +376,7 @@ void KDebugger::programSettings(QWidget* parent)
 
     dlg.m_chooseDriver.setDebuggerCmd(m_debuggerCmd);
     dlg.m_chooseDriver.setDisassemblyFlavor(m_flavor);
+    dlg.m_chooseDriver.setIsX86(isCpuTargetX86());
     dlg.m_output.setTTYLevel(m_ttyLevel);
 
     if (dlg.exec() == QDialog::Accepted)
@@ -1112,6 +1120,9 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	break;
     case DCinfoline:
 	handleInfoLine(cmd, output);
+	break;
+    case DCinfotarget:
+	handleInfoTarget(output);
 	break;
     case DCdisassemble:
 	handleDisassemble(cmd, output);
@@ -2159,6 +2170,11 @@ void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 	    m_d->executeCmd(DCsetpc, addrFrom);
 	}
     }
+}
+
+void KDebugger::handleInfoTarget(const char* output)
+{
+    m_cpuTarget = m_d->parseInfoTarget(output);
 }
 
 void KDebugger::handleDisassemble(CmdQueueItem* cmd, const char* output)

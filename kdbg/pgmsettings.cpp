@@ -67,6 +67,16 @@ QString ChooseDriver::disassemblyFlavor() const
     return m_disassComboBox->currentData().toString();
 }
 
+void ChooseDriver::setIsX86(bool isX86)
+{
+    QString toolTipMsg = isX86 ?
+	i18n("Disassembly flavor for x86 architecture") :
+	i18n("Disassembly flavor is only available for x86 architecture");
+
+    m_disassComboBox->setToolTip(toolTipMsg);
+    m_disassComboBox->setEnabled(isX86);
+}
+
 void ChooseDriver::setDisassemblyFlavor(const QString& flavor)
 {
     int i = m_disassComboBox->findData(flavor);

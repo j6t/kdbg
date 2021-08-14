@@ -57,6 +57,7 @@ static XsldbgCmdInfo cmds[] = {
     {DCinforegisters, "print 'info reg'\n", XsldbgCmdInfo::argNone},
     {DCexamine, "print 'x %s %s'\n", XsldbgCmdInfo::argString2},
     {DCinfoline, "print 'templates %s:%d'\n", XsldbgCmdInfo::argStringNum},
+    {DCinfotarget, "print 'info target\n'", XsldbgCmdInfo::argNone},
     {DCdisassemble, "print 'disassemble %s %s'\n", XsldbgCmdInfo::argString2},
     {DCsetdisassflavor, "print 'set disassembly-flavor %s'\n", XsldbgCmdInfo::argString},
     {DCsetargs, "data %s\n", XsldbgCmdInfo::argString},
@@ -1308,6 +1309,12 @@ XsldbgDriver::parseInfoLine(const char */*output*/, QString & /*addrFrom*/,
                             QString & /*addrTo*/)
 {
     return false;
+}
+
+QString
+XsldbgDriver::parseInfoTarget(const char* /*output*/)
+{
+    return QString();
 }
 
 std::list<DisassembledCode>
