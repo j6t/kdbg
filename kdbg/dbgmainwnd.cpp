@@ -141,6 +141,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	    m_debugger, SLOT(slotDisassemble(const QString&, int)));
     connect(m_debugger, SIGNAL(disassembled(const QString&,int,const std::list<DisassembledCode>&)),
 	    m_filesWindow, SLOT(slotDisassembled(const QString&,int,const std::list<DisassembledCode>&)));
+    connect(m_debugger, &KDebugger::disassFlavorChanged, m_filesWindow, &WinStack::slotFlavorChanged);
     connect(m_filesWindow, SIGNAL(moveProgramCounter(const QString&,int,const DbgAddr&)),
 	    m_debugger, SLOT(setProgramCounter(const QString&,int,const DbgAddr&)));
     // program stopped

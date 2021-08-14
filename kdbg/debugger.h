@@ -448,6 +448,7 @@ protected:
     QString m_programWD;		/* working directory of gdb */
     QString m_cpuTarget;		/* name of the target */
     QString m_flavor;			/* program-specific disassembly flavor */
+    QString m_effectiveFlavor;		/* the actual flavor as reported from the debugger */
     QString m_globalFlavor;		/* which flavor is saved globally? */
     std::map<QString,QString> m_envVars;	/* environment variables set by user */
     QSet<QString> m_boolOptions;	/* boolean options */
@@ -559,6 +560,11 @@ signals:
      * line number (zero-based).
      */
     void disassembled(const QString& file, int line, const std::list<DisassembledCode>& code);
+
+    /**
+     * This informs any listener that a change in disassembly flavor occured
+     */
+    void disassFlavorChanged(const QString& flavor, const QString& target);
 
     /**
      * Indicates that the program has stopped for any reason: by a

@@ -2151,6 +2151,8 @@ void KDebugger::submitDisassemblyFlavor()
 	flavor = m_globalFlavor;
     }
 
+    m_effectiveFlavor = flavor;
+
     if (!flavor.isEmpty())
 	m_d->executeCmd(DCsetdisassflavor, flavor);
 }
@@ -2262,7 +2264,10 @@ void KDebugger::handleSetDisassFlavor(const char* output)
     if (!res.isEmpty()) {
 	m_statusMessage = i18n("Setting the disassembly flavor failed.");
 	emit updateStatusMessage();
+	return;
     }
+
+    emit disassFlavorChanged(m_effectiveFlavor, m_cpuTarget);
 }
 
 void KDebugger::handleSetPC(const char* /*output*/)
