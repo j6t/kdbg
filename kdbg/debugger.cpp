@@ -368,12 +368,16 @@ void KDebugger::programSettings(QWidget* parent)
     ProgramSettings dlg(parent, m_executable);
 
     dlg.m_chooseDriver.setDebuggerCmd(m_debuggerCmd);
+    dlg.m_chooseDriver.setDisassemblyFlavor(m_flavor);
     dlg.m_output.setTTYLevel(m_ttyLevel);
 
     if (dlg.exec() == QDialog::Accepted)
     {
 	m_debuggerCmd = dlg.m_chooseDriver.debuggerCmd();
+	m_flavor = dlg.m_chooseDriver.disassemblyFlavor();
 	m_ttyLevel = TTYLevel(dlg.m_output.ttyLevel());
+
+	submitDisassemblyFlavor();
     }
 }
 
