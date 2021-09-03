@@ -163,10 +163,10 @@ protected:
      * we must be able to tell which is which and disable the functionality.
      */
 
-    QString m_asmGlobalFlavor;		/* Value of disassembly flavor (valid on x86) */
-    QString m_target;			/* What cpu is the executable for */
+    QString m_asmGlobalFlavor;	/* Value of disassembly flavor (valid on x86) */
+    QString m_cpuTarget;	/* What cpu is the executable for */
 
-    bool isTargetX86() const;
+    bool isCpuTargetX86() const;
     void setTerminalCmd(const QString& cmd);
     void setDebuggerCmdStr(const QString& cmd);
 
@@ -220,7 +220,7 @@ public slots:
     void slotConfigureKeys();
 
     // Update m_target when signal is emitted
-    void slotTargetChanged(const QString& target);
+    void slotCpuTargetChanged(const QString& target);
 };
 
 #endif // DBGMAINWND_H

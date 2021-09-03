@@ -345,9 +345,9 @@ void KDebugger::programBreak()
     }
 }
 
-bool KDebugger::isTargetX86() const
+bool KDebugger::isCpuTargetX86() const
 {
-    return m_target.indexOf(QLatin1String("86")) >= 0;
+    return m_cpuTarget.indexOf(QLatin1String("86")) >= 0;
 }
 
 void KDebugger::programArgs(QWidget* parent)
@@ -370,7 +370,7 @@ void KDebugger::programSettings(QWidget* parent)
     if (!m_haveExecutable)
 	return;
 
-    bool isX86 = isTargetX86();
+    bool isX86 = isCpuTargetX86();
 
     ProgramSettings dlg(parent, m_executable);
     dlg.m_chooseDriver.setDebuggerCmd(m_debuggerCmd);
@@ -836,7 +836,7 @@ void KDebugger::restoreProgramSettings()
     QString pgmWd = gg.readEntry(WorkingDirectory);
     QSet<QString> boolOptions = QSet<QString>::fromList(gg.readEntry(OptionsSelected, QStringList()));
     m_boolOptions.clear();
-    m_flavor = gg.readEntry(DisassemblyFlavor, "Global Default");
+    m_flavor = gg.readEntry(DisassemblyFlavor, "");
 
     // read environment variables
     KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
@@ -2143,16 +2143,22 @@ void KDebugger::slotDisassemble(const QString& fileName, int lineNo)
     }
 }
 
+QString KDebugger::flavor() const
+{
+    return m_flavor;
+}
+
 void KDebugger::submitDisassemblyFlavor()
 {
     QString flavor;
 
     if (m_flavor.isEmpty()) {
-	return;
-    } else if (m_flavor.contains("Default", Qt::CaseInsensitive)) {
 	flavor = m_globalFlavor;
-    } else {
+    } else if( m_flavor.contains("Intel", Qt::CaseInsensitive)
+	    || m_flavor.contains("ATT", Qt::CaseInsensitive) ) {
+	// flavor should be overriden
 	flavor = m_flavor.toLower();
+	m_effectiveFlavor = flavor;
     }
 
     m_d->executeCmd(DCsetdisassflavor, flavor);
@@ -2192,10 +2198,10 @@ void KDebugger::handleInfoTarget(const char* output)
      * At this moment parseInfoTarget should return only the file
      * type of the executable (ie "elf64-x86-64" or "elf64-littleriscv")
      */
-    m_target = m_d->parseInfoTarget(output);
+    m_cpuTarget = m_d->parseInfoTarget(output);
 
     // emit nonetheless to update some properties
-    emit targetChanged(m_target);
+    emit targetChanged(m_cpuTarget);
 }
 
 void KDebugger::handleDisassemble(CmdQueueItem* cmd, const char* output)
@@ -2275,7 +2281,8 @@ void KDebugger::handleSetDisassFlavor(const char* output)
 	return;
     }
 
-    emit asmFlavorChangedForTarget(m_flavor, m_target);
+    emit asmFlavorChangedForTarget(m_flavor, m_cpuTarget);
+
 }
 
 void KDebugger::handleSetPC(const char* /*output*/)

@@ -155,7 +155,7 @@ public:
     /**
      * Returns whether the debuggee is for x86 platforms
      */
-    bool isTargetX86() const;
+    bool isCpuTargetX86() const;
 
     /**
      * Queries the user for program arguments.
@@ -167,6 +167,11 @@ public:
      * emulator.
      */
     void programSettings(QWidget* parent);
+
+    /*
+     * Return the flavor value
+     */
+    QString flavor() const;
 
     /**
      * Wrapper for setting the disassembly-flavor in KDebugger
@@ -413,7 +418,6 @@ protected:
     void handleSetPC(const char* output);
     void handleSetVariable(CmdQueueItem* cmd, const char* output);
     void handleSetDisassFlavor(const char* output);
-    void handleShowDisassFlavor(const char* output);
     void evalExpressions();
     void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
     void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
@@ -449,7 +453,7 @@ protected:
     QString m_programArgs;
     QString m_remoteDevice;
     QString m_programWD;		/* working directory of gdb */
-    QString m_target;			/* name of the target */
+    QString m_cpuTarget;		/* name of the target */
     QString m_flavor;			/* flavor to override the global one */
     QString m_effectiveFlavor;		/* the actual flavor as reported from the debugger */
     QString m_globalFlavor;		/* which flavor is saved globally? */

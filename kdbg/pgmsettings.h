@@ -23,8 +23,16 @@ public:
     ChooseDriver(QWidget* parent);
     void setDebuggerCmd(const QString& cmd);
     QString debuggerCmd() const;
+
+    /*
+     * Empty string (m_flavor) represents the Global Setting. So, in
+     * setDisassemblyFlavor and disassemblyFlavor we are going to
+     * "translate" to and from empty string and "Global Setting" with
+     * a bunch of if's.
+     */
     void setDisassemblyFlavor(const QString& flavor);
     QString disassemblyFlavor() const;
+
     void setIsX86(bool isX86);
 protected:
     QLineEdit* m_debuggerCmd;

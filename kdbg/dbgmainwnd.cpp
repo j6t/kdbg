@@ -145,7 +145,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 
     // When the debugger changes the flavor the widgets should be informed
     connect(m_debugger, &KDebugger::asmFlavorChangedForTarget, m_filesWindow, &WinStack::asmFlavorChangedForTarget);
-    connect(m_debugger, &KDebugger::targetChanged, this, &DebuggerMainWnd::slotTargetChanged);
+    connect(m_debugger, &KDebugger::targetChanged, this, &DebuggerMainWnd::slotCpuTargetChanged);
 
     // program stopped
     connect(m_debugger, SIGNAL(programStopped()), SLOT(slotProgramStopped()));
@@ -394,9 +394,9 @@ void DebuggerMainWnd::initStatusBar()
     i18n("Core dump");
 }
 
-bool DebuggerMainWnd::isTargetX86() const
+bool DebuggerMainWnd::isCpuTargetX86() const
 {
-    return m_target.indexOf(QLatin1String("86")) >= 0;
+    return m_cpuTarget.indexOf(QLatin1String("86")) >= 0;
 }
 
 bool DebuggerMainWnd::queryClose()
@@ -873,7 +873,15 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 	if (m_asmGlobalFlavor != oldGlobalFlavor) {
 	    if (m_debugger != 0) {
 		m_debugger->setDefaultFlavor(m_asmGlobalFlavor);
-		m_debugger->submitDisassemblyFlavor();
+
+		/*
+		 * Remember, an empty string represents the Global Setting in
+		 * "This Program". Only if that's the case we should submit the
+		 * new global flavor to the debugger
+		 */
+		if (m_debugger->flavor().isEmpty()) {
+		    m_debugger->submitDisassemblyFlavor();
+		}
 	    }
 	}
 
@@ -956,9 +964,9 @@ void DebuggerMainWnd::slotToggleBreak(const QString& fileName, int lineNo,
     }
 }
 
-void DebuggerMainWnd::slotTargetChanged(const QString& target)
+void DebuggerMainWnd::slotCpuTargetChanged(const QString& target)
 {
-    m_target = target;
+    m_cpuTarget = target;
 }
 
 void DebuggerMainWnd::slotEnaDisBreak(const QString& fileName, int lineNo,

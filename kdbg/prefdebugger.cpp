@@ -50,7 +50,7 @@ PrefDebugger::PrefDebugger(QWidget* parent) :
     m_disassCombo.insertItems(0, {"Default", "ATT", "Intel"});
     m_disassCombo.setMinimumSize(m_disassCombo.sizeHint());
     m_disassCombo.setMinimumHeight(m_disassCombo.sizeHint().height());
-    m_disassCombo.setToolTip(i18n("Setting the flavor makes a difference only for x86 executables"));
+    m_disassCombo.setToolTip(i18n("Disassembly flavor for x86 assembly"));
     m_grid.addWidget(&m_disassLabel, 4, 0);
     m_grid.addWidget(&m_disassCombo, 4, 1);
     m_grid.addItem(new QSpacerItem(0, m_disassCombo.sizeHint().height()), 5, 0);

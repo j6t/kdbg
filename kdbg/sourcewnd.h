@@ -90,7 +90,6 @@ protected:
      * is updated on-the-fly, because a vector is keeping track of the expanded/
      * collapsed lines. We iterate over this vector and re-expand the previously
      * expanded '+' marks. First, `WinStack::reloadAllFiles` must be executed.
-     * \sa `void WinStack::slotHandleAdvancedSett(const QString& flavor)`
      */
     void restorePrevDisass();
 

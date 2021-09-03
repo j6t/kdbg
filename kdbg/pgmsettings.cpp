@@ -37,11 +37,11 @@ ChooseDriver::ChooseDriver(QWidget* parent) :
     // setup flavor-related functionality
     layout->addLayout(gridLayout, 1);
 
-    m_disassComboBox->insertItems(0, {"Global Default", "ATT", "Intel"});
+    m_disassComboBox->insertItems(0, {"Global Setting", "ATT", "Intel"});
     QLabel* disassLabel = new QLabel(i18n("Disassembly flavor:"), this);
     disassLabel->setMinimumSize(disassLabel->sizeHint());
     m_disassComboBox->setMinimumSize(m_disassComboBox->sizeHint());
-    disassLabel->setToolTip(i18n("Leave this to Global Default if you wish to use the global setting"));
+    disassLabel->setToolTip(i18n("Leave this to Global Setting if you wish to use the global setting"));
     disassLabel->setBuddy(m_disassComboBox);
     gridLayout->addWidget(disassLabel, 0, 0);
     gridLayout->addWidget(m_disassComboBox, 0, 1);
@@ -62,14 +62,24 @@ QString ChooseDriver::debuggerCmd() const
 
 QString ChooseDriver::disassemblyFlavor() const
 {
-    return m_disassComboBox->currentText();
+    QString flavorForDebugger { m_disassComboBox->currentText() };
+
+    if (flavorForDebugger.contains(tr("Global Setting"), Qt::CaseInsensitive)) {
+	flavorForDebugger = "";
+    } else if (flavorForDebugger.contains(tr("intel"), Qt::CaseInsensitive)) {
+	flavorForDebugger = "intel";
+    } else if (flavorForDebugger.contains(tr("att"), Qt::CaseInsensitive)) {
+	flavorForDebugger = "att";
+    }
+
+    return flavorForDebugger;
 }
 
 void ChooseDriver::setIsX86(bool isX86)
 {
     QString toolTipMsg = isX86 ?
-	i18n("Disassembly flavors for x86 assembly") :
-	i18n("Disassembly flavors are only available for x86 architecture");
+	i18n("Disassembly flavor for x86 assembly") :
+	i18n("Disassembly flavor is only available for x86 architecture");
 
     m_disassComboBox->setToolTip(toolTipMsg);
     m_disassComboBox->setEnabled(isX86);
@@ -80,10 +90,10 @@ void ChooseDriver::setDisassemblyFlavor(const QString& flavor)
     QString f;
 
     if (flavor.contains("intel", Qt::CaseInsensitive))
-	f = "Intel";
+	f = tr("Intel");
     else if (flavor.contains("att", Qt::CaseInsensitive))
-	f = "ATT";
-    else f = "Global Default";
+	f = tr("ATT");
+    else f = tr("Global Setting");
 
     m_disassComboBox->setCurrentText(f);
 }
