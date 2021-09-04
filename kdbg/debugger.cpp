@@ -2158,8 +2158,9 @@ void KDebugger::submitDisassemblyFlavor()
 	    || m_flavor.contains("ATT", Qt::CaseInsensitive) ) {
 	// flavor should be overriden
 	flavor = m_flavor.toLower();
-	m_effectiveFlavor = flavor;
     }
+    // Keep track of the actual flavor
+    m_effectiveFlavor = flavor;
 
     m_d->executeCmd(DCsetdisassflavor, flavor);
 }
