@@ -382,7 +382,7 @@ protected:
     bool startDriver();
     void stopDriver();
     void writeCommand();
-
+    
     std::list<QString> m_watchEvalExpr;	/* exprs to evaluate for watch window */
     std::list<Breakpoint> m_brkpts;
     QString m_memoryExpression;		/* memory location to watch */

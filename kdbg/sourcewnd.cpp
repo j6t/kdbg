@@ -23,6 +23,7 @@
 #include <algorithm>
 #include "mydebug.h"
 
+
 SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
 	QPlainTextEdit(parent),
 	m_fileName(fileName),

@@ -19,6 +19,7 @@
 #include "mydebug.h"
 
 
+
 WinStack::WinStack(QWidget* parent) :
 	QTabWidget(parent),
 	m_pcLine(-1),
@@ -169,7 +170,7 @@ bool WinStack::activeLine(QString& fileName, int& lineNo, DbgAddr& address)
     if (activeWindow() == 0) {
 	return false;
     }
-
+    
     fileName = activeFileName();
     activeWindow()->activeLine(lineNo, address);
     return true;

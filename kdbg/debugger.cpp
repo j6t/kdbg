@@ -108,6 +108,8 @@ void KDebugger::saveSettings(KConfig* /*config*/)
 void KDebugger::restoreSettings(KConfig* /*config*/)
 {
 }
+
+
 //////////////////////////////////////////////////////////////////////
 // external interface
 

@@ -50,6 +50,7 @@
 #include <sys/stat.h>			/* mknod(2) */
 #include <unistd.h>			/* getpid */
 
+
 static const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
 static const char defaultSourceFilter[] = "*.c *.cc *.cpp *.c++ *.C *.CC";
 static const char defaultHeaderFilter[] = "*.h *.hh *.hpp *.h++";

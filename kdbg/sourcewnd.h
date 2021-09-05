@@ -25,7 +25,7 @@ class SourceWindow : public QPlainTextEdit
 public:
     SourceWindow(const QString& fileName, QWidget* parent);
     ~SourceWindow();
-
+    
     bool loadFile();
     void reloadFile();
     bool fileNameMatches(const QString& other);

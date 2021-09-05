@@ -2740,7 +2740,7 @@ QString GdbDriver::parseMemoryDump(const char* output, std::list<MemoryDump>& me
 
     if (end_region && !memdump.empty())
 	memdump.back().endOfDump = true;
-
+    
     return QString();
 }
 

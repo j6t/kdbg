@@ -13,11 +13,13 @@
 #include <queue>
 #include <list>
 
+
 class VarTree;
 class ExprValue;
 class ExprWnd;
 class KDebugger;
 class QStringList;
+
 
 /**
  * A type representing an address.
@@ -300,7 +302,7 @@ public:
 
 protected:
     QString m_runCmd;
-
+    
     enum DebuggerState {
 	DSidle,				/* gdb waits for input */
 	DSinterrupted,			/* a command was interrupted */
@@ -627,7 +629,7 @@ protected slots:
     virtual void slotReceiveOutput();
     virtual void slotCommandRead();
     virtual void slotExited();
-
+    
 signals:
     /**
      * This signal is emitted when the output of a command has been fully

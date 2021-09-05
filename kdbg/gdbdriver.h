@@ -16,7 +16,7 @@ class GdbDriver : public DebuggerDriver
 public:
     GdbDriver();
     ~GdbDriver();
-
+    
     QString driverName() const override;
     QString defaultInvocation() const override;
     QStringList boolOptionList() const override;
