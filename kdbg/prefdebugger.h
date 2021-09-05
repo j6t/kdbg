@@ -11,6 +11,7 @@
 #include <QLineEdit>
 #include <QLabel>
 #include <QGridLayout>
+#include <QVariant>
 
 #include "dbgdriver.h"
 
@@ -47,25 +48,13 @@ public:
     void setTerminal(const QString& t) { m_terminal.setText(t); }
 
     QString globalDisassemblyFlavor() {
-	QString f = m_disassCombo.currentText();
-
-	if (f.contains("Default"))
-	    f = "att";
-	else f = f.toLower();
-
+	QString f = m_disassCombo.currentData().toString();
 	return f;
     }
 
     void setGlobalDisassemblyFlavor(const QString& flavor) {
-	QString f;
-
-	if (flavor == "intel")
-	    f = "Intel";
-	else if (flavor == "att")
-	    f = "ATT";
-	else f = "Default";
-
-	m_disassCombo.setCurrentText(f);
+	int i = m_disassCombo.findData(flavor);
+	m_disassCombo.setCurrentIndex(i);
     }
 };
 
