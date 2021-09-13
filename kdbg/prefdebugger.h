@@ -42,7 +42,6 @@ protected:
 
     QLabel m_disassLabel;
     QComboBox m_disassCombo;
-    QString m_target;			//!< Target name of the loaded file
 public:
     QString terminal() const { return m_terminal.text(); }
     void setTerminal(const QString& t) { m_terminal.setText(t); }

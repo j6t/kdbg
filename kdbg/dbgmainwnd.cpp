@@ -872,7 +872,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 
 	m_asmGlobalFlavor = prefDebugger.globalDisassemblyFlavor();
 	if (m_asmGlobalFlavor != oldGlobalFlavor) {
-	    if (m_debugger != 0) {
+	    if (m_debugger->driver() != 0) {
 		m_debugger->setDefaultFlavor(m_asmGlobalFlavor);
 
 		/*
