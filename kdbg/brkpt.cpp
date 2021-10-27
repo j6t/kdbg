@@ -362,6 +362,3 @@ ConditionalDlg::ConditionalDlg(QWidget* parent) :
 ConditionalDlg::~ConditionalDlg()
 {
 }
-
-
-#include "brkpt.moc"

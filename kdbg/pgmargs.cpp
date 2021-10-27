@@ -225,5 +225,3 @@ void PgmArgs::on_insertDir_clicked()
 	programArgs->insert(f);
     }
 }
-
-#include "pgmargs.moc"

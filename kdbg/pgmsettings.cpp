@@ -105,5 +105,3 @@ ProgramSettings::ProgramSettings(QWidget* parent, QString exeName) :
     addPage(&m_chooseDriver, i18n("Debugger"));
     addPage(&m_output, i18n("Output"));
 }
-
-#include "pgmsettings.moc"

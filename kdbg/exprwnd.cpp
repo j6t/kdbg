@@ -5,7 +5,6 @@
  */
 
 #include "exprwnd.h"
-#include "exprwnd.moc"
 #include "typetable.h"
 #include <QHeaderView>
 #include <QStringList>

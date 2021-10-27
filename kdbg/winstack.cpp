@@ -430,5 +430,3 @@ void FindDialog::done(int result)
     QDialog::done(result);
     emit closed();
 }
-
-#include "winstack.moc"

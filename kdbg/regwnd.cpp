@@ -617,5 +617,3 @@ void RegisterView::changeEvent(QEvent* ev)
     }
     QTreeWidget::changeEvent(ev);
 }
-
-#include "regwnd.moc"

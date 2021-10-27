@@ -456,5 +456,3 @@ Breakpoint::Breakpoint() :
 	hitCount(0),
 	lineNo(0)
 { }
-
-#include "dbgdriver.moc"

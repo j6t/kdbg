@@ -319,6 +319,3 @@ ProcAttach::ProcAttach(QWidget* parent) :
 ProcAttach::~ProcAttach()
 {
 }
-
-
-#include "procattach.moc"

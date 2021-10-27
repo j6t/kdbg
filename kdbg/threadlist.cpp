@@ -126,6 +126,3 @@ void ThreadList::slotCurrentChanged(QTreeWidgetItem* newItem)
 
     emit setThread(te->id);
 }
-
-
-#include "threadlist.moc"

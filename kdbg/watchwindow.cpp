@@ -90,5 +90,3 @@ void WatchWindow::slotWatchHighlighted()
     QString text = expr ? expr->computeExpr() : QString();
     m_watchEdit.setText(text);
 }
-
-#include "watchwindow.moc"

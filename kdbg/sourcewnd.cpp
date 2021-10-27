@@ -1061,5 +1061,3 @@ bool HighlightCpp::isCppKeyword(const QString& word)
 
     return std::binary_search(ckw, ckw + sizeof(ckw)/sizeof(ckw[0]), word);
 }
-
-#include "sourcewnd.moc"

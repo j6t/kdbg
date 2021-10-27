@@ -1318,6 +1318,3 @@ XsldbgDriver::parseSetVariable(const char */*output*/)
     QString msg;
     return msg;
 }
-
-
-#include "xsldbgdriver.moc"

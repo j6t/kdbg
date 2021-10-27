@@ -434,6 +434,3 @@ void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
 	m_memory.setColumnWidth(i, *w);
     }
 }
-
-
-#include "memwindow.moc"

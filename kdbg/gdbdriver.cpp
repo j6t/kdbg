@@ -2766,6 +2766,3 @@ QString GdbDriver::parseSetVariable(const char* output)
     QString msg = output;
     return msg.trimmed();
 }
-
-
-#include "gdbdriver.moc"

@@ -2251,6 +2251,3 @@ void KDebugger::handleSetVariable(CmdQueueItem* cmd, const char* output)
     printCmd->m_expr = cmd->m_expr;
     printCmd->m_exprWnd = cmd->m_exprWnd;
 }
-
-
-#include "debugger.moc"
