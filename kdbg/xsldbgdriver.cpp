@@ -57,7 +57,9 @@ static XsldbgCmdInfo cmds[] = {
     {DCinforegisters, "print 'info reg'\n", XsldbgCmdInfo::argNone},
     {DCexamine, "print 'x %s %s'\n", XsldbgCmdInfo::argString2},
     {DCinfoline, "print 'templates %s:%d'\n", XsldbgCmdInfo::argStringNum},
+    {DCinfotarget, "print 'info target\n'", XsldbgCmdInfo::argNone},
     {DCdisassemble, "print 'disassemble %s %s'\n", XsldbgCmdInfo::argString2},
+    {DCsetdisassflavor, "print 'set disassembly-flavor %s'\n", XsldbgCmdInfo::argString},
     {DCsetargs, "data %s\n", XsldbgCmdInfo::argString},
     {DCsetenv, "addparam %s %s\n", XsldbgCmdInfo::argString2},
     {DCunsetenv, "unset env %s\n", XsldbgCmdInfo::argString},
@@ -1299,6 +1301,12 @@ XsldbgDriver::parseInfoLine(const char */*output*/, QString & /*addrFrom*/,
     return false;
 }
 
+QString
+XsldbgDriver::parseInfoTarget(const char* /*output*/)
+{
+    return QString();
+}
+
 std::list<DisassembledCode>
 XsldbgDriver::parseDisassemble(const char */*output*/)
 {
@@ -1317,4 +1325,10 @@ XsldbgDriver::parseSetVariable(const char */*output*/)
 {
     QString msg;
     return msg;
+}
+
+QString
+XsldbgDriver::parseSetDisassFlavor(const char* /*output*/)
+{
+    return QString();
 }

@@ -305,6 +305,13 @@ void WinStack::slotExpandCollapse(int)
     }
 }
 
+void WinStack::slotFlavorChanged(const QString&, const QString& target)
+{
+    // only x86 targets can change the flavor
+    if (target.indexOf(QLatin1String("86")) >= 0) {
+        reloadAllFiles();
+    }
+}
 
 void WinStack::slotSetTabWidth(int numChars)
 {

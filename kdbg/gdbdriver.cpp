@@ -79,7 +79,9 @@ static GdbCmdInfo cmds[] = {
     { DCinforegisters, "info all-registers\n", GdbCmdInfo::argNone},
     { DCexamine, "x %s %s\n", GdbCmdInfo::argString2 },
     { DCinfoline, "info line %s:%d\n", GdbCmdInfo::argStringNum },
+    { DCinfotarget, "info target\n", GdbCmdInfo::argNone},
     { DCdisassemble, "disassemble %s %s\n", GdbCmdInfo::argString2 },
+    { DCsetdisassflavor, "set disassembly-flavor %s\n", GdbCmdInfo::argString},
     { DCsetargs, "set args %s\n", GdbCmdInfo::argString },
     { DCsetenv, "set env %s %s\n", GdbCmdInfo::argString2 },
     { DCunsetenv, "unset env %s\n", GdbCmdInfo::argString },
@@ -2584,6 +2586,19 @@ bool GdbDriver::parseInfoLine(const char* output, QString& addrFrom, QString& ad
     return true;
 }
 
+QString GdbDriver::parseInfoTarget(const char* output)
+{
+    auto p = strstr(output, "file type ");
+    if (p) {
+	p += 10;
+	auto start = p;
+	p = strchr(p, '.');
+	if (p)
+	    return QString::fromLatin1(start, p - start);
+    }
+    return {};
+}
+
 std::list<DisassembledCode> GdbDriver::parseDisassemble(const char* output)
 {
     std::list<DisassembledCode> code;
@@ -2765,4 +2780,10 @@ QString GdbDriver::parseSetVariable(const char* output)
     // if there is any output, it is an error message
     QString msg = output;
     return msg.trimmed();
+}
+
+QString GdbDriver::parseSetDisassFlavor(const char* output)
+{
+    // if there is any output, it is an error message
+    return output;
 }

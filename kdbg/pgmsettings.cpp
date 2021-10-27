@@ -6,6 +6,7 @@
 
 #include "pgmsettings.h"
 #include <klocalizedstring.h>		/* i18n */
+#include <QComboBox>
 #include <QFileInfo>
 #include <QLineEdit>
 #include <QLabel>
@@ -19,6 +20,7 @@ ChooseDriver::ChooseDriver(QWidget* parent) :
 	QWidget(parent)
 {
     QVBoxLayout* layout = new QVBoxLayout(this);
+    QGridLayout* gridLayout = new QGridLayout;
 
     QLabel* label = new QLabel(this);
     label->setText(i18n("How to invoke &GDB - leave empty to use\n"
@@ -30,6 +32,21 @@ ChooseDriver::ChooseDriver(QWidget* parent) :
     m_debuggerCmd->setMinimumSize(m_debuggerCmd->sizeHint());
     layout->addWidget(m_debuggerCmd);
     label->setBuddy(m_debuggerCmd);
+
+    // setup flavor-related functionality
+    layout->addLayout(gridLayout, 1);
+
+    m_disassComboBox = new QComboBox(this);
+    m_disassComboBox->addItem(i18n("Global Setting"), "");
+    m_disassComboBox->addItem(i18n("ATT"), "att");
+    m_disassComboBox->addItem(i18n("Intel"), "intel");
+
+    QLabel* disassLabel = new QLabel(i18n("Disassembly flavor:"), this);
+    disassLabel->setMinimumSize(disassLabel->sizeHint());
+    m_disassComboBox->setMinimumSize(m_disassComboBox->sizeHint());
+    disassLabel->setBuddy(m_disassComboBox);
+    gridLayout->addWidget(disassLabel, 0, 0);
+    gridLayout->addWidget(m_disassComboBox, 0, 1);
 
     layout->addStretch();
     this->setLayout(layout);
@@ -45,6 +62,26 @@ QString ChooseDriver::debuggerCmd() const
     return m_debuggerCmd->text();
 }
 
+QString ChooseDriver::disassemblyFlavor() const
+{
+    return m_disassComboBox->currentData().toString();
+}
+
+void ChooseDriver::setIsX86(bool isX86)
+{
+    QString toolTipMsg = isX86 ?
+	i18n("Disassembly flavor for x86 architecture") :
+	i18n("Disassembly flavor is only available for x86 architecture");
+
+    m_disassComboBox->setToolTip(toolTipMsg);
+    m_disassComboBox->setEnabled(isX86);
+}
+
+void ChooseDriver::setDisassemblyFlavor(const QString& flavor)
+{
+    int i = m_disassComboBox->findData(flavor);
+    m_disassComboBox->setCurrentIndex(i < 0 ? 0 : i);
+}
 
 OutputSettings::OutputSettings(QWidget* parent) :
 	QWidget(parent)

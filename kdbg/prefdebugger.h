@@ -7,6 +7,7 @@
 #ifndef PREFDEBUGGER_H
 #define PREFDEBUGGER_H
 
+#include <QComboBox>
 #include <QLineEdit>
 #include <QLabel>
 #include <QGridLayout>
@@ -35,9 +36,14 @@ protected:
     QLabel m_terminalHint;
     QLabel m_terminalLabel;
     QLineEdit m_terminal;
+    QLabel m_disassLabel;
+    QComboBox m_disassCombo;
+
 public:
     QString terminal() const { return m_terminal.text(); }
     void setTerminal(const QString& t) { m_terminal.setText(t); }
+    QString globalDisassemblyFlavor() const;
+    void setGlobalDisassemblyFlavor(const QString& flavor);
 };
 
 #endif // PREFDEBUGGER_H

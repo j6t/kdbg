@@ -16,6 +16,7 @@
 #include <QContextMenuEvent>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QTimer>
 #include <kiconloader.h>
 #include <kxmlguiwindow.h>
 #include <kxmlguifactory.h>
@@ -128,6 +129,8 @@ void SourceWindow::reloadFile()
     // that previously were assembly were painted incorrectly.
     if (m_highlighter)
 	m_highlighter->rehighlight();
+
+    restorePrevDisass();
 }
 
 void SourceWindow::scrollTo(int lineNo, const DbgAddr& address)
@@ -674,6 +677,8 @@ void SourceWindow::expandRow(int row)
     }
     setUpdatesEnabled(true);
 
+    registerExpandedLine(line);
+
     emit expanded(line);		/* must set PC */
 }
 
@@ -697,6 +702,8 @@ void SourceWindow::collapseRow(int row)
 	cursor.removeSelectedText();
     }
     setUpdatesEnabled(true);
+
+    unregisterExpandedLine(line);
 
     emit collapsed(line);
 }
@@ -775,6 +782,24 @@ void SourceWindow::setTabWidth(int numChars)
     QString s;
     int w = fm.width(s.fill('x', numChars));
     setTabStopWidth(w);
+}
+
+void SourceWindow::registerExpandedLine(int line)
+{
+    m_expandedLines.push_back(line);
+}
+
+void SourceWindow::unregisterExpandedLine(int line)
+{
+    m_expandedLines.erase(std::remove(m_expandedLines.begin(), m_expandedLines.end(),line), m_expandedLines.end());
+}
+
+void SourceWindow::restorePrevDisass()
+{
+    for(auto lineNo : m_expandedLines)
+    {
+        QTimer::singleShot(500, [this, lineNo](){actionExpandRow(lineNo);});
+    }
 }
 
 QColor SourceWindow::lineSelectionColor() const

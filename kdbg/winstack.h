@@ -109,6 +109,10 @@ public slots:
     // Updates line items after expanding/collapsing disassembled code
     void slotExpandCollapse(int lineNo);
 
+    /** Handles changes in disassembly flavor.
+     */
+    void slotFlavorChanged(const QString& flavor, const QString& target);
+
 protected:
     bool activatePath(QString pathname, int lineNo, const DbgAddr& address);
     virtual bool activateWindow(SourceWindow* fw, int lineNo, const DbgAddr& address);	/* -1 doesnt change line */

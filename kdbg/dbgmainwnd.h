@@ -153,6 +153,8 @@ protected:
     int m_tabWidth;			/* tab width in characters (can be 0) */
     QString m_sourceFilter;
     QString m_headerFilter;
+    QString m_asmGlobalFlavor;		/* disassembly flavor for x86 architecture */
+
     void setTerminalCmd(const QString& cmd);
     void setDebuggerCmdStr(const QString& cmd);
 

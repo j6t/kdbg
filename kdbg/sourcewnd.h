@@ -72,8 +72,16 @@ protected:
     int lineInfoAreaWidth() const;
     QColor lineSelectionColor() const;
 
+    void registerExpandedLine(int line);
+    void unregisterExpandedLine(int line);
+
     void actionExpandRow(int row);
     void actionCollapseRow(int row);
+
+    /** Restores the previously expanded disassembly that was visible, before
+     * the user changed the disassembly flavor.
+     */
+    void restorePrevDisass();
 
 signals:
     void clickedLeft(const QString&, int, const DbgAddr& address, bool);
@@ -105,6 +113,7 @@ protected:
 
     std::vector<int> m_rowToLine;	//!< The source line number for each row
     std::vector<uchar> m_lineItems;	//!< Icons displayed on the line
+    std::vector<int> m_expandedLines;	//!< Keep track of expanded line numbers
     QPixmap m_pcinner;			/* PC at innermost frame */
     QPixmap m_pcup;			/* PC at frame up the stack */
     QPixmap m_brkena;			/* enabled breakpoint */

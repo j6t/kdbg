@@ -141,6 +141,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	    m_debugger, SLOT(slotDisassemble(const QString&, int)));
     connect(m_debugger, SIGNAL(disassembled(const QString&,int,const std::list<DisassembledCode>&)),
 	    m_filesWindow, SLOT(slotDisassembled(const QString&,int,const std::list<DisassembledCode>&)));
+    connect(m_debugger, &KDebugger::disassFlavorChanged, m_filesWindow, &WinStack::slotFlavorChanged);
     connect(m_filesWindow, SIGNAL(moveProgramCounter(const QString&,int,const DbgAddr&)),
 	    m_debugger, SLOT(setProgramCounter(const QString&,int,const DbgAddr&)));
     // program stopped
@@ -444,6 +445,7 @@ static const char BackTimeout[] = "BackTimeout";
 static const char TabWidth[] = "TabWidth";
 static const char SourceFileFilter[] = "SourceFileFilter";
 static const char HeaderFileFilter[] = "HeaderFileFilter";
+static const char DisassemblyFlavor[] = "DisassemblyFlavor";
 
 void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
 {
@@ -466,6 +468,7 @@ void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
     pg.writeEntry(TabWidth, m_tabWidth);
     pg.writeEntry(SourceFileFilter, m_sourceFilter);
     pg.writeEntry(HeaderFileFilter, m_headerFilter);
+    pg.writeEntry(DisassemblyFlavor, m_asmGlobalFlavor);
 }
 
 void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
@@ -502,7 +505,10 @@ void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
     m_tabWidth = pg.readEntry(TabWidth, 0);
     m_sourceFilter = pg.readEntry(SourceFileFilter, m_sourceFilter);
     m_headerFilter = pg.readEntry(HeaderFileFilter, m_headerFilter);
+    m_asmGlobalFlavor = pg.readEntry(DisassemblyFlavor, m_asmGlobalFlavor);
 
+    if (m_debugger)
+	m_debugger->setDefaultFlavor(m_asmGlobalFlavor);
     emit setTabWidth(m_tabWidth);
 }
 
@@ -848,6 +854,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
     prefDebugger.setDebuggerCmd(m_debuggerCmdStr.isEmpty()  ?
 				GdbDriver::defaultGdb()  :  m_debuggerCmdStr);
     prefDebugger.setTerminal(m_outputTermCmdStr);
+    prefDebugger.setGlobalDisassemblyFlavor( m_asmGlobalFlavor );
 
     PrefMisc prefMisc(&dlg);
     prefMisc.setPopIntoForeground(m_popForeground);
@@ -858,6 +865,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 
     dlg.addPage(&prefDebugger, i18n("Debugger"));
     dlg.addPage(&prefMisc, i18n("Miscellaneous"));
+
     if (dlg.exec() == QDialog::Accepted)
     {
 	setDebuggerCmdStr(prefDebugger.debuggerCmd());
@@ -866,9 +874,18 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 	m_backTimeout = prefMisc.backTimeout();
 	m_tabWidth = prefMisc.tabWidth();
 	m_sourceFilter = prefMisc.sourceFilter();
+
+	m_asmGlobalFlavor = prefDebugger.globalDisassemblyFlavor();
+	m_debugger->setDefaultFlavor(m_asmGlobalFlavor);
+	if (m_debugger->driver()) {
+	    m_debugger->submitDisassemblyFlavor();
+	}
+
 	if (m_sourceFilter.isEmpty())
 	    m_sourceFilter = defaultSourceFilter;
+
 	m_headerFilter = prefMisc.headerFilter();
+
 	if (m_headerFilter.isEmpty())
 	    m_headerFilter = defaultHeaderFilter;
     }
