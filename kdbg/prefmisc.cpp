@@ -25,9 +25,14 @@ PrefMisc::PrefMisc(QWidget* parent) :
     m_grid.addWidget(&m_popForeground, 0, 0, 1, 2);
     m_grid.addItem(new QSpacerItem(0, m_popForeground.sizeHint().height()), 0, 0);
 
-    m_backTimeoutLabel.setText(i18n("Time until window goes &back (in milliseconds):"));
+    m_backTimeoutLabel.setText(i18n("Time until window goes &back [ms] (0 = off):"));
+    const QString backTimeoutTT_Cqs( i18n("Time in ms. 0 has the special "
+	        "meaning of not actively going into the background, but raise it in "
+		    "case of a stop of the debuge.") );
+    m_backTimeoutLabel.setToolTip( backTimeoutTT_Cqs );
     m_backTimeoutLabel.setMinimumSize(m_backTimeoutLabel.sizeHint());
     m_backTimeoutLabel.setBuddy(&m_backTimeout);
+    m_backTimeout.setToolTip( backTimeoutTT_Cqs );
     m_backTimeout.setMinimumSize(m_backTimeout.sizeHint());
     m_grid.addWidget(&m_backTimeoutLabel, 1, 0);
     m_grid.addWidget(&m_backTimeout, 1, 1);

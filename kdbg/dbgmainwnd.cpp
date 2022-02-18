@@ -1085,9 +1085,14 @@ void DebuggerMainWnd::slotProgramStopped()
 
 void DebuggerMainWnd::intoBackground()
 {
-    if (m_popForeground) {
-	m_backTimer.setSingleShot(true);
-	m_backTimer.start(m_backTimeout);
+    if ( m_popForeground ) 
+    {
+        const int       backTimeout_Ci = this->m_backTimeout;
+        if ( backTimeout_Ci != 0 )
+        {
+            m_backTimer.setSingleShot( true );
+            m_backTimer.start( backTimeout_Ci );
+        }
     }
 }
 
