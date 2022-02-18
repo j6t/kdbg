@@ -205,6 +205,7 @@ void TTYWindow::slotAppend(char* buffer, int count)
 	    m_pos.insertText(QString('\n'));
 	}
     }
+    ensureCursorVisible();
 }
 
 void TTYWindow::contextMenuEvent(QContextMenuEvent *event)
