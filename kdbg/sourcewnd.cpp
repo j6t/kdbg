@@ -339,6 +339,30 @@ void SourceWindow::find(const QString& text, bool caseSensitive, FindDirection d
 	setTextCursor(cursor);
 }
 
+void SourceWindow::gotoLine( const QString& text)
+{
+    bool isSuc_b;
+
+    int lineGoto_i; /*< Line to go to. */
+    {   /* lineGoto_i */
+        lineGoto_i = text.toInt( &isSuc_b );
+        if ( ! isSuc_b )
+        {
+            return;
+        }
+    }
+
+    QTextDocument*      document_po = document();
+    QTextCursor     cursor_o( document_po );
+    cursor_o.setPosition( 0 );  /*< Goto file first line. */
+
+    lineGoto_i--;
+    isSuc_b = cursor_o.movePosition( QTextCursor::Down,
+            QTextCursor::MoveAnchor, lineGoto_i );
+
+    setTextCursor( cursor_o );
+}
+
 void SourceWindow::infoMousePress(QMouseEvent* ev)
 {
     // we handle left and middle button

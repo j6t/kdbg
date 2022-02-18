@@ -50,6 +50,29 @@ protected:
 };
 
 
+/** Class for goto line dialog. */
+class GotoDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    GotoDialog();
+    ~GotoDialog();
+
+    QString lineText() const { return m_lineText.text(); }
+    void done(int result) override;
+
+    QLineEdit m_lineText;
+    QPushButton m_buttonClose;
+
+signals:
+    void closed();
+
+protected:
+    void closeEvent(QCloseEvent* ev) override;
+    QHBoxLayout m_layout;
+};
+
+
 class WinStack : public QTabWidget
 {
     Q_OBJECT
@@ -84,6 +107,7 @@ signals:
 public slots:
     virtual void slotFindForward();
     virtual void slotFindBackward();
+    virtual void slotGotoLine();
     virtual void activate(const QString& filename, int lineNo, const DbgAddr& address);
     void updatePC(const QString& filename, int lineNo, const DbgAddr& address, int frameNo);
     void reloadAllFiles();
@@ -92,6 +116,7 @@ public slots:
 
     void slotFileReload();
     void slotViewFind();
+    void slotViewGoto();
     void slotBrkptSet();
     void slotBrkptSetTemp();
     void slotBrkptEnable();
@@ -137,6 +162,7 @@ protected:
 public:
     // find dialog
     FindDialog m_findDlg;
+    GotoDialog m_gotoDlg;	/**< Object goto dialog. */
 };
 
 #endif // WINSTACK_H

@@ -87,6 +87,7 @@ protected:
     QAction* m_coreDumpAction;
     QAction* m_settingsAction;
     QAction* m_findAction;
+    QAction* m_gotoAction;
     QAction* m_btWindowAction;
     QAction* m_localVariablesAction;
     QAction* m_watchesAction;
