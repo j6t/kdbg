@@ -8,6 +8,7 @@
 #define WINSTACK_H
 
 #include <QDialog>
+#include <QLabel>
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QPushButton>
@@ -50,6 +51,30 @@ protected:
 };
 
 
+/** Class for Goto Line dialog. */
+class GotoDialog : public QDialog
+{
+    Q_OBJECT
+public:
+    GotoDialog();
+    ~GotoDialog();
+
+    QString lineText() const { return m_lineText.text(); }
+    void done(int result) override;
+
+    QLabel m_label;
+    QLineEdit m_lineText;
+    QPushButton m_buttonClose;
+
+signals:
+    void closed();
+
+protected:
+    void closeEvent(QCloseEvent* ev) override;
+    QHBoxLayout m_layout;
+};
+
+
 class WinStack : public QTabWidget
 {
     Q_OBJECT
@@ -84,6 +109,7 @@ signals:
 public slots:
     virtual void slotFindForward();
     virtual void slotFindBackward();
+    virtual void slotGotoLine();
     virtual void activate(const QString& filename, int lineNo, const DbgAddr& address);
     void updatePC(const QString& filename, int lineNo, const DbgAddr& address, int frameNo);
     void reloadAllFiles();
@@ -92,6 +118,7 @@ public slots:
 
     void slotFileReload();
     void slotViewFind();
+    void slotViewGoto();
     void slotBrkptSet();
     void slotBrkptSetTemp();
     void slotBrkptEnable();
@@ -137,6 +164,7 @@ protected:
 public:
     // find dialog
     FindDialog m_findDlg;
+    GotoDialog m_gotoDlg;
 };
 
 #endif // WINSTACK_H

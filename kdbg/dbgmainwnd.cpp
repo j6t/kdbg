@@ -119,6 +119,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
     connect(m_watches, SIGNAL(textDropped(const QString&)), SLOT(slotAddWatch(const QString&)));
 
     connect(&m_filesWindow->m_findDlg, SIGNAL(closed()), SLOT(updateUI()));
+    connect(&m_filesWindow->m_gotoDlg, SIGNAL(closed()), SLOT(updateUI()));
     connect(m_filesWindow, SIGNAL(newFileLoaded()),
 	    SLOT(slotNewFileLoaded()));
     connect(m_filesWindow, SIGNAL(toggleBreak(const QString&,int,const DbgAddr&,bool)),
@@ -277,6 +278,7 @@ void DebuggerMainWnd::initKAction()
     m_findAction = KStandardAction::find(m_filesWindow, SLOT(slotViewFind()), actionCollection());
     KStandardAction::findNext(m_filesWindow, SLOT(slotFindForward()), actionCollection());
     KStandardAction::findPrev(m_filesWindow, SLOT(slotFindBackward()), actionCollection());
+    m_gotoAction = KStandardAction::gotoLine(m_filesWindow, &WinStack::slotViewGoto, actionCollection());
 
     struct { QWidget* w; QString id; QAction** act; } dw[] = {
 	{ m_btWindow, "view_stack", &m_btWindowAction },
@@ -516,6 +518,8 @@ void DebuggerMainWnd::updateUI()
 {
     m_findAction->setChecked(m_filesWindow->m_findDlg.isVisible());
     m_findAction->setEnabled(m_filesWindow->hasWindows());
+    m_gotoAction->setChecked(m_filesWindow->m_gotoDlg.isVisible());
+    m_gotoAction->setEnabled(m_filesWindow->hasWindows());
     m_bpSetAction->setEnabled(m_debugger->canChangeBreakpoints());
     m_bpSetTempAction->setEnabled(m_debugger->canChangeBreakpoints());
     m_bpEnableAction->setEnabled(m_debugger->canChangeBreakpoints());
