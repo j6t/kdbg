@@ -46,7 +46,6 @@
 #include "gdbdriver.h"
 #include "xsldbgdriver.h"
 #include "mydebug.h"
-#include <typeinfo>
 #include <sys/stat.h>			/* mknod(2) */
 #include <unistd.h>			/* getpid */
 
@@ -718,9 +717,6 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 	QString msg = i18n("Don't know how to debug language `%1'");
 	KMessageBox::sorry(this, msg.arg(lang));
 	return false;
-    }
-    if (typeid(*driver) == typeid(XsldbgDriver)) {
-	KMessageBox::information(this, i18n("XSL debugging is no longer supported and will be removed in a future version of KDbg"));
     }
 
     driver->setLogFileName(m_transcriptFile);
