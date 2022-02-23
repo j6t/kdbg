@@ -150,6 +150,7 @@ protected:
     QString createOutputWindow();
 
     bool m_popForeground;		/* whether main wnd raises when prog stops */
+    bool m_lowerWindow;		/* whether m_backTimeout is used. */
     int m_backTimeout;			/* when wnd goes back */
     int m_tabWidth;			/* tab width in characters (can be 0) */
     QString m_sourceFilter;
