@@ -64,6 +64,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	m_outputTermProc(new QProcess),
 	m_ttyLevel(-1),			/* no tty yet */
 	m_popForeground(false),
+    m_lowerWindow(false),
 	m_backTimeout(1000),
 	m_tabWidth(0),
 	m_sourceFilter(defaultSourceFilter),
@@ -442,6 +443,7 @@ static const char DebuggerGroup[] = "Debugger";
 static const char DebuggerCmdStr[] = "DebuggerCmdStr";
 static const char PreferencesGroup[] = "Preferences";
 static const char PopForeground[] = "PopForeground";
+static const char LowerWindow[] = "LowerWindow";
 static const char BackTimeout[] = "BackTimeout";
 static const char TabWidth[] = "TabWidth";
 static const char SourceFileFilter[] = "SourceFileFilter";
@@ -465,6 +467,7 @@ void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
 
     KConfigGroup pg(config->group(PreferencesGroup));
     pg.writeEntry(PopForeground, m_popForeground);
+    pg.writeEntry(LowerWindow, m_lowerWindow);
     pg.writeEntry(BackTimeout, m_backTimeout);
     pg.writeEntry(TabWidth, m_tabWidth);
     pg.writeEntry(SourceFileFilter, m_sourceFilter);
@@ -502,6 +505,7 @@ void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
 
     KConfigGroup pg(config->group(PreferencesGroup));
     m_popForeground = pg.readEntry(PopForeground, false);
+    m_lowerWindow = pg.readEntry(LowerWindow, false);
     m_backTimeout = pg.readEntry(BackTimeout, 1000);
     m_tabWidth = pg.readEntry(TabWidth, 0);
     m_sourceFilter = pg.readEntry(SourceFileFilter, m_sourceFilter);
@@ -858,6 +862,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 
     PrefMisc prefMisc(&dlg);
     prefMisc.setPopIntoForeground(m_popForeground);
+    prefMisc.setLowerWindow(m_lowerWindow);
     prefMisc.setBackTimeout(m_backTimeout);
     prefMisc.setTabWidth(m_tabWidth);
     prefMisc.setSourceFilter(m_sourceFilter);
@@ -871,6 +876,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 	setDebuggerCmdStr(prefDebugger.debuggerCmd());
 	setTerminalCmd(prefDebugger.terminal());
 	m_popForeground = prefMisc.popIntoForeground();
+    m_lowerWindow = prefMisc.isLowerWindowRqed();
 	m_backTimeout = prefMisc.backTimeout();
 	m_tabWidth = prefMisc.tabWidth();
 	m_sourceFilter = prefMisc.sourceFilter();
@@ -1083,11 +1089,10 @@ void DebuggerMainWnd::intoBackground()
 {
     if ( m_popForeground ) 
     {
-        const int       backTimeout_Ci = this->m_backTimeout;
-        if ( backTimeout_Ci != 0 )
+        if ( m_lowerWindow )
         {
-            m_backTimer.setSingleShot( true );
-            m_backTimer.start( backTimeout_Ci );
+            m_backTimer.setSingleShot(true);
+            m_backTimer.start m_backTimeout);
         }
     }
 }
