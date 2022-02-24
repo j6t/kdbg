@@ -1087,12 +1087,12 @@ void DebuggerMainWnd::slotProgramStopped()
 
 void DebuggerMainWnd::intoBackground()
 {
-    if ( m_popForeground ) 
+    if (m_popForeground) 
     {
-        if ( m_lowerWindow )
+        if (m_lowerWindow)
         {
             m_backTimer.setSingleShot(true);
-            m_backTimer.start m_backTimeout);
+            m_backTimer.start(m_backTimeout);
         }
     }
 }
