@@ -8,6 +8,7 @@
 #define WINSTACK_H
 
 #include <QDialog>
+#include <QLabel>
 #include <QLineEdit>
 #include <QCheckBox>
 #include <QPushButton>
@@ -61,6 +62,7 @@ public:
     QString lineText() const { return m_lineText.text(); }
     void done(int result) override;
 
+    QLabel m_label;
     QLineEdit m_lineText;
     QPushButton m_buttonClose;
 

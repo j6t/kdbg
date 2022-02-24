@@ -463,14 +463,18 @@ void FindDialog::done(int result)
 
 
 GotoDialog::GotoDialog() :
-    QDialog(  ),
-    m_lineText(this),
-    m_buttonClose(this)
+	QDialog(),
+	m_label(this),
+	m_lineText(this),
+	m_buttonClose(this)
 {
-    setWindowTitle(i18n("Goto line"));
+    const QString label(i18n("Goto line"));
+    setWindowTitle(label);
     setWindowModality( Qt::ApplicationModal );
     setWindowFlags( windowFlags() | Qt::WindowStaysOnTopHint );
-
+    
+    m_label.setText(label);
+    
     m_lineText.setMinimumSize(100, 24);
     m_lineText.setMaxLength(10000);
     m_lineText.setFrame(true);
@@ -479,6 +483,7 @@ GotoDialog::GotoDialog() :
     m_buttonClose.setText(i18n("Close"));
     connect(&m_buttonClose, SIGNAL(clicked()), SLOT(reject()));
 
+    m_layout.addWidget(&m_label);
     m_layout.addWidget(&m_lineText);
     m_layout.addWidget(&m_buttonClose);
 
