@@ -31,8 +31,8 @@ WinStack::WinStack(QWidget* parent) :
     connect(&m_findDlg.m_buttonBackward,
 	    SIGNAL(clicked()), SLOT(slotFindBackward()));
 
-    connect(  &m_gotoDlg.m_lineText,
-	    SIGNAL( returnPressed() ), SLOT(slotGotoLine() )  );
+    connect( &m_gotoDlg.m_lineText,
+	    SIGNAL(returnPressed()), SLOT(slotGotoLine()));
 
     connect(this, SIGNAL(setTabWidth(int)), this, SLOT(slotSetTabWidth(int)));
     connect(this, SIGNAL(tabCloseRequested(int)),
@@ -251,9 +251,9 @@ void WinStack::slotFindBackward()
 void WinStack::slotGotoLine()
 {
     if (activeWindow() != 0)
-        activeWindow()->gotoLine( m_gotoDlg.lineText() );
-    
-    m_gotoDlg.done( 1 );    /*< Hide Dialog. */
+	activeWindow()->gotoLine(m_gotoDlg.lineText());
+
+    m_gotoDlg.done(1);		// hide dialog
 }
 
 bool WinStack::event(QEvent* evt)
@@ -348,13 +348,13 @@ void WinStack::slotViewFind()
 
 void WinStack::slotViewGoto()
 {
-    if (m_gotoDlg.isVisible()) 
-	{
-	    m_gotoDlg.done(0);
-    } 
-	else 
-	{
-        m_gotoDlg.show();
+    if (m_gotoDlg.isVisible())
+    {
+	m_gotoDlg.done(0);
+    }
+    else
+    {
+	m_gotoDlg.show();
     }
 }
 
@@ -472,9 +472,9 @@ GotoDialog::GotoDialog() :
     setWindowTitle(label);
     setWindowModality( Qt::ApplicationModal );
     setWindowFlags( windowFlags() | Qt::WindowStaysOnTopHint );
-    
+
     m_label.setText(label);
-    
+
     m_lineText.setMinimumSize(100, 24);
     m_lineText.setMaxLength(10000);
     m_lineText.setFrame(true);
@@ -505,4 +505,3 @@ void GotoDialog::done(int result)
     QDialog::done(result);
     emit closed();
 }
-

@@ -341,26 +341,17 @@ void SourceWindow::find(const QString& text, bool caseSensitive, FindDirection d
 
 void SourceWindow::gotoLine( const QString& text)
 {
-    bool isSuc_b;
+    bool isSuc;
+    int lineGoto = text.toInt(&isSuc);
+    if (!isSuc)
+	return;
 
-    int lineGoto_i; /*< Line to go to. */
-    {   /* lineGoto_i */
-        lineGoto_i = text.toInt( &isSuc_b );
-        if ( ! isSuc_b )
-        {
-            return;
-        }
-    }
+    QTextCursor cursor(document());
+    cursor.setPosition(0);	// goto file first line
 
-    QTextDocument*      document_po = document();
-    QTextCursor     cursor_o( document_po );
-    cursor_o.setPosition( 0 );  /*< Goto file first line. */
+    isSuc = cursor.movePosition(QTextCursor::Down, QTextCursor::MoveAnchor, lineGoto - 1);
 
-    lineGoto_i--;
-    isSuc_b = cursor_o.movePosition( QTextCursor::Down,
-            QTextCursor::MoveAnchor, lineGoto_i );
-
-    setTextCursor( cursor_o );
+    setTextCursor( cursor );
 }
 
 void SourceWindow::infoMousePress(QMouseEvent* ev)

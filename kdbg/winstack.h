@@ -51,7 +51,7 @@ protected:
 };
 
 
-/** Class for goto line dialog. */
+/** Class for Goto Line dialog. */
 class GotoDialog : public QDialog
 {
     Q_OBJECT
@@ -164,7 +164,7 @@ protected:
 public:
     // find dialog
     FindDialog m_findDlg;
-    GotoDialog m_gotoDlg;	/**< Object goto dialog. */
+    GotoDialog m_gotoDlg;
 };
 
 #endif // WINSTACK_H

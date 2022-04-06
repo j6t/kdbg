@@ -46,6 +46,7 @@
 #include "gdbdriver.h"
 #include "xsldbgdriver.h"
 #include "mydebug.h"
+#include <typeinfo>
 #include <sys/stat.h>			/* mknod(2) */
 #include <unistd.h>			/* getpid */
 
@@ -64,7 +65,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	m_outputTermProc(new QProcess),
 	m_ttyLevel(-1),			/* no tty yet */
 	m_popForeground(false),
-    m_lowerWindow(false),
+	m_lowerWindow(false),
 	m_backTimeout(1000),
 	m_tabWidth(0),
 	m_sourceFilter(defaultSourceFilter),
@@ -278,7 +279,7 @@ void DebuggerMainWnd::initKAction()
     m_findAction = KStandardAction::find(m_filesWindow, SLOT(slotViewFind()), actionCollection());
     KStandardAction::findNext(m_filesWindow, SLOT(slotFindForward()), actionCollection());
     KStandardAction::findPrev(m_filesWindow, SLOT(slotFindBackward()), actionCollection());
-    m_gotoAction = KStandardAction::gotoLine(m_filesWindow, SLOT(slotViewGoto()), actionCollection());
+    m_gotoAction = KStandardAction::gotoLine(m_filesWindow, &WinStack::slotViewGoto, actionCollection());
 
     struct { QWidget* w; QString id; QAction** act; } dw[] = {
 	{ m_btWindow, "view_stack", &m_btWindowAction },
@@ -721,6 +722,9 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 	QString msg = i18n("Don't know how to debug language `%1'");
 	KMessageBox::sorry(this, msg.arg(lang));
 	return false;
+    }
+    if (typeid(*driver) == typeid(XsldbgDriver)) {
+	KMessageBox::information(this, i18n("XSL debugging is no longer supported and will be removed in a future version of KDbg"));
     }
 
     driver->setLogFileName(m_transcriptFile);
