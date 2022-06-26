@@ -74,7 +74,7 @@ static GdbCmdInfo cmds[] = {
     { DCcorefile, "target core %s\n", GdbCmdInfo::argString },
 #endif
     { DCattach, "attach %s\n", GdbCmdInfo::argString },
-    { DCinfolinemain, "kdbg_infolinemain\n", GdbCmdInfo::argNone },
+    { DCinfolinemain, "info line main\n", GdbCmdInfo::argNone },
     { DCinfolocals, "kdbg__alllocals\n", GdbCmdInfo::argNone },
     { DCinforegisters, "info all-registers\n", GdbCmdInfo::argNone},
     { DCexamine, "x %s %s\n", GdbCmdInfo::argString2 },
@@ -264,13 +264,6 @@ bool GdbDriver::startup(QString cmdStr)
 	"define kdbg__alllocals\n"
 	"info locals\n"			/* local vars supersede args with same name */
 	"info args\n"			/* therefore, arguments must come last */
-	"end\n"
-	/*
-	 * Work around a bug in gdb-6.3: "info line main" crashes gdb.
-	 */
-	"define kdbg_infolinemain\n"
-	"list\n"
-	"info line\n"
 	"end\n"
 	// check endianness for memory dumps
 	"show endian\n"
