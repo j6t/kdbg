@@ -5,3 +5,5 @@ Makefile
 kdbg/kdbg_autogen/
 prefix.sh
 install_manifest.txt
+CMakeLists.txt.user*
+/compile_commands.json
