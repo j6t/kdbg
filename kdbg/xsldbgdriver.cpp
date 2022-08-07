@@ -1264,7 +1264,7 @@ XsldbgDriver::parseProgramStopped(const char *output, bool,
     do {
         start++;                /* skip '\n' */
 
-        if (strncmp(start, "Finished stylesheet\n\032\032\n", 21) == 0){ 
+        if (strncmp(start, "Finished stylesheet\n\032\032\n", 23) == 0){
        //     flags &= ~SFprogramActive;
 	    break;
 	}
