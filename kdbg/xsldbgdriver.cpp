@@ -680,9 +680,7 @@ parseVar(const char *&s)
         return 0;
       }
       variable = new ExprValue(name, kind);
-      if (variable != 0L) {
-	  variable->m_varKind = VarTree::VKsimple;
-      }
+      variable->m_varKind = VarTree::VKsimple;
     }else{
       p++;
       // skip whitespace
@@ -693,14 +691,12 @@ parseVar(const char *&s)
         return 0;
       }
       variable = new ExprValue(name, kind);
-      if (variable != 0L) {
-	  variable->m_varKind = VarTree::VKsimple;
-      }
+      variable->m_varKind = VarTree::VKsimple;
       if (*p == '\n')
-	p++;
+        p++;
       if (!parseValue(p, variable)) {
-	delete variable;
-	return 0;
+        delete variable;
+        return 0;
       }
     }
 
