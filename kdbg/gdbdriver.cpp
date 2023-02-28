@@ -8,6 +8,7 @@
 #include "exprwnd.h"
 #include <QFileInfo>
 #include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include <klocalizedstring.h>		/* i18n */
 #include <ctype.h>
@@ -2387,7 +2388,7 @@ bool GdbDriver::parseFindType(const char* output, QString& type)
     if (strncmp(output, "const ", 6) == 0)
         output += 6;
     type = output;
-    type.replace(QRegExp("\\s+"), "");
+    type.replace(QRegularExpression("\\s+"), "");
     if (type.endsWith("&"))
         type.truncate(type.length() - 1);
     return true;
