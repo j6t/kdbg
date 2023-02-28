@@ -16,6 +16,7 @@
 #include <QContextMenuEvent>
 #include <QKeyEvent>
 #include <QMouseEvent>
+#include <QRegExp>
 #include <QTimer>
 #include <kiconloader.h>
 #include <kxmlguiwindow.h>
