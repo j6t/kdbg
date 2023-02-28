@@ -189,7 +189,7 @@ bool BreakpointTable::eventFilter(QObject* ob, QEvent* ev)
     if (ev->type() == QEvent::MouseButtonPress)
     {
 	QMouseEvent* mev = static_cast<QMouseEvent*>(ev);
-	if (mev->button() == Qt::MidButton) {
+	if (mev->button() == Qt::MiddleButton) {
 	    // enable or disable the clicked-on item
 	    BreakpointItem* bp =
 		static_cast<BreakpointItem*>(m_ui.bpList->itemAt(mev->pos()));

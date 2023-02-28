@@ -342,7 +342,7 @@ void SourceWindow::find(const QString& text, bool caseSensitive, FindDirection d
 void SourceWindow::infoMousePress(QMouseEvent* ev)
 {
     // we handle left and middle button
-    if (ev->button() != Qt::LeftButton && ev->button() != Qt::MidButton)
+    if (ev->button() != Qt::LeftButton && ev->button() != Qt::MiddleButton)
     {
 	return;
     }
@@ -379,7 +379,7 @@ void SourceWindow::infoMousePress(QMouseEvent* ev)
 	emit clickedLeft(m_fileName, line, address,
  			 (ev->modifiers() & Qt::ShiftModifier) != 0);
 	break;
-    case Qt::MidButton:
+    case Qt::MiddleButton:
 	TRACE(QString::asprintf("mid-clicked row %d", line));
 	emit clickedMid(m_fileName, line, address);
 	break;
