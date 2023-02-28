@@ -89,11 +89,11 @@ IF (HAVE_LIB_UTIL)
 ENDIF (HAVE_LIB_UTIL)
 
 target_link_libraries(kdbg
-    KF5::I18n
-    KF5::ConfigCore
-    KF5::IconThemes
-    KF5::XmlGui
-    KF5::WindowSystem
+    Qt6::Core5Compat
+    KF6::I18n
+    KF6::ConfigCore
+    KF6::IconThemes
+    KF6::XmlGui
     ${LIB_UTIL}
 )
 
