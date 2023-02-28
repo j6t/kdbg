@@ -18,7 +18,6 @@ class VarTree;
 struct ExprValue;
 class ExprWnd;
 class KDebugger;
-class QStringList;
 
 
 /**
