@@ -6,7 +6,7 @@
 
 #include "regwnd.h"
 #include "dbgdriver.h"
-#include <klocalizedstring.h>		/* i18n */
+#include <KLazyLocalizedString>
 #include <QFontDatabase>
 #include <QMenu>
 #include <QRegExp>
@@ -64,28 +64,28 @@ private:
 // helper struct
 struct MenuPair
 {
-    const char* name;
+    KLazyLocalizedString name;
     uint mode;
-    bool isSeparator() { return name == 0; }
+    bool isSeparator() { return name.isEmpty(); }
 };
 
 static MenuPair menuitems[] = {
     // treat as
-    { I18N_NOOP("&GDB default"), RegisterDisplay::nada },
-    { I18N_NOOP("&Binary"),      RegisterDisplay::binary },
-    { I18N_NOOP("&Octal"),       RegisterDisplay::octal },
-    { I18N_NOOP("&Decimal"),     RegisterDisplay::decimal },
-    { I18N_NOOP("He&xadecimal"), RegisterDisplay::hex },
-    { I18N_NOOP("Real (&e)"),    RegisterDisplay::realE },
-    { I18N_NOOP("Real (&f)"),    RegisterDisplay::realF },
-    { I18N_NOOP("&Real (g)"),    RegisterDisplay::realG },
-    { 0, 0 },
-    { "8 bits",  RegisterDisplay::bits8 },
-    { "16 bits", RegisterDisplay::bits16 },
-    { "32 bits", RegisterDisplay::bits32 },
-    { "64 bits", RegisterDisplay::bits64 },
-    { "80 bits", RegisterDisplay::bits80 },
-    { "128 bits",RegisterDisplay::bits128 },
+    { kli18n("&GDB default"), RegisterDisplay::nada },
+    { kli18n("&Binary"),      RegisterDisplay::binary },
+    { kli18n("&Octal"),       RegisterDisplay::octal },
+    { kli18n("&Decimal"),     RegisterDisplay::decimal },
+    { kli18n("He&xadecimal"), RegisterDisplay::hex },
+    { kli18n("Real (&e)"),    RegisterDisplay::realE },
+    { kli18n("Real (&f)"),    RegisterDisplay::realF },
+    { kli18n("&Real (g)"),    RegisterDisplay::realG },
+    { KLazyLocalizedString(), 0 },
+    { kli18n("8 bits"),  RegisterDisplay::bits8 },
+    { kli18n("16 bits"), RegisterDisplay::bits16 },
+    { kli18n("32 bits"), RegisterDisplay::bits32 },
+    { kli18n("64 bits"), RegisterDisplay::bits64 },
+    { kli18n("80 bits"), RegisterDisplay::bits80 },
+    { kli18n("128 bits"),RegisterDisplay::bits128 },
 };
 
 uint RegisterDisplay::bitMap[] = {
@@ -432,7 +432,7 @@ RegisterView::RegisterView(QWidget* parent) :
 	if (menuitems[i].isSeparator())
 	    m_modemenu->addSeparator();
 	else {
-	    QAction* action = m_modemenu->addAction(i18n(menuitems[i].name));
+	    QAction* action = m_modemenu->addAction(menuitems[i].name.toString());
 	    action->setData(menuitems[i].mode);
 	    action->setCheckable(true);
 	}
