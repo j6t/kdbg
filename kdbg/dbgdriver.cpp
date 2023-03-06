@@ -97,7 +97,7 @@ CmdQueueItem* DebuggerDriver::executeCmdString(DbgCommand cmd,
 	if (m_state == DSrunningLow) {
 	    // take the liberty to interrupt the running command
 	    m_state = DSinterrupted;
-	    ::kill(pid(), SIGINT);
+	    ::kill(processId(), SIGINT);
 	    ASSERT(m_activeCmd != 0);
 	    TRACE(QString::asprintf("interrupted the command %d",
 		  (m_activeCmd ? m_activeCmd->m_cmd : -1)));
