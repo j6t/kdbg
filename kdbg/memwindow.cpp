@@ -287,7 +287,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	    m_memory.setColumnHidden(i, true);
 	}
 	new QTreeWidgetItem(&m_memory, QStringList() << msg);
-	m_memory.header()->resizeSection(COL_ADDR, fm.width(msg)+10);
+	m_memory.header()->resizeSection(COL_ADDR, fm.horizontalAdvance(msg)+10);
 	return;
     }
 
@@ -307,8 +307,8 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	QString addr = md->address.asString() + " " + md->address.fnoffs;
 	QStringList sl = md->dump.split( "\t" );
 
-	if (fm.width(addr) > m_memoryColumnsWidth[COL_ADDR]) {
-	    m_memoryColumnsWidth[COL_ADDR] = fm.width(addr);
+	if (fm.horizontalAdvance(addr) > m_memoryColumnsWidth[COL_ADDR]) {
+	    m_memoryColumnsWidth[COL_ADDR] = fm.horizontalAdvance(addr);
 	}
 
 	QTreeWidgetItem* line = nullptr;
@@ -318,8 +318,8 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	}
 	if (!line) {	 // line not found in memory view, append new one
 	    for (int i = 0; i < sl.count(); i++) {
-		if (fm.width(sl[i]) > m_memoryColumnsWidth[i+1]) {
-		    m_memoryColumnsWidth[i+1] = fm.width(sl[i]);
+		if (fm.horizontalAdvance(sl[i]) > m_memoryColumnsWidth[i+1]) {
+		    m_memoryColumnsWidth[i+1] = fm.horizontalAdvance(sl[i]);
 		}
 	    }
 
@@ -329,8 +329,8 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 		m_dumpMemRegionEnd = true;
 	} else {	// line found in memory view updated it
 	    for (int i = 0; i < sl.count(); i++) {
-		if (fm.width(sl[i]) > m_memoryColumnsWidth[i+1]) {
-		    m_memoryColumnsWidth[i+1] = fm.width(sl[i]);
+		if (fm.horizontalAdvance(sl[i]) > m_memoryColumnsWidth[i+1]) {
+		    m_memoryColumnsWidth[i+1] = fm.horizontalAdvance(sl[i]);
 		}
 		bool changed = i < (line->columnCount() - showDumpAscii) && sl[i] != line->text(i+1);
 		line->setForeground(i+1, changed ? QBrush(QColor(Qt::red)) : palette().text());
@@ -350,8 +350,8 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	    }
 		line->setText(COL_DUMP_ASCII, dumpAscii);
 	    line->setTextAlignment(COL_DUMP_ASCII, Qt::AlignRight);
-	    if (fm.width(dumpAscii) > m_memoryColumnsWidth[COL_DUMP_ASCII]) {
-		m_memoryColumnsWidth[COL_DUMP_ASCII] = fm.width(dumpAscii);
+	    if (fm.horizontalAdvance(dumpAscii) > m_memoryColumnsWidth[COL_DUMP_ASCII]) {
+		m_memoryColumnsWidth[COL_DUMP_ASCII] = fm.horizontalAdvance(dumpAscii);
 	    }
 	}
     }
