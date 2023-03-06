@@ -23,9 +23,9 @@ WatchWindow::WatchWindow(QWidget* parent) :
     // setup the layout
     m_watchAdd.setMinimumSize(m_watchAdd.sizeHint());
     m_watchDelete.setMinimumSize(m_watchDelete.sizeHint());
-    m_watchV.setMargin(0);
+    m_watchV.setContentsMargins(0, 0, 0, 0);
     m_watchV.setSpacing(0);
-    m_watchH.setMargin(0);
+    m_watchH.setContentsMargins(0, 0, 0, 0);
     m_watchH.setSpacing(0);
     m_watchV.addLayout(&m_watchH);
     m_watchV.addWidget(&m_watchVariables);
