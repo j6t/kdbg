@@ -524,7 +524,7 @@ XsldbgDriver::terminate()
     qDebug("XsldbgDriver::Terminate");
     flushCommands();
     executeCmdString(DCinitialize, "quit\n", true);
-    ::kill(pid(), SIGTERM);
+    ::kill(processId(), SIGTERM);
     m_state = DSidle;
 }
 
@@ -534,7 +534,7 @@ XsldbgDriver::detachAndTerminate()
     qDebug("XsldbgDriver::detachAndTerminate");
     flushCommands();
     executeCmdString(DCinitialize, "quit\n", true);
-    ::kill(pid(), SIGINT);
+    ::kill(processId(), SIGINT);
 }
 
 void
@@ -543,7 +543,7 @@ XsldbgDriver::interruptInferior()
     // remove accidentally queued commands
     qDebug("interruptInferior");
     flushHiPriQueue();
-    ::kill(pid(), SIGINT);
+    ::kill(processId(), SIGINT);
 }
 
 static bool

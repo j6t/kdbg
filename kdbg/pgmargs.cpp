@@ -17,7 +17,7 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm,
     setupUi(this);
 
     {
-	QFileInfo fi = pgm;
+	QFileInfo fi(pgm);
 	QString newText = labelArgs->text().arg(fi.fileName());
 	labelArgs->setText(newText);
     }
