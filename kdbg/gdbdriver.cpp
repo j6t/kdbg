@@ -1434,7 +1434,8 @@ repeat:
 		//  @0x100400f08: <error reading variable>
 		// in this case, we do not skip the text here, but leave it
 		// for the subsequent parsing pass induced by the reference
-		else if (reference && strncmp(p, "<error reading", 14) == 0)
+		else if (reference && (strncmp(p, "<error reading", 14) == 0
+			    || strncmp(p, "<incomplete ", 12) == 0))
 		    ;
 		else {
 		    skipNestedAngles(p);
