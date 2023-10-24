@@ -1,6 +1,6 @@
 Later versions
 
-	Please use the gitweb log at http://repo.or.cz/w/kdbg.git to browse
+	Please use the gitweb log at https://repo.or.cz/w/kdbg.git to browse
 	the changes.
 
 Version 2.0.4
@@ -11,7 +11,7 @@ Version 2.0.4
 
 	Fixed that the debugger window really comes to the foreground and
 	receives the focus when the debuggee stops at a breakpoint, when this
-	option is on (http://bugs.debian.org/cgi-bin/bugreport.cgi?bug=171845).
+	option is on (https://bugs.debian.org/cgi-bin/bugreport.cgi?bug=171845).
 
 	Added a filter edit box to the Attach to Process dialog to improve
 	usability.

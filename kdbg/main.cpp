@@ -30,7 +30,7 @@ int main(int argc, char** argv)
 			 KAboutLicense::GPL_V2,
 			 i18n("(c) 1998-2020 Johannes Sixt"),
 			 {},	/* any text */
-			 "http://www.kdbg.org/",
+			 "https://www.kdbg.org/",
 			 "j6t@kdbg.org");
     aboutData.addAuthor(i18n("Johannes Sixt"), QString(), "j6t@kdbg.org");
     aboutData.addCredit(i18n("Keith Isdale"),
