@@ -1,7 +1,8 @@
 CXXFLAGS=-O0 -g
 
-QT5INC = -I/usr/include/qt5 -fPIC
-QT5LIB = /usr/lib64/libQt5Core.so
+QMAKE5 = $(shell which qmake5 qmake-qt5 qmake 2>/dev/null | head -n1)
+QT5INC = -I$(shell $(QMAKE5) -query QT_INSTALL_HEADERS) -fPIC
+QT5LIB = $(shell $(QMAKE5) -query QT_INSTALL_LIBS)/libQt5Core.so
 
 PROGS = \
 	anonstruct \
