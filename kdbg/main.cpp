@@ -42,6 +42,9 @@ int main(int argc, char** argv)
     aboutData.addCredit(i18n("David Edmundson"),
 			i18n("KDE4 porting"),
 			"david@davidedmundson.co.uk");
+    aboutData.addCredit(i18n("Sebastian Pipping"),
+			i18n("GitHub Actions CI"),
+			"sebastian@pipping.org");
     KAboutData::setApplicationData(aboutData);
 
     /* take component name and org. name from KAboutData */
