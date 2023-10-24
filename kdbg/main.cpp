@@ -54,9 +54,6 @@ int main(int argc, char** argv)
 
     QCommandLineParser parser;
     aboutData.setupCommandLine(&parser);
-    parser.setApplicationDescription(aboutData.shortDescription());
-    parser.addHelpOption();
-    parser.addVersionOption();
 
     auto opt = [&](const char* opt, QString desc, const char* arg) {
 	parser.addOption(QCommandLineOption(QStringList() << QLatin1String(opt), desc, QLatin1String(arg)));
