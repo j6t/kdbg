@@ -324,7 +324,7 @@ void SourceWindow::setPC(bool set, int lineNo, const DbgAddr& address, int frame
 void SourceWindow::find(const QString& text, bool caseSensitive, FindDirection dir)
 {
     ASSERT(dir == 1 || dir == -1);
-    QTextDocument::FindFlags flags = 0;
+    QTextDocument::FindFlags flags;
     if (caseSensitive)
 	flags |= QTextDocument::FindCaseSensitively;
     if (dir < 0)
