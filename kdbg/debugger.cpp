@@ -775,7 +775,7 @@ void KDebugger::saveProgramSettings()
     gg.writeEntry(FileVersion, 1);
     gg.writeEntry(ProgramArgs, m_programArgs);
     gg.writeEntry(WorkingDirectory, m_programWD);
-    gg.writeEntry(OptionsSelected, m_boolOptions.toList());
+    gg.writeEntry(OptionsSelected, m_boolOptions.values());
     gg.writeEntry(DebuggerCmdStr, m_debuggerCmd);
     gg.writeEntry(TTYLevelEntry, int(m_ttyLevel));
     gg.writeEntry(DisassemblyFlavor, m_flavor);
