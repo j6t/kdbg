@@ -1,0 +1,63 @@
+# Copyright (c) 2023 Sebastian Pipping <sebastian@pipping.org>
+# Licensed under the GNU General Public License Version 2.
+
+name: Build Debian package
+
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: '0 3 * * 5'  # Every Friday at 3am
+
+jobs:
+  debian_package:
+    name: Build Debian package
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Install build dependencies
+        run: |-
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            cmake \
+            debhelper \
+            devscripts \
+            extra-cmake-modules \
+            libkf5config-dev \
+            libkf5i18n-dev \
+            libkf5iconthemes-dev \
+            libkf5windowsystem-dev \
+            libkf5xmlgui-dev \
+            nasm \
+            qtbase5-dev
+
+      - name: Checkout Git branch
+        uses: actions/checkout@v4
+
+      - name: Build Debian package
+        run: |-
+          set -x
+
+          # Extract current Debian package version from `debian/changelog` (just like debuild will)
+          kdbg_debian_version="$(head -n1 debian/changelog | sed 's,kdbg (\(.*\)-.*,\1,' | tee /dev/stderr)"
+
+          # Bump version in `debian/changelog` using dch mimicking version format "0.5.11+git20200708+dd9ef66-5" of package dash
+          kdbg_debian_version="${kdbg_debian_version}+git$(date +'%Y%m%d')+$(git rev-parse --short=7 HEAD)"
+          EDITOR=true \
+            DEBEMAIL='GitHub Actions <actions@ci.invalid>' \
+            dch \
+            -v "${kdbg_debian_version}-1" \
+            'Bump package version to reflect build date and Git SHA1'
+
+          # This is to make debuild's tarball check happy
+          git archive -o "../kdbg_${kdbg_debian_version}.orig.tar.gz" HEAD
+
+          # Build the actual Debian package
+          debuild -us -uc
+          ls -ld ../*kdbg*.*
+
+      - name: Upload build artifacts
+        uses: actions/upload-artifact@v3
+        with:
+          name: "kdbg_${{ github.sha }}_debian_package"
+          path: "/home/runner/work/*/*kdbg*.*"
+          if-no-files-found: error
