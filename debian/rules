@@ -1,0 +1,12 @@
+#!/usr/bin/make -f
+
+export DEB_BUILD_MAINT_OPTIONS = hardening=+all
+export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed
+
+%:
+	dh $@
+
+override_dh_installchangelogs:
+	cat $$(ls ReleaseNotes-* | sort -Vr) ChangeLog-pre-2.2.0 | \
+	   egrep -av '(KDbg Release Notes for|====)' > debian/upstream.changes
+	dh_installchangelogs debian/upstream.changes

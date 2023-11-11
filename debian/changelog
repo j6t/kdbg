@@ -1,0 +1,518 @@
+kdbg (2.5.5-3) unstable; urgency=medium
+
+  * QA upload.
+  * Upload to unstable.
+
+ -- Adrian Bunk <bunk@debian.org>  Sun, 18 Jun 2017 17:23:43 +0300
+
+kdbg (2.5.5-2) experimental; urgency=medium
+
+  * QA upload.
+  * debian/copyright: Change my entry to new id.
+  * debian/patches:
+    - 11_fix_changelog_encoding.patch: Reproducible build. This patch will close
+      the bug number #823393 when uploaded to unstable.
+  * debian/rules:
+    - override_dh_installchangelogs: Add -a parameter to egrep
+      (don't use binary mode).
+
+ -- Samuel Henrique <samueloph@gmail.com>  Sat, 20 Aug 2016 21:45:21 -0300
+
+kdbg (2.5.5-1) unstable; urgency=medium
+
+  * QA upload.
+  * New upstream release.
+  * Update to DH 9.
+  * debian/clean: Add debian/upstream.changes.
+  * debian/control:
+    - Standards-Version: Update to 3.9.8.
+    - Remove mention to non existent package (closes: #764423).
+  * debian/copyright:
+    - Update format to 1.0.
+    - Update source's copyright year.
+    - Remove trailing whitespace.
+  * debian/rules:
+    - Export DEB_LDFLAGS_MAINT_APPEND = -Wl,--as-needed so building may avoid
+      useless dependencies.
+    - Add hardening=+all.
+    - override_dh_installchangelogs: Concatenate upstream changelogs into one
+      single file at debian/upstream.changes.
+    - Remove garbage comment.
+  * debian/watch: Update to version 4.
+
+ -- Samuel Henrique Oltramari Pinto (SamuelOPH) <samueloph@gmail.com>  Tue, 19 Apr 2016 01:23:10 -0300
+
+kdbg (2.5.4-2) unstable; urgency=medium
+
+  * QA upload.
+  * Orphan package, see #803878.
+    - Set maintainer to Debian QA Group.
+  * Fix FTBFS. Thanks to Eriberto Mota. (Closes: #808760)
+  * Update Standards-Version to 3.9.6, no changes required.
+  * Add watch file. Thanks to Bart Martens.
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Wed, 16 Mar 2016 23:42:03 +0100
+
+kdbg (2.5.4-1) unstable; urgency=medium
+
+  * New upstream release.
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Fri, 29 Nov 2013 19:40:20 +0100
+
+kdbg (2.5.3-1) unstable; urgency=low
+
+  * New upstream release. (Closes: #715031)
+  * Update Standards-Version to 3.9.4, no changes required.
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Mon, 15 Jul 2013 20:08:45 +0200
+
+kdbg (2.5.1-1) unstable; urgency=low
+
+  * New upstream release. (Closes: #672338)
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Thu, 10 May 2012 21:01:19 +0200
+
+kdbg (2.5.0-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Sat, 02 Apr 2011 23:39:51 +0200
+
+kdbg (2.4.92~1-1) unstable; urgency=low
+
+  * Git Snapshot of a future 2.5 release, now ported to KDE 4. This means
+    significant changes in the packaging. (Closes: #604333)
+  * We used cmake now, no outdated config.{sub,guess} anymore. (Closes: #582436)
+  * Remove suggests on kxsldbg, it is not in the Debian archive anymore.
+  * Update years in copyright file.
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Sat, 12 Mar 2011 17:00:01 +0100
+
+kdbg (2.2.1-2) unstable; urgency=low
+
+  * Redone again relibtoolization making sure it uses latest automake.
+    (Closes: #577679)
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Wed, 21 Apr 2010 04:31:55 +0200
+
+kdbg (2.2.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Redone libtoolization.
+  * Remove patch 03_fix_ftbfs, merged upstream.
+  * Update Standards-Version to 3.8.4, no changes required.
+  * Add ${misc:Depends} to Depends:
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Sat, 10 Apr 2010 18:39:35 +0200
+
+kdbg (2.2.0-2) unstable; urgency=low
+
+  * Add patch taken from upstream to fix FTBFS with newer glibc 2.10 and gcc 4.4.
+   (Closes: #552582)
+  * Minor updates in the copyright file.
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Thu, 19 Nov 2009 23:06:37 +0100
+
+kdbg (2.2.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * Redone libtoolization.
+  * Update Standards-Version to 3.8.3, no changes required.
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Sun, 20 Sep 2009 20:41:52 +0200
+
+kdbg (2.1.1-1) unstable; urgency=low
+
+  * New upstream release:
+    - Do not crash when clicking on "delete" button if not program is loaded.
+      (Closes: #467243)
+  * Redo patches: 02_libtool_update.diff and buildprep.
+  * Update upstream's email in copyright file.
+  * Update copyright years.
+  * Update Section in doc-base.
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Mon, 29 Dec 2008 13:24:32 +0100
+
+kdbg (2.1.0-2) unstable; urgency=low
+
+  * Remove unnecessary build dependency on libqt3-compat-headers. 
+    (Closes: #464057) 
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Thu, 07 Feb 2008 11:10:15 +0100
+
+kdbg (2.1.0-1) unstable; urgency=low
+
+   * New upstream release.
+   * Update Standards-Version to 3.7.3.
+   * Move homepage into control field.
+   * Update menu file to new policy.
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Wed, 26 Dec 2007 04:52:24 +0100
+
+kdbg (2.0.5-2) unstable; urgency=low
+
+  * Rewrite debian/rules. Now it can be built twice in a row. 
+   (Closes: #424429)
+  * Dangling symlinks are not longer created. (Closes: #186169)
+  * Redone relibtoolization. (Closes: #418563).
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Wed, 30 May 2007 01:13:37 +0100
+
+kdbg (2.0.5-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Tue, 19 Dec 2006 02:15:51 +0100
+
+kdbg (2.0.4-3) unstable; urgency=low
+  
+  * Bumped compat to 5.
+  * Added space to homepage pseudo header.
+
+ -- Ana Beatriz Guerrero Lopez <ana@debian.org>  Sat, 28 Oct 2006 03:57:29 +0200
+
+kdbg (2.0.4-2) unstable; urgency=medium
+
+  * Dropping re-libtoolizing at build time, instead updating libtool
+    with a patch. (Closes: #379811). 
+
+ -- Ana Beatriz Guerrero Lopez <ana@ekaia.org>  Sat, 29 Jul 2006 14:19:18 +0200
+
+kdbg (2.0.4-1) unstable; urgency=low
+
+  * New upstream release.
+  * Bumped standards-version to 3.7.2, no changes required.
+  * Debugger window comes to the foreground and receives the focus, after a 
+    breakpoint. (Closes: #171845)
+  * Added support for QString in Qt4's debug libraries. (Closes: #354373)
+  * Added copyright of the debian packaging.
+  * Changed kdbg webpage.
+
+ -- Ana Beatriz Guerrero Lopez <ana@ekaia.org>  Sat,  3 Jun 2006 13:17:46 +0200
+
+kdbg (2.0.3-3) unstable; urgency=low
+
+  * Dropping patches, re-libtoolizing at build time. 
+
+ -- Ana Beatriz Guerrero Lopez <ana@ekaia.org>  Tue, 21 Feb 2006 12:43:49 +0100
+
+kdbg (2.0.3-2) unstable; urgency=low
+
+  * Added patch: 04_am_maintainer_mode.diff, the patch adds AM_MAINTAINER_MODE to 
+    configure.in (Closes: #349988). 
+
+ -- Ana Beatriz Guerrero Lopez <ana@ekaia.org>  Thu,  2 Feb 2006 02:08:56 +0100
+
+kdbg (2.0.3-1) unstable; urgency=low
+
+  * New upstream release. 
+  * Added patch: 10_update_libtool.diff, now the package doesn't depend from 
+    libfreetype6 and other spurious libraries.
+
+ -- Ana Beatriz Guerrero Lopez <ana@ekaia.org>  Tue, 24 Jan 2006 23:12:03 +0100
+
+kdbg (2.0.2-1) unstable; urgency=low
+
+  * New upstream release. (Closes: #342096).
+  * New maintainer's email address.
+  * debian/rules: moved debhelper compatibility level setting to
+    'debian/compat'.
+
+ -- Ana Beatriz Guerrero Lopez <ana@ekaia.org>  Tue,  6 Dec 2005 19:07:51 +0100
+
+kdbg (2.0.0-1) unstable; urgency=low
+
+  * Adopted by Ana Beatriz Guerrero Lopez <anja_isbilia@yahoo.es>.
+    (Closes: #315336).
+  * New upstream release.
+  * Bumped standards-version to 3.6.2.
+ 
+ -- Ana Beatriz Guerrero Lopez <anja_isbilia@yahoo.es>  Tue, 30 Aug 2005 19:03:50 +0000
+
+kdbg (1.9.7-2) unstable; urgency=low
+
+  * Updated config.{sub,guess} for compilation on GNU/k*BSD (closes: #305839).
+
+ -- Ben Burton <bab@debian.org>  Wed, 27 Apr 2005 08:11:57 +1000
+
+kdbg (1.9.7-1) unstable; urgency=low
+
+  * New upstream release.
+  * Suggests kxsldbg, since kdbg can now interact with xsldbg for debugging
+    XSLT scripts.
+  * Patched kdbg/doc/en/Makefile.am to install newer parts of the manual
+    that weren't installed by default.  Using AM_MAINTAINER_MODE to
+    facilitate this.
+
+ -- Ben Burton <bab@debian.org>  Sat, 26 Mar 2005 00:24:40 +1100
+
+kdbg (1.2.10-3) unstable; urgency=low
+
+  * Converted all PO-files to UTF-8 so that all characters are properly
+    displayed (closes: #291317).
+
+ -- Ben Burton <bab@debian.org>  Tue,  8 Feb 2005 18:52:34 +1100
+
+kdbg (1.2.10-2) unstable; urgency=low
+
+  * Updated debian/copyright, including more explicit copyright information
+    and additional author credits.
+  * Minor aesthetic update to short package description.
+
+ -- Ben Burton <bab@debian.org>  Wed, 26 Jan 2005 12:44:28 +1100
+
+kdbg (1.2.10-1) unstable; urgency=low
+
+  * New upstream bugfix release.
+
+ -- Ben Burton <bab@debian.org>  Sun, 20 Jun 2004 19:04:02 +1000
+
+kdbg (1.2.9-3) unstable; urgency=low
+
+  * Patched gdb output parsing so that kdbg loads executables without
+    errors when using newer versions of gdb (closes: #247459).
+  * Quoted more fields in debian/menu.
+
+ -- Ben Burton <bab@debian.org>  Sat,  8 May 2004 13:00:12 +1000
+
+kdbg (1.2.9-2) unstable; urgency=low
+
+  * Built against new libXrender.
+  * Bumped standards-version to 3.6.1.
+
+ -- Ben Burton <bab@debian.org>  Fri,  2 Jan 2004 18:13:07 +1100
+
+kdbg (1.2.9-1) unstable; urgency=low
+
+  * New upstream release.
+  * Tighter fix for the security issue regarding debugger commands previously
+    addressed in kdbg 1.2.8-1 (CAN-2003-0644).  Specifically, kdbg now tests
+    for .kdbgrc file ownership.  Thanks to Matt Zimmerman for his help in this
+    matter.
+
+ -- Ben Burton <bab@debian.org>  Tue,  9 Sep 2003 16:16:07 +1000
+
+kdbg (1.2.8-3) unstable; urgency=low
+
+  * Using high colour pixmap for the debian menu entry.
+
+ -- Ben Burton <bab@debian.org>  Wed, 27 Aug 2003 20:04:25 +1000
+
+kdbg (1.2.8-2) unstable; urgency=low
+
+  * Russian translations changed from kio8-r to UTF-8, thanks to Alexander
+    Kogan for the patch (closes: #137203).
+
+ -- Ben Burton <bab@debian.org>  Tue, 22 Jul 2003 21:34:49 +1000
+
+kdbg (1.2.8-1) unstable; urgency=low
+
+  * New upstream release.
+  * Security update.  Fixes the security flaw regarding the program
+    specific debugger command, which can lead to a potential exploit
+    when debugging programs in world-writable directories such as /tmp.
+  * Split menu title into title and longtitle.
+  * Minor man page cleanup.
+  * Bumped standards-version to 3.6.0.
+
+ -- Ben Burton <bab@debian.org>  Sat, 19 Jul 2003 11:32:12 +1000
+
+kdbg (1.2.7-2) unstable; urgency=low
+
+  * Fresh copy of debianrules for new Qt dirs (closes: #185085).
+  * Build-depends on libqt3-compat-headers.
+  * Removed alpha compile flags.
+
+ -- Ben Burton <bab@debian.org>  Mon, 17 Mar 2003 13:38:07 +1100
+
+kdbg (1.2.7-1) unstable; urgency=low
+
+  * New upstream release.
+  * First KDE3 upload to debian!
+
+ -- Ben Burton <bab@debian.org>  Sun,  2 Feb 2003 11:19:37 +1100
+
+kdbg (1.2.6-3) unstable; urgency=low
+
+  * New maintainer email address.
+  * Bumped standards-version to 3.5.8.
+
+ -- Ben Burton <bab@debian.org>  Sun,  1 Dec 2002 15:29:49 +1100
+
+kdbg (1.2.6-2) unstable; urgency=low
+
+  * Built with g++-3.2.
+
+ -- Ben Burton <benb@acm.org>  Tue,  5 Nov 2002 20:09:30 +1100
+
+kdbg (1.2.6-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Ben Burton <benb@acm.org>  Mon, 14 Oct 2002 08:06:01 +1000
+
+kdbg (1.2.5-3) unstable; urgency=low
+
+  * Fixed doc-base link.
+
+ -- Ben Burton <benb@acm.org>  Fri, 30 Aug 2002 17:20:28 +1000
+
+kdbg (1.2.5-2) unstable; urgency=low
+
+  * Rebuilt for KDE3.
+
+ -- Ben Burton <benb@acm.org>  Fri, 30 Aug 2002 08:28:58 +1000
+
+kdbg (1.2.5-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Ben Burton <benb@acm.org>  Wed, 10 Apr 2002 14:05:38 +1000
+
+kdbg (1.2.4-2) unstable; urgency=low
+
+  * Fixed KCmdLineArgs initialisation (closes: Bug#129681).
+
+ -- Ben Burton <benb@acm.org>  Sun, 17 Feb 2002 19:32:01 +1100
+
+kdbg (1.2.4-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Ben Burton <benb@acm.org>  Tue, 29 Jan 2002 16:17:45 +1100
+
+kdbg (1.2.3-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Ben Burton <benb@acm.org>  Thu, 20 Dec 2001 20:59:34 +1000
+
+kdbg (1.2.2-6) unstable; urgency=low
+
+  * Added "Debuggers" hint to debian menu entry (closes: Bug#121011).
+
+ -- Ben Burton <benb@acm.org>  Sat, 24 Nov 2001 19:04:06 -0600
+
+kdbg (1.2.2-5) unstable; urgency=low
+
+  * Changed /usr/share/doc/kdbg/html to link to the english docs instead of
+    the default language docs; this avoids installation breakage on systems
+    with untranslated default languages.
+
+ -- Ben Burton <benb@acm.org>  Thu, 22 Nov 2001 14:00:49 -0600
+
+kdbg (1.2.2-4) unstable; urgency=low
+
+  * Updated config.sub and config.guess (closes: Bug#120260).
+
+ -- Ben Burton <benb@acm.org>  Tue, 20 Nov 2001 01:15:36 -0600
+
+kdbg (1.2.2-3) unstable; urgency=low
+
+  * No longer uses automake.
+
+ -- Ben Burton <benb@acm.org>  Tue, 23 Oct 2001 10:42:24 -0500
+
+kdbg (1.2.2-2) unstable; urgency=low
+
+  * Updated parameters for alpha build.
+
+ -- Ben Burton <benb@acm.org>  Sun, 23 Sep 2001 23:07:01 -0500
+
+kdbg (1.2.2-1) unstable; urgency=low
+
+  * New upstream release.
+
+ -- Ben Burton <benb@acm.org>  Sun, 19 Aug 2001 15:16:44 -0500
+
+kdbg (1.2.1-4) unstable; urgency=low
+
+  * Fixed gcc 3.0 compile errors and added libtoolize/aclocal calls
+    to debian/rules (closes: Bug#108121).
+  * Cleaned up debian/rules.
+
+ -- Ben Burton <benb@acm.org>  Thu,  9 Aug 2001 12:00:54 +1000
+
+kdbg (1.2.1-3) unstable; urgency=low
+
+  * Builds on alpha.
+  * Upped standards-version to 3.5.6.
+
+ -- Ben Burton <benb@acm.org>  Sat,  4 Aug 2001 00:32:46 +1000
+
+kdbg (1.2.1-2) unstable; urgency=low
+
+  * Removed redundancies from build-depends.
+  * Cosmetic changes in debian/.
+
+ -- Ben Burton <benb@acm.org>  Mon, 21 May 2001 10:48:13 -0500
+
+kdbg (1.2.1-1) unstable; urgency=low
+
+  * New upstream release.
+  * Fleshed out man page.
+  * Added automake to debian/rules configuration and removed differences
+    from Makefile.in files from the debian sources.
+
+ -- Ben Burton <benb@acm.org>  Tue,  1 May 2001 03:00:06 -0500
+
+kdbg (1.2.0-6) unstable; urgency=low
+
+  * Updated debian/rules to DH_COMPAT=3.
+  * Build-Depends: required version (>> 3.0.0) of debhelper.
+  * Updated Standards-Version to 3.5.2.
+  * Added kderemove="1" to the debian menu item.
+  * Miscellaneous tidying in debian/.
+ 
+ -- Ben Burton <benb@acm.org>  Thu, 26 Apr 2001 12:47:52 -0500
+
+kdbg (1.2.0-5) unstable; urgency=low
+
+  * Fetched a newer config.sub to allow building on ARM systems
+    (closes: Bug#90671).
+
+ -- Ben Burton <benb@acm.org>  Sun, 25 Mar 2001 16:26:40 -0600
+
+kdbg (1.2.0-4) unstable; urgency=low
+
+  * Rebuilt for new libqt2 libraries.
+  * Added KDbg icon to /usr/share/pixmaps and to the Debian menu item.
+
+ -- Ben Burton <benb@acm.org>  Tue,  6 Mar 2001 07:49:40 -0600
+
+kdbg (1.2.0-3) unstable; urgency=low
+
+  * Build-Depends: Replaced kdelibs3-dev with kdelibs-dev.
+
+ -- Ben Burton <benb@acm.org>  Thu, 22 Feb 2001 12:12:25 -0600
+
+kdbg (1.2.0-2) unstable; urgency=low
+
+  * Adopted by Ben Burton <benb@acm.org> (closes: Bug#84529).
+  * Added a (fairly uninformative) man page.
+  * Upgraded to Standards-Version: 3.2.1.
+  * Upgraded debian/rules to DH_COMPAT=2.
+  * Retitled the KDbg menu item to include the name KDbg.
+  * Added a link to the KDbg User's Manual in /usr/share/doc/kdbg.
+  * Miscellaneous cleanups in debian.
+
+ -- Ben Burton <benb@acm.org>  Sat, 17 Feb 2001 11:05:10 -0600
+
+kdbg (1.2.0-1) unstable; urgency=low
+
+  * New upstream release.
+  * Upload sponsored by Bradley Bell <btb@debian.org>
+
+ -- Mariusz Przygodzki <dune@home.pl>  Mon, 25 Dec 2000 15:51:26 +0100
+
+kdbg (1.1.7-beta1-1) unstable; urgency=low
+
+  * Initial Release. Closes: #75161
+  * Added kdbg.desktop
+  * Upload sponsored by Bradley Bell <btb@debian.org>
+
+ -- Mariusz Przygodzki <dune@home.pl>  Wed,  6 Dec 2000 22:38:22 +0100
+
+Local variables:
+mode: debian-changelog
+End:

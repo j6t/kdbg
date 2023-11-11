@@ -1,0 +1,9 @@
+Document: kdbg
+Title: KDbg - User's Manual
+Author: Johannes Sixt <Johannes.Sixt@telecom.at>
+Abstract:  KDbg is a front-end for gdb, the GNU debugger.
+Section: Programming
+
+Format: HTML
+Index: /usr/share/doc/kde/HTML/en/kdbg/index.html
+Files: /usr/share/doc/kde/HTML/en/kdbg/*.html

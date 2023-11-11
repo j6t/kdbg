@@ -1,0 +1,32 @@
+Source: kdbg
+Section: devel
+Priority: optional
+Maintainer: Debian QA Group <packages@qa.debian.org>
+Build-Depends: debhelper (>=9), cmake, kdelibs5-dev (>= 4:4.4.0)
+Standards-Version: 3.9.8
+Homepage: http://www.kdbg.org/
+
+Package: kdbg
+Architecture: any
+Depends: ${shlibs:Depends}, ${misc:Depends}
+Recommends: gdb (>= 5.0)
+Description: graphical debugger interface
+ KDbg is a graphical user interface to gdb, the GNU debugger.  It provides
+ an intuitive interface for setting breakpoints, inspecting variables,
+ stepping through code and much more.  KDbg requires KDE but you can of
+ course debug any program.
+ .
+ Features include the following:
+  * Inspection of variable values in a tree structure.
+  * Direct member: For certain compound data types the most important
+    member values are displayed next to the variable name, so that it is
+    not necessary to expand the subtree of that variable in order to see
+    the member value.  KDbg can also display Qt's QString values, which
+    are Unicode strings.
+  * Debugger at your finger tips: The basic debugger functions (step,
+    next, run, finish, until, set/clear/enable/disable breakpoint) are
+    bound to function keys F5 through F10.  Quick and easy.
+  * View source code, search text, set program arguments and environment
+    variables, display arbitrary expressions.
+  * Debugging of core dumps, attaching to running processes is possible.
+  * Conditional breakpoints.

@@ -1,0 +1,92 @@
+.\"                                      Hey, EMACS: -*- nroff -*-
+.\" First parameter, NAME, should be all caps
+.\" Second parameter, SECTION, should be 1-8, maybe w/ subsection
+.\" other parameters are allowed: see man(7), man(1)
+.TH KDBG 1 "March 25, 2005"
+.\" Please adjust this date whenever revising the manpage.
+.\"
+.\" Some roff macros, for reference:
+.\" .nh        disable hyphenation
+.\" .hy        enable hyphenation
+.\" .ad l      left justify
+.\" .ad b      justify to both left and right margins
+.\" .nf        disable filling
+.\" .fi        enable filling
+.\" .br        insert line break
+.\" .sp <n>    insert n+1 empty lines
+.\" for manpage-specific macros, see man(7)
+.SH NAME
+kdbg \- a graphical debugger interface
+.SH SYNOPSIS
+.B kdbg
+[ \fIgeneric-options\fP ]
+[ \fB\-t\fP \fIfile\fP ] [ \fB\-r\fP \fIdevice\fP ]
+[ \fB\-l\fP \fIlanguage\fP ] [ \fB\-p\fP \fIpid\fP ]
+[ \fIprogram\fP ] [ \fIcore\fP ]
+.SH DESCRIPTION
+\fBKDbg\fP is a graphical user interface to \fBgdb\fP, the GNU debugger.  It
+provides an intuitive interface for setting breakpoints, inspecting
+variables, stepping through code and much more.  KDbg requires KDE but
+you can of course debug any program.
+.PP
+KDbg can also debug XSLT (XML stylesheet translation) scripts by
+interfacing with \fBxsldbg\fP.  Debian users must install the \fIkxsldbg\fP
+package to make use of this feature.
+.PP
+You can pass KDbg the path of the executable to debug (\fIprogram\fP) or
+a core dump to debug (\fIcore\fP).
+.PP
+Features of KDbg include:
+.PP
+.RS
+Inspection of variable values in a tree structure.
+.PP
+Direct member: For certain compound data types the most important
+member values are displayed next to the variable name, so that it is
+not necessary to expand the subtree of that variable in order to see
+the member value.  KDbg can also display Qt's QString values, which
+are Unicode strings.
+.PP
+Debugger at your finger tips: The basic debugger functions (step,
+next, run, finish, until, set/clear/enable/disable breakpoint) are
+bound to function keys F5 through F10.  Quick and easy.
+.PP
+View source code, search text, set program arguments and environment
+variables, display arbitrary expressions.
+.PP
+Debugging of core dumps, attaching to running processes is possible.
+.PP
+Conditional breakpoints.
+.RE
+.SH OPTIONS
+Below are the kdbg-specific options.
+For a full summary of options, run \fIkdbg \-\-help\fP.
+.TP
+\fB\-t\fP \fIfile\fP
+Write a transcript of the conversation with the debugger to the given
+file.
+.TP
+\fB\-r\fP \fIdevice\fP
+Use remote debugging via the given device.
+.TP
+\fB\-l\fP \fIlanguage\fP
+Specify the language of the program/script to debug.
+This must be either \fIC\fP (for a C/C++ program) or
+\fIXSL\fP (for an XSLT script).
+If this option is not passed then KDbg will try to deduce the language
+from the given filename.
+.TP
+\fB\-p\fP \fIpid\fP
+Attach to the process with the given process ID.
+.SH SEE ALSO
+.BR gdb (1),
+.BR xsldbg (1).
+.PP
+Full user documentation is available through the KDE Help Centre.
+Alternatively the HTML documentation can be viewed directly from
+\fI/usr/share/doc/kdbg/html/\fP.
+.SH AUTHOR
+KDbg was written by Johannes Sixt <Johannes.Sixt@telecom.at>.
+.br
+This manual page was prepared by Ben Burton <bab@debian.org>
+for the Debian GNU/Linux system (but may be used by others).
