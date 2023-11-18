@@ -2,7 +2,14 @@ Source: kdbg
 Section: devel
 Priority: optional
 Maintainer: Debian QA Group <packages@qa.debian.org>
-Build-Depends: debhelper (>=9), cmake, kdelibs5-dev (>= 4:4.4.0)
+Build-Depends: debhelper (>=9), cmake,
+ extra-cmake-modules,
+ libkf5config-dev,
+ libkf5i18n-dev,
+ libkf5iconthemes-dev,
+ libkf5windowsystem-dev,
+ libkf5xmlgui-dev,
+ nasm
 Standards-Version: 3.9.8
 Homepage: http://www.kdbg.org/
 
