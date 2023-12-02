@@ -1,3 +1,9 @@
+kdbg (3.1.0-1) unstable; urgency=medium
+
+  * Release KDbg 3.1.0.
+
+ -- Johannes Sixt <j6t@kdbg.org>  Sun, 3 Dec 2023 18:45:00 +0100
+
 kdbg (3.0.1-1) unstable; urgency=medium
 
   * Release KDbg 3.0.1.
