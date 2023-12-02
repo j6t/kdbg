@@ -56,7 +56,7 @@ msgstr "Registres"
 msgid "Breakpoints"
 msgstr "Points d'arrêt"
 
-#: dbgmainwnd.cpp:94 pgmsettings.cpp:106
+#: dbgmainwnd.cpp:94 pgmsettings.cpp:143
 msgid "Output"
 msgstr "Sortie"
 
@@ -68,139 +68,152 @@ msgstr "Threads"
 msgid "Memory"
 msgstr "Mémoire"
 
-#: dbgmainwnd.cpp:252
+#: dbgmainwnd.cpp:253
 #, fuzzy
 msgid "&Open Source Code..."
 msgstr "&Ouvrir un fichier source..."
 
-#: dbgmainwnd.cpp:254
+#: dbgmainwnd.cpp:255
 #, fuzzy
 msgid "&Reload Source Code"
 msgstr "&Recharger ce fichier source"
 
-#: dbgmainwnd.cpp:256
+#: dbgmainwnd.cpp:257
 #, fuzzy
 msgid "&Load Executable..."
 msgstr "&Exécutable..."
 
-#: dbgmainwnd.cpp:262
+#: dbgmainwnd.cpp:263
 #, fuzzy
 msgid "Recent E&xecutables"
 msgstr "Exécutables récents"
 
-#: dbgmainwnd.cpp:263
+#: dbgmainwnd.cpp:264
 #, fuzzy
 msgid "&Core Dump..."
 msgstr "&Core dump..."
 
-#: dbgmainwnd.cpp:268
+#: dbgmainwnd.cpp:269
 msgid "This &Program..."
 msgstr "Ce &programme..."
 
-#: dbgmainwnd.cpp:270
+#: dbgmainwnd.cpp:271
 msgid "&Global Options..."
 msgstr "&Préférences"
 
-#: dbgmainwnd.cpp:298
+#: dbgmainwnd.cpp:299
 msgid "&Run"
 msgstr "E&xécuter"
 
-#: dbgmainwnd.cpp:302
+#: dbgmainwnd.cpp:303
 msgid "Step &into"
 msgstr "&Entrer dans cette fonction"
 
-#: dbgmainwnd.cpp:306
+#: dbgmainwnd.cpp:307
 msgid "Step &over"
 msgstr "&Prochaine instruction"
 
-#: dbgmainwnd.cpp:310
+#: dbgmainwnd.cpp:311
 msgid "Step o&ut"
 msgstr "&Sortir de cette fonction"
 
-#: dbgmainwnd.cpp:314
+#: dbgmainwnd.cpp:315
 msgid "Run to &cursor"
 msgstr "Exécuter &jusqu'au curseur"
 
-#: dbgmainwnd.cpp:318
+#: dbgmainwnd.cpp:319
 msgid "Step i&nto by instruction"
 msgstr "&Entrer dans cette instruction"
 
-#: dbgmainwnd.cpp:322
+#: dbgmainwnd.cpp:323
 msgid "Step o&ver by instruction"
 msgstr "&Passer cette instruction"
 
-#: dbgmainwnd.cpp:326
+#: dbgmainwnd.cpp:327
 msgid "&Program counter to current line"
 msgstr "&Program Counter jusqu'à la ligne courante"
 
-#: dbgmainwnd.cpp:329
+#: dbgmainwnd.cpp:330
 msgid "&Break"
 msgstr "&Stopper"
 
-#: dbgmainwnd.cpp:331
+#: dbgmainwnd.cpp:332
 msgid "&Kill"
 msgstr "&Tuer"
 
-#: dbgmainwnd.cpp:333
+#: dbgmainwnd.cpp:334
 msgid "Re&start"
 msgstr "&Continuer"
 
-#: dbgmainwnd.cpp:335
+#: dbgmainwnd.cpp:336
 msgid "A&ttach..."
 msgstr "A&ttacher..."
 
-#: dbgmainwnd.cpp:337
+#: dbgmainwnd.cpp:338
 msgid "&Detach"
 msgstr ""
 
-#: dbgmainwnd.cpp:339
+#: dbgmainwnd.cpp:340
 msgid "&Arguments..."
 msgstr "&Paramètres..."
 
-#: dbgmainwnd.cpp:343
+#: dbgmainwnd.cpp:344
 msgid "Set/Clear &breakpoint"
 msgstr "Placer/supp. &point d'arrêt"
 
-#: dbgmainwnd.cpp:345
+#: dbgmainwnd.cpp:346
 msgid "Set &temporary breakpoint"
 msgstr "Point d'arrêt &temporaire"
 
-#: dbgmainwnd.cpp:347
+#: dbgmainwnd.cpp:348
 msgid "&Enable/Disable breakpoint"
 msgstr "&Activer/Désactiver pt. d'arrêt"
 
-#: dbgmainwnd.cpp:351
+#: dbgmainwnd.cpp:352
 msgid "Watch Expression"
 msgstr "Expression surveillée"
 
-#: dbgmainwnd.cpp:353
+#: dbgmainwnd.cpp:354
 #, fuzzy
 msgid "Edit Value"
 msgstr "Valeur"
 
-#: dbgmainwnd.cpp:389
+#: dbgmainwnd.cpp:400
 msgid "Restart"
 msgstr "Redémarrer"
 
-#: dbgmainwnd.cpp:390
+#: dbgmainwnd.cpp:401
 msgid "Core dump"
 msgstr "Core dump"
 
-#: dbgmainwnd.cpp:620
+#: dbgmainwnd.cpp:548 dbgmainwnd.cpp:552
+msgid "Idle"
+msgstr ""
+
+#: dbgmainwnd.cpp:558
+#, fuzzy
+msgid "Break"
+msgstr "&Stopper"
+
+#: dbgmainwnd.cpp:562
+msgid "Busy/Running - Click to Break"
+msgstr ""
+
+#: dbgmainwnd.cpp:646
 msgid "`%1' is not a file or does not exist"
 msgstr "`%1' n'est pas un fichier ou n'existe pas"
 
-#: dbgmainwnd.cpp:688
+#: dbgmainwnd.cpp:714
 msgid "Don't know how to debug language `%1'"
 msgstr "Ne sait pas débogguer le langage `%1'"
 
-#: dbgmainwnd.cpp:693
+#: dbgmainwnd.cpp:719
 msgid ""
 "XSL debugging is no longer supported and will be removed in a future version "
 "of KDbg"
 msgstr ""
 
-#: dbgmainwnd.cpp:704
+#: dbgmainwnd.cpp:730
 msgid ""
 "Could not start the debugger process.\n"
 "Please shut down KDbg and resolve the problem."
@@ -208,61 +221,61 @@ msgstr ""
 "Impossible de démarrer le processus de déboggage.\n"
 "Quittez KDbg et corrigez le problème."
 
-#: dbgmainwnd.cpp:825
+#: dbgmainwnd.cpp:851
 #, fuzzy
 msgid "Global Options"
 msgstr "&Préférences"
 
-#: dbgmainwnd.cpp:839 pgmsettings.cpp:105
+#: dbgmainwnd.cpp:866 pgmsettings.cpp:142
 #, fuzzy
 msgid "Debugger"
 msgstr "&Déboguer"
 
-#: dbgmainwnd.cpp:840
+#: dbgmainwnd.cpp:867
 #, fuzzy
 msgid "Miscellaneous"
 msgstr "Di&vers"
 
-#: dbgmainwnd.cpp:978
+#: dbgmainwnd.cpp:1014
 msgid ": Program output"
 msgstr ": Sortie du programme"
 
-#: dbgmainwnd.cpp:1068
+#: dbgmainwnd.cpp:1104
 #, fuzzy
 msgid "All source files"
 msgstr "Recharger ce fichier source\n"
 
-#: dbgmainwnd.cpp:1069
+#: dbgmainwnd.cpp:1105
 #, fuzzy
 msgid "Source files"
 msgstr "Ouvrir un fichier source\n"
 
-#: dbgmainwnd.cpp:1070
+#: dbgmainwnd.cpp:1106
 #, fuzzy
 msgid "Header files"
 msgstr "|Fichiers d'entête\n"
 
-#: dbgmainwnd.cpp:1071
+#: dbgmainwnd.cpp:1107
 #, fuzzy
 msgid "All files"
 msgstr "*|Tous les fichiers"
 
-#: dbgmainwnd.cpp:1148
+#: dbgmainwnd.cpp:1184
 #, fuzzy
 msgid "Open Source Code"
 msgstr "Code &source"
 
-#: dbgmainwnd.cpp:1165
+#: dbgmainwnd.cpp:1201
 #, fuzzy
 msgid "Select the Executable to Debug"
 msgstr "Choisissez l'exécutable à déboguer"
 
-#: dbgmainwnd.cpp:1179
+#: dbgmainwnd.cpp:1215
 #, fuzzy
 msgid "Select Core Dump"
 msgstr "Choisissez le core dump"
 
-#: debugger.cpp:695
+#: debugger.cpp:708
 #, fuzzy
 msgid ""
 "%1 exited unexpectedly.\n"
@@ -271,7 +284,7 @@ msgstr ""
 "%1 s'est terminé involontairement.\n"
 "Redémarrez votre session (avec Fichier|Exécutable)."
 
-#: debugger.cpp:887
+#: debugger.cpp:905
 msgid ""
 "The settings for this program specify the following debugger command:\n"
 "%1\n"
@@ -281,21 +294,25 @@ msgstr ""
 "%1\n"
 "Cette commande doit-elle être utilisée ?"
 
+#: debugger.cpp:2265
+msgid "Setting the disassembly flavor failed."
+msgstr ""
+
 #. i18n: file: pgmargsbase.ui:235
 #. i18n: ectx: property (text), widget (QTreeWidget, envList)
-#: exprwnd.cpp:325 regwnd.cpp:420 rc.cpp:127
+#: exprwnd.cpp:324 regwnd.cpp:420 rc.cpp:127
 msgid "Value"
 msgstr "Valeur"
 
-#: gdbdriver.cpp:876
+#: gdbdriver.cpp:862
 msgid "<anonymous struct or union>"
 msgstr ""
 
-#: gdbdriver.cpp:1581
+#: gdbdriver.cpp:1574
 msgid "<additional entries of the array suppressed>"
 msgstr "<entrées supplémentaires du tableau supprimées>"
 
-#: gdbdriver.cpp:2218 xsldbgdriver.cpp:1221
+#: gdbdriver.cpp:2211 xsldbgdriver.cpp:1212
 msgid "New working directory: "
 msgstr "Nouveau répertoire de travail"
 
@@ -337,6 +354,14 @@ msgstr ""
 
 #: main.cpp:43
 msgid "KDE4 porting"
+msgstr ""
+
+#: main.cpp:45
+msgid "Sebastian Pipping"
+msgstr ""
+
+#: main.cpp:46
+msgid "GitHub Actions CI"
 msgstr ""
 
 #: main.cpp:67
@@ -437,12 +462,19 @@ msgstr "&Instructions"
 msgid "Select a file name to insert as program argument"
 msgstr "Selectionner un nom de fichier à insérer comme argument de programme"
 
-#: pgmargs.cpp:211
+#. i18n: replacement text for the "Open" button in a file dialog
+#. the selected file name will be inserted in a text box
+#: pgmargs.cpp:205
+msgctxt "@action:button file name into text box"
+msgid "Insert"
+msgstr ""
+
+#: pgmargs.cpp:218
 #, fuzzy
 msgid "Select a directory to insert as program argument"
 msgstr "Selectionner un nom de fichier à insérer comme argument de programme"
 
-#: pgmsettings.cpp:24
+#: pgmsettings.cpp:26
 msgid ""
 "How to invoke &GDB - leave empty to use\n"
 "the default from the global options:"
@@ -450,32 +482,57 @@ msgstr ""
 "Comment lancer &GDB - laissez la cellule vide\n"
 "pour utiliser les valeurs par défault:"
 
-#: pgmsettings.cpp:58
+#: pgmsettings.cpp:40
+#, fuzzy
+msgid "Global Setting"
+msgstr "&Préférences"
+
+#: pgmsettings.cpp:41 prefdebugger.cpp:52
+msgid "ATT"
+msgstr ""
+
+#: pgmsettings.cpp:42 prefdebugger.cpp:53
+msgid "Intel"
+msgstr ""
+
+#: pgmsettings.cpp:44
+msgid "Disassembly flavor:"
+msgstr ""
+
+#: pgmsettings.cpp:73 prefdebugger.cpp:57
+msgid "Disassembly flavor for x86 architecture"
+msgstr ""
+
+#: pgmsettings.cpp:74
+msgid "Disassembly flavor is only available for x86 architecture"
+msgstr ""
+
+#: pgmsettings.cpp:95
 msgid "&No input and output"
 msgstr "&Pas d'entrée/sortie"
 
-#: pgmsettings.cpp:62
+#: pgmsettings.cpp:99
 msgid "&Only output, simple terminal emulation"
 msgstr "Uniquement la &sortie, émulation de terminal simple"
 
-#: pgmsettings.cpp:66
+#: pgmsettings.cpp:103
 msgid "&Full terminal emulation"
 msgstr "&Emulation complète de terminal "
 
-#: pgmsettings.cpp:102
+#: pgmsettings.cpp:139
 #, fuzzy
 msgid "Settings for %1"
 msgstr "%1: Paramètres pour %2"
 
-#: prefdebugger.cpp:20
+#: prefdebugger.cpp:23
 msgid "To revert to the default settings, clear the entries."
 msgstr "Pour les paramêtres par défaut, effacez les valeurs"
 
-#: prefdebugger.cpp:24
+#: prefdebugger.cpp:27
 msgid "How to invoke &GDB:"
 msgstr "Comment lancer &GDB"
 
-#: prefdebugger.cpp:31
+#: prefdebugger.cpp:34
 msgid ""
 "%T will be replaced with a title string,\n"
 "%C will be replaced by a Bourne shell script that\n"
@@ -485,9 +542,18 @@ msgstr ""
 "%C sera remplacé par un script qui\n"
 "garde la console active."
 
-#: prefdebugger.cpp:37
+#: prefdebugger.cpp:40
 msgid "&Terminal for program output:"
 msgstr "&Sortie du programme :"
+
+#: prefdebugger.cpp:47
+msgid "Disassembly Flavor:"
+msgstr ""
+
+#: prefdebugger.cpp:51
+#, fuzzy
+msgid "Default"
+msgstr "Défaut &GDB"
 
 #: prefmisc.cpp:23
 msgid "&Pop into foreground when program stops"
@@ -573,7 +639,7 @@ msgstr "ID du Thread"
 msgid "Location"
 msgstr "Position"
 
-#: ttywnd.cpp:214
+#: ttywnd.cpp:215
 msgid "&Clear"
 msgstr "&Vider"
 
@@ -590,27 +656,27 @@ msgstr " Supp "
 msgid "Expression"
 msgstr "Expression surveillée"
 
-#: winstack.cpp:391
+#: winstack.cpp:398
 msgid "Search"
 msgstr "Rechercher"
 
-#: winstack.cpp:398
+#: winstack.cpp:405
 msgid "&Case sensitive"
 msgstr "&Différencier min/maj"
 
-#: winstack.cpp:400
+#: winstack.cpp:407
 msgid "&Forward"
 msgstr "&Suivant"
 
-#: winstack.cpp:402
+#: winstack.cpp:409
 msgid "&Backward"
 msgstr "&Précédent"
 
-#: winstack.cpp:403
+#: winstack.cpp:410
 msgid "Close"
 msgstr ""
 
-#: xsldbgdriver.cpp:1319
+#: xsldbgdriver.cpp:1316
 msgid "No memory dump available"
 msgstr "Pas de dump de la mémoire disponible"
 

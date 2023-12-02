@@ -57,7 +57,7 @@ msgstr "Registros"
 msgid "Breakpoints"
 msgstr "Puntos de interrupción"
 
-#: dbgmainwnd.cpp:94 pgmsettings.cpp:106
+#: dbgmainwnd.cpp:94 pgmsettings.cpp:143
 msgid "Output"
 msgstr "Salida"
 
@@ -69,136 +69,149 @@ msgstr "Hilos"
 msgid "Memory"
 msgstr "Memoria"
 
-#: dbgmainwnd.cpp:252
+#: dbgmainwnd.cpp:253
 #, fuzzy
 msgid "&Open Source Code..."
 msgstr "&Abrir un fichero fuente..."
 
-#: dbgmainwnd.cpp:254
+#: dbgmainwnd.cpp:255
 #, fuzzy
 msgid "&Reload Source Code"
 msgstr "&Recargar el fichero fuente"
 
-#: dbgmainwnd.cpp:256
+#: dbgmainwnd.cpp:257
 #, fuzzy
 msgid "&Load Executable..."
 msgstr "&Ejecutable..."
 
-#: dbgmainwnd.cpp:262
+#: dbgmainwnd.cpp:263
 msgid "Recent E&xecutables"
 msgstr "E&jecutables Recientes"
 
-#: dbgmainwnd.cpp:263
+#: dbgmainwnd.cpp:264
 msgid "&Core Dump..."
 msgstr ""
 
-#: dbgmainwnd.cpp:268
+#: dbgmainwnd.cpp:269
 msgid "This &Program..."
 msgstr "&Este Programa"
 
-#: dbgmainwnd.cpp:270
+#: dbgmainwnd.cpp:271
 msgid "&Global Options..."
 msgstr "&Opciones globales..."
 
-#: dbgmainwnd.cpp:298
+#: dbgmainwnd.cpp:299
 msgid "&Run"
 msgstr "&Ejecutar"
 
-#: dbgmainwnd.cpp:302
+#: dbgmainwnd.cpp:303
 msgid "Step &into"
 msgstr "Entrar en la &función"
 
-#: dbgmainwnd.cpp:306
+#: dbgmainwnd.cpp:307
 msgid "Step &over"
 msgstr "&Otra instrucción"
 
-#: dbgmainwnd.cpp:310
+#: dbgmainwnd.cpp:311
 msgid "Step o&ut"
 msgstr "&Salir de la función"
 
-#: dbgmainwnd.cpp:314
+#: dbgmainwnd.cpp:315
 msgid "Run to &cursor"
 msgstr "Ejecutar hasta &cursor"
 
-#: dbgmainwnd.cpp:318
+#: dbgmainwnd.cpp:319
 msgid "Step i&nto by instruction"
 msgstr ""
 
-#: dbgmainwnd.cpp:322
+#: dbgmainwnd.cpp:323
 msgid "Step o&ver by instruction"
 msgstr ""
 
-#: dbgmainwnd.cpp:326
+#: dbgmainwnd.cpp:327
 msgid "&Program counter to current line"
 msgstr ""
 
-#: dbgmainwnd.cpp:329
+#: dbgmainwnd.cpp:330
 msgid "&Break"
 msgstr "&Parar"
 
-#: dbgmainwnd.cpp:331
+#: dbgmainwnd.cpp:332
 msgid "&Kill"
 msgstr "&Matar"
 
-#: dbgmainwnd.cpp:333
+#: dbgmainwnd.cpp:334
 msgid "Re&start"
 msgstr "&Reiniciar"
 
-#: dbgmainwnd.cpp:335
+#: dbgmainwnd.cpp:336
 msgid "A&ttach..."
 msgstr "&Ligar..."
 
-#: dbgmainwnd.cpp:337
+#: dbgmainwnd.cpp:338
 msgid "&Detach"
 msgstr ""
 
-#: dbgmainwnd.cpp:339
+#: dbgmainwnd.cpp:340
 msgid "&Arguments..."
 msgstr "&Argumentos..."
 
-#: dbgmainwnd.cpp:343
+#: dbgmainwnd.cpp:344
 msgid "Set/Clear &breakpoint"
 msgstr "&Poner/Quitar puntos de interrupción"
 
-#: dbgmainwnd.cpp:345
+#: dbgmainwnd.cpp:346
 msgid "Set &temporary breakpoint"
 msgstr "&Definir puntos de interrupción temporales"
 
-#: dbgmainwnd.cpp:347
+#: dbgmainwnd.cpp:348
 msgid "&Enable/Disable breakpoint"
 msgstr "&Activar/Desactivar puntos de interrupción"
 
-#: dbgmainwnd.cpp:351
+#: dbgmainwnd.cpp:352
 msgid "Watch Expression"
 msgstr "Vigilar Expresión"
 
-#: dbgmainwnd.cpp:353
+#: dbgmainwnd.cpp:354
 msgid "Edit Value"
 msgstr "Editar Valor"
 
-#: dbgmainwnd.cpp:389
+#: dbgmainwnd.cpp:400
 msgid "Restart"
 msgstr "Reiniciar"
 
-#: dbgmainwnd.cpp:390
+#: dbgmainwnd.cpp:401
 msgid "Core dump"
 msgstr ""
 
-#: dbgmainwnd.cpp:620
+#: dbgmainwnd.cpp:548 dbgmainwnd.cpp:552
+msgid "Idle"
+msgstr ""
+
+#: dbgmainwnd.cpp:558
+#, fuzzy
+msgid "Break"
+msgstr "&Parar"
+
+#: dbgmainwnd.cpp:562
+msgid "Busy/Running - Click to Break"
+msgstr ""
+
+#: dbgmainwnd.cpp:646
 msgid "`%1' is not a file or does not exist"
 msgstr "`%1' no es un fichero o no existe"
 
-#: dbgmainwnd.cpp:688
+#: dbgmainwnd.cpp:714
 msgid "Don't know how to debug language `%1'"
 msgstr "No se puede depurar el lenguaje `%1'"
 
-#: dbgmainwnd.cpp:693
+#: dbgmainwnd.cpp:719
 msgid ""
 "XSL debugging is no longer supported and will be removed in a future version "
 "of KDbg"
 msgstr ""
 
-#: dbgmainwnd.cpp:704
+#: dbgmainwnd.cpp:730
 msgid ""
 "Could not start the debugger process.\n"
 "Please shut down KDbg and resolve the problem."
@@ -206,61 +219,61 @@ msgstr ""
 "No se pudo iniciar el depurador.\n"
 "Por favor, cierre KDbg y solucione el problema."
 
-#: dbgmainwnd.cpp:825
+#: dbgmainwnd.cpp:851
 #, fuzzy
 msgid "Global Options"
 msgstr "&Opciones globales..."
 
-#: dbgmainwnd.cpp:839 pgmsettings.cpp:105
+#: dbgmainwnd.cpp:866 pgmsettings.cpp:142
 #, fuzzy
 msgid "Debugger"
 msgstr "&Depurador"
 
-#: dbgmainwnd.cpp:840
+#: dbgmainwnd.cpp:867
 #, fuzzy
 msgid "Miscellaneous"
 msgstr "&Miscelánea"
 
-#: dbgmainwnd.cpp:978
+#: dbgmainwnd.cpp:1014
 msgid ": Program output"
 msgstr ": Datos de salida"
 
-#: dbgmainwnd.cpp:1068
+#: dbgmainwnd.cpp:1104
 #, fuzzy
 msgid "All source files"
 msgstr "|Todos los ficheros fuente\n"
 
-#: dbgmainwnd.cpp:1069
+#: dbgmainwnd.cpp:1105
 #, fuzzy
 msgid "Source files"
 msgstr "|Ficheros fuente\n"
 
-#: dbgmainwnd.cpp:1070
+#: dbgmainwnd.cpp:1106
 #, fuzzy
 msgid "Header files"
 msgstr "|Ficheros de cabeceras\n"
 
-#: dbgmainwnd.cpp:1071
+#: dbgmainwnd.cpp:1107
 #, fuzzy
 msgid "All files"
 msgstr "*|Todos los ficheros"
 
-#: dbgmainwnd.cpp:1148
+#: dbgmainwnd.cpp:1184
 #, fuzzy
 msgid "Open Source Code"
 msgstr "&Código fuente"
 
-#: dbgmainwnd.cpp:1165
+#: dbgmainwnd.cpp:1201
 #, fuzzy
 msgid "Select the Executable to Debug"
 msgstr "Elija el ejecutable a analizar"
 
-#: dbgmainwnd.cpp:1179
+#: dbgmainwnd.cpp:1215
 #, fuzzy
 msgid "Select Core Dump"
 msgstr "Elija el core dump"
 
-#: debugger.cpp:695
+#: debugger.cpp:708
 #, fuzzy
 msgid ""
 "%1 exited unexpectedly.\n"
@@ -269,7 +282,7 @@ msgstr ""
 "%1 se murió de forma inesperada.\n"
 "Reinicie la sesión (por ejemplo,.: con Fichero|Ejecutable)."
 
-#: debugger.cpp:887
+#: debugger.cpp:905
 msgid ""
 "The settings for this program specify the following debugger command:\n"
 "%1\n"
@@ -279,21 +292,25 @@ msgstr ""
 "%1\n"
 "¿Se debe usar esta orden?"
 
+#: debugger.cpp:2265
+msgid "Setting the disassembly flavor failed."
+msgstr ""
+
 #. i18n: file: pgmargsbase.ui:235
 #. i18n: ectx: property (text), widget (QTreeWidget, envList)
-#: exprwnd.cpp:325 regwnd.cpp:420 rc.cpp:127
+#: exprwnd.cpp:324 regwnd.cpp:420 rc.cpp:127
 msgid "Value"
 msgstr "Valor"
 
-#: gdbdriver.cpp:876
+#: gdbdriver.cpp:862
 msgid "<anonymous struct or union>"
 msgstr ""
 
-#: gdbdriver.cpp:1581
+#: gdbdriver.cpp:1574
 msgid "<additional entries of the array suppressed>"
 msgstr "<se han suprimido las entradas adicionales del array>"
 
-#: gdbdriver.cpp:2218 xsldbgdriver.cpp:1221
+#: gdbdriver.cpp:2211 xsldbgdriver.cpp:1212
 msgid "New working directory: "
 msgstr "Nuevo directorio de trabajo:"
 
@@ -336,6 +353,14 @@ msgstr ""
 
 #: main.cpp:43
 msgid "KDE4 porting"
+msgstr ""
+
+#: main.cpp:45
+msgid "Sebastian Pipping"
+msgstr ""
+
+#: main.cpp:46
+msgid "GitHub Actions CI"
 msgstr ""
 
 #: main.cpp:67
@@ -436,11 +461,18 @@ msgstr "&Instrucciones"
 msgid "Select a file name to insert as program argument"
 msgstr "Seleccione un fichero para insertarlo como argumento del programa"
 
-#: pgmargs.cpp:211
+#. i18n: replacement text for the "Open" button in a file dialog
+#. the selected file name will be inserted in a text box
+#: pgmargs.cpp:205
+msgctxt "@action:button file name into text box"
+msgid "Insert"
+msgstr ""
+
+#: pgmargs.cpp:218
 msgid "Select a directory to insert as program argument"
 msgstr "Seleccione un directorio para insertarlo como argumento del programa"
 
-#: pgmsettings.cpp:24
+#: pgmsettings.cpp:26
 msgid ""
 "How to invoke &GDB - leave empty to use\n"
 "the default from the global options:"
@@ -448,32 +480,57 @@ msgstr ""
 "Cómo iniciar &GDB - dejar en blanco para usar\n"
 "la opción por omisión de las opciones globales:"
 
-#: pgmsettings.cpp:58
+#: pgmsettings.cpp:40
+#, fuzzy
+msgid "Global Setting"
+msgstr "&Opciones globales..."
+
+#: pgmsettings.cpp:41 prefdebugger.cpp:52
+msgid "ATT"
+msgstr ""
+
+#: pgmsettings.cpp:42 prefdebugger.cpp:53
+msgid "Intel"
+msgstr ""
+
+#: pgmsettings.cpp:44
+msgid "Disassembly flavor:"
+msgstr ""
+
+#: pgmsettings.cpp:73 prefdebugger.cpp:57
+msgid "Disassembly flavor for x86 architecture"
+msgstr ""
+
+#: pgmsettings.cpp:74
+msgid "Disassembly flavor is only available for x86 architecture"
+msgstr ""
+
+#: pgmsettings.cpp:95
 msgid "&No input and output"
 msgstr "&Sin entrada ni salida"
 
-#: pgmsettings.cpp:62
+#: pgmsettings.cpp:99
 msgid "&Only output, simple terminal emulation"
 msgstr "Só&lo salida, emulación de terminal sencilla"
 
-#: pgmsettings.cpp:66
+#: pgmsettings.cpp:103
 msgid "&Full terminal emulation"
 msgstr "&Emulación de terminal completa"
 
-#: pgmsettings.cpp:102
+#: pgmsettings.cpp:139
 #, fuzzy
 msgid "Settings for %1"
 msgstr "%1: Configuración para %2"
 
-#: prefdebugger.cpp:20
+#: prefdebugger.cpp:23
 msgid "To revert to the default settings, clear the entries."
 msgstr "Borrar las entradas para volver a los valores por omisión"
 
-#: prefdebugger.cpp:24
+#: prefdebugger.cpp:27
 msgid "How to invoke &GDB:"
 msgstr "Cómo iniciar &GDB"
 
-#: prefdebugger.cpp:31
+#: prefdebugger.cpp:34
 msgid ""
 "%T will be replaced with a title string,\n"
 "%C will be replaced by a Bourne shell script that\n"
@@ -483,9 +540,17 @@ msgstr ""
 "%C será reemplazado por un guión de Bourne shell que\n"
 "mantenga la ventana de terminal abierta."
 
-#: prefdebugger.cpp:37
+#: prefdebugger.cpp:40
 msgid "&Terminal for program output:"
 msgstr "&Terminal de los datos de salida:"
+
+#: prefdebugger.cpp:47
+msgid "Disassembly Flavor:"
+msgstr ""
+
+#: prefdebugger.cpp:51
+msgid "Default"
+msgstr ""
 
 #: prefmisc.cpp:23
 msgid "&Pop into foreground when program stops"
@@ -569,7 +634,7 @@ msgstr "ID de Hilo"
 msgid "Location"
 msgstr "Lugar"
 
-#: ttywnd.cpp:214
+#: ttywnd.cpp:215
 msgid "&Clear"
 msgstr "&Limpiar"
 
@@ -585,28 +650,28 @@ msgstr " Borrar "
 msgid "Expression"
 msgstr "Expresión"
 
-#: winstack.cpp:391
+#: winstack.cpp:398
 #, fuzzy
 msgid "Search"
 msgstr ": Buscar"
 
-#: winstack.cpp:398
+#: winstack.cpp:405
 msgid "&Case sensitive"
 msgstr "&Distinción de mayúsculas"
 
-#: winstack.cpp:400
+#: winstack.cpp:407
 msgid "&Forward"
 msgstr "&Siguiente"
 
-#: winstack.cpp:402
+#: winstack.cpp:409
 msgid "&Backward"
 msgstr "&Anterior"
 
-#: winstack.cpp:403
+#: winstack.cpp:410
 msgid "Close"
 msgstr ""
 
-#: xsldbgdriver.cpp:1319
+#: xsldbgdriver.cpp:1316
 msgid "No memory dump available"
 msgstr "Volcado de memoria no disponible"
 
