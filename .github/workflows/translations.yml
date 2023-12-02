@@ -1,0 +1,32 @@
+# Copyright (c) 2023 Sebastian Pipping <sebastian@pipping.org>
+# Licensed under the GNU General Public License Version 2.
+
+name: Enforce that .po/.pot files are in sync with the code
+
+on:
+  pull_request:
+  push:
+  schedule:
+    - cron: '0 3 * * 5'  # Every Friday at 3am
+
+jobs:
+  translations:
+    name: Enforce that .po/.pot files are in sync with the code
+    runs-on: ubuntu-22.04
+    steps:
+      - name: Install build dependencies
+        run: |-
+          sudo apt-get update
+          sudo apt-get install --yes --no-install-recommends \
+            gettext \
+            kdesdk-scripts \
+            moreutils
+
+      - name: Checkout Git branch
+        uses: actions/checkout@v4
+
+      - name: 'Enforce that .po/.pot files are in sync with the code'
+        run: |-
+          set -x
+          ./po/preparemessages.sh
+          git diff --exit-code  # i.e. fail CI with details if non-empty
