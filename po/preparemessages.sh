@@ -1,4 +1,4 @@
-#!/bin/sh
+#! /usr/bin/env bash
 
 # run in the directory where this script is located
 dir=${0%/*}
@@ -46,6 +46,29 @@ for cat in *.po; do
 	echo $cat
 	msgmerge -o "$cat.new" "$cat" "$project".pot &&
 	mv "$cat.new" "$cat" || exit
+done
+
+echo "Restoring POT-Creation-Date headers from Git"
+
+restore_po_creation_date_from_git() {
+    local filename="${1}"
+    local original="$(git show "HEAD:./${filename}" 2>/dev/null | grep -nF POT-Creation-Date:)"
+    if [[ -z ${original} ]]; then
+        echo "[*] Skipped unversioned file \"${filename}\"."
+        return 0
+    fi
+    local line_number="${original%%:*}"
+    local line_content="${original#*:}"
+    {
+        sed -n "1,$(( line_number - 1 ))p" "${filename}"
+        echo "${line_content}"
+        sed -n "$(( line_number + 1 )),\$p" "${filename}"
+    } | sponge "${filename}"
+    echo "[+] Restored POT-Creation-Date for file \"${filename}\"."
+}
+
+for i in $(git ls-files \*.po \*.pot); do
+    restore_po_creation_date_from_git "${i}"
 done
 
 echo "Done"
