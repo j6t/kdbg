@@ -6,7 +6,7 @@ msgid ""
 msgstr ""
 "Project-Id-Version: 2.0.0\n"
 "Report-Msgid-Bugs-To: \n"
-"POT-Creation-Date: 2017-09-02 14:39+0200\n"
+"POT-Creation-Date: 2023-12-03 08:42+0100\n"
 "PO-Revision-Date: 2005-08-18 10:10+0100\n"
 "Last-Translator: Tamas Szanto <tszanto AT interware DOT hu>\n"
 "Language-Team: Hungarian <kde-lista@sophia.jpte.hu>\n"
@@ -55,7 +55,7 @@ msgstr "Regiszterek"
 msgid "Breakpoints"
 msgstr "Töréspontok"
 
-#: dbgmainwnd.cpp:94 pgmsettings.cpp:106
+#: dbgmainwnd.cpp:94 pgmsettings.cpp:143
 msgid "Output"
 msgstr "Kimenet"
 
@@ -67,137 +67,150 @@ msgstr "Szálak"
 msgid "Memory"
 msgstr "Memória"
 
-#: dbgmainwnd.cpp:252
+#: dbgmainwnd.cpp:253
 #, fuzzy
 msgid "&Open Source Code..."
 msgstr "Forrás &megnyitása..."
 
-#: dbgmainwnd.cpp:254
+#: dbgmainwnd.cpp:255
 #, fuzzy
 msgid "&Reload Source Code"
 msgstr "A forrás ú&jratöltése"
 
-#: dbgmainwnd.cpp:256
+#: dbgmainwnd.cpp:257
 #, fuzzy
 msgid "&Load Executable..."
 msgstr "&Programfájl..."
 
-#: dbgmainwnd.cpp:262
+#: dbgmainwnd.cpp:263
 msgid "Recent E&xecutables"
 msgstr "A leg&utóbbi programfájlok"
 
-#: dbgmainwnd.cpp:263
+#: dbgmainwnd.cpp:264
 #, fuzzy
 msgid "&Core Dump..."
 msgstr "Memór&iakép..."
 
-#: dbgmainwnd.cpp:268
+#: dbgmainwnd.cpp:269
 msgid "This &Program..."
 msgstr "Ez a p&rogram..."
 
-#: dbgmainwnd.cpp:270
+#: dbgmainwnd.cpp:271
 msgid "&Global Options..."
 msgstr "&Globális beállítások..."
 
-#: dbgmainwnd.cpp:298
+#: dbgmainwnd.cpp:299
 msgid "&Run"
 msgstr "&Futtatás"
 
-#: dbgmainwnd.cpp:302
+#: dbgmainwnd.cpp:303
 msgid "Step &into"
 msgstr "&Belépés"
 
-#: dbgmainwnd.cpp:306
+#: dbgmainwnd.cpp:307
 msgid "Step &over"
 msgstr "Á&tlépés"
 
-#: dbgmainwnd.cpp:310
+#: dbgmainwnd.cpp:311
 msgid "Step o&ut"
 msgstr "&Kilépés"
 
-#: dbgmainwnd.cpp:314
+#: dbgmainwnd.cpp:315
 msgid "Run to &cursor"
 msgstr "Futtatás a k&urzorig"
 
-#: dbgmainwnd.cpp:318
+#: dbgmainwnd.cpp:319
 msgid "Step i&nto by instruction"
 msgstr "&Belépés az utasításba"
 
-#: dbgmainwnd.cpp:322
+#: dbgmainwnd.cpp:323
 msgid "Step o&ver by instruction"
 msgstr "Az utasítás á&tlépése"
 
-#: dbgmainwnd.cpp:326
+#: dbgmainwnd.cpp:327
 msgid "&Program counter to current line"
 msgstr "Az aktuális sor pr&ogramszámlálója"
 
-#: dbgmainwnd.cpp:329
+#: dbgmainwnd.cpp:330
 msgid "&Break"
 msgstr "Me&gszakítás"
 
-#: dbgmainwnd.cpp:331
+#: dbgmainwnd.cpp:332
 msgid "&Kill"
 msgstr "Kilö&vés"
 
-#: dbgmainwnd.cpp:333
+#: dbgmainwnd.cpp:334
 msgid "Re&start"
 msgstr "Újra&indítás"
 
-#: dbgmainwnd.cpp:335
+#: dbgmainwnd.cpp:336
 msgid "A&ttach..."
 msgstr "&Hozzáfüzés..."
 
-#: dbgmainwnd.cpp:337
+#: dbgmainwnd.cpp:338
 msgid "&Detach"
 msgstr ""
 
-#: dbgmainwnd.cpp:339
+#: dbgmainwnd.cpp:340
 msgid "&Arguments..."
 msgstr "&Argumentumok..."
 
-#: dbgmainwnd.cpp:343
+#: dbgmainwnd.cpp:344
 msgid "Set/Clear &breakpoint"
 msgstr "Töréspont &beállítása/törlése"
 
-#: dbgmainwnd.cpp:345
+#: dbgmainwnd.cpp:346
 msgid "Set &temporary breakpoint"
 msgstr "Átmeneti törés&pont beállítása"
 
-#: dbgmainwnd.cpp:347
+#: dbgmainwnd.cpp:348
 msgid "&Enable/Disable breakpoint"
 msgstr "Töréspont &ki-be kapcsolása"
 
-#: dbgmainwnd.cpp:351
+#: dbgmainwnd.cpp:352
 msgid "Watch Expression"
 msgstr "Figyelt kifejezés"
 
-#: dbgmainwnd.cpp:353
+#: dbgmainwnd.cpp:354
 msgid "Edit Value"
 msgstr "Az érték szerkesztése"
 
-#: dbgmainwnd.cpp:389
+#: dbgmainwnd.cpp:400
 msgid "Restart"
 msgstr "Újraindítás"
 
-#: dbgmainwnd.cpp:390
+#: dbgmainwnd.cpp:401
 msgid "Core dump"
 msgstr "Memóriakép"
 
-#: dbgmainwnd.cpp:620
+#: dbgmainwnd.cpp:548 dbgmainwnd.cpp:552
+msgid "Idle"
+msgstr ""
+
+#: dbgmainwnd.cpp:558
+#, fuzzy
+msgid "Break"
+msgstr "Me&gszakítás"
+
+#: dbgmainwnd.cpp:562
+msgid "Busy/Running - Click to Break"
+msgstr ""
+
+#: dbgmainwnd.cpp:646
 msgid "`%1' is not a file or does not exist"
 msgstr "`%1' nem fájl vagy nem létezik"
 
-#: dbgmainwnd.cpp:688
+#: dbgmainwnd.cpp:714
 msgid "Don't know how to debug language `%1'"
 msgstr "Nem lehet nyomkövetni a(z) '%1' nyelvet"
 
-#: dbgmainwnd.cpp:693
+#: dbgmainwnd.cpp:719
 msgid ""
 "XSL debugging is no longer supported and will be removed in a future version "
 "of KDbg"
 msgstr ""
 
-#: dbgmainwnd.cpp:704
+#: dbgmainwnd.cpp:730
 msgid ""
 "Could not start the debugger process.\n"
 "Please shut down KDbg and resolve the problem."
@@ -205,61 +218,61 @@ msgstr ""
 "Nem sikerült elindítani a nyomkövetési folyamatot.\n"
 "Zárja be a KDbg-t és hárítsa el a problémát."
 
-#: dbgmainwnd.cpp:825
+#: dbgmainwnd.cpp:851
 #, fuzzy
 msgid "Global Options"
 msgstr "&Globális beállítások..."
 
-#: dbgmainwnd.cpp:839 pgmsettings.cpp:105
+#: dbgmainwnd.cpp:866 pgmsettings.cpp:142
 #, fuzzy
 msgid "Debugger"
 msgstr "Ny&omkövető"
 
-#: dbgmainwnd.cpp:840
+#: dbgmainwnd.cpp:867
 #, fuzzy
 msgid "Miscellaneous"
 msgstr "&Egyéb"
 
-#: dbgmainwnd.cpp:978
+#: dbgmainwnd.cpp:1014
 msgid ": Program output"
 msgstr ": A program kimenete"
 
-#: dbgmainwnd.cpp:1068
+#: dbgmainwnd.cpp:1104
 #, fuzzy
 msgid "All source files"
 msgstr "|Minden forrásfájl\n"
 
-#: dbgmainwnd.cpp:1069
+#: dbgmainwnd.cpp:1105
 #, fuzzy
 msgid "Source files"
 msgstr "|Forrásfájlok\n"
 
-#: dbgmainwnd.cpp:1070
+#: dbgmainwnd.cpp:1106
 #, fuzzy
 msgid "Header files"
 msgstr "|Header fájlok\n"
 
-#: dbgmainwnd.cpp:1071
+#: dbgmainwnd.cpp:1107
 #, fuzzy
 msgid "All files"
 msgstr "*|Minden fájl"
 
-#: dbgmainwnd.cpp:1148
+#: dbgmainwnd.cpp:1184
 #, fuzzy
 msgid "Open Source Code"
 msgstr "&Forráskód"
 
-#: dbgmainwnd.cpp:1165
+#: dbgmainwnd.cpp:1201
 #, fuzzy
 msgid "Select the Executable to Debug"
 msgstr "A nyomkövetni kívánt programfájl kiválasztása"
 
-#: dbgmainwnd.cpp:1179
+#: dbgmainwnd.cpp:1215
 #, fuzzy
 msgid "Select Core Dump"
 msgstr "Memóriakép kiválasztása"
 
-#: debugger.cpp:695
+#: debugger.cpp:708
 #, fuzzy
 msgid ""
 "%1 exited unexpectedly.\n"
@@ -268,7 +281,7 @@ msgstr ""
 "%1 váratlanul leállt.\n"
 "Indítsa újra a munkafolyamatot (pl. a Fájl|Programfájl menüponttal)."
 
-#: debugger.cpp:887
+#: debugger.cpp:905
 msgid ""
 "The settings for this program specify the following debugger command:\n"
 "%1\n"
@@ -278,21 +291,25 @@ msgstr ""
 "%1\n"
 "Ezt a parancsot szeretné használni?"
 
+#: debugger.cpp:2265
+msgid "Setting the disassembly flavor failed."
+msgstr ""
+
 #. i18n: file: pgmargsbase.ui:235
 #. i18n: ectx: property (text), widget (QTreeWidget, envList)
-#: exprwnd.cpp:325 regwnd.cpp:420 rc.cpp:127
+#: exprwnd.cpp:324 regwnd.cpp:420 rc.cpp:127
 msgid "Value"
 msgstr "Érték"
 
-#: gdbdriver.cpp:876
+#: gdbdriver.cpp:862
 msgid "<anonymous struct or union>"
 msgstr ""
 
-#: gdbdriver.cpp:1581
+#: gdbdriver.cpp:1574
 msgid "<additional entries of the array suppressed>"
 msgstr "<a tömb további elemei nem jelennek meg>"
 
-#: gdbdriver.cpp:2218 xsldbgdriver.cpp:1221
+#: gdbdriver.cpp:2211 xsldbgdriver.cpp:1212
 msgid "New working directory: "
 msgstr "Új munkakönyvtár: "
 
@@ -334,6 +351,14 @@ msgstr ""
 
 #: main.cpp:43
 msgid "KDE4 porting"
+msgstr ""
+
+#: main.cpp:45
+msgid "Sebastian Pipping"
+msgstr ""
+
+#: main.cpp:46
+msgid "GitHub Actions CI"
 msgstr ""
 
 #: main.cpp:67
@@ -432,12 +457,19 @@ msgstr "Utasítás&ok"
 msgid "Select a file name to insert as program argument"
 msgstr "Válassza ki a programnak argumentumként átadni kívánt fájlnevet"
 
-#: pgmargs.cpp:211
+#. i18n: replacement text for the "Open" button in a file dialog
+#. the selected file name will be inserted in a text box
+#: pgmargs.cpp:205
+msgctxt "@action:button file name into text box"
+msgid "Insert"
+msgstr ""
+
+#: pgmargs.cpp:218
 #, fuzzy
 msgid "Select a directory to insert as program argument"
 msgstr "Válassza ki a programnak argumentumként átadni kívánt fájlnevet"
 
-#: pgmsettings.cpp:24
+#: pgmsettings.cpp:26
 msgid ""
 "How to invoke &GDB - leave empty to use\n"
 "the default from the global options:"
@@ -445,32 +477,57 @@ msgstr ""
 "A &GDB indítási módja - ha üresen hagyja,\n"
 "a globális alapértelmezés lesz érvényes:"
 
-#: pgmsettings.cpp:58
+#: pgmsettings.cpp:40
+#, fuzzy
+msgid "Global Setting"
+msgstr "&Globális beállítások..."
+
+#: pgmsettings.cpp:41 prefdebugger.cpp:52
+msgid "ATT"
+msgstr ""
+
+#: pgmsettings.cpp:42 prefdebugger.cpp:53
+msgid "Intel"
+msgstr ""
+
+#: pgmsettings.cpp:44
+msgid "Disassembly flavor:"
+msgstr ""
+
+#: pgmsettings.cpp:73 prefdebugger.cpp:57
+msgid "Disassembly flavor for x86 architecture"
+msgstr ""
+
+#: pgmsettings.cpp:74
+msgid "Disassembly flavor is only available for x86 architecture"
+msgstr ""
+
+#: pgmsettings.cpp:95
 msgid "&No input and output"
 msgstr "Kimenet és bemenet nél&kül"
 
-#: pgmsettings.cpp:62
+#: pgmsettings.cpp:99
 msgid "&Only output, simple terminal emulation"
 msgstr "Csa&k a kimenet, egyszerű terminálemuláció"
 
-#: pgmsettings.cpp:66
+#: pgmsettings.cpp:103
 msgid "&Full terminal emulation"
 msgstr "Teljes terminálemulá&ció"
 
-#: pgmsettings.cpp:102
+#: pgmsettings.cpp:139
 #, fuzzy
 msgid "Settings for %1"
 msgstr "%1: %2 beállításai"
 
-#: prefdebugger.cpp:20
+#: prefdebugger.cpp:23
 msgid "To revert to the default settings, clear the entries."
 msgstr "Az eredeti beállítások visszaállításához törölje a bejegyzéseket."
 
-#: prefdebugger.cpp:24
+#: prefdebugger.cpp:27
 msgid "How to invoke &GDB:"
 msgstr "A &GDB meghívási módja:"
 
-#: prefdebugger.cpp:31
+#: prefdebugger.cpp:34
 msgid ""
 "%T will be replaced with a title string,\n"
 "%C will be replaced by a Bourne shell script that\n"
@@ -480,9 +537,18 @@ msgstr ""
 "%C helyére egy szkript kerül,\n"
 "amely nyitva tartja a terminálablakot."
 
-#: prefdebugger.cpp:37
+#: prefdebugger.cpp:40
 msgid "&Terminal for program output:"
 msgstr "&Terminál a program kimenetének:"
+
+#: prefdebugger.cpp:47
+msgid "Disassembly Flavor:"
+msgstr ""
+
+#: prefdebugger.cpp:51
+#, fuzzy
+msgid "Default"
+msgstr "GDB ala&pértelmezés"
 
 #: prefmisc.cpp:23
 msgid "&Pop into foreground when program stops"
@@ -566,7 +632,7 @@ msgstr "Szálazonosító"
 msgid "Location"
 msgstr "Hely"
 
-#: ttywnd.cpp:214
+#: ttywnd.cpp:215
 msgid "&Clear"
 msgstr "&Törlés"
 
@@ -583,28 +649,28 @@ msgstr " Törlés "
 msgid "Expression"
 msgstr "Figyelt kifejezés"
 
-#: winstack.cpp:391
+#: winstack.cpp:398
 #, fuzzy
 msgid "Search"
 msgstr ": Keresés"
 
-#: winstack.cpp:398
+#: winstack.cpp:405
 msgid "&Case sensitive"
 msgstr "&Nagybetűérzékeny"
 
-#: winstack.cpp:400
+#: winstack.cpp:407
 msgid "&Forward"
 msgstr "&Előre"
 
-#: winstack.cpp:402
+#: winstack.cpp:409
 msgid "&Backward"
 msgstr "&Hátra"
 
-#: winstack.cpp:403
+#: winstack.cpp:410
 msgid "Close"
 msgstr ""
 
-#: xsldbgdriver.cpp:1319
+#: xsldbgdriver.cpp:1316
 msgid "No memory dump available"
 msgstr "Nem érhető el memóriakép"
 
