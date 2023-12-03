@@ -2,20 +2,21 @@
 # KDbg - Debugger GUI for gdb
 # Copyright (C) Johannes Sixt <j6t@kdbg.org>, 1998-2009.
 #
-# Johannes Sixt <j6t@kdbg.org>, 2005, 2006, 2007, 2009, 2011.
+# Johannes Sixt <j6t@kdbg.org>, 2005, 2006, 2007, 2009, 2011, 2023.
 msgid ""
 msgstr ""
 "Project-Id-Version: kdbg 2.9.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2023-12-03 08:42+0100\n"
-"PO-Revision-Date: 2017-11-07 22:18+0100\n"
+"PO-Revision-Date: 2023-12-03 09:12+0100\n"
 "Last-Translator: Johannes Sixt <j6t@kdbg.org>\n"
-"Language-Team: Deutsch <de@li.org>\n"
+"Language-Team: German <kde-i18n-de@kde.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Poedit 1.8.9\n"
+"X-Generator: Lokalize 21.12.3\n"
+"Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. i18n: file: brkptbase.ui:86
 #. i18n: ectx: property (text), widget (QPushButton, btEnaDis)
@@ -181,16 +182,15 @@ msgstr "Core dump"
 
 #: dbgmainwnd.cpp:548 dbgmainwnd.cpp:552
 msgid "Idle"
-msgstr ""
+msgstr "Angehalten"
 
 #: dbgmainwnd.cpp:558
-#, fuzzy
 msgid "Break"
-msgstr "&Unterbrechen"
+msgstr "Unterbrechen"
 
 #: dbgmainwnd.cpp:562
 msgid "Busy/Running - Click to Break"
-msgstr ""
+msgstr "Aktiv/Läuft gerade - Zum Unterbrechen klicken"
 
 #: dbgmainwnd.cpp:646
 msgid "`%1' is not a file or does not exist"
@@ -281,7 +281,7 @@ msgstr ""
 
 #: debugger.cpp:2265
 msgid "Setting the disassembly flavor failed."
-msgstr ""
+msgstr "Die Disassembler-Syntax konnte nicht geändert werden."
 
 #. i18n: file: pgmargsbase.ui:235
 #. i18n: ectx: property (text), widget (QTreeWidget, envList)
@@ -343,7 +343,7 @@ msgstr "Portierung nach KDE4"
 
 #: main.cpp:45
 msgid "Sebastian Pipping"
-msgstr ""
+msgstr "Sebastian Pipping "
 
 #: main.cpp:46
 msgid "GitHub Actions CI"
@@ -450,7 +450,7 @@ msgstr "Als Programmargument einzusetzende Datei wählen"
 #: pgmargs.cpp:205
 msgctxt "@action:button file name into text box"
 msgid "Insert"
-msgstr ""
+msgstr "Einfügen"
 
 #: pgmargs.cpp:218
 msgid "Select a directory to insert as program argument"
@@ -465,29 +465,28 @@ msgstr ""
 "wird die globale Einstellung übernommen:"
 
 #: pgmsettings.cpp:40
-#, fuzzy
 msgid "Global Setting"
-msgstr "Globale Einstellungen"
+msgstr "Globale Einstellung"
 
 #: pgmsettings.cpp:41 prefdebugger.cpp:52
 msgid "ATT"
-msgstr ""
+msgstr "AT&T"
 
 #: pgmsettings.cpp:42 prefdebugger.cpp:53
 msgid "Intel"
-msgstr ""
+msgstr "Intel"
 
 #: pgmsettings.cpp:44
 msgid "Disassembly flavor:"
-msgstr ""
+msgstr "Disassembler-Syntax:"
 
 #: pgmsettings.cpp:73 prefdebugger.cpp:57
 msgid "Disassembly flavor for x86 architecture"
-msgstr ""
+msgstr "Disassembler-Syntax für die x86-Architektur"
 
 #: pgmsettings.cpp:74
 msgid "Disassembly flavor is only available for x86 architecture"
-msgstr ""
+msgstr "Disassembler-Syntax kann nur für die x86-Architektur gewählt werden"
 
 #: pgmsettings.cpp:95
 msgid "&No input and output"
@@ -529,12 +528,11 @@ msgstr "&Terminal für die Programmausgabe"
 
 #: prefdebugger.cpp:47
 msgid "Disassembly Flavor:"
-msgstr ""
+msgstr "Disassembler-Syntax:"
 
 #: prefdebugger.cpp:51
-#, fuzzy
 msgid "Default"
-msgstr "&GDB-Standard"
+msgstr "Standard"
 
 #: prefmisc.cpp:23
 msgid "&Pop into foreground when program stops"
