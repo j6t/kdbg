@@ -11,7 +11,7 @@
 #include <QPixmap>
 #include <list>
 
-class ThreadInfo;
+struct ThreadInfo;
 class ThreadEntry;
 
 class ThreadList : public QTreeWidget

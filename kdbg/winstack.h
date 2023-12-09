@@ -20,7 +20,7 @@
 class KDebugger;
 class WinStack;
 class SourceWindow;
-class DisassembledCode;
+struct DisassembledCode;
 struct DbgAddr;
 
 class FindDialog : public QDialog

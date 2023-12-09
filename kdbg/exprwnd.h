@@ -13,7 +13,7 @@
 #include <list>
 
 class ProgramTypeTable;
-class TypeInfo;
+struct TypeInfo;
 struct ExprValue;
 class ExprWnd;
 class QStringList;
