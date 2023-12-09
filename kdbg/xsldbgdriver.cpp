@@ -798,7 +798,7 @@ parseValue(const char *&s, ExprValue * variable)
 	valueBuffer[copySize] = '\0';
 	TRACE("Got value :");
 	TRACE(valueBuffer);
-	if ((variable->m_varKind == VarTree::VKsimple)) {
+	if (variable->m_varKind == VarTree::VKsimple) {
 	    if (!variable->m_value.isEmpty()){
 		variable->m_varKind = VarTree::VKarray;
 		childValue = new ExprValue(variable->m_value, VarTree::NKplain);
