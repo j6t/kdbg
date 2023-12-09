@@ -237,7 +237,7 @@ void ProgramTypeTable::loadTypeTable(TypeTable* table)
     const TypeTable::TypeInfoMap& t = table->templates();
     std::transform(t.begin(), t.end(),
 		std::inserter(m_templates, m_templates.begin()),
-		std::ptr_fun(template2Info));
+		[](const TypeTable::TypeInfoMap::value_type& tt) { return template2Info(tt);});
 
     // check whether to enable builtin QString support
     if (!m_parseQt2QStrings) {
