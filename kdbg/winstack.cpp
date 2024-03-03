@@ -31,6 +31,9 @@ WinStack::WinStack(QWidget* parent) :
     connect(&m_findDlg.m_buttonBackward,
 	    SIGNAL(clicked()), SLOT(slotFindBackward()));
 
+    connect( &m_gotoDlg.m_lineText,
+	    SIGNAL(returnPressed()), SLOT(slotGotoLine()));
+
     connect(this, SIGNAL(setTabWidth(int)), this, SLOT(slotSetTabWidth(int)));
     connect(this, SIGNAL(tabCloseRequested(int)),
 	    this, SLOT(slotCloseTab(int)));
@@ -245,6 +248,14 @@ void WinStack::slotFindBackward()
 			     SourceWindow::findBackward);
 }
 
+void WinStack::slotGotoLine()
+{
+    if (activeWindow() != 0)
+	activeWindow()->gotoLine(m_gotoDlg.lineText());
+
+    m_gotoDlg.done(1);		// hide dialog
+}
+
 bool WinStack::event(QEvent* evt)
 {
     if (evt->type() != QEvent::ToolTip)
@@ -332,6 +343,18 @@ void WinStack::slotViewFind()
 	m_findDlg.done(0);
     } else {
 	m_findDlg.show();
+    }
+}
+
+void WinStack::slotViewGoto()
+{
+    if (m_gotoDlg.isVisible())
+    {
+	m_gotoDlg.done(0);
+    }
+    else
+    {
+	m_gotoDlg.show();
     }
 }
 
@@ -433,6 +456,51 @@ void FindDialog::closeEvent(QCloseEvent* ev)
 }
 
 void FindDialog::done(int result)
+{
+    QDialog::done(result);
+    emit closed();
+}
+
+
+GotoDialog::GotoDialog() :
+	QDialog(),
+	m_label(this),
+	m_lineText(this),
+	m_buttonClose(this)
+{
+    const QString label(i18n("Goto line"));
+    setWindowTitle(label);
+    setWindowModality( Qt::ApplicationModal );
+    setWindowFlags( windowFlags() | Qt::WindowStaysOnTopHint );
+
+    m_label.setText(label);
+
+    m_lineText.setMinimumSize(100, 24);
+    m_lineText.setMaxLength(10000);
+    m_lineText.setFrame(true);
+    m_lineText.setFocus();
+
+    m_buttonClose.setText(i18n("Close"));
+    connect(&m_buttonClose, SIGNAL(clicked()), SLOT(reject()));
+
+    m_layout.addWidget(&m_label);
+    m_layout.addWidget(&m_lineText);
+    m_layout.addWidget(&m_buttonClose);
+
+    setLayout(&m_layout);
+}
+
+GotoDialog::~GotoDialog()
+{
+}
+
+void GotoDialog::closeEvent(QCloseEvent* ev)
+{
+    QDialog::closeEvent(ev);
+    emit closed();
+}
+
+void GotoDialog::done(int result)
 {
     QDialog::done(result);
     emit closed();
