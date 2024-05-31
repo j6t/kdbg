@@ -775,7 +775,8 @@ void KDebugger::saveProgramSettings()
     gg.writeEntry(FileVersion, 1);
     gg.writeEntry(ProgramArgs, m_programArgs);
     gg.writeEntry(WorkingDirectory, m_programWD);
-    gg.writeEntry(OptionsSelected, m_boolOptions.toList());
+    QList<QString> boolOptions(m_boolOptions.begin(), m_boolOptions.end());
+    gg.writeEntry(OptionsSelected, boolOptions);
     gg.writeEntry(DebuggerCmdStr, m_debuggerCmd);
     gg.writeEntry(TTYLevelEntry, int(m_ttyLevel));
     gg.writeEntry(DisassemblyFlavor, m_flavor);
@@ -835,7 +836,8 @@ void KDebugger::restoreProgramSettings()
     // m_ttyLevel has been read in already
     QString pgmArgs = gg.readEntry(ProgramArgs);
     QString pgmWd = gg.readEntry(WorkingDirectory);
-    QSet<QString> boolOptions = QSet<QString>::fromList(gg.readEntry(OptionsSelected, QStringList()));
+    auto selectedOptions = gg.readEntry(OptionsSelected, QStringList());
+    QSet<QString> boolOptions(selectedOptions.begin(), selectedOptions.end());
     m_boolOptions.clear();
     m_flavor = gg.readEntry(DisassemblyFlavor, QString{});
 
@@ -905,8 +907,9 @@ QString KDebugger::readDebuggerCmd(const KConfigGroup& g)
 		"The settings for this program specify "
 		"the following debugger command:\n%1\n"
 		"Shall this command be used?");
-	    if (KMessageBox::warningYesNo(parentWidget(), msg.arg(debuggerCmd))
-		!= KMessageBox::Yes)
+	    if (KMessageBox::questionTwoActions(parentWidget(), msg.arg(debuggerCmd), i18n("Question"),
+						KGuiItem(i18nc("@action:button", "Yes"), QStringLiteral("dialog-ok")), KStandardGuiItem::cancel(), QString(), KMessageBox::Notify | KMessageBox::Dangerous)
+		!= KMessageBox::PrimaryAction)
 	    {
 		// don't use it
 		debuggerCmd = QString();
@@ -1076,7 +1079,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 		emit updateStatusMessage();
 	} else {
 	    QString msg = m_d->driverName() + ": " + m_statusMessage;
-	    KMessageBox::sorry(parentWidget(), msg);
+	    KMessageBox::error(parentWidget(), msg);
 	    m_executable = "";
 	    m_corefile = "";		/* don't process core file */
 	    m_haveExecutable = false;
@@ -1093,7 +1096,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	} else {
 	    // report error
 	    QString msg = m_d->driverName() + ": " + QString(output);
-	    KMessageBox::sorry(parentWidget(), msg);
+	    KMessageBox::error(parentWidget(), msg);
 
 	    // if core file was loaded from command line, revert to info line main
 	    if (!cmd->m_byUser) {
