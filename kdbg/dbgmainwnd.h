@@ -87,6 +87,7 @@ protected:
     QAction* m_coreDumpAction;
     QAction* m_settingsAction;
     QAction* m_findAction;
+    QAction* m_gotoAction;
     QAction* m_btWindowAction;
     QAction* m_localVariablesAction;
     QAction* m_watchesAction;
@@ -149,6 +150,7 @@ protected:
     QString createOutputWindow();
 
     bool m_popForeground;		/* whether main wnd raises when prog stops */
+    bool m_lowerWindow;		/* whether m_backTimeout is used. */
     int m_backTimeout;			/* when wnd goes back */
     int m_tabWidth;			/* tab width in characters (can be 0) */
     QString m_sourceFilter;
