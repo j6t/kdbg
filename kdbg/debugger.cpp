@@ -180,6 +180,7 @@ bool KDebugger::debugProgram(const QString& name,
     m_executable = name;
 
     m_d->executeCmd(DCinfotarget);
+    m_d->executeCmd(DCinfosources);
 
     // set remote target
     if (!m_remoteDevice.isEmpty()) {
@@ -1123,6 +1124,9 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	break;
     case DCinfotarget:
 	handleInfoTarget(output);
+	break;
+    case DCinfosources:
+	handleInfoSources(output);
 	break;
     case DCdisassemble:
 	handleDisassemble(cmd, output);
@@ -2188,6 +2192,12 @@ void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 void KDebugger::handleInfoTarget(const char* output)
 {
     m_cpuTarget = m_d->parseInfoTarget(output);
+}
+
+void KDebugger::handleInfoSources(const char* output)
+{
+    QString s = m_d->parseInfoSources(output);
+    emit sourceFiles(s);
 }
 
 void KDebugger::handleDisassemble(CmdQueueItem* cmd, const char* output)

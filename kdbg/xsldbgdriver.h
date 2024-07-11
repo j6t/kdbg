@@ -58,6 +58,7 @@ class XsldbgDriver:public DebuggerDriver {
     bool parseInfoLine(const char *output, QString & addrFrom,
                                QString & addrTo) override;
     QString parseInfoTarget(const char* output) override;
+    QString parseInfoSources(const char* output) override;
     std::list<DisassembledCode> parseDisassemble(const char *output) override;
     QString parseMemoryDump(const char *output,
                                     std::list < MemoryDump > &memdump) override;

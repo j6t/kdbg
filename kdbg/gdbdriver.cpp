@@ -80,6 +80,7 @@ static GdbCmdInfo cmds[] = {
     { DCexamine, "x %s %s\n", GdbCmdInfo::argString2 },
     { DCinfoline, "info line %s:%d\n", GdbCmdInfo::argStringNum },
     { DCinfotarget, "info target\n", GdbCmdInfo::argNone},
+    { DCinfosources, "info sources\n", GdbCmdInfo::argNone},
     { DCdisassemble, "disassemble %s %s\n", GdbCmdInfo::argString2 },
     { DCsetdisassflavor, "set disassembly-flavor %s\n", GdbCmdInfo::argString},
     { DCsetargs, "set args %s\n", GdbCmdInfo::argString },
@@ -2589,6 +2590,22 @@ QString GdbDriver::parseInfoTarget(const char* output)
 	p = strchr(p, '.');
 	if (p)
 	    return QString::fromLatin1(start, p - start);
+    }
+    return {};
+}
+
+QString GdbDriver::parseInfoSources(const char* output)
+{
+    auto p1 = strstr(output, "read in:\n");
+    if (p1) {
+        p1 += 9;
+        auto p2 = strstr(p1, "\nSource files");
+        if  (p2) {
+            //TODO
+            auto p3 = strstr(p1, "on demand:\n");
+            p3 += 11;
+	        return QString::fromLatin1(p1, p2 - p1) + QString(p3);
+        }
     }
     return {};
 }
