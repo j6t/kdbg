@@ -3,13 +3,18 @@
  * This file is licensed under the GNU General Public License Version 2.
  * See the file COPYING in the toplevel directory of the source directory.
  */
+#include <QDebug>
 
 #include "srcfileswindow.h"
 #include <QStringList>
+#include <QStringList>
+#include <QDir>
 #include <QFileInfo>
 #include <QVariant>
 #include <QMimeDatabase>
 #include <QMimeType>
+#include <QMap>
+#include <QSortFilterProxyModel>
 #include <klocalizedstring.h>
 #include <kconfigbase.h>
 #include <kconfiggroup.h>
@@ -21,7 +26,52 @@ const int MAX_COL = 10;
 
 QMimeDatabase mime_database;
 
-QIcon icon_for_filename(const QString &filename)
+class SrcFilesSortProxyModel : public QSortFilterProxyModel {
+public:
+    SrcFilesSortProxyModel(QObject *parent = nullptr) : QSortFilterProxyModel(parent) {}
+
+protected:
+    bool lessThan(const QModelIndex &left, const QModelIndex &right) const override {
+        QVariant leftData = sourceModel()->data(left);
+        QVariant rightData = sourceModel()->data(right);
+
+        // Custom sorting logic
+        QString leftText = leftData.toString();
+        QString rightText = rightData.toString();
+
+        // Example: Sort directories first
+        bool leftIsDir = left.model()->hasChildren(left); 
+        bool rightIsDir = right.model()->hasChildren(right);
+
+        if (leftIsDir != rightIsDir) {
+            return leftIsDir < rightIsDir; // Directories first
+        }
+
+        return leftText.toLower() > rightText.toLower(); // Default alphabetic sorting
+    }
+};
+
+QString getCommonPath(const QStringList &paths) {
+    if (paths.isEmpty()) {
+        return QString();
+    }
+
+    QString common = QFileInfo(paths[0]).absolutePath();
+    for (const QString &path : paths) {
+        QFileInfo fileInfo(path);
+        QString absolutePath = fileInfo.absolutePath();
+        while (!absolutePath.startsWith(common)) {
+            common = QFileInfo(common).absolutePath();
+            common = common.left(common.lastIndexOf(QDir::separator()));
+            if (common.isEmpty()) {
+                return QString();
+            }
+        }
+    }
+    return common;
+}
+
+QIcon iconForFilename(const QString &filename)
 {
   QIcon icon;
   QList<QMimeType> mime_types = mime_database.mimeTypesForFileName(filename);
@@ -34,14 +84,15 @@ QIcon icon_for_filename(const QString &filename)
   return icon;
 }
 
-void SrcFilesWindow::file_clicked(const QModelIndex &index)
+void SrcFilesWindow::fileClicked(const QModelIndex &index)
 {
-    QStandardItem *item = m_srcfiles_model.itemFromIndex(index);
+    QModelIndex sourceIndex = dynamic_cast<SrcFilesSortProxyModel*>(m_srctree.model())->mapToSource(index);
+    QStandardItem *item = m_srcfiles_model.itemFromIndex(sourceIndex);
     if (!item->data().isNull()) {
+        qDebug() << item->data();
         emit activateFileLine(item->data().toString(), 0, DbgAddr());
     }
 }
-
 
 SrcFilesWindow::SrcFilesWindow(QWidget* parent) :
 	QWidget(parent),
@@ -49,9 +100,12 @@ SrcFilesWindow::SrcFilesWindow(QWidget* parent) :
 	m_srctree(this),
 	m_layout(QBoxLayout::TopToBottom, this)
 {
+    SrcFilesSortProxyModel *proxyModel = new SrcFilesSortProxyModel(this);
     m_srctree.setHeaderHidden(true);
-    m_srctree.setModel(&m_srcfiles_model);
-    connect(&m_srctree, &QTreeView::clicked, this, &SrcFilesWindow::file_clicked);
+    proxyModel->setSourceModel(&m_srcfiles_model);
+    m_srctree.setModel(proxyModel);
+    m_srctree.setSortingEnabled(true);
+    connect(&m_srctree, &QTreeView::clicked, this, &SrcFilesWindow::fileClicked);
     m_layout.addWidget(&m_srctree, 0);
     m_layout.activate();
 }
@@ -60,18 +114,37 @@ SrcFilesWindow::~SrcFilesWindow()
 {
 }
 
+
 void SrcFilesWindow::sourceFiles(QString &files) {
     QStandardItem *item; 
-    QStandardItem *parentItem;
-    QStringList fileNames = files.split(",");
+    QStringList filenamesRaw = files.split(",");
+    QStringList fileNames;
 
     m_srcfiles_model.clear(); 
 
-    auto map_tree = new QMap<QString, QStandardItem *>;
-    for (const auto& filename : fileNames) {
-        QFileInfo *fi = new QFileInfo(filename.trimmed());
-        QStringList path_list = fi->path().split("/");
-        parentItem = m_srcfiles_model.invisibleRootItem();
+    /* Sanitize filenames and skip system libraries */
+    for (const auto& f: filenamesRaw) {
+        QString filename = f.trimmed();
+        if (filename.endsWith("<built-in>", Qt::CaseSensitive) ||
+            filename.startsWith("/usr/", Qt::CaseSensitive) ||
+            filename.startsWith("/lib/", Qt::CaseSensitive) ||
+            filename.contains("/.cargo/", Qt::CaseSensitive) ||
+            filename.startsWith("/rustc/", Qt::CaseSensitive) ||
+            filename.startsWith("/cargo/", Qt::CaseSensitive)) {
+            continue;
+        }
+        fileNames.append(filename);
+    }
+
+    /* Get common path to remove it */
+    QString commonPath = getCommonPath(fileNames);
+
+
+    QMap<QString, QStandardItem *> mapTree;
+    for (const auto& f: fileNames) {
+        QFileInfo fi(f);
+        QStringList pathList = fi.path().remove(commonPath).split(QDir::separator());
+        QStandardItem *parentItem = m_srcfiles_model.invisibleRootItem();
 
         /* Create folder and files tree from file paths a/b/c/f/f1.c a/b/e/f2.c
          * |---a/
@@ -81,39 +154,46 @@ void SrcFilesWindow::sourceFiles(QString &files) {
          *                 |---f1.c
          *     |---e/
          *         |---f2.c
+         *
+         * Removing common path
+         * 
+         * |---b/
+         *     |---c/
+         *         |---f/
+         *             |---f1.c
+         * |---e/
+         *     |---f2.c
          */
 
         /* TODO check if file exists in file system???? should exists... */
-        for (int i = 0; i < path_list.size(); i++) {
-            auto p = fi->path().section("/", 0, i);
-            auto k_it = map_tree->find(p);
+        for (int i = 0; i < pathList.size(); i++) {
+            auto p = fi.path().section(QDir::separator(), 0, i);
+            auto k_it = mapTree.find(p);
             if (p == "" || p == ".") {
                 continue;
             }
-            if (k_it != map_tree->end() ) {
+            if (k_it != mapTree.end() ) {
                 /* Directory already exists in tree */
                 parentItem = k_it.value();
             } else {
                 /* Directory not exists create it */
-                item = new QStandardItem(QIcon::fromTheme("folder"), path_list.at(i));
+                item = new QStandardItem(QIcon::fromTheme("folder"), pathList.at(i));
                 item->setEditable(false);
                 /* Save path of directory created */
                 parentItem->insertRow(0, item);
                 parentItem->sortChildren(0);
                 parentItem = item;
-                map_tree->insert(p, item);
+                mapTree.insert(p, item);
             }
         }   
 
-        item = new QStandardItem(icon_for_filename(fi->fileName()), fi->fileName());
+        item = new QStandardItem(iconForFilename(fi.fileName()), fi.fileName());
         item->setEditable(false);
-        item->setData(QVariant(fi->filePath()));
+        item->setData(QVariant(fi.filePath()));
         parentItem->appendRow(item);
-        parentItem->sortChildren(0);
-        map_tree->insert(fi->filePath(), item);
-        delete fi;
+        mapTree.insert(fi.filePath(), item);
     }
-    delete map_tree;
+
 }
 
 

@@ -8,7 +8,6 @@
 #define SRCFILESWINDOW_H
 
 #include <QBoxLayout>  
-#include <QMap>
 #include <QModelIndex>
 #include <QTreeView>
 #include <QStandardItemModel>
@@ -31,7 +30,7 @@ protected:
     QTreeView m_srctree;
     QBoxLayout m_layout;
 
-    void file_clicked(const QModelIndex &index);
+    void fileClicked(const QModelIndex &index);
 public slots:
     void sourceFiles(QString&);
 };

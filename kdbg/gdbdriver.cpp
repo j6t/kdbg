@@ -2601,10 +2601,9 @@ QString GdbDriver::parseInfoSources(const char* output)
         p1 += 9;
         auto p2 = strstr(p1, "\nSource files");
         if  (p2) {
-            //TODO
             auto p3 = strstr(p1, "on demand:\n");
             p3 += 11;
-	        return QString::fromLatin1(p1, p2 - p1) + QString(p3);
+	        return QString::fromUtf8(p1, p2 - p1) + QString(p3);
         }
     }
     return {};
