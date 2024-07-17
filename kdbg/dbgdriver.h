@@ -55,6 +55,7 @@ enum DbgCommand {
 	DCexamine,
 	DCinfoline,
 	DCinfotarget,
+	DCinfosources,
 	DCdisassemble,
 	DCsetdisassflavor,
 	DCsetargs,
@@ -544,6 +545,11 @@ public:
      * Parse the output of the DCinfotarget command.
      */
     virtual QString parseInfoTarget(const char* output) = 0;
+
+    /**
+     * Parse the output of the DCinfosources command.
+     */
+    virtual QString parseInfoSources(const char* output) = 0;
 
     /**
      * Parses the ouput of the DCdisassemble command.

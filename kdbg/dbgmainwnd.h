@@ -27,6 +27,7 @@ class ThreadList;
 class MemoryWindow;
 class TTYWindow;
 class WatchWindow;
+class SrcFilesWindow;
 class KDebugger;
 class DebuggerDriver;
 struct DbgAddr;
@@ -76,6 +77,7 @@ protected:
     TTYWindow* m_ttyWindow;
     ThreadList* m_threads;
     MemoryWindow* m_memoryWindow;
+    SrcFilesWindow* m_srcFiles;
 
     QTimer m_backTimer;
 
@@ -95,6 +97,7 @@ protected:
     QAction* m_ttyWindowAction;
     QAction* m_threadsAction;
     QAction* m_memoryWindowAction;
+    QAction* m_srcFilesAction;
     QAction* m_runAction;
     QAction* m_stepIntoAction;
     QAction* m_stepOverAction;

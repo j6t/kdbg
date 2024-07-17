@@ -1303,6 +1303,12 @@ XsldbgDriver::parseInfoTarget(const char* /*output*/)
     return QString();
 }
 
+QString
+XsldbgDriver::parseInfoSources(const char* /*output*/)
+{
+    return QString();
+}
+
 std::list<DisassembledCode>
 XsldbgDriver::parseDisassemble(const char */*output*/)
 {
