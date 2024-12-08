@@ -2216,33 +2216,33 @@ bool GdbDriver::parseChangeWD(const char* output, QString& message)
 
 bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
 {
-    message = output;
-
     /*
-     * Lines starting with the following do not indicate errors:
-     *     Using host libthread_db
-     *     (no debugging symbols found)
+     * We expect the first line to begin with
+     *
      *     Reading symbols from
+     *
+     * to indicate that the target has been loaded successfully. If we see
+     * anything else, we treat it an error. If an error occurs while
+     * reading symbols, we ignore the situation under the assumption that
+     * GDB will just treat the program as if it had no symbols in the
+     * first place, but will otherwise respond normally.
      */
-    while (strncmp(output, "Reading symbols from", 20) == 0 ||
-	   strncmp(output, "done.", 5) == 0 ||
-	   strncmp(output, "Missing separate debuginfo", 26) == 0 ||
-	   strncmp(output, "Try: ", 5) == 0 ||
-	   strncmp(output, "Using host libthread_db", 23) == 0 ||
-	   strncmp(output, "(no debugging symbols found)", 28) == 0)
+    if (strncmp(output, "Reading symbols from", 20) == 0)
     {
-	// this line is good, go to the next one
+	// keep just the first line in the message
+	// otherwise, all lines of text would end up in the status bar
 	const char* end = strchr(output, '\n');
 	if (end == 0)
-	    output += strlen(output);
-	else
-	    output = end+1;
+	    end = output + strlen(output);
+	message = QString::fromLatin1(output, end - output);
+	return true;
     }
-
-    /*
-     * If we've parsed all lines, there was no error.
-     */
-    return output[0] == '\0';
+    else
+    {
+	// error: keep all text
+	message = output;
+	return false;
+    }
 }
 
 bool GdbDriver::parseCoreFile(const char* output)
