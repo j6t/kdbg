@@ -1749,7 +1749,7 @@ static void parseFrameInfo(const char*& s, QString& func,
 	// search forward to the end of the whitespace
 	do {
 	    nl++;
-	} while (isspace(func[nl].toLatin1()));
+	} while (nl < func.length() && isspace(func[nl].toLatin1()));
 	// replace
 	func.replace(startWhite, nl-startWhite, " ");
 	/* continue searching for more \n's at this place: */
