@@ -917,7 +917,8 @@ static void skipNested(const char*& s, char opening, char closing)
 /**
  * This function skips text that is delimited by nested angle bracktes, '<>'.
  * A complication arises because the delimited text can contain the names of
- * operator<<, operator>>, operator<, and operator>, which have to be treated
+ * operator<<, operator>>, operator<, operator>, operator<=, operator>=,
+ * and operator<=>, which have to be treated
  * specially so that they do not count towards the nesting of '<>'.
  * This function assumes that the delimited text does not contain strings.
  */
@@ -936,6 +937,8 @@ static void skipNestedAngles(const char*& s)
 	    if (p-s >= 9 && strncmp(p-8, "operator", 8) == 0) {
 		if (p[1] == '<')
 		    p++;
+		else if (p[1] == '=' && p[2] == '>')
+		    p += 2;
 	    } else {
 		nest++;
 	    }
