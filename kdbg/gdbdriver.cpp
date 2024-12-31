@@ -926,15 +926,22 @@ static void skipNestedAngles(const char*& s)
 {
     const char* p = s;
 
+    // We can check for p - s >= 9 instead of 8 because *s is '<'
+    // and cannot be part of keyword "operator".
+    auto isKeywordOperator = [&](const char* p) {
+	return p - s >= 9
+		&& strncmp(p - 8, "operator", 8) == 0
+		// must not be the end of a longer identifier
+		&& !isalnum(p[-9]) && p[-9] != '_';
+    };
+
     int nest = 1;
     p++;		// skip the initial '<'
     while (*p && nest > 0)
     {
-	// Below we can check for p-s >= 9 instead of 8 because
-	// *s is '<' and cannot be part of "operator".
 	if (*p == '<')
 	{
-	    if (p-s >= 9 && strncmp(p-8, "operator", 8) == 0) {
+	    if (isKeywordOperator(p)) {
 		if (p[1] == '<')
 		    p++;
 		else if (p[1] == '=' && p[2] == '>')
@@ -945,7 +952,7 @@ static void skipNestedAngles(const char*& s)
 	}
 	else if (*p == '>')
 	{
-	    if (p-s >= 9 && strncmp(p-8, "operator", 8) == 0) {
+	    if (isKeywordOperator(p)) {
 		if (p[1] == '>')
 		    p++;
 	    } else {
