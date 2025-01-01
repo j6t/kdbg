@@ -46,7 +46,7 @@ bool DebuggerDriver::startup(QString cmdStr)
     if (cmdStr.isEmpty())
 	cmdStr = defaultInvocation();
 
-    QStringList cmd = cmdStr.split(' ', QString::SkipEmptyParts);
+    QStringList cmd = cmdStr.split(' ', Qt::SkipEmptyParts);
     if (cmd.isEmpty())
 	return false;
     QString pgm = cmd.takeFirst();
