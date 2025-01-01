@@ -14,6 +14,7 @@
 #include <QHeaderView>
 #include <QContextMenuEvent>
 #include <stdlib.h>			/* strtoul */
+#include <vector>
 
 /** 
  * Register display modes
@@ -266,17 +267,18 @@ static QString toBCD(const QString& hex)
     return hex.right(2);
 }
 
-static char* toRaw(const QString& hex, uint& length)
+static std::vector<char> toRaw(const QString& hex)
 {
     static uint testNum=1;
     static void* testVoid=(void*)&testNum;
     static char* testChar=(char*)testVoid;
     static bool littleendian=(*testChar==1);
 
-    length=((hex.length()-2)%2)+((hex.length()-2)/2);
-    if (hex.length()<=2) return 0;
+    if (hex.length()<=2)
+	return {};
 
-    char* data=new char[length];
+    // skip 0x, but round up if odd number of hex digits
+    std::vector<char> data((hex.length() - 1) / 2);
 
     if (littleendian) {
 	uint j=0;
@@ -302,19 +304,22 @@ static char* toRaw(const QString& hex, uint& length)
 
 static long double extractNumber(const QString& hex)
 {
-    uint length;
-    char* data=toRaw(hex, length);
+    auto data = toRaw(hex);
     long double val;
-    if (length==4) { // float
-	val=*((float*)data);
-    } else if (length==8) { // double
-	val=*((double*)data);
-    } else if (length==10) { // long double
-	val=*((long double*)data);
+    if (data.size() == sizeof(double)) {
+	double x;
+	memcpy(&x, data.data(), sizeof(x));
+	val = x;
+    } else if (data.size() == sizeof(long double)) {
+	long double x;
+	memcpy(&x, data.data(), sizeof(x));
+	val = x;
     } else {
-	val=*((float*)data);
+	float x;
+	data.resize(sizeof(x));
+	memcpy(&x, data.data(), sizeof(x));
+	val = x;
     }
-    delete[] data;
 
     return val;
 }
