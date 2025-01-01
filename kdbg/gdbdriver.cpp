@@ -917,7 +917,8 @@ static void skipNested(const char*& s, char opening, char closing)
 /**
  * This function skips text that is delimited by nested angle bracktes, '<>'.
  * A complication arises because the delimited text can contain the names of
- * operator<<, operator>>, operator<, and operator>, which have to be treated
+ * operator<<, operator>>, operator<, operator>, operator<=, operator>=,
+ * and operator<=>, which have to be treated
  * specially so that they do not count towards the nesting of '<>'.
  * This function assumes that the delimited text does not contain strings.
  */
@@ -925,24 +926,33 @@ static void skipNestedAngles(const char*& s)
 {
     const char* p = s;
 
+    // We can check for p - s >= 9 instead of 8 because *s is '<'
+    // and cannot be part of keyword "operator".
+    auto isKeywordOperator = [&](const char* p) {
+	return p - s >= 9
+		&& strncmp(p - 8, "operator", 8) == 0
+		// must not be the end of a longer identifier
+		&& !isalnum(p[-9]) && p[-9] != '_';
+    };
+
     int nest = 1;
     p++;		// skip the initial '<'
     while (*p && nest > 0)
     {
-	// Below we can check for p-s >= 9 instead of 8 because
-	// *s is '<' and cannot be part of "operator".
 	if (*p == '<')
 	{
-	    if (p-s >= 9 && strncmp(p-8, "operator", 8) == 0) {
+	    if (isKeywordOperator(p)) {
 		if (p[1] == '<')
 		    p++;
+		else if (p[1] == '=' && p[2] == '>')
+		    p += 2;
 	    } else {
 		nest++;
 	    }
 	}
 	else if (*p == '>')
 	{
-	    if (p-s >= 9 && strncmp(p-8, "operator", 8) == 0) {
+	    if (isKeywordOperator(p)) {
 		if (p[1] == '>')
 		    p++;
 	    } else {
@@ -1739,7 +1749,7 @@ static void parseFrameInfo(const char*& s, QString& func,
 	// search forward to the end of the whitespace
 	do {
 	    nl++;
-	} while (isspace(func[nl].toLatin1()));
+	} while (nl < func.length() && isspace(func[nl].toLatin1()));
 	// replace
 	func.replace(startWhite, nl-startWhite, " ");
 	/* continue searching for more \n's at this place: */
@@ -2216,33 +2226,33 @@ bool GdbDriver::parseChangeWD(const char* output, QString& message)
 
 bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
 {
-    message = output;
-
     /*
-     * Lines starting with the following do not indicate errors:
-     *     Using host libthread_db
-     *     (no debugging symbols found)
+     * We expect the first line to begin with
+     *
      *     Reading symbols from
+     *
+     * to indicate that the target has been loaded successfully. If we see
+     * anything else, we treat it an error. If an error occurs while
+     * reading symbols, we ignore the situation under the assumption that
+     * GDB will just treat the program as if it had no symbols in the
+     * first place, but will otherwise respond normally.
      */
-    while (strncmp(output, "Reading symbols from", 20) == 0 ||
-	   strncmp(output, "done.", 5) == 0 ||
-	   strncmp(output, "Missing separate debuginfo", 26) == 0 ||
-	   strncmp(output, "Try: ", 5) == 0 ||
-	   strncmp(output, "Using host libthread_db", 23) == 0 ||
-	   strncmp(output, "(no debugging symbols found)", 28) == 0)
+    if (strncmp(output, "Reading symbols from", 20) == 0)
     {
-	// this line is good, go to the next one
+	// keep just the first line in the message
+	// otherwise, all lines of text would end up in the status bar
 	const char* end = strchr(output, '\n');
 	if (end == 0)
-	    output += strlen(output);
-	else
-	    output = end+1;
+	    end = output + strlen(output);
+	message = QString::fromLatin1(output, end - output);
+	return true;
     }
-
-    /*
-     * If we've parsed all lines, there was no error.
-     */
-    return output[0] == '\0';
+    else
+    {
+	// error: keep all text
+	message = output;
+	return false;
+    }
 }
 
 bool GdbDriver::parseCoreFile(const char* output)

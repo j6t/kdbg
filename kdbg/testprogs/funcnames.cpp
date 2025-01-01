@@ -35,11 +35,21 @@ struct X
 	}
 };
 
+template<typename T>
+auto anyoperator(const T& arg) -> T	// looks like operator< in the parser
+{
+	return arg;
+}
+
 int main()
 {
+	using fnptr = int(const int&);
+	fnptr* fn = &anyoperator;	// not the last variable
+
 	X<unsigned> x{ 1, 1, 2, 3,  5, 8 };
 	x.outmult(3);
 
 	std::cout << x.refqual() << std::endl;
 	std::cout << X<int>().refqual() << std::endl;
+	std::cout << fn(42) << " fn: " << fn << std::endl;
 }
