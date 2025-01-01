@@ -3,7 +3,7 @@
 
 // a function that has args but no locals
 
-static int nolocals(int argc, const char** argv)
+static void nolocals(int argc, const char** argv)
 {
 	printf("argc=%d, argv[0]=%s\n", argc, argv[0]);
 }
@@ -11,7 +11,7 @@ static int nolocals(int argc, const char** argv)
 
 // a function that has no args but locals
 
-static int noargs()
+static void noargs()
 {
 	int c = 1;
 	const char* pgm[] = { "foo", 0 };

@@ -28,5 +28,5 @@ int main()
 	};
 	a = 'X';
 	b = t.TestPopup();
-	std::fprintf(stderr, "%d, %d, a=%d, b=%d\n", sizeof(mutex), sizeof(t), a, b);
+	std::fprintf(stderr, "%zu, %zu, a=%d, b=%d\n", sizeof(mutex), sizeof(t), a, b);
 }
