@@ -161,7 +161,7 @@ bool KDebugger::debugProgram(const QString& name,
     // get debugger command from per-program settings
     if (m_programConfig != 0) {
 	KConfigGroup g = m_programConfig->group(GeneralGroup);
-	m_debuggerCmd = readDebuggerCmd(g);
+	m_debuggerCmd = g.readEntry(DebuggerCmdStr);
 	// get terminal emulation level
 	m_ttyLevel = TTYLevel(g.readEntry(TTYLevelEntry, int(ttyFull)));
     }
@@ -888,33 +888,6 @@ void KDebugger::restoreProgramSettings()
 
     // give others a chance
     emit restoreProgramSpecific(m_programConfig);
-}
-
-/**
- * Reads the debugger command line from the program settings. The config
- * group must have been set by the caller.
- */
-QString KDebugger::readDebuggerCmd(const KConfigGroup& g)
-{
-    QString debuggerCmd = g.readEntry(DebuggerCmdStr);
-
-    // always let the user confirm the debugger cmd if we are root
-    if (::geteuid() == 0)
-    {
-	if (!debuggerCmd.isEmpty()) {
-	    QString msg = i18n(
-		"The settings for this program specify "
-		"the following debugger command:\n%1\n"
-		"Shall this command be used?");
-	    if (KMessageBox::warningYesNo(parentWidget(), msg.arg(debuggerCmd))
-		!= KMessageBox::Yes)
-	    {
-		// don't use it
-		debuggerCmd = QString();
-	    }
-	}
-    }
-    return debuggerCmd;
 }
 
 /*

@@ -457,7 +457,6 @@ protected:
     KConfig* m_programConfig;		/* program-specific settings (brkpts etc) */
     void saveProgramSettings();
     void restoreProgramSettings();
-    QString readDebuggerCmd(const KConfigGroup& g);
 
     // debugger process
     DebuggerDriver* m_d;
