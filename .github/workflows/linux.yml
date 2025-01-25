@@ -17,11 +17,11 @@ jobs:
       fail-fast: false
       matrix:
         include:
-          - cc: gcc-10
-            cxx: g++-10
+          - cc: gcc-12
+            cxx: g++-12
             clang_major_version: null
             clang_repo_suffix: null
-            runs-on: ubuntu-22.04
+            runs-on: ubuntu-24.04
           - cc: gcc-14
             cxx: g++-14
             clang_major_version: null
@@ -31,7 +31,7 @@ jobs:
             cxx: clang++-18
             clang_major_version: 18
             clang_repo_suffix: -18
-            runs-on: ubuntu-22.04
+            runs-on: ubuntu-24.04
     steps:
       - name: Add Clang/LLVM repositories
         if: "${{ contains(matrix.cxx, 'clang') }}"

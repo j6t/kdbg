@@ -12,12 +12,13 @@ on:
 jobs:
   debian_package:
     name: Build Debian package
-    runs-on: ubuntu-22.04
+    runs-on: ubuntu-24.04
     steps:
       - name: Install build dependencies
         run: |-
           sudo apt-get update
           sudo apt-get install --yes --no-install-recommends \
+            build-essential \
             cmake \
             debhelper \
             devscripts \
