@@ -19,6 +19,7 @@
 #include <kwindowsystem.h>
 #include <ksqueezedtextlabel.h>
 #include <ktoolbar.h>
+#include <kx11extras.h>
 #include <kxmlguifactory.h>
 #include <KPageDialog>
 #include <QListWidget>
@@ -1059,9 +1060,7 @@ void DebuggerMainWnd::slotProgramStopped()
 {
     // when the program stopped, move the window to the foreground
     if (m_popForeground) {
-	// unfortunately, this requires quite some force to work :-(
-	KWindowSystem::raiseWindow(winId());
-	KWindowSystem::forceActiveWindow(winId());
+	KX11Extras::activateWindow(winId());
     }
     m_backTimer.stop();
 }
