@@ -290,11 +290,6 @@ public:
      */
     virtual QString defaultInvocation() const = 0;
 
-    /**
-     * Returns a list of options that can be  turned on and off.
-     */
-    virtual QStringList boolOptionList() const = 0;
-
     virtual bool startup(QString cmdStr);
     void setLogFileName(const QString& fname) { m_logFileName = fname; }
     bool isRunning() { return state() != NotRunning; }

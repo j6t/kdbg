@@ -355,8 +355,7 @@ bool KDebugger::isCpuTargetX86() const
 void KDebugger::programArgs(QWidget* parent)
 {
     if (m_haveExecutable) {
-	QStringList allOptions = m_d->boolOptionList();
-	PgmArgs dlg(parent, m_executable, m_envVars, allOptions);
+	PgmArgs dlg(parent, m_executable, m_envVars);
 	dlg.setArgs(m_programArgs);
 	dlg.setWd(m_programWD);
 	if (dlg.exec()) {

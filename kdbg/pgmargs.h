@@ -9,25 +9,19 @@
 
 #include "ui_pgmargsbase.h"
 #include <QDialog>
-#include <QSet>
 #include <map>
 #include "envvar.h"
-
-class QStringList;
 
 class PgmArgs : public QDialog, private Ui::PgmArgsBase
 {
     Q_OBJECT
 public:
     PgmArgs(QWidget* parent, const QString& pgm,
-	    const std::map<QString,QString>& envVars,
-	    const QStringList& allOptions);
+	    const std::map<QString,QString>& envVars);
     ~PgmArgs();
 
     void setArgs(const QString& text) { programArgs->setText(text); }
     QString args() const { return programArgs->text(); }
-    void setOptions(const QSet<QString>& selectedOptions);
-    QSet<QString> options() const;
     void setWd(const QString& wd) { wdEdit->setText(wd); }
     QString wd() const { return wdEdit->text(); }
     const std::map<QString,EnvVar>& envVars() { return m_envVars; }

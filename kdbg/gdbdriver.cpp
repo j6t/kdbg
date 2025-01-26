@@ -215,12 +215,6 @@ QString GdbDriver::defaultInvocation() const
     }
 }
 
-QStringList GdbDriver::boolOptionList() const
-{
-    // no options
-    return QStringList();
-}
-
 bool GdbDriver::startup(QString cmdStr)
 {
     if (!DebuggerDriver::startup(cmdStr))
