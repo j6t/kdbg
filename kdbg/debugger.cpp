@@ -1978,8 +1978,6 @@ void KDebugger::updateBreakList(const char* output)
 	if (i != m_brkpts.end())
 	{
 	    // preserve accurate location information
-	    // note that xsldbg doesn't have a location in
-	    // the listed breakpoint if it has just been set
 	    // therefore, we copy it as well if necessary
 	    bp->text = i->text;
 	    if (!i->fileName.isEmpty()) {

@@ -15,6 +15,5 @@ install(FILES
 	tips.html
 	types.html
 	watches.html
-	xslt.html
 	index.html
 	DESTINATION ${HTML_INSTALL_DIR}/en/kdbg)
