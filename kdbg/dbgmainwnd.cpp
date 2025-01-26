@@ -44,7 +44,6 @@
 #include "prefdebugger.h"
 #include "prefmisc.h"
 #include "gdbdriver.h"
-#include "xsldbgdriver.h"
 #include "mydebug.h"
 #include <typeinfo>
 #include <sys/stat.h>			/* mknod(2) */
@@ -715,9 +714,6 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 	KMessageBox::sorry(this, msg.arg(lang));
 	return false;
     }
-    if (typeid(*driver) == typeid(XsldbgDriver)) {
-	KMessageBox::information(this, i18n("XSL debugging is no longer supported and will be removed in a future version of KDbg"));
-    }
 
     driver->setLogFileName(m_transcriptFile);
 
@@ -750,10 +746,8 @@ DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
 	{ "c",       "c++",     1 },
 	{ "f",       "fortran", 1 },
 	{ "p",       "python",  3 },
-	{ "x",       "xslt",    2 },
 	// the following are actually driver names
 	{ "gdb",     "gdb",     1 },
-	{ "xsldbg",  "xsldbg",  2 },
     };
     const int N = sizeof(langs)/sizeof(langs[0]);
 
@@ -783,9 +777,6 @@ DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
 	    driver = gdb;
 	}
 	break;
-    case 2:
-	driver = new XsldbgDriver;
-	break;
     default:
 	// unknown language
 	break;
@@ -796,12 +787,8 @@ DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
 /**
  * Try to guess the language to use from the contents of the file.
  */
-QString DebuggerMainWnd::driverNameFromFile(const QString& exe)
+QString DebuggerMainWnd::driverNameFromFile(const QString&)
 {
-    /* Inprecise but simple test to see if file is in XSLT language */
-    if (exe.right(4).toLower() == ".xsl")
-	return "XSLT";
-
     return "GDB";
 }
 

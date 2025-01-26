@@ -53,7 +53,6 @@ set(kdbg_SRCS
     debugger.cpp
     dbgdriver.cpp
     gdbdriver.cpp
-    xsldbgdriver.cpp
     brkpt.cpp
     exprwnd.cpp
     regwnd.cpp
