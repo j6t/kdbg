@@ -1009,7 +1009,6 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	// there is no output
     case DCsetenv:
     case DCunsetenv:
-    case DCsetoption:
 	/* if value is empty, we see output, but we don't care */
 	break;
     case DCcd:
@@ -1328,18 +1327,6 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
 	    // variable not changed
 	    break;
 	}
-    }
-
-    // update options
-    foreach (QString opt, newOptions - m_boolOptions)
-    {
-	// option is not set, set it
-	m_d->executeCmd(DCsetoption, opt, 1);
-    }
-    foreach (QString opt, m_boolOptions - newOptions)
-    {
-	// option is set, unset it
-	m_d->executeCmd(DCsetoption, opt, 0);
     }
     m_boolOptions = newOptions;
 }

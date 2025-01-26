@@ -60,7 +60,6 @@ enum DbgCommand {
 	DCsetargs,
 	DCsetenv,
 	DCunsetenv,
-	DCsetoption,                    /* debugger options */
 	DCcd,
 	DCbt,
 	DCrun,
