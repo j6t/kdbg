@@ -56,7 +56,7 @@ jobs:
           ls -ld ../*kdbg*.*
 
       - name: Upload build artifacts
-        uses: actions/upload-artifact@v3
+        uses: actions/upload-artifact@v4
         with:
           name: "kdbg_${{ github.sha }}_debian_package"
           path: "/home/runner/work/*/*kdbg*.*"
