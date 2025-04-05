@@ -28,7 +28,7 @@ set(PICTOGRAMS
 	watchdis.png
 	pointer.xpm)
 
-install(FILES ${PICTOGRAMS} DESTINATION "${DATA_INSTALL_DIR}/kdbg/pics")
+install(FILES ${PICTOGRAMS} DESTINATION "${KDE_INSTALL_DATADIR}/kdbg/pics")
 
 ecm_install_icons(ICONS
     16-apps-kdbg.png
@@ -37,7 +37,7 @@ ecm_install_icons(ICONS
     64-apps-kdbg.png
     128-apps-kdbg.png
     ${CMAKE_CURRENT_BINARY_DIR}/sc-apps-kdbg.svgz
-    DESTINATION "${DATA_INSTALL_DIR}/icons"
+    DESTINATION "${KDE_INSTALL_ICONDIR}"
     THEME hicolor
 )
 ecm_install_icons(ICONS
@@ -57,6 +57,6 @@ ecm_install_icons(ICONS
     ${CMAKE_CURRENT_BINARY_DIR}/sc-actions-brkpt.svgz
     ${CMAKE_CURRENT_BINARY_DIR}/sc-actions-debug-run.svgz
     ${CMAKE_CURRENT_BINARY_DIR}/sc-actions-executable-open.svgz
-    DESTINATION "${DATA_INSTALL_DIR}/kdbg/icons"
+    DESTINATION "${KDE_INSTALL_DATADIR}/kdbg/icons"
     THEME hicolor
 )
