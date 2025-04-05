@@ -91,6 +91,7 @@ ENDIF (HAVE_LIB_UTIL)
 target_link_libraries(kdbg
     KF5::I18n
     KF5::ConfigCore
+    KF5::CoreAddons
     KF5::IconThemes
     KF5::XmlGui
     KF5::WindowSystem
