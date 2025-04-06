@@ -88,16 +88,21 @@ IF (HAVE_LIB_UTIL)
 ENDIF (HAVE_LIB_UTIL)
 
 target_link_libraries(kdbg
-    KF5::I18n
-    KF5::ConfigCore
-    KF5::CoreAddons
-    KF5::IconThemes
-    KF5::XmlGui
-    KF5::WindowSystem
+    KF${BUILD_FOR_KDE_VERSION}::I18n
+    KF${BUILD_FOR_KDE_VERSION}::ConfigCore
+    KF${BUILD_FOR_KDE_VERSION}::CoreAddons
+    KF${BUILD_FOR_KDE_VERSION}::IconThemes
+    KF${BUILD_FOR_KDE_VERSION}::WindowSystem
+    KF${BUILD_FOR_KDE_VERSION}::XmlGui
     ${LIB_UTIL}
 )
+if(BUILD_FOR_KDE_VERSION EQUAL 6)
+    target_link_libraries(kdbg
+        Qt::Core5Compat
+    )
+endif()
 
 install(TARGETS kdbg ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES kdbg.desktop DESTINATION ${KDE_INSTALL_APPDIR})
 install(FILES kdbgrc DESTINATION ${KDE_INSTALL_CONFDIR})
-install(FILES kdbgui.rc DESTINATION ${KDE_INSTALL_KXMLGUI5DIR}/kdbg)
+install(FILES kdbgui.rc DESTINATION ${KDE_INSTALL_KXMLGUIDIR}/kdbg)
