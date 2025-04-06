@@ -230,17 +230,17 @@ static QString toOctal(QString hex)
 	if (idx < 0)
 	    return hex;
 	v += idx << shift;
-	result.insert(0, (v & 7) + '0');
+	result.insert(0, QChar(v & 7) + '0');
 	v >>= 3;
 	shift++;
 	if (shift == 3) {
 	    // an extra digit this round
-	    result.insert(0, v + '0');
+	    result.insert(0, QChar(v) + '0');
 	    shift = v = 0;
 	}
     }
     if (v != 0) {
-	result.insert(0, v + '0');
+	result.insert(0, QChar(v) + '0');
     }
     return "0" + result;
 }
