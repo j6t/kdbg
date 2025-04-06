@@ -14,6 +14,7 @@
 
 class PrefMisc : public QWidget
 {
+    Q_OBJECT
 public:
     PrefMisc(QWidget* parent);
 
@@ -21,8 +22,7 @@ public:
 
 protected:
     QCheckBox m_popForeground;
-
-    QLabel m_backTimeoutLabel;
+    QCheckBox m_lowerWindow;
     QLineEdit m_backTimeout;
 
     QLabel m_tabWidthLabel;
@@ -37,7 +37,7 @@ protected:
 
 public:
     bool popIntoForeground() const { return m_popForeground.isChecked(); }
-    void setPopIntoForeground(bool pop) { m_popForeground.setChecked(pop); }
+    bool isLowerWindowRqed() const { return m_lowerWindow.isChecked(); }
     int backTimeout() const;
     void setBackTimeout(int to);
     int tabWidth() const;
@@ -46,6 +46,22 @@ public:
     void setSourceFilter(const QString& f) { m_sourceFilter.setText(f); }
     QString headerFilter() const { return m_headerFilter.text(); }
     void setHeaderFilter(const QString& f) { m_headerFilter.setText(f); }
+
+public slots:
+    void setPopIntoForeground(bool pop)
+    {
+        m_popForeground.setChecked(pop);
+        m_lowerWindow.setEnabled(pop);
+        if ( isLowerWindowRqed() )
+        {
+            m_backTimeout.setEnabled(pop);
+        }
+    }
+    void setLowerWindow(bool is)
+    {
+        m_lowerWindow.setChecked(is);
+        m_backTimeout.setEnabled(is);
+    }
 };
 
 #endif // PREFMISC_H

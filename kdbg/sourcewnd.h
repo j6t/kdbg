@@ -35,6 +35,10 @@ public:
     void setPC(bool set, int lineNo, const DbgAddr& address, int frameNo);
     enum FindDirection { findForward = 1, findBackward = -1 };
     void find(const QString& text, bool caseSensitive, FindDirection dir);
+    /**
+     * Scrolls to the specified line number given as text
+     */
+    void gotoLine( const QString& text);
     bool wordAtPoint(const QPoint& p, QString& word, QRect& r);
     /**
      * Translates row number (zero-based) to zero-based source line number.
