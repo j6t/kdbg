@@ -644,7 +644,7 @@ bool DebuggerMainWnd::debugProgram(const QString& exe, const QString& lang)
     if (!success)
     {
 	QString msg = i18n("`%1' is not a file or does not exist");
-	KMessageBox::sorry(this, msg.arg(exe));
+	KMessageBox::error(this, msg.arg(exe));
     }
     else
     {
@@ -712,7 +712,7 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
     {
 	// oops
 	QString msg = i18n("Don't know how to debug language `%1'");
-	KMessageBox::sorry(this, msg.arg(lang));
+	KMessageBox::error(this, msg.arg(lang));
 	return false;
     }
     if (typeid(*driver) == typeid(XsldbgDriver)) {
@@ -729,7 +729,7 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 
 	QString msg = i18n("Could not start the debugger process.\n"
 			   "Please shut down KDbg and resolve the problem.");
-	KMessageBox::sorry(this, msg);
+	KMessageBox::error(this, msg);
     }
 
     return success;
@@ -1272,5 +1272,5 @@ void DebuggerMainWnd::slotExecArgs()
 
 void DebuggerMainWnd::slotConfigureKeys()
 {
-    KShortcutsDialog::configure(actionCollection());
+    KShortcutsDialog::showDialog(actionCollection(), KShortcutsEditor::LetterShortcutsDisallowed, this);
 }
