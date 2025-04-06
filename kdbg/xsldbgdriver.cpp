@@ -250,9 +250,9 @@ XsldbgDriver::commandFinished(CmdQueueItem * cmd)
 	  if (!::isErrorExpr(m_output.constData()))
             parseMarker();
 	  else{
-	    // This only shows an error for DCinfolocals 
-	    //  need to update KDebugger::handleRunCommand ? 
-	    KMessageBox::sorry(0L, m_output);
+	    // This only shows an error for DCinfolocals
+	    //  need to update KDebugger::handleRunCommand ?
+	    KMessageBox::error(nullptr, m_output);
 	  }
 	}
             break;
