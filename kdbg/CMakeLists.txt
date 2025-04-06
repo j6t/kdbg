@@ -67,6 +67,7 @@ set(kdbg_SRCS
     prefmisc.cpp
     pgmsettings.cpp
     watchwindow.cpp
+    srcfileswindow.cpp
     dbgmainwnd.cpp
     main.cpp
 )

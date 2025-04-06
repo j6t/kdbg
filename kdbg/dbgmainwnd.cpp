@@ -40,6 +40,7 @@
 #include "memwindow.h"
 #include "ttywnd.h"
 #include "watchwindow.h"
+#include "srcfileswindow.h"
 #include "procattach.h"
 #include "prefdebugger.h"
 #include "prefmisc.h"
@@ -100,6 +101,9 @@ DebuggerMainWnd::DebuggerMainWnd() :
     QDockWidget* dw8 = createDockWidget("Memory", i18n("Memory"));
     m_memoryWindow = new MemoryWindow(dw8);
     dw8->setWidget(m_memoryWindow);
+    QDockWidget* dw9 = createDockWidget("SrcFiles", i18n("Source Files"));
+    m_srcFiles = new SrcFilesWindow(dw9);
+    dw9->setWidget(m_srcFiles);
 
     m_debugger = new KDebugger(this, m_localVariables, m_watches->watchVariables(), m_btWindow);
 
@@ -178,6 +182,12 @@ DebuggerMainWnd::DebuggerMainWnd() :
     connect(m_localVariables, SIGNAL(customContextMenuRequested(const QPoint&)),
 	    this, SLOT(slotLocalsPopup(const QPoint&)));
 
+    // connect src files to src files window
+    connect(m_debugger, SIGNAL(sourceFiles(QString&)),
+	    m_srcFiles, SLOT(sourceFiles(QString&)));
+    connect(m_srcFiles, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
+	    m_filesWindow, SLOT(activate(const QString&,int,const DbgAddr&)));
+
     makeDefaultLayout();
     setupGUI(KXmlGuiWindow::Default, "kdbgui.rc");
     restoreSettings(KSharedConfig::openConfig());
@@ -206,6 +216,7 @@ DebuggerMainWnd::~DebuggerMainWnd()
     delete m_localVariables;
     delete m_btWindow;
     delete m_filesWindow;
+    delete m_srcFiles;
 
     delete m_outputTermProc;
 }
@@ -286,7 +297,8 @@ void DebuggerMainWnd::initKAction()
 	{ m_bpTable, "view_breakpoints", &m_bpTableAction },
 	{ m_threads, "view_threads", &m_threadsAction },
 	{ m_ttyWindow, "view_output", &m_ttyWindowAction },
-	{ m_memoryWindow, "view_memory", &m_memoryWindowAction }
+	{ m_memoryWindow, "view_memory", &m_memoryWindowAction },
+	{ m_srcFiles, "view_srcfiles", &m_srcFilesAction},
     };
     for (unsigned i = 0; i < sizeof(dw)/sizeof(dw[0]); i++) {
 	QDockWidget* d = dockParent(dw[i].w);
@@ -628,6 +640,7 @@ void DebuggerMainWnd::makeDefaultLayout()
     tabifyDockWidget(dockParent(m_bpTable), dockParent(m_ttyWindow));
     tabifyDockWidget(dockParent(m_ttyWindow), dockParent(m_btWindow));
     tabifyDockWidget(dockParent(m_threads), dockParent(m_watches));
+    tabifyDockWidget(dockParent(m_watches), dockParent(m_srcFiles));
     dockParent(m_localVariables)->setVisible(true);
     dockParent(m_ttyWindow)->setVisible(true);
     dockParent(m_watches)->setVisible(true);

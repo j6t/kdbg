@@ -21,6 +21,7 @@
     <Action name="view_threads"/>
     <Action name="view_output"/>
     <Action name="view_memory"/>
+    <Action name="view_srcfiles"/>
   </Menu>
   <Menu name="execution"><text>E&amp;xecution</text>
     <Action name="exec_run"/>

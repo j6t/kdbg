@@ -406,6 +406,7 @@ protected:
     void handleMemoryDump(const char* output);
     void handleInfoLine(CmdQueueItem* cmd, const char* output);
     void handleInfoTarget(const char* output);
+    void handleInfoSources(const char* output);
     void handleDisassemble(CmdQueueItem* cmd, const char* output);
     void handleThreadList(const char* output);
     void handleSetPC(const char* output);
@@ -588,6 +589,11 @@ signals:
      * Gives other objects a chance to restore program specific settings.
      */
     void restoreProgramSpecific(KConfigBase* config);
+
+    /**
+     * Gives source files to tree view 
+     */
+    void sourceFiles(QString &);
 
 protected:
     ExprWnd& m_localVariables;
