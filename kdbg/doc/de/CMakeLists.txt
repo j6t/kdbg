@@ -14,4 +14,4 @@ install(FILES
 	tips.html
 	watches.html
 	index.html
-	DESTINATION ${HTML_INSTALL_DIR}/de/kdbg)
+	DESTINATION ${KDE_INSTALL_DOCBUNDLEDIR}/de/kdbg)

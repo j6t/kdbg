@@ -11,4 +11,4 @@ install(FILES
 	stdc++.kdbgtt
 	stdc++6.kdbgtt
 	X11.kdbgtt
-	DESTINATION ${DATA_INSTALL_DIR}/kdbg/types)
+	DESTINATION ${KDE_INSTALL_DATADIR}/kdbg/types)
