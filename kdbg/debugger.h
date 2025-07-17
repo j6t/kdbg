@@ -88,7 +88,7 @@ public:
      */
     static const char DriverNameEntry[];
 
-public slots:
+public Q_SLOTS:
     /**
      * Runs the program or continues it if it is stopped at a breakpoint.
      */
@@ -383,7 +383,7 @@ protected:
     QString m_memoryStartExpression; /* start memory location to watch */
     unsigned m_memoryTotalLength;    /* memory total length to watch */
 
-protected slots:
+protected Q_SLOTS:
     void parse(CmdQueueItem* cmd, const char* output);
 protected:
     void handleRunCommands(const char* output);
@@ -461,7 +461,7 @@ protected:
 
     QString m_statusMessage;
 
-protected slots:
+protected Q_SLOTS:
     void gdbExited();
     void slotInferiorRunning();
     void backgroundUpdate();
@@ -471,11 +471,11 @@ protected slots:
     void slotValuePopup(const QString&);
     void slotDisassemble(const QString&, int);
     void slotValueEdited(VarTree*, const QString&);
-public slots:
+public Q_SLOTS:
     void setThread(int);
     void shutdown();
 
-signals:
+Q_SIGNALS:
     /**
      * This signal is emitted before the debugger is started. The slot is
      * supposed to set up m_inferiorTerminal.

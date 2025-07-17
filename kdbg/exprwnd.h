@@ -112,9 +112,9 @@ protected:
     void keyPressEvent(QKeyEvent *e) override;
     void focusOutEvent(QFocusEvent* ev) override;
     void paintEvent(QPaintEvent* e) override;
-public slots:
+public Q_SLOTS:
     void slotSelectionChanged();
-signals:
+Q_SIGNALS:
     void done(VarTree*, const QString&);
 };
 
@@ -177,7 +177,7 @@ protected:
     void unhookSubtree(VarTree* subTree);
     static void unhookSubtree(std::list<VarTree*>& list, VarTree* subTree);
 
-signals:
+Q_SIGNALS:
     void removingItem(VarTree*);
     void editValueCommitted(VarTree*, const QString&);
 };

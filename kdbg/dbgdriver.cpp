@@ -249,7 +249,7 @@ void DebuggerDriver::slotCommandRead()
     // set the flag that reflects whether the program is really running
     switch (m_activeCmd->m_cmd) {
     case DCrun:	case DCcont: case DCnext: case DCstep: case DCfinish: case DCuntil:
-	emit inferiorRunning();
+	Q_EMIT inferiorRunning();
 	break;
     default:
 	break;
@@ -356,7 +356,7 @@ void DebuggerDriver::processOutput(const QByteArray& data)
 	    if (m_hipriCmdQueue.empty() && m_lopriCmdQueue.empty()) {
 		// no pending commands
 		m_state = DSidle;
-		emit enterIdleState();
+		Q_EMIT enterIdleState();
 	    } else {
 		writeCommand();
 	    }

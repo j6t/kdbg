@@ -317,7 +317,7 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
     }
 
     /* ok, the command is ready */
-    emit commandReceived(cmd, m_output.constData());
+    Q_EMIT commandReceived(cmd, m_output.constData());
 
     switch (cmd->m_cmd) {
     case DCcorefile:
@@ -396,7 +396,7 @@ void GdbDriver::parseMarker(CmdQueueItem* cmd)
 
 	// now show the window
 	startMarker[resMarker.capturedStart()] = '\0';	/* split off file name */
-	emit activateFileLine(startMarker, lineNo-1, address);
+	Q_EMIT activateFileLine(startMarker, lineNo-1, address);
     }
 }
 

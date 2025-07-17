@@ -157,7 +157,7 @@ void BreakpointTable::on_btViewCode_clicked()
 	return;
 
     if (!m_debugger->infoLine(bp->fileName, bp->lineNo, bp->address))
-	emit activateFileLine(bp->fileName, bp->lineNo, bp->address);
+	Q_EMIT activateFileLine(bp->fileName, bp->lineNo, bp->address);
 }
 
 void BreakpointTable::updateUI()

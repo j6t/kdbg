@@ -21,11 +21,11 @@ public:
     ThreadList(QWidget* parent);
     ~ThreadList();
 
-public slots:
+public Q_SLOTS:
     void updateThreads(const std::list<ThreadInfo>&);
     void slotCurrentChanged(QTreeWidgetItem*);
 
-signals:
+Q_SIGNALS:
     void setThread(int);
 
 protected:

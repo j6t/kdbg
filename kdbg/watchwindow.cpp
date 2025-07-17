@@ -53,7 +53,7 @@ bool WatchWindow::eventFilter(QObject*, QEvent* ev)
     {
 	QKeyEvent* kev = static_cast<QKeyEvent*>(ev);
 	if (kev->key() == Qt::Key_Delete) {
-	    emit deleteWatch();
+	    Q_EMIT deleteWatch();
 	    return true;
 	}
     }
@@ -77,7 +77,7 @@ void WatchWindow::dropEvent(QDropEvent* event)
 	    text.truncate(pos);
 	text = text.trimmed();
 	if (!text.isEmpty())
-	    emit textDropped(text);
+	    Q_EMIT textDropped(text);
     }
     event->acceptProposedAction();
 }

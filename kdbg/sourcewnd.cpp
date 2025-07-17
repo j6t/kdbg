@@ -376,12 +376,12 @@ void SourceWindow::infoMousePress(QMouseEvent* ev)
     switch (ev->button()) {
     case Qt::LeftButton:
 	TRACE(QString::asprintf("left-clicked line %d", line));
-	emit clickedLeft(m_fileName, line, address,
+	Q_EMIT clickedLeft(m_fileName, line, address,
  			 (ev->modifiers() & Qt::ShiftModifier) != 0);
 	break;
     case Qt::MiddleButton:
 	TRACE(QString::asprintf("mid-clicked row %d", line));
-	emit clickedMid(m_fileName, line, address);
+	Q_EMIT clickedMid(m_fileName, line, address);
 	break;
     default:;
     }
@@ -678,7 +678,7 @@ void SourceWindow::expandRow(int row)
 
     registerExpandedLine(line);
 
-    emit expanded(line);		/* must set PC */
+    Q_EMIT expanded(line);		/* must set PC */
 }
 
 void SourceWindow::collapseRow(int row)
@@ -704,7 +704,7 @@ void SourceWindow::collapseRow(int row)
 
     unregisterExpandedLine(line);
 
-    emit collapsed(line);
+    Q_EMIT collapsed(line);
 }
 
 void SourceWindow::activeLine(int& line, DbgAddr& address)
@@ -759,7 +759,7 @@ void SourceWindow::actionExpandRow(int row)
     if (!sl.canDisass)
 	return;
     if (sl.disass.size() == 0) {
-	emit disassemble(m_fileName, line);
+	Q_EMIT disassemble(m_fileName, line);
     } else {
 	expandRow(row);
     }

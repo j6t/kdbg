@@ -36,12 +36,12 @@ protected:
     void dragEnterEvent(QDragEnterEvent* event) override;
     void dropEvent(QDropEvent* event) override;
 
-signals:
+Q_SIGNALS:
     void addWatch();
     void deleteWatch();
     void textDropped(const QString& text);
 
-protected slots:
+protected Q_SLOTS:
     void slotWatchHighlighted();
 };
 

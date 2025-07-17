@@ -29,7 +29,7 @@ protected:
     void contextMenuEvent(QContextMenuEvent*) override;
     void changeEvent(QEvent* ev) override;
 
-protected slots:
+protected Q_SLOTS:
     void slotModeChange(QAction*);
     void updateRegisters(const std::list<RegisterInfo>&);
 

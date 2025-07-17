@@ -49,7 +49,7 @@ protected:
     void requestMemoryDump(const QString &expr);
     QString parseMemoryDumpLineToAscii(const QString& line, bool littleendian);
 
-public slots:
+public Q_SLOTS:
     void verticalScrollBarMoved(int);
     void verticalScrollBarRangeChanged(int, int);
     void slotNewExpression(const QString&);

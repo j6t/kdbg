@@ -648,7 +648,7 @@ void ExprWnd::unhookSubtree(VarTree* subTree)
     unhookSubtree(m_updatePtrs, subTree);
     unhookSubtree(m_updateType, subTree);
     unhookSubtree(m_updateStruct, subTree);
-    emit removingItem(subTree);
+    Q_EMIT removingItem(subTree);
 }
 
 void ExprWnd::unhookSubtree(std::list<VarTree*>& list, VarTree* subTree)
@@ -790,7 +790,7 @@ void ValueEdit::terminate(bool commit)
 	m_finished = true;
 	hide();	// will call focusOutEvent, that's why we need m_finished
 	if (commit) {
-	    emit done(m_item, text());
+	    Q_EMIT done(m_item, text());
 	}
     }
 }

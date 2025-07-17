@@ -508,7 +508,7 @@ void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
 
     if (m_debugger)
 	m_debugger->setDefaultFlavor(m_asmGlobalFlavor);
-    emit setTabWidth(m_tabWidth);
+    Q_EMIT setTabWidth(m_tabWidth);
 }
 
 void DebuggerMainWnd::updateUI()
@@ -878,7 +878,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
     }
 
     if (m_tabWidth != oldTabWidth) {
-	emit setTabWidth(m_tabWidth);
+	Q_EMIT setTabWidth(m_tabWidth);
     }
 }
 

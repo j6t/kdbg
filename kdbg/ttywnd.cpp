@@ -122,7 +122,7 @@ void STTY::outReceived(int f)
 	    }
 	    break;
 	}
-	emit output(buf, n);
+	Q_EMIT output(buf, n);
 	if (n == 0)
 	    break;
     }

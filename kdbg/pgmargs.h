@@ -33,7 +33,7 @@ protected:
     void modifyVar(bool resurrect);
     void accept() override;
 
-protected slots:
+protected Q_SLOTS:
     void on_buttonModify_clicked();
     void on_buttonDelete_clicked();
     void on_envList_currentItemChanged();

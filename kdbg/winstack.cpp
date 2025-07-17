@@ -134,7 +134,7 @@ bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address
 	fw->setFocusPolicy(Qt::WheelFocus);
 
 	// set PC if there is one
-	emit newFileLoaded();
+	Q_EMIT newFileLoaded();
 	if (m_pcLine >= 0) {
 	    setPC(true, m_pcFile, m_pcLine, DbgAddr(m_pcAddress), m_pcFrame);
 	}
@@ -271,7 +271,7 @@ bool WinStack::event(QEvent* evt)
     m_tipLocation = p;
     m_tipRegion = QRect(w->mapTo(this, r.topLeft()), r.size());
 
-    emit initiateValuePopup(word);
+    Q_EMIT initiateValuePopup(word);
     return true;
 }
 
@@ -298,7 +298,7 @@ void WinStack::slotExpandCollapse(int)
 
     // HACK: we know that this will result in updateLineItems
     // should be done more cleanly with a separate signal
-    emit newFileLoaded();
+    Q_EMIT newFileLoaded();
 
     if (m_pcLine >= 0) {
 	setPC(true, m_pcFile, m_pcLine, DbgAddr(m_pcAddress), m_pcFrame);
@@ -341,7 +341,7 @@ void WinStack::slotBrkptSet()
     int lineNo;
     DbgAddr address;
     if (activeLine(file, lineNo, address))
-	emit toggleBreak(file, lineNo, address, false);
+	Q_EMIT toggleBreak(file, lineNo, address, false);
 }
 
 void WinStack::slotBrkptSetTemp()
@@ -350,7 +350,7 @@ void WinStack::slotBrkptSetTemp()
     int lineNo;
     DbgAddr address;
     if (activeLine(file, lineNo, address))
-	emit toggleBreak(file, lineNo, address, true);
+	Q_EMIT toggleBreak(file, lineNo, address, true);
 }
 
 void WinStack::slotBrkptEnable()
@@ -359,7 +359,7 @@ void WinStack::slotBrkptEnable()
     int lineNo;
     DbgAddr address;
     if (activeLine(file, lineNo, address))
-	emit enadisBreak(file, lineNo, address);
+	Q_EMIT enadisBreak(file, lineNo, address);
 }
 
 void WinStack::slotMoveProgramCounter()
@@ -368,7 +368,7 @@ void WinStack::slotMoveProgramCounter()
     int lineNo;
     DbgAddr address;
     if (activeLine(file, lineNo, address))
-	emit moveProgramCounter(file, lineNo, address);
+	Q_EMIT moveProgramCounter(file, lineNo, address);
 }
 
 void WinStack::slotClose()
@@ -429,11 +429,11 @@ FindDialog::~FindDialog()
 void FindDialog::closeEvent(QCloseEvent* ev)
 {
     QDialog::closeEvent(ev);
-    emit closed();
+    Q_EMIT closed();
 }
 
 void FindDialog::done(int result)
 {
     QDialog::done(result);
-    emit closed();
+    Q_EMIT closed();
 }

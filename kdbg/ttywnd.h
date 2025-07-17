@@ -31,10 +31,10 @@ public:
 
     QString slaveTTY(){ return m_slavetty; };
 
-protected slots:
+protected Q_SLOTS:
     void outReceived(int);
 
-signals:
+Q_SIGNALS:
     void output(char* buffer, int charlen);
 
 protected:
@@ -60,7 +60,7 @@ protected:
     QTextCursor m_pos;		//!< tracks horizontal cursor position
     void contextMenuEvent(QContextMenuEvent*) override;
 
-protected slots:
+protected Q_SLOTS:
     void slotAppend(char* buffer, int count);
     void slotClear();
 };

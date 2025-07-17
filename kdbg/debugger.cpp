@@ -83,7 +83,7 @@ KDebugger::KDebugger(QWidget* parent,
 
     connect(&m_btWindow, SIGNAL(currentRowChanged(int)), this, SLOT(gotoFrame(int)));
 
-    emit updateUI();
+    Q_EMIT updateUI();
 }
 
 KDebugger::~KDebugger()
@@ -192,7 +192,7 @@ bool KDebugger::debugProgram(const QString& name,
     m_typeTable = new ProgramTypeTable;
     m_sharedLibsListed = false;
 
-    emit updateUI();
+    Q_EMIT updateUI();
 
     return true;
 }
@@ -509,7 +509,7 @@ bool KDebugger::enableDisableBreakpoint(BrkptIterator bp)
 	m_d->executeCmd(bp->enabled ? DCdisable : DCenable, bp->id);
     } else {
 	bp->enabled = !bp->enabled;
-	emit breakpointsChanged();
+	Q_EMIT breakpointsChanged();
     }
     return true;
 }
@@ -552,7 +552,7 @@ bool KDebugger::conditionalBreakpoint(BrkptIterator bp,
     } else {
 	bp->condition = condition;
 	bp->ignoreCount = ignoreCount;
-	emit breakpointsChanged();
+	Q_EMIT breakpointsChanged();
     }
     return true;
 }
@@ -575,7 +575,7 @@ bool KDebugger::deleteBreakpoint(BrkptIterator bp)
 	m_d->executeCmd(DCdelete, bp->id);
     } else {
 	m_brkpts.erase(bp);
-	emit breakpointsChanged();
+	Q_EMIT breakpointsChanged();
     }
     return false;
 }
@@ -612,7 +612,7 @@ bool KDebugger::isIdle() const
 
 bool KDebugger::startDriver()
 {
-    emit debuggerStarting();		/* must set m_inferiorTerminal */
+    Q_EMIT debuggerStarting();		/* must set m_inferiorTerminal */
 
     /*
      * If the per-program command string is empty, use the global setting
@@ -716,7 +716,7 @@ void KDebugger::gdbExited()
     m_brkpts.clear();
 
     // erase PC
-    emit updatePC(QString(), -1, DbgAddr(), 0);
+    Q_EMIT updatePC(QString(), -1, DbgAddr(), 0);
 }
 
 QString KDebugger::getConfigForExe(const QString& name)
@@ -805,7 +805,7 @@ void KDebugger::saveProgramSettings()
     }
 
     // give others a chance
-    emit saveProgramSpecific(m_programConfig);
+    Q_EMIT saveProgramSpecific(m_programConfig);
 }
 
 void KDebugger::overrideProgramArguments(const QString& args)
@@ -876,7 +876,7 @@ void KDebugger::restoreProgramSettings()
     }
 
     // give others a chance
-    emit restoreProgramSpecific(m_programConfig);
+    Q_EMIT restoreProgramSpecific(m_programConfig);
 }
 
 /*
@@ -1003,7 +1003,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCcd:
 	/* display gdb's message in the status bar */
 	m_d->parseChangeWD(output, m_statusMessage);
-	emit updateStatusMessage();
+	Q_EMIT updateStatusMessage();
 	break;
     case DCinitialize:
 	break;
@@ -1035,7 +1035,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 		m_d->queueCmdAgain(DCinfolinemain);
 	    }
 	    if (!m_statusMessage.isEmpty())
-		emit updateStatusMessage();
+		Q_EMIT updateStatusMessage();
 	} else {
 	    QString msg = m_d->driverName() + ": " + m_statusMessage;
 	    KMessageBox::error(parentWidget(), msg);
@@ -1127,7 +1127,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
     case DCdetach:
 	m_programRunning = m_programActive = false;
 	// erase PC
-	emit updatePC(QString(), -1, DbgAddr(), 0);
+	Q_EMIT updatePC(QString(), -1, DbgAddr(), 0);
 	break;
     case DCbreaktext:
     case DCbreakline:
@@ -1188,14 +1188,14 @@ void KDebugger::handleRunCommands(const char* output)
 {
     uint flags = m_d->parseProgramStopped(output, !m_corefile.isEmpty(),
 					  m_statusMessage);
-    emit updateStatusMessage();
+    Q_EMIT updateStatusMessage();
 
     m_programActive = flags & DebuggerDriver::SFprogramActive;
 
     // refresh files if necessary
     if (flags & DebuggerDriver::SFrefreshSource) {
 	TRACE("re-reading files");
-	emit executableUpdated();
+	Q_EMIT executableUpdated();
     }
 
     /* 
@@ -1238,7 +1238,7 @@ void KDebugger::handleRunCommands(const char* output)
 	m_d->queueCmd(DCbt);
     } else {
 	// program finished: erase PC
-	emit updatePC(QString(), -1, DbgAddr(), 0);
+	Q_EMIT updatePC(QString(), -1, DbgAddr(), 0);
 	// dequeue any commands in the queues
 	m_d->flushCommands();
     }
@@ -1249,7 +1249,7 @@ void KDebugger::handleRunCommands(const char* output)
     }
 
     m_programRunning = false;
-    emit programStopped();
+    Q_EMIT programStopped();
 }
 
 void KDebugger::slotInferiorRunning()
@@ -1435,7 +1435,7 @@ bool KDebugger::handlePrintPopup(CmdQueueItem* cmd, const char* output)
 
     // construct the tip, m_popupExpr contains the variable name
     QString tip = cmd->m_popupExpr + " = " + formatPopupValue(value);
-    emit valuePopup(tip);
+    Q_EMIT valuePopup(tip);
 
     return true;
 }
@@ -1488,7 +1488,7 @@ void KDebugger::handleBacktrace(const char* output)
 	std::list<StackFrame>::iterator frm = stack.begin();
 	// first frame must set PC
 	// note: frm->lineNo is zero-based
-	emit updatePC(frm->fileName, frm->lineNo, frm->address, frm->frameNo);
+	Q_EMIT updatePC(frm->fileName, frm->lineNo, frm->address, frm->frameNo);
 
 	for (; frm != stack.end(); ++frm) {
 	    QString func;
@@ -1522,9 +1522,9 @@ void KDebugger::handleFrameChange(const char* output)
     DbgAddr address;
     if (m_d->parseFrameChange(output, frameNo, fileName, lineNo, address)) {
 	/* lineNo can be negative here if we can't find a file name */
-	emit updatePC(fileName, lineNo, address, frameNo);
+	Q_EMIT updatePC(fileName, lineNo, address, frameNo);
     } else {
-	emit updatePC(fileName, -1, address, frameNo);
+	Q_EMIT updatePC(fileName, -1, address, frameNo);
     }
 }
 
@@ -1885,7 +1885,7 @@ void KDebugger::slotDeleteWatch()
 
 void KDebugger::handleRegisters(const char* output)
 {
-    emit registersChanged(m_d->parseRegisters(output));
+    Q_EMIT registersChanged(m_d->parseRegisters(output));
 }
 
 /*
@@ -1992,7 +1992,7 @@ void KDebugger::updateBreakList(const char* output)
     }
 
     m_brkpts.swap(brks);
-    emit breakpointsChanged();
+    Q_EMIT breakpointsChanged();
 }
 
 // look if there is at least one temporary breakpoint
@@ -2077,7 +2077,7 @@ void KDebugger::slotValuePopup(const QString& expr)
 
     // construct the tip
     QString tip = v->getText() + " = " + formatPopupValue(v);
-    emit valuePopup(tip);
+    Q_EMIT valuePopup(tip);
 }
 
 void KDebugger::slotDisassemble(const QString& fileName, int lineNo)
@@ -2120,7 +2120,7 @@ void KDebugger::handleInfoLine(CmdQueueItem* cmd, const char* output)
 	    c->m_lineNo = cmd->m_lineNo;
 	} else {
 	    // no code
-	    emit disassembled(cmd->m_fileName, cmd->m_lineNo, std::list<DisassembledCode>());
+	    Q_EMIT disassembled(cmd->m_fileName, cmd->m_lineNo, std::list<DisassembledCode>());
 	}
     } else {
 	// set program counter
@@ -2138,13 +2138,13 @@ void KDebugger::handleInfoTarget(const char* output)
 
 void KDebugger::handleDisassemble(CmdQueueItem* cmd, const char* output)
 {
-    emit disassembled(cmd->m_fileName, cmd->m_lineNo,
+    Q_EMIT disassembled(cmd->m_fileName, cmd->m_lineNo,
 		      m_d->parseDisassemble(output));
 }
 
 void KDebugger::handleThreadList(const char* output)
 {
-    emit threadsChanged(m_d->parseThreadList(output));
+    Q_EMIT threadsChanged(m_d->parseThreadList(output));
 }
 
 void KDebugger::setThread(int id)
@@ -2188,7 +2188,7 @@ void KDebugger::handleMemoryDump(const char* output)
 {
     std::list<MemoryDump> memdump;
     QString msg = m_d->parseMemoryDump(output, memdump);
-    emit memoryDumpChanged(msg, memdump);
+    Q_EMIT memoryDumpChanged(msg, memdump);
 }
 
 void KDebugger::setProgramCounter(const QString& file, int line, const DbgAddr& addr)
@@ -2209,11 +2209,11 @@ void KDebugger::handleSetDisassFlavor(const char* output)
 
     if (!res.isEmpty()) {
 	m_statusMessage = i18n("Setting the disassembly flavor failed.");
-	emit updateStatusMessage();
+	Q_EMIT updateStatusMessage();
 	return;
     }
 
-    emit disassFlavorChanged(m_effectiveFlavor, m_cpuTarget);
+    Q_EMIT disassFlavorChanged(m_effectiveFlavor, m_cpuTarget);
 }
 
 void KDebugger::handleSetPC(const char* /*output*/)
@@ -2248,7 +2248,7 @@ void KDebugger::handleSetVariable(CmdQueueItem* cmd, const char* output)
     {
 	// there was an error; display it in the status bar
 	m_statusMessage = msg;
-	emit updateStatusMessage();
+	Q_EMIT updateStatusMessage();
 	return;
     }
 

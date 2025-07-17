@@ -175,10 +175,10 @@ protected:
     QString m_statusActive;
     KSqueezedTextLabel* m_statusMsgLabel;
 
-signals:
+Q_SIGNALS:
     void setTabWidth(int tabWidth);
 
-public slots:
+public Q_SLOTS:
     virtual void updateUI();
     virtual void updateLineItems();
     void updateToolButtonStyle(Qt::ToolButtonStyle);

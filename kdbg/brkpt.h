@@ -40,7 +40,7 @@ protected:
 
     friend class BreakpointItem;
     
-signals:
+Q_SIGNALS:
     /**
      * This signal is emitted when the user wants to go to the source code
      * where the current breakpoint is in.
@@ -52,7 +52,7 @@ signals:
      * @param address specifies the exact address of the breakpoint.
      */
     void activateFileLine(const QString& file, int lineNo, const DbgAddr& address);
-public slots:
+public Q_SLOTS:
     void on_btAddBP_clicked();
     void on_btAddWP_clicked();
     void on_btRemove_clicked();

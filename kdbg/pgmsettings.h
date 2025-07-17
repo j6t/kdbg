@@ -39,7 +39,7 @@ public:
 protected:
     int m_ttyLevel;
     QButtonGroup* m_group;
-protected slots:
+protected Q_SLOTS:
     void slotLevelChanged(int);
 };
 

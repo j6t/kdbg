@@ -83,13 +83,13 @@ protected:
      */
     void restorePrevDisass();
 
-signals:
+Q_SIGNALS:
     void clickedLeft(const QString&, int, const DbgAddr& address, bool);
     void clickedMid(const QString&, int, const DbgAddr& address);
     void disassemble(const QString&, int);
     void expanded(int lineNo);		/* source lineNo has been expanded */
     void collapsed(int lineNo);		/* source lineNo has been collapsed */
-public slots:
+public Q_SLOTS:
     void setTabWidth(int numChars);
     void cursorChanged();
 

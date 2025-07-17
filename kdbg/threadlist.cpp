@@ -124,5 +124,5 @@ void ThreadList::slotCurrentChanged(QTreeWidgetItem* newItem)
     if (te->hasFocus)
 	return;
 
-    emit setThread(te->id);
+    Q_EMIT setThread(te->id);
 }

@@ -613,15 +613,15 @@ protected:
     QString m_logFileName;
     QFile m_logFile;
 
-public slots:
+public Q_SLOTS:
     void dequeueCmdByVar(VarTree* var);
 
-protected slots:
+protected Q_SLOTS:
     virtual void slotReceiveOutput();
     virtual void slotCommandRead();
     virtual void slotExited();
     
-signals:
+Q_SIGNALS:
     /**
      * This signal is emitted when the output of a command has been fully
      * collected and is ready to be interpreted.

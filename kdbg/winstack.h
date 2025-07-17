@@ -40,7 +40,7 @@ public:
     QPushButton m_buttonBackward;
     QPushButton m_buttonClose;
 
-signals:
+Q_SIGNALS:
     void closed();
 
 protected:
@@ -72,7 +72,7 @@ public:
 
     QSize sizeHint() const override;
 
-signals:
+Q_SIGNALS:
     void toggleBreak(const QString&, int, const DbgAddr&, bool);
     void enadisBreak(const QString&, int, const DbgAddr&);
     void newFileLoaded();
@@ -81,7 +81,7 @@ signals:
     void setTabWidth(int numChars);
     void moveProgramCounter(const QString&, int, const DbgAddr&);
 
-public slots:
+public Q_SLOTS:
     virtual void slotFindForward();
     virtual void slotFindBackward();
     virtual void activate(const QString& filename, int lineNo, const DbgAddr& address);

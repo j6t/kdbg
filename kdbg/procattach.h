@@ -38,7 +38,7 @@ public:
 protected:
     void runPS();
 
-protected slots:
+protected Q_SLOTS:
     void on_buttonRefresh_clicked();
     void on_filterEdit_textChanged(const QString& text);
     void on_processList_currentItemChanged();
