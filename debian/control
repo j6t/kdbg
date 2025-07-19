@@ -2,13 +2,13 @@ Source: kdbg
 Section: devel
 Priority: optional
 Maintainer: Debian QA Group <packages@qa.debian.org>
-Build-Depends: debhelper (>=9), cmake,
- extra-cmake-modules,
- libkf5config-dev,
- libkf5i18n-dev,
- libkf5iconthemes-dev,
- libkf5windowsystem-dev,
- libkf5xmlgui-dev,
+Build-Depends: debhelper (>=9), cmake (>= 3.16),
+ extra-cmake-modules (>= 5.101.0),
+ libkf5config-dev (>= 5.101.0) | libkf6config-dev (>= 6.6.0),
+ libkf5i18n-dev (>= 5.101.0) | libkf6i18n-dev (>= 6.6.0),
+ libkf5iconthemes-dev (>= 5.101.0) | libkf6iconthemes-dev (>= 6.6.0),
+ libkf5windowsystem-dev (>= 5.101.0) | libkf6windowsystem-dev (>= 6.6.0),
+ libkf5xmlgui-dev (>= 5.101.0) | libkf6xmlgui-dev (>= 6.6.0),
  nasm
 Standards-Version: 3.9.8
 Homepage: http://www.kdbg.org/

@@ -11,11 +11,43 @@ on:
 
 jobs:
   debian_package:
-    name: Build Debian package
-    runs-on: ubuntu-24.04
+    name: Build Debian package (KDE ${{ matrix.kde_major }}, ${{ matrix.runs-on }})
+    runs-on: ${{ matrix.runs-on }}
+    strategy:
+      fail-fast: false
+      matrix:
+        include:
+          - kde_major: 5
+            runs-on: ubuntu-24.04
+          - kde_major: 6
+            runs-on: ubuntu-24.04
     steps:
       - name: Install build dependencies
+        env:
+          kde_major: ${{ matrix.kde_major }}
         run: |-
+          set -x
+          if [[ ${kde_major} = 5 ]]; then
+            extra_packages=(
+              libkf5config-dev
+              libkf5i18n-dev
+              libkf5iconthemes-dev
+              libkf5windowsystem-dev
+              libkf5xmlgui-dev
+              qtbase5-dev
+            )
+          else
+            sudo sed 's,noble,oracular,g' -i /etc/apt/sources.list.d/ubuntu.sources  # Ubuntu 24.10
+            extra_packages=(
+              libkf6config-dev
+              libkf6i18n-dev
+              libkf6iconthemes-dev
+              libkf6windowsystem-dev
+              libkf6xmlgui-dev
+              qt6-base-dev
+              qt6-5compat-dev
+            )
+          fi
           sudo apt-get update
           sudo apt-get install --yes --no-install-recommends \
             build-essential \
@@ -23,18 +55,15 @@ jobs:
             debhelper \
             devscripts \
             extra-cmake-modules \
-            libkf5config-dev \
-            libkf5i18n-dev \
-            libkf5iconthemes-dev \
-            libkf5windowsystem-dev \
-            libkf5xmlgui-dev \
             nasm \
-            qtbase5-dev
+            "${extra_packages[@]}"
 
       - name: Checkout Git branch
         uses: actions/checkout@v4
 
       - name: Build Debian package
+        env:
+          kde_major: ${{ matrix.kde_major }}
         run: |-
           set -x
 
@@ -42,12 +71,22 @@ jobs:
           kdbg_debian_version="$(head -n1 debian/changelog | sed 's,kdbg (\(.*\)-.*,\1,' | tee /dev/stderr)"
 
           # Bump version in `debian/changelog` using dch mimicking version format "0.5.11+git20200708+dd9ef66-5" of package dash
-          kdbg_debian_version="${kdbg_debian_version}+git$(date +'%Y%m%d')+$(git rev-parse --short=7 HEAD)"
+          kdbg_debian_version="${kdbg_debian_version}+kde${kde_major}+git$(date +'%Y%m%d')+$(git rev-parse --short=7 HEAD)"
           EDITOR=true \
             DEBEMAIL='GitHub Actions <actions@ci.invalid>' \
             dch \
             -v "${kdbg_debian_version}-1" \
             'Bump package version to reflect build date and Git SHA1'
+
+          # Fix default KDE target on the fly (better approach welcome!)
+          if [[ ${kde_major} -ne 5 ]]; then
+            sed "/^set(BUILD_FOR_KDE_VERSION 5 CACHE/s/ 5 CACHE/ ${kde_major} CACHE/" -i CMakeLists.txt
+            git add CMakeLists.txt
+            git \
+                -c user.name="GitHub Actions" \
+                -c user.email=actions@ci.invalid \
+                commit -m "Set BUILD_FOR_KDE_VERSION to KDE ${kde_major}"
+          fi
 
           # This is to make debuild's tarball check happy
           git archive -o "../kdbg_${kdbg_debian_version}.orig.tar.gz" HEAD
@@ -59,6 +98,6 @@ jobs:
       - name: Upload build artifacts
         uses: actions/upload-artifact@v4
         with:
-          name: "kdbg_${{ github.sha }}_debian_package"
+          name: "kdbg_${{ github.sha }}_kde${{ matrix.kde_major }}_debian_package"
           path: "/home/runner/work/*/*kdbg*.*"
           if-no-files-found: error
