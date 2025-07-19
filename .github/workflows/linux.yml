@@ -11,7 +11,7 @@ on:
 
 jobs:
   linux:
-    name: Build (${{ matrix.cc }})
+    name: Build (${{ matrix.cc }}, KDE ${{ matrix.kde_major }}, ${{ matrix.runs-on }})
     runs-on: ${{ matrix.runs-on }}
     strategy:
       fail-fast: false
@@ -21,16 +21,25 @@ jobs:
             cxx: g++-12
             clang_major_version: null
             clang_repo_suffix: null
+            kde_major: 5
             runs-on: ubuntu-24.04
           - cc: gcc-14
             cxx: g++-14
             clang_major_version: null
             clang_repo_suffix: null
+            kde_major: 5
+            runs-on: ubuntu-24.04
+          - cc: gcc-14
+            cxx: g++-14
+            clang_major_version: null
+            clang_repo_suffix: null
+            kde_major: 6
             runs-on: ubuntu-24.04
           - cc: clang-18
             cxx: clang++-18
             clang_major_version: 18
             clang_repo_suffix: -18
+            kde_major: 5
             runs-on: ubuntu-24.04
     steps:
       - name: Add Clang/LLVM repositories
@@ -42,18 +51,37 @@ jobs:
           sudo add-apt-repository "deb http://apt.llvm.org/${UBUNTU_CODENAME}/ llvm-toolchain-${UBUNTU_CODENAME}${{ matrix.clang_repo_suffix }} main"
 
       - name: Install build dependencies
+        env:
+          kde_major: ${{ matrix.kde_major }}
         run: |-
+          set -x
+          if [[ ${kde_major} = 5 ]]; then
+            extra_packages=(
+              libkf5config-dev
+              libkf5i18n-dev
+              libkf5iconthemes-dev
+              libkf5windowsystem-dev
+              libkf5xmlgui-dev
+              qtbase5-dev
+            )
+          else
+            sudo sed 's,noble,oracular,g' -i /etc/apt/sources.list.d/ubuntu.sources  # Ubuntu 24.10
+            extra_packages=(
+              libkf6config-dev
+              libkf6i18n-dev
+              libkf6iconthemes-dev
+              libkf6windowsystem-dev
+              libkf6xmlgui-dev
+              qt6-base-dev
+              qt6-5compat-dev
+            )
+          fi
           sudo apt-get update
           sudo apt-get install --yes --no-install-recommends \
             cmake \
             extra-cmake-modules \
-            libkf5config-dev \
-            libkf5i18n-dev \
-            libkf5iconthemes-dev \
-            libkf5windowsystem-dev \
-            libkf5xmlgui-dev \
             nasm \
-            qtbase5-dev
+            "${extra_packages[@]}"
 
       - name: Install build dependency Clang ${{ matrix.clang_major_version }}
         if: "${{ contains(matrix.cxx, 'clang') }}"
@@ -69,6 +97,7 @@ jobs:
           cmake_args=(
             -DCMAKE_C_COMPILER="${{ matrix.cc }}"
             -DCMAKE_CXX_COMPILER="${{ matrix.cxx }}"
+            -DBUILD_FOR_KDE_VERSION="${{ matrix.kde_major }}"
             -S ./
             -B build/
           )
