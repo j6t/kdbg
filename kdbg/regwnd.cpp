@@ -9,7 +9,7 @@
 #include <klocalizedstring.h>		/* i18n */
 #include <QFontDatabase>
 #include <QMenu>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include <QHeaderView>
 #include <QContextMenuEvent>
@@ -109,7 +109,9 @@ public:
     GroupingViewItem(RegisterView* parent, 
 		     const QString& name, const QString& pattern,
 		     RegisterDisplay mode) :
-	ModeItem(parent, name), matcher(pattern), gmode(mode)
+	ModeItem(parent, name),
+	matcher(QRegularExpression::anchoredPattern(pattern)),
+	gmode(mode)
     {
 	setExpanded(true);
 	setFirstColumnSpanned(true);
@@ -117,7 +119,7 @@ public:
 
     bool matchName(const QString& str) const
     {
-        return matcher.exactMatch(str);
+        return matcher.match(str).hasMatch();
     }
 
     void setMode(RegisterDisplay mode) override
@@ -135,7 +137,7 @@ public:
     }
 
 private:
-    QRegExp matcher;
+    QRegularExpression matcher;
     RegisterDisplay gmode;
 };
 
@@ -439,25 +441,25 @@ RegisterView::RegisterView(QWidget* parent) :
     }
     connect(m_modemenu, SIGNAL(triggered(QAction*)), SLOT(slotModeChange(QAction*)));
     
-    new GroupingViewItem(this, i18n("GP and others"), "^$",
+    new GroupingViewItem(this, i18n("GP and others"), "",
 			 RegisterDisplay::nada);
     new GroupingViewItem(this, i18n("Flags"),
-			 "(^eflags$|^fctrl$|^mxcsr$|^cr$|^fpscr$|^vscr$|^ftag$|^fstat$)",
+			 "(eflags|fctrl|mxcsr|cr|fpscr|vscr|ftag|fstat)",
 			 RegisterDisplay::bits32|RegisterDisplay::binary);
     new GroupingViewItem(this, i18n("x86/x87 segment"),
-			 "(^cs$|^ss$|^ds$|^es$|^fs$|^gs$|^fiseg$|^foseg$)",
+			 "(cs|ss|ds|es|fs|gs|fiseg|foseg)",
 			 RegisterDisplay::nada);
-    new GroupingViewItem(this, "x87", "^st.*",
+    new GroupingViewItem(this, "x87", "st.*",
 			 RegisterDisplay::bits80|RegisterDisplay::realE);
-    new GroupingViewItem(this, "SSE", "^xmm.*",
+    new GroupingViewItem(this, "SSE", "xmm.*",
 			 RegisterDisplay::bits32|RegisterDisplay::realE);
-    new GroupingViewItem(this, "MMX", "^mm.*",
+    new GroupingViewItem(this, "MMX", "mm.*",
 			 RegisterDisplay::bits32|RegisterDisplay::realE);
-    new GroupingViewItem(this, "POWER real", "^fpr.*",
+    new GroupingViewItem(this, "POWER real", "fpr.*",
 			 RegisterDisplay::bits32|RegisterDisplay::realE);
-    new GroupingViewItem(this, "AltiVec", "^vr.*",
+    new GroupingViewItem(this, "AltiVec", "vr.*",
 			 RegisterDisplay::bits32|RegisterDisplay::realE);
-    new GroupingViewItem(this, "MIPS VU", "^vu.*",
+    new GroupingViewItem(this, "MIPS VU", "vu.*",
 			 RegisterDisplay::bits32|RegisterDisplay::realE);
 
     updateGroupVisibility();

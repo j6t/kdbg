@@ -5,7 +5,7 @@
  */
 
 #include <QString>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include <map>
 
@@ -98,7 +98,7 @@ public:
      * Does the file name match this library?
      */
     bool matchFileName(const QString& fileName) const {
-	return m_shlibNameRE.indexIn(fileName) >= 0;
+	return m_shlibNameRE.match(fileName).hasMatch();
     }
 
     /**
@@ -122,7 +122,7 @@ protected:
     TypeInfoRefMap m_aliasDict;
     TypeInfoMap m_templates;
     QString m_displayName;
-    QRegExp m_shlibNameRE;
+    QRegularExpression m_shlibNameRE;
     QStringList m_enabledBuiltins;
     QByteArray m_printQStringDataCmd;
 };

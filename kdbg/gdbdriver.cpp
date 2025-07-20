@@ -7,7 +7,7 @@
 #include "gdbdriver.h"
 #include "exprwnd.h"
 #include <QFileInfo>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QStringList>
 #include <klocalizedstring.h>		/* i18n */
 #include <ctype.h>
@@ -292,17 +292,17 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
 	     * because at least OpenSUSE writes its own version number
 	     * in the first line (but before GDB's version number).
 	     */
-	    QRegExp re(
+	    QRegularExpression re(
 		" "			// must be preceded by space
 		"[(]?"			// SLES 10 embeds in parentheses
 		"(\\d+)\\.(\\d+)"	// major, minor
 		"[^ ]*\\n"		// no space until end of line
 		);
-	    int pos = re.indexIn(m_output);
+	    auto res = re.match(m_output);
 	    const char* disass = "disassemble %s %s\n";
-	    if (pos >= 0) {
-		int major = re.cap(1).toInt();
-		int minor = re.cap(2).toInt();
+	    if (res.hasMatch()) {
+		int major = res.captured(1).toInt();
+		int minor = res.captured(2).toInt();
 		if (major > 7 || (major == 7 && minor >= 1))
 		{
 		    disass = "disassemble %s, %s\n";
@@ -381,22 +381,21 @@ void GdbDriver::parseMarker(CmdQueueItem* cmd)
     *endMarker = '\0';
 
     // extract filename and line number
-    static QRegExp MarkerRE(":(\\d+):\\d+:[begmidl]+:0x");
+    static QRegularExpression MarkerRE(":(\\d+):\\d+:[begmidl]+:0x");
 
-    int lineNoStart = MarkerRE.indexIn(startMarker);
-    if (lineNoStart >= 0) {
-	int lineNo = MarkerRE.cap(1).toInt();
+    auto resMarker = MarkerRE.match(startMarker);
+    if (resMarker.hasMatch()) {
+	int lineNo = resMarker.captured(1).toInt();
 
 	// get address unless there is one in cmd
 	DbgAddr address = cmd->m_addr;
 	if (address.isEmpty()) {
-	    const char* addrStart = startMarker + lineNoStart +
-				    MarkerRE.matchedLength() - 2;
+	    const char* addrStart = startMarker + resMarker.capturedEnd() - 2;
 	    address = QString(addrStart).trimmed();
 	}
 
 	// now show the window
-	startMarker[lineNoStart] = '\0';   /* split off file name */
+	startMarker[resMarker.capturedStart()] = '\0';	/* split off file name */
 	emit activateFileLine(startMarker, lineNo-1, address);
     }
 }
@@ -2391,7 +2390,7 @@ bool GdbDriver::parseFindType(const char* output, QString& type)
     if (strncmp(output, "const ", 6) == 0)
         output += 6;
     type = output;
-    type.replace(QRegExp("\\s+"), "");
+    type.replace(QRegularExpression("\\s+"), "");
     if (type.endsWith("&"))
         type.truncate(type.length() - 1);
     return true;

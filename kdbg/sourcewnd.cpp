@@ -16,7 +16,7 @@
 #include <QContextMenuEvent>
 #include <QKeyEvent>
 #include <QMouseEvent>
-#include <QRegExp>
+#include <QRegularExpression>
 #include <QTimer>
 #include <kiconloader.h>
 #include <kxmlguiwindow.h>
@@ -54,7 +54,7 @@ SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorChanged()));
 
     // add a syntax highlighter
-    if (QRegExp("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h|pp)?|HH?)$").indexIn(m_fileName) >= 0)
+    if (QRegularExpression("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h|pp)?|HH?)$").match(m_fileName).hasMatch())
     {
 	m_highlighter = new HighlightCpp(this);
     }
@@ -442,7 +442,7 @@ QString SourceWindow::extendExpr(const QString &plainText,
 {
     QString document = plainText.left(wordEnd);
     QString word     = plainText.mid(wordStart, wordEnd - wordStart);
-    QRegExp regex    = QRegExp("(::)?([A-Za-z_]{1}\\w*\\s*(->|\\.|::)\\s*)*" + word + "$");
+    QRegularExpression regex("(::)?([A-Za-z_]{1}\\w*\\s*(->|\\.|::)\\s*)*" + word + "$");
 
     #define IDENTIFIER_MAX_SIZE 256
     // cut the document to reduce size of string to scan
@@ -451,17 +451,15 @@ QString SourceWindow::extendExpr(const QString &plainText,
 	document = document.right(IDENTIFIER_MAX_SIZE);
     }
 
-    const int index = regex.indexIn(document);
+    auto res = regex.match(document);
 
-    if (index == -1)
+    if (!res.hasMatch())
     {
         TRACE("No match, returning " + word);
     }
     else
     {
-        const int length = regex.matchedLength();
-
-	word = document.mid(index, length);
+	word = res.captured();
         TRACE("Matched, returning " + word);
     }
 
@@ -481,11 +479,12 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 	return false;
 
     // keep only letters and digits
-    QRegExp w("[A-Za-z_]{1}[\\dA-Za-z_]*");
-    if (w.indexIn(word) < 0)
+    QRegularExpression w("[A-Za-z_]{1}[\\dA-Za-z_]*");
+    auto res = w.match(word);
+    if (!res.hasMatch())
 	return false;
 
-    word = w.cap();
+    word = res.captured();
 
     if (m_highlighter)
     {

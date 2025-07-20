@@ -99,7 +99,7 @@ void TypeTable::loadFromFile(const QString& fileName)
 	m_displayName = fi.completeBaseName();
     }
 
-    m_shlibNameRE = QRegExp(cf.readEntry(ShlibRE));
+    m_shlibNameRE = QRegularExpression(cf.readEntry(ShlibRE));
     m_enabledBuiltins = cf.readEntry(EnableBuiltin, QStringList());
 
     QString printQString = cf.readEntry(PrintQStringCmd);
