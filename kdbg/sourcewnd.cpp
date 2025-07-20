@@ -28,7 +28,6 @@
 SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
 	QPlainTextEdit(parent),
 	m_fileName(fileName),
-	m_highlighter(0),
 	m_widthItems(16),
 	m_widthPlus(12),
 	m_widthLineNo(30),
@@ -567,7 +566,7 @@ void SourceWindow::disassembled(int lineNo, const std::list<DisassembledCode>& d
 int SourceWindow::rowToLine(int row, int* sourceRow)
 {
     int line = row >= 0  ?  m_rowToLine[row]  :  -1;
-    if (sourceRow != 0) {
+    if (sourceRow) {
 	// search back until we hit the first entry with the current line number
 	while (row > 0 && m_rowToLine[row-1] == line)
 	    row--;

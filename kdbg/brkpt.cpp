@@ -36,8 +36,7 @@ public:
 
 
 BreakpointTable::BreakpointTable(QWidget* parent) :
-	QWidget(parent),
-	m_debugger(0)
+	QWidget(parent)
 {
     m_ui.setupUi(this);
     connect(m_ui.bpEdit, SIGNAL(returnPressed()),
@@ -136,7 +135,7 @@ void BreakpointTable::on_btAddWP_clicked()
 void BreakpointTable::on_btRemove_clicked()
 {
     BreakpointItem* bp = static_cast<BreakpointItem*>(m_ui.bpList->currentItem());
-    if (bp != 0) {
+    if (bp) {
 	m_debugger->deleteBreakpoint(bp->id);
 	// note that bp may be deleted by now
 	// (if bp was an orphaned breakpoint)
@@ -146,7 +145,7 @@ void BreakpointTable::on_btRemove_clicked()
 void BreakpointTable::on_btEnaDis_clicked()
 {
     BreakpointItem* bp = static_cast<BreakpointItem*>(m_ui.bpList->currentItem());
-    if (bp != 0) {
+    if (bp) {
 	m_debugger->enableDisableBreakpoint(bp->id);
     }
 }
@@ -154,7 +153,7 @@ void BreakpointTable::on_btEnaDis_clicked()
 void BreakpointTable::on_btViewCode_clicked()
 {
     BreakpointItem* bp = static_cast<BreakpointItem*>(m_ui.bpList->currentItem());
-    if (bp == 0)
+    if (!bp)
 	return;
 
     if (!m_debugger->infoLine(bp->fileName, bp->lineNo, bp->address))
@@ -168,9 +167,9 @@ void BreakpointTable::updateUI()
     m_ui.btAddWP->setEnabled(enableChkpt);
 
     BreakpointItem* bp = static_cast<BreakpointItem*>(m_ui.bpList->currentItem());
-    m_ui.btViewCode->setEnabled(bp != 0);
+    m_ui.btViewCode->setEnabled(bp != nullptr);
 
-    if (bp == 0) {
+    if (!bp) {
 	enableChkpt = false;
     } else {
 	if (bp->enabled()) {
@@ -193,7 +192,7 @@ bool BreakpointTable::eventFilter(QObject* ob, QEvent* ev)
 	    // enable or disable the clicked-on item
 	    BreakpointItem* bp =
 		static_cast<BreakpointItem*>(m_ui.bpList->itemAt(mev->pos()));
-	    if (bp != 0)
+	    if (bp)
 	    {
 		m_debugger->enableDisableBreakpoint(bp->id);
 	    }
@@ -221,7 +220,7 @@ public:
 void BreakpointTable::on_btConditional_clicked()
 {
     BreakpointItem* bp = static_cast<BreakpointItem*>(m_ui.bpList->currentItem());
-    if (bp == 0)
+    if (!bp)
 	return;
 
     /*

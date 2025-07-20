@@ -126,7 +126,7 @@ protected:
 
     // the debugger proper
     QString m_debuggerCmdStr;
-    KDebugger* m_debugger;
+    KDebugger* m_debugger = {};
     QString m_transcriptFile;		/* where gdb dialog is logged */
 
     /**

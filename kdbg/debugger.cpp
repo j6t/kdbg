@@ -68,9 +68,6 @@ KDebugger::KDebugger(QWidget* parent,
 	m_programActive(false),
 	m_programRunning(false),
 	m_sharedLibsListed(false),
-	m_typeTable(0),
-	m_programConfig(0),
-	m_d(0),
 	m_localVariables(*localVars),
 	m_watchVariables(*watchVars),
 	m_btWindow(*backtrace)
@@ -91,7 +88,7 @@ KDebugger::KDebugger(QWidget* parent,
 
 KDebugger::~KDebugger()
 {
-    if (m_programConfig != 0) {
+    if (m_programConfig) {
 	saveProgramSettings();
 	m_programConfig->sync();
 	delete m_programConfig;
@@ -122,7 +119,7 @@ const char DisassemblyFlavor[] = "DisassemblyFlavor";
 bool KDebugger::debugProgram(const QString& name,
 			     DebuggerDriver* driver)
 {
-    if (m_d != 0 && m_d->isRunning())
+    if (m_d && m_d->isRunning())
     {
 	QApplication::setOverrideCursor(Qt::WaitCursor);
 
@@ -136,7 +133,7 @@ bool KDebugger::debugProgram(const QString& name,
 	    return false;
 	}
 	delete m_d;
-	m_d = 0;
+	m_d = nullptr;
     }
 
     // wire up the driver
@@ -159,7 +156,7 @@ bool KDebugger::debugProgram(const QString& name,
     openProgramConfig(name);
 
     // get debugger command from per-program settings
-    if (m_programConfig != 0) {
+    if (m_programConfig) {
 	KConfigGroup g = m_programConfig->group(GeneralGroup);
 	m_debuggerCmd = g.readEntry(DebuggerCmdStr);
 	// get terminal emulation level
@@ -171,7 +168,7 @@ bool KDebugger::debugProgram(const QString& name,
 
     if (!startDriver()) {
 	TRACE("startDriver failed");
-	m_d = 0;
+	m_d = nullptr;
 	return false;
     }
 
@@ -203,7 +200,7 @@ bool KDebugger::debugProgram(const QString& name,
 void KDebugger::shutdown()
 {
     // shut down debugger driver
-    if (m_d != 0 && m_d->isRunning())
+    if (m_d && m_d->isRunning())
     {
 	stopDriver();
     }
@@ -601,12 +598,12 @@ bool KDebugger::canStart()
 bool KDebugger::isReady() const 
 {
     return m_haveExecutable &&
-	m_d != 0 && m_d->canExecuteImmediately();
+	m_d && m_d->canExecuteImmediately();
 }
 
 bool KDebugger::isIdle() const
 {
-    return m_d == 0 || m_d->isIdle();
+    return !m_d || m_d->isIdle();
 }
 
 
@@ -686,18 +683,18 @@ void KDebugger::gdbExited()
      * main", otherwise we would save an empty config file, because it
      * isn't read in until then!
      */
-    if (m_programConfig != 0) {
+    if (m_programConfig) {
 	if (m_haveExecutable) {
 	    saveProgramSettings();
 	    m_programConfig->sync();
 	}
 	delete m_programConfig;
-	m_programConfig = 0;
+	m_programConfig = nullptr;
     }
 
     // erase types
     delete m_typeTable;
-    m_typeTable = 0;
+    m_typeTable = nullptr;
 
     if (m_explicitKill) {
 	TRACE(m_d->driverName() + " exited normally");
@@ -742,7 +739,7 @@ QString KDebugger::getConfigForExe(const QString& name)
 
 void KDebugger::openProgramConfig(const QString& name)
 {
-    ASSERT(m_programConfig == 0);
+    ASSERT(!m_programConfig);
 
     QString pgmConfigFile = getConfigForExe(name);
 
@@ -766,7 +763,7 @@ const char ExprFmt[] = "Expr%d";
 
 void KDebugger::saveProgramSettings()
 {
-    ASSERT(m_programConfig != 0);
+    ASSERT(m_programConfig);
     KConfigGroup gg = m_programConfig->group(GeneralGroup);
     gg.writeEntry(FileVersion, 1);
     gg.writeEntry(ProgramArgs, m_programArgs);
@@ -776,7 +773,7 @@ void KDebugger::saveProgramSettings()
     gg.writeEntry(DisassemblyFlavor, m_flavor);
 
     QString driverName;
-    if (m_d != 0)
+    if (m_d)
 	driverName = m_d->driverName();
     gg.writeEntry(DriverNameEntry, driverName);
 
@@ -813,14 +810,14 @@ void KDebugger::saveProgramSettings()
 
 void KDebugger::overrideProgramArguments(const QString& args)
 {
-    ASSERT(m_programConfig != 0);
+    ASSERT(m_programConfig);
     KConfigGroup g = m_programConfig->group(GeneralGroup);
     g.writeEntry(ProgramArgs, args);
 }
 
 void KDebugger::restoreProgramSettings()
 {
-    ASSERT(m_programConfig != 0);
+    ASSERT(m_programConfig);
     KConfigGroup gg = m_programConfig->group(GeneralGroup);
     /*
      * We ignore file version for now we will use it in the future to
@@ -989,7 +986,7 @@ void KDebugger::restoreBreakpoints(KConfig* config)
 // parse output of command cmd
 void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 {
-    ASSERT(cmd != 0);			/* queue mustn't be empty */
+    ASSERT(cmd);			/* queue mustn't be empty */
 
     TRACE(QString(__PRETTY_FUNCTION__) + " parsing " + output);
 
@@ -1014,7 +1011,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	if (m_d->parseChangeExecutable(output, m_statusMessage))
 	{
 	    // success; restore breakpoints etc.
-	    if (m_programConfig != 0) {
+	    if (m_programConfig) {
 		restoreProgramSettings();
 	    }
 	    // load file containing main() or core file
@@ -1350,7 +1347,7 @@ void KDebugger::handleLocals(const char* output)
 	    // old variable not in the new variables
 	    TRACE("old var deleted: " + *n);
 	    VarTree* v = m_localVariables.topLevelExprByName(*n);
-	    if (v != 0) {
+	    if (v) {
 		m_localVariables.removeExpr(v);
 	    }
 	} else {
@@ -1408,10 +1405,10 @@ void KDebugger::parseLocals(const char* output, std::list<ExprValue*>& newVars)
 
 bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
 {
-    ASSERT(cmd->m_expr != 0);
+    ASSERT(cmd->m_expr);
 
     ExprValue* variable = m_d->parsePrintExpr(output, true);
-    if (variable == 0)
+    if (!variable)
 	return false;
 
     // set expression "name"
@@ -1431,7 +1428,7 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
 bool KDebugger::handlePrintPopup(CmdQueueItem* cmd, const char* output)
 {
     ExprValue* value = m_d->parsePrintExpr(output, false);
-    if (value == 0)
+    if (!value)
 	return false;
 
     TRACE("<" + cmd->m_popupExpr + "> = " + value->m_value);
@@ -1445,10 +1442,10 @@ bool KDebugger::handlePrintPopup(CmdQueueItem* cmd, const char* output)
 
 bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 {
-    ASSERT(cmd->m_expr != 0);
+    ASSERT(cmd->m_expr);
 
     ExprValue* variable = m_d->parsePrintExpr(output, true);
-    if (variable == 0)
+    if (!variable)
 	return false;
 
     // set expression "name"
@@ -1495,7 +1492,7 @@ void KDebugger::handleBacktrace(const char* output)
 
 	for (; frm != stack.end(); ++frm) {
 	    QString func;
-	    if (frm->var != 0)
+	    if (frm->var)
 		func = frm->var->m_name;
 	    else
 		func = frm->fileName + ":" + QString().setNum(frm->lineNo+1);
@@ -1541,14 +1538,14 @@ void KDebugger::evalExpressions()
     //   types in watch expressions
     //   struct members in local variables
     //   struct members in watch expressions
-    VarTree* exprItem = 0;
+    VarTree* exprItem = nullptr;
     if (!m_watchEvalExpr.empty())
     {
 	QString expr = m_watchEvalExpr.front();
 	m_watchEvalExpr.pop_front();
 	exprItem = m_watchVariables.topLevelExprByName(expr);
     }
-    if (exprItem != 0) {
+    if (exprItem) {
 	CmdQueueItem* cmd = m_d->queueCmd(DCprint, exprItem->getText());
 	// remember which expr this was
 	cmd->m_expr = exprItem;
@@ -1558,15 +1555,15 @@ void KDebugger::evalExpressions()
 #define POINTER(widget) \
 		wnd = &widget; \
 		exprItem = widget.nextUpdatePtr(); \
-		if (exprItem != 0) goto pointer
+		if (exprItem) goto pointer
 #define STRUCT(widget) \
 		wnd = &widget; \
 		exprItem = widget.nextUpdateStruct(); \
-		if (exprItem != 0) goto ustruct
+		if (exprItem) goto ustruct
 #define TYPE(widget) \
 		wnd = &widget; \
 		exprItem = widget.nextUpdateType(); \
-		if (exprItem != 0) goto type
+		if (exprItem) goto type
     repeat:
 	POINTER(m_localVariables);
 	POINTER(m_watchVariables);
@@ -1586,7 +1583,7 @@ void KDebugger::evalExpressions()
 
 	ustruct:
 	// paranoia
-	if (exprItem->m_type == 0 || exprItem->m_type == TypeInfo::unknownType())
+	if (!exprItem->m_type || exprItem->m_type == TypeInfo::unknownType())
 	    goto repeat;
 	evalInitialStructExpression(exprItem, wnd, false);
 	return;
@@ -1597,7 +1594,7 @@ void KDebugger::evalExpressions()
 	 * it may happen that it has already been updated. Hence, we ignore
 	 * it here and go on to the next task.
 	 */
-	if (exprItem->m_type != 0)
+	if (exprItem->m_type)
 	    goto repeat;
 	determineType(wnd, exprItem);
     }
@@ -1640,11 +1637,11 @@ void KDebugger::handleFindType(CmdQueueItem* cmd, const char* output)
     QString type;
     if (m_d->parseFindType(output, type))
     {
-	ASSERT(cmd != 0 && cmd->m_expr != 0);
+	ASSERT(cmd && cmd->m_expr);
 
 	const TypeInfo* info = m_typeTable->lookup(type);
 
-	if (info == 0) {
+	if (!info) {
 	    /*
 	     * We've asked gdb for the type of the expression in
 	     * cmd->m_expr, but it returned a name we don't know. The base
@@ -1655,12 +1652,12 @@ void KDebugger::handleFindType(CmdQueueItem* cmd, const char* output)
 	     */
 	    info = cmd->m_expr->inferTypeFromBaseClass();
 	    // if we found a type through this method, register an alias
-	    if (info != 0) {
+	    if (info) {
 		TRACE("infered alias: " + type);
 		m_typeTable->registerAlias(type, info);
 	    }
 	}
-	if (info == 0) {
+	if (!info) {
             TRACE("unknown type "+type);
 	    cmd->m_expr->m_type = TypeInfo::unknownType();
 	} else {
@@ -1677,7 +1674,7 @@ void KDebugger::handleFindType(CmdQueueItem* cmd, const char* output)
 void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
 {
     VarTree* var = cmd->m_expr;
-    ASSERT(var != 0);
+    ASSERT(var);
     ASSERT(var->m_varKind == VarTree::VKstruct);
 
     ExprValue* partExpr;
@@ -1689,9 +1686,9 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
 	partExpr = m_d->parsePrintExpr(output, false);
     }
     bool errorValue =
-	partExpr == 0 ||
+	!partExpr ||
 	/* we only allow simple values at the moment */
-	partExpr->m_child != 0;
+	partExpr->m_child;
 
     QString partValue;
     if (errorValue)
@@ -1701,7 +1698,7 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
 	partValue = partExpr->m_value;
     }
     delete partExpr;
-    partExpr = 0;
+    partExpr = nullptr;
 
     /*
      * Updating a struct value works like this: var->m_partialValue holds
@@ -1850,7 +1847,7 @@ void KDebugger::addWatch(const QString& t)
 {
     QString expr = t.trimmed();
     // don't add a watched expression again
-    if (expr.isEmpty() || m_watchVariables.topLevelExprByName(expr) != 0)
+    if (expr.isEmpty() || m_watchVariables.topLevelExprByName(expr))
 	return;
     ExprValue e(expr, VarTree::NKplain);
     m_watchVariables.insertExpr(&e, *m_typeTable);
@@ -1869,11 +1866,11 @@ void KDebugger::slotDeleteWatch()
 {
     // delete only allowed while debugger is idle; or else we might delete
     // the very expression the debugger is currently working on...
-    if (m_d == 0 || !m_d->isIdle())
+    if (!m_d || !m_d->isIdle())
 	return;
 
     VarTree* item = m_watchVariables.selectedItem();
-    if (item == 0 || !item->isToplevelExpr())
+    if (!item || !item->isToplevelExpr())
 	return;
 
     // remove the variable from the list to evaluate
@@ -1903,7 +1900,7 @@ void KDebugger::handleRegisters(const char* output)
 void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 {
     BrkptIterator bp;
-    if (cmd->m_brkpt != 0) {
+    if (cmd->m_brkpt) {
 	// a new breakpoint, put it in the list
 	assert(cmd->m_brkpt->id == 0);
 	m_brkpts.push_back(*cmd->m_brkpt);
@@ -1912,7 +1909,7 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 	--bp;
     } else {
 	// an existing breakpoint was retried
-	assert(cmd->m_existingBrkpt != 0);
+	assert(cmd->m_existingBrkpt);
 	bp = breakpointById(cmd->m_existingBrkpt);
 	if (bp == m_brkpts.end())
 	    return;
@@ -2059,15 +2056,15 @@ void KDebugger::slotValuePopup(const QString& expr)
 {
     // search the local variables for a match
     VarTree* v = m_localVariables.topLevelExprByName(expr);
-    if (v == 0) {
+    if (!v) {
 	// not found, check watch expressions
 	v = m_watchVariables.topLevelExprByName(expr);
-	if (v == 0) {
+	if (!v) {
 	    // try a member of 'this'
 	    v = m_localVariables.topLevelExprByName("this");
-	    if (v != 0)
+	    if (v)
 		v = ExprWnd::ptrMemberByName(v, expr);
-	    if (v == 0) {
+	    if (!v) {
 		// nothing found, try printing variable in gdb
 		if (m_d) {
 		    CmdQueueItem *cmd = m_d->executeCmd(DCprintPopup, expr);

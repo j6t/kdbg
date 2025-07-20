@@ -147,14 +147,14 @@ struct CmdQueueItem
     QString m_cmdString;
     bool m_committed;			/* just a debugging aid */
     // remember which expression when printing an expression
-    VarTree* m_expr;
-    ExprWnd* m_exprWnd;
+    VarTree* m_expr = nullptr;
+    ExprWnd* m_exprWnd = nullptr;
     // remember file position
     QString m_fileName;
     int m_lineNo;
     DbgAddr m_addr;
     // the breakpoint info
-    Breakpoint* m_brkpt;
+    Breakpoint* m_brkpt = nullptr;
     int m_existingBrkpt;
     // whether command was emitted due to direct user request (only set when relevant)
     bool m_byUser;
@@ -165,10 +165,7 @@ struct CmdQueueItem
     	m_cmd(cmd),
 	m_cmdString(str),
 	m_committed(false),
-	m_expr(0),
-	m_exprWnd(0),
 	m_lineNo(0),
-	m_brkpt(0),
 	m_existingBrkpt(0),
 	m_byUser(false)
     { }
@@ -223,8 +220,8 @@ struct FrameInfo
 struct StackFrame : FrameInfo
 {
     int frameNo;
-    ExprValue* var;			/* more information if non-zero */
-    StackFrame() : var(0) { }
+    ExprValue* var = nullptr;		/* more information if non-zero */
+    StackFrame() = default;
     ~StackFrame();
 };
 
@@ -579,7 +576,7 @@ protected:
     /**
      * The active command is kept separately from other pending commands.
      */
-    CmdQueueItem* m_activeCmd;
+    CmdQueueItem* m_activeCmd = {};
     /**
      * Helper function that queues the given command string in the
      * low-priority queue.

@@ -220,8 +220,7 @@ TypeInfo::~TypeInfo()
 
 ProgramTypeTable::ProgramTypeTable() :
 	m_parseQt2QStrings(false),
-	m_QCharIsShort(false),
-	m_printQStringDataCmd(0)
+	m_QCharIsShort(false)
 {
 }
 
@@ -329,14 +328,14 @@ const TypeInfo* ProgramTypeTable::lookup(QString type)
      */
     QStringList parts = splitTemplateArgs(type);
     if (parts.size() == 1)
-	return 0;	// not a template
+	return nullptr;		// not a template
 
     // We can have several patterns for the same template name.
     std::pair<TemplateMap::const_iterator, TemplateMap::const_iterator> range =
 	m_templates.equal_range(parts.front());
     // We pick the one that has the wildcards in the later parameters.
     unsigned minPenalty = ~0U;
-    const TypeInfo* result = 0;
+    const TypeInfo* result = nullptr;
     parts.pop_front();
 
     for (TemplateMap::const_iterator i = range.first; i != range.second; ++i)
@@ -378,7 +377,7 @@ const TypeInfo* ProgramTypeTable::lookup(QString type)
 
 void ProgramTypeTable::registerAlias(const QString& name, const TypeInfo* type)
 {
-    ASSERT(lookup(name) == 0 || lookup(name) == type);
+    ASSERT(!lookup(name) || lookup(name) == type);
     m_aliasDict.insert(std::make_pair(name, type));
 }
 

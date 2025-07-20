@@ -32,7 +32,7 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm,
     }
 
     envList->setAllColumnsShowFocus(true);
-    buttonDelete->setEnabled(envList->currentItem() != 0);
+    buttonDelete->setEnabled(envList->currentItem() != nullptr);
 }
 
 PgmArgs::~PgmArgs()
@@ -87,7 +87,7 @@ void PgmArgs::modifyVar(bool resurrect)
 void PgmArgs::on_buttonDelete_clicked()
 {
     QTreeWidgetItem* item = envList->currentItem();
-    if (item == 0)
+    if (!item)
 	return;
     QString name = item->text(0);
 
@@ -97,7 +97,7 @@ void PgmArgs::on_buttonDelete_clicked()
     {
 	EnvVar* val = &i->second;
 	// delete from list
-	val->item = 0;
+	val->item = nullptr;
 	// if this is a new item, delete it completely, otherwise zombie-ize it
 	if (val->status == EnvVar::EVnew) {
 	    m_envVars.erase(i);
@@ -128,8 +128,8 @@ void PgmArgs::parseEnvInput(QString& name, QString& value)
 void PgmArgs::on_envList_currentItemChanged()
 {
     QTreeWidgetItem* item = envList->currentItem();
-    buttonDelete->setEnabled(item != 0);
-    if (item == 0)
+    buttonDelete->setEnabled(item != nullptr);
+    if (!item)
 	return;
 
     // must get name from list box

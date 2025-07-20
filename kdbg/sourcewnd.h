@@ -41,7 +41,7 @@ public:
      * If sourceRow is non-zero, it is filled with the source code row
      * belonging to the line number.
      */
-    int rowToLine(int row, int* sourceRow = 0);
+    int rowToLine(int row, int* sourceRow = nullptr);
     /** Translates zero-based source line number to row number (zero-based) */
     int lineToRow(int line);
     /** Is the row disassembled? */
@@ -109,7 +109,7 @@ protected:
 	int findAddressRowOffset(const DbgAddr& address) const;
     };
     std::vector<SourceLine> m_sourceCode;
-    HighlightCpp* m_highlighter;
+    HighlightCpp* m_highlighter = {};
 
     std::vector<int> m_rowToLine;	//!< The source line number for each row
     std::vector<uchar> m_lineItems;	//!< Icons displayed on the line

@@ -33,8 +33,7 @@
 STTY::STTY() :
 	QObject(),
 	m_masterfd(-1),
-	m_slavefd(-1),
-	m_outNotifier(0)
+	m_slavefd(-1)
 {
     if (findTTY())
     {
@@ -64,9 +63,9 @@ bool STTY::findTTY()
     /* use glibc2's openpty */
     if (m_masterfd < 0)
     {
-	if (::openpty(&m_masterfd, &m_slavefd, 0, 0, 0) == 0) {
+	if (::openpty(&m_masterfd, &m_slavefd, nullptr, nullptr, nullptr) == 0) {
 	    const char* tname = ::ttyname(m_slavefd);
-	    if (tname != 0) {
+	    if (tname) {
 		m_slavetty = tname;
 	    } else {
 		::close(m_slavefd);
@@ -133,7 +132,6 @@ void STTY::outReceived(int f)
 
 TTYWindow::TTYWindow(QWidget* parent) :
 	QPlainTextEdit(parent),
-	m_tty(0),
 	m_pos(document())
 {
     setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
@@ -159,7 +157,7 @@ QString TTYWindow::activate()
     if (ttyName.isEmpty()) {
 	// failed to allocate terminal
 	delete m_tty;
-	m_tty = 0;
+	m_tty = nullptr;
 	return QString();
     } else {
 	connect(m_tty, SIGNAL(output(char*,int)), SLOT(slotAppend(char*,int)));
@@ -170,7 +168,7 @@ QString TTYWindow::activate()
 void TTYWindow::deactivate()
 {
     delete m_tty;
-    m_tty = 0;
+    m_tty = nullptr;
 }
 
 void TTYWindow::slotAppend(char* buffer, int count)

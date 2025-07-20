@@ -66,7 +66,7 @@ struct MenuPair
 {
     const char* name;
     uint mode;
-    bool isSeparator() { return name == 0; }
+    bool isSeparator() { return !name; }
 };
 
 static MenuPair menuitems[] = {
@@ -79,7 +79,7 @@ static MenuPair menuitems[] = {
     { I18N_NOOP("Real (&e)"),    RegisterDisplay::realE },
     { I18N_NOOP("Real (&f)"),    RegisterDisplay::realF },
     { I18N_NOOP("&Real (g)"),    RegisterDisplay::realG },
-    { 0, 0 },
+    { nullptr, 0 },
     { "8 bits",  RegisterDisplay::bits8 },
     { "16 bits", RegisterDisplay::bits16 },
     { "32 bits", RegisterDisplay::bits32 },
@@ -493,7 +493,7 @@ GroupingViewItem* RegisterView::findGroup(const QString& groupName)
 	    return static_cast<GroupingViewItem*>(it);
     }
     // return that nothing was found.
-    return 0;
+    return nullptr;
 }
 
 // only show a group if it has subitems.

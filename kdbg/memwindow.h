@@ -27,7 +27,7 @@ public:
     void setDebugger(KDebugger* deb) { m_debugger = deb; }
 
 protected:
-    KDebugger* m_debugger;
+    KDebugger* m_debugger = {};
     QComboBox m_expression;
 
     QTreeWidget m_memory;

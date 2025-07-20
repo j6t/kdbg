@@ -21,7 +21,6 @@ const int MAX_COL = 10;
 
 MemoryWindow::MemoryWindow(QWidget* parent) :
 	QWidget(parent),
-	m_debugger(0),
 	m_expression(this),
 	m_memory(this),
 	m_layout(QBoxLayout::TopToBottom, this),

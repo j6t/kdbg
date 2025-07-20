@@ -57,7 +57,6 @@ static const char defaultHeaderFilter[] = "*.h *.hh *.hpp *.h++";
 
 DebuggerMainWnd::DebuggerMainWnd() :
 	KXmlGuiWindow(),
-	m_debugger(0),
 #ifdef GDB_TRANSCRIPT
 	m_transcriptFile(GDB_TRANSCRIPT),
 #endif
@@ -195,7 +194,7 @@ DebuggerMainWnd::~DebuggerMainWnd()
     saveSettings(KSharedConfig::openConfig());
     // must delete m_debugger early since it references our windows
     delete m_debugger;
-    m_debugger = 0;
+    m_debugger = nullptr;
 
     delete m_memoryWindow;
     delete m_threads;
@@ -403,7 +402,7 @@ void DebuggerMainWnd::initStatusBar()
 
 bool DebuggerMainWnd::queryClose()
 {
-    if (m_debugger != 0) {
+    if (m_debugger) {
 	m_debugger->shutdown();
     }
     return true;
@@ -415,7 +414,7 @@ void DebuggerMainWnd::saveProperties(KConfigGroup& cg)
 {
     // session management
     QString executable = "";
-    if (m_debugger != 0) {
+    if (m_debugger) {
 	executable = m_debugger->executable();
     }
     cg.writeEntry("executable", executable);
@@ -455,7 +454,7 @@ void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
     lg.writeEntry("Width0Locals", m_localVariables->columnWidth(0));
     lg.writeEntry("Width0Watches", m_watches->columnWidth(0));
 
-    if (m_debugger != 0) {
+    if (m_debugger) {
 	m_debugger->saveSettings(config.data());
     }
 
@@ -484,7 +483,7 @@ void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
     if (w >= 0 && w < 30000)
 	m_watches->setColumnWidth(0, w);
 
-    if (m_debugger != 0) {
+    if (m_debugger) {
 	m_debugger->restoreSettings(config.data());
     }
 
@@ -581,7 +580,7 @@ void DebuggerMainWnd::updateLineItems()
 
 void DebuggerMainWnd::slotAddWatch()
 {
-    if (m_debugger != 0) {
+    if (m_debugger) {
 	QString t = m_watches->watchText();
 	m_debugger->addWatch(t);
     }
@@ -589,7 +588,7 @@ void DebuggerMainWnd::slotAddWatch()
 
 void DebuggerMainWnd::slotAddWatch(const QString& text)
 {
-    if (m_debugger != 0) {
+    if (m_debugger) {
 	m_debugger->addWatch(text);
     }
 }
@@ -597,17 +596,17 @@ void DebuggerMainWnd::slotAddWatch(const QString& text)
 void DebuggerMainWnd::slotNewFileLoaded()
 {
     // updates program counter in the new file
-    if (m_debugger != 0)
+    if (m_debugger)
 	m_filesWindow->updateLineItems(m_debugger);
 }
 
 QDockWidget* DebuggerMainWnd::dockParent(QWidget* w)
 {
-    while ((w = w->parentWidget()) != 0) {
+    while ((w = w->parentWidget())) {
 	if (QDockWidget* dock = qobject_cast<QDockWidget*>(w))
 	    return dock;
     }
-    return 0;
+    return nullptr;
 }
 
 void DebuggerMainWnd::makeDefaultLayout()
@@ -675,12 +674,12 @@ static const char GeneralGroup[] = "General";
 
 bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 {
-    assert(m_debugger != 0);
+    assert(m_debugger);
 
     TRACE(QString("trying language '%1'...").arg(lang));
     DebuggerDriver* driver = driverFromLang(lang);
 
-    if (driver == 0)
+    if (!driver)
     {
 	// see if there is a language in the per-program config file
 	QString configName = m_debugger->getConfigForExe(executable);
@@ -700,7 +699,7 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 	}
 
     }
-    if (driver == 0)
+    if (!driver)
     {
 	QString name = driverNameFromFile(executable);
 
@@ -708,7 +707,7 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 		" from file contents").arg(name));
 	driver = driverFromLang(name);
     }
-    if (driver == 0)
+    if (!driver)
     {
 	// oops
 	QString msg = i18n("Don't know how to debug language `%1'");
@@ -769,7 +768,7 @@ DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
 	    break;
 	}
     }
-    DebuggerDriver* driver = 0;
+    DebuggerDriver* driver = nullptr;
     switch (driverID) {
     case 1:
 	{
@@ -795,33 +794,33 @@ QString DebuggerMainWnd::driverNameFromFile(const QString&)
 
 void DebuggerMainWnd::setCoreFile(const QString& corefile)
 {
-    assert(m_debugger != 0);
+    assert(m_debugger);
     m_debugger->useCoreFile(corefile, true);
 }
 
 void DebuggerMainWnd::setRemoteDevice(const QString& remoteDevice)
 {
-    if (m_debugger != 0) {
+    if (m_debugger) {
 	m_debugger->setRemoteDevice(remoteDevice);
     }
 }
 
 void DebuggerMainWnd::overrideProgramArguments(const QString& args)
 {
-    assert(m_debugger != 0);
+    assert(m_debugger);
     m_debugger->overrideProgramArguments(args);
 }
 
 void DebuggerMainWnd::setTranscript(const QString& name)
 {
     m_transcriptFile = name;
-    if (m_debugger != 0 && m_debugger->driver() != 0)
+    if (m_debugger && m_debugger->driver())
 	m_debugger->driver()->setLogFileName(m_transcriptFile);
 }
 
 void DebuggerMainWnd::setAttachPid(const QString& pid)
 {
-    assert(m_debugger != 0);
+    assert(m_debugger);
     m_debugger->setAttachPid(pid);
 }
 
@@ -903,7 +902,7 @@ void DebuggerMainWnd::setDebuggerCmdStr(const QString& cmd)
 
 void DebuggerMainWnd::slotDebuggerStarting()
 {
-    if (m_debugger == 0)		/* paranoia check */
+    if (!m_debugger)		/* paranoia check */
 	return;
 
     if (m_ttyLevel == m_debugger->ttyLevel())
@@ -943,7 +942,7 @@ void DebuggerMainWnd::slotToggleBreak(const QString& fileName, int lineNo,
 				      const DbgAddr& address, bool temp)
 {
     // lineNo is zero-based
-    if (m_debugger != 0) {
+    if (m_debugger) {
 	m_debugger->setBreakpoint(fileName, lineNo, address, temp);
     }
 }
@@ -952,7 +951,7 @@ void DebuggerMainWnd::slotEnaDisBreak(const QString& fileName, int lineNo,
 				      const DbgAddr& address)
 {
     // lineNo is zero-based
-    if (m_debugger != 0) {
+    if (m_debugger) {
 	m_debugger->enableDisableBreakpoint(fileName, lineNo, address);
     }
 }
@@ -1100,7 +1099,7 @@ QString DebuggerMainWnd::makeSourceFilter()
 void DebuggerMainWnd::slotLocalsPopup(const QPoint& pt)
 {
     QMenu* popup = static_cast<QMenu*>(factory()->container("popup_locals", this));
-    if (popup == 0) {
+    if (!popup) {
         return;
     }
     if (popup->isVisible()) {
@@ -1117,7 +1116,7 @@ void DebuggerMainWnd::slotLocalsToWatch()
 {
     VarTree* item = m_localVariables->selectedItem();
 
-    if (item != 0 && m_debugger != 0) {
+    if (item && m_debugger) {
 	QString text = item->computeExpr();
 	m_debugger->addWatch(text);
     }
@@ -1146,7 +1145,7 @@ void DebuggerMainWnd::slotEditValue()
     }
 
     VarTree* expr = wnd->selectedItem();
-    if (expr != 0 && m_debugger != 0 && m_debugger->canSingleStep())
+    if (expr && m_debugger && m_debugger->canSingleStep())
     {
 	TRACE("edit value");
 	// determine the text to edit
@@ -1208,7 +1207,7 @@ void DebuggerMainWnd::slotFileCore()
 
 void DebuggerMainWnd::slotFileProgSettings()
 {
-    if (m_debugger != 0) {
+    if (m_debugger) {
 	m_debugger->programSettings(this);
     }
 }
@@ -1224,7 +1223,7 @@ void DebuggerMainWnd::slotViewStatusbar()
 
 void DebuggerMainWnd::slotExecUntil()
 {
-    if (m_debugger != 0)
+    if (m_debugger)
     {
 	QString file;
 	int lineNo;
@@ -1251,7 +1250,7 @@ void DebuggerMainWnd::slotExecAttach()
 
 void DebuggerMainWnd::slotExecArgs()
 {
-    if (m_debugger != 0) {
+    if (m_debugger) {
 	m_debugger->programArgs(this);
     }
 }

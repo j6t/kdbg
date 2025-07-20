@@ -96,14 +96,14 @@ void WinStack::activateFile(const QString& fileName)
 bool WinStack::activatePath(QString pathName, int lineNo, const DbgAddr& address)
 {
     // check whether the file is already open
-    SourceWindow* fw = 0;
+    SourceWindow* fw = nullptr;
     for (int i = count()-1; i >= 0; i--) {
 	if (windowAt(i)->fileName() == pathName) {
 	    fw = windowAt(i);
 	    break;
 	}
     }
-    if (fw == 0) {
+    if (!fw) {
 	// not found, load it
 	fw = new SourceWindow(pathName, this);
 
@@ -163,7 +163,7 @@ bool WinStack::activeLine(QString& fileName, int& lineNo)
 
 bool WinStack::activeLine(QString& fileName, int& lineNo, DbgAddr& address)
 {
-    if (activeWindow() == 0) {
+    if (!activeWindow()) {
 	return false;
     }
     
@@ -200,7 +200,7 @@ SourceWindow* WinStack::findByFileName(const QString& fileName) const
 	    return windowAt(i);
 	}
     }
-    return 0;
+    return nullptr;
 }
 
 void WinStack::setPC(bool set, const QString& fileName, int lineNo,
@@ -226,21 +226,21 @@ SourceWindow* WinStack::activeWindow() const
 QString WinStack::activeFileName() const
 {
     QString f;
-    if (activeWindow() != 0)
+    if (activeWindow())
 	f = activeWindow()->fileName();
     return f;
 }
 
 void WinStack::slotFindForward()
 {
-    if (activeWindow() != 0)
+    if (activeWindow())
 	activeWindow()->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
 			     SourceWindow::findForward);
 }
 
 void WinStack::slotFindBackward()
 {
-    if (activeWindow() != 0)
+    if (activeWindow())
 	activeWindow()->find(m_findDlg.searchText(), m_findDlg.caseSensitive(),
 			     SourceWindow::findBackward);
 }
@@ -251,7 +251,7 @@ bool WinStack::event(QEvent* evt)
 	return QTabWidget::event(evt);
 
     SourceWindow* w = activeWindow();
-    if (w == 0)
+    if (!w)
 	return true;
 
     QPoint p = static_cast<QHelpEvent*>(evt)->globalPos();
@@ -284,7 +284,7 @@ void WinStack::slotDisassembled(const QString& fileName, int lineNo,
 				const std::list<DisassembledCode>& disass)
 {
     SourceWindow* fw = findByFileName(fileName);
-    if (fw == 0) {
+    if (!fw) {
 	// not found: ignore
 	return;
     }
@@ -320,7 +320,7 @@ void WinStack::slotSetTabWidth(int numChars)
 
 void WinStack::slotFileReload()
 {
-    if (activeWindow() != 0) {
+    if (activeWindow()) {
 	TRACE("reloading one file");
 	activeWindow()->reloadFile();
     }

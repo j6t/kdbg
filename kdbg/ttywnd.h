@@ -40,7 +40,7 @@ signals:
 protected:
     int m_masterfd;
     int m_slavefd;
-    QSocketNotifier* m_outNotifier;
+    QSocketNotifier* m_outNotifier = {};
     QString m_slavetty;
     bool findTTY();
 };
@@ -56,7 +56,7 @@ public:
     void deactivate();
 
 protected:
-    STTY* m_tty;
+    STTY* m_tty = {};
     QTextCursor m_pos;		//!< tracks horizontal cursor position
     void contextMenuEvent(QContextMenuEvent*) override;
 

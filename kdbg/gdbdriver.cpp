@@ -137,50 +137,50 @@ GdbDriver::GdbDriver() :
 	// must be indexable by DbgCommand values, i.e. sorted by DbgCommand values
 	assert(i == cmds[i].cmd);
 	// a format string must be associated
-	assert(cmds[i].fmt != 0);
+	assert(cmds[i].fmt);
 	assert(strlen(cmds[i].fmt) <= MAX_FMTLEN);
 	// format string must match arg specification
 	switch (cmds[i].argsNeeded) {
 	case GdbCmdInfo::argNone:
-	    assert(strchr(cmds[i].fmt, '%') == 0);
+	    assert(!strchr(cmds[i].fmt, '%'));
 	    break;
 	case GdbCmdInfo::argString:
 	    perc = strchr(cmds[i].fmt, '%');
-	    assert(perc != 0 && perc[1] == 's');
-	    assert(strchr(perc+2, '%') == 0);
+	    assert(perc && perc[1] == 's');
+	    assert(!strchr(perc+2, '%'));
 	    break;
 	case GdbCmdInfo::argNum:
 	    perc = strchr(cmds[i].fmt, '%');
-	    assert(perc != 0 && perc[1] == 'd');
-	    assert(strchr(perc+2, '%') == 0);
+	    assert(perc && perc[1] == 'd');
+	    assert(!strchr(perc+2, '%'));
 	    break;
 	case GdbCmdInfo::argStringNum:
 	    perc = strchr(cmds[i].fmt, '%');
-	    assert(perc != 0 && perc[1] == 's');
+	    assert(perc && perc[1] == 's');
 	    perc = strchr(perc+2, '%');
-	    assert(perc != 0 && perc[1] == 'd');
-	    assert(strchr(perc+2, '%') == 0);
+	    assert(perc && perc[1] == 'd');
+	    assert(!strchr(perc+2, '%'));
 	    break;
 	case GdbCmdInfo::argNumString:
 	    perc = strchr(cmds[i].fmt, '%');
-	    assert(perc != 0 && perc[1] == 'd');
+	    assert(perc && perc[1] == 'd');
 	    perc = strchr(perc+2, '%');
-	    assert(perc != 0 && perc[1] == 's');
-	    assert(strchr(perc+2, '%') == 0);
+	    assert(perc && perc[1] == 's');
+	    assert(!strchr(perc+2, '%'));
 	    break;
 	case GdbCmdInfo::argString2:
 	    perc = strchr(cmds[i].fmt, '%');
-	    assert(perc != 0 && perc[1] == 's');
+	    assert(perc && perc[1] == 's');
 	    perc = strchr(perc+2, '%');
-	    assert(perc != 0 && perc[1] == 's');
-	    assert(strchr(perc+2, '%') == 0);
+	    assert(perc && perc[1] == 's');
+	    assert(!strchr(perc+2, '%'));
 	    break;
 	case GdbCmdInfo::argNum2:
 	    perc = strchr(cmds[i].fmt, '%');
-	    assert(perc != 0 && perc[1] == 'd');
+	    assert(perc && perc[1] == 'd');
 	    perc = strchr(perc+2, '%');
-	    assert(perc != 0 && perc[1] == 'd');
-	    assert(strchr(perc+2, '%') == 0);
+	    assert(perc && perc[1] == 'd');
+	    assert(!strchr(perc+2, '%'));
 	    break;
 	}
     }
@@ -368,14 +368,14 @@ int GdbDriver::findPrompt(const QByteArray& output) const
 void GdbDriver::parseMarker(CmdQueueItem* cmd)
 {
     char* startMarker = strstr(m_output.data(), "\032\032");
-    if (startMarker == 0)
+    if (!startMarker)
 	return;
 
     // extract the marker
     startMarker += 2;
     TRACE(QString("found marker: ") + startMarker);
     char* endMarker = strchr(startMarker, '\n');
-    if (endMarker == 0)
+    if (!endMarker)
 	return;
 
     *endMarker = '\0';
@@ -634,7 +634,7 @@ static bool parseErrorMessage(const char*& output,
     while (strncmp(output, "warning:", 8) == 0)
     {
 	const char* end = strchr(output+8, '\n');
-	if (end == 0)
+	if (!end)
 	    output += strlen(output);
 	else
 	    output = end+1;
@@ -647,11 +647,11 @@ static bool parseErrorMessage(const char*& output,
 	    // put the error message as value in the variable
 	    variable = new ExprValue(QString(), VarTree::NKplain);
 	    const char* endMsg = strchr(output, '\n');
-	    if (endMsg == 0)
+	    if (!endMsg)
 		endMsg = output + strlen(output);
 	    variable->m_value = QString::fromLatin1(output, endMsg-output);
 	} else {
-	    variable = 0;
+	    variable = nullptr;
 	}
 	return true;
     }
@@ -671,7 +671,7 @@ union Qt2QChar {
 void GdbDriver::setPrintQStringDataCmd(const char* cmd)
 {
     // don't accept the command if it is empty
-    if (cmd == 0 || *cmd == '\0')
+    if (!cmd || *cmd == '\0')
 	return;
     assert(strlen(cmd) <= MAX_FMTLEN);
     cmds[DCprintQStringStruct].fmt = cmd;
@@ -679,7 +679,7 @@ void GdbDriver::setPrintQStringDataCmd(const char* cmd)
 
 ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, bool qt3like)
 {
-    ExprValue* variable = 0;
+    ExprValue* variable = nullptr;
 
     /*
      * Parse off white space. gdb sometimes prints white space first if the
@@ -704,7 +704,7 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
     // find '='
     const char* p = output;
     p = strchr(p, '=');
-    if (p == 0) {
+    if (!p) {
 	goto error;
     }
     p++;
@@ -725,7 +725,7 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
 	 * the second index is from the enum above.
 	 */
 	static const char* separator[2][3] = {
-	    { "\"", 0,       ", \"" },	/* normal char is added */
+	    { "\"", nullptr, ", \"" },	/* normal char is added */
 	    { "'",  "\", '", ", '" }	/* repeated char is added */
 	};
 
@@ -743,7 +743,7 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
 	    if (repeats) {
 		const char* start = p;
 		p = strchr(p+9, '>');	/* search end and advance */
-		if (p == 0)
+		if (!p)
 		    goto error;
 		p++;			/* skip '>' */
 		repeatCount = QString::fromLatin1(start, p-start);
@@ -857,14 +857,14 @@ static ExprValue* parseVar(const char*& s)
     else
     {
 	if (!parseName(p, name, kind)) {
-	    return 0;
+	    return nullptr;
 	}
 
 	// go for '='
 	skipSpace(p);
 	if (*p != '=') {
 	    TRACE("parse error: = not found after " + name);
-	    return 0;
+	    return nullptr;
 	}
 	// skip the '=' and more whitespace
 	p++;
@@ -875,7 +875,7 @@ static ExprValue* parseVar(const char*& s)
     
     if (!parseValue(p, variable)) {
 	delete variable;
-	return 0;
+	return nullptr;
     }
     s = p;
     return variable;
@@ -1374,7 +1374,7 @@ repeat:
 	    p += 23;
 	    skipName(p);
 	    const char* e = strchr(p, '.');
-	    if (e == 0) {
+	    if (!e) {
 		p += strlen(p);
 	    } else {
 		p = e+1;
@@ -1510,7 +1510,7 @@ static bool parseNested(const char*& s, ExprValue* variable)
 static bool parseVarSeq(const char*& s, ExprValue* variable)
 {
     // parse a comma-separated sequence of variables
-    ExprValue* var = variable;		/* var != 0 to indicate success if empty seq */
+    ExprValue* var = variable;		/* var != nullptr to indicate success if empty seq */
     for (;;) {
 	if (*s == '}')
 	    break;
@@ -1521,7 +1521,7 @@ static bool parseVarSeq(const char*& s, ExprValue* variable)
 	    break;
 	}
 	var = parseVar(s);
-	if (var == 0)
+	if (!var)
 	    break;			/* syntax error */
 	variable->appendChild(var);
 	if (*s != ',')
@@ -1530,7 +1530,7 @@ static bool parseVarSeq(const char*& s, ExprValue* variable)
 	s++;
 	skipSpace(s);
     }
-    return var != 0;
+    return var != nullptr;
 }
 
 static bool parseValueSeq(const char*& s, ExprValue* variable)
@@ -1812,7 +1812,7 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 {
     // skip first line, which is the headline
     const char* p = strchr(output, '\n');
-    if (p == 0)
+    if (!p)
 	return false;
     p++;
     if (*p == '\0')
@@ -1877,7 +1877,7 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 	}
 	// remainder is location, hit and ignore count, condition
 	end = strchr(p, '\n');
-	if (end == 0) {
+	if (!end) {
 	    bp.location = p;
 	    p += bp.location.length();
 	} else {
@@ -1894,7 +1894,7 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 
 	    // seek end of line
 	    end = strchr(p, '\n');
-	    if (end == 0)
+	    if (!end)
 		end = p+strlen(p);
 
 	    if (strncmp(p, "breakpoint already hit", 22) == 0) {
@@ -1988,7 +1988,7 @@ std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 	if (!newFormat) {
 	    // In the old format, it is terminated by two blanks.
 	    end = strstr(p, "  ");
-	    if (end == 0) {
+	    if (!end) {
 		// syntax error; bail out
 		return threads;
 	    }
@@ -2058,7 +2058,7 @@ bool GdbDriver::parseBreakpoint(const char* output, int& id,
 	   strncmp(output, "Note: breakpoint", 16) == 0)
     {
 	output = strchr(output, '\n');
-	if (output == 0)
+	if (!output)
 	    return false;
 	output++;			/* skip newline */
     }
@@ -2106,24 +2106,24 @@ static bool parseNewBreakpoint(const char* o, int& id,
      *
      * Breakpoint 4 at 0x804f158: lotto739.cpp:95. (3 locations)
      */
-    const char* fileEnd, *numStart = 0;
+    const char* fileEnd, *numStart = nullptr;
     const char* fileStart = strstr(p, "file ");
-    if (fileStart != 0)
+    if (fileStart)
     {
 	fileStart += 5;
 	fileEnd = strstr(fileStart, ", line ");
-	if (fileEnd != 0)
+	if (fileEnd)
 	    numStart = fileEnd + 7;
     }
-    if (numStart == 0 && p[0] == ':' && p[1] == ' ')
+    if (!numStart && p[0] == ':' && p[1] == ' ')
     {
 	fileStart = p+2;
 	skipSpace(fileStart);
 	fileEnd = strchr(fileStart, ':');
-	if (fileEnd != 0)
+	if (fileEnd)
 	    numStart = fileEnd + 1;
     }
-    if (numStart == 0)
+    if (!numStart)
 	return !address.isEmpty();	/* parse error only if there's no address */
 
     QString fileName = QString::fromLatin1(fileStart, fileEnd-fileStart);
@@ -2171,14 +2171,14 @@ void GdbDriver::parseLocals(const char* output, std::list<ExprValue*>& newVars)
 	    strncmp(output, "No arguments", 12) == 0)
 	{
 	    output = strchr(output, '\n');
-	    if (output == 0) {
+	    if (!output) {
 		break;
 	    }
 	    continue;
 	}
 
 	ExprValue* variable = parseVar(output);
-	if (variable == 0) {
+	if (!variable) {
 	    break;
 	}
 	// do not add duplicates
@@ -2195,7 +2195,7 @@ void GdbDriver::parseLocals(const char* output, std::list<ExprValue*>& newVars)
 
 ExprValue* GdbDriver::parsePrintExpr(const char* output, bool wantErrorValue)
 {
-    ExprValue* var = 0;
+    ExprValue* var = nullptr;
     // check for error conditions
     if (!parseErrorMessage(output, var, wantErrorValue))
     {
@@ -2234,7 +2234,7 @@ bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
 	// keep just the first line in the message
 	// otherwise, all lines of text would end up in the status bar
 	const char* end = strchr(output, '\n');
-	if (end == 0)
+	if (!end)
 	    end = output + strlen(output);
 	message = QString::fromLatin1(output, end - output);
 	return true;
@@ -2250,7 +2250,7 @@ bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
 bool GdbDriver::parseCoreFile(const char* output)
 {
     // if command succeeded, gdb emits a line starting with "#0 "
-    return strstr(output, "\n#0 ") != 0;
+    return strstr(output, "\n#0 ") != nullptr;
 }
 
 uint GdbDriver::parseProgramStopped(const char* output, bool haveCoreFile,
@@ -2291,7 +2291,7 @@ uint GdbDriver::parseProgramStopped(const char* output, bool haveCoreFile,
 
 	    // set message
 	    const char* endOfMessage = strchr(start, '\n');
-	    if (endOfMessage == 0)
+	    if (!endOfMessage)
 		endOfMessage = start + strlen(start);
 	    message = QString::fromLatin1(start, endOfMessage-start);
 	} else if (strncmp(start, "[Inferior ", 10) == 0) {
@@ -2307,7 +2307,7 @@ uint GdbDriver::parseProgramStopped(const char* output, bool haveCoreFile,
 
 		    // set message
 		    const char* end = strchr(p, '\n');
-		    if (end == 0)
+		    if (!end)
 			end = p + strlen(p);
 		    // strip [] from the message
 		    message = QString::fromLatin1(start+1, end-start-2);
@@ -2319,13 +2319,13 @@ uint GdbDriver::parseProgramStopped(const char* output, bool haveCoreFile,
 	     * that it stopped at a temporary breakpoint).
 	     */
 	    flags |= SFrefreshBreak;
-	} else if (strstr(start, "re-reading symbols.") != 0) {
+	} else if (strstr(start, "re-reading symbols.")) {
 	    flags |= SFrefreshSource;
 	}
 
 	// next line, please
 	start = strchr(start, '\n');
-    } while (start != 0);
+    } while (start);
 
     /*
      * Gdb only notices when new threads have appeared, but not when a
@@ -2347,7 +2347,7 @@ QStringList GdbDriver::parseSharedLibs(const char* output)
 
     // strip off head line
     output = strchr(output, '\n');
-    if (output == 0)
+    if (!output)
 	return shlibs;
     output++;				/* skip '\n' */
     QString shlibName;
@@ -2365,7 +2365,7 @@ QStringList GdbDriver::parseSharedLibs(const char* output)
 	    return shlibs;
 	const char* start = output;
 	output = strchr(output, '\n');
-	if (output == 0)
+	if (!output)
 	    output = start + strlen(start);
 	shlibName = QString::fromLatin1(start, output-start);
 	if (*output != '\0')
@@ -2500,7 +2500,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 	    // the rest of the line is the register value
 	    start = output;
 	    output = strchr(output,'\n');
-	    if (output == 0)
+	    if (!output)
 		output = start + strlen(start);
 	    value += QString::fromLatin1(start, output-start).simplified();
 
@@ -2508,7 +2508,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 	     * Look ahead: if the subsequent line is indented, it continues
 	     * the current register value.
 	     */
-	    if (output != 0 && isspace(output[1]))
+	    if (output && isspace(output[1]))
 	    {
 		++output;
 		value += ' ';
@@ -2558,7 +2558,7 @@ bool GdbDriver::parseInfoLine(const char* output, QString& addrFrom, QString& ad
 {
     // "is at address" or "starts at address"
     const char* start = strstr(output, "s at address ");
-    if (start == 0)
+    if (!start)
 	return false;
 
     start += 13;
@@ -2568,7 +2568,7 @@ bool GdbDriver::parseInfoLine(const char* output, QString& addrFrom, QString& ad
     addrFrom = QString::fromLatin1(start, p-start);
 
     start = strstr(p, "and ends at ");
-    if (start == 0) {
+    if (!start) {
 	addrTo = addrFrom;
 	return true;
     }
@@ -2609,14 +2609,14 @@ std::list<DisassembledCode> GdbDriver::parseDisassemble(const char* output)
 
     // remove first line
     const char* p = strchr(output, '\n');
-    if (p == 0)
+    if (!p)
 	return code;			/* not a regular output */
 
     p++;
 
     // remove last line
     const char* end = strstr(output, "End of assembler");
-    if (end == 0)
+    if (!end)
 	end = p + strlen(p);
 
     // remove function offsets from the lines

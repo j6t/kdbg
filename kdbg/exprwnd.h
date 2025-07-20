@@ -31,7 +31,7 @@ public:
 	NKaddress			//!< a dereferenced pointer
     };
     NameKind m_nameKind;
-    const TypeInfo* m_type;			//!< the type of struct if it could be derived
+    const TypeInfo* m_type = {};	//!< the type of struct if it could be derived
     int m_exprIndex;			//!< used in struct value update
     bool m_exprIndexUseGuard;		//!< ditto; if guard expr should be used
     QString m_partialValue;		//!< while struct value update is in progress
@@ -82,8 +82,8 @@ struct ExprValue
     QString m_value;
     VarTree::VarKind m_varKind;
     VarTree::NameKind m_nameKind;
-    ExprValue* m_child;			/* the first child expression */
-    ExprValue* m_next;			/* the next sibling expression */
+    ExprValue* m_child = {};		/* the first child expression */
+    ExprValue* m_next = {};		/* the next sibling expression */
     bool m_initiallyExpanded;
 
     ExprValue(const QString& name, VarTree::NameKind kind);
@@ -171,7 +171,7 @@ protected:
     std::list<VarTree*> m_updateType;	//!< structs whose type must be determined
     std::list<VarTree*> m_updateStruct;	//!< structs whose nested value needs update
 
-    ValueEdit* m_edit;
+    ValueEdit* m_edit = {};
 
     /** remove items that are in the subTree from the list */
     void unhookSubtree(VarTree* subTree);

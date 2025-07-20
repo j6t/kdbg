@@ -65,7 +65,7 @@ void ThreadList::updateThreads(const std::list<ThreadInfo>& threads)
     {
 	// look up this thread by id
 	ThreadEntry* te = threadById(i->id);
-	if (te == 0) {
+	if (!te) {
 	    te = new ThreadEntry(this, *i);
 	} else {
 	    te->m_delete = false;
@@ -96,7 +96,7 @@ ThreadEntry* ThreadList::threadById(int id)
 	    return te;
 	}
     }
-    return 0;
+    return nullptr;
 }
 
 /*
@@ -115,7 +115,7 @@ void ThreadList::makeNoFocusIcon()
 
 void ThreadList::slotCurrentChanged(QTreeWidgetItem* newItem)
 {
-    if (newItem == 0)
+    if (!newItem)
 	return;
 
     ThreadEntry* te = static_cast<ThreadEntry*>(newItem);

@@ -58,10 +58,10 @@ void ProcAttachPS::runPS()
 #else
 	"/bin/false",
 #endif
-	0
+	nullptr
     };
     QStringList args;
-    for (int i = 1; psCommand[i] != 0; i++) {
+    for (int i = 1; psCommand[i]; i++) {
 	args.push_back(psCommand[i]);
     }
 
@@ -157,7 +157,7 @@ void ProcAttachPS::pushLine()
     {
 	// insert a line
 	// find the parent process
-	QTreeWidgetItem* parent = 0;
+	QTreeWidgetItem* parent = nullptr;
 	if (m_ppidCol >= 0 && m_ppidCol < int(m_line.size())) {
 	    QList<QTreeWidgetItem*> items =
 	    	processList->findItems(m_line[m_ppidCol], Qt::MatchFixedString|Qt::MatchRecursive, 1);
@@ -167,7 +167,7 @@ void ProcAttachPS::pushLine()
 
 	// we assume that the last column is the command
 	QTreeWidgetItem* item;
-	if (parent == 0) {
+	if (!parent) {
 	    item = new QTreeWidgetItem(processList, QStringList(m_line.back()));
 	} else {
 	    item = new QTreeWidgetItem(parent, QStringList(m_line.back()));
@@ -219,7 +219,7 @@ QString ProcAttachPS::text() const
 {
     QTreeWidgetItem* item = processList->currentItem();
 
-    if (item == 0)
+    if (!item)
 	return QString();
 
     return item->text(1);
@@ -271,7 +271,7 @@ bool ProcAttachPS::setVisibility(QTreeWidgetItem* i, const QString& text)
 
 void ProcAttachPS::on_processList_currentItemChanged()
 {
-    dialogButtons->button(QDialogButtonBox::Ok)->setEnabled(processList->currentItem() != 0);
+    dialogButtons->button(QDialogButtonBox::Ok)->setEnabled(processList->currentItem() != nullptr);
 }
 
 

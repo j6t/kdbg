@@ -16,8 +16,7 @@
 
 
 DebuggerDriver::DebuggerDriver() :
-	m_state(DSidle),
-	m_activeCmd(0)
+	m_state(DSidle)
 {
     // debugger process
     connect(this, SIGNAL(readyReadStandardOutput()), SLOT(slotReceiveOutput()));
@@ -37,7 +36,7 @@ bool DebuggerDriver::startup(QString cmdStr)
 {
     // clear command queues
     delete m_activeCmd;
-    m_activeCmd = 0;
+    m_activeCmd = nullptr;
     flushHiPriQueue();
     flushLoPriQueue();
     m_state = DSidle;
@@ -98,17 +97,17 @@ CmdQueueItem* DebuggerDriver::executeCmdString(DbgCommand cmd,
 	    // take the liberty to interrupt the running command
 	    m_state = DSinterrupted;
 	    ::kill(processId(), SIGINT);
-	    ASSERT(m_activeCmd != 0);
+	    ASSERT(m_activeCmd);
 	    TRACE(QString::asprintf("interrupted the command %d",
 		  (m_activeCmd ? m_activeCmd->m_cmd : -1)));
 	    delete m_activeCmd;
-	    m_activeCmd = 0;
+	    m_activeCmd = nullptr;
 	}
 	flushLoPriQueue();
     }
     // if gdb is idle, send it the command
     if (m_state == DSidle) {
-	ASSERT(m_activeCmd == 0);
+	ASSERT(!m_activeCmd);
 	writeCommand();
     }
 
@@ -125,12 +124,12 @@ CmdQueueItem* DebuggerDriver::queueCmdString(DbgCommand cmd,
 {
     // place a new command into the low-priority queue
     std::list<CmdQueueItem*>::iterator i;
-    CmdQueueItem* cmdItem = 0;
+    CmdQueueItem* cmdItem = nullptr;
     switch (mode) {
     case QMoverrideMoreEqual:
     case QMoverride:
 	// check whether gdb is currently processing this command
-	if (m_activeCmd != 0 &&
+	if (m_activeCmd &&
 	    m_activeCmd->m_cmd == cmd && m_activeCmd->m_cmdString == cmdString)
 	{
 	    return m_activeCmd;
@@ -156,7 +155,7 @@ CmdQueueItem* DebuggerDriver::queueCmdString(DbgCommand cmd,
 
     // if gdb is idle, send it the command
     if (m_state == DSidle) {
-	ASSERT(m_activeCmd == 0);
+	ASSERT(!m_activeCmd);
 	writeCommand();
     }
 
@@ -166,8 +165,7 @@ CmdQueueItem* DebuggerDriver::queueCmdString(DbgCommand cmd,
 // dequeue a pending command, make it the active one and send it to gdb
 void DebuggerDriver::writeCommand()
 {
-//    ASSERT(m_activeCmd == 0);
-    assert(m_activeCmd == 0);
+    assert(!m_activeCmd);
 
     // first check the high-priority queue - only if it is empty
     // use a low-priority command.
@@ -239,7 +237,7 @@ void DebuggerDriver::slotCommandRead()
 
     // there must be an active command which is not yet commited
     ASSERT(m_state == DScommandSent || m_state == DScommandSentLow);
-    ASSERT(m_activeCmd != 0);
+    ASSERT(m_activeCmd);
     ASSERT(!m_activeCmd->m_committed);
 
     // commit the command
@@ -276,7 +274,7 @@ void DebuggerDriver::slotReceiveOutput()
      * which is not commited.
      */
     if (m_state == DScommandSent || m_state == DScommandSentLow) {
-	ASSERT(m_activeCmd != 0);
+	ASSERT(m_activeCmd);
 	ASSERT(!m_activeCmd->m_committed);
 	/*
 	 * We received output before we got signal bytesWritten. Collect this
@@ -303,13 +301,13 @@ void DebuggerDriver::processOutput(const QByteArray& data)
      * The user haltet kdbg with Ctrl-Z, then continues it with "fg", which
      * also continues gdb, which repeats the prompt!
      */
-    if (m_activeCmd == 0 && m_state != DSinterrupted) {
+    if (!m_activeCmd && m_state != DSinterrupted) {
 	// ignore the output
 	TRACE("ignoring stray output: " + QString(data));
 	return;
     }
     ASSERT(m_state == DSrunning || m_state == DSrunningLow || m_state == DSinterrupted);
-    ASSERT(m_activeCmd != 0 || m_state == DSinterrupted);
+    ASSERT(m_activeCmd || m_state == DSinterrupted);
 
     // collect output until next prompt string is found
     
@@ -337,7 +335,7 @@ void DebuggerDriver::processOutput(const QByteArray& data)
 	     */
 	    ASSERT(m_state != DSidle);
 	    CmdQueueItem* cmd = m_activeCmd;
-	    m_activeCmd = 0;
+	    m_activeCmd = nullptr;
 	    commandFinished(cmd);
 	    delete cmd;
 	}
@@ -368,12 +366,12 @@ void DebuggerDriver::processOutput(const QByteArray& data)
 
 void DebuggerDriver::dequeueCmdByVar(VarTree* var)
 {
-    if (var == 0)
+    if (!var)
 	return;
 
     std::list<CmdQueueItem*>::iterator i = m_lopriCmdQueue.begin();
     while (i != m_lopriCmdQueue.end()) {
-	if ((*i)->m_expr != 0 && var->isAncestorEq((*i)->m_expr)) {
+	if ((*i)->m_expr && var->isAncestorEq((*i)->m_expr)) {
 	    // this is indeed a critical command; delete it
 	    TRACE("removing critical lopri-cmd: " + (*i)->m_cmdString);
 	    delete *i;

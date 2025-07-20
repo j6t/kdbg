@@ -450,13 +450,13 @@ protected:
     QString m_globalFlavor;		/* which flavor is saved globally? */
     std::map<QString,QString> m_envVars;	/* environment variables set by user */
     QStringList m_sharedLibs;		/* shared libraries used by program */
-    ProgramTypeTable* m_typeTable;	/* known types used by the program */
-    KConfig* m_programConfig;		/* program-specific settings (brkpts etc) */
+    ProgramTypeTable* m_typeTable = {};	/* known types used by the program */
+    KConfig* m_programConfig = {};	/* program-specific settings (brkpts etc) */
     void saveProgramSettings();
     void restoreProgramSettings();
 
     // debugger process
-    DebuggerDriver* m_d;
+    DebuggerDriver* m_d = {};
     bool m_explicitKill;		/* whether we are killing gdb ourselves */
 
     QString m_statusMessage;
