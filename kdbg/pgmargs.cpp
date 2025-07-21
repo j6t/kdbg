@@ -7,11 +7,11 @@
 #include "pgmargs.h"
 #include <klocalizedstring.h>		/* i18n */
 #include <QFileDialog>
+#include <QStringList>
 #include "mydebug.h"
 
 PgmArgs::PgmArgs(QWidget* parent, const QString& pgm,
-		 const std::map<QString,QString>& envVars,
-		 const QStringList& allOptions) :
+		 const std::map<QString,QString>& envVars) :
 	QDialog(parent)
 {
     setupUi(this);
@@ -20,17 +20,6 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm,
 	QFileInfo fi(pgm);
 	QString newText = labelArgs->text().arg(fi.fileName());
 	labelArgs->setText(newText);
-    }
-
-    // add options only if the option list is non-empty
-    if (!allOptions.isEmpty()) 
-    {
-	xsldbgOptions->addItems(allOptions);
-    }
-    else
-    {
-	delete xsldbgOptionsPage;
-	xsldbgOptionsPage = 0;
     }
 
     EnvVar val;
@@ -48,34 +37,6 @@ PgmArgs::PgmArgs(QWidget* parent, const QString& pgm,
 
 PgmArgs::~PgmArgs()
 {
-}
-
-// initializes the selected options
-void PgmArgs::setOptions(const QSet<QString>& selectedOptions)
-{
-    if (xsldbgOptionsPage == 0)
-	return;
-
-    for (int i = 0; i < xsldbgOptions->count(); i++) {
-	if (selectedOptions.contains(xsldbgOptions->item(i)->text()))
-	{
-	    xsldbgOptions->item(i)->setSelected(true);
-	}
-    }
-}
-
-// returns the selected options
-QSet<QString> PgmArgs::options() const
-{
-    QSet<QString> sel;
-    if (xsldbgOptionsPage != 0)
-    {
-	for (int i = 0; i < xsldbgOptions->count(); i++) {
-	    if (xsldbgOptions->item(i)->isSelected())
-		sel.insert(xsldbgOptions->item(i)->text());
-	}
-    }
-    return sel;
 }
 
 // this is a slot

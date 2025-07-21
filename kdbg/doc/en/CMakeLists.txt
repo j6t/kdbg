@@ -15,6 +15,5 @@ install(FILES
 	tips.html
 	types.html
 	watches.html
-	xslt.html
 	index.html
 	DESTINATION ${KDE_INSTALL_DOCBUNDLEDIR}/en/kdbg)

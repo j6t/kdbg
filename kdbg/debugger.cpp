@@ -355,14 +355,11 @@ bool KDebugger::isCpuTargetX86() const
 void KDebugger::programArgs(QWidget* parent)
 {
     if (m_haveExecutable) {
-	QStringList allOptions = m_d->boolOptionList();
-	PgmArgs dlg(parent, m_executable, m_envVars, allOptions);
+	PgmArgs dlg(parent, m_executable, m_envVars);
 	dlg.setArgs(m_programArgs);
 	dlg.setWd(m_programWD);
-	dlg.setOptions(m_boolOptions);
 	if (dlg.exec()) {
-	    updateProgEnvironment(dlg.args(), dlg.wd(),
-				  dlg.envVars(), dlg.options());
+	    updateProgEnvironment(dlg.args(), dlg.wd(), dlg.envVars());
 	}
     }
 }
@@ -763,7 +760,6 @@ const char WatchGroup[] = "Watches";
 const char FileVersion[] = "FileVersion";
 const char ProgramArgs[] = "ProgramArgs";
 const char WorkingDirectory[] = "WorkingDirectory";
-const char OptionsSelected[] = "OptionsSelected";
 const char Variable[] = "Var%d";
 const char Value[] = "Value%d";
 const char ExprFmt[] = "Expr%d";
@@ -775,7 +771,6 @@ void KDebugger::saveProgramSettings()
     gg.writeEntry(FileVersion, 1);
     gg.writeEntry(ProgramArgs, m_programArgs);
     gg.writeEntry(WorkingDirectory, m_programWD);
-    gg.writeEntry(OptionsSelected, m_boolOptions.values());
     gg.writeEntry(DebuggerCmdStr, m_debuggerCmd);
     gg.writeEntry(TTYLevelEntry, int(m_ttyLevel));
     gg.writeEntry(DisassemblyFlavor, m_flavor);
@@ -835,8 +830,6 @@ void KDebugger::restoreProgramSettings()
     // m_ttyLevel has been read in already
     QString pgmArgs = gg.readEntry(ProgramArgs);
     QString pgmWd = gg.readEntry(WorkingDirectory);
-    auto boolOptions = gg.readEntry(OptionsSelected, QStringList());
-    m_boolOptions.clear();
     m_flavor = gg.readEntry(DisassemblyFlavor, QString{});
 
     // read environment variables
@@ -864,8 +857,7 @@ void KDebugger::restoreProgramSettings()
 
     submitDisassemblyFlavor();
 
-    updateProgEnvironment(pgmArgs, pgmWd, pgmVars,
-			QSet<QString>(boolOptions.begin(), boolOptions.end()));
+    updateProgEnvironment(pgmArgs, pgmWd, pgmVars);
 
     restoreBreakpoints(m_programConfig);
 
@@ -1009,7 +1001,6 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	// there is no output
     case DCsetenv:
     case DCunsetenv:
-    case DCsetoption:
 	/* if value is empty, we see output, but we don't care */
 	break;
     case DCcd:
@@ -1292,8 +1283,7 @@ void KDebugger::updateAllExprs()
 }
 
 void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
-				      const std::map<QString,EnvVar>& newVars,
-				      const QSet<QString>& newOptions)
+				      const std::map<QString,EnvVar>& newVars)
 {
     m_programArgs = args;
     m_d->executeCmd(DCsetargs, m_programArgs);
@@ -1329,19 +1319,6 @@ void KDebugger::updateProgEnvironment(const QString& args, const QString& wd,
 	    break;
 	}
     }
-
-    // update options
-    foreach (QString opt, newOptions - m_boolOptions)
-    {
-	// option is not set, set it
-	m_d->executeCmd(DCsetoption, opt, 1);
-    }
-    foreach (QString opt, m_boolOptions - newOptions)
-    {
-	// option is set, unset it
-	m_d->executeCmd(DCsetoption, opt, 0);
-    }
-    m_boolOptions = newOptions;
 }
 
 void KDebugger::handleLocals(const char* output)
@@ -2001,8 +1978,6 @@ void KDebugger::updateBreakList(const char* output)
 	if (i != m_brkpts.end())
 	{
 	    // preserve accurate location information
-	    // note that xsldbg doesn't have a location in
-	    // the listed breakpoint if it has just been set
 	    // therefore, we copy it as well if necessary
 	    bp->text = i->text;
 	    if (!i->fileName.isEmpty()) {

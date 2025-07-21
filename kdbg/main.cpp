@@ -33,9 +33,6 @@ int main(int argc, char** argv)
 			 "https://www.kdbg.org/",
 			 "j6t@kdbg.org");
     aboutData.addAuthor(i18n("Johannes Sixt"), QString(), "j6t@kdbg.org");
-    aboutData.addCredit(i18n("Keith Isdale"),
-			i18n("XSLT debugging"),
-			"k_isdale@tpg.com.au");
     aboutData.addCredit(i18n("Daniel Kristjansson"),
 			i18n("Register groups and formatting"),
 			"danielk@cat.nyu.edu");
@@ -61,13 +58,9 @@ int main(int argc, char** argv)
     auto opt = [&](const char* opt, QString desc, const char* arg) {
 	parser.addOption(QCommandLineOption(QStringList() << QLatin1String(opt), desc, QLatin1String(arg)));
     };
-    auto opt0 = [&](const char* opt, QString desc) {
-	parser.addOption(QCommandLineOption(QStringList() << QLatin1String(opt), desc));
-    };
     opt("t", i18n("transcript of conversation with the debugger"), "file");
     opt("r", i18n("remote debugging via <device>"), "device");
-    opt("l", i18n("specify language: C, XSLT"), "language");
-    opt0("x", i18n("use language XSLT (deprecated)"));
+    opt("l", i18n("specify language: C"), "language");
     opt("a", i18n("specify arguments of debugged executable"), "args");
     opt("p", i18n("specify PID of process to debug"), "pid");
     parser.addPositionalArgument(QLatin1String("[program]"), i18n("path of executable to debug"));
@@ -103,12 +96,6 @@ int main(int argc, char** argv)
 	debugger->setRemoteDevice(remote);
 
     QString lang = parser.value("l");
-
-    // deprecated option; overrides -l
-    if (parser.isSet("x")){
-         /* run in xsldbg mode  */
-         lang = "xslt";
-    }
 
     // check environment variable for transcript file name
     if (transcript.isEmpty()) {

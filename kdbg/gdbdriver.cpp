@@ -85,7 +85,6 @@ static GdbCmdInfo cmds[] = {
     { DCsetargs, "set args %s\n", GdbCmdInfo::argString },
     { DCsetenv, "set env %s %s\n", GdbCmdInfo::argString2 },
     { DCunsetenv, "unset env %s\n", GdbCmdInfo::argString },
-    { DCsetoption, "setoption %s %d\n", GdbCmdInfo::argStringNum},
     { DCcd, "cd %s\n", GdbCmdInfo::argString },
     { DCbt, "bt\n", GdbCmdInfo::argNone },
     { DCrun, "run\n", GdbCmdInfo::argNone },
@@ -214,12 +213,6 @@ QString GdbDriver::defaultInvocation() const
     } else {
 	return m_defaultCmd;
     }
-}
-
-QStringList GdbDriver::boolOptionList() const
-{
-    // no options
-    return QStringList();
 }
 
 bool GdbDriver::startup(QString cmdStr)

@@ -19,7 +19,6 @@ public:
     
     QString driverName() const override;
     QString defaultInvocation() const override;
-    QStringList boolOptionList() const override;
     void setDefaultInvocation(QString cmd) { m_defaultCmd = cmd; }
     static QString defaultGdb();
     bool startup(QString cmdStr) override;

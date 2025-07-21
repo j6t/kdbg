@@ -289,20 +289,6 @@
        </item>
       </layout>
      </widget>
-     <widget class="QWidget" name="xsldbgOptionsPage">
-      <attribute name="title">
-       <string>&amp;xsldbg Options</string>
-      </attribute>
-      <layout class="QHBoxLayout">
-       <item>
-        <widget class="QListWidget" name="xsldbgOptions">
-         <property name="selectionMode">
-          <enum>QAbstractItemView::MultiSelection</enum>
-         </property>
-        </widget>
-       </item>
-      </layout>
-     </widget>
     </widget>
    </item>
    <item>
@@ -326,7 +312,6 @@
   <tabstop>buttonModify</tabstop>
   <tabstop>buttonDelete</tabstop>
   <tabstop>envList</tabstop>
-  <tabstop>xsldbgOptions</tabstop>
  </tabstops>
  <resources/>
  <connections>
