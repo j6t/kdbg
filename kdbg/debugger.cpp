@@ -799,7 +799,7 @@ void KDebugger::saveProgramSettings()
     // then start a new group
     KConfigGroup wg = m_programConfig->group(WatchGroup);
     int watchNum = 0;
-    foreach (QString expr, m_watchVariables.exprList()) {
+    for (const QString& expr : m_watchVariables.exprList()) {
 	varName = QString::asprintf(ExprFmt, watchNum++);
 	wg.writeEntry(varName, expr);
     }
@@ -1274,7 +1274,7 @@ void KDebugger::updateAllExprs()
     }
 
     // update watch expressions
-    foreach (QString expr, m_watchVariables.exprList()) {
+    for (const QString& expr : m_watchVariables.exprList()) {
 	m_watchEvalExpr.push_back(expr);
     }
 }

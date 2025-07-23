@@ -614,7 +614,7 @@ void RegisterView::contextMenuEvent(QContextMenuEvent* event)
     if (item) {
 	RegisterDisplay mode = static_cast<ModeItem*>(item)->mode();
 	int i = 0;
-	foreach(QAction* action, m_modemenu->actions())
+	for (QAction* action : m_modemenu->actions())
 	{
 	    action->setChecked(mode.contains(menuitems[i].mode));
 	    ++i;

@@ -355,7 +355,7 @@ void DebuggerMainWnd::initKAction()
 
     // all actions force an UI update
     QList<QAction*> actions = actionCollection()->actions();
-    foreach(QAction* action, actions) {
+    for (QAction* action : actions) {
 	connect(action, SIGNAL(triggered()), this, SLOT(updateUI()));
     }
 }
