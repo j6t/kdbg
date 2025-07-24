@@ -316,11 +316,11 @@ void DebuggerMainWnd::initKAction()
 			this, SLOT(slotExecUntil()), "exec_run_to_cursor");
     connect(m_toCursorAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
     m_stepIntoIAction = createAction(i18n("Step i&nto by instruction"),
-			"debug-step-into-instruction", Qt::SHIFT+Qt::Key_F8,
+			"debug-step-into-instruction", Qt::SHIFT | Qt::Key_F8,
 			m_debugger, SLOT(programStepi()), "exec_step_into_by_insn");
     connect(m_stepIntoIAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
     m_stepOverIAction = createAction(i18n("Step o&ver by instruction"),
-			"debug-step-instruction", Qt::SHIFT+Qt::Key_F10,
+			"debug-step-instruction", Qt::SHIFT | Qt::Key_F10,
 			m_debugger, SLOT(programNexti()), "exec_step_over_by_insn");
     connect(m_stepOverIAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
     m_execMovePCAction = createAction(i18n("&Program counter to current line"),
@@ -342,9 +342,9 @@ void DebuggerMainWnd::initKAction()
     // breakpoint menu
     m_bpSetAction = createAction(i18n("Set/Clear &breakpoint"), "brkpt", Qt::Key_F9,
 			m_filesWindow, SLOT(slotBrkptSet()), "breakpoint_set");
-    m_bpSetTempAction = createAction(i18n("Set &temporary breakpoint"), Qt::SHIFT+Qt::Key_F9,
+    m_bpSetTempAction = createAction(i18n("Set &temporary breakpoint"), Qt::SHIFT | Qt::Key_F9,
 			m_filesWindow, SLOT(slotBrkptSetTemp()), "breakpoint_set_temporary");
-    m_bpEnableAction = createAction(i18n("&Enable/Disable breakpoint"), Qt::CTRL+Qt::Key_F9,
+    m_bpEnableAction = createAction(i18n("&Enable/Disable breakpoint"), Qt::CTRL | Qt::Key_F9,
 			m_filesWindow, SLOT(slotBrkptEnable()), "breakpoint_enable");
 
     // only in popup menus
