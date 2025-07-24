@@ -833,7 +833,7 @@ void SourceWindow::contextMenuEvent(QContextMenuEvent* e)
     QWidget* top = this;
     do
 	top = top->parentWidget();
-    while (!top->isTopLevel());
+    while (!top->isWindow());
     KXmlGuiWindow* mw = static_cast<KXmlGuiWindow*>(top);
     QMenu* m = static_cast<QMenu*>(mw->factory()->container("popup_files", mw));
     if (m)
