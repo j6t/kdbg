@@ -10,13 +10,13 @@
 #include <QTreeWidget>
 #include <QLineEdit>
 #include <QPixmap>
+#include <QStringList>
 #include <list>
 
 class ProgramTypeTable;
 struct TypeInfo;
 struct ExprValue;
 class ExprWnd;
-class QStringList;
 
 /*! \brief a variable's value is the tree of sub-variables */
 class VarTree : public QTreeWidgetItem

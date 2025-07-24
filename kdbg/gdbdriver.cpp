@@ -8,7 +8,6 @@
 #include "exprwnd.h"
 #include <QFileInfo>
 #include <QRegularExpression>
-#include <QStringList>
 #include <klocalizedstring.h>		/* i18n */
 #include <ctype.h>
 #include <signal.h>

@@ -10,6 +10,7 @@
 #include <QFile>
 #include <QByteArray>
 #include <QProcess>
+#include <QStringList>
 #include <queue>
 #include <list>
 
@@ -18,7 +19,6 @@ class VarTree;
 struct ExprValue;
 class ExprWnd;
 class KDebugger;
-class QStringList;
 
 
 /**

@@ -7,6 +7,7 @@
 #include "procattach.h"
 #include <QHeaderView>
 #include <QProcess>
+#include <QStringList>
 #include <QTreeWidget>
 #include <ctype.h>
 #include <klocalizedstring.h>		/* i18n */

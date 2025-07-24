@@ -7,7 +7,6 @@
 #include "exprwnd.h"
 #include "typetable.h"
 #include <QHeaderView>
-#include <QStringList>
 #include <QPainter>
 #include <QPaintEvent>
 #include <QFocusEvent>

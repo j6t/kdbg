@@ -11,6 +11,7 @@
 #include <QBitmap>
 #include <QHeaderView>
 #include <QPainter>
+#include <QStringList>
 
 
 class ThreadEntry : public QTreeWidgetItem, public ThreadInfo
