@@ -1193,7 +1193,7 @@ static bool parseName(const char*& s, QString& name, VarTree::NameKind& kind)
 
 static bool parseValue(const char*& s, ExprValue* variable)
 {
-    variable->m_value = "";
+    variable->m_value.clear();
 
 repeat:
     if (*s == '{') {
@@ -1711,7 +1711,7 @@ static void parseFrameInfo(const char*& s, QString& func,
 	    if (*p != '\0')
 		p++;
 	}
-	file = "";
+	file.clear();
 	lineNo = -1;
     }
     // construct the function name (including file info)

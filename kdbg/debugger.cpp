@@ -706,7 +706,7 @@ void KDebugger::gdbExited()
 
     // reset state
     m_haveExecutable = false;
-    m_executable = "";
+    m_executable.clear();
     m_programActive = false;
     m_programRunning = false;
     m_explicitKill = false;
@@ -1039,8 +1039,8 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	} else {
 	    QString msg = m_d->driverName() + ": " + m_statusMessage;
 	    KMessageBox::error(parentWidget(), msg);
-	    m_executable = "";
-	    m_corefile = "";		/* don't process core file */
+	    m_executable.clear();
+	    m_corefile.clear();		/* don't process core file */
 	    m_haveExecutable = false;
 	}
 	break;

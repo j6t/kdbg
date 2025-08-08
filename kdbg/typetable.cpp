@@ -21,9 +21,9 @@ bool typeTablesInited = false;
 
 
 //! an indentifier for wchar_t
-TypeInfo TypeInfo::m_wchartType("");
+TypeInfo TypeInfo::m_wchartType(QString{});
 //! the unknown type
-TypeInfo TypeInfo::m_unknownType("");
+TypeInfo TypeInfo::m_unknownType(QString{});
 
 
 void TypeTable::initTypeLibraries()

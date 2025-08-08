@@ -523,7 +523,7 @@ void ExprWnd::updateStructValue(VarTree* display)
 
     display->updateStructValue(display->m_partialValue);
     // reset the value
-    display->m_partialValue = "";
+    display->m_partialValue.clear();
     display->m_exprIndex = -1;
 }
 

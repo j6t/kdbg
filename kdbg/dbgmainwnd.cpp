@@ -413,7 +413,7 @@ bool DebuggerMainWnd::queryClose()
 void DebuggerMainWnd::saveProperties(KConfigGroup& cg)
 {
     // session management
-    QString executable = "";
+    QString executable;
     if (m_debugger) {
 	executable = m_debugger->executable();
     }
@@ -427,7 +427,7 @@ void DebuggerMainWnd::readProperties(const KConfigGroup& cg)
 
     TRACE("readProperties: executable=" + execName);
     if (!execName.isEmpty()) {
-	debugProgram(execName, "");
+	debugProgram(execName, QString());
     }
 }
 
@@ -1080,7 +1080,7 @@ void DebuggerMainWnd::slotBackTimer()
 void DebuggerMainWnd::slotRecentExec(const QUrl& url)
 {
     QString exe = url.toLocalFile();
-    debugProgram(exe, "");
+    debugProgram(exe, QString());
 }
 
 QString DebuggerMainWnd::makeSourceFilter()
@@ -1188,7 +1188,7 @@ void DebuggerMainWnd::slotFileExe()
 	if (executable.isEmpty())
 	    return;
 
-	debugProgram(executable, "");
+	debugProgram(executable, QString());
     }
 }
 

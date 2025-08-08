@@ -48,7 +48,7 @@ PrefDebugger::PrefDebugger(QWidget* parent) :
     m_disassLabel.setMinimumSize(m_disassLabel.sizeHint());
     m_disassLabel.setBuddy(&m_disassCombo);
 
-    m_disassCombo.addItem(i18n("Default"), "");
+    m_disassCombo.addItem(i18n("Default"), QString());
     m_disassCombo.addItem(i18n("ATT"), "att");
     m_disassCombo.addItem(i18n("Intel"), "intel");
 
