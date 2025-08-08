@@ -38,8 +38,8 @@ ChooseDriver::ChooseDriver(QWidget* parent) :
 
     m_disassComboBox = new QComboBox(this);
     m_disassComboBox->addItem(i18n("Global Setting"), QString());
-    m_disassComboBox->addItem(i18n("ATT"), "att");
-    m_disassComboBox->addItem(i18n("Intel"), "intel");
+    m_disassComboBox->addItem(i18n("ATT"), QStringLiteral("att"));
+    m_disassComboBox->addItem(i18n("Intel"), QStringLiteral("intel"));
 
     QLabel* disassLabel = new QLabel(i18n("Disassembly flavor:"), this);
     disassLabel->setMinimumSize(disassLabel->sizeHint());

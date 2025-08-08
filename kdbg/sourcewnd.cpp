@@ -37,13 +37,13 @@ SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
     setCenterOnScroll(true);
 
     // load pixmaps
-    m_pcinner = KIconLoader::global()->loadIcon("pcinner", KIconLoader::User);
-    m_pcup = KIconLoader::global()->loadIcon("pcup", KIconLoader::User);
-    m_brkena = KIconLoader::global()->loadIcon("brkena", KIconLoader::User);
-    m_brkdis = KIconLoader::global()->loadIcon("brkdis", KIconLoader::User);
-    m_brktmp = KIconLoader::global()->loadIcon("brktmp", KIconLoader::User);
-    m_brkcond = KIconLoader::global()->loadIcon("brkcond", KIconLoader::User);
-    m_brkorph = KIconLoader::global()->loadIcon("brkorph", KIconLoader::User);
+    m_pcinner = KIconLoader::global()->loadIcon(QStringLiteral("pcinner"), KIconLoader::User);
+    m_pcup = KIconLoader::global()->loadIcon(QStringLiteral("pcup"), KIconLoader::User);
+    m_brkena = KIconLoader::global()->loadIcon(QStringLiteral("brkena"), KIconLoader::User);
+    m_brkdis = KIconLoader::global()->loadIcon(QStringLiteral("brkdis"), KIconLoader::User);
+    m_brktmp = KIconLoader::global()->loadIcon(QStringLiteral("brktmp"), KIconLoader::User);
+    m_brkcond = KIconLoader::global()->loadIcon(QStringLiteral("brkcond"), KIconLoader::User);
+    m_brkorph = KIconLoader::global()->loadIcon(QStringLiteral("brkorph"), KIconLoader::User);
     setFont(QFontDatabase::systemFont(QFontDatabase::FixedFont));
     setReadOnly(true);
     setViewportMargins(lineInfoAreaWidth(), 0, 0 ,0);
@@ -53,7 +53,7 @@ SourceWindow::SourceWindow(const QString& fileName, QWidget* parent) :
     connect(this, SIGNAL(cursorPositionChanged()), this, SLOT(cursorChanged()));
 
     // add a syntax highlighter
-    if (QRegularExpression("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h|pp)?|HH?)$").match(m_fileName).hasMatch())
+    if (QRegularExpression(QStringLiteral("\\.(c(pp|c|\\+\\+)?|CC?|h(\\+\\+|h|pp)?|HH?)$")).match(m_fileName).hasMatch())
     {
 	m_highlighter = new HighlightCpp(this);
     }
@@ -441,7 +441,7 @@ QString SourceWindow::extendExpr(const QString &plainText,
 {
     QString document = plainText.left(wordEnd);
     QString word     = plainText.mid(wordStart, wordEnd - wordStart);
-    QRegularExpression regex("(::)?([A-Za-z_]{1}\\w*\\s*(->|\\.|::)\\s*)*" + word + "$");
+    QRegularExpression regex(QStringLiteral("(::)?([A-Za-z_]{1}\\w*\\s*(->|\\.|::)\\s*)*") + word + QLatin1Char('$'));
 
     #define IDENTIFIER_MAX_SIZE 256
     // cut the document to reduce size of string to scan
@@ -478,7 +478,7 @@ bool SourceWindow::wordAtPoint(const QPoint& p, QString& word, QRect& r)
 	return false;
 
     // keep only letters and digits
-    QRegularExpression w("[A-Za-z_]{1}[\\dA-Za-z_]*");
+    QRegularExpression w(QStringLiteral("[A-Za-z_]{1}[\\dA-Za-z_]*"));
     auto res = w.match(word);
     if (!res.hasMatch())
 	return false;
@@ -835,7 +835,7 @@ void SourceWindow::contextMenuEvent(QContextMenuEvent* e)
 	top = top->parentWidget();
     while (!top->isWindow());
     KXmlGuiWindow* mw = static_cast<KXmlGuiWindow*>(top);
-    QMenu* m = static_cast<QMenu*>(mw->factory()->container("popup_files", mw));
+    QMenu* m = static_cast<QMenu*>(mw->factory()->container(QStringLiteral("popup_files"), mw));
     if (m)
 	m->exec(e->globalPos());
 }
@@ -998,7 +998,7 @@ int HighlightCpp::highlight(const QString& text, int state)
 	    setFormat(start, end-start, QColor("gray"));
 	    break;
 	case hlCommentBlock:
-	    end = text.indexOf("*/", start);
+	    end = text.indexOf(QStringLiteral("*/"), start);
 	    if (end >= 0)
 		end += 2, state = 0;
 	    else

@@ -20,27 +20,28 @@
 int main(int argc, char** argv)
 {
     QApplication app(argc, argv);
-    app.setApplicationName(QStringLiteral("kdbg"));
+    const auto strKdbg = QStringLiteral("kdbg");
+    app.setApplicationName(strKdbg);
     KLocalizedString::setApplicationDomain("kdbg");
 
-    KAboutData aboutData("kdbg", i18n("KDbg"),
-			 KDBG_VERSION,
+    KAboutData aboutData(strKdbg, i18n("KDbg"),
+			 QStringLiteral(KDBG_VERSION),
 			 i18n("A Debugger"),
 			 KAboutLicense::GPL_V2,
 			 i18n("(c) 1998-2023 Johannes Sixt"),
 			 QString(),	/* any text */
-			 "https://www.kdbg.org/",
-			 "j6t@kdbg.org");
-    aboutData.addAuthor(i18n("Johannes Sixt"), QString(), "j6t@kdbg.org");
+			 QStringLiteral("https://www.kdbg.org/"),
+			 QStringLiteral("j6t@kdbg.org"));
+    aboutData.addAuthor(i18n("Johannes Sixt"), QString(), QStringLiteral("j6t@kdbg.org"));
     aboutData.addCredit(i18n("Daniel Kristjansson"),
 			i18n("Register groups and formatting"),
-			"danielk@cat.nyu.edu");
+			QStringLiteral("danielk@cat.nyu.edu"));
     aboutData.addCredit(i18n("David Edmundson"),
 			i18n("KDE4 porting"),
-			"david@davidedmundson.co.uk");
+			QStringLiteral("david@davidedmundson.co.uk"));
     aboutData.addCredit(i18n("Sebastian Pipping"),
 			i18n("GitHub Actions CI"),
-			"sebastian@pipping.org");
+			QStringLiteral("sebastian@pipping.org"));
     KAboutData::setApplicationData(aboutData);
 
     /* take component name and org. name from KAboutData */
@@ -71,7 +72,7 @@ int main(int argc, char** argv)
     aboutData.processCommandLine(&parser);
 
     DebuggerMainWnd* debugger = new DebuggerMainWnd;
-    debugger->setObjectName("mainwindow");
+    debugger->setObjectName(QStringLiteral("mainwindow"));
 
     /* type libraries */
     TypeTable::initTypeLibraries();

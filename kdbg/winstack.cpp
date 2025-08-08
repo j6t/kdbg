@@ -49,7 +49,7 @@ void WinStack::contextMenuEvent(QContextMenuEvent* e)
     while (!top->isWindow());
     KXmlGuiWindow* mw = static_cast<KXmlGuiWindow*>(top);
     QMenu* m =
-	static_cast<QMenu*>(mw->factory()->container("popup_files_empty", mw));
+	static_cast<QMenu*>(mw->factory()->container(QStringLiteral("popup_files_empty"), mw));
     m->exec(e->globalPos());
 }
 

@@ -393,9 +393,9 @@ QString convertRaw(const RegisterInfo reg, RegisterDisplay mode)
     if (RegisterDisplay::nada != mode.presentationFlag() &&
 	reg.rawValue.length() > 2 && reg.rawValue[0] == QLatin1Char('0') && reg.rawValue[1] == QLatin1Char('x'))
     {
-	if ("uint128" == reg.type)
+	if (QStringLiteral("uint128") == reg.type)
 	    totalNibles = 32;
-	else if ("uint64" == reg.type)
+	else if (QStringLiteral("uint64") == reg.type)
 	    totalNibles = 16;
 	else if (reg.type.isEmpty())
 	    totalNibles = nibles;
@@ -413,7 +413,7 @@ QString convertRaw(const RegisterInfo reg, RegisterDisplay mode)
 
 	QString separator(QLatin1Char(','));	// locale-specific?
 	for (int nib = totalNibles - nibles; nib >= 0; nib -= nibles) {
-	    QString qstr = convertSingle(raw.mid(nib, nibles).prepend("0x"), mode);
+	    QString qstr = convertSingle(raw.mid(nib, nibles).prepend(QStringLiteral("0x")), mode);
 
 	    if (nib == int(totalNibles - nibles))
 		cooked = qstr + cooked;
@@ -460,7 +460,7 @@ RegisterView::RegisterView(QWidget* parent) :
 
     setAllColumnsShowFocus(true);
 
-    m_modemenu = new QMenu("ERROR", this);
+    m_modemenu = new QMenu(QStringLiteral("ERROR"), this);
     for (uint i = 0; i < sizeof(menuitems) / sizeof(MenuPair); i++) {
 	if (menuitems[i].isSeparator())
 	    m_modemenu->addSeparator();
@@ -480,17 +480,17 @@ RegisterView::RegisterView(QWidget* parent) :
     new GroupingViewItem(this, i18n("x86/x87 segment"),
 			 "(cs|ss|ds|es|fs|gs|fiseg|foseg)",
 			 RegisterDisplay::nada);
-    new GroupingViewItem(this, "x87", "st.*",
+    new GroupingViewItem(this, QStringLiteral("x87"), "st.*",
 			 RegisterDisplay::bits80 | RegisterDisplay::realE);
-    new GroupingViewItem(this, "SSE", "xmm.*",
+    new GroupingViewItem(this, QStringLiteral("SSE"), "xmm.*",
 			 RegisterDisplay::bits32 | RegisterDisplay::realE);
-    new GroupingViewItem(this, "MMX", "mm.*",
+    new GroupingViewItem(this, QStringLiteral("MMX"), "mm.*",
 			 RegisterDisplay::bits32 | RegisterDisplay::realE);
-    new GroupingViewItem(this, "POWER real", "fpr.*",
+    new GroupingViewItem(this, QStringLiteral("POWER real"), "fpr.*",
 			 RegisterDisplay::bits32 | RegisterDisplay::realE);
-    new GroupingViewItem(this, "AltiVec", "vr.*",
+    new GroupingViewItem(this, QStringLiteral("AltiVec"), "vr.*",
 			 RegisterDisplay::bits32 | RegisterDisplay::realE);
-    new GroupingViewItem(this, "MIPS VU", "vu.*",
+    new GroupingViewItem(this, QStringLiteral("MIPS VU"), "vu.*",
 			 RegisterDisplay::bits32 | RegisterDisplay::realE);
 
     updateGroupVisibility();

@@ -140,9 +140,9 @@ void ProcAttachPS::pushLine()
 	{
 	    // we don't allocate the PID and PPID columns,
 	    // but we need to know where in the ps output they are
-	    if (m_line[i] == "PID") {
+	    if (m_line[i] == QStringLiteral("PID")) {
 		m_pidCol = i;
-	    } else if (m_line[i] == "PPID") {
+	    } else if (m_line[i] == QStringLiteral("PPID")) {
 		m_ppidCol = i;
 	    } else if (allocate) {
 		processList->headerItem()->setText(i+1, m_line[i]);

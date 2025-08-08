@@ -235,8 +235,8 @@ void VarTree::inferTypesOfChildren(ProgramTypeTable& typeTable)
 // the value contains the pointer type in parenthesis
 bool VarTree::isWcharT() const
 {
-    return value().startsWith("(const wchar_t *)") ||
-	    value().startsWith("(wchar_t *)");
+    return value().startsWith(QStringLiteral("(const wchar_t *)")) ||
+	    value().startsWith(QStringLiteral("(wchar_t *)"));
 }
 
 /*
@@ -324,7 +324,7 @@ ExprWnd::ExprWnd(QWidget* parent, const QString& colHeader) :
     setRootIsDecorated(true);
     setAllColumnsShowFocus(true);
 
-    m_pixPointer = KIconLoader::global()->loadIcon("pointer.xpm", KIconLoader::User);
+    m_pixPointer = KIconLoader::global()->loadIcon(QStringLiteral("pointer.xpm"), KIconLoader::User);
     if (m_pixPointer.isNull())
 	TRACE("Can't load pointer.xpm");
 }
@@ -582,10 +582,10 @@ void ExprWnd::checkUnknownType(VarTree* var)
 
 QString ExprWnd::formatWCharPointer(QString value)
 {
-    int pos = value.indexOf(") ");
+    int pos = value.indexOf(QStringLiteral(") "));
     if (pos > 0)
 	value = value.mid(pos+2);
-    return value + " L";
+    return value + QStringLiteral(" L");
 }
 
 
@@ -722,7 +722,7 @@ void ExprWnd::editValue(VarTree* item, const QString& text)
      * less than half of it if the text is shorter).
      */
     QFontMetrics metr(m_edit->font());
-    int wMin = metr.horizontalAdvance("88888");
+    int wMin = metr.horizontalAdvance(QStringLiteral("88888"));
     if (w < wMin)
 	w = wMin;
     int wThis = viewport()->width();

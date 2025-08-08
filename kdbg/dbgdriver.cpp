@@ -426,7 +426,7 @@ QString DbgAddr::asString() const
     if (a.isEmpty())
 	return QString();
     else
-	return "0x" + a;
+	return QStringLiteral("0x") + a;
 }
 
 bool operator==(const DbgAddr& a1, const DbgAddr& a2)

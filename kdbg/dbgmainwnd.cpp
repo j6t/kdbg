@@ -178,7 +178,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	    this, SLOT(slotLocalsPopup(const QPoint&)));
 
     makeDefaultLayout();
-    setupGUI(KXmlGuiWindow::Default, "kdbgui.rc");
+    setupGUI(KXmlGuiWindow::Default, QStringLiteral("kdbgui.rc"));
     restoreSettings(KSharedConfig::openConfig());
 
     // The animation button is not part of the restored window state.
@@ -258,7 +258,7 @@ void DebuggerMainWnd::initKAction()
 			this, SLOT(slotFileExe()), "file_executable");
     m_recentExecAction = KStandardAction::openRecent(this, SLOT(slotRecentExec(const QUrl&)),
 		      actionCollection());
-    m_recentExecAction->setObjectName("file_executable_recent");
+    m_recentExecAction->setObjectName(QStringLiteral("file_executable_recent"));
     m_recentExecAction->setText(i18n("Recent E&xecutables"));
     m_coreDumpAction = createAction(i18n("&Core Dump..."), 0,
 			this, SLOT(slotFileCore()), "file_core_dump");
@@ -367,11 +367,11 @@ void DebuggerMainWnd::updateToolButtonStyle(Qt::ToolButtonStyle style)
 
 void DebuggerMainWnd::initAnimation()
 {
-    KToolBar* toolbar = toolBar("mainToolBar");
+    KToolBar* toolbar = toolBar(QStringLiteral("mainToolBar"));
     m_animation = new KAnimatedButton(toolbar);
     updateToolButtonStyle(toolbar->toolButtonStyle());
     toolbar->addWidget(m_animation);
-    m_animation->setAnimationPath(KIconLoader::global()->moviePath("pulse", KIconLoader::Toolbar));
+    m_animation->setAnimationPath(KIconLoader::global()->moviePath(QStringLiteral("pulse"), KIconLoader::Toolbar));
     connect(m_animation, SIGNAL(clicked(bool)), m_debugger, SLOT(programBreak()));
     m_animRunning = false;
 
@@ -789,7 +789,7 @@ DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
  */
 QString DebuggerMainWnd::driverNameFromFile(const QString&)
 {
-    return "GDB";
+    return QStringLiteral("GDB");
 }
 
 void DebuggerMainWnd::setCoreFile(const QString& corefile)
@@ -994,7 +994,7 @@ QString DebuggerMainWnd::createOutputWindow()
 	shellScript = shellScriptFmt;
     }
 
-    shellScript.replace("%s", fifoName);
+    shellScript.replace(QStringLiteral("%s"), fifoName);
     TRACE("output window script is " + shellScript);
 
     QString title = QGuiApplication::applicationDisplayName();
@@ -1099,7 +1099,7 @@ QString DebuggerMainWnd::makeSourceFilter()
  */
 void DebuggerMainWnd::slotLocalsPopup(const QPoint& pt)
 {
-    QMenu* popup = static_cast<QMenu*>(factory()->container("popup_locals", this));
+    QMenu* popup = static_cast<QMenu*>(factory()->container(QStringLiteral("popup_locals"), this));
     if (!popup) {
         return;
     }

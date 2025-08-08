@@ -38,7 +38,7 @@ void TypeTable::loadTypeTables()
     typeTablesInited = true;
 
     std::map<QString,QString> files;
-    for (const QString& dir: QStandardPaths::locateAll(QStandardPaths::AppDataLocation, "types",
+    for (const QString& dir : QStandardPaths::locateAll(QStandardPaths::AppDataLocation, QStringLiteral("types"),
 					QStandardPaths::LocateDirectory))
     {
 	for (const QString& file: QDir(dir).entryList(QStringList() << QStringLiteral("*.kdbgtt")))
@@ -240,10 +240,10 @@ void ProgramTypeTable::loadTypeTable(TypeTable* table)
 
     // check whether to enable builtin QString support
     if (!m_parseQt2QStrings) {
-	m_parseQt2QStrings = table->isEnabledBuiltin("QString::Data");
+	m_parseQt2QStrings = table->isEnabledBuiltin(QStringLiteral("QString::Data"));
     }
     if (!m_QCharIsShort) {
-	m_QCharIsShort = table->isEnabledBuiltin("QCharIsShort");
+	m_QCharIsShort = table->isEnabledBuiltin(QStringLiteral("QCharIsShort"));
     }
     if (m_printQStringDataCmd.isEmpty()) {
 	m_printQStringDataCmd = table->printQStringDataCmd();

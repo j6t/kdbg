@@ -194,15 +194,16 @@ GdbDriver::~GdbDriver()
 
 QString GdbDriver::driverName() const
 {
-    return "GDB";
+    return QStringLiteral("GDB");
 }
 
 QString GdbDriver::defaultGdb()
 {
-    return
+    return QStringLiteral(
 	"gdb"
 	" --fullname"	/* to get standard file names each time the prog stops */
-	" --nx";	/* do not execute initialization files */
+	" --nx"		/* do not execute initialization files */
+    );
 }
 
 QString GdbDriver::defaultInvocation() const
@@ -291,12 +292,12 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
 	     * because at least OpenSUSE writes its own version number
 	     * in the first line (but before GDB's version number).
 	     */
-	    QRegularExpression re(
+	    QRegularExpression re(QStringLiteral(
 		" "			// must be preceded by space
 		"[(]?"			// SLES 10 embeds in parentheses
 		"(\\d+)\\.(\\d+)"	// major, minor
 		"[^ ]*\\n"		// no space until end of line
-		);
+		));
 	    auto res = re.match(m_output);
 	    const char* disass = "disassemble %s %s\n";
 	    if (res.hasMatch()) {
@@ -380,7 +381,7 @@ void GdbDriver::parseMarker(CmdQueueItem* cmd)
     *endMarker = '\0';
 
     // extract filename and line number
-    static QRegularExpression MarkerRE(":(\\d+):\\d+:[begmidl]+:0x");
+    static QRegularExpression MarkerRE(QStringLiteral(":(\\d+):\\d+:[begmidl]+:0x"));
 
     auto resMarker = MarkerRE.match(startMarker);
     if (resMarker.hasMatch()) {
@@ -583,7 +584,7 @@ void GdbDriver::detachAndTerminate()
 {
     ::kill(processId(), SIGINT);
     flushCommands();
-    executeCmdString(DCinitialize, "detach\nquit\n", true);
+    executeCmdString(DCinitialize, QStringLiteral("detach\nquit\n"), true);
 }
 
 void GdbDriver::interruptInferior()
@@ -690,7 +691,7 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
     if (strncmp(output, "Invalid number 0 of repetitions", 31) == 0)
     {
 	variable = new ExprValue(QString(), VarTree::NKplain);
-	variable->m_value = "\"\"";
+	variable->m_value = QStringLiteral("\"\"");
 	return variable;
     }
 
@@ -790,7 +791,7 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
 
 	    // fixup repeat count and lastThing
 	    if (repeats) {
-		result += "' ";
+		result += QStringLiteral("' ");
 		result += repeatCount;
 		lastThing = wasRepeat;
 	    } else {
@@ -811,12 +812,12 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
     else if (strncmp(p, "true", 4) == 0)
     {
 	variable = new ExprValue(QString(), VarTree::NKplain);
-	variable->m_value = "QString::null";
+	variable->m_value = QStringLiteral("QString::null");
     }
     else if (strncmp(p, "false", 5) == 0)
     {
 	variable = new ExprValue(QString(), VarTree::NKplain);
-	variable->m_value = "(null)";
+	variable->m_value = QStringLiteral("(null)");
     }
     else
 	goto error;
@@ -825,7 +826,7 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
 error:
     if (wantErrorValue) {
 	variable = new ExprValue(QString(), VarTree::NKplain);
-	variable->m_value = "internal parse error";
+	variable->m_value = QStringLiteral("internal parse error");
     }
     return variable;
 }
@@ -1571,7 +1572,7 @@ static bool parseValueSeq(const char*& s, ExprValue* variable)
 	// long arrays may be terminated by '...'
 	if (strncmp(s, "...", 3) == 0) {
 	    s += 3;
-	    ExprValue* var = new ExprValue("...", VarTree::NKplain);
+	    ExprValue* var = new ExprValue(QStringLiteral("..."), VarTree::NKplain);
 	    var->m_value = i18n("<additional entries of the array suppressed>");
 	    variable->appendChild(var);
 	    break;
@@ -2034,7 +2035,7 @@ std::list<ThreadInfo> GdbDriver::parseThreadList(const char* output)
 	if (strncmp(p, "[No stack.]", 11) != 0) {
 	    ::parseFrameInfo(p, thr.function, thr.fileName, thr.lineNo, thr.address);
 	} else {
-	    thr.function = "[No stack]";
+	    thr.function = QStringLiteral("[No stack]");
 	    thr.lineNo = -1;
 	    p += 11;			/* \n is skipped above */
 	}
@@ -2389,7 +2390,7 @@ bool GdbDriver::parseFindType(const char* output, QString& type)
     if (strncmp(output, "const ", 6) == 0)
         output += 6;
     type = output;
-    type.replace(QRegularExpression("\\s+"), "");
+    type.replace(QRegularExpression(QStringLiteral("\\s+")), {});
     if (type.endsWith(QLatin1Char('&')))
         type.truncate(type.length() - 1);
     return true;
@@ -2466,7 +2467,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 			QString rawValue = QString::fromLatin1(cur, end-cur).simplified();
 			reg.rawValue = rawValue;
 
-			if (rawValue.left(2)=="0x") {
+			if (rawValue.left(2) == QStringLiteral("0x")) {
 			    // ok we have a raw value, now get it's type
 			    end=cur-1;
 			    while (isspace(*end) || *end=='=') end--;
@@ -2520,7 +2521,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 	     * Here, the cooked value comes first, and the raw value is in
 	     * the second part.
 	     */
-	    int pos = value.indexOf(" (raw ");
+	    int pos = value.indexOf(QStringLiteral(" (raw "));
 	    if (pos >= 0)
 	    {
 		reg.cookedValue = value.left(pos);

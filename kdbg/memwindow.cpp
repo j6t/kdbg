@@ -49,7 +49,7 @@ MemoryWindow::MemoryWindow(QWidget* parent) :
     m_memory.setContextMenuPolicy(Qt::NoContextMenu);	// defer to parent
 
     // get row height
-    new QTreeWidgetItem(&m_memory, QStringList("0x179bf"));
+    new QTreeWidgetItem(&m_memory, QStringList(QStringLiteral("0x179bf")));
     m_memoryRowHeight = m_memory.visualRect(m_memory.indexAt(QPoint(0, 0))).height();
     m_memory.clear();
 

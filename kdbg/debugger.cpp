@@ -42,13 +42,13 @@ QString formatPopupValue(const T* v)
 	// no value: we use some hint
         switch (v->m_varKind) {
         case VarTree::VKstruct:
-            tip += "{...}";
+            tip += QStringLiteral("{...}");
             break;
         case VarTree::VKarray:
-            tip += "[...]";
+            tip += QStringLiteral("[...]");
             break;
         default:
-            tip += "?""?""?";	// 2 question marks in a row would be a trigraph
+            tip += QStringLiteral("?""?""?");	// 2 question marks in a row would be a trigraph
             break;
         }
     }
@@ -346,7 +346,7 @@ void KDebugger::programBreak()
 
 bool KDebugger::isCpuTargetX86() const
 {
-    return m_cpuTarget.indexOf(QLatin1String("86")) >= 0;
+    return m_cpuTarget.indexOf(QStringLiteral("86")) >= 0;
 }
 
 void KDebugger::programArgs(QWidget* parent)
@@ -1037,7 +1037,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	    if (!m_statusMessage.isEmpty())
 		Q_EMIT updateStatusMessage();
 	} else {
-	    QString msg = m_d->driverName() + ": " + m_statusMessage;
+	    QString msg = m_d->driverName() + QStringLiteral(": ") + m_statusMessage;
 	    KMessageBox::error(parentWidget(), msg);
 	    m_executable.clear();
 	    m_corefile.clear();		/* don't process core file */
@@ -1054,7 +1054,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	    // do not reset m_corefile
 	} else {
 	    // report error
-	    QString msg = m_d->driverName() + ": " + QString(output);
+	    QString msg = m_d->driverName() + QStringLiteral(": ") + QString(output);
 	    KMessageBox::error(parentWidget(), msg);
 
 	    // if core file was loaded from command line, revert to info line main
@@ -1435,7 +1435,7 @@ bool KDebugger::handlePrintPopup(CmdQueueItem* cmd, const char* output)
     TRACE("<" + cmd->m_popupExpr + "> = " + value->m_value);
 
     // construct the tip, m_popupExpr contains the variable name
-    QString tip = cmd->m_popupExpr + " = " + formatPopupValue(value);
+    QString tip = cmd->m_popupExpr + QStringLiteral(" = ") + formatPopupValue(value);
     Q_EMIT valuePopup(tip);
 
     return true;
@@ -1694,7 +1694,7 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
     QString partValue;
     if (errorValue)
     {
-	partValue = "?""?""?";	// 2 question marks in a row would be a trigraph
+	partValue = QStringLiteral("?""?""?");	// 2 question marks in a row would be a trigraph
     } else {
 	partValue = partExpr->m_value;
     }
@@ -1784,11 +1784,11 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 	expr = var->m_type->m_exprStrings[var->m_exprIndex];
     }
 
-    expr.replace("%s", base);
+    expr.replace(QStringLiteral("%s"), base);
 
     DbgCommand dbgCmd = DCprintStruct;
     // check if this is a QString::Data
-    if (expr.left(15) == "/QString::Data ")
+    if (expr.left(15) == QStringLiteral("/QString::Data "))
     {
 	if (m_typeTable->parseQt2QStrings())
 	{
@@ -1802,7 +1802,7 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 	     * was not (only qt2 enables the QString feature).
 	     */
 	    // TODO: remove this "print"; queue the next printStruct instead
-	    expr = "*0";
+	    expr = QStringLiteral("*0");
 	}
     }
     TRACE("evalStruct: " + expr + (var->m_exprIndexUseGuard ? " // guard" : " // real"));
@@ -2062,7 +2062,7 @@ void KDebugger::slotValuePopup(const QString& expr)
 	v = m_watchVariables.topLevelExprByName(expr);
 	if (!v) {
 	    // try a member of 'this'
-	    v = m_localVariables.topLevelExprByName("this");
+	    v = m_localVariables.topLevelExprByName(QStringLiteral("this"));
 	    if (v)
 		v = ExprWnd::ptrMemberByName(v, expr);
 	    if (!v) {
@@ -2077,7 +2077,7 @@ void KDebugger::slotValuePopup(const QString& expr)
     }
 
     // construct the tip
-    QString tip = v->getText() + " = " + formatPopupValue(v);
+    QString tip = v->getText() + QStringLiteral(" = ") + formatPopupValue(v);
     Q_EMIT valuePopup(tip);
 }
 

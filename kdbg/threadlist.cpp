@@ -45,7 +45,7 @@ ThreadList::ThreadList(QWidget* parent) :
     setRootIsDecorated(false);
 
     // load pixmaps
-    m_focusIcon = KIconLoader::global()->loadIcon("pcinner", KIconLoader::User);
+    m_focusIcon = KIconLoader::global()->loadIcon(QStringLiteral("pcinner"), KIconLoader::User);
     makeNoFocusIcon();
 
     connect(this, SIGNAL(currentItemChanged(QTreeWidgetItem*, QTreeWidgetItem*)),
