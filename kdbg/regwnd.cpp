@@ -400,7 +400,7 @@ QString convertRaw(const RegisterInfo reg, RegisterDisplay mode)
 	else if (reg.type.isEmpty())
 	    totalNibles = nibles;
 	else {
-	    return "don't know how to handle vector type <" + reg.type + ">";
+	    return QLatin1String("don't know how to handle vector type <%1>").arg(reg.type);
 	}
 	if (0 == nibles)
 	    nibles = 8;			// default to 4 byte, 32 bits values

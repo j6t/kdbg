@@ -730,11 +730,11 @@ QString KDebugger::getConfigForExe(const QString& name)
     // this keeps the file names short.
     QCryptographicHash dirDigest(QCryptographicHash::Md5);
     dirDigest.addData(dir.toUtf8());
-    QString hash = dirDigest.result().toBase64();
-    hash.replace('/', QString());	// avoid directory separators
-    return QStandardPaths::writableLocation(QStandardPaths::AppDataLocation)
-		+ "/sessions/"
-		+ hash.left(15) + "-" + fi.fileName();
+    auto hash = dirDigest.result().toBase64();
+    hash.replace("/", "");	// avoid directory separators
+    return QLatin1String("%1/sessions/%2-%3")
+		.arg(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),
+		      hash.left(15), fi.fileName());
 }
 
 void KDebugger::openProgramConfig(const QString& name)
@@ -1396,7 +1396,7 @@ void KDebugger::parseLocals(const char* output, std::list<ExprValue*>& newVars)
 	    if (variable->m_name == (*v)->m_name) {
 		// we found a duplicate, change name
 		block++;
-		QString newName = origName + " (" + QString().setNum(block) + ")";
+		QString newName = QLatin1String("%1 (%2)").arg(origName, QString().setNum(block));
 		variable->m_name = newName;
 	    }
 	}

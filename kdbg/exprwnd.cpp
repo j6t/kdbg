@@ -91,11 +91,11 @@ QString VarTree::computeExpr() const
 		// remove second index
 		index.remove(i, index.length()-i-1);
 	    }
-	    result = "(" + parentExpr + ")" + index;
+	    result = QLatin1String("(%1)%2").arg(parentExpr, index);
 	}
 	break;
     case VKstruct:
-	result = "(" + parentExpr + ")." + getText();
+	result = QLatin1String("(%1).%2").arg(parentExpr, getText());
 	break;
     case VKsimple:			/* parent can't be simple */
     case VKpointer:			/* handled in NKaddress */

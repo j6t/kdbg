@@ -1085,11 +1085,12 @@ void DebuggerMainWnd::slotRecentExec(const QUrl& url)
 
 QString DebuggerMainWnd::makeSourceFilter()
 {
+    QLatin1String fmt(";;%1 (%2)");
     QString f;
-    f = i18n("All source files") + " (" + m_sourceFilter + " " + m_headerFilter + ")";
-    f += ";;" + i18n("Source files") + " (" + m_sourceFilter + ")";
-    f += ";;" + i18n("Header files") + " (" + m_headerFilter + ")";
-    f += ";;" + i18n("All files") + " (*)";
+    f += fmt.arg(i18n("All source files"), m_sourceFilter + QLatin1Char(' ') + m_headerFilter);
+    f += fmt.arg(i18n("Source files"), m_sourceFilter);
+    f += fmt.arg(i18n("Header files"), m_headerFilter);
+    f += fmt.arg(i18n("All files"), QLatin1Char('*'));
     return f;
 }
 
