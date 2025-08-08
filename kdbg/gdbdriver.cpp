@@ -264,7 +264,7 @@ bool GdbDriver::startup(QString cmdStr)
 	"set prompt " PROMPT "\n"
 	;
 
-    executeCmdString(DCinitialize, gdbInitialize, false);
+    executeCmdString(DCinitialize, QLatin1String(gdbInitialize), false);
 
     // assume that QString::null is ok
     cmds[DCprintQStringStruct].fmt = printQStringStructFmt;
@@ -298,7 +298,7 @@ void GdbDriver::commandFinished(CmdQueueItem* cmd)
 		"(\\d+)\\.(\\d+)"	// major, minor
 		"[^ ]*\\n"		// no space until end of line
 		));
-	    auto res = re.match(m_output);
+	    auto res = re.match(QLatin1String(m_output));
 	    const char* disass = "disassemble %s %s\n";
 	    if (res.hasMatch()) {
 		int major = res.captured(1).toInt();
@@ -383,7 +383,7 @@ void GdbDriver::parseMarker(CmdQueueItem* cmd)
     // extract filename and line number
     static QRegularExpression MarkerRE(QStringLiteral(":(\\d+):\\d+:[begmidl]+:0x"));
 
-    auto resMarker = MarkerRE.match(startMarker);
+    auto resMarker = MarkerRE.match(QLatin1String(startMarker));
     if (resMarker.hasMatch()) {
 	int lineNo = resMarker.captured(1).toInt();
 
@@ -391,12 +391,12 @@ void GdbDriver::parseMarker(CmdQueueItem* cmd)
 	DbgAddr address = cmd->m_addr;
 	if (address.isEmpty()) {
 	    const char* addrStart = startMarker + resMarker.capturedEnd() - 2;
-	    address = QString(addrStart).trimmed();
+	    address = QLatin1String(addrStart).trimmed();
 	}
 
 	// now show the window
 	startMarker[resMarker.capturedStart()] = '\0';	/* split off file name */
-	Q_EMIT activateFileLine(startMarker, lineNo-1, address);
+	Q_EMIT activateFileLine(QLatin1String(startMarker), lineNo-1, address);
     }
 }
 
@@ -513,7 +513,7 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg, int intArg)
 	};
 	if (strArg.isEmpty())
 	    intArg = 7;			/* failsafe if no tty */
-	m_redirect = runRedir[intArg & 7];
+	m_redirect = QLatin1String(runRedir[intArg & 7]);
 
 	return makeCmdString(DCtty, strArg);   /* note: no problem if strArg empty */
     }
@@ -566,7 +566,7 @@ QString GdbDriver::makeCmdString(DbgCommand cmd)
     assert(cmd >= 0 && cmd < NUM_CMDS);
     assert(cmds[cmd].argsNeeded == GdbCmdInfo::argNone);
 
-    return cmds[cmd].fmt;
+    return QLatin1String(cmds[cmd].fmt);
 }
 
 void GdbDriver::terminate()
@@ -781,7 +781,7 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
 	    }
 
 	    // add separator
-	    result += separator[repeats][lastThing];
+	    result += QLatin1String(separator[repeats][lastThing]);
 	    // add char
 	    if (escapeCode != '\0') {
 		result += QLatin1Char('\\');
@@ -1660,7 +1660,7 @@ static void parseFrameInfo(const char*& s, QString& func,
     }
 
     if (*p == '\0') {
-	func = start;
+	func = QLatin1String(start);
 	file = QString();
 	lineNo = -1;
 	s = p;
@@ -1717,7 +1717,7 @@ static void parseFrameInfo(const char*& s, QString& func,
     }
     // construct the function name (including file info)
     if (*p == '\0') {
-	func = start;
+	func = QLatin1String(start);
     } else {
 	func = QString::fromLatin1(start, p-start-1);	/* don't include \n */
     }
@@ -1878,7 +1878,7 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 	// remainder is location, hit and ignore count, condition
 	end = strchr(p, '\n');
 	if (!end) {
-	    bp.location = p;
+	    bp.location = QLatin1String(p);
 	    p += bp.location.length();
 	} else {
 	    // location of a <MULTIPLE> filled in from subsequent breakpoints
@@ -2208,7 +2208,7 @@ ExprValue* GdbDriver::parsePrintExpr(const char* output, bool wantErrorValue)
 bool GdbDriver::parseChangeWD(const char* output, QString& message)
 {
     bool isGood = false;
-    message = QString(output).simplified();
+    message = QString(QLatin1String(output)).simplified();
     if (message.isEmpty()) {
 	message = i18n("New working directory: ") + m_programWD;
 	isGood = true;
@@ -2242,7 +2242,7 @@ bool GdbDriver::parseChangeExecutable(const char* output, QString& message)
     else
     {
 	// error: keep all text
-	message = output;
+	message = QLatin1String(output);
 	return false;
     }
 }
@@ -2389,7 +2389,7 @@ bool GdbDriver::parseFindType(const char* output, QString& type)
     output += 7;
     if (strncmp(output, "const ", 6) == 0)
         output += 6;
-    type = output;
+    type = QLatin1String(output);
     type.replace(QRegularExpression(QStringLiteral("\\s+")), {});
     if (type.endsWith(QLatin1Char('&')))
         type.truncate(type.length() - 1);
@@ -2602,7 +2602,7 @@ std::list<DisassembledCode> GdbDriver::parseDisassemble(const char* output)
     if (strncmp(output, "Dump of assembler", 17) != 0) {
 	// error message?
 	DisassembledCode c;
-	c.code = output;
+	c.code = QLatin1String(output);
 	code.push_back(c);
 	return code;
     }
@@ -2667,7 +2667,7 @@ QString GdbDriver::parseMemoryDump(const char* output, std::list<MemoryDump>& me
 {
     if (isErrorExpr(output)) {
 	// error; strip space
-	QString msg = output;
+	QString msg = QLatin1String(output);
 	return msg.trimmed();
     }
 
@@ -2768,18 +2768,18 @@ repeat:
     }
 
     // else leave it unchanged (or stripped of the reference preamble)
-    return s;
+    return QLatin1String(s);
 }
 
 QString GdbDriver::parseSetVariable(const char* output)
 {
     // if there is any output, it is an error message
-    QString msg = output;
+    QString msg = QLatin1String(output);
     return msg.trimmed();
 }
 
 QString GdbDriver::parseSetDisassFlavor(const char* output)
 {
     // if there is any output, it is an error message
-    return output;
+    return QLatin1String(output);
 }

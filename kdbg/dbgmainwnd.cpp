@@ -60,14 +60,14 @@ DebuggerMainWnd::DebuggerMainWnd() :
 #ifdef GDB_TRANSCRIPT
 	m_transcriptFile(GDB_TRANSCRIPT),
 #endif
-	m_outputTermCmdStr(defaultTermCmdStr),
+	m_outputTermCmdStr(QLatin1String(defaultTermCmdStr)),
 	m_outputTermProc(new QProcess),
 	m_ttyLevel(-1),			/* no tty yet */
 	m_popForeground(false),
 	m_backTimeout(1000),
 	m_tabWidth(0),
-	m_sourceFilter(defaultSourceFilter),
-	m_headerFilter(defaultHeaderFilter),
+	m_sourceFilter(QLatin1String(defaultSourceFilter)),
+	m_headerFilter(QLatin1String(defaultHeaderFilter)),
 	m_statusActive(i18n("active"))
 {
     setDockNestingEnabled(true);
@@ -212,7 +212,7 @@ DebuggerMainWnd::~DebuggerMainWnd()
 QDockWidget* DebuggerMainWnd::createDockWidget(const char* name, const QString& title)
 {
     QDockWidget* w = new QDockWidget(title, this);
-    w->setObjectName(name);
+    w->setObjectName(QLatin1String(name));
     // view menu changes when docking state changes
     connect(w, SIGNAL(visibilityChanged(bool)), SLOT(updateUI()));
     return w;
@@ -222,9 +222,9 @@ QAction* DebuggerMainWnd::createAction(const QString& text, const char* icon,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name)
 {
-    QAction* a = actionCollection()->addAction(name);
+    QAction* a = actionCollection()->addAction(QLatin1String(name));
     a->setText(text);
-    a->setIcon(QIcon(new KIconEngine(icon, KIconLoader::global())));
+    a->setIcon(QIcon(new KIconEngine(QLatin1String(icon), KIconLoader::global())));
     if (shortcut)
 	actionCollection()->setDefaultShortcut(a, QKeySequence(shortcut));
     connect(a, SIGNAL(triggered()), receiver, slot);
@@ -235,7 +235,7 @@ QAction* DebuggerMainWnd::createAction(const QString& text,
 			int shortcut, const QObject* receiver,
 			const char* slot, const char* name)
 {
-    QAction* a = actionCollection()->addAction(name);
+    QAction* a = actionCollection()->addAction(QLatin1String(name));
     a->setText(text);
     if (shortcut)
 	actionCollection()->setDefaultShortcut(a, QKeySequence(shortcut));
@@ -448,9 +448,9 @@ static const char DisassemblyFlavor[] = "DisassemblyFlavor";
 
 void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
 {
-    m_recentExecAction->saveEntries(config->group(RecentExecutables));
+    m_recentExecAction->saveEntries(config->group(QLatin1String(RecentExecutables)));
 
-    KConfigGroup lg = config->group(LastSession);
+    KConfigGroup lg = config->group(QLatin1String(LastSession));
     lg.writeEntry("Width0Locals", m_localVariables->columnWidth(0));
     lg.writeEntry("Width0Watches", m_watches->columnWidth(0));
 
@@ -458,10 +458,10 @@ void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
 	m_debugger->saveSettings(config.data());
     }
 
-    config->group(OutputWindowGroup).writeEntry(TermCmdStr, m_outputTermCmdStr);
-    config->group(DebuggerGroup).writeEntry(DebuggerCmdStr, m_debuggerCmdStr);
+    config->group(QLatin1String(OutputWindowGroup)).writeEntry(TermCmdStr, m_outputTermCmdStr);
+    config->group(QLatin1String(DebuggerGroup)).writeEntry(DebuggerCmdStr, m_debuggerCmdStr);
 
-    KConfigGroup pg(config->group(PreferencesGroup));
+    KConfigGroup pg(config->group(QLatin1String(PreferencesGroup)));
     pg.writeEntry(PopForeground, m_popForeground);
     pg.writeEntry(BackTimeout, m_backTimeout);
     pg.writeEntry(TabWidth, m_tabWidth);
@@ -472,9 +472,9 @@ void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
 
 void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
 {
-    m_recentExecAction->loadEntries(config->group(RecentExecutables));
+    m_recentExecAction->loadEntries(config->group(QLatin1String(RecentExecutables)));
 
-    KConfigGroup lg = config->group(LastSession);
+    KConfigGroup lg = config->group(QLatin1String(LastSession));
     int w;
     w = lg.readEntry("Width0Locals", -1);
     if (w >= 0 && w < 30000)
@@ -487,7 +487,7 @@ void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
 	m_debugger->restoreSettings(config.data());
     }
 
-    KConfigGroup og(config->group(OutputWindowGroup));
+    KConfigGroup og(config->group(QLatin1String(OutputWindowGroup)));
     /*
      * For debugging and emergency purposes, let the config file override
      * the shell script that is used to keep the output window open. This
@@ -496,9 +496,9 @@ void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
     setTerminalCmd(og.readEntry(TermCmdStr, defaultTermCmdStr));
     m_outputTermKeepScript = og.readEntry(KeepScript);
 
-    setDebuggerCmdStr(config->group(DebuggerGroup).readEntry(DebuggerCmdStr));
+    setDebuggerCmdStr(config->group(QLatin1String(DebuggerGroup)).readEntry(DebuggerCmdStr));
 
-    KConfigGroup pg(config->group(PreferencesGroup));
+    KConfigGroup pg(config->group(QLatin1String(PreferencesGroup)));
     m_popForeground = pg.readEntry(PopForeground, false);
     m_backTimeout = pg.readEntry(BackTimeout, 1000);
     m_tabWidth = pg.readEntry(TabWidth, 0);
@@ -691,7 +691,7 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 	    // The config file exists but doesn't have an entry,
 	    // so it must have been created by an old version of KDbg
 	    // that had only the GDB driver.
-	    lang = c.group(GeneralGroup)
+	    lang = c.group(QLatin1String(GeneralGroup))
 		    .readEntry(KDebugger::DriverNameEntry, "GDB");
 
 	    TRACE(QString("...bad, trying config driver %1...").arg(lang));
@@ -758,11 +758,11 @@ DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
 	const L& l = langs[i];
 
 	// shortest must match
-	if (!lang.startsWith(l.shortest))
+	if (!lang.startsWith(QLatin1String(l.shortest)))
 	    continue;
 
 	// lang must not be longer than the full name, and it must match
-	if (QString(l.full).startsWith(lang))
+	if (QLatin1String(l.full).startsWith(lang))
 	{
 	    driverID = l.driver;
 	    break;
@@ -869,12 +869,12 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 	}
 
 	if (m_sourceFilter.isEmpty())
-	    m_sourceFilter = defaultSourceFilter;
+	    m_sourceFilter = QLatin1String(defaultSourceFilter);
 
 	m_headerFilter = prefMisc.headerFilter();
 
 	if (m_headerFilter.isEmpty())
-	    m_headerFilter = defaultHeaderFilter;
+	    m_headerFilter = QLatin1String(defaultHeaderFilter);
     }
 
     if (m_tabWidth != oldTabWidth) {
@@ -887,7 +887,7 @@ void DebuggerMainWnd::setTerminalCmd(const QString& cmd)
     m_outputTermCmdStr = cmd;
     // revert to default if empty
     if (m_outputTermCmdStr.isEmpty()) {
-	m_outputTermCmdStr = defaultTermCmdStr;
+	m_outputTermCmdStr = QLatin1String(defaultTermCmdStr);
     }
 }
 
@@ -991,7 +991,7 @@ QString DebuggerMainWnd::createOutputWindow()
     if (!m_outputTermKeepScript.isEmpty()) {
 	shellScript = m_outputTermKeepScript;
     } else {
-	shellScript = shellScriptFmt;
+	shellScript = QLatin1String(shellScriptFmt);
     }
 
     shellScript.replace(QStringLiteral("%s"), fifoName);
@@ -1018,7 +1018,7 @@ QString DebuggerMainWnd::createOutputWindow()
     {
 	QString& str = *i;
 	for (int j = sizeof(substitute)/sizeof(substitute[0])-1; j >= 0; j--) {
-	    int pos = str.indexOf(substitute[j].seq);
+	    int pos = str.indexOf(QLatin1String(substitute[j].seq));
 	    if (pos >= 0) {
 		str.replace(pos, 2, substitute[j].replace);
 		break;		/* substitute only one sequence */

@@ -91,7 +91,7 @@ void TypeTable::loadFromFile(const QString& fileName)
     /*
      * Read library name and properties.
      */
-    KConfigGroup cf = confFile.group(TypeTableGroup);
+    KConfigGroup cf = confFile.group(QLatin1String(TypeTableGroup));
     m_displayName = cf.readEntry(LibDisplayName);
     if (m_displayName.isEmpty()) {
 	// use file name instead
@@ -113,7 +113,7 @@ void TypeTable::loadFromFile(const QString& fileName)
     QString typesEntry;
     for (int i = 1; ; i++) {
 	// next bunch of types
-	KConfigGroup cf = confFile.group(TypeTableGroup);
+	KConfigGroup cf = confFile.group(QLatin1String(TypeTableGroup));
 	typesEntry = QString::asprintf(TypesEntryFmt, i);
 	if (!cf.hasKey(typesEntry))
 	    break;

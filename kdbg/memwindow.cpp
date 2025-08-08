@@ -372,7 +372,7 @@ static const char ColumnWidths[] = "ColumnWidths";
 
 void MemoryWindow::saveProgramSpecific(KConfigBase* config)
 {
-    KConfigGroup g = config->group(MemoryGroup);
+    KConfigGroup g = config->group(QLatin1String(MemoryGroup));
 
     int numEntries = m_expression.count();
     g.writeEntry(NumExprs, numEntries);
@@ -400,7 +400,7 @@ void MemoryWindow::saveProgramSpecific(KConfigBase* config)
 
 void MemoryWindow::restoreProgramSpecific(KConfigBase* config)
 {
-    KConfigGroup g = config->group(MemoryGroup);
+    KConfigGroup g = config->group(QLatin1String(MemoryGroup));
 
     int numEntries = g.readEntry(NumExprs, 0);
     m_expression.clear();

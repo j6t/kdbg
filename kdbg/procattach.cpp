@@ -63,10 +63,10 @@ void ProcAttachPS::runPS()
     };
     QStringList args;
     for (int i = 1; psCommand[i]; i++) {
-	args.push_back(psCommand[i]);
+	args.push_back(QLatin1String(psCommand[i]));
     }
 
-    m_ps->start(psCommand[0], args);
+    m_ps->start(QLatin1String(psCommand[0]), args);
 }
 
 void ProcAttachPS::slotTextReceived()

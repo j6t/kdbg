@@ -66,7 +66,7 @@ bool STTY::findTTY()
 	if (::openpty(&m_masterfd, &m_slavefd, nullptr, nullptr, nullptr) == 0) {
 	    const char* tname = ::ttyname(m_slavefd);
 	    if (tname) {
-		m_slavetty = tname;
+		m_slavetty = QLatin1String(tname);
 	    } else {
 		::close(m_slavefd);
 		::close(m_masterfd);
@@ -98,7 +98,7 @@ bool STTY::findTTY()
 		{
 		    if (::geteuid() == 0 || ::access(ttynam,R_OK|W_OK) == 0)
 		    {
-			m_slavetty = ttynam;
+			m_slavetty = QLatin1String(ttynam);
 			break;
 		    }
 		    ::close(m_masterfd);

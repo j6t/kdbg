@@ -157,7 +157,7 @@ bool KDebugger::debugProgram(const QString& name,
 
     // get debugger command from per-program settings
     if (m_programConfig) {
-	KConfigGroup g = m_programConfig->group(GeneralGroup);
+	KConfigGroup g = m_programConfig->group(QLatin1String(GeneralGroup));
 	m_debuggerCmd = g.readEntry(DebuggerCmdStr);
 	// get terminal emulation level
 	m_ttyLevel = TTYLevel(g.readEntry(TTYLevelEntry, int(ttyFull)));
@@ -734,7 +734,7 @@ QString KDebugger::getConfigForExe(const QString& name)
     hash.replace("/", "");	// avoid directory separators
     return QLatin1String("%1/sessions/%2-%3")
 		.arg(QStandardPaths::writableLocation(QStandardPaths::AppDataLocation),
-		      hash.left(15), fi.fileName());
+		      QLatin1String(hash.left(15)), fi.fileName());
 }
 
 void KDebugger::openProgramConfig(const QString& name)
@@ -748,7 +748,7 @@ void KDebugger::openProgramConfig(const QString& name)
     // this leaves a clue behind in the config file which
     // executable it applies to; it is mostly intended for
     // users peeking into the file
-    KConfigGroup g = m_programConfig->group(GeneralGroup);
+    KConfigGroup g = m_programConfig->group(QLatin1String(GeneralGroup));
     g.writeEntry("ExecutableFile", name);
 }
 
@@ -764,7 +764,7 @@ const char ExprFmt[] = "Expr%d";
 void KDebugger::saveProgramSettings()
 {
     ASSERT(m_programConfig);
-    KConfigGroup gg = m_programConfig->group(GeneralGroup);
+    KConfigGroup gg = m_programConfig->group(QLatin1String(GeneralGroup));
     gg.writeEntry(FileVersion, 1);
     gg.writeEntry(ProgramArgs, m_programArgs);
     gg.writeEntry(WorkingDirectory, m_programWD);
@@ -778,8 +778,8 @@ void KDebugger::saveProgramSettings()
     gg.writeEntry(DriverNameEntry, driverName);
 
     // write environment variables
-    m_programConfig->deleteGroup(EnvironmentGroup);
-    KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
+    m_programConfig->deleteGroup(QLatin1String(EnvironmentGroup));
+    KConfigGroup eg = m_programConfig->group(QLatin1String(EnvironmentGroup));
     QString varName;
     QString varValue;
     int i = 0;
@@ -795,9 +795,9 @@ void KDebugger::saveProgramSettings()
 
     // watch expressions
     // first get rid of whatever was in this group
-    m_programConfig->deleteGroup(WatchGroup);
+    m_programConfig->deleteGroup(QLatin1String(WatchGroup));
     // then start a new group
-    KConfigGroup wg = m_programConfig->group(WatchGroup);
+    KConfigGroup wg = m_programConfig->group(QLatin1String(WatchGroup));
     int watchNum = 0;
     for (const QString& expr : m_watchVariables.exprList()) {
 	varName = QString::asprintf(ExprFmt, watchNum++);
@@ -811,14 +811,14 @@ void KDebugger::saveProgramSettings()
 void KDebugger::overrideProgramArguments(const QString& args)
 {
     ASSERT(m_programConfig);
-    KConfigGroup g = m_programConfig->group(GeneralGroup);
+    KConfigGroup g = m_programConfig->group(QLatin1String(GeneralGroup));
     g.writeEntry(ProgramArgs, args);
 }
 
 void KDebugger::restoreProgramSettings()
 {
     ASSERT(m_programConfig);
-    KConfigGroup gg = m_programConfig->group(GeneralGroup);
+    KConfigGroup gg = m_programConfig->group(QLatin1String(GeneralGroup));
     /*
      * We ignore file version for now we will use it in the future to
      * distinguish different versions of this configuration file.
@@ -830,7 +830,7 @@ void KDebugger::restoreProgramSettings()
     m_flavor = gg.readEntry(DisassemblyFlavor, QString{});
 
     // read environment variables
-    KConfigGroup eg = m_programConfig->group(EnvironmentGroup);
+    KConfigGroup eg = m_programConfig->group(QLatin1String(EnvironmentGroup));
     m_envVars.clear();
     std::map<QString,EnvVar> pgmVars;
     QString varName;
@@ -859,7 +859,7 @@ void KDebugger::restoreProgramSettings()
     restoreBreakpoints(m_programConfig);
 
     // watch expressions
-    KConfigGroup wg = m_programConfig->group(WatchGroup);
+    KConfigGroup wg = m_programConfig->group(QLatin1String(WatchGroup));
     m_watchVariables.clear();
     for (int i = 0;; ++i) {
 	varName = QString::asprintf(ExprFmt, i);
@@ -1054,7 +1054,7 @@ void KDebugger::parse(CmdQueueItem* cmd, const char* output)
 	    // do not reset m_corefile
 	} else {
 	    // report error
-	    QString msg = m_d->driverName() + QStringLiteral(": ") + QString(output);
+	    QString msg = m_d->driverName() + QStringLiteral(": ") + QLatin1String(output);
 	    KMessageBox::error(parentWidget(), msg);
 
 	    // if core file was loaded from command line, revert to info line main

@@ -108,10 +108,10 @@ class GroupingViewItem : public ModeItem
 {
 public:
     GroupingViewItem(RegisterView* parent,
-		     const QString& name, const QString& pattern,
+		     const QString& name, const char* pattern,
 		     RegisterDisplay mode) :
 	ModeItem(parent, name),
-	matcher(QRegularExpression::anchoredPattern(pattern)),
+	matcher(QRegularExpression::anchoredPattern(QLatin1String(pattern))),
 	gmode(mode)
     {
 	setExpanded(true);
@@ -211,7 +211,7 @@ static QString toBinary(QString hex)
 	    return hex;
 	}
 	const char* bindigits = digits[idx];
-	result += bindigits;
+	result += QLatin1String(bindigits);
     }
     // remove leading zeros
     switch (hexCharToDigit(hex[2].toLatin1())) {
