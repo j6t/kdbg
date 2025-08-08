@@ -89,12 +89,12 @@ int main(int argc, char** argv)
 
     // handle options
 
-    QString transcript = parser.value("t");
-    QString remote = parser.value("r");
+    QString transcript = parser.value(QStringLiteral("t"));
+    QString remote = parser.value(QStringLiteral("r"));
     if (!remote.isEmpty())
 	debugger->setRemoteDevice(remote);
 
-    QString lang = parser.value("l");
+    QString lang = parser.value(QStringLiteral("l"));
 
     // check environment variable for transcript file name
     if (transcript.isEmpty()) {
@@ -102,8 +102,8 @@ int main(int argc, char** argv)
     }
     debugger->setTranscript(transcript);
 
-    QString pid = parser.value("p");
-    QString programArgs = parser.value("a");
+    QString pid = parser.value(QStringLiteral("p"));
+    QString programArgs = parser.value(QStringLiteral("a"));
     QStringList posArgs = parser.positionalArguments();
 
     if (!restored && posArgs.count() > 0) {

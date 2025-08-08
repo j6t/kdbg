@@ -200,7 +200,7 @@ void TTYWindow::slotAppend(char* buffer, int count)
 	    ++start;
 	    --count;
 	    m_pos.movePosition(QTextCursor::End);
-	    m_pos.insertText(QString('\n'));
+	    m_pos.insertText(QStringLiteral("\n"));
 	}
     }
     ensureCursorVisible();
