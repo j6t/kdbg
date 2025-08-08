@@ -49,7 +49,7 @@ void PgmArgs::modifyVar(bool resurrect)
 {
     QString name, value;
     parseEnvInput(name, value);
-    if (name.isEmpty() || name.indexOf(' ') >= 0)	// disallow spaces in names
+    if (name.isEmpty() || name.indexOf(QLatin1Char(' ')) >= 0)	// disallow spaces in names
 	return;
 
     // lookup the value in the dictionary
@@ -115,7 +115,7 @@ void PgmArgs::parseEnvInput(QString& name, QString& value)
 {
     // parse input from edit field
     QString input = envVar->text();
-    int equalSign = input.indexOf('=');
+    int equalSign = input.indexOf(QLatin1Char('='));
     if (equalSign >= 0) {
 	name = input.left(equalSign).trimmed();
 	value = input.mid(equalSign+1);
@@ -134,7 +134,7 @@ void PgmArgs::on_envList_currentItemChanged()
 
     // must get name from list box
     QString name = item->text(0);
-    envVar->setText(name + "=" + m_envVars[name].value);
+    envVar->setText(name + QLatin1Char('=') + m_envVars[name].value);
 }
 
 void PgmArgs::accept()

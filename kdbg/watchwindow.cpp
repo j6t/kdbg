@@ -72,7 +72,7 @@ void WatchWindow::dropEvent(QDropEvent* event)
 	QString text = event->mimeData()->text();
 	// pick only the first line
 	text = text.trimmed();
-	int pos = text.indexOf('\n');
+	int pos = text.indexOf(QLatin1Char('\n'));
 	if (pos > 0)
 	    text.truncate(pos);
 	text = text.trimmed();

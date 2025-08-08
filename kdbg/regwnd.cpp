@@ -243,19 +243,19 @@ static QString toOctal(QString hex)
 	if (idx < 0)
 	    return hex;
 	v += idx << shift;
-	result.insert(0, (v & 7) + '0');
+	result.insert(0, QLatin1Char((v & 7) + '0'));
 	v >>= 3;
 	shift++;
 	if (shift == 3) {
 	    // an extra digit this round
-	    result.insert(0, v + '0');
+	    result.insert(0, QLatin1Char(v + '0'));
 	    shift = v = 0;
 	}
     }
     if (v != 0) {
-	result.insert(0, v + '0');
+	result.insert(0, QLatin1Char(v + '0'));
     }
-    return "0" + result;
+    return QLatin1Char('0') + result;
 }
 
 static QString toDecimal(QString hex)
@@ -357,7 +357,7 @@ static QString toFloat(const QString& hex, char p)
     if (p == 'e') {
 	prec += 7;
 	while (cooked.length()<prec)
-	    cooked = cooked.prepend(" ");
+	    cooked = cooked.prepend(QLatin1Char(' '));
     }
     return cooked;
 }
@@ -391,7 +391,7 @@ QString convertRaw(const RegisterInfo reg, RegisterDisplay mode)
     QString cooked;
     int totalNibles = 0, nibles = mode.bits() >> 2;
     if (RegisterDisplay::nada != mode.presentationFlag() &&
-	reg.rawValue.length() > 2 && reg.rawValue[0] == '0' && reg.rawValue[1] == 'x')
+	reg.rawValue.length() > 2 && reg.rawValue[0] == QLatin1Char('0') && reg.rawValue[1] == QLatin1Char('x'))
     {
 	if ("uint128" == reg.type)
 	    totalNibles = 32;
@@ -409,9 +409,9 @@ QString convertRaw(const RegisterInfo reg, RegisterDisplay mode)
 
 	QString raw = reg.rawValue.right(reg.rawValue.length() - 2);	// clip off "0x"
 	while (raw.length() < totalNibles)
-	    raw.prepend("0");		// pad out to totalNibles
+	    raw.prepend(QLatin1Char('0'));	// pad out to totalNibles
 
-	QString separator = ",";	// locale-specific?
+	QString separator(QLatin1Char(','));	// locale-specific?
 	for (int nib = totalNibles - nibles; nib >= 0; nib -= nibles) {
 	    QString qstr = convertSingle(raw.mid(nib, nibles).prepend("0x"), mode);
 
@@ -425,8 +425,8 @@ QString convertRaw(const RegisterInfo reg, RegisterDisplay mode)
     {
 	cooked = reg.cookedValue;
     }
-    if (!cooked.isEmpty() && cooked.at(0) != ' ' && cooked.at(0) != '-' && cooked.at(0) != '+')
-	cooked.prepend(" ");
+    if (!cooked.isEmpty() && cooked.at(0) != QLatin1Char(' ') && cooked.at(0) != QLatin1Char('-') && cooked.at(0) != QLatin1Char('+'))
+	cooked.prepend(QLatin1Char(' '));
     return cooked;
 }
 

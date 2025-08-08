@@ -243,7 +243,7 @@ void MemoryWindow::slotTypeChange(QAction* action)
 
 QString MemoryWindow::parseMemoryDumpLineToAscii(const QString& line, bool littleendian)
 {
-    QStringList hexdata = line.split("\t");
+    QStringList hexdata = line.split(QLatin1Char('\t'));
 
     // Get the size of value from hex str representation length
     //               0x00 =   (4 - 2) / 2 -> 1 byte
@@ -295,7 +295,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
     std::list<MemoryDump>::const_iterator md = memdump.begin();
 
     // show only needed columns
-    QStringList sl = md->dump.split( "\t" );
+    QStringList sl = md->dump.split(QLatin1Char('\t'));
     for (int i = COL_DUMP_ASCII-1; i > 0; i--)
 	m_memory.setColumnHidden(i, i > sl.count());
 
@@ -303,8 +303,8 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 
     for (; md != memdump.end(); ++md)
     {
-	QString addr = md->address.asString() + " " + md->address.fnoffs;
-	QStringList sl = md->dump.split( "\t" );
+	QString addr = md->address.asString() + QLatin1Char(' ') + md->address.fnoffs;
+	QStringList sl = md->dump.split(QLatin1Char('\t'));
 
 	if (fm.horizontalAdvance(addr) > m_memoryColumnsWidth[COL_ADDR]) {
 	    m_memoryColumnsWidth[COL_ADDR] = fm.horizontalAdvance(addr);

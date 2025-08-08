@@ -79,7 +79,7 @@ void WinStack::activate(const QString& fileName, int lineNo, const DbgAddr& addr
 	if (!fi.isRelative() || m_lastOpenDir.isEmpty()) {
 	    return;
 	}
-	fi.setFile(m_lastOpenDir + "/" + fi.filePath());
+	fi.setFile(m_lastOpenDir + QLatin1Char('/') + fi.filePath());
 	if (!fi.isFile()) {
 	    return;
 	}

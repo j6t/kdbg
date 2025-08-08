@@ -44,7 +44,7 @@ bool DebuggerDriver::startup(QString cmdStr)
     if (cmdStr.isEmpty())
 	cmdStr = defaultInvocation();
 
-    QStringList cmd = cmdStr.split(' ', Qt::SkipEmptyParts);
+    QStringList cmd = cmdStr.split(QLatin1Char(' '), Qt::SkipEmptyParts);
     if (cmd.isEmpty())
 	return false;
     QString pgm = cmd.takeFirst();
@@ -408,7 +408,7 @@ void DbgAddr::cleanAddr()
     if (a.isEmpty())
 	return;
 
-    while (a[0] == '0' || a[0] == 'x') {
+    while (a[0] == QLatin1Char('0') || a[0] == QLatin1Char('x')) {
 	a.remove(0, 1);
     }
 }

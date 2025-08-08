@@ -324,9 +324,9 @@ void BreakpointItem::display()
 	// use only the file name portion
 	QString file = QFileInfo(fileName).fileName();
 	// correct zero-based line-numbers
-	setText(0, file + ":" + QString::number(lineNo+1));
+	setText(0, file + QLatin1Char(':') + QString::number(lineNo+1));
     } else {
-	setText(0, "*" + address.asString());
+	setText(0, QLatin1Char('*') + address.asString());
     }
 
     int c = 0;

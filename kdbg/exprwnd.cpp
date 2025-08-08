@@ -72,7 +72,7 @@ QString VarTree::computeExpr() const
     /* if this is an address, dereference it */
     if (m_nameKind == NKaddress) {
 	ASSERT(par->m_varKind == VKpointer);
-	result = "*" + parentExpr;
+	result = QLatin1Char('*') + parentExpr;
 	return result;
     }
     switch (par->m_varKind) {
@@ -87,7 +87,7 @@ QString VarTree::computeExpr() const
 	     * Some array indices are actually ranges due to repeated array
 	     * values. We use the first index in these cases.
 	     */
-	    if (index[i] != ']') {
+	    if (index[i] != QLatin1Char(']')) {
 		// remove second index
 		index.remove(i, index.length()-i-1);
 	    }
@@ -507,7 +507,7 @@ void ExprWnd::updateSingleExpr(VarTree* display, ExprValue* newValue)
 	ASSERT(newValue->m_varKind == VarTree::VKstruct);
 	if (display->m_type == TypeInfo::wchartType())
 	{
-	    display->m_partialValue = "L";
+	    display->m_partialValue = QLatin1Char('L');
 	}
 	else
 	    display->m_partialValue = display->m_type->m_displayString[0];
@@ -570,7 +570,7 @@ void ExprWnd::checkUnknownType(VarTree* var)
 	else
 	{
 	    var->m_type = TypeInfo::wchartType();
-	    var->m_partialValue = "L";
+	    var->m_partialValue = QLatin1Char('L');
 	    m_updateStruct.push_back(var);
 	}
     }

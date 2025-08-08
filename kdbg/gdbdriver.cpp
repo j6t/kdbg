@@ -411,7 +411,7 @@ static void normalizeStringArg(QString& arg)
      * but we know that there is at the moment no case where a trailing
      * backslash would make sense.
      */
-    while (!arg.isEmpty() && arg[arg.length()-1] == '\\') {
+    while (!arg.isEmpty() && arg[arg.length()-1] == QLatin1Char('\\')) {
 	arg = arg.left(arg.length()-1);
     }
 }
@@ -432,7 +432,7 @@ QString GdbDriver::makeCmdString(DbgCommand cmd, QString strArg)
 	 * Use saved redirection. We prepend it in front of the user's
 	 * arguments so that the user can override the redirections.
 	*/
-	strArg = m_redirect + " " + strArg;
+	strArg = m_redirect + QLatin1Char(' ') + strArg;
     }
 
     return QString::asprintf(cmds[cmd].fmt, strArg.toUtf8().constData());
@@ -783,8 +783,8 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
 	    result += separator[repeats][lastThing];
 	    // add char
 	    if (escapeCode != '\0') {
-		result += '\\';
-		ch = escapeCode;
+		result += QLatin1Char('\\');
+		ch = QLatin1Char(escapeCode);
 	    }
 	    result += ch;
 
@@ -802,7 +802,7 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
 
 	// closing quote
 	if (lastThing == wasChar)
-	    result += "\"";
+	    result += QLatin1Char('"');
 
 	// assign the value
 	variable = new ExprValue(QString(), VarTree::NKplain);
@@ -1208,7 +1208,7 @@ repeat:
 	    const char* start = s;
 	    skipNested(s, '{', '}');
 	    variable->m_value = QString::fromLatin1(start, s-start);
-	    variable->m_value += ' ';	// add only a single space
+	    variable->m_value += QLatin1Char(' ');	// add only a single space
 	    skipSpace(s);
 	    goto repeat;
 	}
@@ -1395,7 +1395,7 @@ repeat:
 
 	// remove line breaks from the value; this is ok since
 	// string values never contain a literal line break
-	variable->m_value.replace('\n', ' ');
+	variable->m_value.replace(QLatin1Char('\n'), QLatin1Char(' '));
 
 	while (checkMultiPart) {
 	    // white space
@@ -1730,7 +1730,7 @@ static void parseFrameInfo(const char*& s, QString& func,
      */
     ASSERT(!isspace(func[0].toLatin1()));	// there must be non-white before first \n
     int nl = 0;
-    while ((nl = func.indexOf('\n', nl)) >= 0) {
+    while ((nl = func.indexOf(QLatin1Char('\n'), nl)) >= 0) {
 	// search back to the beginning of the whitespace
 	int startWhite = nl;
 	do {
@@ -1742,7 +1742,7 @@ static void parseFrameInfo(const char*& s, QString& func,
 	    nl++;
 	} while (nl < func.length() && isspace(func[nl].toLatin1()));
 	// replace
-	func.replace(startWhite, nl-startWhite, " ");
+	func.replace(startWhite, nl-startWhite, QLatin1Char(' '));
 	/* continue searching for more \n's at this place: */
 	nl = startWhite+1;
     }
@@ -1913,7 +1913,7 @@ bool GdbDriver::parseBreakList(const char* output, std::list<Breakpoint>& brks)
 		TRACE(QString("ignore count %1").arg(bp.ignoreCount));
 	    } else {
 		// indeed a continuation
-		bp.location += " " + QString::fromLatin1(p, end-p).trimmed();
+		bp.location += QLatin1Char(' ') + QString::fromLatin1(p, end-p).trimmed();
 	    }
 	    p = end;
 	    if (*p != '\0')
@@ -2390,7 +2390,7 @@ bool GdbDriver::parseFindType(const char* output, QString& type)
         output += 6;
     type = output;
     type.replace(QRegularExpression("\\s+"), "");
-    if (type.endsWith("&"))
+    if (type.endsWith(QLatin1Char('&')))
         type.truncate(type.length() - 1);
     return true;
 }
@@ -2435,7 +2435,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 		output++;
 	    // get rid of the braces at the begining and the end
 	    value.remove(0, 1);
-	    if (value[value.length()-1] == '}') {
+	    if (value[value.length()-1] == QLatin1Char('}')) {
 		value = value.left(value.length()-1);
 	    }
 	    // gdb 5.3 doesn't print a separate set of raw values
@@ -2487,7 +2487,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 		    output++;
 		// get rid of the braces at the begining and the end
 		value.remove(0, 1);
-		if (value[value.length()-1] == '}') {
+		if (value[value.length()-1] == QLatin1Char('}')) {
 		    value.truncate(value.length()-1);
 		}
 	    }
@@ -2510,7 +2510,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 	    if (output && isspace(output[1]))
 	    {
 		++output;
-		value += ' ';
+		value += QLatin1Char(' ');
 		goto continuation;
 	    }
 
@@ -2525,7 +2525,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 	    {
 		reg.cookedValue = value.left(pos);
 		reg.rawValue = value.mid(pos+6);
-		if (reg.rawValue.right(1) == ")")	// remove closing bracket
+		if (reg.rawValue.right(1) == QLatin1Char(')'))	// remove closing bracket
 		    reg.rawValue.truncate(reg.rawValue.length()-1);
 	    }
 	    else
@@ -2535,7 +2535,7 @@ std::list<RegisterInfo> GdbDriver::parseRegisters(const char* output)
 		* whitespace). It is the raw value. The remainder of the line
 		* is the cooked value.
 		*/
-		int pos = value.indexOf(' ');
+		int pos = value.indexOf(QLatin1Char(' '));
 		if (pos < 0) {
 		    reg.rawValue = value;
 		    reg.cookedValue = QString();

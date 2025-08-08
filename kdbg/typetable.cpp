@@ -56,7 +56,7 @@ void TypeTable::loadTypeTables()
 
     for (const auto& file: files) {
 	typeTables.push_back(TypeTable());
-	typeTables.back().loadFromFile(file.second + '/' + file.first);
+	typeTables.back().loadFromFile(file.second + QLatin1Char('/') + file.first);
     }
 }
 
@@ -171,7 +171,7 @@ void TypeTable::readType(const KConfigGroup& cf, const QString& type)
     }
 
     // add the new type
-    if (info.m_templatePattern.indexOf('<') < 0)
+    if (info.m_templatePattern.indexOf(QLatin1Char('<')) < 0)
 	m_typeDict.insert(std::make_pair(type, info));
     else
 	m_templates.insert(std::make_pair(type, info));
@@ -199,7 +199,7 @@ TypeInfo::TypeInfo(const QString& displayString)
     int startIdx = 0;
     int idx;
     while (i < typeInfoMaxExpr &&
-	   (idx = displayString.indexOf('%', startIdx)) >= 0)
+	   (idx = displayString.indexOf(QLatin1Char('%'), startIdx)) >= 0)
     {
 	m_displayString[i] = displayString.mid(startIdx, idx-startIdx);
 	startIdx = idx+1;
@@ -272,7 +272,7 @@ QStringList ProgramTypeTable::splitTemplateArgs(const QString& t)
     QStringList result;
     result.push_back(t);
 
-    int i = t.indexOf('<');
+    int i = t.indexOf(QLatin1Char('<'));
     if (i < 0)
 	return result;
 
@@ -285,11 +285,11 @@ QStringList ProgramTypeTable::splitTemplateArgs(const QString& t)
     int start = i;
     for (; i < t.length() && nest >= 0; i++)
     {
-	if (t[i] == '<')
+	if (t[i] == QLatin1Char('<'))
 	    nest++;
-	else if (t[i] == '>')
+	else if (t[i] == QLatin1Char('>'))
 	    nest--;
-	else if (nest == 0 && t[i] == ',') {
+	else if (nest == 0 && t[i] == QLatin1Char(',')) {
 	    // found end of argument
 	    QString arg = t.mid(start, i-start);
 	    result.push_back(arg);
@@ -346,7 +346,7 @@ const TypeInfo* ProgramTypeTable::lookup(QString type)
 
 	// a "*" in the last position of the pattern matches all arguments
 	// at the end of the template's arguments
-	if (parts.size() > pat.size() && pat.back() != "*")
+	if (parts.size() > pat.size() && pat.back() != QLatin1Char('*'))
 	    continue;	// too many arguments and no wildcard
 
 	auto t = parts.begin();
@@ -356,7 +356,7 @@ const TypeInfo* ProgramTypeTable::lookup(QString type)
 	unsigned penalty = ~(~0U>>1);	// 1 in the leading bit
 	while (equal && p != pat.end())
 	{
-	    if (*p == "*")
+	    if (*p == QLatin1Char('*'))
 		accumPenalty |= penalty;	// penalize wildcards
 	    else
 	    	equal = *p == *t;

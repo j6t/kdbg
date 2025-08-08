@@ -1001,7 +1001,7 @@ QString DebuggerMainWnd::createOutputWindow()
     title += i18n(": Program output");
 
     // parse the command line specified in the preferences
-    QStringList cmdParts = m_outputTermCmdStr.split(' ');
+    QStringList cmdParts = m_outputTermCmdStr.split(QLatin1Char(' '));
 
     /*
      * Build the argv array. Thereby substitute special sequences:

@@ -548,9 +548,9 @@ void SourceWindow::disassembled(int lineNo, const std::list<DisassembledCode>& d
     for (std::list<DisassembledCode>::const_iterator c = disass.begin(); c != disass.end(); ++c, ++i)
     {
 	QString code = c->code;
-	while (code.endsWith("\n"))
+	while (code.endsWith(QLatin1Char('\n')))
 	    code.truncate(code.length()-1);
-	sl.disass[i] = c->address.asString() + ' ' + code;
+	sl.disass[i] = c->address.asString() + QLatin1Char(' ') + code;
 	sl.disassAddr[i] = c->address;
     }
 
@@ -779,7 +779,7 @@ void SourceWindow::setTabWidth(int numChars)
 	numChars = 8;
     QFontMetrics fm(document()->defaultFont());
     QString s;
-    int w = fm.horizontalAdvance(s.fill('x', numChars));
+    int w = fm.horizontalAdvance(s.fill(QLatin1Char('x'), numChars));
     setTabStopDistance(w);
 }
 
@@ -977,7 +977,7 @@ int HighlightCpp::highlight(const QString& text, int state)
 	state = 0;
 
     // check for preprocessor line
-    if (state == 0 && text.trimmed().startsWith("#"))
+    if (state == 0 && text.trimmed().startsWith(QLatin1Char('#')))
     {
 	setFormat(0, text.length(), QColor("darkgreen"));
 	return 0;
@@ -1007,7 +1007,7 @@ int HighlightCpp::highlight(const QString& text, int state)
 	    break;
 	case hlString:
 	    for (end = start+1; end < int(text.length()); end++) {
-		if (text[end] == '\\') {
+		if (text[end] == QLatin1Char('\\')) {
 		    if (end < int(text.length()))
 			++end;
 		} else if (text[end] == text[start]) {
@@ -1020,7 +1020,7 @@ int HighlightCpp::highlight(const QString& text, int state)
 	    break;
 	case hlIdent:
 	    for (end = start+1; end < int(text.length()); end++) {
-		if (!text[end].isLetterOrNumber() && text[end] != '_')
+		if (!text[end].isLetterOrNumber() && text[end] != QLatin1Char('_'))
 		    break;
 	    }
 	    state = 0;
@@ -1034,26 +1034,26 @@ int HighlightCpp::highlight(const QString& text, int state)
 	default:
 	    for (end = start; end < int(text.length()); end++)
 	    {
-		if (text[end] == '/')
+		if (text[end] == QLatin1Char('/'))
 		{
 		    if (end+1 < int(text.length())) {
-			if (text[end+1] == '/') {
+			if (text[end+1] == QLatin1Char('/')) {
 			    state = hlCommentLine;
 			    break;
-			} else if (text[end+1] == '*') {
+			} else if (text[end+1] == QLatin1Char('*')) {
 			    state = hlCommentBlock;
 			    break;
 			}
 		    }
 		}
-		else if (text[end] == '"' || text[end] == '\'')
+		else if (text[end] == QLatin1Char('"') || text[end] == QLatin1Char('\''))
 		{
 		    state = hlString;
 		    break;
 		}
-		else if ((text[end] >= 'A' && text[end] <= 'Z') ||
-			 (text[end] >= 'a' && text[end] <= 'z') ||
-			 text[end] == '_')
+		else if ((text[end] >= QLatin1Char('A') && text[end] <= QLatin1Char('Z')) ||
+			 (text[end] >= QLatin1Char('a') && text[end] <= QLatin1Char('z')) ||
+			 text[end] == QLatin1Char('_'))
 		{
 		    state = hlIdent;
 		    break;
