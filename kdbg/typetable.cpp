@@ -122,7 +122,7 @@ void TypeTable::loadFromFile(const QString& fileName)
 
 	// now read them
 	QString alias;
-	for (QStringList::iterator it = typeNames.begin(); it != typeNames.end(); ++it)
+	for (auto it = typeNames.begin(); it != typeNames.end(); ++it)
 	{
 	    KConfigGroup cf = confFile.group(*it);
 	    // check if this is an alias
@@ -349,8 +349,8 @@ const TypeInfo* ProgramTypeTable::lookup(QString type)
 	if (parts.size() > pat.size() && pat.back() != "*")
 	    continue;	// too many arguments and no wildcard
 
-	QStringList::const_iterator t = parts.begin();
-	QStringList::const_iterator p = pat.begin();
+	auto t = parts.begin();
+	auto p = pat.begin();
 	unsigned accumPenalty = 0;
 	bool equal = true;
 	unsigned penalty = ~(~0U>>1);	// 1 in the leading bit
@@ -383,7 +383,7 @@ void ProgramTypeTable::registerAlias(const QString& name, const TypeInfo* type)
 
 void ProgramTypeTable::loadLibTypes(const QStringList& libs)
 {
-    for (QStringList::const_iterator it = libs.begin(); it != libs.end(); ++it)
+    for (auto it = libs.begin(); it != libs.end(); ++it)
     {
 	// look up the library
 	for (std::list<TypeTable>::iterator t = typeTables.begin(); t != typeTables.end(); ++t)

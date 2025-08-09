@@ -1014,7 +1014,7 @@ QString DebuggerMainWnd::createOutputWindow()
 	{ "%C", shellScript }
     };
 
-    for (QStringList::iterator i = cmdParts.begin(); i != cmdParts.end(); ++i)
+    for (auto i = cmdParts.begin(); i != cmdParts.end(); ++i)
     {
 	QString& str = *i;
 	for (int j = sizeof(substitute)/sizeof(substitute[0])-1; j >= 0; j--) {

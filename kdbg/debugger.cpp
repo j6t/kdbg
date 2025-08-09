@@ -1338,7 +1338,8 @@ void KDebugger::handleLocals(const char* output)
     /*
      * Match old variables against new ones.
      */
-    for (QStringList::ConstIterator n = oldVars.begin(); n != oldVars.end(); ++n) {
+    for (auto n = oldVars.begin(); n != oldVars.end(); ++n)
+    {
 	// lookup this variable in the list of new variables
 	std::list<ExprValue*>::iterator v = newVars.begin();
 	while (v != newVars.end() && (*v)->m_name != *n)

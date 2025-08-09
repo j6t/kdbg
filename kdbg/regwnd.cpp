@@ -596,7 +596,7 @@ void RegisterView::updateRegisters(const std::list<RegisterInfo>& regs)
 	    del.push_back(i->first);
 	}
     }
-    for (QStringList::Iterator i = del.begin(); i != del.end(); ++i)
+    for (auto i = del.begin(); i != del.end(); ++i)
     {
 	RegMap::iterator it = m_registers.find(*i);
 	delete it->second;
