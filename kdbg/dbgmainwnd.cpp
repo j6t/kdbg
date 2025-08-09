@@ -277,7 +277,7 @@ void DebuggerMainWnd::initKAction()
     KStandardAction::findNext(m_filesWindow, SLOT(slotFindForward()), actionCollection());
     KStandardAction::findPrev(m_filesWindow, SLOT(slotFindBackward()), actionCollection());
 
-    struct { QWidget* w; QString id; QAction** act; } dw[] = {
+    struct { QWidget* w; const char* id; QAction** act; } dw[] = {
 	{ m_btWindow, "view_stack", &m_btWindowAction },
 	{ m_localVariables, "view_locals", &m_localVariablesAction },
 	{ m_watches, "view_watched_expressions", &m_watchesAction },
@@ -290,7 +290,7 @@ void DebuggerMainWnd::initKAction()
     for (unsigned i = 0; i < sizeof(dw)/sizeof(dw[0]); i++) {
 	QDockWidget* d = dockParent(dw[i].w);
 	QAction* action = d->toggleViewAction();
-	actionCollection()->addAction(dw[i].id, action);
+	actionCollection()->addAction(QLatin1String(dw[i].id), action);
 	*dw[i].act = action;
     }
 
