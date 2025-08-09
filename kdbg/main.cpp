@@ -14,7 +14,6 @@
 #include "dbgmainwnd.h"
 #include "typetable.h"
 #include "version.h"
-#include <stdlib.h>			/* getenv(3) */
 #include "mydebug.h"
 
 
@@ -99,7 +98,7 @@ int main(int argc, char** argv)
 
     // check environment variable for transcript file name
     if (transcript.isEmpty()) {
-	transcript = getenv("KDBG_TRANSCRIPT");
+	transcript = qEnvironmentVariable("KDBG_TRANSCRIPT");
     }
     debugger->setTranscript(transcript);
 
