@@ -964,13 +964,13 @@ QString DebuggerMainWnd::createOutputWindow()
     // create a fifo that will pass in the tty name
     QFile::remove(fifoName);		// remove remnants
 #ifdef HAVE_MKFIFO
-    if (::mkfifo(fifoName.toLocal8Bit(), S_IRUSR|S_IWUSR) < 0) {
+    if (::mkfifo(fifoName.toLocal8Bit().data(), S_IRUSR|S_IWUSR) < 0) {
 	// failed
 	TRACE("mkfifo " + fifoName + " failed");
 	return QString();
     }
 #else
-    if (::mknod(fifoName.toLocal8Bit(), S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
+    if (::mknod(fifoName.toLocal8Bit().data(), S_IFIFO | S_IRUSR|S_IWUSR, 0) < 0) {
 	// failed
 	TRACE("mknod " + fifoName + " failed");
 	return QString();
@@ -1036,7 +1036,7 @@ QString DebuggerMainWnd::createOutputWindow()
 	if (f.open(QIODevice::ReadOnly))
 	{
 	    QByteArray t = f.readAll();
-	    tty = QString::fromLocal8Bit(t, t.size());
+	    tty = QString::fromLocal8Bit(t);
 	    f.close();
 	}
 	f.remove();

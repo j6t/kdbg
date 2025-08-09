@@ -173,7 +173,7 @@ public:
     /**
      * Returns the command to print the QString data.
      */
-    const char* printQStringDataCmd() const { return m_printQStringDataCmd; }
+    const char* printQStringDataCmd() const { return m_printQStringDataCmd.data(); }
 
 protected:
     TypeTable::TypeInfoRefMap m_types;
