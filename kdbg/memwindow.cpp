@@ -59,7 +59,7 @@ MemoryWindow::MemoryWindow(QWidget* parent) :
     m_layout.addWidget(&m_memory, 10);
     m_layout.activate();
 
-    connect(&m_expression, SIGNAL(activated(const QString&)),
+    connect(&m_expression, SIGNAL(textActivated(const QString&)),
 	    this, SLOT(slotNewExpression(const QString&)));
     connect(m_expression.lineEdit(), SIGNAL(returnPressed()),
 	    this, SLOT(slotNewExpression()));
