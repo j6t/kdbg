@@ -49,6 +49,7 @@ jobs:
             )
           fi
           sudo apt-get update
+          sudo apt-get remove --yes libegl-mesa0 mesa-libgallium  # addresses conflicts
           sudo apt-get install --yes --no-install-recommends \
             build-essential \
             cmake \
