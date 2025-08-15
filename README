@@ -3,17 +3,22 @@ KDE, the K Desktop Environment.
 
 To build and install:
 
-	cmake .
+	mkdir build
+	cd build
+	cmake -DBUILD_FOR_KDE_VERSION=6 ..
 	make
 	sudo make install
 
 It may be necessary to tell the install location explicitly,
 then use, for example,
 
-	cmake -DCMAKE_INSTALL_PREFIX=/usr .
+	cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_FOR_KDE_VERSION=6 ..
 
 The KDE header files libraries must be available. Make sure
-that the development packages are installed.
+that the development packages are installed. To build for the older
+version 5 of the KDE Framework, use
+
+	cmake -DBUILD_FOR_KDE_VERSION=5 ..
 
 The homepage is at
 
