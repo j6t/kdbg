@@ -28,7 +28,7 @@ int main(int argc, char** argv)
 			 QStringLiteral(KDBG_VERSION),
 			 i18n("A Debugger"),
 			 KAboutLicense::GPL_V2,
-			 i18n("(c) 1998-2023 Johannes Sixt"),
+			 i18n("(c) 1998-2025 Johannes Sixt"),
 			 QString(),	/* any text */
 			 QStringLiteral("https://www.kdbg.org/"),
 			 QStringLiteral("j6t@kdbg.org"));
