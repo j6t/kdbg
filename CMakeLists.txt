@@ -7,7 +7,7 @@ set(_QT6_MIN_VERSION "6.6.2")  # matches Ubuntu oracular (24.10)
 set(_KF5_MIN_VERSION "5.101.0")
 set(_KF6_MIN_VERSION "6.6.0")  # matches Ubuntu oracular (24.10)
 
-set(KDBG_VERSION 3.1.0)
+set(KDBG_VERSION 3.2.0)
 configure_file(${CMAKE_CURRENT_SOURCE_DIR}/kdbg/version.h.cmake ${CMAKE_CURRENT_BINARY_DIR}/kdbg/version.h)
 
 if(BUILD_FOR_KDE_VERSION EQUAL 6)
