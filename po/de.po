@@ -1,6 +1,6 @@
 # translation of de.po to Deutsch
 # KDbg - Debugger GUI for gdb
-# Copyright (C) Johannes Sixt <j6t@kdbg.org>, 1998-2009.
+# SPDX-FileCopyrightText: 1998-2009, 2025 Johannes Sixt <j6t@kdbg.org>
 #
 # Johannes Sixt <j6t@kdbg.org>, 2005, 2006, 2007, 2009, 2011, 2023.
 msgid ""
@@ -8,14 +8,14 @@ msgstr ""
 "Project-Id-Version: kdbg 2.9.1\n"
 "Report-Msgid-Bugs-To: \n"
 "POT-Creation-Date: 2025-08-16 17:42+0200\n"
-"PO-Revision-Date: 2023-12-03 09:12+0100\n"
+"PO-Revision-Date: 2025-08-16 17:44+0200\n"
 "Last-Translator: Johannes Sixt <j6t@kdbg.org>\n"
 "Language-Team: German <kde-i18n-de@kde.org>\n"
 "Language: de\n"
 "MIME-Version: 1.0\n"
 "Content-Type: text/plain; charset=UTF-8\n"
 "Content-Transfer-Encoding: 8bit\n"
-"X-Generator: Lokalize 21.12.3\n"
+"X-Generator: Lokalize 23.08.5\n"
 "Plural-Forms: nplurals=2; plural=(n != 1);\n"
 
 #. i18n: file: brkptbase.ui:86
@@ -320,7 +320,7 @@ msgstr "Sebastian Pipping "
 
 #: main.cpp:43
 msgid "GitHub Actions CI"
-msgstr ""
+msgstr "GitHub Actions CI"
 
 #: main.cpp:61
 msgid "transcript of conversation with the debugger"
@@ -331,9 +331,8 @@ msgid "remote debugging via <device>"
 msgstr "entferntes Debuggen über <device>"
 
 #: main.cpp:63
-#, fuzzy
 msgid "specify language: C"
-msgstr "Programmiersprache: C, XSLT"
+msgstr "Programmiersprache: C"
 
 #: main.cpp:64
 msgid "specify arguments of debugged executable"
@@ -560,27 +559,27 @@ msgstr "&Reell (g)"
 
 #: regwnd.cpp:84
 msgid "8 bits"
-msgstr ""
+msgstr "8 Bit"
 
 #: regwnd.cpp:85
 msgid "16 bits"
-msgstr ""
+msgstr "16 Bit"
 
 #: regwnd.cpp:86
 msgid "32 bits"
-msgstr ""
+msgstr "32 Bit"
 
 #: regwnd.cpp:87
 msgid "64 bits"
-msgstr ""
+msgstr "64 Bit"
 
 #: regwnd.cpp:88
 msgid "80 bits"
-msgstr ""
+msgstr "80 Bit"
 
 #: regwnd.cpp:89
 msgid "128 bits"
-msgstr ""
+msgstr "128 Bit"
 
 #: regwnd.cpp:457
 msgid "Register"
