@@ -125,15 +125,21 @@ the project history</a>.</p>
 <p>Compiling is straight forward. Extract the source archive, then go
 to the newly created directory and type:
 </p>
-<p class="cmd">cmake .<br/>
-make<br/>sudo make install
+<p class="cmd">mkdir build<br/>
+cd build<br/>
+cmake -DBUILD_FOR_KDE_VERSION=6 ..<br/>
+make<br/>
+sudo make install
 </p>
 <p>It is necessary that you have the KDE header files and libraries
 installed. Some distributions do not automatically install the header
 files. Please make sure that you installed them. It may also be
 necessary to explicitly tell the location of KDE, e.g.:
 </p>
-<p class="cmd">cmake -DCMAKE_INSTALL_PREFIX=/usr .
+<p class="cmd">cmake -DCMAKE_INSTALL_PREFIX=/usr -DBUILD_FOR_KDE_VERSION=6 ..
+</p>
+<p>To build for the older version 5 of the KDE Framework, use</p>
+<p class="cmd">cmake -DBUILD_FOR_KDE_VERSION=5 ..
 </p>
 <h2>Download Binaries</h2>
 <p>Official Debian packages are available from
