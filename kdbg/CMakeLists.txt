@@ -96,11 +96,6 @@ target_link_libraries(kdbg
     KF${BUILD_FOR_KDE_VERSION}::XmlGui
     ${LIB_UTIL}
 )
-if(BUILD_FOR_KDE_VERSION EQUAL 6)
-    target_link_libraries(kdbg
-        Qt::Core5Compat
-    )
-endif()
 
 install(TARGETS kdbg ${KDE_INSTALL_TARGETS_DEFAULT_ARGS})
 install(FILES kdbg.desktop DESTINATION ${KDE_INSTALL_APPDIR})
