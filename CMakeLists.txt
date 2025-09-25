@@ -31,9 +31,6 @@ include(FeatureSummary)
 find_package(Qt${BUILD_FOR_KDE_VERSION} ${QT_MIN_VERSION} CONFIG REQUIRED COMPONENTS
     Core Widgets
 )
-if(BUILD_FOR_KDE_VERSION EQUAL 6)
-    find_package(Qt${BUILD_FOR_KDE_VERSION}Core5Compat CONFIG REQUIRED)
-endif()
 
 find_package(KF${BUILD_FOR_KDE_VERSION} ${KF_MIN_VERSION} REQUIRED COMPONENTS
     I18n

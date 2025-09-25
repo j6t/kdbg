@@ -45,7 +45,6 @@ jobs:
               libkf6windowsystem-dev
               libkf6xmlgui-dev
               qt6-base-dev
-              qt6-5compat-dev
             )
           fi
           sudo apt-get update
