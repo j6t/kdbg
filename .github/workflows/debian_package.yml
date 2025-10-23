@@ -37,8 +37,9 @@ jobs:
               qtbase5-dev
             )
           else
-            sudo sed 's,noble,plucky,g' -i /etc/apt/sources.list.d/ubuntu.sources  # Ubuntu 25.04
+            sudo sed 's,noble,questing,g' -i /etc/apt/sources.list.d/ubuntu.sources  # Ubuntu 25.10
             extra_packages=(
+              binutils
               libkf6config-dev
               libkf6i18n-dev
               libkf6iconthemes-dev
