@@ -345,7 +345,7 @@ void MemoryWindow::slotNewMemoryDump(const QString& msg, const std::list<MemoryD
 	     */
 	    int dumpAsciiFixedLen = ((m_format & MDTsizemask) == MDTbyte) ? 8:16;
 	    if (dumpAscii.size() < dumpAsciiFixedLen) {
-		dumpAscii += QString::asprintf("%*c", dumpAsciiFixedLen- dumpAscii.size(), ' ');
+		dumpAscii += QString::asprintf("%*c", dumpAsciiFixedLen - (int)dumpAscii.size(), ' ');
 	    }
 		line->setText(COL_DUMP_ASCII, dumpAscii);
 	    line->setTextAlignment(COL_DUMP_ASCII, Qt::AlignRight);
