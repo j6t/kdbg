@@ -348,11 +348,19 @@ void SourceWindow::infoMousePress(QMouseEvent* ev)
     }
 
     // get row
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    int row = cursorForPosition(QPoint(0, ev->position().y())).blockNumber();
+#else
     int row = cursorForPosition(QPoint(0, ev->y())).blockNumber();
+#endif
     if (row < 0)
 	return;
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+    if (ev->position().x() > m_widthItems)
+#else
     if (ev->x() > m_widthItems)
+#endif
     {
 	if (isRowExpanded(row)) {
 	    actionCollapseRow(row);
