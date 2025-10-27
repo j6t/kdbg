@@ -219,25 +219,25 @@ QDockWidget* DebuggerMainWnd::createDockWidget(const char* name, const QString& 
 }
 
 QAction* DebuggerMainWnd::createAction(const QString& text, const char* icon,
-			int shortcut, const QObject* receiver,
+			QKeyCombination shortcut, const QObject* receiver,
 			const char* slot, const char* name)
 {
     QAction* a = actionCollection()->addAction(QLatin1String(name));
     a->setText(text);
     a->setIcon(QIcon(new KIconEngine(QLatin1String(icon), KIconLoader::global())));
-    if (shortcut)
+    if (shortcut != QKeyCombination())
 	actionCollection()->setDefaultShortcut(a, QKeySequence(shortcut));
     connect(a, SIGNAL(triggered()), receiver, slot);
     return a;
 }
 
 QAction* DebuggerMainWnd::createAction(const QString& text,
-			int shortcut, const QObject* receiver,
+			QKeyCombination shortcut, const QObject* receiver,
 			const char* slot, const char* name)
 {
     QAction* a = actionCollection()->addAction(QLatin1String(name));
     a->setText(text);
-    if (shortcut)
+    if (shortcut != QKeyCombination())
 	actionCollection()->setDefaultShortcut(a, QKeySequence(shortcut));
     connect(a, SIGNAL(triggered()), receiver, slot);
     return a;
@@ -251,23 +251,23 @@ void DebuggerMainWnd::initKAction()
                       actionCollection());
     open->setText(i18n("&Open Source Code..."));
     m_closeAction = KStandardAction::close(m_filesWindow, SLOT(slotClose()), actionCollection());
-    m_reloadAction = createAction(i18n("&Reload Source Code"), "view-refresh", 0,
+    m_reloadAction = createAction(i18n("&Reload Source Code"), "view-refresh", {},
 			m_filesWindow, SLOT(slotFileReload()), "file_reload");
     m_fileExecAction = createAction(i18n("&Load Executable..."),
-			"executable-open", 0,
+			"executable-open", {},
 			this, SLOT(slotFileExe()), "file_executable");
     m_recentExecAction = KStandardAction::openRecent(this, SLOT(slotRecentExec(const QUrl&)),
 		      actionCollection());
     m_recentExecAction->setObjectName(QStringLiteral("file_executable_recent"));
     m_recentExecAction->setText(i18n("Recent E&xecutables"));
-    m_coreDumpAction = createAction(i18n("&Core Dump..."), 0,
+    m_coreDumpAction = createAction(i18n("&Core Dump..."), {},
 			this, SLOT(slotFileCore()), "file_core_dump");
     KStandardAction::quit(this, SLOT(close()), actionCollection());
 
     // settings menu
-    m_settingsAction = createAction(i18n("This &Program..."), 0,
+    m_settingsAction = createAction(i18n("This &Program..."), {},
 			this, SLOT(slotFileProgSettings()), "settings_program");
-    createAction(i18n("&Global Options..."), 0,
+    createAction(i18n("&Global Options..."), {},
 			this, SLOT(slotFileGlobalSettings()), "settings_global");
     KStandardAction::keyBindings(this, SLOT(slotConfigureKeys()), actionCollection());
     KStandardAction::showStatusbar(this, SLOT(slotViewStatusbar()), actionCollection());
@@ -324,19 +324,19 @@ void DebuggerMainWnd::initKAction()
 			m_debugger, SLOT(programNexti()), "exec_step_over_by_insn");
     connect(m_stepOverIAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
     m_execMovePCAction = createAction(i18n("&Program counter to current line"),
-			"debug-run-cursor", 0,
+			"debug-run-cursor", {},
 			m_filesWindow, SLOT(slotMoveProgramCounter()), "exec_movepc");
-    m_breakAction = createAction(i18n("&Break"), 0,
+    m_breakAction = createAction(i18n("&Break"), {},
 			m_debugger, SLOT(programBreak()), "exec_break");
-    m_killAction = createAction(i18n("&Kill"), 0,
+    m_killAction = createAction(i18n("&Kill"), {},
 			m_debugger, SLOT(programKill()), "exec_kill");
-    m_restartAction = createAction(i18n("Re&start"), 0,
+    m_restartAction = createAction(i18n("Re&start"), {},
 			m_debugger, SLOT(programRunAgain()), "exec_restart");
-    m_attachAction = createAction(i18n("A&ttach..."), 0,
+    m_attachAction = createAction(i18n("A&ttach..."), {},
 			this, SLOT(slotExecAttach()), "exec_attach");
-    m_detachAction = createAction(i18n("&Detach"), 0,
+    m_detachAction = createAction(i18n("&Detach"), {},
 			m_debugger, SLOT(programDetach()), "exec_detach");
-    m_argumentsAction = createAction(i18n("&Arguments..."), 0,
+    m_argumentsAction = createAction(i18n("&Arguments..."), {},
 			this, SLOT(slotExecArgs()), "exec_arguments");
 
     // breakpoint menu
@@ -348,7 +348,7 @@ void DebuggerMainWnd::initKAction()
 			m_filesWindow, SLOT(slotBrkptEnable()), "breakpoint_enable");
 
     // only in popup menus
-    createAction(i18n("Watch Expression"), 0,
+    createAction(i18n("Watch Expression"), {},
 			this, SLOT(slotLocalsToWatch()), "watch_expression");
     m_editValueAction = createAction(i18n("Edit Value"), Qt::Key_F2,
 			this, SLOT(slotEditValue()), "edit_value");
