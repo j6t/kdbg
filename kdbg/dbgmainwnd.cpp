@@ -371,7 +371,10 @@ void DebuggerMainWnd::initAnimation()
     m_animation = new KAnimatedButton(toolbar);
     updateToolButtonStyle(toolbar->toolButtonStyle());
     toolbar->addWidget(m_animation);
-    m_animation->setAnimationPath(KIconLoader::global()->moviePath(QStringLiteral("pulse"), KIconLoader::Toolbar));
+    // NOTE: KIconLoader::iconPath cannot find *.mng files, so we use this trick:
+    QString executableOpenPngPath = KIconLoader::global()->iconPath(QStringLiteral("executable-open"), KIconLoader::Toolbar);
+    const QString pulseMngPath = executableOpenPngPath.replace(QStringLiteral("executable-open.png"), QStringLiteral("pulse.mng"));
+    m_animation->setAnimationPath(pulseMngPath);
     connect(m_animation, SIGNAL(clicked(bool)), m_debugger, SLOT(programBreak()));
     m_animRunning = false;
 
