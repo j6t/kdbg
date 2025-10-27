@@ -98,6 +98,7 @@ jobs:
           cmake_args=(
             -DCMAKE_C_COMPILER="${{ matrix.cc }}"
             -DCMAKE_CXX_COMPILER="${{ matrix.cxx }}"
+            -DCMAKE_{C,CXX}_FLAGS='-Wall -Wextra -Werror'
             -DBUILD_FOR_KDE_VERSION="${{ matrix.kde_major }}"
             -S ./
             -B build/
