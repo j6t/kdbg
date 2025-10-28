@@ -53,6 +53,12 @@
 #include <sys/stat.h>			/* mknod(2) */
 #include <unistd.h>			/* getpid */
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+# define KDBG_COMBINE_KEY(mod, key) QKeyCombination((mod), (key)).toCombined()
+#else
+# define KDBG_COMBINE_KEY(mod, key) ((mod)|(key))
+#endif
+
 
 static const char defaultTermCmdStr[] = "xterm -name kdbgio -title %T -e sh -c %C";
 static const char defaultSourceFilter[] = "*.c *.cc *.cpp *.c++ *.C *.CC";
@@ -318,25 +324,13 @@ void DebuggerMainWnd::initKAction()
 			"debug-execute-to-cursor", Qt::Key_F7,
 			this, SLOT(slotExecUntil()), "exec_run_to_cursor");
     connect(m_toCursorAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     m_stepIntoIAction = createAction(i18n("Step i&nto by instruction"),
-			"debug-step-into-instruction", QKeyCombination(Qt::SHIFT, Qt::Key_F8).toCombined(),
+			"debug-step-into-instruction", KDBG_COMBINE_KEY(Qt::SHIFT, Qt::Key_F8),
 			m_debugger, SLOT(programStepi()), "exec_step_into_by_insn");
-#else
-    m_stepIntoIAction = createAction(i18n("Step i&nto by instruction"),
-			"debug-step-into-instruction", Qt::SHIFT | Qt::Key_F8,
-			m_debugger, SLOT(programStepi()), "exec_step_into_by_insn");
-#endif
     connect(m_stepIntoIAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
     m_stepOverIAction = createAction(i18n("Step o&ver by instruction"),
-			"debug-step-instruction", QKeyCombination(Qt::SHIFT, Qt::Key_F10).toCombined(),
+			"debug-step-instruction", KDBG_COMBINE_KEY(Qt::SHIFT, Qt::Key_F10),
 			m_debugger, SLOT(programNexti()), "exec_step_over_by_insn");
-#else
-    m_stepOverIAction = createAction(i18n("Step o&ver by instruction"),
-			"debug-step-instruction", Qt::SHIFT | Qt::Key_F10,
-			m_debugger, SLOT(programNexti()), "exec_step_over_by_insn");
-#endif
     connect(m_stepOverIAction, SIGNAL(triggered()), this, SLOT(intoBackground()));
     m_execMovePCAction = createAction(i18n("&Program counter to current line"),
 			"debug-run-cursor", 0,
@@ -357,17 +351,10 @@ void DebuggerMainWnd::initKAction()
     // breakpoint menu
     m_bpSetAction = createAction(i18n("Set/Clear &breakpoint"), "brkpt", Qt::Key_F9,
 			m_filesWindow, SLOT(slotBrkptSet()), "breakpoint_set");
-#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
-    m_bpSetTempAction = createAction(i18n("Set &temporary breakpoint"), QKeyCombination(Qt::SHIFT, Qt::Key_F9).toCombined(),
+    m_bpSetTempAction = createAction(i18n("Set &temporary breakpoint"), KDBG_COMBINE_KEY(Qt::SHIFT, Qt::Key_F9),
 			m_filesWindow, SLOT(slotBrkptSetTemp()), "breakpoint_set_temporary");
-    m_bpEnableAction = createAction(i18n("&Enable/Disable breakpoint"), QKeyCombination(Qt::CTRL, Qt::Key_F9).toCombined(),
+    m_bpEnableAction = createAction(i18n("&Enable/Disable breakpoint"), KDBG_COMBINE_KEY(Qt::CTRL, Qt::Key_F9),
 			m_filesWindow, SLOT(slotBrkptEnable()), "breakpoint_enable");
-#else
-    m_bpSetTempAction = createAction(i18n("Set &temporary breakpoint"), Qt::SHIFT | Qt::Key_F9,
-			m_filesWindow, SLOT(slotBrkptSetTemp()), "breakpoint_set_temporary");
-    m_bpEnableAction = createAction(i18n("&Enable/Disable breakpoint"), Qt::CTRL | Qt::Key_F9,
-			m_filesWindow, SLOT(slotBrkptEnable()), "breakpoint_enable");
-#endif
 
     // only in popup menus
     createAction(i18n("Watch Expression"), 0,
