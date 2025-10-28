@@ -7,6 +7,11 @@
 #ifndef DBGMAINWND_H
 #define DBGMAINWND_H
 
+#if QT_VERSION >= QT_VERSION_CHECK(6, 0, 0)
+#include <QKeyCombination>
+#else
+using QKeyCombination = int;
+#endif
 #include <QPointer>
 #include <QTimer>
 #include <ksharedconfig.h>
@@ -118,10 +123,10 @@ protected:
 protected:
     bool queryClose() override;
     QAction* createAction(const QString& text, const char* icon,
-			int shortcut, const QObject* receiver,
+			QKeyCombination shortcut, const QObject* receiver,
 			const char* slot, const char* name);
     QAction* createAction(const QString& text,
-			int shortcut, const QObject* receiver,
+			QKeyCombination shortcut, const QObject* receiver,
 			const char* slot, const char* name);
 
     // the debugger proper
