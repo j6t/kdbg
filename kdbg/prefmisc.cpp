@@ -11,7 +11,7 @@ PrefMisc::PrefMisc(QWidget* parent) :
 	QWidget(parent),
 	m_grid(this),
 	m_popForeground(this),
-	m_backTimeoutLabel(this),
+	m_lowerWindow(this),
 	m_backTimeout(this),
 	m_tabWidthLabel(this),
 	m_tabWidth(this),
@@ -22,14 +22,17 @@ PrefMisc::PrefMisc(QWidget* parent) :
 {
     m_popForeground.setText(i18n("&Pop into foreground when program stops"));
     m_popForeground.setMinimumSize(m_popForeground.sizeHint());
+    connect( &m_popForeground, SIGNAL(toggled(bool)), this, SLOT(setPopIntoForeground(bool)) );
     m_grid.addWidget(&m_popForeground, 0, 0, 1, 2);
     m_grid.addItem(new QSpacerItem(0, m_popForeground.sizeHint().height()), 0, 0);
 
-    m_backTimeoutLabel.setText(i18n("Time until window goes &back (in milliseconds):"));
-    m_backTimeoutLabel.setMinimumSize(m_backTimeoutLabel.sizeHint());
-    m_backTimeoutLabel.setBuddy(&m_backTimeout);
+    m_lowerWindow.setText(i18n("&Lower window after [ms]:"));
+    const QString backTimeoutTT_Cqs( i18n("Lower the kdbg window with continuing execution of the debuge.") );
+    m_lowerWindow.setToolTip( backTimeoutTT_Cqs );
+    m_lowerWindow.setMinimumSize(m_lowerWindow.sizeHint());
+    connect( &m_lowerWindow, SIGNAL(toggled(bool)), this, SLOT(setLowerWindow(bool)) );
     m_backTimeout.setMinimumSize(m_backTimeout.sizeHint());
-    m_grid.addWidget(&m_backTimeoutLabel, 1, 0);
+    m_grid.addWidget(&m_lowerWindow, 1, 0);
     m_grid.addWidget(&m_backTimeout, 1, 1);
 
     setupEditGroup(i18n("&Tabstop every (characters):"),

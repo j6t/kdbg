@@ -64,6 +64,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
 	m_outputTermProc(new QProcess),
 	m_ttyLevel(-1),			/* no tty yet */
 	m_popForeground(false),
+	m_lowerWindow(false),
 	m_backTimeout(1000),
 	m_tabWidth(0),
 	m_sourceFilter(QLatin1String(defaultSourceFilter)),
@@ -118,6 +119,7 @@ DebuggerMainWnd::DebuggerMainWnd() :
     connect(m_watches, SIGNAL(textDropped(const QString&)), SLOT(slotAddWatch(const QString&)));
 
     connect(&m_filesWindow->m_findDlg, SIGNAL(closed()), SLOT(updateUI()));
+    connect(&m_filesWindow->m_gotoDlg, SIGNAL(closed()), SLOT(updateUI()));
     connect(m_filesWindow, SIGNAL(newFileLoaded()),
 	    SLOT(slotNewFileLoaded()));
     connect(m_filesWindow, SIGNAL(toggleBreak(const QString&,int,const DbgAddr&,bool)),
@@ -276,6 +278,7 @@ void DebuggerMainWnd::initKAction()
     m_findAction = KStandardAction::find(m_filesWindow, SLOT(slotViewFind()), actionCollection());
     KStandardAction::findNext(m_filesWindow, SLOT(slotFindForward()), actionCollection());
     KStandardAction::findPrev(m_filesWindow, SLOT(slotFindBackward()), actionCollection());
+    m_gotoAction = KStandardAction::gotoLine(m_filesWindow, &WinStack::slotViewGoto, actionCollection());
 
     struct { QWidget* w; const char* id; QAction** act; } dw[] = {
 	{ m_btWindow, "view_stack", &m_btWindowAction },
@@ -443,6 +446,7 @@ static const char DebuggerGroup[] = "Debugger";
 static const char DebuggerCmdStr[] = "DebuggerCmdStr";
 static const char PreferencesGroup[] = "Preferences";
 static const char PopForeground[] = "PopForeground";
+static const char LowerWindow[] = "LowerWindow";
 static const char BackTimeout[] = "BackTimeout";
 static const char TabWidth[] = "TabWidth";
 static const char SourceFileFilter[] = "SourceFileFilter";
@@ -466,6 +470,7 @@ void DebuggerMainWnd::saveSettings(KSharedConfigPtr config)
 
     KConfigGroup pg(config->group(QLatin1String(PreferencesGroup)));
     pg.writeEntry(PopForeground, m_popForeground);
+    pg.writeEntry(LowerWindow, m_lowerWindow);
     pg.writeEntry(BackTimeout, m_backTimeout);
     pg.writeEntry(TabWidth, m_tabWidth);
     pg.writeEntry(SourceFileFilter, m_sourceFilter);
@@ -503,6 +508,7 @@ void DebuggerMainWnd::restoreSettings(KSharedConfigPtr config)
 
     KConfigGroup pg(config->group(QLatin1String(PreferencesGroup)));
     m_popForeground = pg.readEntry(PopForeground, false);
+    m_lowerWindow = pg.readEntry(LowerWindow, false);
     m_backTimeout = pg.readEntry(BackTimeout, 1000);
     m_tabWidth = pg.readEntry(TabWidth, 0);
     m_sourceFilter = pg.readEntry(SourceFileFilter, m_sourceFilter);
@@ -518,6 +524,8 @@ void DebuggerMainWnd::updateUI()
 {
     m_findAction->setChecked(m_filesWindow->m_findDlg.isVisible());
     m_findAction->setEnabled(m_filesWindow->hasWindows());
+    m_gotoAction->setChecked(m_filesWindow->m_gotoDlg.isVisible());
+    m_gotoAction->setEnabled(m_filesWindow->hasWindows());
     m_bpSetAction->setEnabled(m_debugger->canChangeBreakpoints());
     m_bpSetTempAction->setEnabled(m_debugger->canChangeBreakpoints());
     m_bpEnableAction->setEnabled(m_debugger->canChangeBreakpoints());
@@ -848,6 +856,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 
     PrefMisc prefMisc(&dlg);
     prefMisc.setPopIntoForeground(m_popForeground);
+    prefMisc.setLowerWindow(m_lowerWindow);
     prefMisc.setBackTimeout(m_backTimeout);
     prefMisc.setTabWidth(m_tabWidth);
     prefMisc.setSourceFilter(m_sourceFilter);
@@ -861,6 +870,7 @@ void DebuggerMainWnd::slotFileGlobalSettings()
 	setDebuggerCmdStr(prefDebugger.debuggerCmd());
 	setTerminalCmd(prefDebugger.terminal());
 	m_popForeground = prefMisc.popIntoForeground();
+    m_lowerWindow = prefMisc.isLowerWindowRqed();
 	m_backTimeout = prefMisc.backTimeout();
 	m_tabWidth = prefMisc.tabWidth();
 	m_sourceFilter = prefMisc.sourceFilter();
@@ -1069,9 +1079,13 @@ void DebuggerMainWnd::slotProgramStopped()
 
 void DebuggerMainWnd::intoBackground()
 {
-    if (m_popForeground) {
-	m_backTimer.setSingleShot(true);
-	m_backTimer.start(m_backTimeout);
+    if (m_popForeground) 
+    {
+        if (m_lowerWindow)
+        {
+            m_backTimer.setSingleShot(true);
+            m_backTimer.start(m_backTimeout);
+        }
     }
 }
 
