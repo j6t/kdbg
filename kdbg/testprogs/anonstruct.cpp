@@ -6,7 +6,7 @@
 struct T {
 	pthread_mutex_t mutex;	// contains anonymous union on Linux
 	struct {
-		int a;
+		int a = 1;
 	};
 	union {
 		int b;
@@ -14,19 +14,19 @@ struct T {
 	};
 	int TestPopup()
 	{
-	    return a ? b : c;
+	    return a ? b - 15 : c + 42;
 	}
 };
 
 int main()
 {
 	pthread_mutex_t mutex = PTHREAD_MUTEX_INITIALIZER;
-	T t;
+	T t = {};
 	union {
 		char a;
 		int b;
 	};
 	a = 'X';
 	b = t.TestPopup();
-	std::fprintf(stderr, "%zu, %zu, a=%d, b=%d\n", sizeof(mutex), sizeof(t), a, b);
+	std::fprintf(stderr, "%zu, %zu, b=%d\n", sizeof(mutex), sizeof(t), b);
 }
