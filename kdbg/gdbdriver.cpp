@@ -839,37 +839,19 @@ static ExprValue* parseVar(const char*& s)
 
     QString name;
     VarTree::NameKind kind;
-    /*
-     * Detect anonymouse struct values: The 'name =' part is missing:
-     *    s = { a = 1, { b = 2 }}
-     * Note that this detection works only inside structs when the anonymous
-     * struct is not the first member:
-     *    s = {{ a = 1 }, b = 2}
-     * This is misparsed (by parseNested()) because it is mistakenly
-     * interprets the second opening brace as the first element of an array
-     * of structs.
-     */
-    if (*p == '{')
-    {
-	name = i18n("<anonymous struct or union>");
-	kind = VarTree::NKanonymous;
+    if (!parseName(p, name, kind)) {
+	return nullptr;
     }
-    else
-    {
-	if (!parseName(p, name, kind)) {
-	    return nullptr;
-	}
 
-	// go for '='
-	skipSpace(p);
-	if (*p != '=') {
-	    TRACE("parse error: = not found after " + name);
-	    return nullptr;
-	}
-	// skip the '=' and more whitespace
-	p++;
-	skipSpace(p);
+    // go for '='
+    skipSpace(p);
+    if (*p != '=') {
+	TRACE("parse error: = not found after " + name);
+	return nullptr;
     }
+    // skip the '=' and more whitespace
+    p++;
+    skipSpace(p);
 
     ExprValue* variable = new ExprValue(name, kind);
     
@@ -1520,7 +1502,30 @@ static bool parseVarSeq(const char*& s, ExprValue* variable)
 	    s += 16;			/* go to the closing brace */
 	    break;
 	}
-	var = parseVar(s);
+
+	/*
+	 * Detect anonymous struct values: The 'name =' part is missing:
+	 *    s = { a = 1, { b = 2 }}
+	 * Note that this detection works only inside structs when the anonymous
+	 * struct is not the first member:
+	 *    s = {{ a = 1 }, b = 2}
+	 * This is misparsed (by parseNested()) because it is mistakenly
+	 * interprets the second opening brace as the first element of an array
+	 * of structs.
+	 */
+	if (*s == '{')
+	{
+	    var = new ExprValue(i18n("<anonymous struct or union>"), VarTree::NKanonymous);
+	    if (!parseValue(s, var)) {
+		delete var;
+		return false;
+	    }
+	}
+	else
+	{
+	    var = parseVar(s);
+	}
+
 	if (!var)
 	    break;			/* syntax error */
 	variable->appendChild(var);
