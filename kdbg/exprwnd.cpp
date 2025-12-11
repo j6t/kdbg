@@ -28,7 +28,7 @@ VarTree::VarTree(VarTree* parent, ExprValue* v) :
 {
     setText(v->m_name);
     updateValueText();
-    if (v->m_child || m_varKind == VarTree::VKpointer)
+    if (!v->m_children.empty() || m_varKind == VarTree::VKpointer)
 	setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
     else
 	setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
@@ -279,33 +279,18 @@ ExprValue::ExprValue(const QString& name, VarTree::NameKind aKind) :
 
 ExprValue::~ExprValue()
 {
-    delete m_child;
-    delete m_next;
+    for (ExprValue* child : m_children)
+	delete child;
 }
 
 void ExprValue::appendChild(ExprValue* newChild)
 {
-    if (!m_child) {
-	m_child = newChild;
-    } else {
-	// walk chain of children to find the last one
-	ExprValue* last = m_child;
-	while (last->m_next)
-	    last = last->m_next;
-	last->m_next = newChild;
-    }
-    newChild->m_next = nullptr;		// just to be sure
+    m_children.push_back(newChild);
 }
 
 int ExprValue::childCount() const
 {
-    int i = 0;
-    ExprValue* c = m_child;
-    while (c) {
-	++i;
-	c = c->m_next;
-    }
-    return i;
+    return int(m_children.size());
 }
 
 
@@ -413,7 +398,7 @@ void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	  * sub-tree for requiring an update.
 	  */
 	 (display->m_varKind != VarTree::VKpointer ||
-	  newValues->m_child)))
+	  !newValues->m_children.empty())))
     {
 	if (isExpanded) {
 	    display->setExpanded(false);
@@ -429,7 +414,7 @@ void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	// update the m_varKind
 	if (newValues->m_varKind != VarTree::VKdummy) {
 	    display->m_varKind = newValues->m_varKind;
-	    if (newValues->m_child || newValues->m_varKind == VarTree::VKpointer)
+	    if (!newValues->m_children.empty() || newValues->m_varKind == VarTree::VKpointer)
 		display->setChildIndicatorPolicy(QTreeWidgetItem::ShowIndicator);
 	    else
 		display->setChildIndicatorPolicy(QTreeWidgetItem::DontShowIndicator);
@@ -459,7 +444,7 @@ void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	 * If the visible sub-tree has children, but newValues doesn't, we
 	 * can stop here.
 	 */
-	if (!newValues->m_child) {
+	if (newValues->m_children.empty()) {
 	    return;
 	}
     }
@@ -467,8 +452,8 @@ void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
     ASSERT(display->childCount() == newValues->childCount());
 
     // go for children
-    ExprValue* vNew = newValues->m_child;
-    for (int i = 0; i < display->childCount(); i++)
+    int i = 0;
+    for (ExprValue* vNew : newValues->m_children)
     {
 	VarTree* vDisplay = display->child(i);
 	// check whether the names are the same
@@ -479,7 +464,7 @@ void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	// recurse
 	updateExprRec(vDisplay, vNew, typeTable);
 
-	vNew = vNew->m_next;
+	++i;
     }
 }
 
@@ -537,7 +522,7 @@ void ExprWnd::replaceChildren(VarTree* display, ExprValue* newValues)
 	delete c;
     }
     // insert copies of the newValues
-    for (ExprValue* v = newValues->m_child; v; v = v->m_next)
+    for (ExprValue* v : newValues->m_children)
     {
 	VarTree* vNew = new VarTree(display, v);
 	// recurse

@@ -1464,7 +1464,7 @@ bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 	variable->m_name = addr;
 	variable->m_nameKind = VarTree::NKaddress;
 
-	dummyParent->m_child = variable;
+	dummyParent->appendChild(variable);
 	// expand the first level for convenience
 	variable->m_initiallyExpanded = true;
 	TRACE("update ptr: " + cmd->m_expr->getText());
@@ -1689,7 +1689,7 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
     bool errorValue =
 	!partExpr ||
 	/* we only allow simple values at the moment */
-	partExpr->m_child;
+	!partExpr->m_children.empty();
 
     QString partValue;
     if (errorValue)

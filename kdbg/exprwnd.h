@@ -82,8 +82,7 @@ struct ExprValue
     QString m_value;
     VarTree::VarKind m_varKind;
     VarTree::NameKind m_nameKind;
-    ExprValue* m_child = {};		/* the first child expression */
-    ExprValue* m_next = {};		/* the next sibling expression */
+    std::list<ExprValue*> m_children;
     bool m_initiallyExpanded;
 
     ExprValue(const QString& name, VarTree::NameKind kind);
