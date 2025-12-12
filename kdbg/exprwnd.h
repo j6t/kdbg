@@ -83,6 +83,7 @@ struct ExprValue
     VarTree::VarKind m_varKind;
     VarTree::NameKind m_nameKind;
     std::list<ExprValue*> m_children;
+    int m_repeatsCount = 1;
     bool m_initiallyExpanded;
 
     ExprValue(const QString& name, VarTree::NameKind kind);
