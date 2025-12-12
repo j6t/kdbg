@@ -1541,6 +1541,29 @@ static bool parseNested(const char*& s, ExprValue* variable)
 
     bool isArray = std::all_of(variable->m_children.begin(), variable->m_children.end(),
 				[](ExprValue* var) { return var->m_name.isEmpty(); });
+    if (isArray && variable->m_children.size() >= 2)
+    {
+	/*
+	 * This looks like an array. But if any of the values are structs
+	 * that have different member names, then all the values are
+	 * anonymous structs or unions. It is sufficient to check just two
+	 * entries: if they have members with the same name, it is an array,
+	 * because two anonymous structs or unions cannot have the same member names.
+	 * Also, if we find an empty struct, then this must be an array, because
+	 * empty structs cannot be anonymous.
+	 */
+	auto firstName = [](ExprValue* var) {
+	    return var->m_children.front()->m_name;
+	};
+	ExprValue* a = variable->m_children.front();
+	ExprValue* b = variable->m_children.back();
+	isArray =
+	    a->m_varKind != VarTree::VKstruct ||
+	    b->m_varKind != VarTree::VKstruct ||
+	    a->m_children.empty() ||
+	    b->m_children.empty() ||	// logically redundant, but protects the next call
+	    firstName(a) == firstName(b);
+    }
     if (isArray)
     {
 	variable->m_varKind = VarTree::VKarray;
