@@ -48,11 +48,15 @@ struct OnlyUnions {
 		};
 	};
 	struct {
+		// nested anonymous struct
 		struct {
 			int used;
 			double avail;
 			double* data;
-		} member;
+		};
+		// need a named member, otherwise this struct
+		// is mistakenly regarded as an array of length 1
+		int member;
 	};
 };
 

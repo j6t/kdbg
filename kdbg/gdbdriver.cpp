@@ -1549,11 +1549,16 @@ static bool parseNested(const char*& s, ExprValue* variable)
 	 * anonymous structs or unions. It is sufficient to check just two
 	 * entries: if they have members with the same name, it is an array,
 	 * because two anonymous structs or unions cannot have the same member names.
+	 * Note that we must search for names recursively in the contained structs,
+	 * because they can be anonymous as well.
 	 * Also, if we find an empty struct, then this must be an array, because
 	 * empty structs cannot be anonymous.
 	 */
 	auto firstName = [](ExprValue* var) {
-	    return var->m_children.front()->m_name;
+	    do {
+		var = var->m_children.front();
+	    } while (var->m_nameKind == VarTree::NKanonymous);
+	    return var->m_name;
 	};
 	ExprValue* a = variable->m_children.front();
 	ExprValue* b = variable->m_children.back();
