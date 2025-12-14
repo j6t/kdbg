@@ -117,7 +117,7 @@ const char KDebugger::DriverNameEntry[] = "DriverName";
 const char DisassemblyFlavor[] = "DisassemblyFlavor";
 
 bool KDebugger::debugProgram(const QString& name,
-			     DebuggerDriver* driver)
+			std::unique_ptr<DebuggerDriver> driver)
 {
     if (m_d && m_d->isRunning())
     {
@@ -132,25 +132,24 @@ bool KDebugger::debugProgram(const QString& name,
 	    TRACE("timed out while waiting for gdb to die!");
 	    return false;
 	}
-	delete m_d;
-	m_d = nullptr;
+	m_d.reset();
     }
 
     // wire up the driver
-    connect(driver, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
+    connect(driver.get(), SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)),
 	    this, SIGNAL(activateFileLine(const QString&,int,const DbgAddr&)));
-    connect(driver, SIGNAL(finished(int, QProcess::ExitStatus)),
+    connect(driver.get(), SIGNAL(finished(int, QProcess::ExitStatus)),
 	    SLOT(gdbExited()));
-    connect(driver, SIGNAL(commandReceived(CmdQueueItem*,const char*)),
+    connect(driver.get(), SIGNAL(commandReceived(CmdQueueItem*,const char*)),
 	    SLOT(parse(CmdQueueItem*,const char*)));
-    connect(driver, SIGNAL(bytesWritten(qint64)), SIGNAL(updateUI()));
-    connect(driver, SIGNAL(inferiorRunning()), SLOT(slotInferiorRunning()));
-    connect(driver, SIGNAL(enterIdleState()), SLOT(backgroundUpdate()));
-    connect(driver, SIGNAL(enterIdleState()), SIGNAL(updateUI()));
+    connect(driver.get(), SIGNAL(bytesWritten(qint64)), SIGNAL(updateUI()));
+    connect(driver.get(), SIGNAL(inferiorRunning()), SLOT(slotInferiorRunning()));
+    connect(driver.get(), SIGNAL(enterIdleState()), SLOT(backgroundUpdate()));
+    connect(driver.get(), SIGNAL(enterIdleState()), SIGNAL(updateUI()));
     connect(&m_localVariables, SIGNAL(removingItem(VarTree*)),
-	    driver, SLOT(dequeueCmdByVar(VarTree*)));
+	    driver.get(), SLOT(dequeueCmdByVar(VarTree*)));
     connect(&m_watchVariables, SIGNAL(removingItem(VarTree*)),
-	    driver, SLOT(dequeueCmdByVar(VarTree*)));
+	    driver.get(), SLOT(dequeueCmdByVar(VarTree*)));
 
     // create the program settings object
     openProgramConfig(name);
@@ -164,11 +163,11 @@ bool KDebugger::debugProgram(const QString& name,
     }
     // the rest is read in later in the handler of DCexecutable
 
-    m_d = driver;
+    m_d = std::move(driver);
 
     if (!startDriver()) {
 	TRACE("startDriver failed");
-	m_d = nullptr;
+	m_d.reset();
 	return false;
     }
 

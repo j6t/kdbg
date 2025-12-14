@@ -16,6 +16,7 @@ using QKeyCombination = int;
 #include <QTimer>
 #include <ksharedconfig.h>
 #include <kxmlguiwindow.h>
+#include <memory>
 #include "regwnd.h"
 
 class QDockWidget;
@@ -139,7 +140,7 @@ protected:
      * driver.
      */
     bool startDriver(const QString& executable, QString lang);
-    DebuggerDriver* driverFromLang(QString lang);
+    std::unique_ptr<DebuggerDriver> driverFromLang(QString lang);
     /**
      * Derives a driver name from the contents of the named file.
      */

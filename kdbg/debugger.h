@@ -10,6 +10,7 @@
 #include <QStringList>
 #include <list>
 #include <map>
+#include <memory>
 #include "envvar.h"
 #include "exprwnd.h"			/* some compilers require this */
 
@@ -51,7 +52,7 @@ public:
      * @return false if an error occurs.
      */
     bool debugProgram(const QString& executable,
-		      DebuggerDriver* driver);
+			std::unique_ptr<DebuggerDriver> driver);
 
     /**
      * Uses the specified core to debug the active program.
@@ -343,7 +344,7 @@ public:
     void setTerminal(const QString& term) { m_inferiorTerminal = term; }
 
     /** Returns the debugger driver. */
-    DebuggerDriver* driver() { return m_d; }
+    DebuggerDriver* driver() { return m_d.get(); }
 
     /** Returns the pid that the debugger is currently attached to. */
     const QString& attachedPid() const { return m_attachedPid; }
@@ -456,7 +457,7 @@ protected:
     void restoreProgramSettings();
 
     // debugger process
-    DebuggerDriver* m_d = {};
+    std::unique_ptr<DebuggerDriver> m_d;
     bool m_explicitKill;		/* whether we are killing gdb ourselves */
 
     QString m_statusMessage;

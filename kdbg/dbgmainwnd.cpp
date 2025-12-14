@@ -680,7 +680,7 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
     assert(m_debugger);
 
     TRACE(QString("trying language '%1'...").arg(lang));
-    DebuggerDriver* driver = driverFromLang(lang);
+    auto driver = driverFromLang(lang);
 
     if (!driver)
     {
@@ -720,12 +720,10 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 
     driver->setLogFileName(m_transcriptFile);
 
-    bool success = m_debugger->debugProgram(executable, driver);
+    bool success = m_debugger->debugProgram(executable, std::move(driver));
 
     if (!success)
     {
-	delete driver;
-
 	QString msg = i18n("Could not start the debugger process.\n"
 			   "Please shut down KDbg and resolve the problem.");
 	KMessageBox::error(this, msg);
@@ -735,7 +733,7 @@ bool DebuggerMainWnd::startDriver(const QString& executable, QString lang)
 }
 
 // derive driver from language
-DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
+std::unique_ptr<DebuggerDriver> DebuggerMainWnd::driverFromLang(QString lang)
 {
     // lang is needed in all lowercase
     lang = lang.toLower();
@@ -771,20 +769,18 @@ DebuggerDriver* DebuggerMainWnd::driverFromLang(QString lang)
 	    break;
 	}
     }
-    DebuggerDriver* driver = nullptr;
     switch (driverID) {
     case 1:
 	{
-	    GdbDriver* gdb = new GdbDriver;
+	    auto gdb = std::make_unique<GdbDriver>();
 	    gdb->setDefaultInvocation(m_debuggerCmdStr);
-	    driver = gdb;
+	    return gdb;
 	}
-	break;
     default:
 	// unknown language
 	break;
     }
-    return driver;
+    return {};
 }
 
 /**
