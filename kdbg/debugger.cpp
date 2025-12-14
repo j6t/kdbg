@@ -93,8 +93,6 @@ KDebugger::~KDebugger()
 	m_programConfig->sync();
 	m_programConfig.reset();
     }
-
-    delete m_typeTable;
 }
 
 
@@ -189,7 +187,7 @@ bool KDebugger::debugProgram(const QString& name,
     }
 
     // create a type table
-    m_typeTable = new ProgramTypeTable;
+    m_typeTable = std::make_unique<ProgramTypeTable>();
     m_sharedLibsListed = false;
 
     Q_EMIT updateUI();
@@ -692,8 +690,7 @@ void KDebugger::gdbExited()
     }
 
     // erase types
-    delete m_typeTable;
-    m_typeTable = nullptr;
+    m_typeTable.reset();
 
     if (m_explicitKill) {
 	TRACE(m_d->driverName() + " exited normally");
