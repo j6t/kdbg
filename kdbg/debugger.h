@@ -452,7 +452,7 @@ protected:
     std::map<QString,QString> m_envVars;	/* environment variables set by user */
     QStringList m_sharedLibs;		/* shared libraries used by program */
     ProgramTypeTable* m_typeTable = {};	/* known types used by the program */
-    KConfig* m_programConfig = {};	/* program-specific settings (brkpts etc) */
+    std::unique_ptr<KConfig> m_programConfig;	/* program-specific settings (brkpts etc) */
     void saveProgramSettings();
     void restoreProgramSettings();
 

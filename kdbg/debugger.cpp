@@ -91,7 +91,7 @@ KDebugger::~KDebugger()
     if (m_programConfig) {
 	saveProgramSettings();
 	m_programConfig->sync();
-	delete m_programConfig;
+	m_programConfig.reset();
     }
 
     delete m_typeTable;
@@ -687,8 +687,7 @@ void KDebugger::gdbExited()
 	    saveProgramSettings();
 	    m_programConfig->sync();
 	}
-	delete m_programConfig;
-	m_programConfig = nullptr;
+	m_programConfig.reset();
     }
 
     // erase types
@@ -742,7 +741,7 @@ void KDebugger::openProgramConfig(const QString& name)
 
     QString pgmConfigFile = getConfigForExe(name);
 
-    m_programConfig = new KConfig(pgmConfigFile);
+    m_programConfig = std::make_unique<KConfig>(pgmConfigFile);
 
     // this leaves a clue behind in the config file which
     // executable it applies to; it is mostly intended for
@@ -790,7 +789,7 @@ void KDebugger::saveProgramSettings()
 	eg.writeEntry(varValue, it->second);
     }
 
-    saveBreakpoints(m_programConfig);
+    saveBreakpoints(m_programConfig.get());
 
     // watch expressions
     // first get rid of whatever was in this group
@@ -804,7 +803,7 @@ void KDebugger::saveProgramSettings()
     }
 
     // give others a chance
-    Q_EMIT saveProgramSpecific(m_programConfig);
+    Q_EMIT saveProgramSpecific(m_programConfig.get());
 }
 
 void KDebugger::overrideProgramArguments(const QString& args)
@@ -855,7 +854,7 @@ void KDebugger::restoreProgramSettings()
 
     updateProgEnvironment(pgmArgs, pgmWd, pgmVars);
 
-    restoreBreakpoints(m_programConfig);
+    restoreBreakpoints(m_programConfig.get());
 
     // watch expressions
     KConfigGroup wg = m_programConfig->group(QLatin1String(WatchGroup));
@@ -875,7 +874,7 @@ void KDebugger::restoreProgramSettings()
     }
 
     // give others a chance
-    Q_EMIT restoreProgramSpecific(m_programConfig);
+    Q_EMIT restoreProgramSpecific(m_programConfig.get());
 }
 
 /*
