@@ -168,6 +168,7 @@ bool KDebugger::debugProgram(const QString& name,
     if (!startDriver()) {
 	TRACE("startDriver failed");
 	m_d.reset();
+	m_programConfig.reset();
 	return false;
     }
 
