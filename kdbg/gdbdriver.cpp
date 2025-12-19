@@ -25,8 +25,6 @@ static ExprValue* parseVar(const char*& s);
 static bool parseName(const char*& s, QString& name, VarTree::NameKind& kind);
 static bool parseValue(const char*& s, ExprValue* variable);
 static bool parseNested(const char*& s, ExprValue* variable);
-static bool parseVarSeq(const char*& s, ExprValue* variable);
-static bool parseValueSeq(const char*& s, ExprValue* variable);
 
 #define PROMPT "(kdbg)"
 #define PROMPT_LEN 6
@@ -841,37 +839,19 @@ static ExprValue* parseVar(const char*& s)
 
     QString name;
     VarTree::NameKind kind;
-    /*
-     * Detect anonymouse struct values: The 'name =' part is missing:
-     *    s = { a = 1, { b = 2 }}
-     * Note that this detection works only inside structs when the anonymous
-     * struct is not the first member:
-     *    s = {{ a = 1 }, b = 2}
-     * This is misparsed (by parseNested()) because it is mistakenly
-     * interprets the second opening brace as the first element of an array
-     * of structs.
-     */
-    if (*p == '{')
-    {
-	name = i18n("<anonymous struct or union>");
-	kind = VarTree::NKanonymous;
+    if (!parseName(p, name, kind)) {
+	return nullptr;
     }
-    else
-    {
-	if (!parseName(p, name, kind)) {
-	    return nullptr;
-	}
 
-	// go for '='
-	skipSpace(p);
-	if (*p != '=') {
-	    TRACE("parse error: = not found after " + name);
-	    return nullptr;
-	}
-	// skip the '=' and more whitespace
-	p++;
-	skipSpace(p);
+    // go for '='
+    skipSpace(p);
+    if (*p != '=') {
+	TRACE("parse error: = not found after " + name);
+	return nullptr;
     }
+    // skip the '=' and more whitespace
+    p++;
+    skipSpace(p);
 
     ExprValue* variable = new ExprValue(name, kind);
     
@@ -1472,47 +1452,20 @@ repeat:
 
 static bool parseNested(const char*& s, ExprValue* variable)
 {
-    // could be a structure or an array
+    /*
+     * The opening brace '{' has already been consumed. Parse a
+     * comma-separated list of values up to the closing brace '}'.
+     * The parts of the list can be:
+     * - NAME = VALUE, but for anonymous structs and unions NAME = is omitted.
+     * - VALUE, optionally followed by
+     *   - a repeat count
+     *   - "..." to indicate omitted values
+     */
+
     skipSpace(s);
 
-    const char* p = s;
-    bool isStruct = false;
-    /*
-     * If there is a name followed by an = or an < -- which starts a type
-     * name -- or "static", it is a structure
-     */
-    if (*p == '<' || *p == '}') {
-	isStruct = true;
-    } else if (strncmp(p, "static ", 7) == 0) {
-	isStruct = true;
-    } else if (isalpha(*p) || *p == '_' || *p == '$') {
-	// look ahead for a comma after the name
-	skipName(p);
-	skipSpace(p);
-	if (*p == '=') {
-	    isStruct = true;
-	}
-	p = s;				/* rescan the name */
-    }
-    if (isStruct) {
-	if (!parseVarSeq(p, variable)) {
-	    return false;
-	}
-	variable->m_varKind = VarTree::VKstruct;
-    } else {
-	if (!parseValueSeq(p, variable)) {
-	    return false;
-	}
-	variable->m_varKind = VarTree::VKarray;
-    }
-    s = p;
-    return true;
-}
-
-static bool parseVarSeq(const char*& s, ExprValue* variable)
-{
-    // parse a comma-separated sequence of variables
-    ExprValue* var = variable;		/* var != nullptr to indicate success if empty seq */
+    bool haveEllipsis = false;
+    bool good;
     for (;;) {
 	if (*s == '}')
 	    break;
@@ -1522,27 +1475,26 @@ static bool parseVarSeq(const char*& s, ExprValue* variable)
 	    s += 16;			/* go to the closing brace */
 	    break;
 	}
-	var = parseVar(s);
-	if (!var)
-	    break;			/* syntax error */
-	variable->appendChild(var);
-	if (*s != ',')
-	    break;
-	// skip the comma and whitespace
-	s++;
-	skipSpace(s);
-    }
-    return var != nullptr;
-}
 
-static bool parseValueSeq(const char*& s, ExprValue* variable)
-{
-    // parse a comma-separated sequence of variables
-    int index = 0;
-    bool good;
-    for (;;) {
-	QString name = QString::asprintf("[%d]", index);
-	ExprValue* var = new ExprValue(name, VarTree::NKplain);
+	QString name;
+	VarTree::NameKind kind = VarTree::NKplain;
+
+	// look ahead if we have a name or a type followed by '='
+	auto p = s;
+	if (parseName(p, name, kind))
+	{
+	    skipSpace(p);
+	    if (*p == '=') {
+		// yes, we have a named member
+		++p;
+		skipSpace(p);
+		s = p;
+	    } else
+		name.clear();
+	}
+
+	ExprValue* var = new ExprValue(name, kind);
+
 	good = parseValue(s, var);
 	if (!good) {
 	    delete var;
@@ -1558,25 +1510,17 @@ static bool parseValueSeq(const char*& s, ExprValue* variable)
 		delete var;
 		return false;
 	    }
+	    var->m_repeatsCount = l;
 	    TRACE(QString::asprintf("found <repeats %d times> in array", l));
-	    // replace name and advance index
-	    name = QString::asprintf("[%d .. %d]", index, index+l-1);
-	    var->m_name = name;
-	    index += l;
 	    // skip " times>" and space
 	    s = end+7;
-	    // possible final space
 	    skipSpace(s);
-	} else {
-	    index++;
 	}
 	variable->appendChild(var);
 	// long arrays may be terminated by '...'
 	if (strncmp(s, "...", 3) == 0) {
+	    haveEllipsis = true;
 	    s += 3;
-	    ExprValue* var = new ExprValue(QStringLiteral("..."), VarTree::NKplain);
-	    var->m_value = i18n("<additional entries of the array suppressed>");
-	    variable->appendChild(var);
 	    break;
 	}
 	if (*s != ',') {
@@ -1588,6 +1532,79 @@ static bool parseValueSeq(const char*& s, ExprValue* variable)
 	// sometimes there is a closing brace after a comma
 //	if (*s == '}')
 //	    break;
+    }
+
+    // shortcut out if there is no content
+    if (variable->m_children.empty()) {
+	variable->m_varKind = VarTree::VKstruct;
+	return true;
+    }
+
+    bool isArray = std::all_of(variable->m_children.begin(), variable->m_children.end(),
+				[](ExprValue* var) { return var->m_name.isEmpty(); });
+    if (isArray && variable->m_children.size() >= 2)
+    {
+	/*
+	 * This looks like an array. But if any of the values are structs
+	 * that have different member names, then all the values are
+	 * anonymous structs or unions. It is sufficient to check just two
+	 * entries: if they have members with the same name, it is an array,
+	 * because two anonymous structs or unions cannot have the same member names.
+	 * Note that we must search for names recursively in the contained structs,
+	 * because they can be anonymous as well.
+	 * Also, if we find an empty struct, then this must be an array, because
+	 * empty structs cannot be anonymous.
+	 */
+	auto firstName = [](ExprValue* var) {
+	    do {
+		var = var->m_children.front();
+	    } while (var->m_nameKind == VarTree::NKanonymous);
+	    return var->m_name;
+	};
+	ExprValue* a = variable->m_children.front();
+	ExprValue* b = variable->m_children.back();
+	isArray =
+	    a->m_varKind != VarTree::VKstruct ||
+	    b->m_varKind != VarTree::VKstruct ||
+	    a->m_children.empty() ||
+	    b->m_children.empty() ||	// logically redundant, but protects the next call
+	    firstName(a) == firstName(b);
+    }
+    if (isArray)
+    {
+	variable->m_varKind = VarTree::VKarray;
+
+	// format array indices
+	int index = 0;
+	for (ExprValue* var : variable->m_children)
+	{
+	    if (var->m_repeatsCount == 1)
+		var->m_name = QStringLiteral("[%1]").arg(index);
+	    else
+		var->m_name = QStringLiteral("[%1 .. %2]")
+				.arg(index)
+				.arg(index + var->m_repeatsCount - 1);
+	    index += var->m_repeatsCount;
+	}
+	if (haveEllipsis)
+	{
+	    ExprValue* var = new ExprValue(QStringLiteral("..."), VarTree::NKplain);
+	    var->m_value = i18n("<additional entries of the array suppressed>");
+	    variable->appendChild(var);
+	}
+    }
+    else
+    {
+	variable->m_varKind = VarTree::VKstruct;
+
+	// any empty names indicate anonymous structs or unions
+	for (ExprValue* var : variable->m_children)
+	{
+	    if (var->m_name.isEmpty()) {
+		var->m_name = i18n("<anonymous struct or union>");
+		var->m_nameKind = VarTree::NKanonymous;
+	    }
+	}
     }
     return true;
 }
