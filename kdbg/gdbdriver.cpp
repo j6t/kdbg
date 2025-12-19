@@ -9,6 +9,8 @@
 #include <QFileInfo>
 #include <QRegularExpression>
 #include <klocalizedstring.h>		/* i18n */
+#include <algorithm>
+#include <iterator>
 #include <ctype.h>
 #include <signal.h>
 #include <stdlib.h>			/* strtol, atoi */
@@ -2352,24 +2354,29 @@ QStringList GdbDriver::parseSharedLibs(const char* output)
     output++;				/* skip '\n' */
     QString shlibName;
     while (*output != '\0') {
-	// format of a line is
-	// 0x404c5000  0x40580d90  Yes         /lib/libc.so.5
-	// 3 blocks of non-space followed by space
-	for (int i = 0; *output != '\0' && i < 3; i++) {
-	    while (*output != '\0' && !isspace(*output)) {	/* non-space */
-		output++;
-	    }
-	    skipSpace(output);		/* space */
-	}
-	if (*output == '\0')
-	    return shlibs;
+	/*
+	 * Possible line formats are:
+	 *
+	 * 0x00007ffff703f4c0  0x00007ffff71a5b3d  Yes (*)     /lib64/libc.so.6
+	 *                                         Yes (*)     /usr/lib64/libicudata.so.73
+	 * (*): Shared library is missing debugging information.
+	 *
+	 * The addresses and "(*)" are optional.
+	 */
 	const char* start = output;
 	output = strchr(output, '\n');
 	if (!output)
-	    output = start + strlen(start);
+	    break;			// ignore incomplete lines
+	if (strncmp(start, "(*): ", 5) == 0)
+	    break;			// found the notice; list is complete
+
+	/*
+	 * Pick out the file name from the end of the line.
+	 * Assume that it has no space characters.
+	 */
+	start = std::find(std::make_reverse_iterator(output), std::make_reverse_iterator(start), ' ').base();
 	shlibName = QString::fromLatin1(start, output-start);
-	if (*output != '\0')
-	    output++;
+	output++;
 	shlibs.append(shlibName);
 	TRACE("found shared lib " + shlibName);
     }
