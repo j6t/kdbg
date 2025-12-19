@@ -2200,15 +2200,7 @@ void GdbDriver::parseLocals(const char* output, std::list<ExprValue*>& newVars)
 	if (!variable) {
 	    break;
 	}
-	// do not add duplicates
-	for (std::list<ExprValue*>::iterator o = newVars.begin(); o != newVars.end(); ++o) {
-	    if ((*o)->m_name == variable->m_name) {
-		delete variable;
-		goto skipDuplicate;
-	    }
-	}
 	newVars.push_back(variable);
-    skipDuplicate:;
     }
 }
 
