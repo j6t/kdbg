@@ -36,7 +36,7 @@ public:
     std::list<ThreadInfo> parseThreadList(const char* output) override;
     bool parseBreakpoint(const char* output, int& id,
 				 QString& file, int& lineNo, QString& address) override;
-    void parseLocals(const char* output, std::list<ExprValue*>& newVars) override;
+    std::list<ExprValue*> parseLocals(const char* output) override;
     ExprValue* parsePrintExpr(const char* output, bool wantErrorValue) override;
     bool parseChangeWD(const char* output, QString& message) override;
     bool parseChangeExecutable(const char* output, QString& message) override;

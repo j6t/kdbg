@@ -1322,8 +1322,7 @@ void KDebugger::handleLocals(const char* output)
     /*
      *  Get local variables.
      */
-    std::list<ExprValue*> newVars;
-    parseLocals(output, newVars);
+    auto newVars = parseLocals(output);
 
     /*
      * Clear any old VarTree item pointers, so that later we don't access
@@ -1367,16 +1366,14 @@ void KDebugger::handleLocals(const char* output)
     }
 }
 
-void KDebugger::parseLocals(const char* output, std::list<ExprValue*>& newVars)
+std::list<ExprValue*> KDebugger::parseLocals(const char* output)
 {
-    std::list<ExprValue*> vars;
-    m_d->parseLocals(output, vars);
+    auto vars = m_d->parseLocals(output);
 
     QString origName;			/* used in renaming variables */
-    while (!vars.empty())
+    for (auto i = vars.begin(), e = vars.end(); i != e; ++i)
     {
-	ExprValue* variable = vars.front();
-	vars.pop_front();
+	ExprValue* variable = *i;
 	/*
 	 * When gdb prints local variables, those from the innermost block
 	 * come first. We run through the list of already parsed variables
@@ -1388,7 +1385,7 @@ void KDebugger::parseLocals(const char* output, std::list<ExprValue*>& newVars)
 	 */
 	int block = 0;
 	origName = variable->m_name;
-	for (std::list<ExprValue*>::iterator v = newVars.begin(); v != newVars.end(); ++v) {
+	for (auto v = vars.begin(); v != i; ++v) {
 	    if (variable->m_name == (*v)->m_name) {
 		// we found a duplicate, change name
 		block++;
@@ -1396,8 +1393,9 @@ void KDebugger::parseLocals(const char* output, std::list<ExprValue*>& newVars)
 		variable->m_name = newName;
 	    }
 	}
-	newVars.push_back(variable);
     }
+
+    return vars;
 }
 
 bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)

@@ -2173,12 +2173,14 @@ static bool parseNewWatchpoint(const char* o, int& id,
     return true;
 }
 
-void GdbDriver::parseLocals(const char* output, std::list<ExprValue*>& newVars)
+std::list<ExprValue*> GdbDriver::parseLocals(const char* output)
 {
+    std::list<ExprValue*> newVars;
+
     // check for possible error conditions
     if (strncmp(output, "No symbol table", 15) == 0)
     {
-	return;
+	return newVars;
     }
 
     while (*output != '\0') {
@@ -2202,6 +2204,8 @@ void GdbDriver::parseLocals(const char* output, std::list<ExprValue*>& newVars)
 	}
 	newVars.push_back(variable);
     }
+
+    return newVars;
 }
 
 ExprValue* GdbDriver::parsePrintExpr(const char* output, bool wantErrorValue)
