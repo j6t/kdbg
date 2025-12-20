@@ -391,7 +391,7 @@ protected:
     void updateAllExprs();
     void updateProgEnvironment(const QString& args, const QString& wd,
 			       const std::map<QString,EnvVar>& newVars);
-    std::list<ExprValue*> parseLocals(const char* output);
+    std::list<std::unique_ptr<ExprValue>> parseLocals(const char* output);
     void handleLocals(const char* output);
     bool handlePrint(CmdQueueItem* cmd, const char* output);
     bool handlePrintPopup(CmdQueueItem* cmd, const char* output);

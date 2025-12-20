@@ -28,7 +28,7 @@ public:
     void detachAndTerminate() override;
     void interruptInferior() override;
     void setPrintQStringDataCmd(const char* cmd) override;
-    ExprValue* parseQCharArray(const char* output, bool wantErrorValue, bool qt3like) override;
+    std::unique_ptr<ExprValue> parseQCharArray(const char* output, bool wantErrorValue, bool qt3like) override;
     void parseBackTrace(const char* output, std::list<StackFrame>& stack) override;
     bool parseFrameChange(const char* output, int& frameNo,
 				  QString& file, int& lineNo, DbgAddr& address) override;
@@ -36,8 +36,8 @@ public:
     std::list<ThreadInfo> parseThreadList(const char* output) override;
     bool parseBreakpoint(const char* output, int& id,
 				 QString& file, int& lineNo, QString& address) override;
-    std::list<ExprValue*> parseLocals(const char* output) override;
-    ExprValue* parsePrintExpr(const char* output, bool wantErrorValue) override;
+    std::list<std::unique_ptr<ExprValue>> parseLocals(const char* output) override;
+    std::unique_ptr<ExprValue> parsePrintExpr(const char* output, bool wantErrorValue) override;
     bool parseChangeWD(const char* output, QString& message) override;
     bool parseChangeExecutable(const char* output, QString& message) override;
     bool parseCoreFile(const char* output) override;

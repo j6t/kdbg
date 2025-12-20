@@ -1336,7 +1336,7 @@ void KDebugger::handleLocals(const char* output)
     for (auto n = oldVars.begin(); n != oldVars.end(); ++n)
     {
 	// lookup this variable in the list of new variables
-	std::list<ExprValue*>::iterator v = newVars.begin();
+	auto v = newVars.begin();
 	while (v != newVars.end() && (*v)->m_name != *n)
 	    ++v;
 	if (v == newVars.end()) {
@@ -1349,31 +1349,29 @@ void KDebugger::handleLocals(const char* output)
 	} else {
 	    // variable in both old and new lists: update
 	    TRACE("update var: " + *n);
-	    m_localVariables.updateExpr(*v, *m_typeTable);
+	    m_localVariables.updateExpr(v->get(), *m_typeTable);
 	    // remove the new variable from the list
-	    delete *v;
 	    newVars.erase(v);
 	}
     }
     // insert all remaining new variables
     while (!newVars.empty())
     {
-	ExprValue* v = newVars.front();
+	ExprValue* v = newVars.front().get();
 	TRACE("new var: " + v->m_name);
 	m_localVariables.insertExpr(v, *m_typeTable);
-	delete v;
 	newVars.pop_front();
     }
 }
 
-std::list<ExprValue*> KDebugger::parseLocals(const char* output)
+std::list<std::unique_ptr<ExprValue>> KDebugger::parseLocals(const char* output)
 {
     auto vars = m_d->parseLocals(output);
 
     QString origName;			/* used in renaming variables */
     for (auto i = vars.begin(), e = vars.end(); i != e; ++i)
     {
-	ExprValue* variable = *i;
+	ExprValue* variable = i->get();
 	/*
 	 * When gdb prints local variables, those from the innermost block
 	 * come first. We run through the list of already parsed variables
@@ -1402,7 +1400,7 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
 {
     ASSERT(cmd->m_expr);
 
-    ExprValue* variable = m_d->parsePrintExpr(output, true);
+    auto variable = m_d->parsePrintExpr(output, true);
     if (!variable)
 	return false;
 
@@ -1411,8 +1409,7 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
 
     {
 	TRACE("update expr: " + cmd->m_expr->getText());
-	cmd->m_exprWnd->updateExpr(cmd->m_expr, variable, *m_typeTable);
-	delete variable;
+	cmd->m_exprWnd->updateExpr(cmd->m_expr, variable.get(), *m_typeTable);
     }
 
     evalExpressions();			/* enqueue dereferenced pointers */
@@ -1422,14 +1419,14 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
 
 bool KDebugger::handlePrintPopup(CmdQueueItem* cmd, const char* output)
 {
-    ExprValue* value = m_d->parsePrintExpr(output, false);
+    auto value = m_d->parsePrintExpr(output, false);
     if (!value)
 	return false;
 
     TRACE("<" + cmd->m_popupExpr + "> = " + value->m_value);
 
     // construct the tip, m_popupExpr contains the variable name
-    QString tip = cmd->m_popupExpr + QStringLiteral(" = ") + formatPopupValue(value);
+    QString tip = cmd->m_popupExpr + QStringLiteral(" = ") + formatPopupValue(value.get());
     Q_EMIT valuePopup(tip);
 
     return true;
@@ -1439,7 +1436,7 @@ bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 {
     ASSERT(cmd->m_expr);
 
-    ExprValue* variable = m_d->parsePrintExpr(output, true);
+    auto variable = m_d->parsePrintExpr(output, true);
     if (!variable)
 	return false;
 
@@ -1451,19 +1448,18 @@ bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 	 * We must insert a dummy parent, because otherwise variable's value
 	 * would overwrite cmd->m_expr's value.
 	 */
-	ExprValue* dummyParent = new ExprValue(variable->m_name, VarTree::NKplain);
-	dummyParent->m_varKind = VarTree::VKdummy;
+	ExprValue dummyParent(variable->m_name, VarTree::NKplain);
+	dummyParent.m_varKind = VarTree::VKdummy;
 	// the name of the parsed variable is the address of the pointer
 	QString addr = QLatin1Char('*') + cmd->m_expr->value();
 	variable->m_name = addr;
 	variable->m_nameKind = VarTree::NKaddress;
 
-	dummyParent->appendChild(variable);
 	// expand the first level for convenience
 	variable->m_initiallyExpanded = true;
+	dummyParent.appendChild(std::move(variable));
 	TRACE("update ptr: " + cmd->m_expr->getText());
-	cmd->m_exprWnd->updateExpr(cmd->m_expr, dummyParent, *m_typeTable);
-	delete dummyParent;
+	cmd->m_exprWnd->updateExpr(cmd->m_expr, &dummyParent, *m_typeTable);
     }
 
     evalExpressions();			/* enqueue dereferenced pointers */
@@ -1672,7 +1668,7 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
     ASSERT(var);
     ASSERT(var->m_varKind == VarTree::VKstruct);
 
-    ExprValue* partExpr;
+    std::unique_ptr<ExprValue> partExpr;
     if (cmd->m_cmd == DCprintQStringStruct) {
 	partExpr = m_d->parseQCharArray(output, false, m_typeTable->qCharIsShort());
     } else if (cmd->m_cmd == DCprintWChar) {
@@ -1692,8 +1688,7 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
     } else {
 	partValue = partExpr->m_value;
     }
-    delete partExpr;
-    partExpr = nullptr;
+    partExpr.reset();
 
     /*
      * Updating a struct value works like this: var->m_partialValue holds

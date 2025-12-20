@@ -12,6 +12,7 @@
 #include <QPixmap>
 #include <QStringList>
 #include <list>
+#include <memory>
 
 class ProgramTypeTable;
 struct TypeInfo;
@@ -82,7 +83,7 @@ struct ExprValue
     QString m_value;
     VarTree::VarKind m_varKind;
     VarTree::NameKind m_nameKind;
-    std::list<ExprValue*> m_children;
+    std::list<std::unique_ptr<ExprValue>> m_children;
     int m_repeatsCount = 1;
     bool m_initiallyExpanded;
 
@@ -93,7 +94,7 @@ struct ExprValue
         return m_value;
     }
 
-    void appendChild(ExprValue* newChild);
+    void appendChild(std::unique_ptr<ExprValue>&& newChild);
     int childCount() const;
 };
 

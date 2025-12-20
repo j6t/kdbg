@@ -388,10 +388,8 @@ QString DebuggerDriver::editableValue(VarTree* value)
 }
 
 
-StackFrame::~StackFrame()
-{
-    delete var;
-}
+StackFrame::StackFrame() = default;
+StackFrame::~StackFrame() = default;
 
 
 DbgAddr::DbgAddr(const QString& aa) :

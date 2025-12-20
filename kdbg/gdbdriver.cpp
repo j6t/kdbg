@@ -21,7 +21,7 @@
 
 static void skipString(const char*& p);
 static void skipNested(const char*& s, char opening, char closing);
-static ExprValue* parseVar(const char*& s);
+static std::unique_ptr<ExprValue> parseVar(const char*& s);
 static bool parseName(const char*& s, QString& name, VarTree::NameKind& kind);
 static bool parseValue(const char*& s, ExprValue* variable);
 static bool parseNested(const char*& s, ExprValue* variable);
@@ -626,7 +626,7 @@ static void skipDecimal(const char*& p)
  * on return (even if there \e are errors).
  */
 static bool parseErrorMessage(const char*& output,
-			      ExprValue*& variable, bool wantErrorValue)
+			      std::unique_ptr<ExprValue>& variable, bool wantErrorValue)
 {
     skipSpace(output);
 
@@ -645,7 +645,7 @@ static bool parseErrorMessage(const char*& output,
     {
 	if (wantErrorValue) {
 	    // put the error message as value in the variable
-	    variable = new ExprValue(QString(), VarTree::NKplain);
+	    variable = std::make_unique<ExprValue>(QString(), VarTree::NKplain);
 	    const char* endMsg = strchr(output, '\n');
 	    if (!endMsg)
 		endMsg = output + strlen(output);
@@ -677,9 +677,9 @@ void GdbDriver::setPrintQStringDataCmd(const char* cmd)
     cmds[DCprintQStringStruct].fmt = cmd;
 }
 
-ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, bool qt3like)
+std::unique_ptr<ExprValue> GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, bool qt3like)
 {
-    ExprValue* variable = nullptr;
+    std::unique_ptr<ExprValue> variable;
 
     /*
      * Parse off white space. gdb sometimes prints white space first if the
@@ -690,7 +690,7 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
     // special case: empty string (0 repetitions)
     if (strncmp(output, "Invalid number 0 of repetitions", 31) == 0)
     {
-	variable = new ExprValue(QString(), VarTree::NKplain);
+	variable = std::make_unique<ExprValue>(QString(), VarTree::NKplain);
 	variable->m_value = QStringLiteral("\"\"");
 	return variable;
     }
@@ -806,17 +806,17 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
 	    result += QLatin1Char('"');
 
 	// assign the value
-	variable = new ExprValue(QString(), VarTree::NKplain);
+	variable = std::make_unique<ExprValue>(QString(), VarTree::NKplain);
 	variable->m_value = result;
     }
     else if (strncmp(p, "true", 4) == 0)
     {
-	variable = new ExprValue(QString(), VarTree::NKplain);
+	variable = std::make_unique<ExprValue>(QString(), VarTree::NKplain);
 	variable->m_value = QStringLiteral("QString::null");
     }
     else if (strncmp(p, "false", 5) == 0)
     {
-	variable = new ExprValue(QString(), VarTree::NKplain);
+	variable = std::make_unique<ExprValue>(QString(), VarTree::NKplain);
 	variable->m_value = QStringLiteral("(null)");
     }
     else
@@ -825,13 +825,13 @@ ExprValue* GdbDriver::parseQCharArray(const char* output, bool wantErrorValue, b
 
 error:
     if (wantErrorValue) {
-	variable = new ExprValue(QString(), VarTree::NKplain);
+	variable = std::make_unique<ExprValue>(QString(), VarTree::NKplain);
 	variable->m_value = QStringLiteral("internal parse error");
     }
     return variable;
 }
 
-static ExprValue* parseVar(const char*& s)
+static std::unique_ptr<ExprValue> parseVar(const char*& s)
 {
     const char* p = s;
 
@@ -853,10 +853,9 @@ static ExprValue* parseVar(const char*& s)
     p++;
     skipSpace(p);
 
-    ExprValue* variable = new ExprValue(name, kind);
+    auto variable = std::make_unique<ExprValue>(name, kind);
     
-    if (!parseValue(p, variable)) {
-	delete variable;
+    if (!parseValue(p, variable.get())) {
 	return nullptr;
     }
     s = p;
@@ -1465,7 +1464,6 @@ static bool parseNested(const char*& s, ExprValue* variable)
     skipSpace(s);
 
     bool haveEllipsis = false;
-    bool good;
     for (;;) {
 	if (*s == '}')
 	    break;
@@ -1493,13 +1491,11 @@ static bool parseNested(const char*& s, ExprValue* variable)
 		name.clear();
 	}
 
-	ExprValue* var = new ExprValue(name, kind);
+	auto var = std::make_unique<ExprValue>(name, kind);
 
-	good = parseValue(s, var);
-	if (!good) {
-	    delete var;
+	if (!parseValue(s, var.get()))
 	    return false;
-	}
+
 	// a value may be followed by "<repeats 45 times>"
 	if (strncmp(s, "<repeats ", 9) == 0) {
 	    s += 9;
@@ -1507,7 +1503,6 @@ static bool parseNested(const char*& s, ExprValue* variable)
 	    int l = strtol(s, &end, 10);
 	    if (end == s || strncmp(end, " times>", 7) != 0) {
 		// should not happen
-		delete var;
 		return false;
 	    }
 	    var->m_repeatsCount = l;
@@ -1516,7 +1511,7 @@ static bool parseNested(const char*& s, ExprValue* variable)
 	    s = end+7;
 	    skipSpace(s);
 	}
-	variable->appendChild(var);
+	variable->appendChild(std::move(var));
 	// long arrays may be terminated by '...'
 	if (strncmp(s, "...", 3) == 0) {
 	    haveEllipsis = true;
@@ -1541,7 +1536,7 @@ static bool parseNested(const char*& s, ExprValue* variable)
     }
 
     bool isArray = std::all_of(variable->m_children.begin(), variable->m_children.end(),
-				[](ExprValue* var) { return var->m_name.isEmpty(); });
+				[](const std::unique_ptr<ExprValue>& var) { return var->m_name.isEmpty(); });
     if (isArray && variable->m_children.size() >= 2)
     {
 	/*
@@ -1557,12 +1552,12 @@ static bool parseNested(const char*& s, ExprValue* variable)
 	 */
 	auto firstName = [](ExprValue* var) {
 	    do {
-		var = var->m_children.front();
+		var = var->m_children.front().get();
 	    } while (var->m_nameKind == VarTree::NKanonymous);
 	    return var->m_name;
 	};
-	ExprValue* a = variable->m_children.front();
-	ExprValue* b = variable->m_children.back();
+	ExprValue* a = variable->m_children.front().get();
+	ExprValue* b = variable->m_children.back().get();
 	isArray =
 	    a->m_varKind != VarTree::VKstruct ||
 	    b->m_varKind != VarTree::VKstruct ||
@@ -1576,7 +1571,7 @@ static bool parseNested(const char*& s, ExprValue* variable)
 
 	// format array indices
 	int index = 0;
-	for (ExprValue* var : variable->m_children)
+	for (auto& var : variable->m_children)
 	{
 	    if (var->m_repeatsCount == 1)
 		var->m_name = QStringLiteral("[%1]").arg(index);
@@ -1588,9 +1583,9 @@ static bool parseNested(const char*& s, ExprValue* variable)
 	}
 	if (haveEllipsis)
 	{
-	    ExprValue* var = new ExprValue(QStringLiteral("..."), VarTree::NKplain);
+	    auto var = std::make_unique<ExprValue>(QStringLiteral("..."), VarTree::NKplain);
 	    var->m_value = i18n("<additional entries of the array suppressed>");
-	    variable->appendChild(var);
+	    variable->appendChild(std::move(var));
 	}
     }
     else
@@ -1598,7 +1593,7 @@ static bool parseNested(const char*& s, ExprValue* variable)
 	variable->m_varKind = VarTree::VKstruct;
 
 	// any empty names indicate anonymous structs or unions
-	for (ExprValue* var : variable->m_children)
+	for (auto& var : variable->m_children)
 	{
 	    if (var->m_name.isEmpty()) {
 		var->m_name = i18n("<anonymous struct or union>");
@@ -1809,13 +1804,13 @@ void GdbDriver::parseBackTrace(const char* output, std::list<StackFrame>& stack)
     DbgAddr address;
 
     while (::parseFrame(output, frameNo, func, file, lineNo, address)) {
-	stack.push_back(StackFrame());
+	stack.emplace_back();
 	StackFrame* frm = &stack.back();
 	frm->frameNo = frameNo;
 	frm->fileName = file;
 	frm->lineNo = lineNo;
 	frm->address = address;
-	frm->var = new ExprValue(func, VarTree::NKplain);
+	frm->var = std::make_unique<ExprValue>(func, VarTree::NKplain);
     }
 }
 
@@ -2173,9 +2168,9 @@ static bool parseNewWatchpoint(const char* o, int& id,
     return true;
 }
 
-std::list<ExprValue*> GdbDriver::parseLocals(const char* output)
+std::list<std::unique_ptr<ExprValue>> GdbDriver::parseLocals(const char* output)
 {
-    std::list<ExprValue*> newVars;
+    std::list<std::unique_ptr<ExprValue>> newVars;
 
     // check for possible error conditions
     if (strncmp(output, "No symbol table", 15) == 0)
@@ -2198,19 +2193,19 @@ std::list<ExprValue*> GdbDriver::parseLocals(const char* output)
 	    continue;
 	}
 
-	ExprValue* variable = parseVar(output);
+	auto variable = parseVar(output);
 	if (!variable) {
 	    break;
 	}
-	newVars.push_back(variable);
+	newVars.push_back(std::move(variable));
     }
 
     return newVars;
 }
 
-ExprValue* GdbDriver::parsePrintExpr(const char* output, bool wantErrorValue)
+std::unique_ptr<ExprValue> GdbDriver::parsePrintExpr(const char* output, bool wantErrorValue)
 {
-    ExprValue* var = nullptr;
+    std::unique_ptr<ExprValue> var;
     // check for error conditions
     if (!parseErrorMessage(output, var, wantErrorValue))
     {

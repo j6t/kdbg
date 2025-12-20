@@ -11,8 +11,9 @@
 #include <QByteArray>
 #include <QProcess>
 #include <QStringList>
-#include <queue>
 #include <list>
+#include <memory>
+#include <queue>
 
 
 class VarTree;
@@ -220,8 +221,8 @@ struct FrameInfo
 struct StackFrame : FrameInfo
 {
     int frameNo;
-    ExprValue* var = nullptr;		/* more information if non-zero */
-    StackFrame() = default;
+    std::unique_ptr<ExprValue> var;	/* more information if not empty */
+    StackFrame();
     ~StackFrame();
 };
 
@@ -405,7 +406,7 @@ public:
     /**
      * Parses the output as an array of QChars.
      */
-    virtual ExprValue* parseQCharArray(const char* output, bool wantErrorValue, bool qt3like) = 0;
+    virtual std::unique_ptr<ExprValue> parseQCharArray(const char* output, bool wantErrorValue, bool qt3like) = 0;
 
     /**
      * Parses a back-trace (the output of the DCbt command).
@@ -461,7 +462,7 @@ public:
      * @param newVars Receives the parsed variable values. The values are
      * simply append()ed to the supplied list.
      */
-    virtual std::list<ExprValue*> parseLocals(const char* output) = 0;
+    virtual std::list<std::unique_ptr<ExprValue>> parseLocals(const char* output) = 0;
 
     /**
      * Parses the output of a DCprint or DCprintStruct command.
@@ -473,7 +474,7 @@ public:
      * or if the output is an error message and #wantErrorValue
      * is \c false. The returned object's text() is undefined.
      */
-    virtual ExprValue* parsePrintExpr(const char* output, bool wantErrorValue) = 0;
+    virtual std::unique_ptr<ExprValue> parsePrintExpr(const char* output, bool wantErrorValue) = 0;
 
     /**
      * Parses the output of the DCcd command.

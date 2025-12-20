@@ -277,15 +277,11 @@ ExprValue::ExprValue(const QString& name, VarTree::NameKind aKind) :
 {
 }
 
-ExprValue::~ExprValue()
-{
-    for (ExprValue* child : m_children)
-	delete child;
-}
+ExprValue::~ExprValue() = default;
 
-void ExprValue::appendChild(ExprValue* newChild)
+void ExprValue::appendChild(std::unique_ptr<ExprValue>&& newChild)
 {
-    m_children.push_back(newChild);
+    m_children.push_back(std::move(newChild));
 }
 
 int ExprValue::childCount() const
@@ -453,7 +449,7 @@ void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 
     // go for children
     int i = 0;
-    for (ExprValue* vNew : newValues->m_children)
+    for (auto& vNew : newValues->m_children)
     {
 	VarTree* vDisplay = display->child(i);
 	// check whether the names are the same
@@ -462,7 +458,7 @@ void ExprWnd::updateExprRec(VarTree* display, ExprValue* newValues, ProgramTypeT
 	    vDisplay->setText(vNew->m_name);
 	}
 	// recurse
-	updateExprRec(vDisplay, vNew, typeTable);
+	updateExprRec(vDisplay, vNew.get(), typeTable);
 
 	++i;
     }
@@ -522,11 +518,11 @@ void ExprWnd::replaceChildren(VarTree* display, ExprValue* newValues)
 	delete c;
     }
     // insert copies of the newValues
-    for (ExprValue* v : newValues->m_children)
+    for (auto& v : newValues->m_children)
     {
-	VarTree* vNew = new VarTree(display, v);
+	VarTree* vNew = new VarTree(display, v.get());
 	// recurse
-	replaceChildren(vNew, v);
+	replaceChildren(vNew, v.get());
     }
 }
 
