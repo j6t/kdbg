@@ -24,18 +24,13 @@ DebuggerDriver::DebuggerDriver() :
 	    SLOT(slotExited()));
 }
 
-DebuggerDriver::~DebuggerDriver()
-{
-    flushHiPriQueue();
-    flushLoPriQueue();
-}
+DebuggerDriver::~DebuggerDriver() = default;
 
 
 bool DebuggerDriver::startup(QString cmdStr)
 {
     // clear command queues
-    delete m_activeCmd;
-    m_activeCmd = nullptr;
+    m_activeCmd.reset();
     flushHiPriQueue();
     flushLoPriQueue();
     m_state = DSidle;
@@ -88,8 +83,8 @@ CmdQueueItem* DebuggerDriver::executeCmdString(DbgCommand cmd,
 					       QString cmdString, bool clearLow)
 {
     // place a new command into the high-priority queue
-    CmdQueueItem* cmdItem = new CmdQueueItem(cmd, cmdString);
-    m_hipriCmdQueue.push(cmdItem);
+    m_hipriCmdQueue.push(std::make_unique<CmdQueueItem>(cmd, cmdString));
+    CmdQueueItem* cmdItem = m_hipriCmdQueue.back().get();
 
     if (clearLow) {
 	if (m_state == DSrunningLow) {
@@ -99,8 +94,7 @@ CmdQueueItem* DebuggerDriver::executeCmdString(DbgCommand cmd,
 	    ASSERT(m_activeCmd);
 	    TRACE(QString::asprintf("interrupted the command %d",
 		  (m_activeCmd ? m_activeCmd->m_cmd : -1)));
-	    delete m_activeCmd;
-	    m_activeCmd = nullptr;
+	    m_activeCmd.reset();
 	}
 	flushLoPriQueue();
     }
@@ -113,7 +107,7 @@ CmdQueueItem* DebuggerDriver::executeCmdString(DbgCommand cmd,
     return cmdItem;
 }
 
-bool CmdQueueItem::IsEqualCmd::operator()(CmdQueueItem* cmd) const
+bool CmdQueueItem::IsEqualCmd::operator()(const std::unique_ptr<CmdQueueItem>& cmd) const
 {
     return cmd->m_cmd == m_cmd && cmd->m_cmdString == m_str;
 }
@@ -122,7 +116,7 @@ CmdQueueItem* DebuggerDriver::queueCmdString(DbgCommand cmd,
 					     QString cmdString, QueueMode mode)
 {
     // place a new command into the low-priority queue
-    std::list<CmdQueueItem*>::iterator i;
+    decltype(m_lopriCmdQueue.begin()) i;
     CmdQueueItem* cmdItem = nullptr;
     switch (mode) {
     case QMoverrideMoreEqual:
@@ -131,25 +125,24 @@ CmdQueueItem* DebuggerDriver::queueCmdString(DbgCommand cmd,
 	if (m_activeCmd &&
 	    m_activeCmd->m_cmd == cmd && m_activeCmd->m_cmdString == cmdString)
 	{
-	    return m_activeCmd;
+	    return m_activeCmd.get();
 	}
 	// check whether there is already the same command in the queue
 	i = find_if(m_lopriCmdQueue.begin(), m_lopriCmdQueue.end(), CmdQueueItem::IsEqualCmd(cmd, cmdString));
 	if (i != m_lopriCmdQueue.end()) {
 	    // found one
-	    cmdItem = *i;
+	    cmdItem = i->get();
 	    if (mode == QMoverrideMoreEqual) {
 		// All commands are equal, but some are more equal than others...
 		// put this command in front of all others
-		m_lopriCmdQueue.erase(i);
-		m_lopriCmdQueue.push_front(cmdItem);
+		m_lopriCmdQueue.splice(m_lopriCmdQueue.begin(), m_lopriCmdQueue, i);
 	    }
 	    break;
 	} // else none found, so add it
 	// fall through
     case QMnormal:
-	cmdItem = new CmdQueueItem(cmd, cmdString);
-	m_lopriCmdQueue.push_back(cmdItem);
+	m_lopriCmdQueue.push_back(std::make_unique<CmdQueueItem>(cmd, cmdString));
+	cmdItem = m_lopriCmdQueue.back().get();
     }
 
     // if gdb is idle, send it the command
@@ -168,13 +161,12 @@ void DebuggerDriver::writeCommand()
 
     // first check the high-priority queue - only if it is empty
     // use a low-priority command.
-    CmdQueueItem* cmd;
     DebuggerState newState = DScommandSent;
     if (!m_hipriCmdQueue.empty()) {
-	cmd = m_hipriCmdQueue.front();
+	m_activeCmd = std::move(m_hipriCmdQueue.front());
 	m_hipriCmdQueue.pop();
     } else if (!m_lopriCmdQueue.empty()) {
-	cmd = m_lopriCmdQueue.front();
+	m_activeCmd = std::move(m_lopriCmdQueue.front());
 	m_lopriCmdQueue.pop_front();
 	newState = DScommandSentLow;
     } else {
@@ -183,7 +175,7 @@ void DebuggerDriver::writeCommand()
 	return;
     }
 
-    m_activeCmd = cmd;
+    CmdQueueItem* cmd = m_activeCmd.get();
     TRACE("in writeCommand: " + cmd->m_cmdString);
 
     QByteArray str = cmd->m_cmdString.toLocal8Bit();
@@ -208,18 +200,12 @@ void DebuggerDriver::writeCommand()
 
 void DebuggerDriver::flushLoPriQueue()
 {
-    while (!m_lopriCmdQueue.empty()) {
-	delete m_lopriCmdQueue.back();
-	m_lopriCmdQueue.pop_back();
-    }
+    m_lopriCmdQueue.clear();
 }
 
 void DebuggerDriver::flushHiPriQueue()
 {
-    while (!m_hipriCmdQueue.empty()) {
-	delete m_hipriCmdQueue.front();
-	m_hipriCmdQueue.pop();
-    }
+    m_hipriCmdQueue = {};
 }
 
 void DebuggerDriver::flushCommands(bool hipriOnly)
@@ -333,10 +319,8 @@ void DebuggerDriver::processOutput(const QByteArray& data)
 	     * instead of being written to gdb immediately.
 	     */
 	    ASSERT(m_state != DSidle);
-	    CmdQueueItem* cmd = m_activeCmd;
-	    m_activeCmd = nullptr;
-	    commandFinished(cmd);
-	    delete cmd;
+	    auto cmd = std::move(m_activeCmd);
+	    commandFinished(cmd.get());
 	}
 
 	// empty buffer
@@ -368,13 +352,12 @@ void DebuggerDriver::dequeueCmdByVar(VarTree* var)
     if (!var)
 	return;
 
-    std::list<CmdQueueItem*>::iterator i = m_lopriCmdQueue.begin();
+    auto i = m_lopriCmdQueue.begin();
     while (i != m_lopriCmdQueue.end()) {
 	if ((*i)->m_expr && var->isAncestorEq((*i)->m_expr)) {
 	    // this is indeed a critical command; delete it
 	    TRACE("removing critical lopri-cmd: " + (*i)->m_cmdString);
-	    delete *i;
-	    m_lopriCmdQueue.erase(i++);
+	    i = m_lopriCmdQueue.erase(i);
 	} else
 	    ++i;
     }

@@ -171,7 +171,7 @@ struct CmdQueueItem
     struct IsEqualCmd
     {
 	IsEqualCmd(DbgCommand cmd, const QString& str) : m_cmd(cmd), m_str(str) { }
-	bool operator()(CmdQueueItem*) const;
+	bool operator()(const std::unique_ptr<CmdQueueItem>&) const;
 	DbgCommand m_cmd;
 	const QString& m_str;
     };
@@ -569,12 +569,12 @@ protected:
     /** Removes all commands from  the high-priority queue. */
     void flushHiPriQueue();
 
-    std::queue<CmdQueueItem*> m_hipriCmdQueue;
-    std::list<CmdQueueItem*> m_lopriCmdQueue;
+    std::queue<std::unique_ptr<CmdQueueItem>> m_hipriCmdQueue;
+    std::list<std::unique_ptr<CmdQueueItem>> m_lopriCmdQueue;
     /**
      * The active command is kept separately from other pending commands.
      */
-    CmdQueueItem* m_activeCmd = {};
+    std::unique_ptr<CmdQueueItem> m_activeCmd;
     /**
      * Helper function that queues the given command string in the
      * low-priority queue.
