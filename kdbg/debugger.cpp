@@ -1406,11 +1406,10 @@ bool KDebugger::handlePrint(CmdQueueItem* cmd, const char* output)
 
     // set expression "name"
     variable->m_name = cmd->m_expr->getText();
+    TRACE("update expr: " + cmd->m_expr->getText());
 
-    {
-	TRACE("update expr: " + cmd->m_expr->getText());
-	cmd->m_exprWnd->updateExpr(cmd->m_expr, variable.get(), *m_typeTable);
-    }
+    auto wnd = static_cast<ExprWnd*>(cmd->m_expr->treeWidget());
+    wnd->updateExpr(cmd->m_expr, variable.get(), *m_typeTable);
 
     evalExpressions();			/* enqueue dereferenced pointers */
 
@@ -1459,7 +1458,8 @@ bool KDebugger::handlePrintDeref(CmdQueueItem* cmd, const char* output)
 	variable->m_initiallyExpanded = true;
 	dummyParent.appendChild(std::move(variable));
 	TRACE("update ptr: " + cmd->m_expr->getText());
-	cmd->m_exprWnd->updateExpr(cmd->m_expr, &dummyParent, *m_typeTable);
+	auto wnd = static_cast<ExprWnd*>(cmd->m_expr->treeWidget());
+	wnd->updateExpr(cmd->m_expr, &dummyParent, *m_typeTable);
     }
 
     evalExpressions();			/* enqueue dereferenced pointers */
@@ -1540,19 +1540,14 @@ void KDebugger::evalExpressions()
 	CmdQueueItem* cmd = m_d->queueCmd(DCprint, exprItem->getText());
 	// remember which expr this was
 	cmd->m_expr = exprItem;
-	cmd->m_exprWnd = &m_watchVariables;
     } else {
-	ExprWnd* wnd;
 #define POINTER(widget) \
-		wnd = &widget; \
 		exprItem = widget.nextUpdatePtr(); \
 		if (exprItem) goto pointer
 #define STRUCT(widget) \
-		wnd = &widget; \
 		exprItem = widget.nextUpdateStruct(); \
 		if (exprItem) goto ustruct
 #define TYPE(widget) \
-		wnd = &widget; \
 		exprItem = widget.nextUpdateType(); \
 		if (exprItem) goto type
     repeat:
@@ -1569,14 +1564,14 @@ void KDebugger::evalExpressions()
 
 	pointer:
 	// we have an expression to send
-	dereferencePointer(wnd, exprItem, false);
+	dereferencePointer(exprItem, false);
 	return;
 
 	ustruct:
 	// paranoia
 	if (!exprItem->m_type || exprItem->m_type == TypeInfo::unknownType())
 	    goto repeat;
-	evalInitialStructExpression(exprItem, wnd, false);
+	evalInitialStructExpression(exprItem, false);
 	return;
 
 	type:
@@ -1587,12 +1582,11 @@ void KDebugger::evalExpressions()
 	 */
 	if (exprItem->m_type)
 	    goto repeat;
-	determineType(wnd, exprItem);
+	determineType(exprItem);
     }
 }
 
-void KDebugger::dereferencePointer(ExprWnd* wnd, VarTree* exprItem,
-				   bool immediate)
+void KDebugger::dereferencePointer(VarTree* exprItem, bool immediate)
 {
     ASSERT(exprItem->m_varKind == VarTree::VKpointer);
 
@@ -1606,10 +1600,9 @@ void KDebugger::dereferencePointer(ExprWnd* wnd, VarTree* exprItem,
     }
     // remember which expr this was
     cmd->m_expr = exprItem;
-    cmd->m_exprWnd = wnd;
 }
 
-void KDebugger::determineType(ExprWnd* wnd, VarTree* exprItem)
+void KDebugger::determineType(VarTree* exprItem)
 {
     ASSERT(exprItem->m_varKind == VarTree::VKstruct);
 
@@ -1620,7 +1613,6 @@ void KDebugger::determineType(ExprWnd* wnd, VarTree* exprItem)
 
     // remember which expr this was
     cmd->m_expr = exprItem;
-    cmd->m_exprWnd = wnd;
 }
 
 void KDebugger::handleFindType(CmdQueueItem* cmd, const char* output)
@@ -1654,7 +1646,7 @@ void KDebugger::handleFindType(CmdQueueItem* cmd, const char* output)
 	} else {
 	    cmd->m_expr->m_type = info;
 	    /* since this node has a new type, we get its value immediately */
-	    evalInitialStructExpression(cmd->m_expr, cmd->m_exprWnd, false);
+	    evalInitialStructExpression(cmd->m_expr, false);
 	    return;
 	}
     }
@@ -1725,24 +1717,25 @@ void KDebugger::handlePrintStruct(CmdQueueItem* cmd, const char* output)
     /* go for more sub-expressions if needed */
     if (var->m_exprIndex < var->m_type->m_numExprs) {
 	/* queue a new print command with quite high priority */
-	evalStructExpression(var, cmd->m_exprWnd, true);
+	evalStructExpression(var, true);
 	return;
     }
 
-    cmd->m_exprWnd->updateStructValue(var);
+    auto wnd = static_cast<ExprWnd*>(cmd->m_expr->treeWidget());
+    wnd->updateStructValue(var);
 
     evalExpressions();			/* enqueue dereferenced pointers */
 }
 
 /* queues the first printStruct command for a struct */
-void KDebugger::evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
+void KDebugger::evalInitialStructExpression(VarTree* var, bool immediate)
 {
     var->m_exprIndex = 0;
     if (var->m_type != TypeInfo::wchartType())
     {
 	var->m_exprIndexUseGuard = true;
 	var->m_partialValue = var->m_type->m_displayString[0];
-	evalStructExpression(var, wnd, immediate);
+	evalStructExpression(var, immediate);
     }
     else
     {
@@ -1753,12 +1746,11 @@ void KDebugger::evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool imm
 				m_d->queueCmd(DCprintWChar, expr)  ;
 	// remember which expression this was
 	cmd->m_expr = var;
-	cmd->m_exprWnd = wnd;
     }
 }
 
 /** queues a printStruct command; var must have been initialized correctly */
-void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
+void KDebugger::evalStructExpression(VarTree* var, bool immediate)
 {
     QString base = var->computeExpr();
     QString expr;
@@ -1801,7 +1793,6 @@ void KDebugger::evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate)
 
     // remember which expression this was
     cmd->m_expr = var;
-    cmd->m_exprWnd = wnd;
 }
 
 void KDebugger::handleSharedLibs(const char* output)
@@ -1828,8 +1819,7 @@ void KDebugger::slotExpanding(QTreeWidgetItem* item)
     if (exprItem->m_varKind != VarTree::VKpointer) {
 	return;
     }
-    ExprWnd* wnd = static_cast<ExprWnd*>(item->treeWidget());
-    dereferencePointer(wnd, exprItem, true);
+    dereferencePointer(exprItem, true);
 }
 
 // add the expression in the edit field to the watch expressions
@@ -2220,7 +2210,6 @@ void KDebugger::slotValueEdited(VarTree* expr, const QString& text)
     if (text.simplified().isEmpty())
 	return;			       /* no text entered: ignore request */
 
-    ExprWnd* wnd = static_cast<ExprWnd*>(expr->treeWidget());
     TRACE(QString::asprintf("Changing %s to ",
 			    wnd->exprList().join(" ")) + text);
 
@@ -2228,7 +2217,6 @@ void KDebugger::slotValueEdited(VarTree* expr, const QString& text)
     QString lvalue = expr->computeExpr();
     CmdQueueItem* cmd = m_d->executeCmd(DCsetvariable, lvalue, text);
     cmd->m_expr = expr;
-    cmd->m_exprWnd = wnd;
 }
 
 void KDebugger::handleSetVariable(CmdQueueItem* cmd, const char* output)
@@ -2246,5 +2234,4 @@ void KDebugger::handleSetVariable(CmdQueueItem* cmd, const char* output)
     QString expr = cmd->m_expr->computeExpr();
     CmdQueueItem* printCmd = m_d->queueCmdPrio(DCprint, expr);
     printCmd->m_expr = cmd->m_expr;
-    printCmd->m_exprWnd = cmd->m_exprWnd;
 }

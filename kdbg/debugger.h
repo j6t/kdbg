@@ -411,10 +411,10 @@ protected:
     void handleSetVariable(CmdQueueItem* cmd, const char* output);
     void handleSetDisassFlavor(const char* output);
     void evalExpressions();
-    void evalInitialStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
-    void evalStructExpression(VarTree* var, ExprWnd* wnd, bool immediate);
-    void dereferencePointer(ExprWnd* wnd, VarTree* var, bool immediate);
-    void determineType(ExprWnd* wnd, VarTree* var);
+    void evalInitialStructExpression(VarTree* var, bool immediate);
+    void evalStructExpression(VarTree* var, bool immediate);
+    void dereferencePointer(VarTree* var, bool immediate);
+    void determineType(VarTree* var);
     void queueMemoryDump(bool immediate, bool update);
     CmdQueueItem* loadCoreFile();
     void openProgramConfig(const QString& name);

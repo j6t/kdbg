@@ -18,8 +18,6 @@
 
 class VarTree;
 struct ExprValue;
-class ExprWnd;
-class KDebugger;
 
 
 /**
@@ -149,7 +147,6 @@ struct CmdQueueItem
     bool m_committed;			/* just a debugging aid */
     // remember which expression when printing an expression
     VarTree* m_expr = nullptr;
-    ExprWnd* m_exprWnd = nullptr;
     // remember file position
     QString m_fileName;
     int m_lineNo;
