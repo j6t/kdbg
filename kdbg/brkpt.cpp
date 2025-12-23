@@ -111,10 +111,10 @@ void BreakpointTable::on_btAddBP_clicked()
     bpText = bpText.trimmed();
     if (m_debugger->isReady())
     {
-	Breakpoint* bp = new Breakpoint;
+	auto bp = std::make_unique<Breakpoint>();
 	bp->text = bpText;
 
-	m_debugger->setBreakpoint(bp, false);
+	m_debugger->setBreakpoint(std::move(bp), false);
     }
 }
 
@@ -124,11 +124,11 @@ void BreakpointTable::on_btAddWP_clicked()
     QString wpExpr = m_ui.bpEdit->text();
     wpExpr = wpExpr.trimmed();
     if (m_debugger->isReady()) {
-	Breakpoint* bp = new Breakpoint;
+	auto bp = std::make_unique<Breakpoint>();
 	bp->type = Breakpoint::watchpoint;
 	bp->text = wpExpr;
 
-	m_debugger->setBreakpoint(bp, false);
+	m_debugger->setBreakpoint(std::move(bp), false);
     }
 }
 

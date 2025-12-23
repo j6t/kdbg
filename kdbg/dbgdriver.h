@@ -152,7 +152,7 @@ struct CmdQueueItem
     int m_lineNo;
     DbgAddr m_addr;
     // the breakpoint info
-    Breakpoint* m_brkpt = nullptr;
+    std::unique_ptr<Breakpoint> m_brkpt;
     int m_existingBrkpt;
     // whether command was emitted due to direct user request (only set when relevant)
     bool m_byUser;

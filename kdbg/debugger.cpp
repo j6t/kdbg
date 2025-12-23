@@ -396,7 +396,7 @@ bool KDebugger::setBreakpoint(QString file, int lineNo,
 	 * set the breakpoint exactly there. Otherwise we use the file name
 	 * plus line no.
 	 */
-	Breakpoint* bp = new Breakpoint;
+	auto bp = std::make_unique<Breakpoint>();
 	bp->temporary = temporary;
 
 	if (address.isEmpty())
@@ -408,7 +408,7 @@ bool KDebugger::setBreakpoint(QString file, int lineNo,
 	{
 	    bp->address = address;
 	}
-	setBreakpoint(bp, false);
+	setBreakpoint(std::move(bp), false);
     }
     else
     {
@@ -425,47 +425,47 @@ bool KDebugger::setBreakpoint(QString file, int lineNo,
     return true;
 }
 
-void KDebugger::setBreakpoint(Breakpoint* bp, bool queueOnly)
+void KDebugger::setBreakpoint(std::unique_ptr<Breakpoint> bp, bool queueOnly)
 {
-    CmdQueueItem* cmd = executeBreakpoint(bp, queueOnly);
-    cmd->m_brkpt = bp;	// used in newBreakpoint()
+    CmdQueueItem* cmd = executeBreakpoint(*bp, queueOnly);
+    cmd->m_brkpt = std::move(bp);	// used in newBreakpoint()
 }
 
-CmdQueueItem* KDebugger::executeBreakpoint(const Breakpoint* bp, bool queueOnly)
+CmdQueueItem* KDebugger::executeBreakpoint(const Breakpoint& bp, bool queueOnly)
 {
     CmdQueueItem* cmd;
-    if (!bp->text.isEmpty())
+    if (!bp.text.isEmpty())
     {
 	/*
 	 * The breakpoint was set using the text box in the breakpoint
 	 * list. This is the only way in which watchpoints are set.
 	 */
-	if (bp->type == Breakpoint::watchpoint) {
-	    cmd = m_d->executeCmd(DCwatchpoint, bp->text);
+	if (bp.type == Breakpoint::watchpoint) {
+	    cmd = m_d->executeCmd(DCwatchpoint, bp.text);
 	} else {
-	    cmd = m_d->executeCmd(DCbreaktext, bp->text);
+	    cmd = m_d->executeCmd(DCbreaktext, bp.text);
 	}
     }
-    else if (bp->address.isEmpty())
+    else if (bp.address.isEmpty())
     {
 	// strip off directory part of file name
-	QString file = QFileInfo(bp->fileName).fileName();
+	QString file = QFileInfo(bp.fileName).fileName();
 	if (queueOnly) {
-	    cmd = m_d->queueCmd(bp->temporary ? DCtbreakline : DCbreakline,
-				file, bp->lineNo);
+	    cmd = m_d->queueCmd(bp.temporary ? DCtbreakline : DCbreakline,
+				file, bp.lineNo);
 	} else {
-	    cmd = m_d->executeCmd(bp->temporary ? DCtbreakline : DCbreakline,
-				  file, bp->lineNo);
+	    cmd = m_d->executeCmd(bp.temporary ? DCtbreakline : DCbreakline,
+				  file, bp.lineNo);
 	}
     }
     else
     {
 	if (queueOnly) {
-	    cmd = m_d->queueCmd(bp->temporary ? DCtbreakaddr : DCbreakaddr,
-				bp->address.asString());
+	    cmd = m_d->queueCmd(bp.temporary ? DCtbreakaddr : DCbreakaddr,
+				bp.address.asString());
 	} else {
-	    cmd = m_d->executeCmd(bp->temporary ? DCtbreakaddr : DCbreakaddr,
-				  bp->address.asString());
+	    cmd = m_d->executeCmd(bp.temporary ? DCtbreakaddr : DCbreakaddr,
+				  bp.address.asString());
 	}
     }
     return cmd;
@@ -951,7 +951,7 @@ void KDebugger::restoreBreakpoints(KConfig* config)
 	    /* group not present, assume that we've hit them all */
 	    break;
 	}
-	Breakpoint* bp = new Breakpoint;
+	auto bp = std::make_unique<Breakpoint>();
 	bp->fileName = g.readEntry(File);
 	bp->lineNo = g.readEntry(Line, -1);
 	bp->text = g.readEntry(Text);
@@ -961,7 +961,6 @@ void KDebugger::restoreBreakpoints(KConfig* config)
 	    bp->text.isEmpty() &&
 	    bp->address.isEmpty())
 	{
-	    delete bp;
 	    continue;
 	}
 	bp->enabled = g.readEntry(Enabled, true);
@@ -971,7 +970,7 @@ void KDebugger::restoreBreakpoints(KConfig* config)
 	/*
 	 * Add the breakpoint.
 	 */
-	setBreakpoint(bp, false);
+	setBreakpoint(std::move(bp), false);
 	// the new breakpoint is disabled or conditionalized later
 	// in newBreakpoint()
     }
@@ -1197,13 +1196,13 @@ void KDebugger::handleRunCommands(const char* output)
     /* 
      * Try to set any orphaned breakpoints now.
      */
-    for (BrkptIterator bp = m_brkpts.begin(); bp != m_brkpts.end(); ++bp)
+    for (const auto& bp : m_brkpts)
     {
-	if (bp->isOrphaned()) {
+	if (bp.isOrphaned()) {
 	    TRACE(QString("re-trying brkpt loc: %2 file: %3 line: %1")
-		    .arg(bp->lineNo).arg(bp->location, bp->fileName));
-	    CmdQueueItem* cmd = executeBreakpoint(&*bp, true);
-	    cmd->m_existingBrkpt = bp->id;	// used in newBreakpoint()
+		    .arg(bp.lineNo).arg(bp.location, bp.fileName));
+	    CmdQueueItem* cmd = executeBreakpoint(bp, true);
+	    cmd->m_existingBrkpt = bp.id;	// used in newBreakpoint()
 	    flags |= DebuggerDriver::SFrefreshBreak;
 	}
     }
@@ -1884,7 +1883,6 @@ void KDebugger::newBreakpoint(CmdQueueItem* cmd, const char* output)
 	// a new breakpoint, put it in the list
 	assert(cmd->m_brkpt->id == 0);
 	m_brkpts.push_back(*cmd->m_brkpt);
-	delete cmd->m_brkpt;
 	bp = m_brkpts.end();
 	--bp;
     } else {

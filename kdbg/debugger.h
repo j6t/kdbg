@@ -223,7 +223,7 @@ public:
      * @param bp Describes the breakpoint.
      * @param queueOnly If false, the breakpoint is set using a high-priority command.
      */
-    void setBreakpoint(Breakpoint* bp, bool queueOnly);
+    void setBreakpoint(std::unique_ptr<Breakpoint> bp, bool queueOnly);
 
     /**
      * Enable or disable a breakpoint at the specified location.
@@ -421,7 +421,7 @@ protected:
     BrkptIterator breakpointByFilePos(QString file, int lineNo,
 				    const DbgAddr& address);
     BrkptIterator breakpointById(int id);
-    CmdQueueItem* executeBreakpoint(const Breakpoint* bp, bool queueOnly);
+    CmdQueueItem* executeBreakpoint(const Breakpoint& bp, bool queueOnly);
     void newBreakpoint(CmdQueueItem* cmd, const char* output);
     void updateBreakList(const char* output);
     bool stopMayChangeBreakList() const;
