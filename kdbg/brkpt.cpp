@@ -68,19 +68,19 @@ void BreakpointTable::updateBreakList()
     }
 
     // get the new list
-    for (KDebugger::BrkptROIterator bp = m_debugger->breakpointsBegin(); bp != m_debugger->breakpointsEnd(); ++bp)
+    for (const auto& bp : m_debugger->breakpoints())
     {
 	// look up this item
 	for (std::list<BreakpointItem*>::iterator o = deletedItems.begin(); o != deletedItems.end(); ++o)
 	{
-	    if ((*o)->id == bp->id) {
-		(*o)->updateFrom(*bp);
+	    if ((*o)->id == bp.id) {
+		(*o)->updateFrom(bp);
 		deletedItems.erase(o);	/* don't delete */
 		goto nextItem;
 	    }
 	}
 	// not in the list; add it
-	new BreakpointItem(m_ui.bpList,*bp);
+	new BreakpointItem(m_ui.bpList, bp);
 nextItem:;
     }
 

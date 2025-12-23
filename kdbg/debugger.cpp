@@ -1979,12 +1979,10 @@ void KDebugger::updateBreakList(const char* output)
 // or a watchpoint
 bool KDebugger::stopMayChangeBreakList() const
 {
-    for (BrkptROIterator bp = m_brkpts.begin(); bp != m_brkpts.end(); ++bp)
-    {
-	if (bp->temporary || bp->type == Breakpoint::watchpoint)
-	    return true;
-    }
-    return false;
+    return std::any_of(m_brkpts.begin(), m_brkpts.end(),
+	    [](const Breakpoint& bp) {
+		return bp.temporary || bp.type == Breakpoint::watchpoint;
+	    });
 }
 
 KDebugger::BrkptIterator KDebugger::breakpointByFilePos(QString file, int lineNo,

@@ -245,24 +245,21 @@ void SourceWindow::drawLineInfoArea(QPainter* p, QPaintEvent* event)
 
 void SourceWindow::updateLineItems(const KDebugger* dbg)
 {
+    const auto& bpList = dbg->breakpoints();
+
     // clear outdated breakpoints
     for (int i = m_lineItems.size()-1; i >= 0; i--) {
 	if (m_lineItems[i] & liBPany) {
 	    // check if this breakpoint still exists
 	    int line = rowToLine(i);
 	    TRACE(QString::asprintf("checking for bp at %d", line));
-	    KDebugger::BrkptROIterator bp = dbg->breakpointsBegin();
-	    for (; bp != dbg->breakpointsEnd(); ++bp)
-	    {
-		if (bp->lineNo == line &&
-		    fileNameMatches(bp->fileName) &&
-		    lineToRow(line, bp->address) == i)
-		{
-		    // yes it exists; mode is changed below
-		    break;
-		}
-	    }
-	    if (bp == dbg->breakpointsEnd()) {
+	    auto isBreakpointOnLine = [&](const Breakpoint& bp) {
+		    return
+			bp.lineNo == line &&
+			fileNameMatches(bp.fileName) &&
+			lineToRow(line, bp.address) == i;
+		};
+	    if (std::none_of(bpList.begin(), bpList.end(), isBreakpointOnLine)) {
 		/* doesn't exist anymore, remove it */
 		m_lineItems[i] &= ~liBPany;
 	    }
@@ -270,23 +267,23 @@ void SourceWindow::updateLineItems(const KDebugger* dbg)
     }
 
     // add new breakpoints
-    for (KDebugger::BrkptROIterator bp = dbg->breakpointsBegin(); bp != dbg->breakpointsEnd(); ++bp)
+    for (const auto& bp : bpList)
     {
-	if (fileNameMatches(bp->fileName)) {
-	    TRACE(QString("updating %2:%1").arg(bp->lineNo).arg(bp->fileName));
-	    int i = bp->lineNo;
+	if (fileNameMatches(bp.fileName)) {
+	    TRACE(QString("updating %2:%1").arg(bp.lineNo).arg(bp.fileName));
+	    int i = bp.lineNo;
 	    if (i < 0 || i >= int(m_sourceCode.size()))
 		continue;
 	    // compute new line item flags for breakpoint
-	    uchar flags = bp->enabled ? liBP : liBPdisabled;
-	    if (bp->temporary)
+	    uchar flags = bp.enabled ? liBP : liBPdisabled;
+	    if (bp.temporary)
 		flags |= liBPtemporary;
-	    if (!bp->condition.isEmpty() || bp->ignoreCount != 0)
+	    if (!bp.condition.isEmpty() || bp.ignoreCount != 0)
 		flags |= liBPconditional;
-	    if (bp->isOrphaned())
+	    if (bp.isOrphaned())
 		flags |= liBPorphan;
 	    // update if changed
-	    int row = lineToRow(i, bp->address);
+	    int row = lineToRow(i, bp.address);
 	    if ((m_lineItems[row] & liBPany) != flags) {
 		m_lineItems[row] &= ~liBPany;
 		m_lineItems[row] |= flags;

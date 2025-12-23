@@ -320,9 +320,7 @@ public:
     bool isIdle() const;
 
     /* The list of breakpoints. */
-    typedef std::list<Breakpoint>::const_iterator BrkptROIterator;
-    BrkptROIterator breakpointsBegin() const { return m_brkpts.begin(); }
-    BrkptROIterator breakpointsEnd() const { return m_brkpts.end(); }
+    const std::list<Breakpoint>& breakpoints() const { return m_brkpts; }
 
     const QString& executable() const { return m_executable; }
 
