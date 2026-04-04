@@ -25,3 +25,6 @@ The homepage is at
 	https://www.kdbg.org/
 
 Johannes Sixt <j6t@kdbg.org>
+
+Install dependencies for Debian 6.12
+sudo apt install libkf6iconthemes-dev libkf6xmlgui-dev libkf6windowsystem-dev 
