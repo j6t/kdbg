@@ -7,6 +7,7 @@
 #include "debugger.h"
 #include "sourcewnd.h"
 #include "dbgdriver.h"
+#include <QScrollBar>
 #include <QTextStream>
 #include <QPainter>
 #include <QFile>
@@ -97,6 +98,11 @@ bool SourceWindow::loadFile()
 
 void SourceWindow::reloadFile()
 {
+    // save scrollbar and cursor positions
+    int x = horizontalScrollBar()->value();
+    int y = verticalScrollBar()->value();
+    int row = textCursor().blockNumber();
+
     QFile f(m_fileName);
     if (!f.open(QIODevice::ReadOnly)) {
 	// open failed; leave alone
@@ -131,6 +137,13 @@ void SourceWindow::reloadFile()
 	m_highlighter->rehighlight();
 
     restorePrevDisass();
+
+    // restore cursor and scrollbar positions
+    QTextCursor cursor(document()->findBlockByNumber(row));
+    setTextCursor(cursor);
+
+    horizontalScrollBar()->setValue(x);
+    verticalScrollBar()->setValue(y);
 }
 
 void SourceWindow::scrollTo(int lineNo, const DbgAddr& address)
