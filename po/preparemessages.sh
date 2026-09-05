@@ -44,8 +44,7 @@ echo "Merging translations"
 
 for cat in *.po; do
 	echo $cat
-	msgmerge -o "$cat.new" "$cat" "$project".pot &&
-	mv "$cat.new" "$cat" || exit
+	msgmerge --add-location --backup=off -U "$cat" "$project".pot || exit
 done
 
 echo "Done"
