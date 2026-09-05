@@ -8,7 +8,7 @@ To find new translatable strings in source files and propagate them
 to "XX.po", run this command:
 
 ```shell
-./preparemessages.sh
+./preparemessages.sh XX.po
 ```
 
 It will:
