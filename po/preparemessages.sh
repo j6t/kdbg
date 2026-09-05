@@ -1,6 +1,13 @@
 #!/bin/sh
 
 # run in the directory where this script is located
+
+if [ $# = 0 ]
+then
+	echo >&2 "usage: $0 <pofile>..."
+	exit 1
+fi
+
 dir=${0%/*}
 cd "${dir:-.}" || exit
 
@@ -42,7 +49,8 @@ xgettext --from-code=UTF-8 -C -kde \
 
 echo "Merging translations"
 
-for cat in *.po; do
+for cat
+do
 	echo $cat
 	msgmerge --add-location --backup=off -U "$cat" "$project".pot || exit
 done
