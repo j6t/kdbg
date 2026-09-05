@@ -22,6 +22,18 @@ and these location lines will help translation tools to locate
 translation context easily.
 
 
+## Initialize a new "XX.po" file
+
+Run this command:
+
+```shell
+./preparemessages.sh --init XX.po
+```
+
+This runs "msginit --locale=XX" and asks for your email address
+interactively.
+
+
 ## Preparing a "XX.po" file for commit
 
 To save a location-less "po/XX.po" automatically in the repository,
