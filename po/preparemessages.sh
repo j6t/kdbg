@@ -5,6 +5,7 @@
 if [ $# = 0 ]
 then
 	echo >&2 "usage: $0 <pofile>..."
+	echo >&2 "usage: $0 --init <pofile>"
 	exit 1
 fi
 
@@ -13,6 +14,11 @@ cd "${dir:-.}" || exit
 
 basedir="../kdbg/"	# root of translatable sources
 project="kdbg"		# project name
+if [ "$1" = --init ]
+then
+	init=1
+	shift
+fi
 
 echo "Preparing rc files"
 
@@ -52,7 +58,12 @@ echo "Merging translations"
 for cat
 do
 	echo $cat
-	msgmerge --add-location --backup=off -U "$cat" "$project".pot || exit
+	if [ -z "$init" ]
+	then
+		msgmerge --add-location --backup=off -U "$cat" "$project".pot || exit
+	else
+		msginit --input="$project".pot --locale="${cat%.po}" --output="$cat" || exit
+	fi
 done
 
 echo "Done"
