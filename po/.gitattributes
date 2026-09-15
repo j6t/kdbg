@@ -1,1 +1,9 @@
-*.po encoding=UTF-8
+# Git Attributes for PO Files
+#
+# This file configures a Git filter to automatically strip location information
+# from PO files when committing, producing cleaner diffs and saving repository
+# space.
+#
+# See `po/README.md` for instructions on setting up the required filter driver.
+
+*.po encoding=UTF-8 filter=gettext-no-location
