@@ -1,0 +1,831 @@
+# Georgian translation for kdbg.
+# Copyright (C) 2026 kdbg's authors.
+# This file is distributed under the same license as the kdbg package.
+# Ekaterine Papava <papava.e@gtu.ge>, 2026.
+#
+msgid ""
+msgstr ""
+"Project-Id-Version: kdbg\n"
+"Report-Msgid-Bugs-To: \n"
+"POT-Creation-Date: 2026-09-05 07:42+0200\n"
+"PO-Revision-Date: 2026-09-05 08:02+0200\n"
+"Last-Translator: Ekaterine Papava <papava.e@gtu.ge>\n"
+"Language-Team: Georgian <(nothing)>\n"
+"Language: ka\n"
+"MIME-Version: 1.0\n"
+"Content-Type: text/plain; charset=UTF-8\n"
+"Content-Transfer-Encoding: 8bit\n"
+"X-Generator: Poedit 3.9\n"
+
+#. i18n: file: brkptbase.ui:86
+#. i18n: ectx: property (text), widget (QPushButton, btEnaDis)
+msgid "&Disable"
+msgstr "გამო&რთვა"
+
+msgid "&Enable"
+msgstr "ჩარ&თვა"
+
+msgid "active"
+msgstr "აქტიური"
+
+msgid "Stack"
+msgstr "დასტა"
+
+msgid "Locals"
+msgstr "ლოკალურები"
+
+msgid "Variable"
+msgstr "ცვლადი"
+
+msgid "Watched Expressions"
+msgstr "თვალყურდევნებული გამოსახულებები"
+
+msgid "Registers"
+msgstr "რეგსტრები"
+
+msgid "Breakpoints"
+msgstr "შეჩერების წერტილები"
+
+msgid "Output"
+msgstr "გამოტანა"
+
+msgid "Threads"
+msgstr "ნაკადები"
+
+msgid "Memory"
+msgstr "მეხსიერება"
+
+msgid "&Open Source Code..."
+msgstr "&წყარო კოდის გახსნა..."
+
+msgid "&Reload Source Code"
+msgstr "წყა&რო კოდის თავიდან თატვირთვა"
+
+msgid "&Load Executable..."
+msgstr "გამშვები ფაი&ლის ჩატვირთვა..."
+
+msgid "Recent E&xecutables"
+msgstr "ბოლო &გამშვები ფაილები"
+
+msgid "&Core Dump..."
+msgstr "&ბირთვის დამპი..."
+
+msgid "This &Program..."
+msgstr "ეს &პროგრამა..."
+
+msgid "&Global Options..."
+msgstr "&გლობალური პარამეტრები..."
+
+msgid "&Run"
+msgstr "&გაშვება"
+
+msgid "Step &into"
+msgstr "შებ&იჯება"
+
+msgid "Step &over"
+msgstr "გა&დაბიჯება"
+
+msgid "Step o&ut"
+msgstr "გამობი&ჯება"
+
+msgid "Run to &cursor"
+msgstr "&კურსორამდე გაშვება"
+
+msgid "Step i&nto by instruction"
+msgstr "ი&ნსტრუქციაში შებიჯება"
+
+msgid "Step o&ver by instruction"
+msgstr "ინსტრუ&ქციის გადაბიჯება"
+
+msgid "&Program counter to current line"
+msgstr "&პროგრამის მთვლელი მიმდინარე ხაზამდე"
+
+msgid "&Break"
+msgstr "გა&წვეტა"
+
+msgid "&Kill"
+msgstr "მოკვლა"
+
+msgid "Re&start"
+msgstr "გადა&ტვირთვა"
+
+msgid "A&ttach..."
+msgstr "&მიმაგრება..."
+
+msgid "&Detach"
+msgstr "მოხს&ნა"
+
+msgid "&Arguments..."
+msgstr "&არგუმენტები..."
+
+msgid "Set/Clear &breakpoint"
+msgstr "გამართვის წერტილის დაყენება/გასუფთავე&ბა"
+
+msgid "Set &temporary breakpoint"
+msgstr "დროებითი გამართვის წერ&ტილის დაყენება"
+
+msgid "&Enable/Disable breakpoint"
+msgstr "წყვ&ეტის წერტილის ჩართვა/გამორთვა"
+
+msgid "Watch Expression"
+msgstr "გამოსახულების თვალყურის დევნება"
+
+msgid "Edit Value"
+msgstr "მნიშვნელობის ჩასწორება"
+
+msgid "Restart"
+msgstr "გადატვირთვა"
+
+msgid "Core dump"
+msgstr "ბირთვის დამპი"
+
+msgid "Idle"
+msgstr "უმოქმედო"
+
+msgid "Break"
+msgstr "გაჩერება"
+
+msgid "Busy/Running - Click to Break"
+msgstr "დაკავებულია/გაშვებულია - გასაჩერებლად დააწკაპუნეთ"
+
+msgid "`%1' is not a file or does not exist"
+msgstr "`%1' ფაილი არაა, ან არ არსებობს"
+
+msgid "Don't know how to debug language `%1'"
+msgstr "არ ვიცი გამართვის გზები ენისთვის '%1'"
+
+msgid ""
+"Could not start the debugger process.\n"
+"Please shut down KDbg and resolve the problem."
+msgstr ""
+"გამმართველის პროცესის გაშვება შეუძლებელია.\n"
+"გამორთეთ KDbg და მოაგვარეთ პრობლემა."
+
+msgid "Global Options"
+msgstr "გლობალური პარამეტრები"
+
+msgid "Debugger"
+msgstr "გამმართველი"
+
+msgid "Miscellaneous"
+msgstr "სხვადასხვა"
+
+msgid ": Program output"
+msgstr ": პროგრამის გამოტანილი ინფორმაცია"
+
+msgid "All source files"
+msgstr "ყველა კოდის ფაილი"
+
+msgid "Source files"
+msgstr "კოდის ფაილები"
+
+msgid "Header files"
+msgstr "თავსართის ფაილები"
+
+msgid "All files"
+msgstr "ყველა ფაილი"
+
+msgid "Open Source Code"
+msgstr "წყარო კოდის გახსნა"
+
+msgid "Select the Executable to Debug"
+msgstr "აირჩიეთ გასამართი გამშვები ფაილი"
+
+msgid "Select Core Dump"
+msgstr "აირჩიეთ პროცესის მეხსიერების შენახული ასლი"
+
+msgid ""
+"%1 exited unexpectedly.\n"
+"Restart the session (e.g. with File|Load Executable)."
+msgstr ""
+"%1 მოულოდნელად მოკვდა.\n"
+"გადატვირთეთ სესია (მაგ: მენიუდან ფაილი|გამშვები ფაილის ჩატვირთვა)."
+
+msgid "Setting the disassembly flavor failed."
+msgstr "დიზასამბლერის ვარიანტის დაყენება ჩავარდა."
+
+#. i18n: file: pgmargsbase.ui:235
+#. i18n: ectx: property (text), widget (QTreeWidget, envList)
+msgid "Value"
+msgstr "მნიშვნელობა"
+
+msgid "<additional entries of the array suppressed>"
+msgstr "<მასივის დამატებითი ჩანაწერები ჩახშობილია>"
+
+msgid "<anonymous struct or union>"
+msgstr "<ანონიმური სტრუქტურა, ან გაერთიანება>"
+
+msgid "New working directory: "
+msgstr "ახალი სამუშაო საქაღალდე: "
+
+msgid "KDbg"
+msgstr "KDbg"
+
+msgid "A Debugger"
+msgstr "გამმართველი"
+
+msgid "(c) 1998-2025 Johannes Sixt"
+msgstr "(c) 1998-2025 Johannes Sixt"
+
+msgid "Johannes Sixt"
+msgstr "Johannes Sixt"
+
+msgid "Daniel Kristjansson"
+msgstr "Daniel Kristjansson"
+
+msgid "Register groups and formatting"
+msgstr "ჯგუფების და დაფორმატების რეგისტრაცია"
+
+msgid "David Edmundson"
+msgstr "დავიდ ედმუნდსონი"
+
+msgid "KDE4 porting"
+msgstr "გადატანა KDE4 -ზე"
+
+msgid "Sebastian Pipping"
+msgstr "Sebastian Pipping"
+
+msgid "GitHub Actions CI"
+msgstr "GitHub ქმედებების CI"
+
+msgid "transcript of conversation with the debugger"
+msgstr "გამმართველთან საუბრის ტრანსკრიფცია"
+
+msgid "remote debugging via <device>"
+msgstr "დაშორებული გამართვა <მოწყობილობით>"
+
+msgid "specify language: C"
+msgstr "ენის მითითება: C"
+
+msgid "specify arguments of debugged executable"
+msgstr "მიუთითეთ გასამართი გამშვები ფაილის არგუმენტები"
+
+msgid "specify PID of process to debug"
+msgstr "მიუთითეთ გასამართი პროცესის PID"
+
+msgid "path of executable to debug"
+msgstr "გასამართი გამშვები ფაილის ბილიკი"
+
+msgid "a core file to use"
+msgstr "ბირთვის ფაილი გამოსაყენებლად"
+
+msgid "Cannot start debugger."
+msgstr "გამმართველის გაშვება შეუძლებელია."
+
+msgid "B&ytes"
+msgstr "ბა&იტი"
+
+msgid "Halfwords (&2 Bytes)"
+msgstr "ნახევარსიტყვები (&2 ბაიტი)"
+
+msgid "Words (&4 Bytes)"
+msgstr "სიტყვები (&4 ბაიტი)"
+
+msgid "Giantwords (&8 Bytes)"
+msgstr "დიდისიტყვები (%8 ბაიტი)"
+
+msgid "He&xadecimal"
+msgstr "ტე&ქვსმეტობითი"
+
+msgid "Signed &decimal"
+msgstr "ნიშნიანი &ათობითი"
+
+msgid "&Unsigned decimal"
+msgstr "&უნიშნო ათობითი"
+
+msgid "&Octal"
+msgstr "&რვაობითი"
+
+msgid "&Binary"
+msgstr "&ბინარული"
+
+msgid "&Addresses"
+msgstr "მის&ამართები"
+
+msgid "&Character"
+msgstr "სიმბო&ლო"
+
+msgid "&Floatingpoint"
+msgstr "მ&ცურავმძიმიანი"
+
+msgid "&Strings"
+msgstr "&სტრიქონები"
+
+msgid "&Instructions"
+msgstr "&ინსტრუქციები"
+
+msgid "Select a file name to insert as program argument"
+msgstr "აირჩიეთ ფაილის სახელი პროგრამის არგუმენტად ჩასასმელად"
+
+#. i18n: replacement text for the "Open" button in a file dialog
+#. the selected file name will be inserted in a text box
+msgctxt "@action:button file name into text box"
+msgid "Insert"
+msgstr "ჩასმა"
+
+msgid "Select a directory to insert as program argument"
+msgstr "აირჩიეთ საქაღალდე პროგრამის არგუმენტად ჩასასმელად"
+
+msgid ""
+"How to invoke &GDB - leave empty to use\n"
+"the default from the global options:"
+msgstr ""
+"როგორ მოხდება GDB-ის &გამოძახება -\n"
+"ნაგულისხმევი გამოსაყენებლად გლობალური პარამეტრებიდან - დატოვეთ ცარიელი:"
+
+msgid "Global Setting"
+msgstr "გლობალური პარამეტრი"
+
+msgid "ATT"
+msgstr "ATT"
+
+msgid "Intel"
+msgstr "Intel"
+
+msgid "Disassembly flavor:"
+msgstr "დიზასამბლირების ვარიანტი:"
+
+msgid "Disassembly flavor for x86 architecture"
+msgstr "დიზასამბლერის ვარიანტი x86 არქიტექტურისთვის"
+
+msgid "Disassembly flavor is only available for x86 architecture"
+msgstr "დიზასამბლერის ვარიანტი, მხოლოდ, x86 არქიტექტურისთვისაა ხელმისაწვდომი"
+
+msgid "&No input and output"
+msgstr "შეყვა&ნისა და გამოტანის გარეშე"
+
+msgid "&Only output, simple terminal emulation"
+msgstr "მხ&ოლოდ გამოტანა, მარტივი ტერმინალის ემულაცია"
+
+msgid "&Full terminal emulation"
+msgstr "&სრული ტერმინალის ემულაცია"
+
+msgid "Settings for %1"
+msgstr "%1-ის მორგება"
+
+msgid "To revert to the default settings, clear the entries."
+msgstr "ნაგულისხმევ პარამეტრებზე დასაბრუნებლად გაასუფთავეთ ჩანაწერები."
+
+msgid "How to invoke &GDB:"
+msgstr "როგორ გაეშვას &GDB:"
+
+msgid ""
+"%T will be replaced with a title string,\n"
+"%C will be replaced by a Bourne shell script that\n"
+"keeps the terminal window open."
+msgstr ""
+"%T ჩანაცვლდება სათაურის სტრიქონით.\n"
+"%C ჩანაცვლდება bash-ის სკრიპტით,\n"
+"რომელიც ტერმინალის ფანჯარას ღიას ტოვებს."
+
+msgid "&Terminal for program output:"
+msgstr "&ტერმინალი პროგრამის გამოტანილი ინფორმაციისთვის:"
+
+msgid "Disassembly Flavor:"
+msgstr "დიზასამბლერის ვარიანტი:"
+
+msgid "Default"
+msgstr "ნაგულისხმევი"
+
+msgid "&Pop into foreground when program stops"
+msgstr "წინა პლანზე გადასვლა &პროგრამის გაჩერებისას"
+
+msgid "Time until window goes &back (in milliseconds):"
+msgstr "დრო ფანჯრის უკან დაბრუნებამდე (მილიწამებში):"
+
+msgid "&Tabstop every (characters):"
+msgstr "&ტაბულაციის ზომა (სიმბოლოებში):"
+
+msgid "File filter for &source files:"
+msgstr "ფაილის ფილტრი &წყაროს ფაილებისთვის:"
+
+msgid "File filter for &header files:"
+msgstr "ფაილის ფილტრი &თავსართის ფაილებისთვის:"
+
+msgid "Specify the process number to attach to:"
+msgstr "მიუთითეთ პროცესის ნომერი მისამაგრებლად:"
+
+msgid "OK"
+msgstr "დიახ"
+
+msgid "Cancel"
+msgstr "გაუქმება"
+
+msgid "&GDB default"
+msgstr "&GDB-ის ნაგულისხმევი"
+
+msgid "&Decimal"
+msgstr "&ათობითი"
+
+msgid "Real (&e)"
+msgstr "რეალური (&e)"
+
+msgid "Real (&f)"
+msgstr "რეალური (&f)"
+
+msgid "&Real (g)"
+msgstr "&რეალური (g)"
+
+msgid "8 bits"
+msgstr "8 ბიტიანი"
+
+msgid "16 bits"
+msgstr "16 ბიტიანი"
+
+msgid "32 bits"
+msgstr "32 ბიტი"
+
+msgid "64 bits"
+msgstr "64 ბიტი"
+
+msgid "80 bits"
+msgstr "80 ბიტი"
+
+msgid "128 bits"
+msgstr "128 ბიტი"
+
+msgid "Register"
+msgstr "რეგისტრაცია"
+
+msgid "Decoded value"
+msgstr "გაშიფრული მნიშვნელობა"
+
+msgid "GP and others"
+msgstr "GP და სხვები"
+
+msgid "Flags"
+msgstr "ალმები"
+
+msgid "x86/x87 segment"
+msgstr "x86/x87 სეგმენტი"
+
+msgid "Thread ID"
+msgstr "ნაკადის ID"
+
+#. i18n: file: brkptbase.ui:33
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+msgid "Location"
+msgstr "მდებარეობა"
+
+msgid "&Clear"
+msgstr "&გასუფთავება"
+
+msgid " Add "
+msgstr " დამატება "
+
+msgid " Del "
+msgstr " წაშლა "
+
+msgid "Expression"
+msgstr "გამოსახულება"
+
+msgid "Search"
+msgstr "ძებნა"
+
+msgid "&Case sensitive"
+msgstr "&დიდი თუ პატარა სიმბოლოები"
+
+msgid "&Forward"
+msgstr "&წინ"
+
+msgid "&Backward"
+msgstr "&უკან"
+
+msgid "Close"
+msgstr "დახურვა"
+
+msgid "Go to Line"
+msgstr "გადასვლა ხაზზე"
+
+#. i18n: file: brkptbase.ui:14
+#. i18n: ectx: property (windowTitle), widget (QWidget, BrkPtBase)
+msgid "Form"
+msgstr "ფორმა"
+
+#. i18n: file: brkptbase.ui:38
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+msgid "Address"
+msgstr "მისამართი"
+
+#. i18n: file: brkptbase.ui:43
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+msgid "Hits"
+msgstr "მინიშნებები"
+
+#. i18n: file: brkptbase.ui:48
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+msgid "Ignore"
+msgstr "იგნორი"
+
+#. i18n: file: brkptbase.ui:53
+#. i18n: ectx: property (text), widget (QTreeWidget, bpList)
+msgid "Condition"
+msgstr "პირობა"
+
+#. i18n: file: brkptbase.ui:65
+#. i18n: ectx: property (text), widget (QPushButton, btAddBP)
+msgid "Add &Breakpoint"
+msgstr "წყვეტის წერტილის დამატე&ბა"
+
+#. i18n: file: brkptbase.ui:72
+#. i18n: ectx: property (text), widget (QPushButton, btAddWP)
+msgid "Add &Watchpoint"
+msgstr "თვალთვალის &წერტილის დამატება"
+
+#. i18n: file: brkptbase.ui:79
+#. i18n: ectx: property (text), widget (QPushButton, btRemove)
+msgid "&Remove"
+msgstr "&წაშლა"
+
+#. i18n: file: brkptbase.ui:93
+#. i18n: ectx: property (text), widget (QPushButton, btViewCode)
+msgid "&View Code"
+msgstr "კოდის ნახ&ვა"
+
+#. i18n: file: brkptbase.ui:100
+#. i18n: ectx: property (text), widget (QPushButton, btConditional)
+msgid "&Conditional..."
+msgstr "&პირობითი..."
+
+#. i18n: file: brkptcondition.ui:14
+#. i18n: ectx: property (windowTitle), widget (QDialog, BrkPtCondition)
+msgid "Conditional Breakpoint"
+msgstr "პირობითი წყვეტის წერტილი"
+
+#. i18n: file: brkptcondition.ui:28
+#. i18n: ectx: property (text), widget (QLabel, label)
+msgid "Condi&tion:"
+msgstr "&პირობა:"
+
+#. i18n: file: brkptcondition.ui:41
+#. i18n: ectx: property (text), widget (QLabel, label_2)
+msgid "Ignore &next hits:"
+msgstr "შემდეგი გარტყმების იგ&ნორი:"
+
+#. i18n: file: brkptcondition.ui:51
+#. i18n: ectx: property (specialValueText), widget (QSpinBox, ignoreCount)
+msgid "do not ignore"
+msgstr "არგამოტოვება"
+
+#. i18n: file: kdbgui.rc:4
+#. i18n: ectx: Menu (file)
+msgid "&File"
+msgstr "&ფაილი"
+
+#. i18n: file: kdbgui.rc:11
+#. i18n: ectx: Menu (view)
+msgid "&View"
+msgstr "&ხედი"
+
+#. i18n: file: kdbgui.rc:27
+#. i18n: ectx: Menu (execution)
+msgid "E&xecution"
+msgstr "შე&სრულება"
+
+#. i18n: file: kdbgui.rc:45
+#. i18n: ectx: Menu (breakpoint)
+msgid "&Breakpoint"
+msgstr "&გამართვის წერტილი"
+
+#. i18n: file: kdbgui.rc:50
+#. i18n: ectx: Menu (settings)
+msgid "&Settings"
+msgstr "მორგე&ბა"
+
+#. i18n: file: pgmargsbase.ui:14
+#. i18n: ectx: property (windowTitle), widget (QDialog, PgmArgsBase)
+msgid "Program Arguments"
+msgstr "პროგრამის არგუმენტები"
+
+#. i18n: file: pgmargsbase.ui:27
+#. i18n: ectx: attribute (title), widget (QWidget, argsPage)
+msgid "&Arguments"
+msgstr "&არგუმენტები"
+
+#. i18n: file: pgmargsbase.ui:35
+#. i18n: ectx: property (text), widget (QLabel, labelArgs)
+#, no-c-format
+msgid "Run <i>%1</i> with these arguments:"
+msgstr "<i>%1</i>-ის გაშვება ამ არგუმენტებით:"
+
+#. i18n: file: pgmargsbase.ui:48
+#. i18n: ectx: property (whatsThis), widget (QLineEdit, programArgs)
+msgid ""
+"Specify the arguments with which the program shall be invoked for this "
+"debugging session. You specify the arguments just as you would on the "
+"command line, that is, you can even use quotes and environment variables, "
+"for example:<p><tt>--message 'start in: ' $HOME</tt>"
+msgstr ""
+"მიუთითეთ არგუმენტები, რომლითაც პროგრამა გაეშვება ამ გამართვის სესიისთვის. "
+"არგუმენტები ზუსტად ისე უნდა მიუთითოთ, როგორც ბრძანების სტრიქონში, რაც "
+"ნიშნავს, რომ შეგიძლიათ გამოიყენოთ როგორც ბრჭყალები, ისე გარემოს ცვლადები. "
+"მაგ: <p><tt>--message 'start in: ' $HOME</tt>"
+
+#. i18n: file: pgmargsbase.ui:57
+#. i18n: ectx: property (whatsThis), widget (QPushButton, insertFile)
+msgid ""
+"Browse for a file; the full path name will be inserted at the current cursor "
+"location in the edit box above."
+msgstr ""
+"ფაილის პოვნა. სრული ბილიკის სახელი ჩაისმება კურსორის მიმდინარე მდებარეობაზე "
+"ზედა ჩასწორების ველში."
+
+#. i18n: file: pgmargsbase.ui:60
+#. i18n: ectx: property (text), widget (QPushButton, insertFile)
+msgid "Insert &file name..."
+msgstr "&ფაილის სახელის ჩასმა..."
+
+#. i18n: file: pgmargsbase.ui:63
+#. i18n: ectx: property (shortcut), widget (QPushButton, insertFile)
+msgid "Alt+F"
+msgstr "Alt+F"
+
+#. i18n: file: pgmargsbase.ui:70
+#. i18n: ectx: property (whatsThis), widget (QPushButton, insertDir)
+msgid ""
+"Browse for a directory; the full path name will be inserted at the current "
+"cursor location in the edit box above."
+msgstr ""
+"საქაღალდის პოვნა. სრული ბილიკის სახელი ჩაისმება კურსორის მიმდინარე "
+"მდებარეობაზე ზედა ჩასწორების ველში."
+
+#. i18n: file: pgmargsbase.ui:73
+#. i18n: ectx: property (text), widget (QPushButton, insertDir)
+msgid "Insert &directory name..."
+msgstr "საქაღალ&დის სახელის ჩასმა..."
+
+#. i18n: file: pgmargsbase.ui:76
+#. i18n: ectx: property (shortcut), widget (QPushButton, insertDir)
+#. i18n: file: pgmargsbase.ui:266
+#. i18n: ectx: property (shortcut), widget (QPushButton, buttonDelete)
+msgid "Alt+D"
+msgstr "Alt+D"
+
+#. i18n: file: pgmargsbase.ui:120
+#. i18n: ectx: attribute (title), widget (QWidget, wdPage)
+msgid "&Working Directory"
+msgstr "სამუშაო საქა&ღალდე"
+
+#. i18n: file: pgmargsbase.ui:128
+#. i18n: ectx: property (whatsThis), widget (QLineEdit, wdEdit)
+msgid "Specify here the initial working directory where the program is run."
+msgstr "მიუთითეთ საწყისი სამუშაო საქაღალდე, სადაც პროგრამა გაეშვება."
+
+#. i18n: file: pgmargsbase.ui:137
+#. i18n: ectx: property (whatsThis), widget (QPushButton, wdBrowse)
+msgid "Browse for the initial working directory where the program is run."
+msgstr "საწყისი საქაღალდის პოვნა, სადაც პროგრამა გაეშვება."
+
+#. i18n: file: pgmargsbase.ui:140
+#. i18n: ectx: property (text), widget (QPushButton, wdBrowse)
+msgid "&Browse..."
+msgstr "&მოძებნა..."
+
+#. i18n: file: pgmargsbase.ui:143
+#. i18n: ectx: property (shortcut), widget (QPushButton, wdBrowse)
+msgid "Alt+B"
+msgstr "Alt+B"
+
+#. i18n: file: pgmargsbase.ui:187
+#. i18n: ectx: attribute (title), widget (QWidget, envPage)
+msgid "&Environment"
+msgstr "&გარემო"
+
+#. i18n: file: pgmargsbase.ui:197
+#. i18n: ectx: property (text), widget (QLabel, envLabel)
+msgid "Environment variables (<tt>NAME=value</tt>):"
+msgstr "გარემოს ცვლადები (<tt>NAME=value</tt>):"
+
+#. i18n: file: pgmargsbase.ui:210
+#. i18n: ectx: property (whatsThis), widget (QLineEdit, envVar)
+msgid ""
+"To add a new environment variable or to modify one, specify it here in the "
+"form <tt>NAME=value</tt> and click <b>Modify</b>."
+msgstr ""
+"ახალი გარემოს ცვლადის დასამატებლად, ან არსებულის შესაცვლელად შეიყვანეთ ის "
+"აქ, ფორმით <tt>სახელი=მნიშვნელობა</tt> და დააწკაპუნეთ ღილაკზე <b>შეცვლა</b>."
+
+#. i18n: file: pgmargsbase.ui:217
+#. i18n: ectx: property (whatsThis), widget (QTreeWidget, envList)
+msgid ""
+"Environment variables that are set <i>in addition</i> to those that are "
+"inherited are listed in this table. To add new environment variables, "
+"specify them as <tt>NAME=value</tt> in the edit box above and click "
+"<b>Modify</b>. To modify a value, select it in this list and click "
+"<b>Modify</b>. To delete an environment variable, select it in this list and "
+"click <b>Delete</b>."
+msgstr ""
+"გარემოს ცვლადები, რომლებიც დაყენებულია <i>დამატებით</i> მართთან ერთად, "
+"რომლებიც მემკვიდრეობითაა მიღებული, ამ ცხრილშია ჩამოთვლილი. ახალის "
+"დასამატებლად მიუთითეთ ისინი ფორმაში <tt>სახელი=მნიშვნელობა</tt> ზემო "
+"ჩასწორების ველში და დააწკაპუნეთ ღილაკზე <b>ცვლილება</b>. მნიშვნელობის "
+"შესაცვლელად მონიშნეთ ის სიაში და დააწკაპუნეთ ღილაკზე <b>ცვლილება</b>. "
+"გარემოს ცვლადის წასაშლელად მონიშნეთ ის სიაში და დააწკაპუნეთ ღილაკზე "
+"<b>წაშლა</b>."
+
+#. i18n: file: pgmargsbase.ui:230
+#. i18n: ectx: property (text), widget (QTreeWidget, envList)
+msgid "Name"
+msgstr "სახელი"
+
+#. i18n: file: pgmargsbase.ui:247
+#. i18n: ectx: property (whatsThis), widget (QPushButton, buttonModify)
+msgid ""
+"Enters the environment variable that is currently specified in the edit box "
+"into the list. If the named variable is already in the list, it receives a "
+"new value; otherwise, a new entry is created."
+msgstr ""
+"შეიყვანს სიაში გარემოს ცვლადს, რომელიც ამჟამად მითითებულია ჩასწორების ველში. "
+"თუ მითითებული ცვლადი უკვე სიაშია, ის ახალ მნიშვნელობას მიიღებს. თუ არა, "
+"ახალი ცვლადი შეიქმნება."
+
+#. i18n: file: pgmargsbase.ui:250
+#. i18n: ectx: property (text), widget (QPushButton, buttonModify)
+msgid "&Modify"
+msgstr "&შეცვლა"
+
+#. i18n: file: pgmargsbase.ui:253
+#. i18n: ectx: property (shortcut), widget (QPushButton, buttonModify)
+msgid "Alt+M"
+msgstr "Alt+M"
+
+#. i18n: file: pgmargsbase.ui:260
+#. i18n: ectx: property (whatsThis), widget (QPushButton, buttonDelete)
+msgid ""
+"Deletes the selected environment variable from the list. This cannot be used "
+"to delete environment variables that are inherited."
+msgstr ""
+"წაშლის მონიშნულ გარემოს ცვლადს სიიდან. ამას ვერ იმ გარემოს ცვლადების "
+"წასაშლელად, რომლებიც მემკვიდრეობითაა მიღებული."
+
+#. i18n: file: pgmargsbase.ui:263
+#. i18n: ectx: property (text), widget (QPushButton, buttonDelete)
+msgid "&Delete"
+msgstr "&წაშლა"
+
+#. i18n: file: procattachbase.ui:15
+#. i18n: ectx: property (windowTitle), widget (QDialog, ProcAttachBase)
+msgid "Attach to Process"
+msgstr "პროცესზე მიბმა"
+
+#. i18n: file: procattachbase.ui:26
+#. i18n: ectx: property (text), widget (QLabel, filterLabel)
+msgid "Fi&lter or PID:"
+msgstr "ფი&ლტრი, ან PID:"
+
+#. i18n: file: procattachbase.ui:39
+#. i18n: ectx: property (whatsThis), widget (QLineEdit, filterEdit)
+msgid ""
+"Type the name of the process or its process ID (PID) here to reduce the "
+"number of entries in the list."
+msgstr ""
+"აკრიფეთ პროცესის სახელი, ან მისი პროცესის ID (PID) სიაში ჩანაწერების "
+"რაოდენობის შესამცირებლად."
+
+#. i18n: file: procattachbase.ui:57
+#. i18n: ectx: property (whatsThis), widget (QTreeWidget, processList)
+msgid ""
+"<p>This list displays all processes that are currently running. You must "
+"select the process that you want KDbg to attach to. Use the <b>Filter or "
+"PID</b> edit box to reduce the number of entries in this list.<p>The text in "
+"the <i>Command</i> column is usually, but not always, the command that was "
+"used to start the process. The <i>PID</i> column shows the process ID. The "
+"<i>PPID</i> column shows the process ID of the parent process. Additional "
+"columns show more information about the processes that is also available via "
+"the system's <i>ps</i> command.</p><p>The list is not updated automatically. "
+"Use the <b>Refresh</b> button to update it.</p>"
+msgstr ""
+"<p>ეს სია ყველა ამჟამად გაშვებულ პროცესს აჩვენებს. უნდა აირჩიოთ პროცესი, "
+"რომელზეც KDbg-ის მიმაგრება გნებავთ. სიის ჩანაწერების რაოდენობის "
+"შესამცირებლად გამოიყენეთ <b>ფილტრის, ან PID-ის</b> ჩასწორების ველი.<p>ტექსტი "
+"სვეტში <i>ბრძანება</i> ჩვეულებრივ, თუმცა, არა ყოველთვის, წარმოადგენს "
+"ბრძანებას, რომელიც პროცესის გასაშვებად იყო გამოყენებული. სვეტი <i>PID</i> "
+"პროცესის ID-ს აჩვენებს. სვეტი <i>PPID</i> შეიცავს პროცესის მშობელი პროცესის "
+"ID-ს. დამატებითი სვეტები პროცესის შესახებ მეტ ინფორმაციას შეიცავს, რომელიც "
+"ხელმისაწვდომია სისტემის ბრძანებით <i>ps</i>.</p><p>სიის განახლება "
+"ავტომატურად არ ხდება. განახლებისთვის გამოიყენეთ ღილაკი <b>განახლება</b>.</p>"
+
+#. i18n: file: procattachbase.ui:67
+#. i18n: ectx: property (text), widget (QTreeWidget, processList)
+msgid "Command"
+msgstr "ბრძანება"
+
+#. i18n: file: procattachbase.ui:72
+#. i18n: ectx: property (text), widget (QTreeWidget, processList)
+msgid "PID"
+msgstr "PID"
+
+#. i18n: file: procattachbase.ui:77
+#. i18n: ectx: property (text), widget (QTreeWidget, processList)
+msgid "PPID"
+msgstr "PPID"
+
+#. i18n: file: procattachbase.ui:93
+#. i18n: ectx: property (whatsThis), widget (QPushButton, buttonRefresh)
+msgid "This button updates the list of processes."
+msgstr "ეს ღილაკი პროცესების სიას ანახლებს."
+
+#. i18n: file: procattachbase.ui:96
+#. i18n: ectx: property (text), widget (QPushButton, buttonRefresh)
+msgid "&Refresh"
+msgstr "&განახლება"
