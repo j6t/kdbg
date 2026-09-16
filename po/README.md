@@ -1,11 +1,11 @@
-## Updating a "XX.po" file
+## Updating a `XX.po` file
 
-To replace translation strings in an existing "XX.po" file to improve
+To replace translation strings in an existing `XX.po` file to improve
 the translation, just edit the file.  Please use tools like Poedit or
 KBabel, because they update the meta-data correctly.
 
 To find new translatable strings in source files and propagate them
-to "XX.po", run this command:
+to `XX.po`, run this command:
 
 ```shell
 ./preparemessages.sh XX.po
@@ -13,16 +13,16 @@ to "XX.po", run this command:
 
 It will:
 
-- Generate a new "kdbg.pot" file
-- Call "msgmerge --add-location --backup=off -U XX.po git.pot"
-  to update "XX.po"
+- Generate a new `kdbg.pot` file
+- Call `msgmerge --add-location --backup=off -U XX.po kdbg.pot`
+  to update `XX.po`
 
-The "--add-location" option for msgmerge will add location lines,
+The `--add-location` option for msgmerge will add location lines,
 and these location lines will help translation tools to locate
 translation context easily.
 
 
-## Initialize a new "XX.po" file
+## Initialize a new `XX.po` file
 
 Run this command:
 
@@ -30,13 +30,13 @@ Run this command:
 ./preparemessages.sh --init XX.po
 ```
 
-This runs "msginit --locale=XX" and asks for your email address
+This runs `msginit --locale=XX` and asks for your email address
 interactively.
 
 
-## Preparing a "XX.po" file for commit
+## Preparing a `XX.po` file for commit
 
-To save a location-less "po/XX.po" automatically in the repository,
+To save a location-less `po/XX.po` automatically in the repository,
 define the driver for the "gettext-no-location" clean filter like this:
 
 ```shell
